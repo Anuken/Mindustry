@@ -32,6 +32,7 @@ public class MapImagesView implements AssetView{
         buttons.button("@add", Icon.add, () -> {
             FileChooser.open("png", "jpeg", "jpg").submitMulti(results -> {
                 var images = getImages();
+                state.data.clearGeneratedImages();
 
                 for(var result : results){
                     try{
@@ -44,19 +45,18 @@ public class MapImagesView implements AssetView{
 
                         if(width > DataPatcher.maxImageSize || height > DataPatcher.maxImageSize){
                             ui.showErrorMessage(Core.bundle.format("asset.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
-                            return;
+                            continue;
                         }
 
                         String name = result.nameWithoutExtension();
                         String path = result.name();
-                        var other = images.find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
+                        var other = images.find(p -> p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name));
                         if(other != null){
                             ui.showErrorMessage(Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")"));
-                            return;
+                            continue;
                         }
 
                         byte[] hash = assetCache.add(bytes);
-
                         images.add(new ImageAsset(path, hash));
                     }catch(Exception e){
                         ui.showException(e);
@@ -64,7 +64,7 @@ public class MapImagesView implements AssetView{
                 }
 
                 images.sort();
-                state.data.reloadImages(images);
+                state.data.regenerateContentSprites(true);
                 diag.rebuild();
             });
         }).size(190f, 64f);
@@ -132,6 +132,8 @@ public class MapImagesView implements AssetView{
                                 zipped.delete(); //closes the zip file
                                 int imported = 0;
 
+                                state.data.clearGeneratedImages();
+
                                 for(var future : images){
                                     var image = (Result)future.get();
                                     if(image != null){
@@ -141,11 +143,12 @@ public class MapImagesView implements AssetView{
                                         }
 
                                         String path = image.path.pathWithoutExtension(), name = image.path.nameWithoutExtension();
-                                        var other = getImages().find(op -> (op.path.equalsIgnoreCase(path) || op.name.equalsIgnoreCase(name)));
+                                        var other = getImages().find(op -> !op.isGenerated() && (op.path.equalsIgnoreCase(path) || op.name.equalsIgnoreCase(name)));
                                         if(other != null){
                                             errors.add("[accent]" + image.path + "[white]: " + Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")").replace("\n", " "));
                                             continue;
                                         }
+                                        getImages().removeAll(i -> i.isGenerated() && i.name.equals(name));
                                         getImages().add(new ImageAsset(path, image.hash));
                                         imported ++;
                                     }
@@ -154,6 +157,7 @@ public class MapImagesView implements AssetView{
                                 getImages().sort();
 
                                 state.data.reloadImages(getImages());
+                                state.data.regenerateContentSprites(true);
                                 diag.rebuild();
 
                                 var idiag = new BaseDialog("@asset.image.imports");
@@ -208,10 +212,13 @@ public class MapImagesView implements AssetView{
         inner.top().left();
 
         float size = 200f;
-        int cols = (int)Math.max(1, Core.graphics.getWidth() / Scl.scl(size + 12f));
+        int cols = (int)Math.max(1, (Core.graphics.getWidth() - Scl.scl(20f)) * 0.9f / Scl.scl(size + 14f));
         int i = 0;
         for(var image : getImages()){
+            //showing generated images is confusing, so don't.
+            if(image.isGenerated()) continue;
             if(diag.searchString != null && !image.path.toLowerCase().contains(diag.searchString)) continue;
+
             TextureRegion region = Core.atlas.find(regionPrefix + image.name, "nomap");
             boolean found = Core.atlas.has(regionPrefix + image.name);
             @Nullable Fi cacheFile = image.getCacheFile();
@@ -254,10 +261,12 @@ public class MapImagesView implements AssetView{
                     var istyle = Styles.emptyi;
                     b.button(Icon.pencil, istyle, () -> {
                         ui.showTextInput("@save.rename", "@patch.path", image.path, res -> {
+                            if(!res.endsWith(".png")) res = res + ".png";
+
                             Fi fi = new Fi(res);
                             String name = fi.nameWithoutExtension();
                             String path = fi.pathWithoutExtension();
-                            var other = getImages().find(p -> p != image && (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
+                            var other = getImages().find(p -> p != image && !p.isGenerated() && (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
                             if(other != null){
                                 ui.showErrorMessage(Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")"));
                             }else{
@@ -269,7 +278,7 @@ public class MapImagesView implements AssetView{
                                     at.name = regionPrefix + name;
                                 }
 
-                                image.setPath(path);
+                                image.setPath(fi.path());
                                 image.name = name;
                                 diag.rebuild();
                             }

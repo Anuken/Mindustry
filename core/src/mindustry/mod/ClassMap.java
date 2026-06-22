@@ -165,8 +165,6 @@ public class ClassMap{
         classes.put("BaseShieldBuild", mindustry.world.blocks.defense.BaseShield.BaseShieldBuild.class);
         classes.put("BuildTurret", mindustry.world.blocks.defense.BuildTurret.class);
         classes.put("BuildTurretBuild", mindustry.world.blocks.defense.BuildTurret.BuildTurretBuild.class);
-        classes.put("DirectionalForceProjector", mindustry.world.blocks.defense.DirectionalForceProjector.class);
-        classes.put("DirectionalForceProjectorBuild", mindustry.world.blocks.defense.DirectionalForceProjector.DirectionalForceProjectorBuild.class);
         classes.put("Door", mindustry.world.blocks.defense.Door.class);
         classes.put("DoorBuild", mindustry.world.blocks.defense.Door.DoorBuild.class);
         classes.put("ForceProjector", mindustry.world.blocks.defense.ForceProjector.class);
@@ -422,9 +420,6 @@ public class ClassMap{
         classes.put("Unloader", mindustry.world.blocks.storage.Unloader.class);
         classes.put("ContainerStat", mindustry.world.blocks.storage.Unloader.ContainerStat.class);
         classes.put("UnloaderBuild", mindustry.world.blocks.storage.Unloader.UnloaderBuild.class);
-        classes.put("DroneCenter", mindustry.world.blocks.units.DroneCenter.class);
-        classes.put("DroneCenterBuild", mindustry.world.blocks.units.DroneCenter.DroneCenterBuild.class);
-        classes.put("EffectDroneAI", mindustry.world.blocks.units.DroneCenter.EffectDroneAI.class);
         classes.put("Reconstructor", mindustry.world.blocks.units.Reconstructor.class);
         classes.put("ReconstructorBuild", mindustry.world.blocks.units.Reconstructor.ReconstructorBuild.class);
         classes.put("RepairTower", mindustry.world.blocks.units.RepairTower.class);

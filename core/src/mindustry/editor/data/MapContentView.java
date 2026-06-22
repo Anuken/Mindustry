@@ -82,7 +82,7 @@ public class MapContentView implements AssetView{
                 list.add().size(h);
             }
 
-            list.button(content.content instanceof UnlockableContent u && (u.uiIcon.found() || u.fullIcon.found()) ? new TextureRegionDrawable(u.uiIcon.found() ? u.uiIcon : u.fullIcon) :
+            list.button(content.content instanceof UnlockableContent u && u.uiIcon != null && (u.uiIcon.found() || u.fullIcon.found()) ? new TextureRegionDrawable(u.uiIcon.found() ? u.uiIcon : u.fullIcon) :
                 contentIcons.get(content.type, Icon.warning), Styles.graySquarei, iconMed, () -> {}).touchable(Touchable.disabled).size(h);
 
             list.button(("[accent]" + content.name + "\n") + "[lightgray]" + Core.bundle.get("content." + content.type), Styles.grayt, () -> {
@@ -102,8 +102,11 @@ public class MapContentView implements AssetView{
             list.button(Icon.refresh, Styles.graySquarei, Vars.iconMed, () -> {
                 Cons<String> handler = str -> {
                     content.data = str;
-                    state.data.reloadContent(false);
-                    diag.rebuild();
+                    ui.loadAnd(() -> {
+                        state.data.reloadContent(false);
+                        state.data.regenerateContentSprites(false);
+                        diag.rebuild();
+                    });
                 };
 
                 BaseDialog dialog = new BaseDialog("@editor.import");
@@ -176,10 +179,14 @@ public class MapContentView implements AssetView{
         buttons.button("@add", Icon.add, () -> showImport(diag)).size(190f, 64f);
     }
 
-    void addContent(ContentType type, String path, String data){
-        ContentAsset asset = new ContentAsset(path, type, data);
-        state.data.getContent().add(asset);
-        state.data.reloadContent(false);
+    void addContent(MapAssetsDialog diag, ContentType type, String path, String data){
+        ui.loadAnd(() -> {
+            ContentAsset asset = new ContentAsset(path, type, data);
+            state.data.getContent().add(asset);
+            state.data.reloadContent(false);
+            state.data.regenerateContentSprites(false);
+            diag.rebuild();
+        });
     }
 
     void showImport(MapAssetsDialog diag){
@@ -220,7 +227,7 @@ public class MapContentView implements AssetView{
 
         choose.buttons.button("@asset.content.import.file", Icon.fileText, () -> FileChooser.open("json", "json5", "hjson").submit(file -> {
             choose.hide();
-            addContent(selected[0], nameField.getText() + ".json", file.readString());
+            addContent(diag, selected[0], nameField.getText() + ".json", file.readString());
             diag.rebuild();
         })).size(200f, 64f).disabled(b -> nameField.getText().isEmpty() || invalid[0]);
 
@@ -229,8 +236,7 @@ public class MapContentView implements AssetView{
             if(text == null) return;
 
             choose.hide();
-            addContent(selected[0], nameField.getText() + ".json", text);
-            diag.rebuild();
+            addContent(diag, selected[0], nameField.getText() + ".json", text);
         }).size(200f, 64f).disabled(b -> nameField.getText().isEmpty() || invalid[0] || Core.app.getClipboardText() == null);
         choose.show();
     }

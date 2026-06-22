@@ -1216,9 +1216,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float brcy = y - (block.size * tilesize / 2f) + (tilesize * multiplier / 2f);
 
             Draw.z(Layer.power + 1);
-            Draw.color(Pal.gray);
+            Draw.color(Pal.gray, Lod.alpha2);
             Fill.square(brcx, brcy, 2.5f * multiplier, 45);
-            Draw.color(status().color);
+            Draw.color(status().color, Lod.alpha2);
             Fill.square(brcx, brcy, 1.5f * multiplier, 45);
             Draw.color();
         }
@@ -1279,12 +1279,19 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public void recache(){
-        if(!headless) renderer.blocks.recacheBuilding(tile);
+        if(!headless) renderer.blocks.recacheBuilding(block.buildingCacheLayer, tile);
     }
 
     public void payloadDraw(){
-        if(block.isAir()) return;
-        draw();
+        float z = Draw.z();
+        if(block.drawCached){
+            Draw.z(block.buildingCacheLayer.layer);
+            drawCached();
+        }
+        if(block.drawDynamic){
+            Draw.z(z);
+            draw();
+        }
     }
 
     public void drawTeamTop(){
@@ -1793,6 +1800,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(power != null && updatePower){
             var oldGraph = power.graph;
+            for(var other : proximity){
+                if(other != null && other.team != team && other.power != null && other.power.graph == oldGraph){
+                    new PowerGraph().reflow(other);
+                }
+            }
             for(int i = 0; i < power.links.size; i++){
                 var other = world.build(power.links.items[i]);
 
@@ -1886,6 +1898,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(Building other : tmpTiles){
             other.onProximityUpdate();
         }
+
+        if(!headless && block.drawCached) recache();
     }
 
     public void onNearbyBuildAdded(Building other){}

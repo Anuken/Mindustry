@@ -3,22 +3,21 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.scene.*;
+import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
-import arc.scene.event.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.input.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.io.JsonIO;
 import mindustry.maps.*;
-import mindustry.content.Planets;
-import mindustry.type.Planet;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
@@ -31,6 +30,7 @@ public abstract class MapListDialog extends BaseDialog{
     private Seq<String> availablePlanets = new Seq<>();
     private Table mapTable = new Table();
     private TextField searchField;
+    private ObjectMap<Map, Rules> rulesCache = new ObjectMap<>();
 
     private boolean
     showBuiltIn = Core.settings.getBool("editorshowbuiltinmaps", true),
@@ -53,6 +53,7 @@ public abstract class MapListDialog extends BaseDialog{
 
         addCloseListener();
 
+        hidden(() -> rulesCache.clear());
         shown(this::setup);
         onResize(() -> {
             if(activeDialog != null){
@@ -147,11 +148,12 @@ public abstract class MapListDialog extends BaseDialog{
                 invalid |= !mode.valid(map);
             }
 
-            Rules rules = JsonIO.read(Rules.class, map.tags.get("rules", "{}"));
-
-            // Only filter through active planets. Preserve modded planets when the mod is disabled
-            if(!activePlanetFilters.isEmpty() && !activePlanetFilters.contains(rules.planet.name)){
-                continue;
+            // Only filter through active planets.
+            if(!activePlanetFilters.isEmpty()){
+                Rules rules = rulesCache.get(map, map::rules);
+                if(!activePlanetFilters.contains(rules.planet.name)){
+                    continue;
+                }
             }
 
             if(invalid || (searchString != null
@@ -277,7 +279,7 @@ public abstract class MapListDialog extends BaseDialog{
                                         // Get the planet's custom icon. Defaults to the default colored planet icon
                                         TextureRegion foundIcon = Core.atlas.find(planet.name + "-ui", planet.name);
                                         TextureRegionDrawable picon = Core.atlas.isFound(foundIcon) ? new TextureRegionDrawable(foundIcon) : ((TextureRegionDrawable)ui.getIcon("planet").tint(planet.iconColor));
-                                        
+
                                         in.button(planet.localizedName, picon, Styles.flatTogglet, iconMed, () -> {
                                             if(planets.contains(planet.name)){
                                                 planets.remove(planet.name);

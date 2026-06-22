@@ -71,11 +71,15 @@ public class PowerNode extends PowerBlock{
                 //reflow from this point, covering all tiles on this side
                 newgraph.reflow(entity);
 
+                newgraph.update();
+
                 if(valid && other.power.graph != newgraph){
                     //create new graph for other end
                     PowerGraph og = new PowerGraph();
                     //reflow from other end
                     og.reflow(other);
+
+                    og.update();
                 }
             }else if(linkValid(entity, other) && valid && power.links.size < maxNodes){
 
@@ -176,7 +180,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void setupColor(float satisfaction){
-        Draw.color(Tmp.c1.set(laserColor1).lerp(laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f)).a(Renderer.laserOpacity));
+        Draw.color(Tmp.c1.set(laserColor1).lerp(laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f)).a(Renderer.laserOpacity * Lod.alpha2));
     }
 
     public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2){

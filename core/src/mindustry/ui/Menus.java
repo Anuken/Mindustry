@@ -142,8 +142,18 @@ public class Menus{
     }
 
     @Remote(variants = Variant.both, unreliable = true)
+    public static void label(@Nullable String message, int id, float duration, float worldx, float worldy, int flags){
+        ui.showLabel(message, id, duration, worldx, worldy, flags);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void labelReliable(@Nullable String message, int id, float duration, float worldx, float worldy, int flags){
+        label(message, id, duration, worldx, worldy, flags);
+    }
+
+    @Remote(variants = Variant.both, unreliable = true)
     public static void label(@Nullable String message, int id, float duration, float worldx, float worldy){
-        ui.showLabel(message, id, duration, worldx, worldy);
+        label(message, id, duration, worldx, worldy, WorldLabel.flagBackground | WorldLabel.flagAutoscale | WorldLabel.flagOutline);
     }
 
     @Remote(variants = Variant.both)

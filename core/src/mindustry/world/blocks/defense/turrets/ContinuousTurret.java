@@ -63,7 +63,7 @@ public class ContinuousTurret extends Turret{
 
         @Override
         public boolean shouldConsume(){
-            return isShooting();
+            return isShooting;
         }
 
         @Override
@@ -123,7 +123,7 @@ public class ContinuousTurret extends Turret{
                 entry.bullet.damage = entry.bullet.type.damage * Math.min(efficiency, 1f) * timeScale * entry.bullet.damageMultiplier();
             }
 
-            if(isShooting() && hasAmmo()){
+            if(isShooting && hasAmmo()){
                 entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * Math.min(shootWarmup, efficiency);
                 entry.bullet.keepAlive = true;
             }
