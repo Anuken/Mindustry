@@ -31,6 +31,7 @@ import mindustry.world.meta.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
+import java.security.*;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -38,8 +39,6 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
     private static final int maxSnapshotSize = 800;
-    /** Maximum time to wait for a client to confirm its public key. */
-    private static final long authTimeoutMs = 10_000L;
     private static final Timekeeper
         blockSyncTime = Timekeeper.ofSeconds(6f),
         healthSyncTime = Timekeeper.ofSeconds(0.5f),
@@ -306,7 +305,8 @@ public class NetServer implements ApplicationListener{
             con.player = player;
 
             if(headless){
-                byte[] nonce = NetCrypto.generateNonce();
+                byte[] nonce = new byte[32];
+                new SecureRandom().nextBytes(nonce);
                 con.pendingNonce = nonce;
 
                 AuthChallengePacket challenge = new AuthChallengePacket();
@@ -315,13 +315,13 @@ public class NetServer implements ApplicationListener{
 
                 debug("Issued challenge to @", con.address);
 
-                // Kick the client if it doesn't respond in time.
+                // Don't wait forever
                 Timer.schedule(() -> {
                     if(con.pendingNonce != null && con.isConnected() && !con.kicked){
                         debug("@ timed out waiting for auth response.", con.address);
                         con.kick("Authentication timeout.");
                     }
-                }, authTimeoutMs / 1000f);
+                }, 10);
             }else{
                 connectPlayer(con);
             }
@@ -340,7 +340,7 @@ public class NetServer implements ApplicationListener{
                 con.kick("Connection failed."); // Generic fail as to not give more info to potential attackers
             }
 
-            boolean sigOk = NetCrypto.verify(packet.publicKey, nonce, packet.claimedHost, packet.signature);
+            boolean sigOk = NetPubKey.verify(packet.publicKey, nonce, packet.claimedHost, packet.signature);
             if(!sigOk){
                 info("Rejected @ — invalid signature (relay/MITM attempt or bad key).", con.address);
                 con.kick("Connection failed."); // Generic fail as to not give more info to potential attackers
