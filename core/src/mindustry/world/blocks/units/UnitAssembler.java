@@ -166,8 +166,9 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public void afterPatch(){
-        initCapacities();
         super.afterPatch();
+
+        initCapacities();
     }
 
     public void initCapacities(){
@@ -703,6 +704,13 @@ public class UnitAssembler extends PayloadBlock{
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress) return progress;
             return super.sense(sensor);
+        }
+
+        @Override
+        public boolean acceptUnitPayload(Unit unit){
+            var plan = plan();
+            return plan.requirements.contains(b -> b.item == unit.type() &&
+                blocks.get(unit.type()) < Mathf.round(b.amount * state.rules.unitCost(team)));
         }
 
         @Override

@@ -4,6 +4,7 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
+import mindustry.mod.*;
 
 import java.io.*;
 
@@ -29,6 +30,10 @@ public class ContentAsset extends DataAsset{
     }
 
     public ContentAsset(){
+    }
+
+    public String hashData(){
+        return type.name() + "_" + DataAssetCache.encodeHash(Strings.sha256(data));
     }
 
     public void readOverride(String path, Fi file, ContentType type) throws IOException{

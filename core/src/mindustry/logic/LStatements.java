@@ -68,7 +68,7 @@ public class LStatements{
 
             table.add(" = ");
 
-            fields(table, target, str -> target = str);
+            field(table, target, str -> target = str);
 
             row(table);
 
@@ -100,7 +100,7 @@ public class LStatements{
 
             table.add(" to ");
 
-            fields(table, target, str -> target = str);
+            field(table, target, str -> target = str);
 
             row(table);
 
@@ -1574,7 +1574,7 @@ public class LStatements{
             }).size(80f, 40f).pad(4f).color(table.color);
 
             if(statusNames == null){
-                statusNames = content.statusEffects().select(s -> !s.isHidden()).map(s -> s.name).toArray(String.class);
+                statusNames = content.statusEffects().map(s -> s.name).toArray(String.class);
             }
 
             table.button(b -> {

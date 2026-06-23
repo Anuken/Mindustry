@@ -198,6 +198,8 @@ public class Renderer implements ApplicationListener{
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
 
+        Lod.update();
+
         if(state.isMenu()){
             landTime = 0f;
             graphics.clear(Color.black);
@@ -416,7 +418,7 @@ public class Renderer implements ApplicationListener{
 
         Groups.draw.draw(Drawc::draw);
 
-        if(drawDebugHitboxes){
+        if(settings.getBool("drawhitboxes")){
             DebugCollisionRenderer.draw();
         }
 
@@ -581,6 +583,7 @@ public class Renderer implements ApplicationListener{
         }
 
         try{
+            Lod.disable = true;
             FrameBuffer buffer = new FrameBuffer(w, h);
 
             drawWeather = false;
@@ -616,6 +619,8 @@ public class Renderer implements ApplicationListener{
         }catch(Throwable e){
             Log.err(e);
             Vars.ui.showException("@screenshot.error", e);
+        }finally{
+            Lod.disable = false;
         }
 
     }

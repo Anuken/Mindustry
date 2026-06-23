@@ -23,7 +23,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
-import mindustry.type.Planet;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
@@ -36,6 +36,7 @@ public class SettingsMenuDialog extends BaseDialog{
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
+    public SettingsTable dev;
     public SettingsTable main;
 
     private Table prefs;
@@ -63,6 +64,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 graphics.rebuild();
                 sound.rebuild();
                 game.rebuild();
+                dev.rebuild();
                 updateScrollFocus();
                 lastRebuildSize[0] = Core.graphics.getWidth();
                 lastRebuildSize[1] = Core.graphics.getHeight();
@@ -78,6 +80,7 @@ public class SettingsMenuDialog extends BaseDialog{
         game = new SettingsTable();
         graphics = new SettingsTable();
         sound = new SettingsTable();
+        dev = new SettingsTable();
 
         prefs = new Table();
         prefs.top();
@@ -347,6 +350,7 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         menu.button("@settings.data", Icon.save, style, isize, () -> dataDialog.show()).marginLeft(marg).row();
+        menu.button("@settings.dev", Icon.fileCode, style, isize, () -> visible(3)).marginLeft(marg).row();
 
         int i = 3;
         for(var cat : categories){
@@ -411,24 +415,12 @@ public class SettingsMenuDialog extends BaseDialog{
         game.checkPref("doubletapmine", false);
         game.checkPref("commandmodehold", true);
 
-        if(!ios){
-            game.checkPref("modcrashdisable", true);
-        }
-
         if(steam){
             game.sliderPref("playerlimit", 16, 2, 32, i -> {
                 platform.updateLobby();
                 return i + "";
             });
-
-            if(!Version.modifier.contains("beta")){
-                game.checkPref("steampublichost", false, i -> {
-                    platform.updateLobby();
-                });
-            }
         }
-
-        game.checkPref("console", false);
 
         graphics.sliderPref("uiEdgePadding", 0, 0, 100, s -> s + "px", s -> {
             if(ui != null){
@@ -573,6 +565,14 @@ public class SettingsMenuDialog extends BaseDialog{
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
+
+        dev.sliderPref("buildingtimestep", 65, 10, 65, 5, s -> s > 60 ? bundle.get("off") : s + "");
+        dev.checkPref("console", false);
+        dev.checkPref("drawhitboxes", false);
+
+        if(!ios){
+            dev.checkPref("modcrashdisable", true);
+        }
     }
 
     public void exportData(Fi file) throws IOException{
@@ -648,7 +648,7 @@ public class SettingsMenuDialog extends BaseDialog{
         prefs.clearChildren();
 
         Seq<Table> tables = new Seq<>();
-        tables.addAll(game, graphics, sound);
+        tables.addAll(game, graphics, sound, dev);
         for(var custom : categories){
             tables.add(custom.table);
         }
@@ -816,11 +816,18 @@ public class SettingsMenuDialog extends BaseDialog{
 
             @Override
             public void add(SettingsTable table){
-                CheckBox box = new CheckBox(title);
+                Button box = new Button(Styles.grayt);
+                box.background(Styles.grayPanel);
+                box.margin(10f);
+
+                box.add(new Image()).update(i -> i.setDrawable(box.isOver() ? (box.isChecked() ? Tex.checkOnOver : Tex.checkOver) : box.isChecked() ? Tex.checkOn : Tex.checkOff))
+                    .size(32f).padRight(8f).padLeft(-4f);
+
+                box.add(title);
 
                 box.update(() -> box.setChecked(settings.getBool(name)));
 
-                box.changed(() -> {
+                box.clicked(() -> {
                     settings.put(name, box.isChecked());
                     if(changed != null){
                         changed.get(box.isChecked());
@@ -828,7 +835,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 });
 
                 box.left();
-                addDesc(table.add(box).left().padTop(3f).get());
+                addDesc(table.add(box).minWidth(Math.min(500f, Core.graphics.getWidth() / 1.2f / Scl.scl(1f))).fillX().height(45f).left().padTop(7f).get());
                 table.row();
             }
         }
@@ -869,7 +876,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
                 slider.change();
 
-                addDesc(table.stack(slider, content).width(Math.min(Core.graphics.getWidth() / 1.2f, 460f)).left().padTop(4f).get());
+                addDesc(table.stack(slider, content).width(Math.min(Core.graphics.getWidth() / 1.2f / Scl.scl(1f), 500f)).left().padTop(4f).get());
                 table.row();
             }
         }

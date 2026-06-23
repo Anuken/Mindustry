@@ -460,6 +460,30 @@ public class Logic implements ApplicationListener{
         Core.settings.manualSave();
     }
 
+    protected void updateEntities(){
+        int timestep = Core.settings.getInt("buildingtimestep", 65);
+
+        PerfCounter.entityUpdate.begin();
+
+        Groups.updatePooling();
+
+        Groups.bullet.updatePhysics();
+        Groups.unit.updatePhysics();
+        Groups.all.update();
+
+        PerfCounter.buildingUpdate.begin();
+        if(timestep > 60){
+            Groups.build.update();
+        }else{
+            Groups.build.fixedUpdate(timestep);
+        }
+
+        PerfCounter.buildingUpdate.begin();
+
+        Groups.bullet.collide();
+        PerfCounter.entityUpdate.end();
+    }
+
     @Override
     public void update(){
         PerfCounter.frame.end();
@@ -564,9 +588,7 @@ public class Logic implements ApplicationListener{
                 state.envAttrs.add(state.rules.attributes);
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
-                PerfCounter.entityUpdate.begin();
-                Groups.update();
-                PerfCounter.entityUpdate.end();
+                updateEntities();
 
                 Events.fire(Trigger.afterGameUpdate);
             }
