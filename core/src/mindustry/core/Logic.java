@@ -460,6 +460,10 @@ public class Logic implements ApplicationListener{
         Core.settings.manualSave();
     }
 
+    public boolean hasFixedTimestep(){
+        return Core.settings.getInt("buildingtimestep", 65) <= 60;
+    }
+
     protected void updateEntities(){
         int timestep = Core.settings.getInt("buildingtimestep", 65);
 
