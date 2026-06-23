@@ -159,6 +159,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return 0;
     }
 
+    public boolean inMapArea(){
+        return !state.rules.limitMapArea || Rect.contains(state.rules.limitX , state.rules.limitY , state.rules.limitWidth, state.rules.limitHeight, x, y);
+    }
+
     public float worldx(){
         return x * tilesize;
     }
