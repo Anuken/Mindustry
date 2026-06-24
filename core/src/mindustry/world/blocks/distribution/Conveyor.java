@@ -9,7 +9,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -21,8 +20,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
-
-import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -143,8 +140,6 @@ public class Conveyor extends Block implements Autotiler{
 
         public float clogHeat = 0f;
 
-        float[] lastXs, lastYs;
-
         @Override
         public void draw(){
             int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
@@ -167,40 +162,18 @@ public class Conveyor extends Block implements Autotiler{
             Draw.z(Layer.block - 0.1f);
             float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
 
-            if(Renderer.blockTimestep){
-                if(lastXs == null) lastXs = Arrays.copyOf(xs, capacity);
-                if(lastYs == null) lastYs = Arrays.copyOf(ys, capacity);
+            for(int i = 0; i < len; i++){
+                Item item = ids[i];
+                Tmp.v1.trns(rotation * 90, tilesize, 0);
+                Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
-                for(int i = 0; i < len; i++){
-                    Item item = ids[i];
-                    float cx = Mathf.lerp(lastXs[i], xs[i], Renderer.blockInterp);
-                    float cy = Mathf.lerp(lastYs[i], ys[i], Renderer.blockInterp);
+                float
+                ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
 
-                    Tmp.v1.trns(rotation * 90, tilesize, 0);
-                    Tmp.v2.trns(rotation * 90, -tilesize / 2f, cx * tilesize / 2f);
-
-                    float
-                    ix = (x + Tmp.v1.x * cy + Tmp.v2.x),
-                    iy = (y + Tmp.v1.y * cy + Tmp.v2.y);
-
-                    //keep draw position deterministic.
-                    Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
-                    Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
-                }
-            }else{
-                for(int i = 0; i < len; i++){
-                    Item item = ids[i];
-                    Tmp.v1.trns(rotation * 90, tilesize, 0);
-                    Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
-
-                    float
-                    ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
-                    iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
-
-                    //keep draw position deterministic.
-                    Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
-                    Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
-                }
+                //keep draw position deterministic.
+                Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
+                Draw.rect(item.fullIcon, ix, iy, itemSize, itemSize);
             }
         }
 
@@ -279,12 +252,6 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
-            if(Renderer.blockTimestep && lastXs != null){
-                for(int i = 0; i < len; i++){
-                    lastXs[i] = xs[i];
-                    lastYs[i] = ys[i];
-                }
-            }
             minitem = 1f;
             mid = 0;
 
