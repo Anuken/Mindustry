@@ -142,6 +142,7 @@ public class Planets{
                 r.waveTeam = Team.crux;
                 r.placeRangeCheck = false;
                 r.hideSpawns = true;
+                r.derelictRepair = true;
                 r.coreDestroyClear = true;
             };
             showRtsAIRule = true;

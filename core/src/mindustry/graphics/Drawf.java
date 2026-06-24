@@ -522,7 +522,7 @@ public class Drawf{
 
         if(a >= 1f/255f){
             if(lod > 0.0001f){
-                Draw.alpha(lod);
+                Draw.alpha(lod * a);
                 Draw.rect(start, x, y, start.width * scale * start.scl(), start.height * scale * start.scl(), rot + 180);
                 Draw.rect(end, x2, y2, end.width * scale * end.scl(), end.height * scale * end.scl(), rot);
                 Draw.alpha(a);

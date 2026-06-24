@@ -598,6 +598,8 @@ public class JoinDialog extends BaseDialog{
             netClient.disconnectQuietly();
         });
 
+        ui.editor.hide();
+
         Time.runTask(2f, () -> {
             logic.reset();
             net.reset();

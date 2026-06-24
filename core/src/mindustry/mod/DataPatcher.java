@@ -197,18 +197,18 @@ public class DataPatcher{
 
             parser.finishParsing();
 
-            for(var errored : dpMod.erroredContent){
-                if(errored.minfo.error != null && errored.minfo.asset != null){
-                    errored.minfo.asset.warnings.add(errored.minfo.error);
-                }
-                Vars.content.remove(errored);
-            }
-
             addedContent.clear();
             Seq<Content> all = addedContent;
 
             for(var arr : Vars.content.getContentMap()){
                 all.addAll(arr.select(c -> c.minfo.mod == dpMod));
+            }
+
+            for(var errored : dpMod.erroredContent){
+                if(errored.minfo.error != null && errored.minfo.asset != null){
+                    errored.minfo.asset.warnings.add(errored.minfo.error);
+                }
+                Vars.content.remove(errored);
             }
 
             for(var cont : all){

@@ -529,11 +529,6 @@ public class LogicBlock extends Block{
                         l.trySet(executor, null); //always clear old variable, it may get a new name
 
                         if(valid){
-                            //this prevents conflicts
-                            l.name = "";
-                            //finds a new matching name after toggling
-                            l.name = findLinkName(cur.block);
-
                             //remove redundant links
                             links.removeAll(o -> {
                                 boolean remove = world.build(o.x, o.y) == cur && o != l;
@@ -581,7 +576,7 @@ public class LogicBlock extends Block{
         }
 
         public void updateLinks(){
-            if(linksVar == null) return; //no valid code compiled yet
+            if(linksVar == null) return;
 
             int valids = links.count(l -> l.valid);
             executor.links = new Building[valids];

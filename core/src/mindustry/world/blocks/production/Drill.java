@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
@@ -293,8 +294,6 @@ public class Drill extends Block{
                 return;
             }
 
-            timeDrilled += warmup * delta();
-
             float delay = getDrillTime(dominantItem);
 
             if(items.total() < itemCapacity && dominantItems > 0 && efficiency > 0){
@@ -360,6 +359,8 @@ public class Drill extends Block{
                 Draw.blend();
                 Draw.color();
             }
+
+            if(Renderer.renderUpdate) timeDrilled += warmup * delta();
 
             if(drawSpinSprite){
                 Drawf.spinSprite(rotatorRegion, x, y, timeDrilled * rotateSpeed);

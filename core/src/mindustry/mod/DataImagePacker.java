@@ -89,6 +89,7 @@ public class DataImagePacker{
             }
         }
 
+        AtomicBoolean failedEnv = new AtomicBoolean();
         var tasks = new Seq<Future<?>>();
         for(var image : toPack){
             tasks.add(Vars.mainExecutor.submit(() -> {
@@ -101,27 +102,32 @@ public class DataImagePacker{
                     String name = regionPrefix + image.name;
 
                     if(anyEnv && image.path.contains("blocks/environment/")){
-                        envPacker.pack(name, pixmap);
+                        if(!failedEnv.get()) envPacker.pack(name, pixmap);
                     }else{
                         packer.pack(name, pixmap);
                     }
 
                     pixmap.dispose();
                 }catch(Throwable e){
-                    Log.err("Invalid patch image: " + image.path, e);
+                    if(e instanceof ArcRuntimeException && e.getMessage().contains("one page")){
+                        failedEnv.set(true);
+                    }else{
+                        Log.err("Invalid patch image: " + image.path, e);
+                    }
                 }
             }));
         }
 
         Threads.awaitAll(tasks);
 
+        if(envPacker != null && failedEnv.get()){
+            Log.warn("[Patch Atlas] Unable to fit all environment images into a " + envPacker.getPageWidth() + "x" + envPacker.getPageHeight() + " page. Reduce the size or number of images.");
+        }
+
         TextureFilter filter = Core.settings.getBool("linear", !Vars.mobile) ? TextureFilter.linear : TextureFilter.nearest;
         patchAtlas = packer.generateTextureAtlas(filter, filter, false);
 
         if(envPacker != null && envPacker.getPages().size > 0){
-            if(envPacker.getPages().size > 1){
-                Log.warn("[Patch Atlas] Unable to fit all environment images into a " + envPacker.getPageWidth() + "x" + envPacker.getPageHeight() + " page. Reduce the size or number of images.");
-            }
             //directly update existing atlas page's reserved region
             var page = envPacker.getPages().first();
             envReserveRegion.texture.draw(page.getPixmap(), envReserveRegion.getX(), envReserveRegion.getY());

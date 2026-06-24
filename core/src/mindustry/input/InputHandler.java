@@ -1424,7 +1424,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     overlappingPlayer= player;
                 }
 
-                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f * Time.delta);
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f);
                 plan.block.drawOtherPlayerPlan(plan, player.planEachable, overlappingPlan == plan ? 0.7f : 0.25f);
             });
         });
