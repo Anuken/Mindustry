@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
@@ -88,7 +89,6 @@ public class SolidPump extends Pump{
 
     public class SolidPumpBuild extends PumpBuild{
         public float warmup;
-        public float pumpTime;
         public float boost;
         public float validTiles;
         public float lastPump;
@@ -103,13 +103,15 @@ public class SolidPump extends Pump{
 
         @Override
         public void draw(){
+            if(Renderer.renderUpdate) totalProgress += warmup * edelta();
+
             Draw.rect(region, x, y);
             Draw.z(Layer.blockCracks);
             super.drawCracks();
             Draw.z(Layer.blockAfterCracks);
 
             Drawf.liquid(liquidRegion, x, y, liquids.get(result) / liquidCapacity, result.color);
-            Drawf.spinSprite(rotatorRegion, x, y, pumpTime * rotateSpeed);
+            Drawf.spinSprite(rotatorRegion, x, y, totalProgress * rotateSpeed);
             Draw.rect(topRegion, x, y);
         }
 
@@ -134,8 +136,6 @@ public class SolidPump extends Pump{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.02f);
                 lastPump = 0f;
             }
-
-            pumpTime += warmup * edelta();
 
             dumpLiquid(result);
         }

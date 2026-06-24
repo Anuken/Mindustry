@@ -685,12 +685,17 @@ public class EntityProcess extends BaseProcessor{
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             MethodSpec.Builder groupUpdate = MethodSpec.methodBuilder("update")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+
+            MethodSpec.Builder groupPoolUpdate = MethodSpec.methodBuilder("updatePooling")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
 
             //free everything pooled at the start of each updaet
-            groupUpdate
+            groupPoolUpdate
                 .addStatement("for($T p : freeQueue) $T.free(p)", Poolable.class, Pools.class)
                 .addStatement("freeQueue.clear()");
+
+            groupUpdate.addStatement("updatePooling()");
 
             //method resize
             for(GroupDefinition group : groupDefs){
@@ -713,6 +718,7 @@ public class EntityProcess extends BaseProcessor{
             }
 
             groupsBuilder.addMethod(groupResize.build());
+            groupsBuilder.addMethod(groupPoolUpdate.build());
             groupsBuilder.addMethod(groupUpdate.build());
 
             write(groupsBuilder);

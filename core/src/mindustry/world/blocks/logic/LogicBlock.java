@@ -523,11 +523,6 @@ public class LogicBlock extends Block{
                         l.trySet(executor, null); //always clear old variable, it may get a new name
 
                         if(valid){
-                            //this prevents conflicts
-                            l.name = "";
-                            //finds a new matching name after toggling
-                            l.name = findLinkName(cur.block);
-
                             //remove redundant links
                             links.removeAll(o -> {
                                 boolean remove = world.build(o.x, o.y) == cur && o != l;
