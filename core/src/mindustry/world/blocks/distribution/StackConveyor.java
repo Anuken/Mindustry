@@ -7,7 +7,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -277,13 +276,10 @@ public class StackConveyor extends Block implements Autotiler{
             float eff = enabled ? (efficiency + baseEfficiency) : 1f;
 
             //reel in crater
-            if(lastUpdate != Vars.state.updateId){
-                lastX = Mathf.lerp(Point2.x(link) * tilesize, x, 1f - cooldown);
-                lastY = Mathf.lerp(Point2.y(link) * tilesize, y, 1f - cooldown);
-                if(cooldown > 0f) cooldown = Math.min(cooldown - speed * eff * delta(), recharge);
-            }
+            lastX = Mathf.lerp(Point2.x(link) * tilesize, x, 1f - cooldown);
+            lastY = Mathf.lerp(Point2.y(link) * tilesize, y, 1f - cooldown);
+            if(cooldown > 0f) cooldown = Math.min(cooldown - speed * eff * delta(), recharge);
             if(state != stateMove) cooldown = Math.max(cooldown, 0f);
-            lastUpdate = Vars.state.updateId;
 
             //indicates empty state
             if(link == -1) return;
@@ -325,7 +321,6 @@ public class StackConveyor extends Block implements Autotiler{
 
                         cooldown = recharge;
                         e.cooldown = 1f + remaining;
-                        e.lastUpdate = Vars.state.updateId;
                         e.lastX = lastX;
                         e.lastY = lastY;
                     }else{
