@@ -160,16 +160,26 @@ public class Conveyor extends Block implements Autotiler{
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
             Draw.z(Layer.block - 0.1f);
-            float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
+
+            float
+
+            layer = Layer.block - 0.1f,
+            wwidth = world.unitWidth(),
+            wheight = world.unitHeight(),
+            scaling = 0.01f,
+
+            rotationRad = rotation * 90f * Mathf.degreesToRadians,
+            cos = Mathf.cos(rotationRad),
+            sin = Mathf.sin(rotationRad);
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
-                Tmp.v1.trns(rotation * 90, tilesize, 0);
-                Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
                 float
-                ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
-                iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
+                vx = -tilesize / 2f + tilesize * ys[i],
+                vy = xs[i] * tilesize / 2f,
+                ix = x + vx * cos - vy * sin,
+                iy = y + vx * sin + vy * cos;
 
                 //keep draw position deterministic.
                 Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);

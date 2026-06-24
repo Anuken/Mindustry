@@ -260,7 +260,6 @@ public class Turret extends ReloadTurret{
         public abstract BulletType type();
     }
 
-
     @Override
     public boolean rotatedOutput(int x, int y){
         return false;
