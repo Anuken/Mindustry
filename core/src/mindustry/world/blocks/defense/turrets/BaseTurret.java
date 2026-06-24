@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -111,8 +112,13 @@ public class BaseTurret extends Block{
     }
 
     public class BaseTurretBuild extends Building implements Ranged, RotBlock{
+        protected float prevRotation = Float.NaN;
         public float rotation = 90;
         public float activationTimer = 0;
+
+        public float getVisualRotation(){
+            return Renderer.blockTimestep ? (Float.isNaN(prevRotation) ? rotation : Mathf.slerp(prevRotation, rotation, Renderer.blockInterp)) : rotation;
+        }
 
         @Override
         public void placed(){

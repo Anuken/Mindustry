@@ -87,6 +87,8 @@ public class DrawTurret extends DrawBlock{
         drawTurret(turret, tb);
         drawHeat(turret, tb);
 
+        float rotation = tb.getVisualRotation();
+
         if(parts.size > 0){
             if(outline.found()){
                 //draw outline under everything when parts are involved
@@ -98,7 +100,7 @@ public class DrawTurret extends DrawBlock{
             float progress = tb.progress();
 
             //TODO no smooth reload
-            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, rotation);
 
             for(var part : parts){
                 params.setRecoil(part.recoilIndex >= 0 && tb.curRecoils != null ? tb.curRecoils[part.recoilIndex] : tb.curRecoil);
@@ -107,7 +109,7 @@ public class DrawTurret extends DrawBlock{
         }
         if(ammoParts.size > 0 && tb.getAmmoContent() != null){
             float progress = tb.progress();
-            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, tb.rotation);
+            var params = DrawPart.params.set(build.warmup(), 1f - progress, 1f - progress, tb.heat, tb.curRecoil, tb.charge, tb.x + tb.recoilOffset.x, tb.y + tb.recoilOffset.y, rotation);
 
             var parts = ammoParts.get(tb.getAmmoContent());
             if(parts != null){

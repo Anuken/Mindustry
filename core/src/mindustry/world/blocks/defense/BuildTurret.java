@@ -119,6 +119,8 @@ public class BuildTurret extends BaseTurret{
 
         @Override
         public void updateTile(){
+            prevRotation = rotation;
+
             unit.tile(this);
             unit.team(team);
 

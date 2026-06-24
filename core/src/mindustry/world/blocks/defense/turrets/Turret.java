@@ -150,6 +150,8 @@ public class Turret extends ReloadTurret{
     public float elevation = -1f;
     /** How much the screen shakes per shot. */
     public float shake = 0f;
+    /** Maximum shots fired in a single building tick. */
+    public int maxShotsPerUpdate = 3;
 
     /** Defines drawing behavior for this turret. */
     public DrawBlock drawer = new DrawTurret();
@@ -356,7 +358,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public float drawrot(){
-            return rotation - 90;
+            return getVisualRotation() - 90;
         }
 
         @Override
@@ -487,6 +489,8 @@ public class Turret extends ReloadTurret{
 
         @Override
         public void updateTile(){
+            prevRotation = rotation;
+
             if(!validateTarget()) target = null;
             isShooting = alwaysShooting || (unit.controller() instanceof Player ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
 
@@ -717,9 +721,6 @@ public class Turret extends ReloadTurret{
 
         protected void updateReload(){
             reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
-
-            //cap reload for visual reasons
-            reloadCounter = Math.min(reloadCounter, reload);
         }
 
         @Override
@@ -728,13 +729,16 @@ public class Turret extends ReloadTurret{
         }
 
         protected void updateShooting(){
+            if(charging() || shootWarmup < minWarmup) return;
 
-            if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
+            reloadCounter = Math.min(reloadCounter, reload * maxShotsPerUpdate);
+
+            while(reloadCounter >= reload){
                 BulletType type = peekAmmo();
 
                 shoot(type);
 
-                reloadCounter %= reload;
+                reloadCounter -= reload;
             }
         }
 
