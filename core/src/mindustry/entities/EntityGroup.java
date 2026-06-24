@@ -122,7 +122,6 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         Time.delta = timeDelta;
         Time.setInternalTime(timeCounter);
         Time.setRuns(timeRuns);
-        int updates = 0;
 
         float delta = Core.graphics.getDeltaTime();
 
@@ -130,8 +129,9 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         if(totalUpdates++ < 2) delta = Math.min(delta, 1f / 60f);
 
         fixedCounter += delta;
+        fixedCounter = Math.min(fixedCounter, targetDelta * maxUpdatesPerFrame);
 
-        while(fixedCounter >= targetDelta && updates++ < maxUpdatesPerFrame){
+        while(fixedCounter >= targetDelta){
             //this executes any pending tasks (manually reassigned), and increments internal time, which is local to this group
             Time.update();
             update();

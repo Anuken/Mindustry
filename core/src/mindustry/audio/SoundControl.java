@@ -90,31 +90,6 @@ public class SoundControl{
         Events.fire(new MusicRegisterEvent());
     }
 
-    public void loop(Sound sound, float volume){
-        if(Vars.headless) return;
-
-        loop(sound, Core.camera.position, volume);
-    }
-
-    public void loop(Sound sound, Position pos, float volume){
-        loop(sound, pos, volume, 1f);
-    }
-
-    public void loop(Sound sound, Position pos, float volume, float pitch){
-        if(Vars.headless || sound == Sounds.none || volume <= 0.00001f) return;
-
-        float baseVol = sound.calcFalloff(pos.getX(), pos.getY());
-        float vol = baseVol * volume;
-
-        SoundData data = sounds.get(sound, SoundData::new);
-        data.volume += vol;
-        data.pitch += pitch * vol;
-        data.volume = Mathf.clamp(data.volume, 0f, 1f);
-        data.total += baseVol;
-        data.totalVolume += vol;
-        data.sum.add(pos.getX() * baseVol, pos.getY() * baseVol);
-    }
-
     public void stop(){
         silenced = true;
         if(current != null){
@@ -196,48 +171,6 @@ public class SoundControl{
 
     public void keepSilent(){
         keepSilent = true;
-    }
-
-    protected void updateLoops(){
-        //clear loops when in menu
-        if(!state.isGame()){
-            sounds.clear();
-            return;
-        }
-
-        if(state.isPaused()) return;
-
-        float avol = Core.settings.getInt("ambientvol", 100) / 100f;
-
-        sounds.each((sound, data) -> {
-            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.11f);
-
-            boolean play = data.curVolume > 0.01f;
-            float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
-            float pitch = Mathf.zero(data.totalVolume, 0.0001f) ? 1f : data.pitch / data.totalVolume;
-            if(data.soundID <= 0 || !Core.audio.isPlaying(data.soundID)){
-                if(play){
-                    data.soundID = sound.loop(data.curVolume, pitch, pan);
-                    Core.audio.protect(data.soundID, true);
-                }
-            }else{
-                if(data.curVolume <= 0.001f){
-                    sound.stop();
-                    data.soundID = -1;
-                    return;
-                }
-                Core.audio.set(data.soundID, pan, data.curVolume);
-                if(!Mathf.equal(pitch, 1f, 0.001f)){
-                    Core.audio.setPitch(data.soundID, pitch);
-                }
-            }
-
-            data.pitch = 0f;
-            data.volume = 0f;
-            data.total = 0f;
-            data.totalVolume = 0f;
-            data.sum.setZero();
-        });
     }
 
     public void playMusic(@Nullable Music music, boolean interrupt){
@@ -375,6 +308,85 @@ public class SoundControl{
         play(null);
     }
 
+    public static @Nullable Music findMusic(String name){
+        if(name == null) return null;
+        Music cached = Core.assets.getOrNull(name, Music.class);
+        if(cached == null) cached = Core.assets.getOrNull(name + ".ogg", Music.class);
+        if(cached == null) cached = Core.assets.getOrNull(name + ".mp3", Music.class);
+        if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".ogg", Music.class);
+        if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".mp3", Music.class);
+        return cached;
+    }
+
+    //loop system
+
+    public void loop(Sound sound, float volume){
+        if(Vars.headless) return;
+
+        loop(sound, Core.camera.position, volume);
+    }
+
+    public void loop(Sound sound, Position pos, float volume){
+        loop(sound, pos, volume, 1f);
+    }
+
+    public void loop(Sound sound, Position pos, float volume, float pitch){
+        if(Vars.headless || sound == Sounds.none || volume <= 0.00001f) return;
+
+        float baseVol = sound.calcFalloff(pos.getX(), pos.getY());
+        float vol = baseVol * volume;
+
+        SoundData data = sounds.get(sound, SoundData::new);
+        data.volume += vol;
+        data.pitch += pitch * vol;
+        data.volume = Mathf.clamp(data.volume, 0f, 1f);
+        data.total += baseVol;
+        data.totalVolume += vol;
+        data.sum.add(pos.getX() * baseVol, pos.getY() * baseVol);
+    }
+
+    protected void updateLoops(){
+        //clear loops when in menu
+        if(!state.isGame()){
+            sounds.clear();
+            return;
+        }
+
+        if(state.isPaused()) return;
+
+        float avol = Core.settings.getInt("ambientvol", 100) / 100f;
+
+        sounds.each((sound, data) -> {
+            data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.11f);
+
+            boolean play = data.curVolume > 0.01f;
+            float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
+            float pitch = Mathf.zero(data.totalVolume, 0.0001f) ? 1f : data.pitch / data.totalVolume;
+            if(data.soundID <= 0 || !Core.audio.isPlaying(data.soundID)){
+                if(play){
+                    data.soundID = sound.loop(data.curVolume, pitch, pan);
+                    Core.audio.protect(data.soundID, true);
+                }
+            }else{
+                if(data.curVolume <= 0.001f){
+                    sound.stop();
+                    data.soundID = -1;
+                    return;
+                }
+                Core.audio.set(data.soundID, pan, data.curVolume);
+                if(!Mathf.equal(pitch, 1f, 0.001f)){
+                    Core.audio.setPitch(data.soundID, pitch);
+                }
+            }
+
+            data.pitch = 0f;
+            data.volume = 0f;
+            data.total = 0f;
+            data.totalVolume = 0f;
+            data.sum.setZero();
+        });
+    }
+
     protected static class SoundData{
         float volume, pitch;
         float total;
@@ -384,13 +396,30 @@ public class SoundControl{
         float curVolume, totalVolume;
     }
 
-    public static @Nullable Music findMusic(String name){
-        if(name == null) return null;
-        Music cached = Core.assets.getOrNull(name, Music.class);
-        if(cached == null) cached = Core.assets.getOrNull(name + ".ogg", Music.class);
-        if(cached == null) cached = Core.assets.getOrNull(name + ".mp3", Music.class);
-        if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".ogg", Music.class);
-        if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".mp3", Music.class);
-        return cached;
+    static class AudioThread extends Thread{
+        static final int targetFps = 20;
+        static final long targetNanos = Time.millisToNanos(1000) / 20;
+
+        Seq<AmbientSource> sources = new Seq<>(AmbientSource.class);
+        long time = Time.nanos();
+
+        @Override
+        public void run(){
+            try{
+                while(true){
+                    var items = sources.items;
+                    int size = sources.size;
+
+                    long elapsed = Time.timeSinceNanos(time);
+                    time = Time.timeSinceNanos(elapsed);
+                    if(elapsed < targetNanos){
+                        long remaining = targetNanos - elapsed;
+                        Thread.sleep(remaining / Time.nanosPerMilli, (int)(remaining % Time.nanosPerMilli));
+                    }
+                }
+            }catch(InterruptedException e){
+                //exit
+            }
+        }
     }
 }
