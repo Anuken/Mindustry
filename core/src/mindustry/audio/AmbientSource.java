@@ -6,6 +6,6 @@ import arc.math.geom.*;
 public interface AmbientSource extends Position{
     boolean isValid();
     boolean shouldAmbientSound();
-    float ambientVolume();
+    float getAmbientVolume();
     Sound getAmbientSound();
 }

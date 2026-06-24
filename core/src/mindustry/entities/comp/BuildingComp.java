@@ -127,6 +127,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(shouldAdd){
             add();
+
+            if(block.ambientSound != Sounds.none && !headless){
+                control.sound.addAmbientSource(this);
+            }
         }
 
         checkAllowUpdate();
@@ -2268,11 +2272,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScale = 1f;
         }
 
-        //TODO separate multithreaded system for sound? AudioSource, etc
-        if(!headless && block.ambientSound != Sounds.none && shouldAmbientSound()){
-            control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
-        }
-
         updateConsumption();
 
         if(enabled || !block.noUpdateDisabled){
@@ -2288,6 +2287,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             renderer.blocks.updateShadow(self());
             renderer.minimap.update(tile);
         }
+    }
+
+    @Override
+    public float getAmbientVolume(){
+        return block.ambientSoundVolume * ambientVolume();
     }
 
     @Override

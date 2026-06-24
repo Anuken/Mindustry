@@ -13,6 +13,8 @@ import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
+import java.util.concurrent.*;
+
 import static mindustry.Vars.*;
 
 /** Controls playback of multiple audio tracks.*/
@@ -34,6 +36,10 @@ public class SoundControl{
     protected @Nullable Music current;
     protected float fade;
     protected boolean silenced, keepSilent;
+
+    protected @Nullable AudioThread ambientThread;
+    protected boolean launchingAmbientThread;
+    protected Seq<SoundData> localData = new Seq<>();
 
     protected boolean wasPlaying;
     protected AudioFilter filter = new BiquadFilter(){{
@@ -64,6 +70,13 @@ public class SoundControl{
             //stop all in-game voices
             Core.audio.soundBus.stop();
             Core.audio.soundBus.play();
+
+            launchingAmbientThread = false;
+            if(ambientThread != null){
+                ambientThread.running = false;
+                ambientThread.interrupt();
+                ambientThread = null;
+            }
         });
     }
 
@@ -333,16 +346,42 @@ public class SoundControl{
     public void loop(Sound sound, Position pos, float volume, float pitch){
         if(Vars.headless || sound == Sounds.none || volume <= 0.00001f) return;
 
+        loop(sounds.get(sound, SoundData::new), sound, pos, volume, pitch);
+    }
+
+    static void loop(SoundData data, Sound sound, Position pos, float volume, float pitch){
         float baseVol = sound.calcFalloff(pos.getX(), pos.getY());
         float vol = baseVol * volume;
 
-        SoundData data = sounds.get(sound, SoundData::new);
         data.volume += vol;
         data.pitch += pitch * vol;
         data.volume = Mathf.clamp(data.volume, 0f, 1f);
         data.total += baseVol;
         data.totalVolume += vol;
-        data.sum.add(pos.getX() * baseVol, pos.getY() * baseVol);
+        data.sumX += pos.getX() * baseVol;
+        data.sumY += pos.getY() * baseVol;
+    }
+
+    public void addAmbientSource(AmbientSource source){
+        if(headless) return;
+
+        if(launchingAmbientThread && ambientThread != null){
+            ambientThread.sources.add(source); //directly add to buffer while thread is launching; this prevents a million add calls to the queue during map load
+        }else if(ambientThread != null){
+            ambientThread.inputSources.add(source);
+        }else{
+            launchingAmbientThread = true;
+            ambientThread = new AudioThread();
+            ambientThread.setDaemon(true);
+
+            //start thread with all the sources that were added during launch
+            Core.app.post(() -> {
+                if(ambientThread != null){
+                    ambientThread.start();
+                    launchingAmbientThread = false;
+                }
+            });
+        }
     }
 
     protected void updateLoops(){
@@ -360,7 +399,7 @@ public class SoundControl{
             data.curVolume = Mathf.lerpDelta(data.curVolume, data.volume * avol, 0.11f);
 
             boolean play = data.curVolume > 0.01f;
-            float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sum.x / data.total, data.sum.y / data.total);
+            float pan = Mathf.zero(data.total, 0.0001f) ? 0f : sound.calcPan(data.sumX / data.total, data.sumY / data.total);
             float pitch = Mathf.zero(data.totalVolume, 0.0001f) ? 1f : data.pitch / data.totalVolume;
             if(data.soundID <= 0 || !Core.audio.isPlaying(data.soundID)){
                 if(play){
@@ -383,35 +422,133 @@ public class SoundControl{
             data.volume = 0f;
             data.total = 0f;
             data.totalVolume = 0f;
-            data.sum.setZero();
+            data.sumX = 0f;
+            data.sumY = 0f;
         });
+
+        //grab data from ambient thread
+        if(ambientThread != null){
+            synchronized(ambientThread.outputData){
+                localData.set(ambientThread.outputData);
+            }
+
+            for(var data : localData){
+                var target = sounds.get(data.sound, SoundData::new);
+
+                target.pitch = data.pitch;
+                target.volume = data.volume;
+                target.total = data.total;
+                target.totalVolume = data.totalVolume;
+                target.sumX = data.sumX;
+                target.sumY = data.sumY;
+            }
+        }
     }
 
-    protected static class SoundData{
+    protected static class SoundData implements Cloneable{
         float volume, pitch;
         float total;
-        Vec2 sum = new Vec2();
+        float sumX, sumY;
 
         int soundID;
         float curVolume, totalVolume;
+        Sound sound;
+
+        @Override
+        public SoundData clone(){
+            try{
+                return (SoundData)super.clone();
+            }catch(CloneNotSupportedException e){
+                throw new AssertionError("death");
+            }
+        }
     }
 
     static class AudioThread extends Thread{
         static final int targetFps = 20;
-        static final long targetNanos = Time.millisToNanos(1000) / 20;
+        static final long targetNanos = Time.millisToNanos(1000) / targetFps;
 
-        Seq<AmbientSource> sources = new Seq<>(AmbientSource.class);
-        long time = Time.nanos();
+        volatile boolean running = true;
+        Seq<AmbientSource> sources = new Seq<>(false, 16, AmbientSource.class);
+
+        LinkedBlockingQueue<AmbientSource> inputSources = new LinkedBlockingQueue<>();
+        ObjectMap<Sound, SoundData> sounds = new ObjectMap<>();
+
+        //buffer that is built up on the audio thread
+        final Seq<SoundData> localData = new Seq<>();
+        //buffer for output sound data
+        final Seq<SoundData> outputData = new Seq<>();
+
+        void doLoop(){
+            var items = sources.items;
+            int size = sources.size;
+            localData.size = 0;
+
+            AmbientSource source;
+            while((source = inputSources.poll()) != null){
+                sources.add(source);
+            }
+
+            for(int i = 0; i < size; i++){
+                var item = items[i];
+                if(item.isValid()){
+                    if(item.shouldAmbientSound()){
+                        float volume = item.getAmbientVolume();
+                        if(volume > 0.00001f){
+
+                            Sound sound = item.getAmbientSound();
+                            var data = sounds.get(sound, SoundData::new);
+                            data.sound = sound;
+
+                            boolean silent = data.volume == 0f;
+
+                            loop(data, sound, item, volume, 1f);
+
+                            if(silent && data.volume > 0f){
+                                localData.add(data);
+                            }
+                        }
+                    }
+                }else{
+                    sources.remove(i); //unordered swap
+                    i --;
+                    size --;
+                }
+            }
+
+            //copy built-up data to output buffer
+            synchronized(outputData){
+                outputData.size = 0;
+                for(var data : localData){
+
+                    //this allocates, which is bad, but it only happens at 20fps with a few audio types at most
+                    outputData.add(data.clone());
+                }
+            }
+
+            //reset data for next iteration
+            sounds.each((sound, data) -> {
+                data.pitch = 0f;
+                data.volume = 0f;
+                data.total = 0f;
+                data.totalVolume = 0f;
+                data.sumX = 0f;
+                data.sumY = 0f;
+            });
+        }
 
         @Override
         public void run(){
             try{
-                while(true){
-                    var items = sources.items;
-                    int size = sources.size;
+                while(running){
+                    long nanos = Time.nanos();
 
-                    long elapsed = Time.timeSinceNanos(time);
-                    time = Time.timeSinceNanos(elapsed);
+                    if(state.isMenu()) break;
+                    if(state.isPlaying()){
+                        doLoop();
+                    }
+
+                    long elapsed = Time.timeSinceNanos(nanos);
                     if(elapsed < targetNanos){
                         long remaining = targetNanos - elapsed;
                         Thread.sleep(remaining / Time.nanosPerMilli, (int)(remaining % Time.nanosPerMilli));
