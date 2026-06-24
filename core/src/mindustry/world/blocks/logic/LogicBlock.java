@@ -239,18 +239,10 @@ public class LogicBlock extends Block{
 
         public void trySet(LExecutor exec, Object value){
             if(logicVar != null){
-                logicVar.setconst(value);
+                logicVar.setlink(value);
             }else{
-                var foundVar = exec.optionalVar(name);
-                if(foundVar != null){
-                    if(value != null){
-                        //should now become const as it is now a valid link
-                        //note: this will never become non-const even if invalidated
-                        //there isn't really a good reason to use these variables anyway, and it is an edge case
-                        foundVar.constant = true;
-                    }
-                    foundVar.setconst(value);
-                }
+                logicVar = exec.optionalVar(name);
+                if(logicVar != null) logicVar.setlink(value);
             }
         }
 
