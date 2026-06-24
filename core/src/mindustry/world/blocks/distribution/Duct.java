@@ -138,6 +138,7 @@ public class Duct extends Block implements Autotiler{
 
         float lastFrom, lastTo;
         Item lastItem;
+        long lastUpdate;
 
         @Override
         public void draw(){
@@ -207,22 +208,34 @@ public class Duct extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
+            if(lastUpdate == state.updateId) return;
+            lastUpdate = state.updateId;
+
             lastItem = current;
             lastFrom = progress;
             progress += edelta() / speed * 2f;
             lastTo = progress;
 
             if(current != null && next != null){
-                if(progress >= (1f - 1f/speed) && moveForward(current)){
+                float target = (1f - 1f/speed);
+
+                if(progress >= target && next.acceptItem(this, current)){
+                    next.handleItem(this, current);
                     items.remove(current, 1);
                     current = null;
-                    progress %= (1f - 1f/speed);
+                    if(nextc != null){
+                        nextc.lastUpdate = state.updateId;
+                        nextc.progress += (progress - target);
+                    }
+
+                    progress = 0f;
                 }
             }else{
-                progress = 0;
+                lastTo = progress = 0;
             }
 
             if(current == null && items.total() > 0){
+                Log.info("replacing item @", this);
                 current = items.first();
             }
         }
@@ -272,6 +285,7 @@ public class Duct extends Block implements Autotiler{
             yscl = bits[2];
             blending = bits[4];
             next = front();
+            if(next != null && next.team != team) next = null;
             nextc = next instanceof DuctBuild d ? d : null;
         }
 
