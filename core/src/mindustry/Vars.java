@@ -85,17 +85,17 @@ public class Vars implements Loadable{
     public static final String patchesGuideURL = "https://mindustrygame.github.io/wiki/datapatches/";
     /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
-    /** URLs to the JSON file containing all the stable servers.  */
+    /** URLs to the JSON file containing all the stable servers. */
     public static final String[] serverJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_v8.json"};
-    /** URLs to the JSON files containing the list of mods.  */
+    /** URLs to the JSON files containing the list of mods. */
     public static final String[] modJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrymods/mods.json"};
-    /** URLs to the JSON file containing players banned from Steam.  */
+    /** URLs to the JSON file containing players banned from Steam. */
     public static final String[] steamBansURLs = {"https://raw.githubusercontent.com/Anuken/MindustrySteamBans/master/data.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrysteambans/data.json"};
-    /** URL of the github issue report template.*/
+    /** URL of the github issue report template. */
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
-    /** cached server list - only used if defaultServers have not been fetched*/
+    /** cached server list - only used if defaultServers have not been fetched */
     public static final Seq<ServerGroup> cachedServers = Seq.with();
     /** maximum openGL errors logged */
     public static final int maxGlErrors = 100;
@@ -216,8 +216,6 @@ public class Vars implements Loadable{
     /** Whether to draw shadows of blocks at map edges and static blocks.
      * Do not change unless you know exactly what you are doing.*/
     public static boolean enableDarkness = true;
-    /** Whether to draw debug lines for collisions. */
-    public static boolean drawDebugHitboxes = false;
     /** Whether to draw avoidance fields. */
     public static boolean debugDrawAvoidance = false;
     /** Whether the on-disk server file cache has been loaded. */
@@ -232,6 +230,8 @@ public class Vars implements Loadable{
     public static Fi customMapDirectory;
     /** data subdirectory used for custom map previews */
     public static Fi mapPreviewDirectory;
+    /** directory for extracted assets */
+    public static Fi assetCacheDirectory;
     /** tmp subdirectory for map conversion */
     public static Fi tmpDirectory;
     /** data subdirectory used for saves */
@@ -263,7 +263,7 @@ public class Vars implements Loadable{
     public static Locale[] locales;
 
     //the main executor will only have at most [cores] number of threads active
-    public static ExecutorService mainExecutor = Threads.executor("Main Executor", OS.cores);
+    public static ExecutorService mainExecutor = Core.executor;
 
     public static FileTree tree = new FileTree();
     public static Net net;
@@ -280,6 +280,7 @@ public class Vars implements Loadable{
     public static GlobalVars logicVars;
     public static MapEditor editor;
     public static AvoidanceProcess avoidance;
+    public static DataAssetCache assetCache;
     public static GameService service = new GameService();
 
     public static Universe universe;
@@ -339,6 +340,7 @@ public class Vars implements Loadable{
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
         modDirectory = dataDirectory.child("mods/");
+        assetCacheDirectory = dataDirectory.child("assetCache");
         schematicDirectory = dataDirectory.child("schematics/");
         bebuildDirectory = dataDirectory.child("be_builds/");
         serverCacheFile = dataDirectory.child("server_list.json");
@@ -364,6 +366,7 @@ public class Vars implements Loadable{
         fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();
+        assetCache = new DataAssetCache();
         javaPath =
             new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
             Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() : // Unix
@@ -384,6 +387,7 @@ public class Vars implements Loadable{
             emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20);
         });
 
+        assetCache.load();
         mods.load();
         maps.load();
     }

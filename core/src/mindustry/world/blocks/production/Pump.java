@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.logic.*;
 import mindustry.type.*;
@@ -115,6 +116,8 @@ public class Pump extends LiquidBlock{
 
         @Override
         public void draw(){
+            if(Renderer.renderUpdate) totalProgress += warmup * edelta();
+
             drawer.draw(this);
         }
 

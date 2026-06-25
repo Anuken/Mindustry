@@ -1,11 +1,11 @@
 package mindustry.mod;
 
+import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
@@ -13,6 +13,9 @@ import mindustry.ctype.*;
 import mindustry.entities.part.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
+import mindustry.mod.Mods.*;
+import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -26,9 +29,18 @@ import java.util.*;
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class DataPatcher{
+    public static final int maxImageSize = 2000;
+    public static final int patchFormatVersion = 2;
+
+    private static boolean needsArrayFix = false;
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
+    private static DataPatcher currentDataPatcher;
     private static ContentParser parser = createParser();
+    private static  ModMeta dpModMeta = new ModMeta(){{
+        name = internalName = "dp";
+    }};
+    private static LoadedMod dpMod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, dpModMeta);
 
     private boolean applied;
     private ContentLoader contentLoader;
@@ -36,10 +48,10 @@ public class DataPatcher{
     private Seq<Runnable> resetters = new Seq<>();
     private Seq<Runnable> afterCallbacks = new Seq<>();
     private Seq<Object> visitStack = new Seq<>();
-    private @Nullable PatchSet currentlyApplying;
-
-    /** Currently active patches. Note that apply() should be called after modification. */
-    public Seq<PatchSet> patches = new Seq<>();
+    private Seq<Content> addedContent = new Seq<>();
+    private @Nullable PatchAsset currentlyApplyingPatch;
+    private @Nullable ContentAsset currentlyApplyingContent;
+    private Seq<LVar> addedVars = new Seq<>();
 
     static{
         for(var type : ContentType.all){
@@ -50,15 +62,16 @@ public class DataPatcher{
     static ContentParser createParser(){
         ContentParser cont = new ContentParser(){
             @Override
-            void warn(String string, Object... format){
+            void warnContext(@Nullable Content currentContent, @Nullable Fi currentFile, String string, Object... format){
                 //forward warnings to the current patcher - this is a bit hacky, but I do not want to re-initialize the parser every time
-                if(Vars.state.patcher != null){
-                    Vars.state.patcher.warn(string, format);
+                if(currentDataPatcher!= null){
+                    currentDataPatcher.warnContext(currentContent, currentFile, string, format);
                 }
             }
         };
         cont.allowClassResolution = false;
         cont.allowAssetLoading = false;
+        cont.allowPatching = false;
 
         return cont;
     }
@@ -68,15 +81,23 @@ public class DataPatcher{
     }
 
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
-    public void apply(Seq<String> patchArray) throws Exception{
+    public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content){
+        apply(patches, content, true);
+    }
+
+    /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
+    public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content, boolean reloadContentWorld){
+        //if you're un-applying data patches, and it throws an error, just crash. this is not recoverable.
         if(applied){
             unapply();
             applied = false;
         }
 
+        if(patches.isEmpty() && content.isEmpty()) return;
+
+        currentDataPatcher = this;
         applied = true;
         contentLoader = Vars.content.copy();
-        patches.clear();
 
         Attribute[] oldAttributes = Attribute.all.clone();
         var oldAttributeMap = Attribute.map.copy();
@@ -85,14 +106,30 @@ public class DataPatcher{
             Attribute.map = oldAttributeMap;
         });
 
-        for(String patch : patchArray){
-            PatchSet set = new PatchSet(patch, new JsonValue("error"));
-            patches.add(set);
+        //patches are read first.
+        for(var set : patches){
+            set.warnings.clear();
+            set.error = false;
 
             try{
-                JsonValue value = parser.getJson().fromJson(null, Jval.read(patch).toString(Jformat.plain));
+                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                if(!(someValue instanceof JsonValue value)) throw new SerializationException("Patch must be a JSON object.");
+
+                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
+                    JsonValue req = value.get("requiredPlanets");
+                    value.remove("requiredPlanets");
+
+                    //this should be ignored unless this instance is a dedicated server
+                    if(Vars.headless){
+                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
+                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                            continue;
+                        }
+                    }
+                }
+
                 set.json = value;
-                currentlyApplying = set;
+                currentlyApplyingPatch = set;
                 visitStack.clear();
 
                 set.name = value.getString("name", "");
@@ -100,23 +137,139 @@ public class DataPatcher{
                 for(var child : value){
                     assign(root, child.name, child, null, null, null);
                 }
-                currentlyApplying = null;
+                currentlyApplyingPatch = null;
 
             }catch(Exception e){
                 set.error = true;
+                set.name = "";
                 set.warnings.add(Strings.getSimpleMessage(e));
-                currentlyApplying = null;
+                currentlyApplyingPatch = null;
 
-                Log.err("Failed to apply patch: " + patch, e);
+                Log.err("Failed to apply patch: " + set.patch, e);
             }
+        }
+
+        if(!content.isEmpty()){
+            content.sort();
+
+            dpMod.erroredContent.clear();
+
+            for(var asset : content){
+                asset.errored = false;
+                asset.content = null;
+                asset.warnings.clear();
+
+                currentlyApplyingContent = asset;
+
+                if(!Structs.contains(ContentAsset.loadableContent, asset.type)){
+                    warn("Content @ is of type '@', which is not supported. Skipping.", asset.path, asset.type);
+                    continue;
+                }
+
+                Content current = Vars.content.getLastAdded();
+                Fi file = new Fi(asset.path);
+
+                //this is very important for resizing various arrays used in the game
+                if((asset.type == ContentType.item || asset.type == ContentType.liquid)){
+                    needsArrayFix = true;
+                }
+
+                try{
+                    //this binds the content but does not load it entirely
+                    asset.content = parser.parse(dpMod, asset.name, asset.data, file, asset.type);
+                    asset.content.minfo.asset = asset;
+                }catch(Throwable e){
+                    asset.warnings.add(Strings.getFinalMessage(e));
+                    asset.errored = true;
+
+                    var lastAdded = Vars.content.getLastAdded();
+                    if(current != lastAdded && lastAdded != null){
+                        Vars.content.remove(lastAdded);
+                        //markError should log it already
+                        parser.markError(lastAdded, dpMod, file, e);
+                    }else{
+                        Log.err("Error loading content: " + asset.path, e);
+                    }
+                }
+            }
+
+            currentlyApplyingContent = null;
+
+            parser.finishParsing();
+
+            addedContent.clear();
+            Seq<Content> all = addedContent;
+
+            for(var arr : Vars.content.getContentMap()){
+                all.addAll(arr.select(c -> c.minfo.mod == dpMod));
+            }
+
+            for(var errored : dpMod.erroredContent){
+                if(errored.minfo.error != null && errored.minfo.asset != null){
+                    errored.minfo.asset.warnings.add(errored.minfo.error);
+                }
+                Vars.content.remove(errored);
+            }
+
+            for(var cont : all){
+                try{
+                    cont.init();
+                }catch(Throwable t){
+                    Vars.content.remove(cont);
+                    if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
+                    parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
+                }
+            }
+
+            for(var cont : all){
+                try{
+                    cont.postInit();
+                }catch(Throwable t){
+                    Vars.content.remove(cont);
+                    if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
+                    parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
+                }
+            }
+
+            //register global variables
+            for(var cont : all){
+                if(!cont.hasErrored() && cont instanceof UnlockableContent u && Vars.logicVars.get("@" + u.name) == null){
+                    addedVars.add(Vars.logicVars.put("@" + u.name, u, false));
+                }
+            }
+
+            if(!Vars.headless){
+                for(var cont : all){
+                    try{
+                        cont.loadIcon();
+                        cont.load();
+                        if(cont.minfo.asset != null && cont instanceof UnlockableContent u){
+                            if(!u.uiIcon.found() && u.getContentType() != ContentType.planet && u.getContentType() != ContentType.weather){
+                                cont.minfo.asset.warnings.add("[" + u.name.substring(u.minfo.mod.name.length() + 1) + "] Could not find an icon. Ensure that you have an image named '" + u.name + "' loaded. Remember that imported images always have the 'dp-' prefix automatically applied.");
+                            }
+                        }
+                    }catch(Throwable t){
+                        //not removed here, as this code is only called clientside, and removing it would cause a desync
+                        if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
+                        parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
+                    }
+                }
+            }
+
+            if(reloadContentWorld) fixContentArrays();
         }
 
         afterCallbacks.each(Runnable::run);
     }
 
     public void unapply(){
+        unapply(true);
+    }
+
+    public void unapply(boolean reloadContentWorld){
         if(!applied) return;
 
+        callContentRemove();
         Vars.content = contentLoader;
         applied = false;
 
@@ -129,11 +282,59 @@ public class DataPatcher{
             }
         }
         resetters.clear();
+        for(var lvar : addedVars){
+            Vars.logicVars.remove(lvar);
+        }
 
         //this should never throw an exception
         afterCallbacks.each(Runnable::run);
         afterCallbacks.clear();
         usedpatches.clear();
+        addedContent.clear();
+
+        if(reloadContentWorld) fixContentArrays();
+    }
+
+    public Seq<Content> getAddedContent(){
+        return addedContent;
+    }
+
+    void callContentRemove(){
+        for(var arr : Vars.content.getContentMap()){
+            for(var value : arr){
+                if(value.isModded() && value.minfo.mod == dpMod){
+                    value.removed = true;
+                    value.removeContent();
+                }
+            }
+        }
+    }
+
+    public static void fixContentArrays(){
+        if(!needsArrayFix) return;
+        int items = Vars.content.items().size, liquids = Vars.content.liquids().size;
+
+        //block item/liquid filter
+        for(var block : Vars.content.blocks()){
+            //don't waste time resizing arrays for blocks that can't use them
+            if(!block.synthetic()) continue;
+
+            block.checkContentArrayCapacity(items, liquids);
+        }
+
+        //resize capacities in the world (editor). this SHOULD be the only time when fixing arrays is necessary
+        if(!Vars.headless && Vars.ui != null && Vars.ui.editor != null && Vars.ui.editor.isShown()){
+            int wh = Vars.world.width() * Vars.world.height();
+            for(int i = 0; i < wh; i++){
+                var b = Vars.world.tiles.geti(i).build;
+                if(b != null && b.items != null) b.items.checkArrayCapacity(items);
+                if(b != null && b.liquids != null) b.liquids.checkArrayCapacity(items);
+            }
+        }
+
+        //TODO: this doesn't do anything about extensive ItemSeq usage across the codebase, which is limited to the campaign
+        //TODO: this also doesn't change sectors
+        needsArrayFix = false;
     }
 
     void visit(Object object){
@@ -590,10 +791,20 @@ public class DataPatcher{
     }
 
     void warn(String error, Object... fmt){
+        warnContext(null, null, error, fmt);
+    }
+
+    void warnContext(@Nullable Content currentContent, @Nullable Fi currentFile, String error, Object... fmt){
         String formatted = Strings.format(error, fmt);
-        if(currentlyApplying != null){
-            currentlyApplying.warnings.add(formatted);
+
+        if(currentlyApplyingPatch != null){
+            currentlyApplyingPatch.warnings.add(formatted);
+        }else if(currentlyApplyingContent != null && (currentlyApplyingContent.content == null || currentlyApplyingContent.content.minfo.asset == null)){
+            currentlyApplyingContent.warnings.add(formatted);
+        }else if(currentContent != null && currentContent.minfo.asset != null){
+            currentContent.minfo.asset.warnings.add(formatted);
         }
+
         Log.warn("[ContentPatcher] " + formatted);
     }
 
@@ -611,25 +822,6 @@ public class DataPatcher{
         else if(object instanceof float[] i) return i.clone();
         else if(object instanceof double[] i) return i.clone();
         else return ((Object[])object).clone();
-    }
-
-    public static class PatchSet{
-        public String patch;
-        public JsonValue json;
-        public String name = "";
-        public boolean error;
-        public Seq<String> warnings = new Seq<>();
-
-        public PatchSet(String patch, JsonValue json){
-            this.patch = patch;
-            this.json = json;
-        }
-
-        @Override
-        public String toString(){
-            //the json can be a single 'error' value if it failed to parse
-            return !json.isObject() ? patch : json.prettyPrint(OutputType.minimal, 2);
-        }
     }
 
     private static class FieldData{

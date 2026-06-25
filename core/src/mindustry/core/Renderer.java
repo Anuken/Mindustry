@@ -26,7 +26,9 @@ import static mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
     /** These are global variables, for headless access. Cached. */
-    public static float laserOpacity = 0.5f, unitLaserOpacity = 1f, bridgeOpacity = 0.75f;
+    public static float laserOpacity = 0.5f, unitLaserOpacity = 1f, bridgeOpacity = 0.75f, blockInterp = 1f;
+    public static boolean blockTimestep = false, renderUpdate = false;
+    public static long blockRenderUpdateId;
 
     public final BlockRenderer blocks = new BlockRenderer();
     public final FogRenderer fog = new FogRenderer();
@@ -165,6 +167,8 @@ public class Renderer implements ApplicationListener{
         unitLaserOpacity = settings.getInt("unitlaseropacity") / 100f;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
+        blockTimestep = logic.hasFixedTimestep();
+        blockRenderUpdateId = Groups.build.getFixedUpdateId();
         animateShields = settings.getBool("animatedshields");
         animateWater = settings.getBool("animatedwater");
         drawStatus = settings.getBool("blockstatus");
@@ -197,6 +201,8 @@ public class Renderer implements ApplicationListener{
 
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
+
+        Lod.update();
 
         if(state.isMenu()){
             landTime = 0f;
@@ -412,11 +418,13 @@ public class Renderer implements ApplicationListener{
         }
 
         Events.fire(Trigger.drawOver);
+        blockInterp = blockTimestep ? Groups.build.getRenderInterpolation() : 1f;
+        renderUpdate = !state.isPaused();
         blocks.drawBlocks();
 
         Groups.draw.draw(Drawc::draw);
 
-        if(drawDebugHitboxes){
+        if(settings.getBool("drawhitboxes")){
             DebugCollisionRenderer.draw();
         }
 
@@ -580,38 +588,47 @@ public class Renderer implements ApplicationListener{
             return;
         }
 
-        FrameBuffer buffer = new FrameBuffer(w, h);
+        try{
+            Lod.disable = true;
+            FrameBuffer buffer = new FrameBuffer(w, h);
 
-        drawWeather = false;
-        float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
-        disableUI = true;
-        camera.width = w;
-        camera.height = h;
-        camera.position.x = w / 2f + tilesize / 2f;
-        camera.position.y = h / 2f + tilesize / 2f;
-        buffer.begin(Color.clear);
-        draw();
-        Draw.flush();
-        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        buffer.end();
-        disableUI = false;
-        camera.width = vpW;
-        camera.height = vpH;
-        camera.position.set(px, py);
-        drawWeather = true;
-        buffer.dispose();
+            drawWeather = false;
+            float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
+            disableUI = true;
+            camera.width = w;
+            camera.height = h;
+            camera.position.x = w / 2f + tilesize / 2f;
+            camera.position.y = h / 2f + tilesize / 2f;
+            buffer.begin(Color.clear);
+            draw();
+            Draw.flush();
+            byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
+            buffer.end();
+            disableUI = false;
+            camera.width = vpW;
+            camera.height = vpH;
+            camera.position.set(px, py);
+            drawWeather = true;
+            buffer.dispose();
 
-        Threads.thread(() -> {
-            for(int i = 0; i < lines.length; i += 4){
-                lines[i + 3] = (byte)255;
-            }
-            Pixmap fullPixmap = new Pixmap(w, h);
-            Buffers.copy(lines, 0, fullPixmap.pixels, lines.length);
-            Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
-            PixmapIO.writePng(file, fullPixmap);
-            fullPixmap.dispose();
-            app.post(() -> ui.showInfoFade(bundle.format("screenshot", file.toString())));
-        });
+            mainExecutor.submit(() -> {
+                for(int i = 0; i < lines.length; i += 4){
+                    lines[i + 3] = (byte)255;
+                }
+                Pixmap fullPixmap = new Pixmap(w, h);
+                Buffers.copy(lines, 0, fullPixmap.pixels, lines.length);
+                Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
+                PixmapIO.writePng(file, fullPixmap);
+                fullPixmap.dispose();
+                app.post(() -> ui.showInfoFade(bundle.format("screenshot", file.toString())));
+            });
+        }catch(Throwable e){
+            Log.err(e);
+            Vars.ui.showException("@screenshot.error", e);
+        }finally{
+            Lod.disable = false;
+        }
+
     }
 
     public static class EnvRenderer{

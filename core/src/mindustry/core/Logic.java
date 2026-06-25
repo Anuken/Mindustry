@@ -100,16 +100,15 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, e -> {
-            //enable infinite ammo for wave team by default
-            state.rules.waveTeam.rules().infiniteAmmo = true;
 
             if(state.isCampaign()){
                 //enable building AI on campaign unless the preset disables it
-
                 state.rules.coreIncinerates = true;
                 state.rules.infiniteResources = false;
                 state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
+                state.rules.worldProcessorPlayerLink = false;
+
                 if(state.getPlanet().enemyInfiniteItems){
                     state.rules.waveTeam.rules().infiniteResources = true;
                     state.rules.waveTeam.rules().fillItems = true;
@@ -298,17 +297,17 @@ public class Logic implements ApplicationListener{
     }
 
     public void reset(){
-        State prev = state.getState();
-        state.patcher.unapply();
-        //recreate gamestate - sets state to menu
-        state = new GameState();
-        //fire change event, since it was technically changed
-        Events.fire(new StateChangeEvent(prev, State.menu));
-
         Groups.clear();
         Time.clear();
         Events.fire(new ResetEvent());
         world.tiles = new Tiles(0, 0);
+
+        state.data.unload();
+        State prev = state.getState();
+        //recreate gamestate - sets state to menu
+        state = new GameState();
+        //fire change event, since it was technically changed
+        Events.fire(new StateChangeEvent(prev, State.menu));
 
         Core.settings.manualSave();
     }
@@ -461,6 +460,34 @@ public class Logic implements ApplicationListener{
         Core.settings.manualSave();
     }
 
+    public boolean hasFixedTimestep(){
+        return Core.settings.getInt("buildingtimestep", 65) <= 60;
+    }
+
+    protected void updateEntities(){
+        int timestep = Core.settings.getInt("buildingtimestep", 65);
+
+        PerfCounter.entityUpdate.begin();
+
+        Groups.updatePooling();
+
+        Groups.bullet.updatePhysics();
+        Groups.unit.updatePhysics();
+        Groups.all.update();
+
+        PerfCounter.buildingUpdate.begin();
+        if(timestep > 60){
+            Groups.build.update();
+        }else{
+            Groups.build.fixedUpdate(timestep);
+        }
+
+        PerfCounter.buildingUpdate.begin();
+
+        Groups.bullet.collide();
+        PerfCounter.entityUpdate.end();
+    }
+
     @Override
     public void update(){
         PerfCounter.frame.end();
@@ -565,9 +592,7 @@ public class Logic implements ApplicationListener{
                 state.envAttrs.add(state.rules.attributes);
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
-                PerfCounter.entityUpdate.begin();
-                Groups.update();
-                PerfCounter.entityUpdate.end();
+                updateEntities();
 
                 Events.fire(Trigger.afterGameUpdate);
             }

@@ -7,6 +7,7 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.MultiPacker;
+import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
@@ -107,12 +108,12 @@ public class EventType{
     /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
     public static class WorldLoadEndEvent{}
 
-    /** Called when a save loads custom patches. {@link #patches} can be modified in the event handler. */
-    public static class ContentPatchLoadEvent{
-        public final Seq<String> patches;
+    /** Called when a save loads custom data patches. {@link #assets} can be modified in the event handler. The array may be empty. */
+    public static class DataPatchLoadEvent{
+        public final Seq<DataAsset> assets;
 
-        public ContentPatchLoadEvent(Seq<String> patches){
-            this.patches = patches;
+        public DataPatchLoadEvent(Seq<DataAsset> assets){
+            this.assets = assets;
         }
     }
 

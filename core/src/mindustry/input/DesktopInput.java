@@ -241,7 +241,7 @@ public class DesktopInput extends InputHandler{
 
         if(!scene.hasField() && !scene.hasDialog()){
             if(input.keyTap(Binding.debugHitboxes)){
-                drawDebugHitboxes = !drawDebugHitboxes;
+                Core.settings.put("drawhitboxes", !settings.getBool("drawhitboxes"));
             }
 
             if(input.keyTap(Binding.detachCamera)){
@@ -435,6 +435,7 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyTap(Binding.respawn)){
                 controlledType = null;
                 recentRespawnTimer = 1f;
+                droppingItem = false;
                 Call.unitClear(player);
             }
         }

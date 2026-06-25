@@ -19,7 +19,7 @@ public class BaseShield extends Block{
     //TODO game rule? or field? should vary by base.
     public float radius = 200f;
     public int sides = 24;
-    
+
     public @Nullable Color shieldColor;
 
     protected static BaseShieldBuild paramBuild;
@@ -62,6 +62,7 @@ public class BaseShield extends Block{
         hasPower = true;
         update = solid = true;
         rebuildable = false;
+        canPickup = true;
     }
 
     @Override
@@ -79,7 +80,7 @@ public class BaseShield extends Block{
     }
 
     public class BaseShieldBuild extends Building{
-        public boolean broken = false; //TODO
+        public boolean broken = false;
         public float hit = 0f;
         public float smoothRadius;
 

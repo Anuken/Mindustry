@@ -11,7 +11,7 @@ public class LegacyCommandCenter extends LegacyBlock{
         update = true;
     }
 
-    public class CommandBuild extends Building{
+    public class LegacyCommandBuild extends Building{
 
         @Override
         public void write(Writes write){
