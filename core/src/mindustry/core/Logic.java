@@ -460,13 +460,7 @@ public class Logic implements ApplicationListener{
         Core.settings.manualSave();
     }
 
-    public boolean hasFixedTimestep(){
-        return Core.settings.getInt("buildingtimestep", 65) <= 60;
-    }
-
     protected void updateEntities(){
-        int timestep = Core.settings.getInt("buildingtimestep", 65);
-
         PerfCounter.entityUpdate.begin();
 
         Groups.updatePooling();
@@ -476,12 +470,7 @@ public class Logic implements ApplicationListener{
         Groups.all.update();
 
         PerfCounter.buildingUpdate.begin();
-        if(timestep > 60){
-            Groups.build.update();
-        }else{
-            Groups.build.fixedUpdate(timestep);
-        }
-
+        Groups.build.update();
         PerfCounter.buildingUpdate.begin();
 
         Groups.bullet.collide();

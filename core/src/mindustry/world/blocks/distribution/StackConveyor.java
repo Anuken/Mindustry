@@ -9,7 +9,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -119,8 +118,6 @@ public class StackConveyor extends Block implements Autotiler{
         public float cooldown;
         public Item lastItem;
 
-        float lastX = x, lastY = y;
-
         boolean proxUpdating = false;
 
         @Override
@@ -170,12 +167,10 @@ public class StackConveyor extends Block implements Autotiler{
 
             int fromRot = from.build == null ? rotation : from.build.rotation;
 
-            float itemX = Mathf.lerp(from.worldx(), x, 1f - cooldown);
-            float itemY = Mathf.lerp(from.worldy(), y, 1f - cooldown);
-            if(Renderer.blockTimestep){
-                if(itemX != lastX) itemX = Mathf.lerp(lastX, itemX, Renderer.blockInterp);
-                if(itemY != lastY) itemY = Mathf.lerp(lastY, itemY, Renderer.blockInterp);
-            }
+            //offset
+            Tmp.v1.set(from.worldx(), from.worldy());
+            Tmp.v2.set(x, y);
+            Tmp.v1.interpolate(Tmp.v2, 1f - cooldown, Interp.linear);
 
             //rotation
             float a = (fromRot%4) * 90;
@@ -188,11 +183,11 @@ public class StackConveyor extends Block implements Autotiler{
             }
 
             //stack
-            Draw.rect(stackRegion, itemX, itemY, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
+            Draw.rect(stackRegion, Tmp.v1.x, Tmp.v1.y, Mathf.lerp(a, b, Interp.smooth.apply(1f - Mathf.clamp(cooldown * 2, 0f, 1f))));
 
             //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
-            Draw.rect(lastItem.fullIcon, itemX, itemY, size, size, 0);
+            Draw.rect(lastItem.fullIcon, Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
         @Override
@@ -273,10 +268,9 @@ public class StackConveyor extends Block implements Autotiler{
         public void updateTile(){
             //the item still needs to be "reeled" in when disabled
             float eff = enabled ? (efficiency + baseEfficiency) : 1f;
-            lastX = Mathf.lerp(Point2.x(link) * tilesize, x, 1f - cooldown);
-            lastY = Mathf.lerp(Point2.y(link) * tilesize, y, 1f - cooldown);
-            if(cooldown > 0f) cooldown = Math.min(cooldown - speed * eff * delta(), recharge);
-            if(state != stateMove) cooldown = Math.max(cooldown, 0f);
+
+            //reel in crater
+            if(cooldown > 0f) cooldown = Mathf.clamp(cooldown - speed * eff * delta(), 0f, recharge);
 
             //indicates empty state
             if(link == -1) return;
@@ -305,7 +299,7 @@ public class StackConveyor extends Block implements Autotiler{
                     }
                 }
             }else{ //transfer
-                if(state != stateLoad || items.total() >= getMaximumAccepted(lastItem)){
+                if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
                     if(front() instanceof StackConveyorBuild e && e.team == team && e.link == -1){
                         e.items.add(items);
                         e.lastItem = lastItem;
@@ -314,14 +308,8 @@ public class StackConveyor extends Block implements Autotiler{
                         link = -1;
                         items.clear();
 
-                        float remaining = 0f;//cooldown % 1f;
-
                         cooldown = recharge;
-                        e.cooldown = 1f + remaining;
-                        e.lastX = lastX;
-                        e.lastY = lastY;
-                    }else{
-                        cooldown = Math.max(cooldown, 0f);
+                        e.cooldown = 1;
                     }
                 }
             }
@@ -345,8 +333,6 @@ public class StackConveyor extends Block implements Autotiler{
         protected void poofIn(){
             link = tile.pos();
             loadEffect.at(this);
-            lastX = x;
-            lastY = y;
         }
 
         protected void poofOut(){

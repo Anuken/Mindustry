@@ -9,7 +9,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
@@ -141,14 +140,6 @@ public class Conveyor extends Block implements Autotiler{
 
         public float clogHeat = 0f;
 
-        private static int nextItemId = 0;
-
-        private int[] itemIds = new int[capacity];
-
-        private int prevLen = 0;
-        private int[] prevItemIds = new int[capacity];
-        private float[] prevXs = new float[capacity], prevYs = new float[capacity];
-
         @Override
         public void draw(){
             int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
@@ -169,52 +160,16 @@ public class Conveyor extends Block implements Autotiler{
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
             Draw.z(Layer.block - 0.1f);
-
-            float
-
-            layer = Layer.block - 0.1f,
-            wwidth = world.unitWidth(),
-            wheight = world.unitHeight(),
-            scaling = 0.01f,
-            alpha = Renderer.blockInterp,
-
-            rotationRad = rotation * 90f * Mathf.degreesToRadians,
-            cos = Mathf.cos(rotationRad),
-            sin = Mathf.sin(rotationRad);
+            float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
-                long id = itemIds[i];
-
-                float cx = xs[i], cy = ys[i];
-
-                float px = cx, py = cy;
-                boolean found = false;
-                int start = Math.min(i, prevLen - 1);
-                //TODO: awful code, should be deleted when a proper solution is found
-                //scan for prev item's position based on ID (not as slow as it appears)
-                for(int d = 0; d <= prevLen; d++){
-                    int lo = start - d, hi = start + d;
-                    if(lo >= 0 && prevItemIds[lo] == id){
-                        px = prevXs[lo]; py = prevYs[lo];
-                        found = true;
-                        break;
-                    }
-                    if(d != 0 && hi < prevLen && prevItemIds[hi] == id){
-                        px = prevXs[hi]; py = prevYs[hi];
-                        found = true;
-                        break;
-                    }
-                }
-
-                float ixl = found ? Mathf.lerp(px, cx, alpha) : cx;
-                float iyl = found ? Mathf.lerp(py, cy, alpha) : cy;
+                Tmp.v1.trns(rotation * 90, tilesize, 0);
+                Tmp.v2.trns(rotation * 90, -tilesize / 2f, xs[i] * tilesize / 2f);
 
                 float
-                vx = -tilesize / 2f + tilesize * iyl,
-                vy = ixl * tilesize / 2f,
-                ix = x + vx * cos - vy * sin,
-                iy = y + vx * sin + vy * cos;
+                ix = (x + Tmp.v1.x * ys[i] + Tmp.v2.x),
+                iy = (y + Tmp.v1.y * ys[i] + Tmp.v2.y);
 
                 //keep draw position deterministic.
                 Draw.z(layer + (ix / wwidth + iy / wheight) * scaling);
@@ -297,12 +252,6 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
-            //save snapshot for interpolation
-            prevLen = len;
-            System.arraycopy(itemIds, 0, prevItemIds, 0, len);
-            System.arraycopy(xs, 0, prevXs, 0, len);
-            System.arraycopy(ys, 0, prevYs, 0, len);
-
             minitem = 1f;
             mid = 0;
 
@@ -313,7 +262,7 @@ public class Conveyor extends Block implements Autotiler{
                 return;
             }
 
-            float nextMax = aligned ? 1f - Math.max(itemSpace - nextc.minitem, 0f) : 1f;
+            float nextMax = aligned ? 1f - Math.max(itemSpace - nextc.minitem, 0) : 1f;
             float moved = speed * edelta();
 
             for(int i = len - 1; i >= 0; i--){
@@ -394,7 +343,6 @@ public class Conveyor extends Block implements Autotiler{
                 xs[0] = 0;
                 ys[0] = i * itemSpace;
                 ids[0] = item;
-                itemIds[0] = nextItemId++;
                 items.add(item, 1);
             }
 
@@ -427,13 +375,11 @@ public class Conveyor extends Block implements Autotiler{
                 xs[0] = x;
                 ys[0] = 0;
                 ids[0] = item;
-                itemIds[0] = nextItemId++;
-            }else{
+            }else{ //idx = mid
                 add(mid);
                 xs[mid] = x;
                 ys[mid] = 0.5f;
                 ids[mid] = item;
-                itemIds[mid] = nextItemId++;
             }
         }
 
@@ -520,7 +466,6 @@ public class Conveyor extends Block implements Autotiler{
                 ids[i] = ids[i - 1];
                 xs[i] = xs[i - 1];
                 ys[i] = ys[i - 1];
-                itemIds[i] = itemIds[i - 1];
             }
 
             len++;
@@ -531,7 +476,6 @@ public class Conveyor extends Block implements Autotiler{
                 ids[i] = ids[i + 1];
                 xs[i] = xs[i + 1];
                 ys[i] = ys[i + 1];
-                itemIds[i] = itemIds[i + 1];
             }
 
             len--;
