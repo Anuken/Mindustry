@@ -406,6 +406,7 @@ public class JoinDialog extends BaseDialog{
         //if the servers have been fetched, use the fetched list
         //otherwise use the cached list + the extra servers that may have been included by mods
         var servers = fetchedServers ? defaultServers : tmpServers.clear().addAll(cachedServers).addAll(defaultServers);
+        servers.shuffle();
 
         for(int i = 0; i < servers.size; i ++){
             ServerGroup group = servers.get((i + servers.size/2) % servers.size);
