@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -190,6 +191,9 @@ public class GenericCrafter extends Block{
 
         @Override
         public void draw(){
+            //called in draw() for smooth interpolation
+            if(Renderer.renderUpdate) totalProgress += warmup * Time.delta;
+
             drawer.draw(this);
         }
 
@@ -252,9 +256,6 @@ public class GenericCrafter extends Block{
             }else{
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
             }
-
-            //TODO may look bad, revert to edelta() if so
-            totalProgress += warmup * Time.delta;
 
             if(progress >= 1f){
                 craft();

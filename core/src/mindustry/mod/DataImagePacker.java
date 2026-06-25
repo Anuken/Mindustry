@@ -1,6 +1,7 @@
-package mindustry.graphics;
+package mindustry.mod;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
@@ -10,34 +11,57 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
-import mindustry.mod.*;
+import mindustry.mod.data.*;
 
+import java.io.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 /** Manages data patch images. */
-public class DataPatchPacker{
+public class DataImagePacker{
     public static final String regionPrefix = "dp-";
 
     private @Nullable TextureAtlas patchAtlas;
 
     /** Packs a new set of images. If images are already packed, disposes of the old ones. */
-    public void pack(Seq<PatchImage> images){
+    public void pack(Seq<ImageAsset> images){
         if(patchAtlas != null){
-            unapply();
+            unload();
         }
         if(images.isEmpty()) return;
 
         Time.mark();
 
-        float totalSumArea = 0f;
-        int maxSize = 0;
+        AtomicInteger totalSumArea = new AtomicInteger(), maxSize = new AtomicInteger();
+        var sizeTasks = new Seq<Future<?>>();
+
         for(var image : images){
-            totalSumArea += image.width * image.height;
-            maxSize += Math.max(image.width, image.height);
+            sizeTasks.add(Vars.mainExecutor.submit(() -> {
+                try{
+                    try(DataInputStream in = new DataInputStream(image.getCacheFile().read())){
+                        long header = in.readLong();
+                        if(header != 0x89504e470d0a1a0aL) return; //not a PNG
+                        in.readInt(); //length
+                        int type = in.readInt(); //chunk type
+                        if(type != 0x49484452) return; //no HDR
+                        int width = in.readInt();
+                        int height = in.readInt();
+                        if(width <= 0 || height <= 0) return; //negative size
+
+                        totalSumArea.addAndGet(width * height);
+
+                        synchronized(maxSize){
+                            maxSize.set(Math.max(maxSize.get(), Math.max(width, height)));
+                        }
+                    }
+                }catch(Exception ignored){}
+            }));
         }
 
-        int targetPower = Mathf.nextPowerOfTwo((int)(Mathf.sqrt(totalSumArea) * 1.35f));
-        int targetSize = Mathf.clamp(Math.max(targetPower, maxSize), 128, Math.min(4096, Vars.maxTextureSize));
+        Threads.awaitAll(sizeTasks);
+
+        int targetPower = Mathf.nextPowerOfTwo((int)(Mathf.sqrt(totalSumArea.get()) * 1.35f));
+        int targetSize = Mathf.clamp(Math.max(targetPower, maxSize.get()), 128, Math.min(4096, Vars.maxTextureSize));
 
         PixmapPacker packer = new PixmapPacker(targetSize, targetSize, 2, true);
 
@@ -46,33 +70,64 @@ public class DataPatchPacker{
         TextureRegion envReserveRegion = Core.atlas.find("data-patch-reserved-env");
         PixmapPacker envPacker = anyEnv ? new PixmapPacker(envReserveRegion.width, envReserveRegion.height, 2, true) : null;
 
-        var tasks = new Seq<Future<?>>();
+        Seq<ImageAsset> toPack = new Seq<>(), pending = new Seq<>();
+        ObjectSet<String> generatedNames = new ObjectSet<>();
+
+        //this makes sure that generated images are prioritized
         for(var image : images){
+            if(image.isGenerated()){
+                generatedNames.add(image.name);
+                toPack.add(image);
+            }else{
+                pending.add(image);
+            }
+        }
+
+        for(var image : pending){
+            if(!generatedNames.contains(image.name)){
+                toPack.add(image);
+            }
+        }
+
+        AtomicBoolean failedEnv = new AtomicBoolean();
+        var tasks = new Seq<Future<?>>();
+        for(var image : toPack){
             tasks.add(Vars.mainExecutor.submit(() -> {
+                Fi cacheFile = image.getCacheFile();
+                //logged elsewhere
+                if(cacheFile == null) return;
+
                 try{
-                    Pixmap pixmap = new Pixmap(image.data);
+                    Pixmap pixmap = new Pixmap(cacheFile);
                     String name = regionPrefix + image.name;
 
                     if(anyEnv && image.path.contains("blocks/environment/")){
-                        envPacker.pack(name, pixmap);
+                        if(!failedEnv.get()) envPacker.pack(name, pixmap);
                     }else{
                         packer.pack(name, pixmap);
                     }
+
+                    pixmap.dispose();
                 }catch(Throwable e){
-                    Log.err("Invalid patch image: " + image.path, e);
+                    if(e instanceof ArcRuntimeException && e.getMessage().contains("one page")){
+                        failedEnv.set(true);
+                    }else{
+                        Log.err("Invalid patch image: " + image.path, e);
+                    }
                 }
             }));
         }
 
         Threads.awaitAll(tasks);
 
+        if(envPacker != null && failedEnv.get()){
+            Log.warn("[Patch Atlas] Unable to fit all environment images into a " + envPacker.getPageWidth() + "x" + envPacker.getPageHeight() + " page. Reduce the size or number of images.");
+        }
+
         TextureFilter filter = Core.settings.getBool("linear", !Vars.mobile) ? TextureFilter.linear : TextureFilter.nearest;
         patchAtlas = packer.generateTextureAtlas(filter, filter, false);
 
         if(envPacker != null && envPacker.getPages().size > 0){
-            if(envPacker.getPages().size > 1){
-                Log.warn("[Patch Atlas] Unable to fit all environment images into a " + envPacker.getPageWidth() + "x" + envPacker.getPageHeight() + " page. Reduce the size or number of images.");
-            }
             //directly update existing atlas page's reserved region
             var page = envPacker.getPages().first();
             envReserveRegion.texture.draw(page.getPixmap(), envReserveRegion.getX(), envReserveRegion.getY());
@@ -101,7 +156,7 @@ public class DataPatchPacker{
 
         printStats(packer, envPacker);
 
-        packer.dispose();
+        packer.forceDispose();
         //textures are never updated, so force disposal
         if(envPacker != null) envPacker.forceDispose();
 
@@ -113,7 +168,7 @@ public class DataPatchPacker{
         Log.debug("[Patch Atlas] Time to pack: @ms", Time.elapsed());
     }
 
-    public void unapply(){
+    public void unload(){
         if(patchAtlas != null){
             for(var texture : patchAtlas.getTextures()){
                 patchAtlas.getTextures().remove(texture);

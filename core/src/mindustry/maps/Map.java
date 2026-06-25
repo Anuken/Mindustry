@@ -107,6 +107,7 @@ public class Map implements Comparable<Map>, Publishable{
             if(result.planet == Planets.serpulo && result.hasEnv(Env.scorching)){
                 result.planet = Planets.erekir;
             }
+            if(result.planet == null) result.planet = Planets.serpulo;
             if(result.spawns.isEmpty()) result.spawns = Vars.waves.get();
             return result;
         }catch(Exception e){

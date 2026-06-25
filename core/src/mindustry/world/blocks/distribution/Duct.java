@@ -2,7 +2,6 @@ package mindustry.world.blocks.distribution;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -11,6 +10,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -27,7 +27,6 @@ import static mindustry.Vars.*;
 public class Duct extends Block implements Autotiler{
     public float speed = 5f;
     public boolean armored = false;
-    public Color transparentColor = new Color(0.4f, 0.4f, 0.4f, 0.1f);
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
@@ -51,6 +50,9 @@ public class Duct extends Block implements Autotiler{
         isDuct = true;
         priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
+
+        drawCached = true;
+        buildingCacheLayer = BuildingCacheLayer.under;
     }
 
     @Override
@@ -134,32 +136,59 @@ public class Duct extends Block implements Autotiler{
         public @Nullable Building next;
         public @Nullable DuctBuild nextc;
 
+        float lastFrom, lastTo;
+        Item lastItem;
+
         @Override
         public void draw(){
+            draw(false);
+        }
+
+        @Override
+        public void drawCached(){
+            draw(true);
+        }
+
+        public void draw(boolean under){
             float rotation = rotdeg();
             int r = this.rotation;
+
+            Draw.z(Layer.blockUnder + 0.2f);
 
             //draw extra ducts facing this one for tiling purposes
             for(int i = 0; i < 4; i++){
                 if((blending & (1 << i)) != 0){
                     int dir = r - i;
                     float rot = i == 0 ? rotation : (dir)*90;
-                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top);
+                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top, under);
                 }
             }
 
-            //draw item
-            if(current != null){
-                Draw.z(Layer.blockUnder + 0.1f);
-                Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
-                .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
-                Mathf.clamp((progress + 1f) / (2f - 1f/speed)));
+            if(Renderer.blockTimestep){
+                //draw item
+                if(!under && lastItem != null){
+                    Draw.z(Layer.blockUnder + 0.1f);
+                    Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
+                    .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
+                    Mathf.clamp((Mathf.lerp(lastFrom, lastTo, Renderer.blockInterp) + 1f) / (2f - 1f/speed)));
 
-                Draw.rect(current.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
+                    Draw.rect(lastItem.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
+                }
+            }else{
+                //draw item
+                if(!under && current != null){
+                    Draw.z(Layer.blockUnder + 0.1f);
+                    Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
+                    .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
+                    Mathf.clamp((progress + 1f) / (2f - 1f/speed)));
+
+                    Draw.rect(current.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
+                }
             }
 
             Draw.scl(xscl, yscl);
-            drawAt(x, y, blendbits, rotation, SliceMode.none);
+            Draw.z(Layer.blockUnder + 0.2f);
+            drawAt(x, y, blendbits, rotation, SliceMode.none, under);
             Draw.reset();
         }
 
@@ -168,20 +197,20 @@ public class Duct extends Block implements Autotiler{
             Draw.rect(fullIcon, x, y);
         }
 
-        protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
-            Draw.z(Layer.blockUnder);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
-
-            Draw.z(Layer.blockUnder + 0.2f);
-            Draw.color(transparentColor);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
-            Draw.color();
-            Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
+        protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice, boolean under){
+            if(under){
+                Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
+            }else{
+                Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
+            }
         }
 
         @Override
         public void updateTile(){
+            lastItem = current;
+            lastFrom = progress;
             progress += edelta() / speed * 2f;
+            lastTo = progress;
 
             if(current != null && next != null){
                 if(progress >= (1f - 1f/speed) && moveForward(current)){
@@ -235,6 +264,7 @@ public class Duct extends Block implements Autotiler{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            recache();
 
             int[] bits = buildBlending(tile, rotation, null, true);
             blendbits = bits[0];

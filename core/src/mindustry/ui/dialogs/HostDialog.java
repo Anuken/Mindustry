@@ -43,7 +43,7 @@ public class HostDialog extends BaseDialog{
 
             cont.add().width(65f);
 
-            cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost"), val -> Core.settings.put("steampublichost", !val)).colspan(2).left()
+            cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost2"), val -> Core.settings.put("steampublichost2", !val)).colspan(2).left()
                 .with(c -> ui.addDescTooltip(c, "@steam.friendsonly.tooltip")).padBottom(15f).row();
         }
 
@@ -98,9 +98,9 @@ public class HostDialog extends BaseDialog{
                 player.admin = true;
                 Events.fire(new HostEvent());
 
-                if(steam && Core.settings.getBool("steampublichost")){
+                if(steam && Core.settings.getBool("steampublichost2")){
                     if(Version.modifier.contains("beta") || Version.modifier.contains("alpha")){
-                        Core.settings.put("steampublichost", false);
+                        Core.settings.put("steampublichost2", false);
                         platform.updateLobby();
                         Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
                     }
