@@ -88,6 +88,7 @@ public class MapPlayDialog extends BaseDialog{
             if(playListener != null) playListener.run();
             control.playMap(map, rules, playtesting);
             hide();
+            ui.editor.hide_menu();
             ui.custom.hide();
         }).size(210f, 64f);
 

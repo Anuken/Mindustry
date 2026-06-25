@@ -70,23 +70,23 @@ public class MapEditorDialog extends Dialog implements Disposable{
         menu.cont.table(t -> {
             t.defaults().size(swidth, 60f).padBottom(5).padRight(5).padLeft(5);
 
-            t.button("@editor.savemap", Icon.save, this::save);
+            t.button("@editor.savemap", Icon.save, () -> {
+                Map map = save(); // must be saved successfully if doesn't return null
+                if(map != null) menu.hide();
+            });
 
             t.button("@editor.mapinfo", Icon.pencil, () -> {
                 infoDialog.show();
-                menu.hide();
             });
 
             t.row();
 
             t.button("@editor.generate", Icon.terrain, () -> {
                 generateDialog.show(generateDialog::applyToEditor);
-                menu.hide();
             });
 
             t.button("@editor.resize", Icon.resize, () -> {
                 resizeDialog.show();
-                menu.hide();
             });
 
             t.row();
@@ -179,7 +179,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }
 
         menu.cont.button("@editor.sectorgenerate", Icon.terrain, () -> {
-            menu.hide();
             sectorGenDialog.show();
         }).padTop(!steam ? -3 : 1).size(swidth * 2f + 10, 60f);
 
@@ -256,7 +255,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
         menu.cont.button("@quit", Icon.exit, () -> {
             tryExit();
-            menu.hide();
         }).padTop(1).size(swidth * 2f + 10, 60f);
 
         resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
@@ -373,7 +371,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void playtest(){
-        menu.hide();
         Map map = save();
 
         if(map != null){
@@ -437,7 +434,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         }
 
-        menu.hide();
         saved = true;
         state.rules.editor = isEditor;
         return returned;
@@ -791,6 +787,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         ui.showConfirm("@confirm", "@editor.unsaved", () -> {
             //clears data patches
             logic.reset();
+            menu.hide();
             hide();
         });
     }
@@ -883,5 +880,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
         if(i == 0){
             blockSelection.add("@none.found").padLeft(54f).padTop(10f);
         }
+    }
+
+    public void hide_menu(){
+        menu.hide();
     }
 }

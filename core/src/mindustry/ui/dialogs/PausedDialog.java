@@ -102,7 +102,6 @@ public class PausedDialog extends BaseDialog{
 
             if(state.isEditor()){
                 cont.button("@editor.worldprocessors", Icon.logic, () -> {
-                    hide();
                     processors.show();
                 });
             }

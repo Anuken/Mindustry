@@ -72,6 +72,7 @@ public class MapGenerateDialog extends BaseDialog{
             buttons.button("@editor.apply", Icon.ok, () -> {
                 ui.loadAnd(() -> {
                     apply();
+                    ui.editor.hide_menu();
                     hide();
                 });
             });

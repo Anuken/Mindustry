@@ -69,19 +69,16 @@ public class MapInfoDialog extends BaseDialog{
 
                 r.button("@editor.rules", Icon.list, style, () -> {
                     ruleInfo.show(Vars.state.rules, () -> Vars.state.rules = new Rules());
-                    hide();
                 }).marginLeft(10f);
 
                 r.button("@editor.waves", Icon.units, style, () -> {
                     waveInfo.show();
-                    hide();
                 }).marginLeft(10f);
 
                 r.row();
 
                 r.button("@editor.objectives", Icon.info, style, () -> {
                     objectives.show(state.rules.objectives.all, state.rules.objectives.all::set);
-                    hide();
                 }).marginLeft(10f);
 
                 r.button("@editor.generation", Icon.terrain, style, () -> {
@@ -95,7 +92,6 @@ public class MapInfoDialog extends BaseDialog{
                         filters.each(f -> f.seed = 0);
                         editor.tags.put("genfilters", JsonIO.write(filters));
                     });
-                    hide();
                 }).marginLeft(10f);
 
                 r.row();
@@ -108,18 +104,15 @@ public class MapInfoDialog extends BaseDialog{
                         locales.show(new MapLocales());
                         ui.showException(e);
                     }
-                    hide();
                 }).marginLeft(10f);
 
                 r.button("@editor.worldprocessors", Icon.logic, style, () -> {
-                    hide();
                     processors.show();
                 }).marginLeft(10f);
 
                 r.row();
 
                 r.button("@asset.title", Icon.fileCode, style, () -> {
-                    hide();
                     patches.show();
                 }).marginLeft(10f).colspan(2).width(460f).row();
             }).colspan(2).center();

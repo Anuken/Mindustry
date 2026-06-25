@@ -57,6 +57,7 @@ public class MapResizeDialog extends BaseDialog{
         buttons.button("@cancel", this::hide);
         buttons.button("@ok", () -> {
             cons.get(width, height, shiftX, shiftY);
+            ui.editor.hide_menu();
             hide();
         });
     }

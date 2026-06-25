@@ -78,6 +78,7 @@ public class SectorGenerateDialog extends BaseDialog{
 
         buttons.button("@editor.apply", Icon.ok, () -> {
             ui.loadAnd(() -> {
+                ui.editor.hide_menu();
                 apply();
                 hide();
             });
