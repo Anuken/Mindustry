@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -102,6 +103,7 @@ public class Separator extends Block{
 
         @Override
         public void draw(){
+            if(Renderer.renderUpdate) totalProgress += warmup * delta();
             drawer.draw(this);
         }
 
@@ -128,7 +130,6 @@ public class Separator extends Block{
 
         @Override
         public void updateTile(){
-            totalProgress += warmup * delta();
 
             if(efficiency > 0){
                 progress += getProgressIncrease(craftTime);

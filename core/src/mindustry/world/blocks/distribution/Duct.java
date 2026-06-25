@@ -10,6 +10,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -135,6 +136,9 @@ public class Duct extends Block implements Autotiler{
         public @Nullable Building next;
         public @Nullable DuctBuild nextc;
 
+        float lastFrom, lastTo;
+        Item lastItem;
+
         @Override
         public void draw(){
             draw(false);
@@ -160,14 +164,26 @@ public class Duct extends Block implements Autotiler{
                 }
             }
 
-            //draw item
-            if(!under && current != null){
-                Draw.z(Layer.blockUnder + 0.1f);
-                Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
-                .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
-                Mathf.clamp((progress + 1f) / (2f - 1f/speed)));
+            if(Renderer.blockTimestep){
+                //draw item
+                if(!under && lastItem != null){
+                    Draw.z(Layer.blockUnder + 0.1f);
+                    Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
+                    .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
+                    Mathf.clamp((Mathf.lerp(lastFrom, lastTo, Renderer.blockInterp) + 1f) / (2f - 1f/speed)));
 
-                Draw.rect(current.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
+                    Draw.rect(lastItem.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
+                }
+            }else{
+                //draw item
+                if(!under && current != null){
+                    Draw.z(Layer.blockUnder + 0.1f);
+                    Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
+                    .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
+                    Mathf.clamp((progress + 1f) / (2f - 1f/speed)));
+
+                    Draw.rect(current.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
+                }
             }
 
             Draw.scl(xscl, yscl);
@@ -191,16 +207,23 @@ public class Duct extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
+            lastItem = current;
+            lastFrom = progress;
             progress += edelta() / speed * 2f;
+            lastTo = progress;
 
             if(current != null && next != null){
-                if(progress >= (1f - 1f/speed) && moveForward(current)){
+                float target = (1f - 1f/speed);
+
+                if(progress >= target && next.acceptItem(this, current)){
+                    next.handleItem(this, current);
                     items.remove(current, 1);
                     current = null;
-                    progress %= (1f - 1f/speed);
+
+                    progress = 0f;
                 }
             }else{
-                progress = 0;
+                lastTo = progress = 0;
             }
 
             if(current == null && items.total() > 0){
@@ -253,6 +276,7 @@ public class Duct extends Block implements Autotiler{
             yscl = bits[2];
             blending = bits[4];
             next = front();
+            if(next != null && next.team != team) next = null;
             nextc = next instanceof DuctBuild d ? d : null;
         }
 

@@ -210,13 +210,17 @@ public class PayloadConveyor extends Block{
         public void draw(){
             super.draw();
 
+            float progress = time() % moveTime;
+            float fract = interp.apply(progress / moveTime);
             float dst = 0.8f;
 
-            float glow = Math.max((dst - (Math.abs(fract() - 0.5f) * 2)) / dst, 0);
+            if(Renderer.blockTimestep) updatePayload(fract);
+
+            float glow = Math.max((dst - (Math.abs(fract - 0.5f) * 2)) / dst, 0);
             Draw.mixcol(team.color, glow);
 
             float s = tilesize * size;
-            float trnext = s * fract(), trprev = s * (fract() - 1), rot = rotdeg();
+            float trnext = s * fract, trprev = s * (fract - 1), rot = rotdeg();
 
             //next
             TextureRegion clipped = clipRegion(tile.getHitbox(Tmp.r1), tile.getHitbox(Tmp.r2).move(trnext, 0), topRegion);
@@ -234,7 +238,7 @@ public class PayloadConveyor extends Block{
 
             for(int i = 0; i < 4; i++){
                 if(blends(i) && i != rotation){
-                    Draw.alpha(1f - Interp.pow5In.apply(fract()));
+                    Draw.alpha(1f - Interp.pow5In.apply(fract));
                     //prev from back
                     Tmp.v1.set(widthPrev, heightPrev).rotate(i * 90 + 180);
                     Draw.rect(clipped, x + Tmp.v1.x, y + Tmp.v1.y, i * 90 + 180);
@@ -324,12 +328,16 @@ public class PayloadConveyor extends Block{
         }
 
         public void updatePayload(){
+            updatePayload(fract());
+        }
+
+        public void updatePayload(float fraction){
             if(item != null){
-                if(animation > fract()){
+                if(animation > fraction){
                     animation = Mathf.lerp(animation, 0.8f, 0.15f);
                 }
 
-                animation = Math.max(animation, fract());
+                animation = Math.max(animation, fraction);
 
                 float fract = animation;
                 float rot = Mathf.slerp(itemRotation, rotdeg(), fract);
