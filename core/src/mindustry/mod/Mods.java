@@ -123,6 +123,7 @@ public class Mods implements Loadable{
             requiresReload = true;
             //enable the mod on import
             Core.settings.put("mod-" + loaded.name + "-enabled", true);
+            Core.settings.put("mod-" + loaded.name + "-failed", false);
             sortMods();
             //try to load the mod's icon so it displays on import
             Core.app.post(() -> loadIcon(loaded));
@@ -995,6 +996,7 @@ public class Mods implements Loadable{
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
             Core.settings.put("mod-" + mod.name + "-enabled", enabled);
+            Core.settings.put("mod-" + mod.name + "-failed", false);
             requiresReload = true;
             mod.state = enabled ? ModState.enabled : ModState.disabled;
             mods.each(this::updateDependencies);
@@ -1236,7 +1238,9 @@ public class Mods implements Loadable{
 
             //skip mod loading if it failed
             if(skipModLoading()){
+                boolean wasEnabled = Core.settings.getBool("mod-" + baseName + "-enabled", true);
                 Core.settings.put("mod-" + baseName + "-enabled", false);
+                Core.settings.put("mod-" + baseName + "-failed", wasEnabled);
             }
 
             if(!headless && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
@@ -1309,6 +1313,10 @@ public class Mods implements Loadable{
 
         public boolean shouldBeEnabled(){
             return Core.settings.getBool("mod-" + name + "-enabled", true);
+        }
+
+        public boolean failed(){
+            return Core.settings.getBool("mod-" + name + "-failed", false);
         }
 
         public boolean hasUnmetDependencies(){

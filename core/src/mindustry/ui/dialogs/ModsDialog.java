@@ -77,6 +77,16 @@ public class ModsDialog extends BaseDialog{
 
         browser.onResize(this::rebuildBrowser);
 
+        if(!mods.list().allMatch(m -> !m.failed())){
+            buttons.button("@mods.restore", Icon.power, () -> {
+                Seq<LoadedMod> skipped = new Seq<>();
+                skipped.selectFrom(mods.list(), LoadedMod::failed);
+
+                skipped.each(m -> mods.setEnabled(m, true));
+                setup();
+            });
+        }
+
         buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
 
         if(!mobile){
