@@ -118,7 +118,6 @@ public class StackConveyor extends Block implements Autotiler{
         public int link = -1;
         public float cooldown;
         public Item lastItem;
-        public long lastUpdate = -1;
 
         float lastX = x, lastY = y;
 

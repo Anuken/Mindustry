@@ -230,7 +230,6 @@ public class Duct extends Block implements Autotiler{
             }
 
             if(current == null && items.total() > 0){
-                Log.info("replacing item @", this);
                 current = items.first();
             }
         }
