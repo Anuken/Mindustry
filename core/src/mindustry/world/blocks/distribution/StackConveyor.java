@@ -122,7 +122,6 @@ public class StackConveyor extends Block implements Autotiler{
         float lastX = x, lastY = y;
 
         boolean proxUpdating = false;
-        boolean skipLastUpdate = false;
 
         @Override
         public void drawCached(){
@@ -274,13 +273,8 @@ public class StackConveyor extends Block implements Autotiler{
         public void updateTile(){
             //the item still needs to be "reeled" in when disabled
             float eff = enabled ? (efficiency + baseEfficiency) : 1f;
-
-            //reel in crater
-            if(!skipLastUpdate){
-                lastX = Mathf.lerp(Point2.x(link) * tilesize, x, 1f - cooldown);
-                lastY = Mathf.lerp(Point2.y(link) * tilesize, y, 1f - cooldown);
-            }
-            skipLastUpdate = false;
+            lastX = Mathf.lerp(Point2.x(link) * tilesize, x, 1f - cooldown);
+            lastY = Mathf.lerp(Point2.y(link) * tilesize, y, 1f - cooldown);
             if(cooldown > 0f) cooldown = Math.min(cooldown - speed * eff * delta(), recharge);
             if(state != stateMove) cooldown = Math.max(cooldown, 0f);
 
@@ -323,7 +317,6 @@ public class StackConveyor extends Block implements Autotiler{
                         float remaining = 0f;//cooldown % 1f;
 
                         cooldown = recharge;
-                        e.skipLastUpdate = true;
                         e.cooldown = 1f + remaining;
                         e.lastX = lastX;
                         e.lastY = lastY;

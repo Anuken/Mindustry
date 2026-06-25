@@ -219,9 +219,6 @@ public class Duct extends Block implements Autotiler{
                     next.handleItem(this, current);
                     items.remove(current, 1);
                     current = null;
-                    if(nextc != null){
-                        nextc.progress += (progress - target);
-                    }
 
                     progress = 0f;
                 }
