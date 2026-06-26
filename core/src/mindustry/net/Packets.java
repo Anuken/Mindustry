@@ -190,4 +190,57 @@ public class Packets{
             return priorityHigh;
         }
     }
+
+    public static class AuthChallengePacket extends Packet{
+        public byte[] nonce;
+
+        @Override
+        public void read(Reads read){
+            int len = read.i();
+            nonce = new byte[len];
+            read.b(nonce);
+        }
+
+        @Override
+        public void write(Writes write){
+            write.i(nonce.length);
+            write.b(nonce);
+        }
+
+        @Override
+        public int getPriority(){
+            return priorityHigh;
+        }
+    }
+
+    public static class AuthResponsePacket extends Packet{
+        public byte[] publicKey;
+        public byte[] signature;
+        public String claimedHost;
+
+        @Override
+        public void read(Reads read){
+            int pkLen = read.i();
+            publicKey = new byte[pkLen];
+            read.b(publicKey);
+            int sigLen = read.i();
+            signature = new byte[sigLen];
+            read.b(signature);
+            claimedHost = read.str();
+        }
+
+        @Override
+        public void write(Writes write){
+            write.i(publicKey.length);
+            write.b(publicKey);
+            write.i(signature.length);
+            write.b(signature);
+            write.str(claimedHost);
+        }
+
+        @Override
+        public int getPriority(){
+            return priorityHigh;
+        }
+    }
 }

@@ -60,6 +60,8 @@ public class NetClient implements ApplicationListener{
     private long lastSnapshotTimestamp;
     /** Last sent client snapshot ID. */
     private int lastSent;
+    /** Last address that the client attempted to connect to. */
+    private String lastTargetAddress;
 
     /** List of entities that were removed, and need not be added while syncing. */
     private IntSet removed = new IntSet();
@@ -119,12 +121,37 @@ public class NetClient implements ApplicationListener{
                 return;
             }
 
+            lastTargetAddress = packet.addressTCP;
             net.send(c, true);
+        });
+
+        net.handleClient(AuthChallengePacket.class, packet -> {
+            if(packet.nonce == null || packet.nonce.length == 0){
+                Log.warn("Auth: received empty nonce from server, ignoring.");
+                return;
+            }
+
+            Log.info("Auth: received challenge from server, signing nonce @.", (Object) packet.nonce);
+
+            String target = lastTargetAddress.isBlank() ? "unknown" : lastTargetAddress;
+            lastTargetAddress = null;
+
+            byte[] signature = NetPubKey.sign(packet.nonce, target);
+
+            AuthResponsePacket response = new AuthResponsePacket();
+            response.publicKey  = NetPubKey.getPublicKeyBytes();
+            response.signature  = signature;
+            response.claimedHost = target;
+
+            net.send(response, true);
+
+            Log.info("Auth: responded to challenge from server, claimed host '@'.", target);
         });
 
         net.handleClient(Disconnect.class, packet -> {
             if(quietReset) return;
 
+            lastTargetAddress = null;
             connecting = false;
             logic.reset();
             platform.updateRPC();
@@ -149,6 +176,7 @@ public class NetClient implements ApplicationListener{
         net.handleClient(WorldStream.class, data -> {
             Log.info("Received world data: @", Strings.formatByteCount(data.stream.available()));
             NetworkIO.loadWorld(new InflaterInputStream(data.stream));
+            lastTargetAddress = null;
 
             finishConnecting();
         });
