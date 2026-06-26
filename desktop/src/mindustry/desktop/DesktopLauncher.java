@@ -6,7 +6,6 @@ import arc.backend.sdl.*;
 import arc.discord.*;
 import arc.discord.DiscordRPC.*;
 import arc.files.*;
-import arc.func.*;
 import arc.math.*;
 import arc.profiling.*;
 import arc.struct.*;
@@ -25,6 +24,8 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
 import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.ui.FileChooser.*;
 import mindustry.ui.dialogs.*;
 import org.lwjgl.*;
 import org.lwjgl.sdl.*;
@@ -331,118 +332,63 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     @Override
-    public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
-        showNativeFileChooser(open, cons, extension);
-    }
-
-    @Override
-    public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-        showNativeFileChooser(true, cons, extensions);
-    }
-
-    void showNativeFileChooser(boolean open, Cons<Fi> cons, String... shownExtensions){
-        String[] ext = shownExtensions == null || shownExtensions.length == 0 ? new String[]{""} : shownExtensions;
-
-        SDL_DialogFileFilter.Buffer filters = SDL_DialogFileFilter.calloc(ext.length);
-        try(MemoryStack stack = MemoryStack.stackPush()){
-            for(int i = 0; i < ext.length; i++){
-                String extName = ext[i];
-
-                var filter = SDL_DialogFileFilter.calloc(stack)
-                .name(MemoryUtil.memUTF8(extName.isEmpty() ? "All Files" : "." + extName + " files"))
-                .pattern(MemoryUtil.memUTF8(extName.isEmpty() ? "*" : extName));
-
-                filters.put(i, filter);
-            }
-        }
-        SDL_DialogFileCallbackI callback = (userData, files, filter) -> {
-            if(files != 0){
-                PointerBuffer pointerBuffer = MemoryUtil.memPointerBuffer(files, 1);
-                long firstFile = pointerBuffer.get();
-                if(firstFile != 0){
-                    String result = MemoryUtil.memUTF8(firstFile);
-
-                    if(result.isEmpty() || result.equals("\n")) return;
-                    if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
-                    if(result.contains("\n")) return;
-
-                    Fi file = Core.files.absolute(result);
-                    Core.app.post(() -> {
-                        FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
-
-                        if(!open){
-                            cons.get(file.parent().child(file.nameWithoutExtension() + "." + ext[0]));
-                        }else{
-                            cons.get(file);
-                        }
-                    });
-                }
-            }
-        };
-
-        if(open){
-            SDLDialog.SDL_ShowOpenFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath(), false);
-        }else{
-            SDLDialog.SDL_ShowSaveFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath() + "/" + "export." + ext[0]);
-        }
-
-        filters.free();
-    }
-
-
-    /** attempt to use the native file picker with zenity, or runs the fallback Runnable if the operation fails */
-    static void showZenity(boolean open, String title, String[] extensions, Cons<Fi> cons, Runnable fallback){
+    public void showFileChooser(FileChooserParams params){
         Threads.daemon(() -> {
             try{
-                String formatted = (title.startsWith("@") ? Core.bundle.get(title.substring(1)) : title).replaceAll("\"", "'");
+                FileDialogs.loadNatives();
+                var ext = params.extensions;
 
-                String last = FileChooser.getLastDirectory().absolutePath();
-                if(!last.endsWith("/")) last += "/";
-
-                //zenity doesn't support filtering by extension
-                Seq<String> args = Seq.with("zenity",
-                "--file-selection",
-                "--title=" + formatted,
-                "--filename=" + last,
-                "--confirm-overwrite",
-                "--file-filter=" + Seq.with(extensions).toString(" ", s -> "*." + s),
-                "--file-filter=All files | *" //allow anything if the user wants
-                );
-
-                if(!open){
-                    args.add("--save");
+                String result;
+                String[] patterns = new String[ext.length];
+                for(int i = 0; i < ext.length; i++){
+                    patterns[i] = "*." + ext[i];
                 }
 
-                String result = OS.exec(args.toArray(String.class));
-                //first line.
+                //on MacOS, .msav is not properly recognized until I put garbage into the array?
+                if(patterns.length == 1 && OS.isMac && params.open){
+                    patterns = new String[]{"", "*." + ext[0]};
+                }
+
+                if(params.open){
+                    result = FileDialogs.openFileDialog(params.title, FileChooserDialog.getLastDirectory().absolutePath() + "/", patterns, "." + ext[0] + " files", params.allowMultiple);
+                }else{
+                    result = FileDialogs.saveFileDialog(params.title, FileChooserDialog.getLastDirectory().child(params.fileName).absolutePath(), patterns, "." + ext[0] + " files");
+                }
+
+                if(result == null) return;
+
                 if(result.length() > 1 && result.contains("\n")){
                     result = result.split("\n")[0];
                 }
 
                 //cancelled selection, ignore result
                 if(result.isEmpty() || result.equals("\n")) return;
-
                 if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
-                if(result.contains("\n")) throw new IOException("invalid input: \"" + result + "\"");
 
-                Fi file = Core.files.absolute(result);
+                Fi[] resultFiles = Seq.with(result.split("\\|")).map(Core.files::absolute).toArray(Fi.class);
+
+                if(result.isEmpty()) return;
+
                 Core.app.post(() -> {
-                    FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
+                    FileChooserDialog.setLastDirectory(resultFiles[0].isDirectory() ? resultFiles[0] : resultFiles[0].parent());
 
-                    if(!open){
-                        cons.get(file.parent().child(file.nameWithoutExtension() + "." + extensions[0]));
+                    if(!params.open){
+                        Fi single = resultFiles[0];
+                        //fix extension to match filters
+                        if(!Structs.contains(params.extensions, single::extEquals)){
+                            single = single.parent().child(single.nameWithoutExtension() + "." + ext[0]);
+                        }
+                        params.handleChooseResult(single);
                     }else{
-                        cons.get(file);
+                        params.handleChooseResult(resultFiles);
                     }
                 });
-            }catch(Exception e){
-                Log.err(e);
-                Log.warn("zenity not found, using non-native file dialog. Consider installing `zenity` for native file dialogs.");
-                Core.app.post(fallback);
+            }catch(Throwable error){
+                Log.err("Failed to execute native file chooser", error);
+                Core.app.post(() -> FileChooser.showFallbackFileChooser(params));
             }
         });
     }
-
 
     @Override
     public Seq<Fi> getWorkshopContent(Class<? extends Publishable> type){

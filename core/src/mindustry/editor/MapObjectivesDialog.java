@@ -486,8 +486,8 @@ public class MapObjectivesDialog extends BaseDialog{
                 buttons.defaults().size(160f, 64f).pad(2f);
                 buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
                 buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
-                buttons.button("@waves.edit", Icon.edit, () -> {
-                    BaseDialog dialog = new BaseDialog("@waves.edit");
+                buttons.button("@edit.menu", Icon.edit, () -> {
+                    BaseDialog dialog = new BaseDialog("@edit.menu");
                     dialog.addCloseButton();
                     dialog.setFillParent(false);
                     dialog.cont.table(Tex.button, t -> {

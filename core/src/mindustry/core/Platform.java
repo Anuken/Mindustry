@@ -2,21 +2,17 @@ package mindustry.core;
 
 import arc.*;
 import arc.files.*;
-import arc.func.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.type.*;
-import mindustry.ui.dialogs.*;
+import mindustry.ui.FileChooser.*;
 import rhino.*;
 
 import java.net.*;
-
-import static mindustry.Vars.*;
 
 public interface Platform{
 
@@ -106,68 +102,9 @@ public interface Platform{
     default void shareFile(Fi file){
     }
 
-    default void export(String name, String extension, FileWriter writer){
-        if(!ios){
-            platform.showFileChooser(false, extension, file -> {
-                ui.loadAnd(() -> {
-                    try{
-                        writer.write(file);
-                    }catch(Throwable e){
-                        ui.showException(e);
-                        Log.err(e);
-                    }
-                });
-            });
-        }else{
-            ui.loadAnd(() -> {
-                try{
-                    Fi result = Core.files.local(name + "." + extension);
-                    writer.write(result);
-                    platform.shareFile(result);
-                }catch(Throwable e){
-                    ui.showException(e);
-                    Log.err(e);
-                }
-            });
-        }
-    }
-
-    /**
-     * Show a file chooser.
-     * @param cons Selection listener
-     * @param open Whether to open or save files
-     * @param extension File extension to filter
-     * @param title The title of the native dialog
-     */
-    default void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
-        defaultFileDialog(open, title, extension, cons);
-    }
-
-    /**
-     * Show a file chooser for multiple file types.
-     * @param cons Selection listener
-     * @param extensions File extensions to filter
-     */
-    default void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-        defaultMultiFileChooser(cons, extensions);
-    }
-
-    default void showFileChooser(boolean open, String extension, Cons<Fi> cons){
-        showFileChooser(open, open ? "@open": "@save", extension, cons);
-    }
-
-    static void defaultFileDialog(boolean open, String title, String extension, Cons<Fi> cons){
-        new FileChooser(title, file -> file.extEquals(extension), open, file -> {
-            if(!open){
-                cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
-            }else{
-                cons.get(file);
-            }
-        }).show();
-    }
-
-    static void defaultMultiFileChooser(Cons<Fi> cons, String... extensions){
-        new FileChooser("@open", file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
+    /** Do not call directly; use the builder pattern in {@link mindustry.ui.FileChooser}. */
+    default void showFileChooser(FileChooserParams params){
+        throw new IllegalArgumentException("Not implemented on this platform!");
     }
 
     /** Hide the app. Android only. */

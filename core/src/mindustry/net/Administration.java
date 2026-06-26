@@ -21,6 +21,8 @@ import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
+    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     public Seq<String> bannedIPs = new Seq<>();
     public Seq<String> whitelist = new Seq<>();
     public Seq<ChatFilter> chatFilters = new Seq<>();
@@ -31,8 +33,7 @@ public class Administration{
     public Seq<Pattern> bannedNames = new Seq<>();
 
     private boolean modified, loaded;
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
-    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
+    private ObjectMap<String, IdEncounterInfo> encounteredIDsForIp = new ObjectMap<>();
 
     public Administration(){
         load();
@@ -288,6 +289,24 @@ public class Administration{
         return true;
     }
 
+    public boolean checkUuidChanges(String address, String uuid){
+        if(Config.uuidChangeLimit.num() <= 1) return false;
+
+        var set = encounteredIDsForIp.get(address, IdEncounterInfo::new);
+        //clear encountered list every hour
+        if(Time.timeSinceMillis(set.initialTime) > 1000L * 60 * 60 * Config.uuidChangeTimePeriod.num()){
+            set.hashes.clear();
+            set.initialTime = Time.millis();
+        }
+        set.hashes.add(uuid.hashCode());
+
+        if(set.hashes.size > Config.uuidChangeLimit.num()){
+            banPlayerIP(address);
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Returns list of all players with admin status
      */
@@ -506,6 +525,7 @@ public class Administration{
      * Server configuration definition. Each config value can be a string, boolean or number.
      * Creating a new Config instance implicitly adds it to the list of server configs. This can be used for custom plugin configuration.
      * */
+    //TODO: move this into a non-nested class, this is messy and annoying to read
     public static class Config{
         public static final Seq<Config> all = new Seq<>();
 
@@ -527,6 +547,8 @@ public class Administration{
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
+        uuidChangeLimit = new Config("uuidChangeLimit", "Limit for how many UUID changes an IP can send in the time frame specified by uuidChangeTimePeriod before it gets banned.", 10),
+        uuidChangeTimePeriod = new Config("uuidChangeTimePeriod", "Time window for the uuidChangeLimit config, in hours.", 3),
         chatSpamLimit = new Config("chatSpamLimit", "Limit for chat packet count sent within 2sec that will lead to a blacklist + kick. Not the same as a rate limit.", 20),
         socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
@@ -743,4 +765,8 @@ public class Administration{
         breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload, pingLocation
     }
 
+    static class IdEncounterInfo{
+        long initialTime;
+        IntSet hashes = new IntSet();
+    }
 }
