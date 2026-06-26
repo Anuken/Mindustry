@@ -295,12 +295,12 @@ public class Administration{
         var set = encounteredIDsForIp.get(address, IdEncounterInfo::new);
         //clear encountered list every hour
         if(Time.timeSinceMillis(set.initialTime) > 1000L * 60 * 60 * Config.uuidChangeTimePeriod.num()){
-            set.hashes.clear();
+            set.ids.clear();
             set.initialTime = Time.millis();
         }
-        set.hashes.add(uuid.hashCode());
+        set.ids.add(uuid);
 
-        if(set.hashes.size > Config.uuidChangeLimit.num()){
+        if(set.ids.size > Config.uuidChangeLimit.num()){
             banPlayerIP(address);
             return true;
         }
@@ -767,6 +767,6 @@ public class Administration{
 
     static class IdEncounterInfo{
         long initialTime;
-        IntSet hashes = new IntSet();
+        ObjectSet<String> ids = new ObjectSet<>();
     }
 }
