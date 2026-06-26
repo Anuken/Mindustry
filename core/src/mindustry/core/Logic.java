@@ -470,7 +470,9 @@ public class Logic implements ApplicationListener{
         Groups.all.update();
 
         PerfCounter.buildingUpdate.begin();
-        Groups.build.update();
+        if(!state.isEditor()){
+            Groups.build.update();
+        }
         PerfCounter.buildingUpdate.begin();
 
         Groups.bullet.collide();
