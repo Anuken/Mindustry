@@ -87,6 +87,7 @@ public class Binding{
 
     zoom = KeyBind.add("zoom", new Axis(KeyCode.scroll), "view"),
     detachCamera = KeyBind.add("detach_camera", KeyCode.unset),
+    teleportCursor = KeyBind.add("teleport_cusor", KeyCode.unset),
     menu = KeyBind.add("menu", Vars.android ? KeyCode.back : KeyCode.escape),
     fullscreen = KeyBind.add("fullscreen", KeyCode.f11),
     pause = KeyBind.add("pause", KeyCode.space),

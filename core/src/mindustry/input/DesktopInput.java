@@ -244,6 +244,14 @@ public class DesktopInput extends InputHandler{
                 Core.settings.put("drawhitboxes", !settings.getBool("drawhitboxes"));
             }
 
+            if(input.keyTap(Binding.teleportCursor) && (state.rules.editor || state.rules.infiniteResources)){
+                if(player.dead()){
+                    camera.position.set(input.mouseWorld());
+                }else{
+                    player.unit().set(input.mouseWorld());
+                }
+            }
+
             if(input.keyTap(Binding.detachCamera)){
                 settings.put("detach-camera", detached = !detached);
                 if(!detached){
