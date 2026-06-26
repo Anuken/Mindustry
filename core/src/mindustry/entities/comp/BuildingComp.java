@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -16,6 +17,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -49,7 +51,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, excludeGroups = {"all"}, isFinal = false, genio = false, serialize = false)
 @Component(base = true, genInterface = false)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable, AmbientSource{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -125,6 +127,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(shouldAdd){
             add();
+
+            if(block.ambientSound != Sounds.none && !headless){
+                control.sound.addAmbientSource(this);
+            }
         }
 
         checkAllowUpdate();
@@ -623,6 +629,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return team != Team.derelict && block.supportsEnv(state.rules.env) &&
             //check if outside map limit (privileged blocks are exempt)
             (tile instanceof EditorTile || block.privileged || !state.rules.limitMapArea || !state.rules.disableOutsideArea || Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight, tile.x, tile.y));
+    }
+
+    public boolean inMapArea(){
+        return !state.rules.limitMapArea || Rect.contains(state.rules.limitX * tilesize, state.rules.limitY * tilesize, state.rules.limitWidth * tilesize, state.rules.limitHeight * tilesize, x, y);
     }
 
     public BlockStatus status(){
@@ -2262,11 +2272,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScale = 1f;
         }
 
-        //TODO separate multithreaded system for sound? AudioSource, etc
-        if(!headless && block.ambientSound != Sounds.none && shouldAmbientSound()){
-            control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
-        }
-
         updateConsumption();
 
         if(enabled || !block.noUpdateDisabled){
@@ -2282,6 +2287,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             renderer.blocks.updateShadow(self());
             renderer.minimap.update(tile);
         }
+    }
+
+    @Override
+    public float getAmbientVolume(){
+        return block.ambientSoundVolume * ambientVolume();
+    }
+
+    @Override
+    public Sound getAmbientSound(){
+        return block.ambientSound;
     }
 
     @Override
