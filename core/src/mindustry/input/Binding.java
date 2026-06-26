@@ -47,7 +47,6 @@ public class Binding{
 
     cancelOrders = KeyBind.add("cancel_orders", KeyCode.unset),
 
-    unitStanceShoot = KeyBind.add("unit_stance_shoot", KeyCode.unset),
     unitStanceHoldFire = KeyBind.add("unit_stance_hold_fire", KeyCode.unset),
     unitStancePursueTarget = KeyBind.add("unit_stance_pursue_target", KeyCode.unset),
     unitStancePatrol = KeyBind.add("unit_stance_patrol", KeyCode.unset),
