@@ -21,6 +21,8 @@ import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
+    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     public Seq<String> bannedIPs = new Seq<>();
     public Seq<String> whitelist = new Seq<>();
     public Seq<ChatFilter> chatFilters = new Seq<>();
@@ -31,8 +33,6 @@ public class Administration{
     public Seq<Pattern> bannedNames = new Seq<>();
 
     private boolean modified, loaded;
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
-    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     private ObjectMap<String, IdEncounterInfo> encounteredIDsForIp = new ObjectMap<>();
 
     public Administration(){
