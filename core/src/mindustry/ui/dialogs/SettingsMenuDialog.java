@@ -260,6 +260,7 @@ public class SettingsMenuDialog extends BaseDialog{
             t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> FileChooser.open("zip").submit(file -> {
                 try{
                     importData(file);
+                    mapPreviewDirectory.deleteDirectory();
                     control.saves.resetSave();
                     state = new GameState();
                     Core.app.exit();
