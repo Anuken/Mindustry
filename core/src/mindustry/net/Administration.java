@@ -294,7 +294,7 @@ public class Administration{
 
         var set = encounteredIDsForIp.get(address, IdEncounterInfo::new);
         //clear encountered list every hour
-        if(Time.timeSinceMillis(set.initialTime) > 1000 * 60 * 60){
+        if(Time.timeSinceMillis(set.initialTime) > 1000L * 60 * 60 * Config.uuidChangeTimePeriod.num()){
             set.hashes.clear();
             set.initialTime = Time.millis();
         }
@@ -525,6 +525,7 @@ public class Administration{
      * Server configuration definition. Each config value can be a string, boolean or number.
      * Creating a new Config instance implicitly adds it to the list of server configs. This can be used for custom plugin configuration.
      * */
+    //TODO: move this into a non-nested class, this is messy and annoying to read
     public static class Config{
         public static final Seq<Config> all = new Seq<>();
 
@@ -546,7 +547,8 @@ public class Administration{
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
-        uuidChangeLimit = new Config("uuidChangeLimit", "Limit for how many UUID changes an IP can send in an hour before it gets banned.", 10),
+        uuidChangeLimit = new Config("uuidChangeLimit", "Limit for how many UUID changes an IP can send in the time frame specified by uuidChangeTimePeriod before it gets banned.", 10),
+        uuidChangeTimePeriod = new Config("uuidChangeTimePeriod", "Time window for the uuidChangeLimit config, in hours.", 3),
         chatSpamLimit = new Config("chatSpamLimit", "Limit for chat packet count sent within 2sec that will lead to a blacklist + kick. Not the same as a rate limit.", 20),
         socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),

@@ -166,7 +166,7 @@ public class NetServer implements ApplicationListener{
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address) || con.kicked || !con.isConnected()) return;
 
             if(admins.checkUuidChanges(con.address, packet.uuid)){
-                Log.info("Banning IP @ due to more than @ ID changes in an hour.", con.address, Config.uuidChangeLimit.num());
+                Log.info("Banning IP @ due to more than @ ID changes in @ hour(s).", con.address, Config.uuidChangeLimit.num(), Config.uuidChangeTimePeriod.num());
                 con.kick(KickReason.banned);
                 return;
             }
