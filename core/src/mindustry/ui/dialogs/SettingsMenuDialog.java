@@ -569,6 +569,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         dev.checkPref("console", false);
         dev.checkPref("drawhitboxes", false);
+        dev.checkPref("showperformance", false);
 
         if(!ios){
             dev.checkPref("modcrashdisable", true);

@@ -463,11 +463,12 @@ public class Logic implements ApplicationListener{
     protected void updateEntities(){
         PerfCounter.entityUpdate.begin();
 
+        PerfCounter.entityMisc.begin();
         Groups.updatePooling();
-
         Groups.bullet.updatePhysics();
         Groups.unit.updatePhysics();
         Groups.all.update();
+        PerfCounter.entityMisc.end();
 
         PerfCounter.unitUpdate.begin();
         Groups.unit.update();
@@ -481,7 +482,12 @@ public class Logic implements ApplicationListener{
         if(!state.isEditor()) Groups.build.update();
         PerfCounter.buildingUpdate.end();
 
+        PerfCounter.bulletUpdate.begin();
+        Groups.bullet.update();
+
         Groups.bullet.collide();
+        PerfCounter.bulletUpdate.begin();
+
         PerfCounter.entityUpdate.end();
     }
 
@@ -489,6 +495,8 @@ public class Logic implements ApplicationListener{
     public void update(){
         PerfCounter.frame.end();
         PerfCounter.frame.begin();
+
+        PerfCounter.stateUpdate.begin();
 
         Events.fire(Trigger.update);
         universe.updateGlobal();
@@ -600,6 +608,8 @@ public class Logic implements ApplicationListener{
         }else if(netServer.isWaitingForPlayers() && runStateCheck){
             checkGameState();
         }
+
+        PerfCounter.stateUpdate.end(PerfCounter.entityUpdate.latestValueNs());
     }
 
     /** @return whether the wave timer is paused due to enemies */
