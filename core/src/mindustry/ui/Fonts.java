@@ -10,6 +10,7 @@ import arc.freetype.FreetypeFontLoader.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -17,8 +18,10 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.mod.Mods.*;
 
 import java.io.*;
 import java.util.*;
@@ -184,10 +187,8 @@ public class Fonts{
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
 
-        //TODO: mod emojis can't work because most mod icons are not on the UI page!
-        /*
-        if(Vars.mods.list().contains(m -> m.shouldBeEnabled())){
-            ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit};
+        if(Vars.mods.list().contains(LoadedMod::shouldBeEnabled)){
+            ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit, ContentType.team, ContentType.weather};
             int startChar = 0xE000 + 1;
 
             for(var type : types){
@@ -201,7 +202,7 @@ public class Fonts{
                     }
                 }
             }
-        }*/
+        }
 
         for(Team team : Team.baseTeams){
             team.emoji = stringIcons.get(team.name, "");
