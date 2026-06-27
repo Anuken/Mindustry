@@ -178,7 +178,7 @@ public class Vars implements Loadable{
     /** multicast group for discovery.*/
     public static final String multicastGroup = "227.2.7.7";
     /** Maximum delta time. If the actual delta time (*60) between frames is higher than this number, the game will start to slow down. */
-    public static float maxDeltaClient = 6f, maxDeltaServer = 10f;
+    public static float maxDeltaClient = 4f, maxDeltaServer = 4f;
     /** whether the graphical game client has loaded */
     public static boolean clientLoaded = false;
     /** whether the serpulo campaign sectors were remapped (older save) */
