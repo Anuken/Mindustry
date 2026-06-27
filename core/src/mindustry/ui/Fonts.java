@@ -153,6 +153,7 @@ public class Fonts{
         glyph.v = region.v2;
         glyph.u2 = region.u2;
         glyph.v2 = region.v;
+        glyph.texture = region.texture;
         glyph.xoffset = (size - glyph.width) / 2;
         glyph.yoffset = (size - glyph.height) / 2 - size;
         glyph.xadvance = size;
@@ -164,7 +165,6 @@ public class Fonts{
     }
 
     public static void loadContentIcons(){
-        Texture uitex = Core.atlas.find("logo").texture;
 
         try(var reader = Core.files.internal("icons/icons.properties").reader(Vars.bufferSize)){
             String line;
@@ -173,13 +173,8 @@ public class Fonts{
                 String[] nametex = split[1].split("\\|");
                 String character = split[0], texture = nametex[1];
                 int ch = Integer.parseInt(character);
-                TextureRegion region = Core.atlas.find(texture);
 
-                if(region.texture != uitex){
-                    continue;
-                }
-
-                registerIcon(nametex[0], texture, ch, region);
+                registerIcon(nametex[0], texture, ch, Core.atlas.find(texture));
             }
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -187,6 +182,12 @@ public class Fonts{
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
 
+        for(Team team : Team.baseTeams){
+            team.emoji = stringIcons.get(team.name, "");
+        }
+    }
+
+    public static void loadModContentIcons(){
         if(Vars.mods.list().contains(LoadedMod::shouldBeEnabled)){
             ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit, ContentType.team, ContentType.weather};
             int startChar = 0xE000 + 1;
@@ -202,10 +203,6 @@ public class Fonts{
                     }
                 }
             }
-        }
-
-        for(Team team : Team.baseTeams){
-            team.emoji = stringIcons.get(team.name, "");
         }
     }
 

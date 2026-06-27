@@ -228,8 +228,6 @@ public class Mods implements Loadable{
             packer.add(entry.name, entry.region, entry.splits, entry.pads);
         }
 
-        Pixmap[] whitePixmap = {null};
-        Texture[] whiteTex = {null};
         TextureAtlas oldAtlas = Core.atlas;
 
         //generate new icons
@@ -253,7 +251,9 @@ public class Mods implements Loadable{
 
             //TODO very very hacky solution...
             Events.on(ClientLoadEvent.class, e -> {
+                //grab the font texture and overwrite the contents of its reference with the real font texture
                 ArraySliceTexture last = new ArraySliceTexture(Core.atlas.getTexture(), Core.atlas.getTexture().depth - 1);
+
                 var target = (ArraySliceTexture)UI.packer.getTargetTexture();
                 target.array = last.array;
                 target.index = last.index;
