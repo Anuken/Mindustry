@@ -486,7 +486,7 @@ public class Logic implements ApplicationListener{
         Groups.bullet.update();
 
         Groups.bullet.collide();
-        PerfCounter.bulletUpdate.begin();
+        PerfCounter.bulletUpdate.end();
 
         PerfCounter.entityUpdate.end();
     }
