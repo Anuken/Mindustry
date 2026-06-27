@@ -11,7 +11,7 @@ public class NvGpuInfo{
     private static boolean supported, initialized;
 
     public static int getMaxMemoryKB(){
-        return hasMemoryInfo() ? arc.graphics.gl.Gl.getInt(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX) : 0;
+        return hasMemoryInfo() ? Gl.getInt(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX) : 0;
     }
 
     public static int getAvailableMemoryKB(){

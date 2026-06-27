@@ -56,7 +56,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         loadFileLogger();
         platform = this;
-        maxTextureSize = arc.graphics.gl.Gl.getInt(Gl.maxTextureSize);
+        maxTextureSize = Gl.getInt(Gl.maxTextureSize);
         beginTime = Time.millis();
 
         //debug GL information

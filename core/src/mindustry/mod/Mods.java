@@ -244,23 +244,8 @@ public class Mods implements Loadable{
         }
 
         waitForMain(() -> {
-            //TODO: flashes for some reason.
-
             //replace old atlas data
             Core.atlas = packer.create(filter);
-
-            //TODO very very hacky solution...
-            Events.on(ClientLoadEvent.class, e -> {
-                //grab the font texture and overwrite the contents of its reference with the real font texture
-                ArraySliceTexture last = new ArraySliceTexture(Core.atlas.getTexture(), Core.atlas.getTexture().depth - 1);
-
-                var target = (ArraySliceTexture)UI.packer.getTargetTexture();
-                target.array = last.array;
-                target.index = last.index;
-                target.overwriteHandle(last.getHandle());
-
-                oldAtlas.dispose();
-            });
 
             textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
             renderer.loadFluidFrames();
@@ -269,6 +254,15 @@ public class Mods implements Loadable{
             Log.debug("Total pages: @", Core.atlas.getPages().size);
 
             packer.printStats();
+
+            //TODO: if this is done during loading, it makes the font flash transparent for some reason, despite the fact that the texture should already be drawn at that point
+            Events.on(ClientLoadEvent.class, e -> {
+                //grab the font texture and overwrite the contents of its reference with the real font texture
+                ArraySliceTexture last = new ArraySliceTexture(Core.atlas.getTexture(), Core.atlas.getTexture().depth - 1);
+                ((ArraySliceTexture)UI.packer.getTargetTexture()).overwrite(last.array, last.index);
+
+                oldAtlas.dispose();
+            });
 
             Events.fire(new AtlasPackEvent(packer));
 
