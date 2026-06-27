@@ -469,11 +469,17 @@ public class Logic implements ApplicationListener{
         Groups.unit.updatePhysics();
         Groups.all.update();
 
+        PerfCounter.unitUpdate.begin();
+        Groups.unit.update();
+        PerfCounter.unitUpdate.end();
+
+        PerfCounter.powerUpdate.begin();
+        if(!state.isEditor()) Groups.powerGraph.update();
+        PerfCounter.powerUpdate.end();
+
         PerfCounter.buildingUpdate.begin();
-        if(!state.isEditor()){
-            Groups.build.update();
-        }
-        PerfCounter.buildingUpdate.begin();
+        if(!state.isEditor()) Groups.build.update();
+        PerfCounter.buildingUpdate.end();
 
         Groups.bullet.collide();
         PerfCounter.entityUpdate.end();
