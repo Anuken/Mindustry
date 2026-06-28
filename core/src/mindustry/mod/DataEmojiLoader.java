@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.mod.data.*;
 import mindustry.ui.*;
 
@@ -18,8 +19,7 @@ public class DataEmojiLoader{
 
         for(var emoji : emojis){
             if(!Fonts.hasIcon(emoji.name)){
-                TextureRegion region = Core.atlas.find(DataImagePacker.regionPrefix + emoji.name, emoji.name);
-                if(!region.found()) continue;
+                TextureRegion region = Vars.headless ? null : Core.atlas.find(DataImagePacker.regionPrefix + emoji.name, emoji.name);
 
                 Fonts.registerIcon(emoji.name, start, region);
                 loadedNames.add(emoji.name);
