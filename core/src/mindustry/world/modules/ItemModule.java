@@ -13,13 +13,13 @@ import static mindustry.Vars.*;
 public class ItemModule extends BlockModule{
     public static final ItemModule empty = new ItemModule();
 
-    private static final int windowSize = 6;
+    private static final int windowSize = 12;
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;
     private static float[] displayFlow;
     private static final Bits cacheBits = new Bits();
     private static final Interval flowTimer = new Interval(2);
-    private static final float pollScl = 20f;
+    private static final float pollScl = 10f;
 
     protected int[] items = new int[content.items().size];
     protected int total;
@@ -64,7 +64,7 @@ public class ItemModule extends BlockModule{
                 flow = cacheFlow;
             }
 
-            boolean updateFlow = flowTimer.get(30);
+            boolean updateFlow = flowTimer.get(15);
 
             for(int i = 0; i < items.length; i++){
                 flow[i].add(cacheSums[i]);
