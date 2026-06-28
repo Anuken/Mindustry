@@ -670,7 +670,7 @@ public class BlockRenderer{
 
         drawDestroyed();
 
-        if(chunksToDraw.size > 0 && !input.keyDown(KeyCode.y)){
+        if(chunksToDraw.size > 0){
 
             for(int mlayer = 0; mlayer < BuildingCacheLayer.amount; mlayer++){
                 int layer = mlayer;

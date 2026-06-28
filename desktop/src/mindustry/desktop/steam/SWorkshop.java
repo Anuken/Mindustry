@@ -75,6 +75,7 @@ public class SWorkshop implements SteamUGCCallback{
 
     /** Fetches info for an item, checking to make sure that it exists.*/
     public void viewListing(Publishable p){
+        if(p.getSteamID() == null) return;
         long handle = Strings.parseLong(p.getSteamID(), -1);
         SteamPublishedFileID id = new SteamPublishedFileID(handle);
         Log.info("Handle = " + handle);

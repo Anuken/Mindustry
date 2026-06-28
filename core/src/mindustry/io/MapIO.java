@@ -47,10 +47,15 @@ public class MapIO{
     }
 
     public static void writeMap(Fi file, Map map) throws IOException{
+        writeMap(file, map, true);
+    }
+
+    /** @param embed if true, assets will be embedded in the map - this is needed for external export. */
+    public static void writeMap(Fi file, Map map, boolean embed) throws IOException{
         try{
             SaveIO.write(file, new SaveOptions(){{
                 extraTags = map.tags;
-                embedAssets = true;
+                embedAssets = embed;
             }});
         }catch(Exception e){
             throw new IOException(e);

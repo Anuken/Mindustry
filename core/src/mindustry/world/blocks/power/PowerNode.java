@@ -71,11 +71,15 @@ public class PowerNode extends PowerBlock{
                 //reflow from this point, covering all tiles on this side
                 newgraph.reflow(entity);
 
+                newgraph.update();
+
                 if(valid && other.power.graph != newgraph){
                     //create new graph for other end
                     PowerGraph og = new PowerGraph();
                     //reflow from other end
                     og.reflow(other);
+
+                    og.update();
                 }
             }else if(linkValid(entity, other) && valid && power.links.size < maxNodes){
 

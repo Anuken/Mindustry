@@ -56,6 +56,7 @@ public class HudFragment{
 
     private Seq<Block> blocksOut = new Seq<>();
     private Table hudLabel;
+    private float coreAttackTime;
 
     private static ObjectSet<String> favoriteBlocks = new ObjectSet<>();
     private static String lastFavorited = null;
@@ -592,9 +593,11 @@ public class HudFragment{
                 c.top().collapser(coreItems, () -> Core.settings.getBool("coreitems") && !mobile && shown).fillX().row();
 
                 float notifDuration = 240f;
-                float[] coreAttackTime = {0};
 
-                Events.run(Trigger.teamCoreDamage, () -> coreAttackTime[0] = notifDuration);
+                Events.run(Trigger.teamCoreDamage, () -> coreAttackTime = notifDuration);
+                Events.on(ResetEvent.class, e -> {
+                    coreAttackTime = 0f;
+                });
 
                 //'core is under attack' table
                 c.collapser(top -> top.background(Styles.black6).add("@coreattack").pad(8)
@@ -608,13 +611,13 @@ public class HudFragment{
                 })
                 .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time, 2f, 1f))), true,
                 () -> {
-                    if(!shown || state.isPaused()) return false;
                     if(state.isMenu() || !player.team().data().hasCore()){
-                        coreAttackTime[0] = 0f;
+                        coreAttackTime = 0f;
                         return false;
                     }
+                    if(!shown || state.isPaused()) return false;
 
-                    return (coreAttackTime[0] -= Time.delta) > 0;
+                    return (coreAttackTime -= Time.delta) > 0;
                 })
                 .touchable(Touchable.disabled)
                 .fillX().row();
@@ -1070,7 +1073,6 @@ public class HudFragment{
                     lcell[0].padRight(-42f);
                 }
                 table.invalidateHierarchy();
-                table.pack();
                 couldSkip[0] = can;
             }
 
