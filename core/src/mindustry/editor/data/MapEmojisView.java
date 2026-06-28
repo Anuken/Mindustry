@@ -40,6 +40,10 @@ public class MapEmojisView implements AssetView{
                 table.row();
             }
         }
+
+        if(table.getChildren().isEmpty()){
+            table.center().add("@none.found").pad(10f);
+        }
     }
 
     @Override
