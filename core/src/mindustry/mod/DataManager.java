@@ -16,6 +16,7 @@ public class DataManager{
     private DataImagePacker packer = new DataImagePacker();
     private DataAudioLoader soundLoader = new DataAudioLoader();
     private DataBundleLoader bundleLoader = new DataBundleLoader();
+    private DataEmojiLoader emojiLoader = new DataEmojiLoader();
 
     private ObjectMap<DataAssetType, Seq<DataAsset>> assets = new ObjectMap<>();
     private Seq<DataAsset> orderedAssets = new Seq<>();
@@ -170,7 +171,7 @@ public class DataManager{
         packer.unload();
         packer.pack(getImages());
 
-        rebuildOrderedAssets();
+        reloadEmojis();
     }
 
     public void reloadImages(Seq<ImageAsset> images){
@@ -182,6 +183,13 @@ public class DataManager{
     public void reloadAudio(){
         soundLoader.unload();
         soundLoader.load(getSounds(), getMusic());
+
+        rebuildOrderedAssets();
+    }
+
+    public void reloadEmojis(){
+        emojiLoader.unload();
+        emojiLoader.load(getEmojis());
 
         rebuildOrderedAssets();
     }
@@ -203,6 +211,7 @@ public class DataManager{
         }
 
         patcher.apply(getPatches(), getContent());
+        emojiLoader.load(getEmojis());
 
         rebuildOrderedAssets();
     }
@@ -214,6 +223,7 @@ public class DataManager{
             packer.unload();
         }
         soundLoader.unload();
+        emojiLoader.unload();
 
         assets.clear();
         orderedAssets.clear();
@@ -299,5 +309,9 @@ public class DataManager{
 
     public Seq<ContentAsset> getContent(){
         return getAssets(DataAssetType.content);
+    }
+
+    public Seq<EmojiAsset> getEmojis(){
+        return getAssets(DataAssetType.emoji);
     }
 }

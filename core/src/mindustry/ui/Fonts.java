@@ -33,6 +33,7 @@ public class Fonts{
     private static IntMap<String> unicodeToName = new IntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
+    private static int lastUsedModCodepoint;
 
     public static Font def, outline, icon, iconLarge, tech, logic, monospace;
 
@@ -134,34 +135,48 @@ public class Fonts{
         });
     }
 
-    public static void registerIcon(String name, String regionName, int ch, TextureRegion region){
-        int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
-
+    public static void registerIcon(String name, int ch, TextureRegion region){
         unicodeIcons.put(name, ch);
         stringIcons.put(name, ((char)ch) + "");
-        unicodeToName.put(ch, regionName);
+        unicodeToName.put(ch, region instanceof AtlasRegion at ? at.name : name);
 
-        Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
+        if(!Vars.headless){
+            int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
-        Glyph glyph = new Glyph();
-        glyph.id = ch;
-        glyph.srcX = 0;
-        glyph.srcY = 0;
-        glyph.width = (int)out.x;
-        glyph.height = (int)out.y;
-        glyph.u = region.u;
-        glyph.v = region.v2;
-        glyph.u2 = region.u2;
-        glyph.v2 = region.v;
-        glyph.texture = region.texture;
-        glyph.xoffset = (size - glyph.width) / 2;
-        glyph.yoffset = (size - glyph.height) / 2 - size;
-        glyph.xadvance = size;
-        glyph.kerning = null;
-        glyph.fixedWidth = true;
-        glyph.page = 0;
-        Fonts.def.getData().setGlyph(ch, glyph);
-        Fonts.outline.getData().setGlyph(ch, glyph);
+            Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
+
+            Glyph glyph = new Glyph();
+            glyph.id = ch;
+            glyph.srcX = 0;
+            glyph.srcY = 0;
+            glyph.width = (int)out.x;
+            glyph.height = (int)out.y;
+            glyph.u = region.u;
+            glyph.v = region.v2;
+            glyph.u2 = region.u2;
+            glyph.v2 = region.v;
+            glyph.texture = region.texture;
+            glyph.xoffset = (size - glyph.width) / 2;
+            glyph.yoffset = (size - glyph.height) / 2 - size;
+            glyph.xadvance = size;
+            glyph.kerning = null;
+            glyph.fixedWidth = true;
+            glyph.page = 0;
+            Fonts.def.getData().setGlyph(ch, glyph);
+            Fonts.outline.getData().setGlyph(ch, glyph);
+        }
+    }
+
+    public static void unregisterIcon(String name){
+        int id = unicodeIcons.remove(name, 0);
+        stringIcons.remove(name);
+        if(id != 0){
+            unicodeToName.remove(id);
+        }
+    }
+
+    public static boolean hasIcon(String name){
+        return unicodeIcons.containsKey(name);
     }
 
     public static void loadContentIcons(){
@@ -174,7 +189,7 @@ public class Fonts{
                 String character = split[0], texture = nametex[1];
                 int ch = Integer.parseInt(character);
 
-                registerIcon(nametex[0], texture, ch, Core.atlas.find(texture));
+                registerIcon(nametex[0], ch, Core.atlas.find(texture));
             }
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -190,20 +205,24 @@ public class Fonts{
     public static void loadModContentIcons(){
         if(Vars.mods.list().contains(LoadedMod::shouldBeEnabled)){
             ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit, ContentType.team, ContentType.weather};
-            int startChar = 0xE000 + 1;
+            lastUsedModCodepoint = 0xE000 + 1;
 
             for(var type : types){
                 for(var cont : Vars.content.getBy(type)){
                     if(!cont.isVanilla() && cont instanceof UnlockableContent u && u.uiIcon.found()){
-                        int id = startChar;
+                        int id = lastUsedModCodepoint;
 
-                        registerIcon(u.name, u.uiIcon instanceof AtlasRegion atlas ? atlas.name : u.name, id, u.uiIcon);
+                        registerIcon(u.name, id, u.uiIcon);
 
-                        startChar ++;
+                        lastUsedModCodepoint ++;
                     }
                 }
             }
         }
+    }
+
+    public static int getLastUsedModCodepoint(){
+        return lastUsedModCodepoint;
     }
 
     public static void loadContentIconsHeadless(){
@@ -217,6 +236,7 @@ public class Fonts{
 
                 unicodeIcons.put(nametex[0], ch);
                 stringIcons.put(nametex[0], ((char)ch) + "");
+                unicodeToName.put(ch, nametex[0]);
             }
         }catch(IOException e){
             throw new RuntimeException(e);
