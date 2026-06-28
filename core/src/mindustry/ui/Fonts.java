@@ -138,9 +138,7 @@ public class Fonts{
     public static void registerIcon(String name, int ch, TextureRegion region){
         unicodeIcons.put(name, ch);
         stringIcons.put(name, ((char)ch) + "");
-        if(region != null && region.found()){
-            unicodeToName.put(ch, region instanceof AtlasRegion at ? at.name : name);
-        }
+        unicodeToName.put(ch, region instanceof AtlasRegion at ? at.name : name);
 
         if(!Vars.headless){
             int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
