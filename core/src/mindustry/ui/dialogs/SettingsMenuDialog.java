@@ -260,6 +260,7 @@ public class SettingsMenuDialog extends BaseDialog{
             t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> FileChooser.open("zip").submit(file -> {
                 try{
                     importData(file);
+                    mapPreviewDirectory.deleteDirectory();
                     control.saves.resetSave();
                     state = new GameState();
                     Core.app.exit();
@@ -352,7 +353,7 @@ public class SettingsMenuDialog extends BaseDialog{
         menu.button("@settings.data", Icon.save, style, isize, () -> dataDialog.show()).marginLeft(marg).row();
         menu.button("@settings.dev", Icon.fileCode, style, isize, () -> visible(3)).marginLeft(marg).row();
 
-        int i = 3;
+        int i = 4;
         for(var cat : categories){
             int index = i;
             if(cat.icon == null){
@@ -566,9 +567,9 @@ public class SettingsMenuDialog extends BaseDialog{
             Core.settings.put("swapdiagonal", false);
         }
 
-        dev.sliderPref("buildingtimestep", 65, 10, 65, 5, s -> s > 60 ? bundle.get("off") : s + "");
         dev.checkPref("console", false);
         dev.checkPref("drawhitboxes", false);
+        dev.checkPref("showperformance", false);
 
         if(!ios){
             dev.checkPref("modcrashdisable", true);
