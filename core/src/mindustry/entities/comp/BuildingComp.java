@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -16,6 +17,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -47,9 +49,9 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-@EntityDef(value = {Buildingc.class}, isFinal = false, genio = false, serialize = false)
+@EntityDef(value = {Buildingc.class}, excludeGroups = {"all"}, isFinal = false, genio = false, serialize = false)
 @Component(base = true, genInterface = false)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable, AmbientSource{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -125,6 +127,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(shouldAdd){
             add();
+
+            if(block.ambientSound != Sounds.none && !headless){
+                control.sound.addAmbientSource(this);
+            }
         }
 
         checkAllowUpdate();
@@ -459,6 +465,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** Sets the time scale of the building to the given intensity, unless it's above that value */
     public void applyBoost(float intensity, float duration){
+        if(!block.canOverdrive) return;
         //do not refresh time scale when getting a lower intensity
         if(intensity >= this.timeScale - 0.001f){
             timeScaleDuration = Math.max(timeScaleDuration, duration);
@@ -622,6 +629,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return team != Team.derelict && block.supportsEnv(state.rules.env) &&
             //check if outside map limit (privileged blocks are exempt)
             (tile instanceof EditorTile || block.privileged || !state.rules.limitMapArea || !state.rules.disableOutsideArea || Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight, tile.x, tile.y));
+    }
+
+    public boolean inMapArea(){
+        return !state.rules.limitMapArea || Rect.contains(state.rules.limitX * tilesize, state.rules.limitY * tilesize, state.rules.limitWidth * tilesize, state.rules.limitHeight * tilesize, x, y);
     }
 
     public BlockStatus status(){
@@ -1215,9 +1226,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float brcy = y - (block.size * tilesize / 2f) + (tilesize * multiplier / 2f);
 
             Draw.z(Layer.power + 1);
-            Draw.color(Pal.gray);
+            Draw.color(Pal.gray, Lod.alpha2);
             Fill.square(brcx, brcy, 2.5f * multiplier, 45);
-            Draw.color(status().color);
+            Draw.color(status().color, Lod.alpha2);
             Fill.square(brcx, brcy, 1.5f * multiplier, 45);
             Draw.color();
         }
@@ -1236,6 +1247,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Draw the block overlay that is shown when a cursor is over the block. */
     public void drawSelect(){
         block.drawOverlay(x, y, rotation);
+        if(status() == BlockStatus.inactiveUnitFactory){
+            block.drawPlaceText(Core.bundle.format("rules.unitfactoryactivation.objective", UI.formatTime((float)Math.max(0f, state.rules.unitActivationDelay(team) - state.tick))), tile.x, tile.y, false);
+        }
     }
 
     public void drawItemSelection(@Nullable UnlockableContent selection){
@@ -1258,6 +1272,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         Draw.reset();
     }
 
+    /** Called only if {@link Block#drawDynamic} is true (on by default). */
     public void draw(){
         if(block.variants == 0 || block.variantRegions == null){
             Draw.rect(block.region, x, y, drawrot());
@@ -1268,9 +1283,25 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         drawTeamTop();
     }
 
-    public void payloadDraw(){
-        if(block.isAir()) return;
+    /** Called only if {@link Block#drawCached} is true (off by default). */
+    public void drawCached(){
         draw();
+    }
+
+    public void recache(){
+        if(!headless) renderer.blocks.recacheBuilding(block.buildingCacheLayer, tile);
+    }
+
+    public void payloadDraw(){
+        float z = Draw.z();
+        if(block.drawCached){
+            Draw.z(block.buildingCacheLayer.layer);
+            drawCached();
+        }
+        if(block.drawDynamic){
+            Draw.z(z);
+            draw();
+        }
     }
 
     public void drawTeamTop(){
@@ -1779,6 +1810,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(power != null && updatePower){
             var oldGraph = power.graph;
+            for(var other : proximity){
+                if(other != null && other.team != team && other.power != null && other.power.graph == oldGraph){
+                    new PowerGraph().reflow(other);
+                }
+            }
             for(int i = 0; i < power.links.size; i++){
                 var other = world.build(power.links.items[i]);
 
@@ -1872,6 +1908,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         for(Building other : tmpTiles){
             other.onProximityUpdate();
         }
+
+        if(!headless && block.drawCached) recache();
     }
 
     public void onNearbyBuildAdded(Building other){}
@@ -2229,14 +2267,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     @Override
     public void update(){
 
-        //TODO refactor to timestamp-based system?
-        if((timeScaleDuration -= Time.delta) <= 0f || !block.canOverdrive){
+        //TODO refactor to separate loop?
+        if((timeScaleDuration -= Time.delta) <= 0f){
             timeScale = 1f;
-        }
-
-        //TODO separate multithreaded system for sound? AudioSource, etc
-        if(!headless && block.ambientSound != Sounds.none && shouldAmbientSound()){
-            control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
         }
 
         updateConsumption();
@@ -2254,6 +2287,16 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             renderer.blocks.updateShadow(self());
             renderer.minimap.update(tile);
         }
+    }
+
+    @Override
+    public float getAmbientVolume(){
+        return block.ambientSoundVolume * ambientVolume();
+    }
+
+    @Override
+    public Sound getAmbientSound(){
+        return block.ambientSound;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package mindustry.world.blocks.environment;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
@@ -37,10 +36,10 @@ public class ShallowLiquid extends Floor{
         //super.createIcons(packer);
 
         if(liquidBase != null && floorBase != null){
-            var overlay = Core.atlas.getPixmap(liquidBase.region);
+            var overlay = packer.get(liquidBase.region);
             int index = 0;
             for(TextureRegion region : floorBase.variantRegions()){
-                var res = Core.atlas.getPixmap(region).crop();
+                var res = packer.get(region).crop();
                 for(int x = 0; x < res.width; x++){
                     for(int y = 0; y < res.height; y++){
                         res.setRaw(x, y, Pixmap.blend((overlay.getRaw(x, y) & 0xffffff00) | (int)(liquidOpacity * 255), res.getRaw(x, y)));

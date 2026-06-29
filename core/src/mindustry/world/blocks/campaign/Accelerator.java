@@ -28,6 +28,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.storage.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class Accelerator extends Block{
@@ -88,6 +90,12 @@ public class Accelerator extends Block{
         }
         consumeItems(launchBlock.requirements);
         super.init();
+    }
+
+    @Override
+    public void checkContentArrayCapacity(int items, int liquids){
+        super.checkContentArrayCapacity(items, liquids);
+        if(capacities.length != items) capacities = Arrays.copyOf(capacities, items);
     }
 
     @Override

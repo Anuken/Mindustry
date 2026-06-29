@@ -10,10 +10,12 @@ import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import arc.util.serialization.JsonValue.*;
+import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -22,10 +24,13 @@ import mindustry.maps.Map;
 import mindustry.maps.*;
 import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
+import mindustry.mod.data.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import org.jline.reader.*;
+import org.jline.reader.impl.completer.*;
 
 import java.io.*;
 import java.net.*;
@@ -43,6 +48,8 @@ public class ServerControl implements ApplicationListener{
     protected static DateTimeFormatter dateTime = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss"),
         autosaveDate = DateTimeFormatter.ofPattern("MM-dd-yyyy_HH-mm-ss");
 
+    static final String defaultRuleString = "reactorExplosions: false\nlogicUnitBuild: false\nlogicUnitDeconstruct: false";
+
     /** Global instance of ServerControl, initialized when the server is created. Should never be null on a dedicated server. */
     public static ServerControl instance;
 
@@ -50,14 +57,6 @@ public class ServerControl implements ApplicationListener{
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
 
     private final Interval autosaveCount = new Interval();
-
-    public Runnable serverInput = () -> {
-        Scanner scan = new Scanner(System.in);
-        while(scan.hasNext()){
-            String line = scan.nextLine();
-            Core.app.post(() -> handleCommandString(line));
-        }
-    };
 
     /** The file to which the logs are currently being written. */
     public Fi currentLogFile;
@@ -74,8 +73,25 @@ public class ServerControl implements ApplicationListener{
     private PrintWriter socketOutput;
     private String suggested;
     private boolean autoPaused = false;
-    private Fi patchDirectory;
-    private Seq<String> contentPatches = new Seq<>();
+    private Fi dataAssetDirectory, rulesFile;
+    private Seq<DataAsset> dataAssets = new Seq<>();
+
+    private LineReader lineReader;
+
+    public Runnable serverInput = () -> {
+        while(true){
+            try{
+                String line = lineReader.readLine("> ");
+                if(!line.isEmpty()){
+                    Core.app.post(() -> handleCommandString(line));
+                }
+            }catch(EndOfFileException | UserInterruptException e){
+                Core.app.exit();
+            }catch(Exception e){
+                Core.app.post(() -> { throw new ArcRuntimeException(e); });
+            }
+        }
+    };
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
@@ -112,11 +128,14 @@ public class ServerControl implements ApplicationListener{
     }
 
     protected void setup(String[] args){
+        registerCommands();
+
+        lineReader = LineReaderBuilder.builder().completer(new StringsCompleter(handler.getCommandList().map(c -> c.text))).build();
+
         Core.settings.defaults(
             "bans", "",
             "admins", "",
-            "shufflemode", "custom",
-            "globalrules", "{reactorExplosions: false, logicUnitBuild: false, logicUnitDeconstruct: false}"
+            "shufflemode", "custom"
         );
 
         //update log level
@@ -133,7 +152,14 @@ public class ServerControl implements ApplicationListener{
             if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
 
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
-            System.out.println(result);
+            if(lineReader.isReading()){
+                lineReader.callWidget(LineReader.CLEAR);
+                lineReader.getTerminal().writer().println(result);
+                lineReader.callWidget(LineReader.REDRAW_LINE);
+                lineReader.callWidget(LineReader.REDISPLAY);
+            }else{
+                lineReader.getTerminal().writer().println(result);
+            }
 
             if(Config.logging.bool()){
                 logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + formatColors(tags[level1.ordinal()] + " " + text + "&fr", false));
@@ -154,8 +180,6 @@ public class ServerControl implements ApplicationListener{
         };
 
         Time.setDeltaProvider(() -> Math.min(Core.graphics.getDeltaTime() * 60f, maxDeltaServer));
-
-        registerCommands();
 
         Core.app.post(() -> {
             //try to load auto-update save if possible
@@ -202,9 +226,31 @@ public class ServerControl implements ApplicationListener{
 
         customMapDirectory.mkdirs();
 
-        patchDirectory = dataDirectory.child("patches");
-        patchDirectory.mkdirs();
-        loadPatchFiles();
+        rulesFile = dataDirectory.child("rules.hjson");
+
+        if(!rulesFile.exists() && !Core.settings.has("globalrules")){
+            rulesFile.writeString(defaultRuleString);
+        }
+
+        //load the old 'globalrules' value
+        if(Core.settings.has("globalrules")){
+            try{
+                Jval base = Jval.newObject();
+                if(rulesFile.exists()){
+                    base.asObject().putAll(Jval.read(rulesFile.readString()).asObject());
+                }
+                base.asObject().putAll(Jval.read(Core.settings.getString("globalrules")).asObject());
+                rulesFile.writeString(base.toString(Jformat.hjson));
+
+                Core.settings.remove("globalrules");
+            }catch(Exception e){
+                Log.err("Failed to load previous global rules: ", e);
+            }
+        }
+
+        dataAssetDirectory = dataDirectory.child("assets");
+        dataAssetDirectory.mkdirs();
+        loadDataAssets();
 
         //set up default shuffle mode
         try{
@@ -284,8 +330,7 @@ public class ServerControl implements ApplicationListener{
 
         Events.on(PlayEvent.class, e -> {
             try{
-                JsonValue value = JsonIO.json.fromJson(null, Core.settings.getString("globalrules"));
-                JsonIO.json.readFields(state.rules, value);
+                JsonIO.json.readFields(state.rules, readRulesFile());
             }catch(Throwable t){
                 err("Error applying custom rules, proceeding without them.", t);
             }
@@ -323,28 +368,93 @@ public class ServerControl implements ApplicationListener{
             info("Server loaded. Type @ for help.", "'help'");
         });
 
-        Events.on(ContentPatchLoadEvent.class, event -> {
-            //NOTE: if patches change, and an older save is loaded, the patches will be applied twice; the old ones won't be removed.
-            for(String patch : contentPatches){
-                event.patches.addUnique(patch);
+        Events.on(DataPatchLoadEvent.class, event -> {
+            //load server data patches
+            for(var asset : dataAssets){
+                int index = event.assets.indexOf(d -> d.getType() == asset.getType() && d.path.equalsIgnoreCase(asset.path));
+                if(index == -1){
+                    event.assets.add(asset);
+                }else{
+                    event.assets.set(index, asset);
+                }
             }
         });
     }
 
-    void loadPatchFiles(){
-        contentPatches.clear();
-        Seq<Fi> patches = patchDirectory.findAll(f -> f.extEquals("json") || f.extEquals("hjson") || f.extEquals("json5")).sort();
+    JsonValue readRulesFile(){
+        return JsonIO.json.fromJson(null, Jval.read(rulesFile.readString()).toString(Jformat.plain));
+    }
 
-        for(Fi patch : patches){
-            try{
-                contentPatches.add(Jval.read(patch.readString()).toString(Jformat.plain));
-            }catch(Throwable e){
-                Log.err("Invalid patch file: " + patch.name(), e);
+    void loadDataAssets(){
+        Fi oldPatchDirectory = dataDirectory.child("patches");
+        if(oldPatchDirectory.exists()){
+            Log.warn("Note: Patches are now placed in assets/patches. Any files contained in that directory have been automatically moved.");
+            Fi destDir = dataAssetDirectory.child("patches");
+            destDir.mkdirs();
+            for(Fi file : oldPatchDirectory.list()){
+                Fi dest = destDir.child(file.name());
+                if(!dest.isDirectory() && dest.exists()){
+                    dest = destDir.child("copied_patch_" + file.name());
+                }
+                if(!file.isDirectory()){
+                    file.copyTo(dest);
+                }else{
+                    file.copyFilesTo(dest);
+                }
+            }
+            oldPatchDirectory.deleteDirectory();
+        }
+
+        dataAssets.clear();
+
+        //special folder prefix for server-loaded content. this helps avoid conflicts.
+        String prefix = "server-assets/";
+
+        for(var type : DataAssetType.all){
+            Fi folder = dataAssetDirectory.child(type.folder);
+            folder.mkdirs();
+
+            //content has sub-dirs based on type, which need to be passed as context to the reader
+            if(type == DataAssetType.content){
+                for(ContentType ctype : ContentAsset.loadableContent){
+                    Fi subfolder = folder.child(ctype.folderName);
+
+                    subfolder.mkdirs();
+
+                    Seq<Fi> files = subfolder.findAll(f -> type.extensions.contains(f.extension().toLowerCase(Locale.ROOT)));
+
+                    for(Fi file : files){
+                        try{
+                            ContentAsset asset = (ContentAsset)type.create();
+                            asset.readOverride(prefix + file.absolutePath().substring(subfolder.absolutePath().length() + 1), file, ctype);
+                            dataAssets.add(asset);
+                        }catch(Throwable e){
+                            Log.err("Error loading content asset: " + file, e);
+                        }
+                    }
+                }
+            }else{
+                Seq<Fi> files = folder.findAll(f -> type.extensions.contains(f.extension().toLowerCase(Locale.ROOT)));
+
+                for(Fi file : files){
+                    try{
+                        var asset = type.create();
+                        asset.readOverride(prefix + file.absolutePath().substring(folder.absolutePath().length() + 1), file);
+                        dataAssets.add(asset);
+                    }catch(Throwable e){
+                        Log.err("Error loading data asset: " + file, e);
+                    }
+                }
             }
         }
 
-        if(contentPatches.size > 0){
-            Log.info("Loaded @ content patch files.", contentPatches.size);
+        dataAssets.sort();
+
+        if(dataAssets.size > 0){
+            Log.info("Loaded @ data asset files.", dataAssets.size);
+            if(dataAssets.count(d -> !d.isAlwaysEmbedded()) >= Short.MAX_VALUE){
+                Log.err("Warning: You have more than 32k asset files, which is above the maximum limit. Clients will not be able to connect.");
+            }
         }
     }
 
@@ -468,10 +578,10 @@ public class ServerControl implements ApplicationListener{
             info("Map directory: &fi@", customMapDirectory.file().getAbsoluteFile().toString());
         });
 
-        handler.register("reloadpatches", "Reload all patch files from disk.", arg -> {
-            loadPatchFiles();
-            if(contentPatches.isEmpty()){
-                err("No valid content patch files found.");
+        handler.register("reloadassets", "Reload all content/patch asset files from disk.", arg -> {
+            loadDataAssets();
+            if(dataAssets.isEmpty()){
+                err("No valid asset files found.");
             }
         });
 
@@ -565,11 +675,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
-            String rules = Core.settings.getString("globalrules");
-            JsonValue base = JsonIO.json.fromJson(null, rules);
+            JsonValue base = readRulesFile();
 
             if(arg.length == 0){
-                info("Rules:\n@", JsonIO.print(rules));
+                info("Rules:\n@", Jval.read(base.toJson(OutputType.minimal)).toString(Jformat.hjson));
             }else if(arg.length == 1){
                 err("Invalid usage. Specify which rule to remove or add.");
             }else{
@@ -611,8 +720,36 @@ public class ServerControl implements ApplicationListener{
                     }
                 }
 
-                Core.settings.put("globalrules", base.toString());
+                rulesFile.writeString(Jval.read(base.toString()).toString(Jformat.hjson));
                 Call.setRules(state.rules);
+            }
+        });
+
+        handler.register("dumpsettings", "Print every settings value. Useful for debugging.", arg -> {
+            var allKeys = Seq.with(Core.settings.keys());
+            allKeys.sort();
+            int maxLength = allKeys.max(String::length).length();
+            Log.info("Total values: @ | @ bytes", allKeys.size, Strings.formatByteCount(Core.settings.getSettingsFile().length()));
+
+            for(String key : allKeys){
+                var value = Core.settings.get(key, null);
+
+                String valueToString;
+
+                if(value instanceof byte[] b) valueToString = "[" + b.length + " bytes]";
+                else valueToString = String.valueOf(value);
+
+                String typeName = switch(value == null ? "null" : value.getClass().getSimpleName()){
+                    case "Integer" -> "int   ";
+                    case "Boolean" -> "bool  ";
+                    case "Float"   -> "float ";
+                    case "Long"    -> "long  ";
+                    case "byte[]"  -> "byte[]";
+                    case "String"  -> "string";
+                    default -> value.getClass().getSimpleName();
+                };
+
+                Log.info("&lg@  &lg| @&lg |  &lg@", key + " ".repeat(maxLength - key.length()), typeName, valueToString);
             }
         });
 
@@ -1053,7 +1190,7 @@ public class ServerControl implements ApplicationListener{
             });
         });
 
-        handler.register("save", "<slot>", "Save game state to a slot.", arg -> {
+        handler.register("save", "<slot> [embedAssets]", "Save game state to a slot.", arg -> {
             if(!state.isGame()){
                 err("Not hosting. Host a game first.");
                 return;
@@ -1062,7 +1199,9 @@ public class ServerControl implements ApplicationListener{
             Fi file = saveDirectory.child(arg[0] + "." + saveExtension);
 
             Core.app.post(() -> {
-                SaveIO.save(file);
+                SaveIO.save(file, new SaveOptions(){{
+                    embedAssets = arg.length > 1 && ("true".equalsIgnoreCase(arg[1]) || "yes".equalsIgnoreCase(arg[1]));
+                }});
                 info("Saved to @.", file);
             });
         });
