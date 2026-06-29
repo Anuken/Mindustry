@@ -88,7 +88,7 @@ public class Rules{
     /** How much damage unit crash and unit explosive damage deals. (Compounds with unitDamageMultiplier) */
     public float unitCrashDamageMultiplier = 1f;
     /** How much damage unit crash damage and unit explosive deals to buildings. (Compounds with unitDamageMultiplier) */
-    public float unitCrashBuildDamageMultiplier = 0.3f;
+    public float unitCrashBuildDamageMultiplier = 0.5f;
     /** How fast units can mine. */
     public float unitMineSpeedMultiplier = 1f;
     /** Time until unit factories activate (global). */
