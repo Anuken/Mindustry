@@ -234,6 +234,12 @@ public class EntityProcess extends BaseProcessor{
                     return result;
                 });
 
+                Seq<Stype> exclusions = types(an, GroupDef::exclude).map(stype -> {
+                    Stype result = interfaceToComp(stype);
+                    if(result == null) throw new IllegalArgumentException("Interface " + stype + " does not have an associated component!");
+                    return result;
+                });
+
                 //representative component type
                 Stype repr = types.first();
                 String groupType = repr.annotation(Component.class).base() ? baseName(repr) : interfaceName(repr);
@@ -242,7 +248,7 @@ public class EntityProcess extends BaseProcessor{
 
                 boolean collides = an.collide();
                 groupDefs.add(new GroupDefinition(name,
-                    ClassName.bestGuess(packageName + "." + groupType), types, an.spatial(), an.mapping(), collides, an.update()));
+                    ClassName.bestGuess(packageName + "." + groupType), types, exclusions, an.spatial(), an.mapping(), collides, an.update()));
 
                 TypeSpec.Builder accessor = TypeSpec.interfaceBuilder("IndexableEntity__" + name);
                 accessor.addMethod(MethodSpec.methodBuilder("setIndex__" + name).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(int.class, "index").returns(void.class).build());
@@ -258,7 +264,9 @@ public class EntityProcess extends BaseProcessor{
 
                 //all component classes (not interfaces)
                 Seq<Stype> components = allComponents(type);
-                Seq<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !Structs.contains(ann.excludeGroups(), g.name) && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
+                Seq<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !Structs.contains(ann.excludeGroups(), g.name)
+                    && !g.components.contains(s -> !components.contains(s)) && !g.excludedComponents.contains(s -> components.contains(s))));
+
                 ObjectMap<String, Seq<Smethod>> methods = new ObjectMap<>();
                 ObjectMap<FieldSpec, Svar> specVariables = new ObjectMap<>();
                 ObjectSet<String> usedFields = new ObjectSet<>();
@@ -994,13 +1002,13 @@ public class EntityProcess extends BaseProcessor{
     class GroupDefinition{
         final String name;
         final ClassName baseType;
-        final Seq<Stype> components;
+        final Seq<Stype> components, excludedComponents;
         final boolean spatial, mapping, collides, updates;
-        final ObjectSet<Selement> manualInclusions = new ObjectSet<>();
 
-        public GroupDefinition(String name, ClassName bestType, Seq<Stype> components, boolean spatial, boolean mapping, boolean collides, boolean updates){
+        public GroupDefinition(String name, ClassName bestType, Seq<Stype> components, Seq<Stype> excludedComponents, boolean spatial, boolean mapping, boolean collides, boolean updates){
             this.baseType = bestType;
             this.components = components;
+            this.excludedComponents = excludedComponents;
             this.name = name;
             this.spatial = spatial;
             this.mapping = mapping;

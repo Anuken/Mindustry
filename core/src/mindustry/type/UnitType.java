@@ -1436,6 +1436,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             case armor -> armor;
             case range -> World.conv(maxRange);
             case size -> hitSize / tilesize;
+            case flying -> flying ? 1f : 0f;
             case itemCapacity -> itemCapacity;
             case speed -> speed * 60f / tilesize;
             case payloadCapacity -> sample instanceof Payloadc ? payloadCapacity / tilePayload : 0f;
