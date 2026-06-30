@@ -49,7 +49,7 @@ public class SectorSubmissions{
         //191 has several alternate submissions
         registerSerpuloSector(191, "tinport", "https://discord.com/channels/391020510269669376/1379926912004001914/1421139764819660884");
         //alternate, more difficult submission: https://discord.com/channels/391020510269669376/1379926782966497322/1416145231853781022
-        registerSerpuloSector(6, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926782966497322/1437001083221184535", -1, 9f);
+        registerSerpuloSector(6, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926782966497322/1516634498307985460", -1, 9f);
         registerSerpuloSector(265, "Dem0", "https://discord.com/channels/391020510269669376/1379928052921929891/1450757980206137359");
         registerSerpuloSector(161, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926882203730024/1416686287204782217");
         registerSerpuloSector(24, "Stormrider", "https://discord.com/channels/391020510269669376/1379926797042581716/1419213541512187935");
