@@ -110,7 +110,7 @@ public class Blocks{
     //defense - erekir
     radar,
     buildTower,
-    regenProjector, barrierProjector, shockwaveTower,
+    regenProjector, shockwaveTower,
     //campaign only
     shieldProjector,
     largeShieldProjector,
@@ -719,52 +719,52 @@ public class Blocks{
             sclMax = 100f;
         }};
 
-        boulder = new Prop("boulder"){{
+        boulder = new StaticProp("boulder"){{
             variants = 2;
             stone.asFloor().decoration = craters.asFloor().decoration = charr.asFloor().decoration = this;
         }};
 
-        snowBoulder = new Prop("snow-boulder"){{
+        snowBoulder = new StaticProp("snow-boulder"){{
             variants = 2;
             snow.asFloor().decoration = ice.asFloor().decoration = iceSnow.asFloor().decoration = salt.asFloor().decoration = this;
         }};
 
-        shaleBoulder = new Prop("shale-boulder"){{
+        shaleBoulder = new StaticProp("shale-boulder"){{
             variants = 2;
             shale.asFloor().decoration = this;
         }};
 
-        sandBoulder = new Prop("sand-boulder"){{
+        sandBoulder = new StaticProp("sand-boulder"){{
             variants = 2;
             sand.asFloor().decoration = this;
         }};
 
-        daciteBoulder = new Prop("dacite-boulder"){{
+        daciteBoulder = new StaticProp("dacite-boulder"){{
             variants = 2;
             dacite.asFloor().decoration = this;
         }};
 
-        basaltBoulder = new Prop("basalt-boulder"){{
+        basaltBoulder = new StaticProp("basalt-boulder"){{
             variants = 2;
             basalt.asFloor().decoration = hotrock.asFloor().decoration = darksand.asFloor().decoration = magmarock.asFloor().decoration = this;
         }};
 
-        carbonBoulder = new Prop("carbon-boulder"){{
+        carbonBoulder = new StaticProp("carbon-boulder"){{
             variants = 2;
             carbonStone.asFloor().decoration = this;
         }};
 
-        ferricBoulder = new Prop("ferric-boulder"){{
+        ferricBoulder = new StaticProp("ferric-boulder"){{
             variants = 2;
             ferricStone.asFloor().decoration = ferricCraters.asFloor().decoration = this;
         }};
 
-        beryllicBoulder = new Prop("beryllic-boulder"){{
+        beryllicBoulder = new StaticProp("beryllic-boulder"){{
             variants = 2;
             beryllicStone.asFloor().decoration = this;
         }};
 
-        yellowStoneBoulder = new Prop("yellow-stone-boulder"){{
+        yellowStoneBoulder = new StaticProp("yellow-stone-boulder"){{
             variants = 2;
             yellowStone.asFloor().decoration = regolith.asFloor().decoration = yellowStonePlates.asFloor().decoration = this;
         }};
@@ -801,22 +801,22 @@ public class Blocks{
             shadowOffset = -2.5f;
         }};
 
-        crystallineBoulder = new Prop("crystalline-boulder"){{
+        crystallineBoulder = new StaticProp("crystalline-boulder"){{
             variants = 2;
             crystallineStone.asFloor().decoration = this;
         }};
 
-        redIceBoulder = new Prop("red-ice-boulder"){{
+        redIceBoulder = new StaticProp("red-ice-boulder"){{
             variants = 3;
             redIce.asFloor().decoration = this;
         }};
 
-        rhyoliteBoulder = new Prop("rhyolite-boulder"){{
+        rhyoliteBoulder = new StaticProp("rhyolite-boulder"){{
             variants = 3;
             rhyolite.asFloor().decoration = roughRhyolite.asFloor().decoration = this;
         }};
 
-        redStoneBoulder = new Prop("red-stone-boulder"){{
+        redStoneBoulder = new StaticProp("red-stone-boulder"){{
             variants = 4;
             denseRedStone.asFloor().decoration = redStone.asFloor().decoration = this;
         }};
@@ -1503,7 +1503,7 @@ public class Blocks{
         }};
 
         smallHeatRedirector = new HeatConductor("small-heat-redirector"){{
-            requirements(Category.crafting, with(Items.surgeAlloy, 8, Items.graphite, 8));
+            requirements(Category.crafting, with(Items.surgeAlloy, 3, Items.graphite, 8));
 
             researchCostMultiplier = 2f;
             researchCostMultipliers.put(Items.graphite, 7f);
@@ -2034,19 +2034,6 @@ public class Blocks{
             }});
         }};
 
-        //TODO implement
-        if(false)
-        barrierProjector = new DirectionalForceProjector("barrier-projector"){{
-            requirements(Category.effect, with(Items.surgeAlloy, 100, Items.silicon, 125));
-            size = 3;
-            width = 50f;
-            length = 36;
-            shieldHealth = 2000f;
-            cooldownNormal = 3f;
-            cooldownBrokenBase = 0.35f;
-
-            consumePower(4f);
-        }};
 
         shockwaveTower = new ShockwaveTower("shockwave-tower"){{
             requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
@@ -2090,7 +2077,7 @@ public class Blocks{
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
-            speed = 0.08f;
+            speed = 0.0801f;
             displayedSpeed = 10f;
         }};
 
@@ -2694,6 +2681,7 @@ public class Blocks{
             laserColor2 = Color.valueOf("ffd9c2");
             laserScale = 0.8f;
             scaledHealth = 130;
+            useLod = false;
         }};
 
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{

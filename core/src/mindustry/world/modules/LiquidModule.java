@@ -11,9 +11,9 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class LiquidModule extends BlockModule{
-    private static final int windowSize = 3;
+    private static final int windowSize = 6;
     private static final Interval flowTimer = new Interval(2);
-    private static final float pollScl = 20f;
+    private static final float pollScl = 10f;
 
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;
@@ -48,7 +48,7 @@ public class LiquidModule extends BlockModule{
                 flow = cacheFlow;
             }
 
-            boolean updateFlow = flowTimer.get(30);
+            boolean updateFlow = flowTimer.get(15);
 
             for(int i = 0; i < liquids.length; i++){
                 flow[i].add(cacheSums[i]);
@@ -143,6 +143,10 @@ public class LiquidModule extends BlockModule{
             }
         }
         return sum;
+    }
+
+    public void checkArrayCapacity(int size){
+        if(liquids.length != size) liquids = Arrays.copyOf(liquids, size);
     }
 
     @Override

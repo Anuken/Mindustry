@@ -56,6 +56,8 @@ public class LogicBlock extends Block{
         group = BlockGroup.logic;
         schematicPriority = 5;
         ignoreResizeConfig = true;
+        drawCached = true;
+        drawDynamic = false;
 
         //universal, no real requirements
         envEnabled = Env.any;
@@ -521,11 +523,6 @@ public class LogicBlock extends Block{
                         l.trySet(executor, null); //always clear old variable, it may get a new name
 
                         if(valid){
-                            //this prevents conflicts
-                            l.name = "";
-                            //finds a new matching name after toggling
-                            l.name = findLinkName(cur.block);
-
                             //remove redundant links
                             links.removeAll(o -> {
                                 boolean remove = world.build(o.x, o.y) == cur && o != l;
@@ -573,6 +570,8 @@ public class LogicBlock extends Block{
         }
 
         public void updateLinks(){
+            if(linksVar == null) return;
+
             int valids = links.count(l -> l.valid);
             executor.links = new Building[valids];
             executor.linkIds.clear();
