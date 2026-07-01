@@ -2680,6 +2680,7 @@ public class Blocks{
             laserColor2 = Color.valueOf("ffd9c2");
             laserScale = 0.8f;
             scaledHealth = 130;
+            useLod = false;
         }};
 
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{

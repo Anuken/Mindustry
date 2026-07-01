@@ -247,6 +247,23 @@ public class Rules{
         return JsonIO.copy(this);
     }
 
+    /**
+     * When a map is played, it uses rules from the rules dialog, which cannot contain patched content, since it doesn't exist at that point in time.
+     * This means that any existing rules containing patched content will contain garbage or empty data.
+     * This function copies original map rule data from {@param source} (obtained after map load) that may contain new content into this ruleset.
+     * */
+    public void retainContentFields(Rules source){
+        //these fields can't be modified in the custom rules anyway, so force-overwriting them is fine
+        spawns = source.spawns;
+        objectives = source.objectives;
+        weather = source.weather;
+
+        //TODO: this overwrites banned blocks/units and loadouts if someone set it in custom rules when playing; there isn't a good way to avoid this
+        if(Seq.with(source.bannedBlocks).contains(Content::isPatchContent)) bannedBlocks = source.bannedBlocks;
+        if(Seq.with(source.bannedUnits).contains(Content::isPatchContent)) bannedUnits = source.bannedUnits;
+        if(source.loadout.contains(i -> i.item.isPatchContent())) loadout = source.loadout;
+    }
+
     /** Returns the gamemode that best fits these rules. */
     public Gamemode mode(){
         if(pvp){
