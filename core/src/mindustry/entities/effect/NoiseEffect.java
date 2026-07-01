@@ -21,11 +21,13 @@ public class NoiseEffect extends Effect{
     public float layerAlphaMul = 0.7f;
     public float layerSclMul = 0.8f;
     public float layerColorMul = 0.9f;
-    public Texture tex = Core.assets.getOrNull(noisePath, Texture.class);
+    public Texture tex;
 
     @Override
     public void render(EffectContainer e){
-        if(tex == null) return;
+        if(tex == null){
+            tex = Core.assets.getOrNull(noisePath, Texture.class);
+        }
 
         Color col = Tmp.c2.set(color != null ? color : e.color).mul(1f, 1f, 1f, e.fout());
         drawNoiseLayers(tex, col, noiseScl, opacity, baseSpeed, intensity, windX, windY, layers, layerSpeedMul, layerAlphaMul, layerSclMul, layerColorMul);
