@@ -162,7 +162,7 @@ public class ArcNetProvider implements NetProvider{
                 if(packetSpamLimit > 0 && !k.packetRate.allow(3000, packetSpamLimit)){
                     Log.warn("Blacklisting IP '@' as potential DOS attack - packet spam.", k.address);
                     connection.close(DcReason.closed);
-                    netServer.admins.blacklistDos(k.address);
+                    k.blacklist();
                     return;
                 }
 
@@ -364,6 +364,17 @@ public class ArcNetProvider implements NetProvider{
         @Override
         public boolean isConnected(){
             return connection.isConnected();
+        }
+
+        @Override
+        public void blacklist(){
+            //Blacklist TCP address
+            super.blacklist();
+            //Blacklist UDP address
+            var address = connection.getRemoteAddressUDP();
+            if(address != null){
+                netServer.admins.blacklistDos(address.getAddress().getHostAddress());
+            }
         }
 
         @Override
