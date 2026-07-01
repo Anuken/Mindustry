@@ -28,6 +28,7 @@ public class NoiseEffect extends Effect{
         if(tex == null){
             tex = Core.assets.getOrNull(noisePath, Texture.class);
         }
+        if(tex == null) return;
 
         Color col = Tmp.c2.set(color != null ? color : e.color).mul(1f, 1f, 1f, e.fout());
         drawNoiseLayers(tex, col, noiseScl, opacity, baseSpeed, intensity, windX, windY, layers, layerSpeedMul, layerAlphaMul, layerSclMul, layerColorMul);
