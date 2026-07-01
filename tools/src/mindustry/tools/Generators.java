@@ -331,7 +331,9 @@ public class Generators{
 
                 Pixmap shardTeamTop = null;
 
-                if(block.teamRegion.found()){
+                if(block.teamRegion == null){
+                Log.err("Block '@' has no team region!", block.name);
+                }else if(block.teamRegion.found()){
                     Pixmap teamr = get(block.teamRegion);
 
                     for(Team team : Team.all){
