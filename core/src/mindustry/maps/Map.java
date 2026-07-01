@@ -100,7 +100,8 @@ public class Map implements Comparable<Map>, Publishable{
 
     public Rules rules(Rules base){
         try{
-            Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}"));
+            Rules result = JsonIO.read(base, tags.get("rules", "{}"));
+
             //replace the default serpulo env with erekir
             if(result.planet == Planets.serpulo && result.hasEnv(Env.scorching)){
                 result.planet = Planets.erekir;
