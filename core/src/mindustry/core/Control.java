@@ -401,6 +401,8 @@ public class Control implements ApplicationListener, Loadable{
         ui.loadAnd(() -> {
             logic.reset();
             world.loadMap(map, rules);
+            var oldRules = state.rules;
+            rules.retainContentFields(oldRules);
             state.rules = rules;
             if(playtest) state.playtestingMap = map;
             state.rules.sector = null;

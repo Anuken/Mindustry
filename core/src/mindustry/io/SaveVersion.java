@@ -60,13 +60,13 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     @Override
-    public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
-        readRegion("meta", stream, counter, in -> readMeta(in, context));
-        if(version >= 12) readRegion("patches", stream, counter, this::readDataPatches);
+    public void read(DataInputStream stream, CounterInputStream counter, SaveReadState saveState) throws IOException{
+        readRegion("meta", stream, counter, in -> readMeta(in, saveState));
+        if(version >= 12) readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
 
         try{
             readRegion("content", stream, counter, this::readContentHeader);
-            readRegion("map", stream, counter, in -> readMap(in, context));
+            readRegion("map", stream, counter, in -> readMap(in, saveState.context));
             readRegion("entities", stream, counter, this::readEntities);
             if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
             readRegion("custom", stream, counter, this::readCustomChunks);
@@ -75,6 +75,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
+    @Override
     public void write(DataOutputStream stream, SaveOptions options) throws IOException{
         writeRegion("meta", stream, out -> writeMeta(out, options.extraTags));
         writeRegion("patches", stream, out -> writeDataPatches(out, options.embedAssets));
@@ -148,27 +149,20 @@ public abstract class SaveVersion extends SaveFileReader{
         )));
     }
 
-    public void readMeta(DataInput stream, WorldContext context) throws IOException{
+    public void readMeta(DataInput stream, SaveReadState saveState) throws IOException{
         StringMap map = readStringMap(stream);
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.tick = map.getFloat("tick");
         state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
-        state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         state.mapLocales = JsonIO.read(MapLocales.class, map.get("locales", "{}"));
-        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
 
-        if(context.getSector() != null){
-            state.rules.sector = context.getSector();
-            if(state.rules.sector != null){
-                state.rules.sector.planet.applyRules(state.rules);
-            }
-        }
+        saveState.ruleString = map.get("rules", "{}");
 
-        //replace the default serpulo env with erekir
-        if(state.rules.planet == Planets.serpulo && state.rules.hasEnv(Env.scorching)){
-            state.rules.planet = Planets.erekir;
+        //for versions >= 13, rules are parsed after data patches are loaded
+        if(version < 13){
+            readRules(saveState);
         }
 
         if(!headless){
@@ -194,6 +188,25 @@ public abstract class SaveVersion extends SaveFileReader{
             "width", 1,
             "height", 1
         )) : worldmap;
+    }
+
+    public void readRules(SaveReadState saveState){
+        if(saveState.ruleString == null) return; //in NetworkIO, rules are null, not read here
+        state.rules = JsonIO.read(Rules.class, saveState.ruleString);
+
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
+
+        if(saveState.context.getSector() != null){
+            state.rules.sector = saveState.context.getSector();
+            if(state.rules.sector != null){
+                state.rules.sector.planet.applyRules(state.rules);
+            }
+        }
+
+        //replace the default serpulo env with erekir
+        if(state.rules.planet == Planets.serpulo && state.rules.hasEnv(Env.scorching)){
+            state.rules.planet = Planets.erekir;
+        }
     }
 
     public void writeMap(DataOutput stream) throws IOException{
@@ -527,7 +540,7 @@ public abstract class SaveVersion extends SaveFileReader{
         readWorldEntities(stream, mapping);
     }
 
-    public void readDataPatches(DataInput stream) throws IOException{
+    public void readDataPatches(DataInput stream, SaveReadState saveState) throws IOException{
         stream.readInt(); //version - ignored for now
 
         int total = stream.readInt();
@@ -563,6 +576,9 @@ public abstract class SaveVersion extends SaveFileReader{
         Events.fire(new DataPatchLoadEvent(assets));
 
         state.data.load(assets);
+
+        //now that patches are loaded, the rules can actually be read
+        readRules(saveState);
     }
 
     public void writeDataPatches(DataOutput stream, boolean forceEmbed) throws IOException{

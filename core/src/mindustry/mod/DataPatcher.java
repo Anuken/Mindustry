@@ -29,6 +29,12 @@ import java.util.*;
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class DataPatcher{
+    private static ModMeta dpModMeta = new ModMeta(){{
+        name = internalName = "dp";
+    }};
+
+    public static final LoadedMod dpMod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, dpModMeta);
+
     public static final int maxImageSize = 2000;
     public static final int patchFormatVersion = 2;
 
@@ -37,10 +43,7 @@ public class DataPatcher{
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static DataPatcher currentDataPatcher;
     private static ContentParser parser = createParser();
-    private static  ModMeta dpModMeta = new ModMeta(){{
-        name = internalName = "dp";
-    }};
-    private static LoadedMod dpMod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, dpModMeta);
+
 
     private boolean applied;
     private ContentLoader contentLoader;
