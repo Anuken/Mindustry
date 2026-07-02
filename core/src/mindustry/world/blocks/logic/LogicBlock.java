@@ -514,6 +514,7 @@ public class LogicBlock extends Block{
                     var cur = world.build(l.x, l.y);
 
                     boolean valid = validLink(cur);
+                    Block lastBlock = (l.lastBuild == null ? null : l.lastBuild.block);
                     if(l.lastBuild == null) l.lastBuild = cur;
                     if(valid != l.valid || l.lastBuild != cur){
                         l.lastBuild = cur;
@@ -523,6 +524,13 @@ public class LogicBlock extends Block{
                         l.trySet(executor, null); //always clear old variable, it may get a new name
 
                         if(valid){
+
+                            if(lastBlock != null && cur.block != lastBlock){
+                                l.logicVar = null; //name was reassigned because block type changed, the old cached logic var is no longer relevant
+                                l.name = "";
+                                l.name = findLinkName(cur.block);
+                            }
+
                             //remove redundant links
                             links.removeAll(o -> {
                                 boolean remove = world.build(o.x, o.y) == cur && o != l;
