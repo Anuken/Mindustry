@@ -109,7 +109,7 @@ public class Map implements Comparable<Map>, Publishable{
             if(result.planet == null) result.planet = Planets.serpulo;
             if(result.spawns.isEmpty()) result.spawns = Vars.waves.get();
             return result;
-        }catch(Exception e){
+        }catch(Throwable e){
             //error reading rules. ignore?
             Log.err(e);
             return new Rules();
