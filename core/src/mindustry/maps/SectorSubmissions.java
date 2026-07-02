@@ -6,6 +6,7 @@ import mindustry.content.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
+import static mindustry.type.SectorDifficulty.*;
 
 /** Class for temporarily (?) storing links to map submissions on Discord. */
 public class SectorSubmissions{
@@ -24,58 +25,58 @@ public class SectorSubmissions{
     }
 
     public static void registerSectors(){
-        registerSerpuloSector(76, "Tyrant-classZzz", "https://discord.com/channels/391020510269669376/1379926833411391580/1479890094486716499", -1, 8f);
-        registerSerpuloSector(47, "tinport", "https://discord.com/channels/391020510269669376/1379926802591645820/1481778410018570274");
-        registerSerpuloSector(225, "Summi", "https://discord.com/channels/391020510269669376/1379926925719376152/1419026814826709103");
-        registerSerpuloSector(111, "enwyz", "https://discord.com/channels/391020510269669376/1379926842659569864/1517216621616169084");
-        registerSerpuloSector(176, "wpx", "https://discord.com/channels/391020510269669376/1379926887203213353/1419025548696621209");
-        registerSerpuloSector(13, "chocomint", "https://discord.com/channels/391020510269669376/1379926785164312810/1518092246300229677");
-        registerSerpuloSector(259, "tinport", "https://discord.com/channels/391020510269669376/1379928048245280871/1381300770866987049");
-        registerSerpuloSector(192, "Skeledragon", "https://discord.com/channels/391020510269669376/1379926914122256449/1380767793989029923");
-        registerSerpuloSector(127, "playfree", "https://discord.com/channels/391020510269669376/1379926869465632829/1380253194428354602");
-        registerSerpuloSector(207, "cyan", "https://discord.com/channels/391020510269669376/1379926923370827827/1405919087883976837");
-        registerSerpuloSector(94, "Wine", "https://discord.com/channels/391020510269669376/1379926838079393802/1433736458174468197");
-        registerSerpuloSector(16, "Namero", "https://discord.com/channels/391020510269669376/1379926788280680579/1409970152283312352");
-        registerSerpuloSector(116, "Jamespire", "https://discord.com/channels/391020510269669376/1379926845058711734/1483297088426082336");
-        registerSerpuloSector(69, "Oct", "https://discord.com/channels/391020510269669376/1379926831326822610/1406230980120940556");
-        registerSerpuloSector(92, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926835621527615/1484550444369051772");
-        registerSerpuloSector(197, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926916911599676/1423257237341863966");
-        registerSerpuloSector(67, "Ếch ngồi đáy giếng", "https://discord.com/channels/391020510269669376/1379926828696866898/1389981795386396768");
+        register(76, "Tyrant-classZzz", "https://discord.com/channels/391020510269669376/1379926833411391580/1479890094486716499", extreme);
+        register(47, "tinport", "https://discord.com/channels/391020510269669376/1379926802591645820/1481778410018570274", extreme);
+        register(225, "Summi", "https://discord.com/channels/391020510269669376/1379926925719376152/1419026814826709103", extreme);
+        register(111, "enwyz", "https://discord.com/channels/391020510269669376/1379926842659569864/1517216621616169084", extreme);
+        register(176, "wpx", "https://discord.com/channels/391020510269669376/1379926887203213353/1419025548696621209", extreme);
+        register(13, "chocomint", "https://discord.com/channels/391020510269669376/1379926785164312810/1518092246300229677", extreme);
+        register(259, "tinport", "https://discord.com/channels/391020510269669376/1379928048245280871/1381300770866987049", extreme);
+        register(192, "Skeledragon", "https://discord.com/channels/391020510269669376/1379926914122256449/1380767793989029923", extreme);
+        register(127, "playfree", "https://discord.com/channels/391020510269669376/1379926869465632829/1380253194428354602", extreme);
+        register(207, "cyan", "https://discord.com/channels/391020510269669376/1379926923370827827/1405919087883976837", extreme);
+        register(94, "Wine", "https://discord.com/channels/391020510269669376/1379926838079393802/1433736458174468197", high);
+        register(16, "Namero", "https://discord.com/channels/391020510269669376/1379926788280680579/1409970152283312352", high);
+        register(116, "Jamespire", "https://discord.com/channels/391020510269669376/1379926845058711734/1483297088426082336", high);
+        register(69, "Oct", "https://discord.com/channels/391020510269669376/1379926831326822610/1406230980120940556", high);
+        register(92, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926835621527615/1484550444369051772", high);
+        register(197, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926916911599676/1423257237341863966", extreme);
+        register(67, "Ếch ngồi đáy giếng", "https://discord.com/channels/391020510269669376/1379926828696866898/1389981795386396768", extreme);
         //180 has an alternate submission that may be more appropriate in terms of difficulty: https://discord.com/channels/391020510269669376/1379926889648619580/1411534650412892185
-        registerSerpuloSector(180, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926889648619580/1426523800815538178");
-        registerSerpuloSector(55, "Amomogus391", "https://discord.com/channels/391020510269669376/1379926823277695189/1478733623829200910");
-        registerSerpuloSector(19, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926792479183019/1424375936169545730");
-        registerSerpuloSector(200, "Axye", "https://discord.com/channels/391020510269669376/1379926918429806755/1419180347232485448");
+        register(180, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926889648619580/1426523800815538178", extreme);
+        register(55, "Amomogus391", "https://discord.com/channels/391020510269669376/1379926823277695189/1478733623829200910", eradication);
+        register(19, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926792479183019/1424375936169545730", extreme);
+        register(200, "Axye", "https://discord.com/channels/391020510269669376/1379926918429806755/1419180347232485448", medium);
         //191 has several alternate submissions
-        registerSerpuloSector(191, "tinport", "https://discord.com/channels/391020510269669376/1379926912004001914/1421139764819660884");
+        register(191, "tinport", "https://discord.com/channels/391020510269669376/1379926912004001914/1421139764819660884", eradication);
         //alternate, more difficult submission: https://discord.com/channels/391020510269669376/1379926782966497322/1416145231853781022
-        registerSerpuloSector(6, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926782966497322/1516634498307985460", -1, 9f);
-        registerSerpuloSector(265, "Dem0", "https://discord.com/channels/391020510269669376/1379928052921929891/1450757980206137359");
-        registerSerpuloSector(161, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926882203730024/1416686287204782217");
-        registerSerpuloSector(24, "Stormrider", "https://discord.com/channels/391020510269669376/1379926797042581716/1419213541512187935");
-        registerSerpuloSector(263, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379928050010951694/1483982628268019916");
-        registerSerpuloSector(66, "quad", "https://discord.com/channels/391020510269669376/1379926825941078128/1419165493008535706");
-        registerSerpuloSector(248, "iqtik123", "https://discord.com/channels/391020510269669376/1379926979129774151/1417864622412922890");
-        registerSerpuloSector(133, "wpx", "https://discord.com/channels/391020510269669376/1379926871227240770/1419018550932279440");
-        registerSerpuloSector(185, "quad", "https://discord.com/channels/391020510269669376/1379926892181983283/1419231958336016458");
+        register(6, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926782966497322/1516634498307985460", extreme);
+        register(265, "Dem0", "https://discord.com/channels/391020510269669376/1379928052921929891/1450757980206137359", extreme);
+        register(161, "Hengryton Luck", "https://discord.com/channels/391020510269669376/1379926882203730024/1416686287204782217", extreme);
+        register(24, "Stormrider", "https://discord.com/channels/391020510269669376/1379926797042581716/1419213541512187935", eradication);
+        register(263, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379928050010951694/1518065606161862710", eradication);
+        register(66, "quad", "https://discord.com/channels/391020510269669376/1379926825941078128/1419165493008535706", extreme);
+        register(248, "iqtik123", "https://discord.com/channels/391020510269669376/1379926979129774151/1417864622412922890", high);
+        register(133, "wpx", "https://discord.com/channels/391020510269669376/1379926871227240770/1419018550932279440", extreme);
+        register(185, "quad", "https://discord.com/channels/391020510269669376/1379926892181983283/1419231958336016458", high);
         //alternate submission: https://discord.com/channels/391020510269669376/1379928045577703424/1426592904767475745
-        registerSerpuloSector(254, "wpx", "https://discord.com/channels/391020510269669376/1379928045577703424/1420456601667502193");
-        registerSerpuloSector(0, "iqtik123", "https://discord.com/channels/391020510269669376/1379926780860698784/1482671494268977341");
-        registerSerpuloSector(30, "cyan", "https://discord.com/channels/391020510269669376/1379926800854945823/1423932799647481910");
-        registerSerpuloSector(20, "Namero", "https://discord.com/channels/391020510269669376/1379926794114961634/1406768731471872162");
-        registerSerpuloSector(162, "Bravo Tizmo", "https://discord.com/channels/391020510269669376/1379926884606808247/1443239231366500415");
-        registerSerpuloSector(230, "Jamespire", "https://discord.com/channels/391020510269669376/1379926927585841163/1483113630202335447");
-        registerSerpuloSector(240, "hhhi17", "https://discord.com/channels/391020510269669376/1253758616117186590/1253758616117186590", -1, 8f);
-        registerSerpuloSector(202, "D&X", "https://discord.com/channels/391020510269669376/1253760205091635201/1253760205091635201", 33, 6f);
+        register(254, "wpx", "https://discord.com/channels/391020510269669376/1379928045577703424/1420456601667502193", eradication);
+        register(0, "iqtik123", "https://discord.com/channels/391020510269669376/1379926780860698784/1482671494268977341", extreme);
+        register(30, "cyan", "https://discord.com/channels/391020510269669376/1379926800854945823/1423932799647481910", eradication);
+        register(20, "Namero", "https://discord.com/channels/391020510269669376/1379926794114961634/1406768731471872162", extreme);
+        register(162, "Bravo Tizmo", "https://discord.com/channels/391020510269669376/1379926884606808247/1443239231366500415", eradication);
+        register(230, "Jamespire", "https://discord.com/channels/391020510269669376/1379926927585841163/1483113630202335447", high);
+        register(240, "hhhi17", "https://discord.com/channels/391020510269669376/1253758616117186590/1253758616117186590", extreme);
+        registerSurvival(202, "D&X", "https://discord.com/channels/391020510269669376/1253760205091635201/1253760205091635201", 33, high);
 
         //megabases
-        registerSerpuloSector(246, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255");
-        registerSerpuloSector(244, "Chocomint", "https://discord.com/channels/391020510269669376/1379926929636851812/1474447354982563840");
-        registerSerpuloSector(242, "cyan", "https://discord.com/channels/391020510269669376/1379926873152164004/1470268689201889464");
-        registerSerpuloSector(243, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543");
-        registerSerpuloSector(247, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926976361533752/1431827990295220266");
-        registerSerpuloSector(245, "Grushashusha", "https://discord.com/channels/391020510269669376/1379926971286290584/1485245072034365462");
-        registerSerpuloSector(27, "Stormrider", "https://discord.com/channels/391020510269669376/1379926798833287289/1451252137224044722", -1, 10)
+        register(246, "enwyz", "https://discord.com/channels/391020510269669376/1379926839559979030/1429203869514207255", eradication);
+        register(244, "Chocomint", "https://discord.com/channels/391020510269669376/1379926929636851812/1474447354982563840", eradication);
+        register(242, "cyan", "https://discord.com/channels/391020510269669376/1379926873152164004/1470268689201889464", eradication);
+        register(243, "Jamespire", "https://discord.com/channels/391020510269669376/1379926876457537547/1484013941477609543", eradication);
+        register(247, "Locla^Glass", "https://discord.com/channels/391020510269669376/1379926976361533752/1431827990295220266", eradication);
+        register(245, "Grushashusha", "https://discord.com/channels/391020510269669376/1379926971286290584/1485245072034365462", eradication);
+        register(27, "Stormrider", "https://discord.com/channels/391020510269669376/1379926798833287289/1451252137224044722", unreasonable)
         .showHidden = true;
 
         Planets.serpulo.sectors.get(27).preset.shieldSectors.addAll(Planets.serpulo.sectors.get(246), Planets.serpulo.sectors.get(244), Planets.serpulo.sectors.get(242));
@@ -85,18 +86,18 @@ public class SectorSubmissions{
             requireUnlock = false;
             //showHidden = true;
             captureWave = 70;
-            difficulty = 9;
+            difficulty = extreme;
         }};
 
         new SectorPreset("geothermalStronghold", serpulo, 264){{
             requireUnlock = false;
-            difficulty = 10;
+            difficulty = eradication;
             //showHidden = true;
         }};
 
         new SectorPreset("cruxscape", serpulo, 54){{
             requireUnlock = false;
-            difficulty = 10;
+            difficulty = eradication;
             //showHidden = true;
         }};
 
@@ -112,11 +113,15 @@ public class SectorSubmissions{
         );*/
     }
 
-    static SectorPreset registerSerpuloSector(int id, String author, String mapFileLink){
-        return registerSerpuloSector(id, author, mapFileLink, -1, 0f);
+    static SectorPreset register(int id, String author, String mapFileLink, int difficulty){
+        return registerSector(id, author, mapFileLink, -1, difficulty);
     }
 
-    static SectorPreset registerSerpuloSector(int id, String author, String mapFileLink, int captureWave, float difficulty){
+    static SectorPreset registerSurvival(int id, String author, String mapFileLink, int captureWave, float difficulty){
+        return registerSector(id, author, mapFileLink, captureWave, difficulty);
+    }
+
+    static SectorPreset registerSector(int id, String author, String mapFileLink, int captureWave, float difficulty){
         Planet planet = Planets.serpulo;
         Sector sector = planet.sectors.get(id);
         MapSubmission sub = threadMap.get(sector, MapSubmission::new);
