@@ -77,6 +77,16 @@ public class ModsDialog extends BaseDialog{
 
         browser.onResize(this::rebuildBrowser);
 
+        if(!mods.list().allMatch(m -> !m.failed())){
+            buttons.button("@mods.restore", Icon.power, () -> {
+                Seq<LoadedMod> skipped = new Seq<>();
+                skipped.selectFrom(mods.list(), LoadedMod::failed);
+
+                skipped.each(m -> mods.setEnabled(m, true));
+                setup();
+            });
+        }
+
         buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
 
         if(!mobile){
@@ -278,7 +288,7 @@ public class ModsDialog extends BaseDialog{
                                         (shortDesc.length() > 0 ? "[lightgray]" + shortDesc + "\n" : "")
                                         //so does anybody care about version?
                                         //+ "[gray]v" + Strings.stripColors(trimText(item.meta.version)) + "\n"
-                                        + (item.enabled() || hideDisabled ? "" : Core.bundle.get("mod.disabled") + ""))
+                                        + (item.enabled() || hideDisabled ? "" : Core.bundle.get(item.failed() ? "mod.failed" : "mod.disabled") + ""))
                                     .wrap().top().width(300f).growX().left();
 
                                     text.row();
