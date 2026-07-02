@@ -42,7 +42,7 @@ public class ForceProjector extends Block{
     public float cooldownBrokenBase = 0.35f;
     public float coolantConsumption = 0.1f;
     public boolean consumeCoolant = true;
-    public float crashDamageMultiplier = 2f;
+    public float crashDamageMultiplier = 1.5f;
     public Sound breakSound = Sounds.shieldBreak;
     public Sound hitSound = Sounds.shieldHit;
     public float hitSoundVolume = 0.12f;
