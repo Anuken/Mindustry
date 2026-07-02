@@ -191,7 +191,7 @@ public class SectorInfo{
             entity.items.clear();
             entity.items.add(items);
             //ensure capacity.
-            entity.items.each((i, a) -> entity.items.set(i, Mathf.clamp(a, 0, entity.storageCapacity)));
+            entity.items.each((i, a) -> entity.items.set(i, Mathf.clamp(a, 0, entity.capacity())));
         }
     }
 
@@ -221,7 +221,7 @@ public class SectorInfo{
         attack = state.rules.attackMode;
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
-        storageCapacity = entity != null ? entity.storageCapacity : 0;
+        storageCapacity = entity != null ? entity.capacity() : 0;
         hasSpawns = spawner.countSpawns() > 0;
         lastPresetName = sector.preset == null ? null : sector.preset.name;
         lastWidth = world.width();
