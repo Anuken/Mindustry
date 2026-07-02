@@ -129,6 +129,10 @@ public abstract class NetConnection{
         }
     }
 
+    public void blacklist(){
+        netServer.admins.blacklistDos(address);
+    }
+
     public abstract void send(Object object, boolean reliable);
 
     public abstract void close();
