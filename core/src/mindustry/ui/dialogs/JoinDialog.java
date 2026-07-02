@@ -598,6 +598,8 @@ public class JoinDialog extends BaseDialog{
             netClient.disconnectQuietly();
         });
 
+        ui.editor.hide();
+
         Time.runTask(2f, () -> {
             logic.reset();
             net.reset();
@@ -725,7 +727,7 @@ public class JoinDialog extends BaseDialog{
             }
             servers.add(new ServerGroup(name, addresses, prioritized));
         });
-        servers.sort(s -> s.name == null ? Integer.MAX_VALUE : s.name.hashCode());
+        servers.shuffle();
         return servers;
     }
 

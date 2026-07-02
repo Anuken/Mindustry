@@ -263,7 +263,7 @@ public class Mods implements Loadable{
 
                 @Override
                 public AtlasRegion find(String name){
-                    var base = packer.get(name);
+                    var base = packer.getPacked(name);
 
                     if(base != null){
                         var reg = new AtlasRegion(shadow.find(name).texture, base.x, base.y, base.width, base.height);
@@ -287,15 +287,15 @@ public class Mods implements Loadable{
 
                 @Override
                 public boolean has(String s){
-                    return shadow.has(s) || packer.get(s) != null;
+                    return shadow.has(s) || packer.getPacked(s) != null;
                 }
 
                 //return the *actual* pixmap regions, not the disposed ones.
                 @Override
                 public PixmapRegion getPixmap(AtlasRegion region){
-                    PixmapRegion out = packer.get(region.name);
+                    PixmapRegion out = packer.getPacked(region.name);
                     //this should not happen in normal situations
-                    if(out == null) return packer.get("error");
+                    if(out == null) return packer.getPacked("error");
                     return out;
                 }
             };

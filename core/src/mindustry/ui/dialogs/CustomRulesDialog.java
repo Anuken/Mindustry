@@ -61,7 +61,7 @@ public class CustomRulesDialog extends BaseDialog{
         categoryNames = new Seq<>();
 
         buttons.button("@edit", Icon.pencil, () -> {
-            BaseDialog dialog = new BaseDialog("@waves.edit");
+            BaseDialog dialog = new BaseDialog("@edit.menu");
             dialog.addCloseButton();
             dialog.setFillParent(false);
 

@@ -3,6 +3,7 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.editor.*;
 import mindustry.game.*;
@@ -57,6 +58,14 @@ public class PausedDialog extends BaseDialog{
         });
 
         if(!mobile){
+            if(steam){
+                cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost2"), val -> {
+                    Core.settings.put("steampublichost2", !val);
+                    platform.updateLobby();
+                }).colspan(2).left().with(c -> ui.addDescTooltip(c, "@steam.friendsonly.tooltip")).width(440f)
+                    .visible(() -> net.server()).center().colspan(2).fillX().padBottom(10f).row();
+            }
+
             float dw = 220f;
             cont.defaults().width(dw).height(55).pad(5f);
 
@@ -170,6 +179,10 @@ public class PausedDialog extends BaseDialog{
     }
 
     public void runExitSave(){
+        runExitSave(true);
+    }
+
+    public void runExitSave(boolean save){
         boolean wasClient = net.client();
         if(net.client()) netClient.disconnectQuietly();
 
@@ -185,14 +198,16 @@ public class PausedDialog extends BaseDialog{
             return;
         }
 
-        ui.loadAnd("@saving", () -> {
-            try{
-                control.saves.getCurrent().save();
-            }catch(Throwable e){
-                e.printStackTrace();
-                ui.showException("[accent]" + Core.bundle.get("savefail"), e);
-            }
-            logic.reset();
-        });
+        if(save){
+            ui.loadAnd("@saving", () -> {
+                try{
+                    control.saves.getCurrent().save();
+                }catch(Throwable e){
+                    Log.err(e);
+                    ui.showException("[accent]" + Core.bundle.get("savefail"), e);
+                }
+                logic.reset();
+            });
+        }
     }
 }

@@ -28,6 +28,8 @@ public class StorageBlock extends Block{
         flags = EnumSet.of(BlockFlag.storage);
         allowResupply = true;
         envEnabled = Env.any;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override
