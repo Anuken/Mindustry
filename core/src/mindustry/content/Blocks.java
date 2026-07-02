@@ -2624,6 +2624,7 @@ public class Blocks{
             itemDuration = 360f;
             powerProduction = 15f;
             heating = 0.02f;
+            scaleHeat = false;
 
             consumeItem(Items.thorium);
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
