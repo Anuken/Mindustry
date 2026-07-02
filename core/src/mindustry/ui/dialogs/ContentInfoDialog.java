@@ -11,6 +11,7 @@ import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 
@@ -34,6 +35,7 @@ public class ContentInfoDialog extends BaseDialog{
     public void show(UnlockableContent content){
         cont.clear();
 
+        Planet curPlanet = ui.planet.isShown() ? ui.planet.state.planet : state.isGame() ? state.getPlanet() : null;
         Table table = new Table();
         table.margin(10);
 
@@ -57,7 +59,7 @@ public class ContentInfoDialog extends BaseDialog{
         }
 
         if(content.description != null){
-            var any = content.stats.toMap().size > 0;
+            var any = content.stats.toMap(curPlanet).size > 0;
 
             if(any){
                 table.add("@category.purpose").color(Pal.accent).fillX().padTop(10);
@@ -75,8 +77,8 @@ public class ContentInfoDialog extends BaseDialog{
 
         Stats stats = content.stats;
 
-        for(StatCat cat : stats.toMap().keys()){
-            OrderedMap<Stat, Seq<StatValue>> map = stats.toMap().get(cat);
+        for(StatCat cat : stats.toMap(curPlanet).keys()){
+            OrderedMap<Stat, Seq<StatValue>> map = stats.toMap(curPlanet).get(cat);
 
             if(map.size == 0) continue;
 
