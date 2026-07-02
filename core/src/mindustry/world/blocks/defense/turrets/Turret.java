@@ -31,6 +31,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
+import static arc.math.Angles.within;
 import static mindustry.Vars.*;
 
 public class Turret extends ReloadTurret{
@@ -44,9 +45,9 @@ public class Turret extends ReloadTurret{
     public float newTargetInterval = -1f;
 
     /** Maximum ammo units stored. */
-    public int maxAmmo = 30;
+    public float maxAmmo = 30;
     /** Ammo units used per shot. */
-    public int ammoPerShot = 1;
+    public float ammoPerShot = 1;
     /** If true, ammo is only consumed once per shot regardless of bullet count. */
     public boolean consumeAmmoOnce = true;
     /** Minimum input heat required to fire. */
@@ -255,7 +256,7 @@ public class Turret extends ReloadTurret{
     }
 
     public static abstract class AmmoEntry{
-        public int amount;
+        public float amount;
 
         public abstract BulletType type();
     }
@@ -280,7 +281,7 @@ public class Turret extends ReloadTurret{
         public Vec2 recoilOffset = new Vec2();
 
         public Seq<AmmoEntry> ammo = new Seq<>();
-        public int totalAmmo;
+        public float totalAmmo;
         public float curRecoil, heat, logicControlTime = -1;
         public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
@@ -683,7 +684,7 @@ public class Turret extends ReloadTurret{
 
             AmmoEntry entry = ammo.peek();
             entry.amount -= ammoPerShot;
-            if(entry.amount <= 0) ammo.pop();
+            if(entry.amount <= 0.0001f) ammo.pop();
             totalAmmo -= ammoPerShot;
             totalAmmo = Math.max(totalAmmo, 0);
             return entry.type();
@@ -697,7 +698,7 @@ public class Turret extends ReloadTurret{
         /** @return whether the turret has ammo. */
         public boolean hasAmmo(){
             //skip first entry if it has less than the required amount of ammo
-            if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot){
+            if(ammo.size >= 2 && ammo.peek().amount + 0.0001f < ammoPerShot){
                 for(int i = 0; i < ammo.size; i ++){
                     if(ammo.get(i).amount >= ammoPerShot){
                         ammo.swap(ammo.size - 1, i);
@@ -709,7 +710,7 @@ public class Turret extends ReloadTurret{
             //used for "side-ammo" like gas in some turrets
             if(!canConsume()) return false;
 
-            return ammo.size > 0 && (ammo.peek().amount >= ammoPerShot || cheating());
+            return ammo.size > 0 && (ammo.peek().amount + 0.0001f >= ammoPerShot || cheating());
         }
 
         public boolean charging(){
