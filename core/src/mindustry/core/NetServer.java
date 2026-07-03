@@ -114,6 +114,11 @@ public class NetServer implements ApplicationListener{
     public static float voteDuration = 0.5f * 60;
     /** Cooldown between votes in seconds. */
     public static int voteCooldown = 60 * 5;
+    /**
+     * If this is true, the check for some hidden entities will be skipped if fog of war is disabled.
+     * Set this to false if a mod uses isSyncHidden to hide entities even when fog of war is disabled.
+     */
+    public boolean skipHiddenEntitiesCheck = true;
 
     private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
     private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
@@ -1085,7 +1090,7 @@ public class NetServer implements ApplicationListener{
         }
     }
 
-    public void writeEntitySnapshot(Player player) throws IOException{
+    public void serializeStateSnapshot(){
         byte tps = (byte)Math.min(Core.graphics.getFramesPerSecond(), 255);
         syncStream.reset();
         int activeTeams = (byte)state.teams.present.count(t -> t.cores.size > 0);
@@ -1102,8 +1107,12 @@ public class NetServer implements ApplicationListener{
         }
 
         dataStream.close();
+    }
+
+    public void writeEntitySnapshot(Player player) throws IOException{
 
         //write basic state data.
+        serializeStateSnapshot();
         Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.isPaused(), state.gameOver,
         universe.seconds(), tps, GlobalVars.rand.seed0, GlobalVars.rand.seed1, syncStream.toByteArray());
 
@@ -1146,6 +1155,43 @@ public class NetServer implements ApplicationListener{
         }
 
         player.con.snapshotsSent++;
+    }
+
+    /** Does not check isSyncHidden. Call this if no entities are hidden. */
+    public void writeSharedEntitySnapshots() throws IOException{
+        //write basic state data.
+        serializeStateSnapshot();
+        Call.stateSnapshot(state.wavetime, state.wave, state.enemies, state.isPaused(), state.gameOver,
+        universe.seconds(), tps, GlobalVars.rand.seed0, GlobalVars.rand.seed1, syncStream.toByteArray());
+
+        syncStream.reset();
+
+        int sent = 0;
+
+        for(Syncc entity : Groups.sync){
+            //write all entities now
+            dataStream.writeInt(entity.id()); //write id
+            dataStream.writeByte(entity.classId() & 0xFF); //write type ID
+            entity.beforeWrite();
+            entity.writeSync(dataStreamWrites); //write entity itself
+
+            sent++;
+
+            if(syncStream.size() > maxSnapshotSize){
+                dataStream.close();
+                Call.entitySnapshot((short)sent, syncStream.toByteArray());
+                sent = 0;
+                syncStream.reset();
+            }
+        }
+
+        if(sent > 0){
+            dataStream.close();
+
+            Call.entitySnapshot((short)sent, syncStream.toByteArray());
+        }
+
+        Groups.player.each(p -> p.con.snapshotsSent++);
     }
 
     public String fixName(String name){
@@ -1200,24 +1246,34 @@ public class NetServer implements ApplicationListener{
     void sync(){
         try{
             int interval = Config.snapshotInterval.num();
+
+            boolean shareSnapshot = !Vars.state.rules.fog && (skipHiddenEntitiesCheck ||
+                Groups.player.contains(p -> Groups.sync.contains(e -> e.isSyncHidden(p))));
+
             Groups.player.each(p -> !p.isLocal(), player -> {
                 if(player.con == null || !player.con.isConnected()){
                     onDisconnect(player, "disappeared");
                     return;
                 }
 
-                var connection = player.con;
+                if(!shareSnapshot){
+                    var connection = player.con;
 
-                if(Time.timeSinceMillis(connection.syncTime) < interval || !connection.hasConnected) return;
+                    if(Time.timeSinceMillis(connection.syncTime) < interval || !connection.hasConnected) return;
 
-                connection.syncTime = Time.millis();
+                    connection.syncTime = Time.millis();
 
-                try{
-                    writeEntitySnapshot(player);
-                }catch(IOException e){
-                    Log.err(e);
+                    try{
+                        writeEntitySnapshot(player);
+                    }catch(IOException e){
+                        Log.err(e);
+                    }
                 }
             });
+
+            if(shareSnapshot && Groups.player.contains(p -> Time.timeSinceMillis(p.con.syncTime) >= interval)){
+                writeSharedEntitySnapshots();
+            }
 
             if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && blockSyncTime.poll()){
                 writeBlockSnapshots();
