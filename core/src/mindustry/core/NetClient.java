@@ -537,7 +537,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(priority = PacketPriority.low, unreliable = true)
+    @Remote(variants = Variant.both, priority = PacketPriority.low, unreliable = true)
     public static void entitySnapshot(short amount, byte[] data){
         try{
             netClient.lastSnapshotTimestamp = Time.millis();
