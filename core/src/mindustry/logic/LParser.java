@@ -118,7 +118,11 @@ public class LParser{
                 if(jumpLocations.size >= maxJumps){
                     error("Too many jump locations. Max jumps: " + maxJumps);
                 }
-                jumpLocations.put(tokens[0].substring(0, tokens[0].length() - 1), line);
+                String label = tokens[0].substring(0, tokens[0].length() - 1);
+                if(jumpLocations.containsKey(label)){
+                    error("Jump label already defined: \"" + label + "\".");
+                }
+                jumpLocations.put(label, line);
             }else{
                 boolean wasJump;
                 String jumpLoc = null;

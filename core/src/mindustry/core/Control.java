@@ -401,6 +401,8 @@ public class Control implements ApplicationListener, Loadable{
         ui.loadAnd(() -> {
             logic.reset();
             world.loadMap(map, rules);
+            var oldRules = state.rules;
+            rules.retainContentFields(oldRules);
             state.rules = rules;
             if(playtest) state.playtestingMap = map;
             state.rules.sector = null;
@@ -694,6 +696,10 @@ public class Control implements ApplicationListener, Loadable{
         }
         if(Float.isNaN(camera.position.x)) camera.position.x = world.unitWidth()/2f;
         if(Float.isNaN(camera.position.y)) camera.position.y = world.unitHeight()/2f;
+
+        if(!scene.hasKeyboard()){
+            if(Core.input.keyTap(Binding.performanceMetrics)) Core.settings.toggle("showperformance");
+        }
 
         if(state.isGame()){
             input.update();

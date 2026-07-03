@@ -321,6 +321,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Seq<Unit> toAdd = queuedCommands.get(targetAsVec, Seq::new);
         boolean anyCommandedTarget = false;
 
+        if(unitTarget != null || buildTarget != null){
+            Events.fire(Trigger.unitCommandAttack);
+        }else{
+            Events.fire(Trigger.unitCommandPosition);
+        }
+
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
             if(unit != null && unit.team == player.team()){
@@ -407,6 +413,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
             event.unitIDs = unitIds;
+            event.unitCommand = command;
         })){
             throw new ValidateException(player, "Player cannot command units.");
         }
@@ -731,7 +738,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Events.fire(new TapEvent(player, tile));
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server)
     public static void buildingControlSelect(Player player, Building build){
         if(player == null || build == null || player.dead()) return;
 
@@ -743,7 +750,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player.team() == build.team && build.canControlSelect(player.unit())){
             var before = player.unit();
 
-            build.onControlSelect(player.unit());
+            Call.unitBuildingControlSelect(player.unit(), build);
 
             if(!before.dead && before.spawnedByCore && !before.isPlayer()){
                 Call.unitDespawn(before);
@@ -1173,12 +1180,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ids[i] = selectedUnits.get(i).id;
                 }
 
-                if(attack != null){
-                    Events.fire(Trigger.unitCommandAttack);
-                }else{
-                    Events.fire(Trigger.unitCommandPosition);
-                }
-
                 int maxChunkSize = 200;
 
                 if(ids.length > maxChunkSize){
@@ -1423,7 +1424,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     overlappingPlayer= player;
                 }
 
-                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f * Time.delta);
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f);
                 plan.block.drawOtherPlayerPlan(plan, player.planEachable, overlappingPlan == plan ? 0.7f : 0.25f);
             });
         });

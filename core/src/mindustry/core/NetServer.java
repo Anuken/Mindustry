@@ -21,6 +21,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
+import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
@@ -30,7 +31,6 @@ import mindustry.world.meta.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
-import java.util.zip.*;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -164,6 +164,12 @@ public class NetServer implements ApplicationListener{
             String uuid = packet.uuid;
 
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address) || con.kicked || !con.isConnected()) return;
+
+            if(admins.checkUuidChanges(con.address, packet.uuid)){
+                Log.info("Banning IP @ due to more than @ ID changes in @ hour(s).", con.address, Config.uuidChangeLimit.num(), Config.uuidChangeTimePeriod.num());
+                con.kick(KickReason.banned);
+                return;
+            }
 
             if(con.hasBegunConnecting){
                 con.kick(KickReason.idInUse);
@@ -306,7 +312,7 @@ public class NetServer implements ApplicationListener{
             //playing in pvp mode automatically assigns players to teams
             player.team(assignTeam(player));
 
-            sendWorldData(player);
+            sendWorldAndAssets(player);
 
             platform.updateRPC();
 
@@ -314,6 +320,17 @@ public class NetServer implements ApplicationListener{
         });
 
         registerCommands();
+    }
+
+    public void sendWorldAndAssets(Player player){
+        if(state.data.hasExternalAssets()){
+            player.con.determiningAssets = true;
+            player.con.receivingAssets = false;
+            player.con.hasConnected = false;
+            sendAssetRequirements(player);
+        }else{
+            sendWorldData(player);
+        }
     }
 
     @Override
@@ -513,15 +530,21 @@ public class NetServer implements ApplicationListener{
         return assigner.assign(current, players);
     }
 
-    public void sendWorldData(Player player){
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        DeflaterOutputStream def = new FastDeflaterOutputStream(stream);
-        NetworkIO.writeWorld(player, def);
-        WorldStream data = new WorldStream();
-        data.stream = new ByteArrayInputStream(stream.toByteArray());
-        player.con.sendStream(data);
+    public void sendAssetRequirements(Player player){
+        var assets = state.data.getAllExternalAssets();
+        mainExecutor.submit(() -> {
+            var stream = new ByteArrayOutputStream();
+            NetworkIO.writeRequiredAssets(new FastDeflaterOutputStream(stream), assets);
+            player.con.sendStreamAsync(new AssetRequirementStream(), stream);
+        });
+    }
 
-        debug("Packed @ bytes of world data to @ (@ / @)", stream.size(), player.name, player.con.address, player.uuid());
+    public void sendWorldData(Player player){
+        var stream = new ByteArrayOutputStream();
+        NetworkIO.writeWorld(player, new FastDeflaterOutputStream(stream));
+        player.con.sendStream(new WorldStream(), stream);
+
+        debug("Packed @ of world data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
@@ -560,6 +583,12 @@ public class NetServer implements ApplicationListener{
 
             String message = Strings.format("&lb@&fi&lk has disconnected. [&lb@&fi&lk] (@)", player.plainName(), player.uuid(), reason);
             if(Config.showConnectMessages.bool()) info(message);
+        }
+
+        //force despawn the player unit upon disconnection in case the game is paused
+        Unit u = player.unit();
+        if(u != null && u.spawnedByCore && !u.dead){
+            Call.unitDespawn(u);
         }
 
         player.remove();
@@ -643,6 +672,17 @@ public class NetServer implements ApplicationListener{
 
     private static boolean invalid(float f){
         return Float.isInfinite(f) || Float.isNaN(f);
+    }
+
+    public static void syncBuilding(Building build){
+        if(build == null) return;
+        netServer.syncStream.reset();
+        netServer.dataStreamWrites.i(build.pos());
+        netServer.dataStreamWrites.s(build.block.id);
+        build.writeSync(netServer.dataStreamWrites);
+
+        Call.blockSnapshot((short)1, netServer.syncStream.toByteArray());
+        netServer.syncStream.reset();
     }
 
     @Remote(targets = Loc.client, priority = PacketPriority.low, unreliable = true)
@@ -873,6 +913,48 @@ public class NetServer implements ApplicationListener{
     }
 
     @Remote(targets = Loc.client, priority = PacketPriority.high)
+    public static void requestWorld(Player player){
+        if(!player.con.hasBegunConnecting || player.con.determiningAssets || !player.con.receivingAssets || player.con.hasConnected) return;
+
+        player.con.receivingAssets = false;
+        netServer.sendWorldData(player);
+    }
+
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
+    public static void requestAssets(Player player, short[] ids){
+        if(!player.con.hasBegunConnecting || !player.con.determiningAssets || player.con.receivingAssets || player.con.hasConnected) return;
+
+        player.con.determiningAssets = false;
+        player.con.receivingAssets = true;
+
+        if(ids.length == 0){  //no assets required, all cached
+            player.con.receivingAssets = false;
+            netServer.sendWorldData(player);
+        }else{
+            Seq<DataAsset> res = new Seq<>();
+            Seq<DataAsset> allAssets = state.data.getAllExternalAssets();
+            for(short id : ids){
+                if(id >= allAssets.size || id < 0) continue;
+                res.add(allAssets.get(id));
+            }
+
+            //packing the data and reading it from disk can be async; it shouldn't need to block the main thread.
+            mainExecutor.submit(() -> {
+                try{
+                    var stream = new ByteArrayOutputStream();
+                    NetworkIO.writeAssets(stream, res);
+
+                    debug("Packed @ of asset data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
+
+                    player.con.sendStreamAsync(new AssetStream(), stream);
+                }catch(Exception e){
+                    Log.err(e);
+                }
+            });
+        }
+    }
+
+    @Remote(targets = Loc.client, priority = PacketPriority.high)
     public static void connectConfirm(Player player){
         if(player.con.kicked) return;
 
@@ -895,6 +977,13 @@ public class NetServer implements ApplicationListener{
         }
 
         Events.fire(new PlayerJoin(player));
+
+        //plugins may have kicked the player immediately in PlayerJoinEvent, so don't respawn if that happens
+        if(!player.con.kicked){
+            //instantly respawn the player upon connection, even if the game is paused
+            player.deathTimer = Player.deathDelay;
+            player.update();
+        }
     }
 
     public boolean isWaitingForPlayers(){

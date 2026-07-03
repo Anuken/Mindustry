@@ -111,7 +111,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         Events.run(Trigger.newGame, this::updateWave);
 
         Events.on(PlayerIpBanEvent.class, e -> updateBans(e.ip));
-        Events.on(PlayerIpUnbanEvent.class, e -> updateBans(e.ip));
+        Events.on(PlayerUnbanEvent.class, e -> {
+            // updateBans works off of ip ban list. Unbanning a player does not unban their ip but since this is steam, their "ip" is just their steam id (which is their uuid as well) prefixed with steam:
+            netServer.admins.unbanPlayerIP("steam:" + e.uuid);
+            updateBans(null);
+        });
     }
 
     public boolean isSteamClient(){
@@ -128,6 +132,38 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
                 smat.joinLobby(lobby);
             }catch(NumberFormatException e){
                 throw new IOException("Invalid Steam ID: " + lobbyname);
+            }
+        }else if (ip.startsWith("steamserver:")){
+            String server = ip.substring("steamserver:".length());
+            try{
+                SteamID serverID = SteamID.createFromNativeHandle(Long.parseLong(server));
+                if(!serverID.isValid()) throw new IOException("Invalid Steam ID structure: " + server);
+
+                Core.app.post(() -> {
+                    currentLobby = null;
+                    currentServer = serverID;
+
+                    // Run success
+                    if(success != null) success.run();
+
+                    // Connect
+                    Connect con = new Connect();
+                    con.addressTCP = "steam:" + currentServer.getAccountID();
+
+                    net.setClientConnected();
+                    net.handleClientReceived(con);
+                    Core.app.post(() -> {  // TODO: This gets hidden and I can't figure out how to not do so.
+                        ui.loadfrag.show("@connecting");
+                        ui.loadfrag.setButton(() -> {
+                            ui.loadfrag.hide();
+                            netClient.disconnectQuietly();
+                        });
+                    });
+
+                    Log.info("Initiated direct Steam P2P connection to server: @", currentServer.getAccountID());
+                });
+            }catch(NumberFormatException e){
+                throw new IOException("Failed to parse server Steam ID: " + server);
             }
         }else{
             provider.connectClient(ip, port, success);
@@ -161,13 +197,11 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public void disconnectClient(){
         if(isSteamClient()){
-            if(currentLobby != null){
-                smat.leaveLobby(currentLobby);
-                snet.closeP2PSessionWithUser(currentServer);
-                currentServer = null;
-                currentLobby = null;
-                net.handleClientReceived(new Disconnect());
-            }
+            if(currentLobby != null) smat.leaveLobby(currentLobby);
+            snet.closeP2PSessionWithUser(currentServer);
+            currentServer = null;
+            currentLobby = null;
+            net.handleClientReceived(new Disconnect());
         }else{
             provider.disconnectClient();
         }
@@ -192,14 +226,14 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
     @Override
     public void hostServer(int port) throws IOException{
         provider.hostServer(port);
-        smat.createLobby(Core.settings.getBool("steampublichost") ? LobbyType.Public : LobbyType.FriendsOnly, Core.settings.getInt("playerlimit"));
+        smat.createLobby(Core.settings.getBool("steampublichost2") ? LobbyType.Public : LobbyType.FriendsOnly, Core.settings.getInt("playerlimit"));
 
         Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
     }
 
     public void updateLobby(){
         if(currentLobby != null && net.server()){
-            smat.setLobbyType(currentLobby, Core.settings.getBool("steampublichost") ? LobbyType.Public : LobbyType.FriendsOnly);
+            smat.setLobbyType(currentLobby, Core.settings.getBool("steampublichost2") ? LobbyType.Public : LobbyType.FriendsOnly);
             smat.setLobbyMemberLimit(currentLobby, Core.settings.getInt("playerlimit"));
         }
     }
@@ -281,31 +315,37 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             return;
         }
 
-        logic.reset();
-        net.reset();
+        ui.editor.hide();
 
-        currentLobby = steamIDLobby;
-        currentServer = smat.getLobbyOwner(steamIDLobby);
+        //delay joining by one frame because the editor bugs out if you don't
+        Core.app.post(() -> {
+            logic.reset();
+            net.reset();
 
-        Log.info("Connect to owner @: @", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
+            currentLobby = steamIDLobby;
+            currentServer = smat.getLobbyOwner(steamIDLobby);
 
-        if(joinCallback != null){
-            joinCallback.run();
-            joinCallback = null;
-        }
+            Log.info("Connecting to owner @: @", currentServer.getAccountID(), friends.getFriendPersonaName(currentServer));
 
-        Connect con = new Connect();
-        con.addressTCP = "steam:" + currentServer.getAccountID();
+            if(joinCallback != null){
+                joinCallback.run();
+                joinCallback = null;
+            }
 
-        net.setClientConnected();
-        net.handleClientReceived(con);
+            Connect con = new Connect();
+            con.addressTCP = "steam:" + currentServer.getAccountID();
 
-        Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
+            net.setClientConnected();
+            net.handleClientReceived(con);
+
+            Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> Log.info("Server: @\nClient: @\nActive: @", net.server(), net.client(), net.active()))));
+        });
     }
 
     @Override
     public void onLobbyChatUpdate(SteamID lobby, SteamID who, SteamID changer, ChatMemberStateChange change){
-        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), who.getAccountID(), changer.getAccountID(), change);
+        Log.info("lobby @: @ caused @'s change: @", lobby.getAccountID(), changer.getAccountID(), who.getAccountID(), change);
+        if(net.server() && change == ChatMemberStateChange.Entered && SteamAdmin.isAdmin("steam:" + who.getAccountID())) SteamAdmin.fetch(true); //fetch on admin join
         if(change == ChatMemberStateChange.Disconnected || change == ChatMemberStateChange.Left){
             if(net.client()){
                 //host left, leave as well
@@ -401,6 +441,13 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
         }else if(steamIDRemote.equals(currentServer)){
             Log.info("Disconnected! @: @", steamIDRemote.getAccountID(), sessionError);
             net.handleClientReceived(new Disconnect());
+
+            Core.app.post(() -> {
+                ui.loadfrag.hide();
+                ui.showErrorMessage(Core.bundle.format("cantconnect", sessionError.name()));
+                net.handleClientReceived(new Disconnect());
+                currentServer = null;
+            });
         }
     }
 
@@ -426,6 +473,16 @@ public class SNet implements SteamNetworkingCallback, SteamMatchmakingCallback, 
             super("steam:" + sid.getAccountID());
             this.sid = sid;
             Log.info("Created STEAM connection: @", sid.getAccountID());
+        }
+
+        @Override
+        public void sendStreamAsync(Streamable stream, ByteArrayOutputStream data){
+            if(Core.app.isOnMainThread()){
+                sendStream(stream, data);
+            }else{
+                //must be sent on main thread because of global buffer variables.
+                Core.app.post(() -> sendStream(stream, data));
+            }
         }
 
         @Override

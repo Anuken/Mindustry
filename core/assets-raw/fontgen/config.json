@@ -309,12 +309,6 @@
       ]
     },
     {
-      "uid": "dd6df3b754e8d0dbf09d9b24088f0442",
-      "css": "box",
-      "code": 59422,
-      "src": "iconic"
-    },
-    {
       "uid": "f08ba9f0e8f9b426a92efcaa59c1e932",
       "css": "reddit-alien",
       "code": 62081,
@@ -1083,6 +1077,186 @@
       "search": [
         "arrow-note"
       ]
+    },
+    {
+      "uid": "9ea0a737ccc45d6c510dcbae56058849",
+      "css": "music",
+      "code": 59402,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "81db033e704eb7c586a365559d7c0f36",
+      "css": "file-audio",
+      "code": 61895,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e44601720c64e6bb6a2d5cba6b0c588c",
+      "css": "volume-off",
+      "code": 59404,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "fee6e00f36e8ca8ef3e4a62caa213bf6",
+      "css": "volume-down",
+      "code": 59423,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "76857a03fbaa6857fe063b6c25aa98ed",
+      "css": "volume-up",
+      "code": 59424,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "3db5347bd219f3bce6025780f5d9ef45",
+      "css": "tag",
+      "code": 59425,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "a3f89e106175a5c5c4e9738870b12e55",
+      "css": "tags",
+      "code": 59432,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "69bd9dfe950d07d910f39c6988364e49",
+      "css": "battery-4",
+      "code": 62016,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "7ab4ec24078133effbc4e923b65ef835",
+      "css": "battery-3",
+      "code": 62017,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e430a168b45ba40aa988ca1a5034a553",
+      "css": "battery-2",
+      "code": 62018,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "99f4ea74adc24022106932d84a49b055",
+      "css": "battery-1",
+      "code": 62019,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "9983d2489e028d659d196915a25ef3ca",
+      "css": "battery-0",
+      "code": 62020,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "26613a2e6bc41593c54bead46f8c8ee3",
+      "css": "file-code",
+      "code": 61897,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "dd69d9aa589ea7bc0a82a3fe67039f4b",
+      "css": "file-video",
+      "code": 61896,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e80ae555c1413a4ec18b33fb348b4049",
+      "css": "file-archive",
+      "code": 61894,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "c95735c17a10af81448c7fed98a04546",
+      "css": "folder-open",
+      "code": 59438,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "b091a8bd0fdade174951f17d936f51e4",
+      "css": "folder-empty",
+      "code": 61716,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "6533bdc16ab201eb3f3b27ce989cab33",
+      "css": "folder-open-empty",
+      "code": 61717,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "c7a75a25880928fe76981a53eca4f926",
+      "css": "inbox",
+      "code": 59439,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "6fe95ffc3c807e62647d4f814a96e0d7",
+      "css": "sitemap",
+      "code": 61672,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "2c413e78faf1d6631fd7b094d14c2253",
+      "css": "cloud",
+      "code": 59441,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "de2fc7a5c986ab8c622f63455d7cf814",
+      "css": "upload-cloud",
+      "code": 61678,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "f5999a012fc3752386635ec02a858447",
+      "css": "download-cloud",
+      "code": 61677,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e7a4824e79002c2d8ce3047b2da8b5a2",
+      "css": "rain",
+      "code": 59442,
+      "src": "typicons"
+    },
+    {
+      "uid": "ac10a3a3077eab1b9d66509eb25fb9b4",
+      "css": "cloud-sun",
+      "code": 59448,
+      "src": "typicons"
+    },
+    {
+      "uid": "6f200a5a449259c51cd0ccf56b4c1e93",
+      "css": "drizzle",
+      "code": 59452,
+      "src": "typicons"
+    },
+    {
+      "uid": "3cac7625657b10cf706e7f332749c912",
+      "css": "cloud-flash",
+      "code": 59456,
+      "src": "typicons"
+    },
+    {
+      "uid": "364cc69fb3edb8fb21caa6a2c0489589",
+      "css": "cloud-wind",
+      "code": 59457,
+      "src": "typicons"
+    },
+    {
+      "uid": "cc05df515bebe11df3ada0a5910a8f6d",
+      "css": "box",
+      "code": 59422,
+      "src": "entypo"
+    },
+    {
+      "uid": "d5f287ad8e3a2db8f808bc09980ec3dc",
+      "css": "chart-alt",
+      "code": 59459,
+      "src": "typicons"
     }
   ]
 }

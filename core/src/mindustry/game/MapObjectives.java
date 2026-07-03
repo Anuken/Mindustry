@@ -1254,6 +1254,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(fetchedRegion == null) setTexture(texture.value);
             prepareTexture(this, texture.value);
 
+            float width = this.width, height = this.height;
+
             // Zero width/height scales marker to original texture's size
             if(Mathf.equal(width, 0f)) width = fetchedRegion.width * fetchedRegion.scl() * Draw.xscl;
             if(Mathf.equal(height, 0f)) height = fetchedRegion.height * fetchedRegion.scl() * Draw.yscl;

@@ -15,6 +15,7 @@ import arc.util.pooling.*;
 import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
+import mindustry.mod.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -23,8 +24,9 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class MessageBlock extends Block{
-    //don't change this too much unless you want to run into issues with packet sizes
-    public int maxTextLength = 300;
+    /** writeUTF maximum UTF-8 length per char is 3, so 3*400 = 1200 bytes, the max string byte size */
+    @NoPatch
+    public int maxTextLength = 400;
     public int maxNewlines = 24;
 
     public MessageBlock(String name){

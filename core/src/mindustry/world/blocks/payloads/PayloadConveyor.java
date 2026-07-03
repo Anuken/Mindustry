@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.ctype.Content;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -176,6 +177,7 @@ public class PayloadConveyor extends Block{
                         if(item.dump()){
                             item = null;
                             moved();
+                            NetServer.syncBuilding(this);
                         }
                     }
                 }

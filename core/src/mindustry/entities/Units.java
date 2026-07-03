@@ -265,13 +265,18 @@ public class Units{
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
     public static Teamc closestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Building> tilePred){
+        return closestTarget(team, x, y, range, null, unitPred, tilePred);
+    }
+
+    /** Returns the closest target enemy. First, units are checked, then tile entities. */
+    public static Teamc closestTarget(Team team, float x, float y, float range, @Nullable Team sourceTeam, Boolf<Unit> unitPred, Boolf<Building> tilePred){
         if(team == Team.derelict) return null;
 
         Unit unit = closestEnemy(team, x, y, range, unitPred);
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tilePred);
+            return indexer.findEnemyTile(team, x, y, range, UnitSorts.buildingDefault, tilePred, sourceTeam);
         }
     }
 

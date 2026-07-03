@@ -43,6 +43,8 @@ public class Unloader extends Block{
         noUpdateDisabled = true;
         clearOnDoubleTap = true;
         unloadable = false;
+        drawCached = true;
+        drawDynamic = false;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);
@@ -144,7 +146,7 @@ public class Unloader extends Block{
 
                 //partial check
                 boolean canLoad = !(other instanceof CoreBuild || other instanceof StorageBuild);
-                boolean canUnload = other.canUnload() && (allowCoreUnload || canLoad) && other.items != null;
+                boolean canUnload = other.canUnload() && (allowCoreUnload || canLoad || (other instanceof StorageBuild b && b.linkedCore == null)) && other.items != null;
 
                 if(canLoad || canUnload){ //avoid blocks that can neither give nor receive items
                     var pb = Pools.obtain(ContainerStat.class, ContainerStat::new);
@@ -242,6 +244,13 @@ public class Unloader extends Block{
         public void drawSelect(){
             super.drawSelect();
             drawItemSelection(sortItem);
+        }
+
+        @Override
+        public void configured(Unit builder, Object value){
+            super.configured(builder, value);
+
+            if(!headless) recache();
         }
 
         @Override

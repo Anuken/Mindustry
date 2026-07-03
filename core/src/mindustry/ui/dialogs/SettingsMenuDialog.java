@@ -23,6 +23,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
@@ -35,11 +36,14 @@ public class SettingsMenuDialog extends BaseDialog{
     public SettingsTable graphics;
     public SettingsTable game;
     public SettingsTable sound;
+    public SettingsTable dev;
     public SettingsTable main;
 
     private Table prefs;
     private Table menu;
     private BaseDialog dataDialog;
+    private BaseDialog planetDataDialog;
+    private Planet planet = Planets.serpulo;
     private Seq<SettingsCategory> categories = new Seq<>();
 
     public SettingsMenuDialog(){
@@ -60,6 +64,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 graphics.rebuild();
                 sound.rebuild();
                 game.rebuild();
+                dev.rebuild();
                 updateScrollFocus();
                 lastRebuildSize[0] = Core.graphics.getWidth();
                 lastRebuildSize[1] = Core.graphics.getHeight();
@@ -75,6 +80,7 @@ public class SettingsMenuDialog extends BaseDialog{
         game = new SettingsTable();
         graphics = new SettingsTable();
         sound = new SettingsTable();
+        dev = new SettingsTable();
 
         prefs = new Table();
         prefs.top();
@@ -84,6 +90,85 @@ public class SettingsMenuDialog extends BaseDialog{
 
         prefs.clearChildren();
         prefs.add(menu);
+
+        planetDataDialog = new BaseDialog("@settings.data");
+        planetDataDialog.addCloseButton();
+
+        planetDataDialog.cont.table(Tex.button, t -> {
+            t.defaults().size(280f, 60f).left();
+            TextButtonStyle style = Styles.flatt;
+
+            t.button(bundle.format("settings.planetselect", "[#" + planet.iconColor + "]" + planet.localizedName), Icon.planet, style, () -> {
+                BaseDialog dialog = new BaseDialog("");
+                dialog.cont.pane(p -> {
+                    p.background(Tex.button);
+                    int i = 0;
+
+                    for(var plan : content.planets()){
+                        if(plan.generator == null || plan.sectors.size == 0 || !plan.accessible) continue;
+
+                        p.button(plan.localizedName, Styles.flatTogglet, () -> {
+                            planet = plan;
+                            dialog.hide();
+                        }).size(110f, 45f).checked(planet == plan);
+
+                        if(++i % 4 == 0){
+                            p.row();
+                        }
+                    }
+                });
+                dialog.setFillParent(false);
+                dialog.addCloseButton();
+                dialog.show();
+            }).marginLeft(4).get().getLabel().setText(() -> bundle.format("settings.planetselect", "[#" + planet.iconColor + "]" + planet.localizedName));
+
+            t.row();
+
+            t.button("@settings.clearplanetresearch", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", bundle.format("settings.clearplanetresearch.confirm", planet.localizedName), () -> {
+                    universe.clearLoadoutInfo();
+                    for(TechNode node : TechTree.all){
+                        if(node.rootNode == planet.techTree){
+                            node.reset();
+                        }
+                    }
+                    content.each(c -> {
+                        if(c instanceof UnlockableContent u && u.databaseTabs.contains(planet)){
+                            u.clearUnlock();
+                        }
+                    });
+                    settings.remove("unlocks");
+                });
+            }).marginLeft(4);
+
+            t.row();
+
+            t.button("@settings.clearplanetcampaignsaves", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm", bundle.format("settings.clearplanetcampaignsaves.confirm", planet.localizedName), () -> {
+                    planet.clearStats();
+                    boolean any = false;
+                    for(var sec : planet.sectors){
+                        sec.clearInfo();
+                        if(sec.save != null){
+                            any = true;
+                            sec.save.delete();
+                            sec.save = null;
+                        }
+                    }
+                    if(any){
+                        planet.reloadMeshAsync();
+                    }
+
+                    for(var slot : control.saves.getSaveSlots().copy()){
+                        if(slot.isSector() && slot.getSector().planet == planet){
+                            slot.delete();
+                        }
+                    }
+                });
+            }).marginLeft(4);
+
+            t.row();
+        });
 
         dataDialog = new BaseDialog("@settings.data");
         dataDialog.addCloseButton();
@@ -110,6 +195,8 @@ public class SettingsMenuDialog extends BaseDialog{
             })).marginLeft(4);
 
             t.row();
+
+            t.button("@settings.clearplanetdata", Icon.trash, style, () -> planetDataDialog.show()).marginLeft(4).row();
 
             t.button("@settings.clearsaves", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearsaves.confirm", () -> {
@@ -140,12 +227,17 @@ public class SettingsMenuDialog extends BaseDialog{
                 ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
                     for(var planet : content.planets()){
                         planet.clearStats();
+                        boolean any = false;
                         for(var sec : planet.sectors){
                             sec.clearInfo();
                             if(sec.save != null){
+                                any = true;
                                 sec.save.delete();
                                 sec.save = null;
                             }
+                        }
+                        if(any){
+                            planet.reloadMeshAsync();
                         }
                     }
 
@@ -160,39 +252,22 @@ public class SettingsMenuDialog extends BaseDialog{
             t.row();
 
             t.button("@data.export", Icon.upload, style, () -> {
-                if(ios){
-                    Fi file = Core.files.local("mindustry-data-export.zip");
-                    try{
-                        exportData(file);
-                    }catch(Exception e){
-                        ui.showException(e);
-                    }
-                    platform.shareFile(file);
-                }else{
-                    platform.showFileChooser(false, "zip", file -> {
-                        try{
-                            exportData(file);
-                            ui.showInfo("@data.exported");
-                        }catch(Exception e){
-                            e.printStackTrace();
-                            ui.showException(e);
-                        }
-                    });
-                }
+                FileChooser.export("mindustry-data-export", "zip", this::exportData);
             }).marginLeft(4);
 
             t.row();
 
-            t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> platform.showFileChooser(true, "zip", file -> {
+            t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> FileChooser.open("zip").submit(file -> {
                 try{
                     importData(file);
+                    mapPreviewDirectory.deleteDirectory();
                     control.saves.resetSave();
                     state = new GameState();
                     Core.app.exit();
                 }catch(IllegalArgumentException e){
                     ui.showErrorMessage("@data.invalid");
                 }catch(Exception e){
-                    e.printStackTrace();
+                    Log.err(e);
                     if(e.getMessage() == null || !e.getMessage().contains("too short")){
                         ui.showException(e);
                     }else{
@@ -212,20 +287,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 if(settings.getDataDirectory().child("crashes").list().length == 0 && !settings.getDataDirectory().child("last_log.txt").exists()){
                     ui.showInfo("@crash.none");
                 }else{
-                    if(ios){
-                        Fi logs = tmpDirectory.child("logs.txt");
-                        logs.writeString(getLogs());
-                        platform.shareFile(logs);
-                    }else{
-                        platform.showFileChooser(false, "txt", file -> {
-                            try{
-                                file.writeBytes(getLogs().getBytes(Strings.utf8));
-                                app.post(() -> ui.showInfo("@crash.exported"));
-                            }catch(Throwable e){
-                                ui.showException(e);
-                            }
-                        });
-                    }
+                    FileChooser.export("logs", "txt", file -> file.writeString(getLogs()));
                 }
             }).marginLeft(4);
         });
@@ -282,15 +344,16 @@ public class SettingsMenuDialog extends BaseDialog{
         menu.defaults().size(300f, 60f);
         menu.button("@settings.game", Icon.settings, style, isize, () -> visible(0)).marginLeft(marg).row();
         menu.button("@settings.graphics", Icon.image, style, isize, () -> visible(1)).marginLeft(marg).row();
-        menu.button("@settings.sound", Icon.filters, style, isize, () -> visible(2)).marginLeft(marg).row();
+        menu.button("@settings.sound", Icon.volumeUp, style, isize, () -> visible(2)).marginLeft(marg).row();
         menu.button("@settings.language", Icon.chat, style, isize, ui.language::show).marginLeft(marg).row();
         if(!mobile || Core.settings.getBool("keyboard")){
             menu.button("@settings.controls", Icon.move, style, isize, ui.controls::show).marginLeft(marg).row();
         }
 
         menu.button("@settings.data", Icon.save, style, isize, () -> dataDialog.show()).marginLeft(marg).row();
+        menu.button("@settings.dev", Icon.fileCode, style, isize, () -> visible(3)).marginLeft(marg).row();
 
-        int i = 3;
+        int i = 4;
         for(var cat : categories){
             int index = i;
             if(cat.icon == null){
@@ -353,24 +416,12 @@ public class SettingsMenuDialog extends BaseDialog{
         game.checkPref("doubletapmine", false);
         game.checkPref("commandmodehold", true);
 
-        if(!ios){
-            game.checkPref("modcrashdisable", true);
-        }
-
         if(steam){
             game.sliderPref("playerlimit", 16, 2, 32, i -> {
                 platform.updateLobby();
                 return i + "";
             });
-
-            if(!Version.modifier.contains("beta")){
-                game.checkPref("steampublichost", false, i -> {
-                    platform.updateLobby();
-                });
-            }
         }
-
-        game.checkPref("console", false);
 
         graphics.sliderPref("uiEdgePadding", 0, 0, 100, s -> s + "px", s -> {
             if(ui != null){
@@ -515,6 +566,14 @@ public class SettingsMenuDialog extends BaseDialog{
         if(!mobile){
             Core.settings.put("swapdiagonal", false);
         }
+
+        dev.checkPref("console", false);
+        dev.checkPref("drawhitboxes", false);
+        dev.checkPref("showperformance", false);
+
+        if(!ios){
+            dev.checkPref("modcrashdisable", true);
+        }
     }
 
     public void exportData(Fi file) throws IOException{
@@ -524,6 +583,7 @@ public class SettingsMenuDialog extends BaseDialog{
         files.addAll(saveDirectory.list());
         files.addAll(modDirectory.list());
         files.addAll(schematicDirectory.list());
+        files.addAll(assetCacheDirectory.list()); //important for saves
         String base = Core.settings.getDataDirectory().path();
 
         //add directories
@@ -564,6 +624,9 @@ public class SettingsMenuDialog extends BaseDialog{
         //delete old saves so they don't interfere
         saveDirectory.deleteDirectory();
 
+        //clear old assets cache
+        assetCacheDirectory.deleteDirectory();
+
         //purge existing tmp data, keep everything else
         tmpDirectory.deleteDirectory();
 
@@ -586,7 +649,7 @@ public class SettingsMenuDialog extends BaseDialog{
         prefs.clearChildren();
 
         Seq<Table> tables = new Seq<>();
-        tables.addAll(game, graphics, sound);
+        tables.addAll(game, graphics, sound, dev);
         for(var custom : categories){
             tables.add(custom.table);
         }
@@ -754,11 +817,18 @@ public class SettingsMenuDialog extends BaseDialog{
 
             @Override
             public void add(SettingsTable table){
-                CheckBox box = new CheckBox(title);
+                Button box = new Button(Styles.grayt);
+                box.background(Styles.grayPanel);
+                box.margin(10f);
+
+                box.add(new Image()).update(i -> i.setDrawable(box.isOver() ? (box.isChecked() ? Tex.checkOnOver : Tex.checkOver) : box.isChecked() ? Tex.checkOn : Tex.checkOff))
+                    .size(32f).padRight(8f).padLeft(-4f);
+
+                box.add(title);
 
                 box.update(() -> box.setChecked(settings.getBool(name)));
 
-                box.changed(() -> {
+                box.clicked(() -> {
                     settings.put(name, box.isChecked());
                     if(changed != null){
                         changed.get(box.isChecked());
@@ -766,7 +836,7 @@ public class SettingsMenuDialog extends BaseDialog{
                 });
 
                 box.left();
-                addDesc(table.add(box).left().padTop(3f).get());
+                addDesc(table.add(box).minWidth(Math.min(500f, Core.graphics.getWidth() / 1.2f / Scl.scl(1f))).fillX().height(45f).left().padTop(7f).get());
                 table.row();
             }
         }
@@ -807,7 +877,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
                 slider.change();
 
-                addDesc(table.stack(slider, content).width(Math.min(Core.graphics.getWidth() / 1.2f, 460f)).left().padTop(4f).get());
+                addDesc(table.stack(slider, content).width(Math.min(Core.graphics.getWidth() / 1.2f / Scl.scl(1f), 500f)).left().padTop(4f).get());
                 table.row();
             }
         }

@@ -37,7 +37,7 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unused")
 @TypeIOHandler
 public class TypeIO{
-    private static final int maxArraySize = 1000, maxByteArraySize = 40_000;
+    private static final int maxArraySize = 1000, maxByteArraySize = 40_000, maxSyncedPlans = 20;
 
     public static void writeObject(Writes write, Object object){
         if(object == null){
@@ -147,7 +147,7 @@ public class TypeIO{
         }else if(object instanceof UnitCommand command){
             write.b(23);
             write.s(command.id);
-        }else if(object instanceof Bullet b){ //write bullets as null
+        }else if(object instanceof Bullet b || object instanceof Seq<?> s){ //write bullets as null
             write.b((byte)0);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
@@ -188,8 +188,8 @@ public class TypeIO{
             case 4 -> {
                 byte exists = read.b();
                 if(exists != 0){
-                    //in a safe context, strings can only be 1000 chars
-                    yield read.str(safe ? 1000 : 0);
+                    //in a safe context, strings can only be 1200 chars
+                    yield read.str(safe ? 1200 : 0);
                 }else{
                     yield null;
                 }
@@ -314,6 +314,12 @@ public class TypeIO{
 
     public static Ability[] readAbilities(Reads read, Ability[] abilities){
         byte len = read.b();
+
+        if(len != abilities.length){
+            abilities = new Ability[len];
+            for(int i = 0; i < len; i++) abilities[i] = new EmptyDataAbility();
+        }
+
         for(int i = 0; i < len; i++){
             float data = read.f();
             if(abilities.length > i){
@@ -467,7 +473,7 @@ public class TypeIO{
     /** @return the maximum acceptable amount of plans to send over the network */
     public static int getMaxPlans(Queue<BuildPlan> plans){
         //limit to prevent buffer overflows
-        int used = Math.min(plans.size, 20);
+        int used = Math.min(plans.size, maxSyncedPlans);
         int totalLength = 0;
 
         //prevent buffer overflow by checking config length
@@ -505,10 +511,21 @@ public class TypeIO{
         }
     }
 
+    public static Queue<BuildPlan> readPlansQueueNet(Reads read){
+        int used = read.i();
+        if(used == -1) return null;
+        if(used > maxSyncedPlans) throw new RuntimeException("Queue too long: " + used);
+        var out = new Queue<BuildPlan>();
+        for(int i = 0; i < used; i++){
+            out.add(readPlan(read));
+        }
+        return out;
+    }
+
     public static Queue<BuildPlan> readPlansQueue(Reads read){
         int used = read.i();
         if(used == -1) return null;
-        if(used >= maxArraySize) throw new RuntimeException("Queue too long: "+ used);
+        //this is ONLY used in saves, so don't enforce a max size, it can be anything.
         var out = new Queue<BuildPlan>();
         for(int i = 0; i < used; i++){
             out.add(readPlan(read));
@@ -613,6 +630,7 @@ public class TypeIO{
             int x = read.us();
             int y = read.us();
             Block block = Vars.content.block(read.us());
+            if(block == null) throw new ArcRuntimeException("Invalid block ID in block plans! Client is likely using an incorrectly configured mod.");
             int rotation = (block.rotate ? read.b() : 0);
             Object config = readClientPlanConfig(read);
             BuildPlan plan = new BuildPlan(x, y, rotation, block, config);
@@ -1167,6 +1185,22 @@ public class TypeIO{
         int[] out = new int[length];
         for(int i = 0; i < length; i++){
             out[i] = read.i();
+        }
+        return out;
+    }
+
+    public static void writeShorts(Writes write, short[] ints){
+        write.s((short)ints.length);
+        for(short i : ints){
+            write.s(i);
+        }
+    }
+
+    public static short[] readShorts(Reads read){
+        short length = read.s();
+        short[] out = new short[length];
+        for(int i = 0; i < length; i++){
+            out[i] = read.s();
         }
         return out;
     }
