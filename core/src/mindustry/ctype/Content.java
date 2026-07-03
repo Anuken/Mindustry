@@ -65,6 +65,11 @@ public abstract class Content implements Comparable<Content>{
         return !isVanilla();
     }
 
+    /** @return whether this content is from a map data patch. */
+    public boolean isPatchContent(){
+        return minfo.mod == DataPatcher.dpMod;
+    }
+
     @Override
     public int compareTo(Content c){
         return Integer.compare(id, c.id);

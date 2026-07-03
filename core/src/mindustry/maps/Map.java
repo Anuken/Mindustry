@@ -100,9 +100,8 @@ public class Map implements Comparable<Map>, Publishable{
 
     public Rules rules(Rules base){
         try{
-            //this replacement is a MASSIVE hack but it fixes some incorrect overwriting of team-specific rules.
-            //may need to be tweaked later
-            Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}").replace("teams:{2:{infiniteAmmo:true}},", ""));
+            Rules result = JsonIO.read(base, tags.get("rules", "{}"));
+
             //replace the default serpulo env with erekir
             if(result.planet == Planets.serpulo && result.hasEnv(Env.scorching)){
                 result.planet = Planets.erekir;
@@ -110,7 +109,7 @@ public class Map implements Comparable<Map>, Publishable{
             if(result.planet == null) result.planet = Planets.serpulo;
             if(result.spawns.isEmpty()) result.spawns = Vars.waves.get();
             return result;
-        }catch(Exception e){
+        }catch(Throwable e){
             //error reading rules. ignore?
             Log.err(e);
             return new Rules();
