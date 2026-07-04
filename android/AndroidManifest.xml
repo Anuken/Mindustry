@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+            android:enableOnBackInvokedCallback="false"
             android:resizeableActivity="true"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
@@ -29,6 +30,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="mindustry"/>
             </intent-filter>
 
         </activity>

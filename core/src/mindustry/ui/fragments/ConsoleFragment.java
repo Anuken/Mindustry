@@ -122,7 +122,7 @@ public class ConsoleFragment extends Table{
 
             button(Icon.downOpen, Styles.cleari, () -> scrollPos = Mathf.clamp(scrollPos - 1, 0, Math.max(0, messages.size))).disabled(b -> scrollPos <= 0).size(s).padLeft(4f);
 
-            button(Icon.fileText, Styles.cleari, () -> platform.showFileChooser(true, "js", file -> {
+            button(Icon.fileText, Styles.cleari, () -> FileChooser.open("js").submit(file -> {
                 try{
                     mods.getScripts().runConsole(file.readString());
                 }catch(Exception e){

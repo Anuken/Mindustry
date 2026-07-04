@@ -65,6 +65,8 @@ public class ContentParser{
     boolean allowClassResolution = true;
     /** If false, sound asset loading is disabled. */
     boolean allowAssetLoading = true;
+    /** If false, vanilla content cannot be edited. */
+    boolean allowPatching = true;
 
     ObjectMap<Class<?>, FieldParser> classParsers = new ObjectMap<>(){{
         put(Effect.class, (type, data) -> {
@@ -184,11 +186,12 @@ public class ContentParser{
             Class<?> bc = alternate == Object.class ? resolve(data.getString("type", ""), BasicBulletType.class) : alternate;
             data.remove("type");
             BulletType result = (BulletType)make(bc);
+            result.minfo.mod = currentMod;
             readFields(result, data);
             return result;
         });
         put(MassDriverBolt.class, (type, data) -> {
-            MassDriverBolt result = (MassDriverBolt)make(MassDriverBolt.class);
+            MassDriverBolt result = make(MassDriverBolt.class);
             readFields(result, data);
             return result;
         });
@@ -308,7 +311,13 @@ public class ContentParser{
         put(Sound.class, (type, data) -> {
             if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
+            if(headless) return Sounds.none; //no reason to fetch on a server
+
             var field = fieldOpt(Sounds.class, data);
+            //try grabbing it from the asset manager directly (relevant for data patches)
+            if(field == null) field = Core.assets.getOrNull(data.asString() + ".ogg", Sound.class);
+            if(field == null) field = Core.assets.getOrNull(data.asString() + ".mp3", Sound.class);
+            if(field == null) field = Core.assets.getOrNull(data.asString(), Sound.class);
 
             if(!allowAssetLoading && field == null){
                 warn("Sound not found: @", data.asString());
@@ -318,6 +327,13 @@ public class ContentParser{
         });
         put(Music.class, (type, data) -> {
             var field = fieldOpt(Musics.class, data);
+
+            if(headless) return new Music(); //no reason to fetch on a server
+
+            //try grabbing it from the asset manager directly (relevant for data patches)
+            if(field == null) field = Core.assets.getOrNull(data.asString() + ".ogg", Music.class);
+            if(field == null) field = Core.assets.getOrNull(data.asString() + ".mp3", Music.class);
+            if(field == null) field = Core.assets.getOrNull(data.asString(), Music.class);
 
             if(!allowAssetLoading && field == null){
                 warn("Music not found: @", data.asString());
@@ -389,8 +405,9 @@ public class ContentParser{
     private Seq<Runnable> postreads = new Seq<>();
     private ObjectSet<Object> toBeParsed = new ObjectSet<>();
 
-    LoadedMod currentMod;
-    Content currentContent;
+    @Nullable LoadedMod currentMod;
+    @Nullable Content currentContent;
+    @Nullable Fi currentFile;
 
     private Json parser = new Json(){
         @Override
@@ -564,7 +581,7 @@ public class ContentParser{
 
             Block block;
 
-            if(locate(ContentType.block, name) != null){
+            if(allowPatching && locate(ContentType.block, name) != null){
                 if(value.has("type")){
                     warn("Warning: '" + currentMod.name + "-" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
                     block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
@@ -572,7 +589,7 @@ public class ContentParser{
                     block = locate(ContentType.block, name);
                 }
             }else{
-                block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
+                block = make(resolve(value.getString("type", "Block"), allowPatching ? Block.class : null), mod + "-" + name);
             }
 
             currentContent = block;
@@ -601,7 +618,7 @@ public class ContentParser{
             readBundle(ContentType.unit, name, value);
 
             UnitType unit;
-            if(locate(ContentType.unit, name) == null){
+            if(!allowPatching || locate(ContentType.unit, name) == null){
 
                 unit = make(resolve(value.getString("template", ""), UnitType.class), mod + "-" + name);
 
@@ -670,7 +687,7 @@ public class ContentParser{
         },
         ContentType.weather, (TypeParser<Weather>)(mod, name, value) -> {
             Weather item;
-            if(locate(ContentType.weather, name) != null){
+            if(allowPatching && locate(ContentType.weather, name) != null){
                 item = locate(ContentType.weather, name);
                 readBundle(ContentType.weather, name, value);
             }else{
@@ -685,7 +702,7 @@ public class ContentParser{
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, (TypeParser<Liquid>)(mod, name, value) -> {
             Liquid liquid;
-            if(locate(ContentType.liquid, name) != null){
+            if(allowPatching && locate(ContentType.liquid, name) != null){
                 liquid = locate(ContentType.liquid, name);
                 readBundle(ContentType.liquid, name, value);
             }else{
@@ -699,7 +716,7 @@ public class ContentParser{
         },
         ContentType.status, (TypeParser<StatusEffect>)(mod, name, value) -> {
             StatusEffect status;
-            if(locate(ContentType.status, name) != null){
+            if(allowPatching && locate(ContentType.status, name) != null){
                 status = locate(ContentType.status, name);
                 readBundle(ContentType.status, name, value);
             }else{
@@ -732,7 +749,7 @@ public class ContentParser{
             }
 
             SectorPreset preset;
-            SectorPreset found = locate(ContentType.sector, name);
+            SectorPreset found = allowPatching ? locate(ContentType.sector, name) : null;
 
             if(found != null){
                 preset = found;
@@ -757,7 +774,11 @@ public class ContentParser{
                     if(prev != null && prev.preset == preset){
                         prev.preset = null;
                     }
-                    preset.initialize(planet, value.getInt("sector", 0), true);
+                    int sector = value.getInt("sector", 0) % planet.sectors.size;
+                    if(!allowPatching && sector > 0 && planet.sectors.get(sector).preset != null){
+                        throw new RuntimeException("Overwriting existing sectors is not allowed.");
+                    }
+                    preset.initialize(planet, sector, true);
                 }
 
                 value.remove("sector");
@@ -785,6 +806,7 @@ public class ContentParser{
             if(value.isString()) return locate(ContentType.planet, name);
 
             Planet parent = locate(ContentType.planet, value.getString("parent", ""));
+            //TODO: even if allowPatching is off, this modifies the parent.
             Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
 
             value.remove("sectorSize");
@@ -849,7 +871,7 @@ public class ContentParser{
             }
             value.remove("team");
 
-            if(locate(ContentType.team, name) != null){
+            if(allowPatching && locate(ContentType.team, name) != null){
                 entry = locate(ContentType.team, name);
                 readBundle(ContentType.team, name, value);
             }else{
@@ -875,7 +897,7 @@ public class ContentParser{
             case "hover" -> ElevationMoveUnit::create;
             case "tether" -> BuildingTetherPayloadUnit::create;
             case "crawl" -> CrawlUnit::create;
-            default -> throw new RuntimeException("Invalid unit type: '" + value + "'. Must be 'flying/mech/legs/naval/payload/missile/tether/crawl'.");
+            default -> throw new IllegalArgumentException("Invalid unit type: '" + value.asString() + "'. Must be 'flying/mech/legs/naval/payload/missile/tether/crawl'.");
         };
     }
 
@@ -901,7 +923,7 @@ public class ContentParser{
     private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
             T item;
-            if(locate(type, name) != null){
+            if(allowPatching && locate(type, name) != null){
                 item = (T)locate(type, name);
                 readBundle(type, name, value);
             }else{
@@ -915,7 +937,7 @@ public class ContentParser{
     }
 
     private void readBundle(ContentType type, String name, JsonValue value){
-        UnlockableContent cont = locate(type, name) instanceof UnlockableContent ? locate(type, name) : null;
+        UnlockableContent cont = allowPatching && locate(type, name) instanceof UnlockableContent ? locate(type, name) : null;
 
         String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
         I18NBundle bundle = Core.bundle;
@@ -942,7 +964,9 @@ public class ContentParser{
     private void read(Runnable run){
         Content cont = currentContent;
         LoadedMod mod = currentMod;
+        Fi file = currentFile;
         reads.add(() -> {
+            this.currentFile = file;
             this.currentMod = mod;
             this.currentContent = cont;
             run.run();
@@ -974,7 +998,6 @@ public class ContentParser{
         try{
             run.run();
         }catch(Throwable t){
-            Log.err(t);
             //don't overwrite double errors
             markError(currentContent, t);
         }
@@ -987,6 +1010,7 @@ public class ContentParser{
         postreads.clear();
         toBeParsed.clear();
         currentMod = null;
+        currentFile = null;
     }
 
     /**
@@ -1005,15 +1029,17 @@ public class ContentParser{
             json = json.replace("#", "\\#");
         }
 
+        currentFile = file;
         currentMod = mod;
 
-        JsonValue value = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
+        var rawValue = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
+        if(!(rawValue instanceof JsonValue value)) throw new SerializationException("Content JSON must be an object, not a single value.");
 
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
-        boolean located = locate(type, name) != null;
+        boolean located = allowPatching && locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
         c.minfo.sourceFile = file;
         toBeParsed.add(c);
@@ -1023,6 +1049,7 @@ public class ContentParser{
         }
 
         currentMod = null;
+        currentFile = null;
         return c;
     }
 
@@ -1033,7 +1060,7 @@ public class ContentParser{
     }
 
     public void markError(Content content, LoadedMod mod, Fi file, Throwable error){
-        Log.err("Error for @ / @:\n@\n", content, file, Strings.getStackTrace(error));
+        Log.err("Error loading content: " + file, error);
 
         content.minfo.mod = mod;
         content.minfo.sourceFile = file;
@@ -1227,7 +1254,7 @@ public class ContentParser{
                 if(!field.field.isAnnotationPresent(Nullable.class) && field.field.get(object) == null && !implicitNullable.contains(field.field.getType())){
                     throw new RuntimeException("'" + field.field.getName() + "' in " +
                         ((object.getClass().isAnonymousClass() ? object.getClass().getSuperclass() : object.getClass()).getSimpleName()) +
-                        " is missing! Object = " + object + ", field = (" + field.field.getName() + " = " + field.field.get(object) + ")");
+                        " is missing! " + object + "." + field.field.getName() + " cannot be null.");
                 }
             }catch(Exception e){
                 throw new RuntimeException(e);
@@ -1310,6 +1337,10 @@ public class ContentParser{
         }
 
         if(object instanceof UnlockableContent unlock && research != null){
+            if(!allowPatching){
+                warn("Modifying the tech tree is not allowed (@)", currentFile);
+                return;
+            }
 
             //add research tech node
             String researchName;
@@ -1332,10 +1363,12 @@ public class ContentParser{
 
             TechNode node = new TechNode(null, unlock, customRequirements == null ? ItemStack.empty : customRequirements);
             LoadedMod cur = currentMod;
+            Fi file = currentFile;
 
             postreads.add(() -> {
                 currentContent = unlock;
                 currentMod = cur;
+                currentFile = file;
 
                 //add custom objectives
                 if(research.has("objectives")){
@@ -1420,13 +1453,17 @@ public class ContentParser{
         }
 
         if(def != null){
-            if(warn) warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentContent == null && currentMod != null ? currentMod.name : "");
+            if(warn) warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentFile != null ? currentFile : currentMod != null ? currentMod.name : "");
             return def;
         }
         throw new IllegalArgumentException("Type not found: " + base);
     }
 
     void warn(String string, Object... format){
+        warnContext(currentContent, currentFile, string, format);
+    }
+
+    void warnContext(@Nullable Content currentContent, @Nullable Fi currentFile, String string, Object... format){
         Log.warn(string, format);
     }
 

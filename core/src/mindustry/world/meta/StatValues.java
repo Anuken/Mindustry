@@ -656,7 +656,7 @@ public class StatValues{
                     if(blockName != null && t instanceof UnlockableContent){
                         UnlockableContent content = (UnlockableContent) t;
                         String key = "block." + blockName + "." + content.name + ".info";
-                        if(Core.bundle.has(key)){
+                        if(Core.bundle.has(key) && !Vars.headless){
                             bt.table(desc -> {
                                 desc.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
                                 desc.add("[lightgray]" + Core.bundle.get(key));
@@ -872,7 +872,7 @@ public class StatValues{
     private static Cell<?> note(Table table, String text){
         table.row();
         return table.table(t -> {
-            t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
+            if(!Vars.headless) t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
             t.add(text);
         });
     }

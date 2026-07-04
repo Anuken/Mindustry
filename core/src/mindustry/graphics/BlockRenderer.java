@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -20,13 +21,16 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.environment.Floor.*;
 import mindustry.world.blocks.power.*;
 
+import java.util.*;
+
 import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class BlockRenderer{
     //TODO cracks take up far to much space, so I had to limit it to 7. this means larger blocks won't have cracks - draw tiling mirrored stuff instead?
-    public static final int crackRegions = 8, maxCrackSize = 7;
-    public static boolean drawQuadtreeDebug = false;
+    public static final int crackRegions = 8, maxCrackSize = 7, chunkSize = 30, maxSpritesPerCacheTile = 3;
+    public static final boolean drawQuadtreeDebug = false;
+    public static final boolean blockDrawCountDebug = false;
     public static final Color shadowColor = new Color(0, 0, 0, 0.71f), blendShadowColor = Color.white.cpy().lerp(Color.black, shadowColor.a);
 
     private static final int initialRequests = 32 * 32;
@@ -34,13 +38,18 @@ public class BlockRenderer{
     public final FloorRenderer floor = new FloorRenderer();
     public TextureRegion[][] cracks;
 
+    private IntSeq chunksToDraw = new IntSeq();
+    private IntSet chunksToDrawSet = new IntSet();
     private Seq<Tile> tileview = new Seq<>(false, initialRequests, Tile.class);
+    private Seq<Building> tileExtraCachedView = new Seq<>(false, initialRequests, Building.class);
+    private Seq<Building> tileWithConsumerView = new Seq<>(false, initialRequests, Building.class);
     private Seq<Tile> lightview = new Seq<>(false, initialRequests, Tile.class);
     //TODO I don't like this system
     private Seq<UpdateRenderState> updateFloors = new Seq<>(UpdateRenderState.class);
 
     private boolean hadMapLimit;
     private int lastCamX, lastCamY, lastRangeX, lastRangeY;
+    private Team lastTeam;
     private float brokenFade = 0f;
     private FrameBuffer shadows = new FrameBuffer();
     private FrameBuffer dark = new FrameBuffer();
@@ -50,11 +59,29 @@ public class BlockRenderer{
     private IntSet procLinks = new IntSet(), procLights = new IntSet();
 
     private BlockQuadtree blockTree = new BlockQuadtree(new Rect(0, 0, 1, 1));
+    private BlockQuadtree blockCachedTree = new BlockQuadtree(new Rect(0, 0, 1, 1));
     private BlockLightQuadtree blockLightTree = new BlockLightQuadtree(new Rect(0, 0, 1, 1));
     private OverlayQuadtree overlayTree = new OverlayQuadtree(new Rect(0, 0, 1, 1));
     private FloorQuadtree floorTree = new FloorQuadtree(new Rect(0, 0, 1, 1));
 
+    private CacheChunk[][] cacheChunks;
+    private CacheBatch cbatch = new CacheBatch(null);
+
+    private Seq<SpriteCache>[] caches = new Seq[BuildingCacheLayer.amount];
+    private Seq<IntSeq>[] queuedCacheDraws = new Seq[BuildingCacheLayer.amount];
+    private IntSeq[] queuedCacheIndices = new IntSeq[BuildingCacheLayer.amount];
+    private IntSet dirtyChunks = new IntSet();
+
+    //only used when blockDrawCountDebug = true
+    private ObjectIntMap<Block> blockDrawSprites = new ObjectIntMap<>();
+    private ObjectIntMap<Block> blockDrawTotal = new ObjectIntMap<>();
+
     public BlockRenderer(){
+        for(int i = 0; i < BuildingCacheLayer.amount; i++){
+            caches[i] = new Seq<>();
+            queuedCacheDraws[i] = new Seq<>();
+            queuedCacheIndices[i] = new IntSeq();
+        }
 
         Events.on(ClientLoadEvent.class, e -> {
             cracks = new TextureRegion[maxCrackSize][crackRegions];
@@ -80,9 +107,16 @@ public class BlockRenderer{
         Events.on(TilePreChangeEvent.class, event -> {
             if(blockTree == null || floorTree == null || overlayTree == null) return;
 
+            if(event.tile.block().drawCached){
+                recacheBuilding(event.tile.block().buildingCacheLayer, event.tile);
+            }
+
             if(indexBlock(event.tile)){
                 blockTree.remove(event.tile);
                 blockLightTree.remove(event.tile);
+            }
+            if(indexBlockCached(event.tile)){
+                blockCachedTree.remove(event.tile);
             }
             if(indexFloor(event.tile)) floorTree.remove(event.tile);
             if(indexOverlay(event.tile)) overlayTree.remove(event.tile);
@@ -92,6 +126,10 @@ public class BlockRenderer{
             boolean visible = event.tile.build == null || !event.tile.build.inFogTo(Vars.player.team());
             if(event.tile.build != null){
                 event.tile.build.wasVisible = visible;
+            }
+
+            if(event.tile.block().drawCached){
+                recacheBuilding(event.tile.block().buildingCacheLayer, event.tile);
             }
 
             if(visible){
@@ -112,11 +150,104 @@ public class BlockRenderer{
         });
     }
 
+    public void recacheBuilding(BuildingCacheLayer layer, Tile tile){
+        if(cacheChunks == null) return;
+
+        int cx = tile.x / chunkSize, cy = tile.y / chunkSize;
+
+        if(cx < 0 || cy < 0 || cx >= cacheChunks.length || cy >= cacheChunks[0].length) return;
+
+        CacheChunk chunk = cacheChunks[cx][cy];
+
+        if(chunk == null) return;
+
+        chunk.dirty[layer.ordinal()] = true;
+        int packed = Point2.pack(cx, cy);
+        //don't re-cache the chunk unless it was in view
+        if(chunksToDrawSet.contains(packed)){
+            dirtyChunks.add(packed);
+        }
+    }
+
+    public void cacheChunk(int layer, int cx, int cy){
+        int required = chunkSize * chunkSize * maxSpritesPerCacheTile;
+
+        CacheChunk chunk = cacheChunks[cx][cy];
+        if(chunk == null){
+            chunk = cacheChunks[cx][cy] = new CacheChunk();
+        }
+
+        SpriteCache cache = chunk.caches[layer];
+        if(cache == null){
+            var cacheArr = caches[layer];
+            if(cacheArr.isEmpty() || cacheArr.peek().getSpritesUsed() + required > cacheArr.peek().getSpriteCapacity()){
+                //there's no sense adding leftover space, since it will never be used
+                cacheArr.add(new SpriteCache(16382 - (16382 % required), true));
+                queuedCacheDraws[layer].add(new IntSeq());
+            }
+            cache = chunk.caches[layer] = cacheArr.peek();
+            chunk.spriteCacheIndices[layer] = cacheArr.size - 1;
+            cache.beginCache();
+        }else{
+            cache = chunk.caches[layer];
+            cache.beginCache(chunk.cacheIds[layer]);
+        }
+
+        cbatch.cache = cache;
+        Batch lastBatch = Core.batch;
+        try{
+            Draw.flush();
+            batch = cbatch;
+            Team pteam = player.team();
+            chunk.lastSeenTeam = pteam;
+            int x1 = cx * chunkSize, y1 = cy * chunkSize, x2 = x1 + chunkSize, y2 = y1 + chunkSize;
+
+            blockCachedTree.intersect(cx * chunkSize * tilesize, cy * chunkSize * tilesize, chunkSize * tilesize, chunkSize * tilesize, tile -> {
+                //only draw blocks strictly inside the chunk
+                if(!(tile.x >= x1 && tile.x < x2 && tile.y >= y1 && tile.y < y2) || !tile.block().drawCached || tile.block().buildingCacheLayer.ordinal() != layer) return;
+
+                Block block = tile.block();
+                Building build = tile.build;
+
+                boolean visible = (build == null || !build.inFogTo(pteam));
+
+                if(visible || build.wasVisible){
+                    block.drawBaseCached(tile);
+                    Draw.reset();
+                    Draw.z(Layer.block);
+
+                    if(build != null && build.team != pteam && build.block.drawTeamOverlay){
+                        build.drawTeam();
+                        Draw.z(Layer.block);
+                    }
+                    Draw.reset();
+                }
+            });
+        }finally{
+            Draw.flush();
+            batch = lastBatch;
+        }
+
+        chunk.dirty[layer] = false;
+        cache.reserve(required);
+        chunk.cacheIds[layer] = cache.endCache();
+    }
+
     public void reload(){
         blockTree = new BlockQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+        blockCachedTree = new BlockQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
         blockLightTree = new BlockLightQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
         overlayTree = new OverlayQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
         floorTree = new FloorQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+
+        for(var arr : caches){
+            for(SpriteCache cache : arr){
+                cache.dispose();
+            }
+            arr.clear();
+        }
+        int chunksx = Mathf.ceil((float)(world.width()) / chunkSize), chunksy = Mathf.ceil((float)(world.height()) / chunkSize);
+        cacheChunks = new CacheChunk[chunksx][chunksy];
 
         shadowEvents.clear();
         updateFloors.clear();
@@ -247,6 +378,10 @@ public class BlockRenderer{
         return tile.isCenter() && block != Blocks.air && block.cacheLayer == CacheLayer.normal;
     }
 
+    boolean indexBlockCached(Tile tile){
+        return tile.isCenter() && tile.block().drawCached;
+    }
+
     boolean indexOverlay(Tile tile){
         return !tile.block().obstructsLight && tile.overlay().emitLight && world.getDarkness(tile.x, tile.y) < 3;
     }
@@ -260,6 +395,8 @@ public class BlockRenderer{
             blockTree.insert(tile);
             blockLightTree.insert(tile);
         }
+
+        if(indexBlockCached(tile)) blockCachedTree.insert(tile);
         if(indexOverlay(tile)) overlayTree.insert(tile);
         if(indexFloor(tile)) floorTree.insert(tile);
     }
@@ -400,14 +537,20 @@ public class BlockRenderer{
         }
 
 
-        if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey){
+        if(avgx == lastCamX && avgy == lastCamY && lastRangeX == rangex && lastRangeY == rangey && lastTeam == player.team()){
             return;
         }
 
+        chunksToDraw.clear();
+        chunksToDrawSet.clear();
+        lastTeam = player.team();
         tileview.clear();
+        tileExtraCachedView.clear();
+        tileWithConsumerView.clear();
         lightview.clear();
         procLinks.clear();
         procLights.clear();
+        dirtyChunks.clear();
 
         var bounds = camera.bounds(Tmp.r3).grow(tilesize * 2f);
 
@@ -421,17 +564,77 @@ public class BlockRenderer{
             }
         });
 
+        Team pteam = player.team();
+
         blockTree.intersect(bounds, tile -> {
-            if(tile.build == null || procLinks.add(tile.build.id)){
+            var build = tile.build;
+            var block = tile.block();
+
+            if(block.drawCached){
+                int coords = Point2.pack(tile.x / chunkSize, tile.y / chunkSize);
+                if(chunksToDrawSet.add(coords)){
+                    chunksToDraw.add(coords);
+                }
+            }
+
+            if(build != null && block.hasConsumers && build.team == pteam){
+                tileWithConsumerView.add(build);
+            }
+
+            if(!block.drawDynamic){
+                if(build != null) tileExtraCachedView.add(build);
+                return;
+            }
+
+            if(build == null || procLinks.add(build.id)){
                 tileview.add(tile);
             }
 
-            if(tile.build != null && tile.build.power != null && tile.build.power.links.size > 0){
-                for(Building other : tile.build.getPowerConnections(outArray2)){
+            if(build != null && build.power != null && build.power.links.size > 0){
+                for(Building other : build.getPowerConnections(outArray2)){
                     if(other.block instanceof PowerNode && procLinks.add(other.id)){ //TODO need a generic way to render connections!
                         tileview.add(other.tile);
                     }
                 }
+            }
+        });
+
+        for(var seq : queuedCacheIndices){
+            seq.clear();
+        }
+
+        for(var arr : queuedCacheDraws){
+            for(var seq : arr){
+                seq.clear();
+            }
+        }
+
+        //begin by checking any stale/uncached chunks, and caching them if necessary
+        chunksToDraw.each(xy -> {
+            int cx = Point2.x(xy);
+            int cy = Point2.y(xy);
+            CacheChunk chunk = cacheChunks[cx][cy];
+            if(chunk == null || chunk.lastSeenTeam != pteam){
+                for(int i = 0; i < BuildingCacheLayer.amount; i++){
+                    cacheChunk(i, cx, cy);
+                }
+            }else{
+                for(int i = 0; i < BuildingCacheLayer.amount; i++){
+                    if(chunk.dirty[i]){
+                        cacheChunk(i, cx, cy);
+                    }
+                }
+            }
+            //in case it was null (it can never be null after caching)
+            chunk = cacheChunks[cx][cy];
+
+            for(int layer = 0; layer < BuildingCacheLayer.amount; layer++){
+                //record the sprite cache IDs that will be drawn in queuedCacheIndices, and record the actual cache IDs of the respective sprite caches in queuedCacheDraws
+                IntSeq cacheIDsToDraw = queuedCacheDraws[layer].get(chunk.spriteCacheIndices[layer]);
+                if(cacheIDsToDraw.isEmpty()){
+                    queuedCacheIndices[layer].add(chunk.spriteCacheIndices[layer]);
+                }
+                cacheIDsToDraw.add(chunk.cacheIds[layer]);
             }
         });
 
@@ -467,18 +670,60 @@ public class BlockRenderer{
 
         drawDestroyed();
 
+        if(chunksToDraw.size > 0){
+
+            for(int mlayer = 0; mlayer < BuildingCacheLayer.amount; mlayer++){
+                int layer = mlayer;
+                float z = BuildingCacheLayer.layers[layer];
+
+                Draw.draw(z, () -> {
+                    if(layer == 0){
+                        dirtyChunks.each(c -> {
+                            int cx = Point2.x(c), cy = Point2.y(c);
+                            var chunk = cacheChunks[cx][cy];
+
+                            for(int l = 0; l < BuildingCacheLayer.amount; l++){
+                                if(chunk == null || chunk.dirty[l]){
+                                    cacheChunk(l, Point2.x(c), Point2.y(c));
+                                }
+                            }
+                        });
+                        dirtyChunks.clear();
+
+                        //minor optimization: don't transfer the matrix every time
+                        SpriteCache.getDefaultShader().bind();
+                        SpriteCache.getDefaultShader().setUniformMatrix4("u_projectionViewMatrix", camera.mat);
+                    }
+
+                    queuedCacheIndices[layer].each(spriteCacheIndex -> {
+                        SpriteCache sprites = caches[layer].get(spriteCacheIndex);
+                        IntSeq cachesToDraw = queuedCacheDraws[layer].get(spriteCacheIndex);
+                        sprites.begin(false);
+                        cachesToDraw.each(sprites::draw);
+                        sprites.end();
+                    });
+                });
+            }
+        }
+
+        if(blockDrawCountDebug){
+            blockDrawTotal.clear();
+            blockDrawSprites.clear();
+        }
+
         //draw most tile stuff
         for(int i = 0; i < tileview.size; i++){
             Tile tile = tileview.items[i];
             Block block = tile.block();
+
             Building build = tile.build;
 
             Draw.z(Layer.block);
 
             boolean visible = (build == null || !build.inFogTo(pteam));
 
-            //comment wasVisible part for hiding?
             if(block != Blocks.air && (visible || build.wasVisible)){
+                SpriteBatch.totalDrawCalls = 0;
                 block.drawBase(tile);
                 Draw.reset();
                 Draw.z(Layer.block);
@@ -510,16 +755,79 @@ public class BlockRenderer{
                             build.drawTeam();
                             Draw.z(Layer.block);
                         }
-                    }else if(renderer.drawStatus && block.hasConsumers){
-                        build.drawStatus();
                     }
                 }
                 Draw.reset();
-            }else if(!visible){
-                //TODO here is the question: should buildings you lost sight of remain rendered? if so, how should this information be stored?
-                //uncomment lines below for buggy persistence
-                //if(build.wasVisible) updateShadow(build);
-                //build.wasVisible = false;
+
+                if(blockDrawCountDebug){
+                    blockDrawTotal.increment(block, 1);
+                    if(SpriteBatch.totalDrawCalls > 0) blockDrawSprites.increment(block, (int)SpriteBatch.totalDrawCalls);
+                }
+            }
+        }
+
+        if(blockDrawCountDebug && graphics.getFrameId() % 30 == 0){
+            class Entry implements Comparable<Entry>{
+                Block block;
+                int amount;
+
+                public Entry(Block block, int amount){
+                    this.block = block;
+                    this.amount = amount;
+                }
+
+                @Override
+                public String toString(){
+                    return block + ": " + amount + " (average: " + Strings.autoFixed((float)amount/blockDrawTotal.get(block), 1) + ")";
+                }
+
+                @Override
+                public int compareTo(Entry entry){
+                    return Integer.compare(amount, entry.amount);
+                }
+            }
+            int total = 0;
+
+            Seq<Entry> entries = new Seq<>();
+            for(var v : blockDrawSprites){
+                entries.add(new Entry(v.key, v.value));
+                total += v.value;
+            }
+            entries.sort().reverse();
+            Log.info("Draw calls:\n" + entries.toString("\n") + "\nTOTAL: " + total + "\n");
+        }
+
+        //draw overlay of extra cached tiles (they otherwise wouldn't draw cracks / status overlays)
+        for(int i = 0; i < tileExtraCachedView.size; i++){
+            Building build = tileExtraCachedView.items[i];
+
+            boolean visible = !build.inFogTo(pteam);
+
+            if(visible || build.wasVisible){
+                if(visible){
+                    build.visibleFlags |= (1L << pteam.id);
+                    if(!build.wasVisible){
+                        build.wasVisible = true;
+                        updateShadow(build);
+                        renderer.minimap.update(build.tile);
+                        recacheBuilding(build.block.buildingCacheLayer, build.tile);
+                    }
+                }
+
+                if(build.damaged()){
+                    Draw.z(Layer.blockCracks);
+                    build.drawCracks();
+                }
+            }
+        }
+
+        if(renderer.drawStatus && Lod.l2){
+            for(int i = 0; i < tileWithConsumerView.size; i++){
+                Building build = tileWithConsumerView.items[i];
+                if(build.wasVisible){
+                    //always guaranteed to be player team
+                    build.drawStatus();
+                }
             }
         }
 
@@ -574,6 +882,20 @@ public class BlockRenderer{
 
     public void updateShadowTile(Tile tile){
         shadowEvents.add(tile);
+    }
+
+    static class CacheChunk{
+        SpriteCache[] caches = new SpriteCache[BuildingCacheLayer.amount];
+        //index of cache variable in list of global sprite caches
+        int[] spriteCacheIndices = new int[BuildingCacheLayer.amount];
+        int[] cacheIds = new int[BuildingCacheLayer.amount];
+        boolean[] dirty = new boolean[BuildingCacheLayer.amount];
+
+        Team lastSeenTeam;
+
+        {
+            Arrays.fill(dirty, true);
+        }
     }
 
     static class BlockQuadtree extends QuadTree<Tile>{

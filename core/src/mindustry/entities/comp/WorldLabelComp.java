@@ -17,14 +17,14 @@ import mindustry.ui.*;
 public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
     @Import int id;
     @Import float x, y;
+    @Import boolean added;
 
     public static final byte
-    flagBackground = 1,
-    flagOutline = 2,
-    flagAlignLeft = 4,
-    flagAlignRight = 8,
-    flagAutoscale = 16,
-    flagOnlyParentVisible = 32;
+    flagBackground =        1 << 0,
+    flagOutline =           1 << 1,
+    flagAlignLeft =         1 << 2,
+    flagAlignRight =        1 << 3,
+    flagAutoscale =         1 << 4;
 
     public String text = "sample text";
     public float fontSize = 1f, z = Layer.playerName + 1;
@@ -32,10 +32,21 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
     public byte flags = flagBackground | flagOutline;
     /** If not null, this label gets set to the parent position with x, y used as offsets. */
     public @Nullable Posc parent;
+    /** Duration in seconds. Ignored if zero or negative. */
+    public transient float duration;
 
     @Replace
     public float clipSize(){
+        if(parent != null) return Float.MAX_VALUE;
         return text.length() * 10f * fontSize;
+    }
+
+    @Override
+    public void update(){
+        if(duration > 0){
+            duration -= Time.delta / 60f;
+            if(duration <= 0) hide();
+        }
     }
 
     @Override
@@ -44,9 +55,6 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
         if(parent != null){
             x += parent.x();
             y += parent.y();
-            if((flags & flagOnlyParentVisible) != 0 && !parent.isLocal()){
-                return;
-            }
         }
         drawAt(text, x, y, z, flags, fontSize, Align.center, (flags & flagAlignLeft) != 0 ? Align.left : (flags & flagAlignRight) != 0 ? Align.right : Align.center);
     }
@@ -99,6 +107,21 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
         font.setUseIntegerPositions(ints);
 
         Draw.z(z);
+    }
+
+    /** Makes this label visible only to the specific player. This must be called instead of add(). */
+    public void show(Player player){
+        if(added || player.con == null) return;
+        player.con.localEntities.add(this);
+        added = true;
+    }
+
+    /** Hides this player-specific label. If you used {@link #show(Player)} previously, you must call this method instead of {@link #hide()}! */
+    public void hide(Player player){
+        if(!added || player.con == null) return;
+        player.con.localEntities.remove(this);
+        Call.removeWorldLabel(player.con, id);
+        added = false;
     }
 
     /** This MUST be called instead of remove()! */
