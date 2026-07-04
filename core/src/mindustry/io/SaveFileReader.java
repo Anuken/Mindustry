@@ -3,7 +3,6 @@ package mindustry.io;
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
 import arc.util.io.*;
-import mindustry.world.*;
 
 import java.io.*;
 
@@ -190,7 +189,7 @@ public abstract class SaveFileReader{
         return map;
     }
 
-    public abstract void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException;
+    public abstract void read(DataInputStream stream, CounterInputStream counter, SaveReadState state) throws IOException;
 
     public abstract void write(DataOutputStream stream, SaveOptions options) throws IOException;
 

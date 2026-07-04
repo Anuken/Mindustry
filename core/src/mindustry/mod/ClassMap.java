@@ -117,6 +117,7 @@ public class ClassMap{
         classes.put("Publishable", mindustry.type.Publishable.class);
         classes.put("Sector", mindustry.type.Sector.class);
         classes.put("SectorRect", mindustry.type.Sector.SectorRect.class);
+        classes.put("SectorDifficulty", mindustry.type.SectorDifficulty.class);
         classes.put("SectorPreset", mindustry.type.SectorPreset.class);
         classes.put("StatusEffect", mindustry.type.StatusEffect.class);
         classes.put("TransitionHandler", mindustry.type.StatusEffect.TransitionHandler.class);

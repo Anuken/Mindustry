@@ -42,6 +42,9 @@ public class NetworkIO{
                 }
             }
 
+            //data patches must be first, as rules can involve patched content
+            SaveIO.getSaveWriter().writeDataPatches(stream, false);
+
             stream.writeUTF(JsonIO.write(state.rules));
             stream.writeUTF(JsonIO.write(state.mapLocales));
             SaveIO.getSaveWriter().writeStringMap(stream, state.map.tags);
@@ -55,7 +58,6 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(new Writes(stream));
 
-            SaveIO.getSaveWriter().writeDataPatches(stream, false);
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
             SaveIO.getSaveWriter().writeTeamBlocks(stream);
@@ -70,6 +72,8 @@ public class NetworkIO{
 
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
+            SaveIO.getSaveWriter().readDataPatches(stream, new SaveReadState(world.context));
+
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
             state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
@@ -89,7 +93,6 @@ public class NetworkIO{
             player.id = id;
             player.add();
 
-            SaveIO.getSaveWriter().readDataPatches(stream);
             SaveIO.getSaveWriter().readContentHeader(stream);
             SaveIO.getSaveWriter().readMap(stream, world.context);
             SaveIO.getSaveWriter().readTeamBlocks(stream);

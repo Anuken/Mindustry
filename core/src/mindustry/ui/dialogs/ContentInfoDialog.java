@@ -7,6 +7,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.core.UI;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -64,7 +65,7 @@ public class ContentInfoDialog extends BaseDialog{
                 table.row();
             }
 
-            table.add("[lightgray]" + content.displayDescription()).wrap().fillX().padLeft(any ? 10 : 0).width(500f).padTop(any ? 0 : 10).left();
+            table.add("[lightgray]" + UI.formatIcons(content.displayDescription())).wrap().fillX().padLeft(any ? 10 : 0).width(500f).padTop(any ? 0 : 10).left();
             table.row();
 
             if(!content.stats.useCategories && any){
@@ -100,7 +101,7 @@ public class ContentInfoDialog extends BaseDialog{
         }
 
         if(content.details != null){
-            table.add("[gray]" + (content.unlocked() || !content.hideDetails ? content.details : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
+            table.add("[gray]" + (content.unlocked() || !content.hideDetails ? UI.formatIcons(content.details) : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
         }
 
