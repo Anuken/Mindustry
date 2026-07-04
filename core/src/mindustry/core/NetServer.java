@@ -115,8 +115,8 @@ public class NetServer implements ApplicationListener{
     /** Cooldown between votes in seconds. */
     public static int voteCooldown = 60 * 5;
     /**
-     * If this is true, the check for some hidden entities will be skipped if fog of war is disabled.
-     * Set this to false if a mod uses isSyncHidden to hide entities even when fog of war is disabled.
+     * If this is true, isSyncHidden will called only once per team if FoW is enabled, or not at all.
+     * Set this to false if a mod uses isSyncHidden to hide entities.
      */
     public boolean skipHiddenEntitiesCheck = true;
 
@@ -134,7 +134,7 @@ public class NetServer implements ApplicationListener{
     private ObjectMap<String, Seq<Cons2<Player, byte[]>>> customBinaryPacketHandlers = new ObjectMap<>();
     /** Packet handlers for logic client data */
     private ObjectMap<String, Seq<Cons2<Player, Object>>> logicClientDataHandlers = new ObjectMap<>();
-    /** Reused Seq<Player> for writing entity snapshots */
+    /** Reused Seq<Player> for writing entity snapshots per team. */
     private Seq<Player> playersToSend = new Seq<>(false);
 
     public NetServer(){
@@ -1286,6 +1286,7 @@ public class NetServer implements ApplicationListener{
 
     void sync(){
         try{
+            int interval = Config.snapshotInterval.num();
             Groups.player.each(p -> !p.isLocal(), player -> {
                 if(player.con == null || !player.con.isConnected()){
                     onDisconnect(player, "disappeared");
@@ -1293,7 +1294,6 @@ public class NetServer implements ApplicationListener{
                 }
             });
 
-            int interval = Config.snapshotInterval.num();
             boolean someNeedsSnapshot = Groups.player.contains(p -> Time.timeSinceMillis(p.con.syncTime) >= interval);
 
             if(someNeedsSnapshot){
@@ -1306,6 +1306,7 @@ public class NetServer implements ApplicationListener{
 
             if(skipHiddenEntitiesCheck){
                 if(Vars.state.rules.fog){
+                    //Serialize by teams and use TeamData.syncTime
                     for(Team team : Team.all){ //Not Teams.active, because players can be on inactive teams
                         var tdata = team.data();
                         playersToSend.selectFrom(tdata.players, p -> !p.isLocal() && p.con.hasConnected);
@@ -1319,11 +1320,13 @@ public class NetServer implements ApplicationListener{
                         }
                     }
                 } else {
+                    //Serialize once for all players and use NetConnection.syncTime
                     if(someNeedsSnapshot){
                         writeEntitySnapshotsAll();
                     }
                 }
             } else {
+                //Serialize for each player and use NetConnection.syncTime
                 Groups.player.each(p -> !p.isLocal() && p.con.hasConnected, player -> {
                     var connection = player.con;
 
