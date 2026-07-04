@@ -63,7 +63,7 @@ public class HeatProducer extends GenericCrafter{
 
         @Override
         public double sense(LAccess sensor){
-            if (sensor == LAccess.heat) return heat;
+            if(sensor == LAccess.heat) return heat;
             return super.sense(sensor);
         }
 
