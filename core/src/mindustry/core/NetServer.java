@@ -136,6 +136,8 @@ public class NetServer implements ApplicationListener{
     private ObjectMap<String, Seq<Cons2<Player, Object>>> logicClientDataHandlers = new ObjectMap<>();
     /** Reused Seq<Player> for writing entity snapshots per team. */
     private Seq<Player> playersToSend = new Seq<>(false);
+    /** Used for entity snapshot timing. */
+    public long snapshotSyncTime;
 
     public NetServer(){
 
@@ -1185,10 +1187,7 @@ public class NetServer implements ApplicationListener{
             Call.entitySnapshot((short)sent, syncStream.toByteArray());
         }
 
-        Groups.player.each(p -> {
-            p.con.snapshotsSent++;
-            p.con.syncTime = Time.millis();
-        });
+        Groups.player.each(p -> p.con.snapshotsSent++);
     }
 
     /** Checks isSyncHidden for only one player per team. Called if FoW is enabled but there is no custom syncHidden. */
@@ -1216,7 +1215,8 @@ public class NetServer implements ApplicationListener{
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
                 final var ssent = (short)sent;
-                players.each(player -> Call.entitySnapshot(player.con, (short)ssent, syncStream.toByteArray()));
+                var bytes = syncStream.toByteArray();
+                players.each(player -> Call.entitySnapshot(player.con, ssent, bytes));
                 sent = 0;
                 syncStream.reset();
             }
@@ -1225,7 +1225,8 @@ public class NetServer implements ApplicationListener{
         if(sent > 0){
             dataStream.close();
             final var ssent = (short)sent;
-            players.each(player -> Call.entitySnapshot(player.con, ssent, syncStream.toByteArray()));
+            var bytes = syncStream.toByteArray();
+            players.each(player -> Call.entitySnapshot(player.con, ssent, bytes));
         }
 
         if(hiddenIds.size > 0){
@@ -1294,53 +1295,37 @@ public class NetServer implements ApplicationListener{
                 }
             });
 
-            boolean someNeedsSnapshot = Groups.player.contains(p -> Time.timeSinceMillis(p.con.syncTime) >= interval);
+            if(Time.timeSinceMillis(snapshotSyncTime) >= interval){
+                snapshotSyncTime = Time.millis();
 
-            if(someNeedsSnapshot){
-                try{
-                    writeStateSnapshot();
-                }catch(IOException e){
-                    Log.err(e);
-                }
-            }
+                writeStateSnapshot();
 
-            if(skipHiddenEntitiesCheck){
-                if(Vars.state.rules.fog){
-                    //Serialize by teams and use TeamData.syncTime
-                    for(Team team : Team.all){ //Not Teams.active, because players can be on inactive teams
-                        var tdata = team.data();
-                        playersToSend.selectFrom(tdata.players, p -> !p.isLocal() && p.con.hasConnected);
-                        if(!playersToSend.isEmpty() && Time.timeSinceMillis(tdata.syncTime) >= interval){
-                            tdata.syncTime = Time.millis();
-                            try{
+                if(skipHiddenEntitiesCheck){
+                    if(Vars.state.rules.fog){
+                        //Serialize by teams
+                        for(Team team : Team.all){ //Not Teams.active, because players can be on inactive teams
+                            var tdata = team.data();
+                            playersToSend.selectFrom(tdata.players, p -> !p.isLocal() && p.con.hasConnected);
+                            if(!playersToSend.isEmpty()){
                                 writeEntitySnapshotsTeam(playersToSend);
-                            }catch(IOException e){
-                                Log.err(e);
                             }
                         }
-                    }
-                } else {
-                    //Serialize once for all players and use NetConnection.syncTime
-                    if(someNeedsSnapshot){
+                    }else{
+                        //Serialize once for all players
                         writeEntitySnapshotsAll();
                     }
+                }else{
+                    //Serialize for each player
+                    Groups.player.each(p -> !p.isLocal() && p.con.hasConnected, player -> {
+                        try{
+                            writeEntitySnapshot(player);
+                        }catch(IOException e){
+                            Log.err(e);
+                        }
+                    });
                 }
-            } else {
-                //Serialize for each player and use NetConnection.syncTime
-                Groups.player.each(p -> !p.isLocal() && p.con.hasConnected, player -> {
-                    var connection = player.con;
-
-                    if(Time.timeSinceMillis(connection.syncTime) < interval || !connection.hasConnected) return;
-
-                    connection.syncTime = Time.millis();
-
-                    try{
-                        writeEntitySnapshot(player);
-                    }catch(IOException e){
-                        Log.err(e);
-                    }
-                });
             }
+
 
             if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && blockSyncTime.poll()){
                 writeBlockSnapshots();

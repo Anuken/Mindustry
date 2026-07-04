@@ -310,8 +310,6 @@ public class Teams{
         public Seq<Building> buildings = new Seq<>(false);
         /** Units of this team by type. Updated each frame. */
         public @Nullable Seq<Unit>[] unitsByType;
-        /** Used for writing entity snapshots. */
-        public long syncTime;
 
         public TeamData(Team team){
             this.team = team;
