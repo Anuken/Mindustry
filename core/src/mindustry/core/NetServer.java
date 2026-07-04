@@ -38,6 +38,14 @@ import static mindustry.Vars.*;
 public class NetServer implements ApplicationListener{
     /** note that snapshots are compressed, so the max snapshot size here is above the typical UDP safe limit */
     private static final int maxSnapshotSize = 800;
+
+    /** Multiplier of the viewport half-diagonal for the inner (L0) snapshot zone. */
+    private static final float safeRadiusRatio = 1.3f;
+    /** Multiplier of the viewport half-diagonal for the outer (L1) snapshot zone. */
+    private static final float outerRadiusRatio = 2.5f;
+    /** L1 entities are sent once every N snapshots, spread by entity id for even distribution. */
+    private static final int l1Interval = 3;
+
     private static final Timekeeper
         blockSyncTime = Timekeeper.ofSeconds(6f),
         healthSyncTime = Timekeeper.ofSeconds(0.5f),
@@ -1117,7 +1125,32 @@ public class NetServer implements ApplicationListener{
 
         int sent = 0;
 
+        //compute union bounding box of all connected players' view ranges (outer radius)
+        float minX = Float.MAX_VALUE, maxX = -Float.MAX_VALUE;
+        float minY = Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
+        boolean hasViewData = false;
+        for(Player p : Groups.player){
+            if(!p.isLocal() && p.con != null && p.con.hasConnected && p.con.viewWidth > 1){
+                NetConnection c = p.con;
+                float viewR = (float)Math.sqrt(c.viewWidth * c.viewWidth + c.viewHeight * c.viewHeight) / 2f * outerRadiusRatio;
+                float lx = c.viewX - viewR, rx = c.viewX + viewR;
+                float ly = c.viewY - viewR, ry = c.viewY + viewR;
+                if(lx < minX) minX = lx;
+                if(rx > maxX) maxX = rx;
+                if(ly < minY) minY = ly;
+                if(ry > maxY) maxY = ry;
+                hasViewData = true;
+            }
+        }
+
         for(Syncc entity : Groups.sync){
+            if(hasViewData && entity instanceof Posc pos){
+                float ex = pos.x(), ey = pos.y();
+                if(ex < minX || ex > maxX || ey < minY || ey > maxY){
+                    continue;
+                }
+            }
+
             writeEntity(entity, dataStream);
 
             sent++;
@@ -1146,10 +1179,35 @@ public class NetServer implements ApplicationListener{
         hiddenIds.clear();
         int sent = 0;
 
+        //compute union view bounds for this team
+        float minX = Float.MAX_VALUE, maxX = -Float.MAX_VALUE;
+        float minY = Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
+        boolean hasViewData = false;
+        for(Player p : players){
+            if(p.con != null && p.con.viewWidth > 1){
+                NetConnection c = p.con;
+                float viewR = (float)Math.sqrt(c.viewWidth * c.viewWidth + c.viewHeight * c.viewHeight) / 2f * outerRadiusRatio;
+                float lx = c.viewX - viewR, rx = c.viewX + viewR;
+                float ly = c.viewY - viewR, ry = c.viewY + viewR;
+                if(lx < minX) minX = lx;
+                if(rx > maxX) maxX = rx;
+                if(ly < minY) minY = ly;
+                if(ry > maxY) maxY = ry;
+                hasViewData = true;
+            }
+        }
+
         for(Syncc entity : Groups.sync){
             if(entity.isSyncHidden(team)){
                 hiddenIds.add(entity.id());
                 continue;
+            }
+
+            if(hasViewData && entity instanceof Posc pos){
+                float ex = pos.x(), ey = pos.y();
+                if(ex < minX || ex > maxX || ey < minY || ey > maxY){
+                    continue;
+                }
             }
 
             writeEntity(entity, dataStream);
