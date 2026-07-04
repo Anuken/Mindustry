@@ -1,5 +1,6 @@
 package mindustry.mod;
 
+import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
@@ -10,6 +11,11 @@ import mindustry.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.part.*;
+import mindustry.entities.units.*;
+import mindustry.gen.*;
+import mindustry.logic.*;
+import mindustry.mod.Mods.*;
+import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -23,19 +29,32 @@ import java.util.*;
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class DataPatcher{
+    private static ModMeta dpModMeta = new ModMeta(){{
+        name = internalName = "dp";
+    }};
+
+    public static final LoadedMod dpMod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, dpModMeta);
+
+    public static final int maxImageSize = 2000;
+    public static final int patchFormatVersion = 2;
+
+    private static boolean needsArrayFix = false;
     private static final Object root = new Object();
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
+    private static DataPatcher currentDataPatcher;
     private static ContentParser parser = createParser();
+
 
     private boolean applied;
     private ContentLoader contentLoader;
     private ObjectSet<Object> usedpatches = new ObjectSet<>();
     private Seq<Runnable> resetters = new Seq<>();
     private Seq<Runnable> afterCallbacks = new Seq<>();
-    private @Nullable PatchSet currentlyApplying;
-
-    /** Currently active patches. Note that apply() should be called after modification. */
-    public Seq<PatchSet> patches = new Seq<>();
+    private Seq<Object> visitStack = new Seq<>();
+    private Seq<Content> addedContent = new Seq<>();
+    private @Nullable PatchAsset currentlyApplyingPatch;
+    private @Nullable ContentAsset currentlyApplyingContent;
+    private Seq<LVar> addedVars = new Seq<>();
 
     static{
         for(var type : ContentType.all){
@@ -46,60 +65,214 @@ public class DataPatcher{
     static ContentParser createParser(){
         ContentParser cont = new ContentParser(){
             @Override
-            void warn(String string, Object... format){
+            void warnContext(@Nullable Content currentContent, @Nullable Fi currentFile, String string, Object... format){
                 //forward warnings to the current patcher - this is a bit hacky, but I do not want to re-initialize the parser every time
-                if(Vars.state.patcher != null){
-                    Vars.state.patcher.warn(string, format);
+                if(currentDataPatcher!= null){
+                    currentDataPatcher.warnContext(currentContent, currentFile, string, format);
                 }
             }
         };
         cont.allowClassResolution = false;
+        cont.allowAssetLoading = false;
+        cont.allowPatching = false;
 
         return cont;
     }
 
+    public boolean isPatched(Object object){
+        return usedpatches.contains(object);
+    }
+
     /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
-    public void apply(Seq<String> patchArray) throws Exception{
+    public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content){
+        apply(patches, content, true);
+    }
+
+    /** Applies the specified patches. If patches were already applied, the previous ones are un-applied - they do not stack! */
+    public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content, boolean reloadContentWorld){
+        //if you're un-applying data patches, and it throws an error, just crash. this is not recoverable.
         if(applied){
             unapply();
             applied = false;
         }
 
+        if(patches.isEmpty() && content.isEmpty()) return;
+
+        currentDataPatcher = this;
         applied = true;
         contentLoader = Vars.content.copy();
-        patches.clear();
 
-        for(String patch : patchArray){
-            PatchSet set = new PatchSet(patch, new JsonValue("error"));
-            patches.add(set);
+        Attribute[] oldAttributes = Attribute.all.clone();
+        var oldAttributeMap = Attribute.map.copy();
+        reset(() -> {
+            Attribute.all = oldAttributes;
+            Attribute.map = oldAttributeMap;
+        });
+
+        //patches are read first.
+        for(var set : patches){
+            set.warnings.clear();
+            set.error = false;
 
             try{
-                JsonValue value = parser.getJson().fromJson(null, Jval.read(patch).toString(Jformat.plain));
+                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                if(!(someValue instanceof JsonValue value)) throw new SerializationException("Patch must be a JSON object.");
+
+                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
+                    JsonValue req = value.get("requiredPlanets");
+                    value.remove("requiredPlanets");
+
+                    //this should be ignored unless this instance is a dedicated server
+                    if(Vars.headless){
+                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
+                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                            continue;
+                        }
+                    }
+                }
+
                 set.json = value;
-                currentlyApplying = set;
+                currentlyApplyingPatch = set;
+                visitStack.clear();
 
                 set.name = value.getString("name", "");
                 value.remove("name"); //patchsets can have a name, ignore it if present
                 for(var child : value){
                     assign(root, child.name, child, null, null, null);
                 }
-                currentlyApplying = null;
+                currentlyApplyingPatch = null;
 
             }catch(Exception e){
                 set.error = true;
+                set.name = "";
                 set.warnings.add(Strings.getSimpleMessage(e));
-                currentlyApplying = null;
+                currentlyApplyingPatch = null;
 
-                Log.err("Failed to apply patch: " + patch, e);
+                Log.err("Failed to apply patch: " + set.patch, e);
             }
+        }
+
+        if(!content.isEmpty()){
+            content.sort();
+
+            dpMod.erroredContent.clear();
+
+            for(var asset : content){
+                asset.errored = false;
+                asset.content = null;
+                asset.warnings.clear();
+
+                currentlyApplyingContent = asset;
+
+                if(!Structs.contains(ContentAsset.loadableContent, asset.type)){
+                    warn("Content @ is of type '@', which is not supported. Skipping.", asset.path, asset.type);
+                    continue;
+                }
+
+                Content current = Vars.content.getLastAdded();
+                Fi file = new Fi(asset.path);
+
+                //this is very important for resizing various arrays used in the game
+                if((asset.type == ContentType.item || asset.type == ContentType.liquid)){
+                    needsArrayFix = true;
+                }
+
+                try{
+                    //this binds the content but does not load it entirely
+                    asset.content = parser.parse(dpMod, asset.name, asset.data, file, asset.type);
+                    asset.content.minfo.asset = asset;
+                }catch(Throwable e){
+                    asset.warnings.add(Strings.getFinalMessage(e));
+                    asset.errored = true;
+
+                    var lastAdded = Vars.content.getLastAdded();
+                    if(current != lastAdded && lastAdded != null){
+                        Vars.content.remove(lastAdded);
+                        //markError should log it already
+                        parser.markError(lastAdded, dpMod, file, e);
+                    }else{
+                        Log.err("Error loading content: " + asset.path, e);
+                    }
+                }
+            }
+
+            currentlyApplyingContent = null;
+
+            parser.finishParsing();
+
+            addedContent.clear();
+            Seq<Content> all = addedContent;
+
+            for(var arr : Vars.content.getContentMap()){
+                all.addAll(arr.select(c -> c.minfo.mod == dpMod));
+            }
+
+            for(var errored : dpMod.erroredContent){
+                if(errored.minfo.error != null && errored.minfo.asset != null){
+                    errored.minfo.asset.warnings.add(errored.minfo.error);
+                }
+                Vars.content.remove(errored);
+            }
+
+            for(var cont : all){
+                try{
+                    cont.init();
+                }catch(Throwable t){
+                    Vars.content.remove(cont);
+                    if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
+                    parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
+                }
+            }
+
+            for(var cont : all){
+                try{
+                    cont.postInit();
+                }catch(Throwable t){
+                    Vars.content.remove(cont);
+                    if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
+                    parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
+                }
+            }
+
+            //register global variables
+            for(var cont : all){
+                if(!cont.hasErrored() && cont instanceof UnlockableContent u && Vars.logicVars.get("@" + u.name) == null){
+                    addedVars.add(Vars.logicVars.put("@" + u.name, u, false));
+                }
+            }
+
+            if(!Vars.headless){
+                for(var cont : all){
+                    try{
+                        cont.loadIcon();
+                        cont.load();
+                        if(cont.minfo.asset != null && cont instanceof UnlockableContent u){
+                            if(!u.uiIcon.found() && u.getContentType() != ContentType.planet && u.getContentType() != ContentType.weather){
+                                cont.minfo.asset.warnings.add("[" + u.name.substring(u.minfo.mod.name.length() + 1) + "] Could not find an icon. Ensure that you have an image named '" + u.name + "' loaded. Remember that imported images always have the 'dp-' prefix automatically applied.");
+                            }
+                        }
+                    }catch(Throwable t){
+                        //not removed here, as this code is only called clientside, and removing it would cause a desync
+                        if(cont.minfo.asset != null) cont.minfo.asset.errored = true;
+                        parser.markError(cont, dpMod, cont.minfo.sourceFile, t);
+                    }
+                }
+            }
+
+            if(reloadContentWorld) fixContentArrays();
         }
 
         afterCallbacks.each(Runnable::run);
     }
 
     public void unapply(){
+        unapply(true);
+    }
+
+    public void unapply(boolean reloadContentWorld){
         if(!applied) return;
 
+        callContentRemove();
         Vars.content = contentLoader;
         applied = false;
 
@@ -112,21 +285,86 @@ public class DataPatcher{
             }
         }
         resetters.clear();
+        for(var lvar : addedVars){
+            Vars.logicVars.remove(lvar);
+        }
 
         //this should never throw an exception
         afterCallbacks.each(Runnable::run);
         afterCallbacks.clear();
         usedpatches.clear();
+        addedContent.clear();
+
+        if(reloadContentWorld) fixContentArrays();
+    }
+
+    public Seq<Content> getAddedContent(){
+        return addedContent;
+    }
+
+    void callContentRemove(){
+        for(var arr : Vars.content.getContentMap()){
+            for(var value : arr){
+                if(value.isModded() && value.minfo.mod == dpMod){
+                    value.removed = true;
+                    value.removeContent();
+                }
+            }
+        }
+    }
+
+    public static void fixContentArrays(){
+        if(!needsArrayFix) return;
+        int items = Vars.content.items().size, liquids = Vars.content.liquids().size;
+
+        //block item/liquid filter
+        for(var block : Vars.content.blocks()){
+            //don't waste time resizing arrays for blocks that can't use them
+            if(!block.synthetic()) continue;
+
+            block.checkContentArrayCapacity(items, liquids);
+        }
+
+        //resize capacities in the world (editor). this SHOULD be the only time when fixing arrays is necessary
+        if(!Vars.headless && Vars.ui != null && Vars.ui.editor != null && Vars.ui.editor.isShown()){
+            int wh = Vars.world.width() * Vars.world.height();
+            for(int i = 0; i < wh; i++){
+                var b = Vars.world.tiles.geti(i).build;
+                if(b != null && b.items != null) b.items.checkArrayCapacity(items);
+                if(b != null && b.liquids != null) b.liquids.checkArrayCapacity(items);
+            }
+        }
+
+        //TODO: this doesn't do anything about extensive ItemSeq usage across the codebase, which is limited to the campaign
+        //TODO: this also doesn't change sectors
+        needsArrayFix = false;
     }
 
     void visit(Object object){
+        visitStack.add(object);
         if(object instanceof Content c && usedpatches.add(c)){
             after(c::afterPatch);
         }
     }
 
-    void created(Object object, Object parent){
+    void created(Object object){
+        if(object instanceof Weapon weapon){
+            weapon.init();
+        }else if(object instanceof Content cont){
+            cont.init();
+            cont.postInit();
+        }
+
         if(!Vars.headless){
+            Object parent = null;
+            //find last item on the stack that can be mapped to this part or weapon
+            for(int i = visitStack.size - 1; i >= 0; i --){
+                Object o = visitStack.items[i];
+                if(o != object && (o instanceof Content || o instanceof Weapon)){
+                    parent = o;
+                    break;
+                }
+            }
             if(object instanceof DrawPart part && parent instanceof MappableContent cont){
                 part.load(cont.name);
             }else if(object instanceof DrawPart part && parent instanceof Weapon w){
@@ -135,13 +373,8 @@ public class DataPatcher{
                 draw.load(block);
             }else if(object instanceof Weapon weapon){
                 weapon.load();
-                weapon.init();
             }else if(object instanceof Content cont){
                 cont.load();
-            }
-        }else{
-            if(object instanceof Weapon weapon){
-                weapon.init();
             }
         }
     }
@@ -149,47 +382,128 @@ public class DataPatcher{
     void assign(Object object, String field, Object value, @Nullable FieldData metadata, @Nullable Object parentObject, @Nullable String parentField) throws Exception{
         if(field == null || field.isEmpty()) return;
 
-        //field.field2.field3 nested syntax
-        if(field.indexOf('.') != -1){
-            //resolve the field chain until the final field is reached
-            String[] path = field.split("\\.");
-            for(int i = 0; i < path.length - 1; i++){
-                parentObject = object;
-                parentField = path[i];
-                Object[] result = resolve(object, path[i], metadata);
-                if(result == null){
-                    warn("Failed to resolve @.@", object, path[i]);
-                    return;
-                }
-                object = result[0];
-                metadata = (FieldData)result[1];
+        int oldLength = visitStack.size;
+        try{
 
-                if(i < path.length - 2){
-                    visit(object);
-                }
-            }
-            field = path[path.length - 1];
-        }
+            //field.field2.field3 nested syntax
+            if(field.indexOf('.') != -1){
+                //resolve the field chain until the final field is reached
+                String[] path = field.split("\\.");
+                for(int i = 0; i < path.length - 1; i++){
+                    parentObject = object;
+                    parentField = path[i];
+                    Object[] result = resolve(object, path[i], metadata);
+                    if(result == null){
+                        warn("Failed to resolve @.@", object, path[i]);
+                        return;
+                    }
+                    object = result[0];
+                    metadata = (FieldData)result[1];
 
-        visit(object);
-
-        if(object == root){
-            if(value instanceof JsonValue jval && jval.isObject()){
-                for(var child : jval){
-                    Object[] otherResolve = resolve(object, jval.name, null);
-                    if(otherResolve != null && otherResolve[0] instanceof ObjectMap map && map.containsKey(child.name)){
-                        assign(otherResolve[0], child.name, child, (FieldData)otherResolve[1], object, field);
-                    }else{
-                        Log.warn("Content not found: @.@", field, child.name);
+                    if(i < path.length - 2){
+                        visit(object);
                     }
                 }
-            }else{
-                warn("Content '@' cannot be assigned.", field);
+                field = path[path.length - 1];
             }
-        }else if(object instanceof Seq<?> || object.getClass().isArray()){
 
-            if(field.equals("+")){
-                var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
+            visit(object);
+
+            if(object == root){
+                if(value instanceof JsonValue jval && jval.isObject()){
+                    for(var child : jval){
+                        assign(root, field + "." + child.name, child, null, null, null);
+                    }
+                }else{
+                    warn("Content '@' cannot be assigned.", field);
+                }
+            }else if(object instanceof Seq<?> || object.getClass().isArray()){
+
+                if(field.equals("+")){
+                    var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
+                    boolean multiAdd;
+
+                    if(value instanceof JsonValue jval && jval.isArray()){
+                        meta = metadata;
+                        multiAdd = true;
+                    }else{
+                        multiAdd = false;
+                    }
+
+                    //handle array addition syntax
+                    if(object instanceof Seq s){
+                        modifiedField(parentObject, parentField, s.copy());
+
+                        assignValue(object, field, meta, () -> null, val -> {
+                            if(multiAdd){
+                                s.addAll((Seq)val);
+                            }else{
+                                s.add(val);
+                            }
+                        }, value, false);
+                    }else{
+                        modifiedField(parentObject, parentField, copyArray(object));
+
+                        var fobj = object;
+                        var fpo = parentObject;
+                        var fpf = parentField;
+                        assignValue(parentObject, parentField, meta, () -> null, val -> {
+                            try{
+                                //create copy array, put the new object in the last slot, and assign the parent's field to it
+                                int len = Array.getLength(fobj);
+                                Object copy;
+
+                                if(multiAdd){
+                                    int otherLen = Array.getLength(val);
+                                    copy = Array.newInstance(fobj.getClass().getComponentType(), len + otherLen);
+                                    System.arraycopy(val, 0, copy, len, otherLen);
+                                    System.arraycopy(fobj, 0, copy, 0, len);
+                                }else{
+                                    copy = Array.newInstance(fobj.getClass().getComponentType(), len + 1);
+                                    Array.set(copy, len, val);
+                                    System.arraycopy(fobj, 0, copy, 0, len);
+                                }
+
+                                assign(fpo, fpf, copy, null, null, null);
+                            }catch(Exception e){
+                                throw new RuntimeException(e);
+                            }
+                        }, value, false);
+                    }
+                }else{
+                    if(metadata != null){
+                        var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
+                        if(meta.type != null){
+                            metadata = meta;
+                        }
+                    }
+
+                    int i = Strings.parseInt(field);
+                    int length = object instanceof Seq s ? s.size : Array.getLength(object);
+
+                    if(i == Integer.MIN_VALUE){
+                        warn("Invalid number for array access: '@'", field);
+                        return;
+                    }else if(i < 0 || i >= length){
+                        warn("Number outside of array bounds: '" + field + "' (length is " + length + ")");
+                        return;
+                    }
+
+                    if(object instanceof Seq s){
+                        modifiedField(parentObject, parentField, s.copy());
+
+                        assignValue(object, field, metadata, () -> s.get(i), val -> s.set(i, val), value, true);
+                    }else{
+                        modifiedField(parentObject, parentField, copyArray(object));
+
+                        var fobj = object;
+                        assignValue(object, field, metadata, () -> Array.get(fobj, i), val -> Array.set(fobj, i, val), value, true);
+                    }
+                }
+            }else if(object instanceof ObjectSet set && field.equals("+")){
+                modifiedField(parentObject, parentField, set.copy());
+
+                var meta = new FieldData(metadata.elementType, null, null);
                 boolean multiAdd;
 
                 if(value instanceof JsonValue jval && jval.isArray()){
@@ -199,194 +513,123 @@ public class DataPatcher{
                     multiAdd = false;
                 }
 
-                //handle array addition syntax
-                if(object instanceof Seq s){
-                    modifiedField(parentObject, parentField, s.copy());
-
-                    assignValue(object, field, meta, () -> null, val -> {
-                        if(multiAdd){
-                            s.addAll((Seq)val);
-                        }else{
-                            s.add(val);
-                        }
-                    }, value, false);
-                }else{
-                    modifiedField(parentObject, parentField, copyArray(object));
-
-                    var fobj = object;
-                    var fpo = parentObject;
-                    var fpf = parentField;
-                    assignValue(parentObject, parentField, meta, () -> null, val -> {
-                        try{
-                            //create copy array, put the new object in the last slot, and assign the parent's field to it
-                            int len = Array.getLength(fobj);
-                            Object copy;
-
-                            if(multiAdd){
-                                int otherLen = Array.getLength(val);
-                                copy = Array.newInstance(fobj.getClass().getComponentType(), len + otherLen);
-                                System.arraycopy(val, 0, copy, len, otherLen);
-                                System.arraycopy(fobj, 0, copy, 0, len);
-                            }else{
-                                copy = Array.newInstance(fobj.getClass().getComponentType(), len + 1);
-                                Array.set(copy, len, val);
-                                System.arraycopy(fobj, 0, copy, 0, len);
-                            }
-
-                            assign(fpo, fpf, copy, null, null, null);
-                        }catch(Exception e){
-                            throw new RuntimeException(e);
-                        }
-                    }, value, false);
-                }
-            }else{
-                if(metadata != null){
-                    var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
-                    if(meta.type != null){
-                        metadata = meta;
+                assignValue(object, field, multiAdd ? meta : metadata, () -> null, val -> {
+                    if(multiAdd){
+                        set.addAll((ObjectSet)val);
+                    }else{
+                        set.add(val);
                     }
-                }
-
-                int i = Strings.parseInt(field);
-                int length = object instanceof Seq s ? s.size : Array.getLength(object);
-
-                if(i == Integer.MIN_VALUE){
-                    warn("Invalid number for array access: '@'", field);
+                }, value, false);
+            }else if(object instanceof ObjectMap map){
+                if(metadata == null){
+                    warn("ObjectMap cannot be parsed without metadata: @.@", parentObject, parentField);
                     return;
-                }else if(i < 0 || i >= length){
-                    warn("Number outside of array bounds: '" + field + "' (length is " + length + ")");
+                }
+                Object key = convertKeyType(field, metadata.keyType);
+                if(key == null){
+                    warn("Null key: '@'", field);
                     return;
                 }
 
-                if(object instanceof Seq s){
-                    var copy = s.copy();
-                    reset(() -> s.set(copy));
+                var copy = map.copy();
+                reset(() -> map.set(copy));
 
-                    assignValue(object, field, metadata, () -> s.get(i), val -> s.set(i, val), value, false);
+                if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
+                    //removal syntax:
+                    //"value": "-"
+                    map.remove(key);
                 }else{
-                    modifiedField(parentObject, parentField, copyArray(object));
-
-                    var fobj = object;
-                    assignValue(object, field, metadata, () -> Array.get(fobj, i), val -> Array.set(fobj, i, val), value, false);
+                    assignValue(object, field, new FieldData(metadata.elementType, null, null), () -> map.get(key), val -> map.put(key, val), value, false);
                 }
-            }
-        }else if(object instanceof ObjectSet set && field.equals("+")){
-            modifiedField(parentObject, parentField, set.copy());
+            }else if(object instanceof ObjectFloatMap map){
+                if(metadata == null){
+                    warn("ObjectFloatMap cannot be parsed without metadata: @.@", parentObject, parentField);
+                    return;
+                }
+                Object key = convertKeyType(field, metadata.elementType);
+                if(key == null){
+                    warn("Null key: '@'", field);
+                    return;
+                }
 
-            var meta = new FieldData(metadata.elementType, null, null);
-            boolean multiAdd;
+                var copy = map.copy();
+                reset(() -> map.set(copy));
 
-            if(value instanceof JsonValue jval && jval.isArray()){
-                meta = metadata;
-                multiAdd = true;
-            }else{
-                multiAdd = false;
-            }
-
-            assignValue(object, field, multiAdd ? meta : metadata, () -> null, val -> {
-                if(multiAdd){
-                    set.addAll((ObjectSet)val);
+                if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
+                    //removal syntax:
+                    //"value": "-"
+                    map.remove(key, 0f);
                 }else{
-                    set.add(val);
+                    assignValue(object, field, new FieldData(float.class, null, null), () -> map.get(key, 0f), val -> map.put(key, (Float)val), value, false);
                 }
-            }, value, false);
-        }else if(object instanceof ObjectMap map){
-            if(metadata == null){
-                warn("ObjectMap cannot be parsed without metadata: @.@", parentObject, parentField);
-                return;
-            }
-            Object key = convertKeyType(field, metadata.keyType);
-            if(key == null){
-                warn("Null key: '@'", field);
-                return;
-            }
-
-            var copy = map.copy();
-            reset(() -> map.set(copy));
-
-            if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
-                //removal syntax:
-                //"value": "-"
-                map.remove(key);
+            }else if(object instanceof Attributes map && value instanceof JsonValue jval){
+                Attribute key = Attribute.getOrNull(field);
+                if(key == null){
+                    warn("Unknown attribute: '@'", field);
+                    return;
+                }
+                if(!jval.isNumber()){
+                    warn("Attribute value must be a number: '@'", jval);
+                    return;
+                }
+                float prev = map.get(key);
+                reset(() -> map.set(key, prev));
+                map.set(key, jval.asFloat());
             }else{
-                assignValue(object, field, new FieldData(metadata.elementType, null, null), () -> map.get(key), val -> map.put(key, val), value, false);
-            }
-        }else if(object instanceof ObjectFloatMap map){
-            if(metadata == null){
-                warn("ObjectFloatMap cannot be parsed without metadata: @.@", parentObject, parentField);
-                return;
-            }
-            Object key = convertKeyType(field, metadata.elementType);
-            if(key == null){
-                warn("Null key: '@'", field);
-                return;
-            }
+                Class<?> actualType = object.getClass();
+                if(actualType.isAnonymousClass()) actualType = actualType.getSuperclass();
 
-            var copy = map.copy();
-            reset(() -> map.set(copy));
+                var fields = parser.getJson().getFields(actualType);
+                var fdata = fields.get(field);
+                var fobj = object;
 
-            if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
-                //removal syntax:
-                //"value": "-"
-                map.remove(key, 0f);
-            }else{
-                assignValue(object, field, new FieldData(float.class, null, null), () -> map.get(key, 0f), val -> map.put(key, (Float)val), value, false);
-            }
-        }else if(object instanceof Attributes map && value instanceof JsonValue jval){
-            Attribute key = Attribute.getOrNull(field);
-            if(key == null){
-                warn("Unknown attribute: '@'", field);
-                return;
-            }
-            if(!jval.isNumber()){
-                warn("Attribute value must be a number: '@'", jval);
-                return;
-            }
-            float prev = map.get(key);
-            reset(() -> map.set(key, prev));
-            map.set(key, jval.asFloat());
-        }else{
-            Class<?> actualType = object.getClass();
-            if(actualType.isAnonymousClass()) actualType = actualType.getSuperclass();
+                if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("controller")){
+                    var fmeta = fields.get("controller");
+                    assignValue(object, "controller", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), (Func<Unit, UnitController>)(u -> parser.resolveController(jsv.asString()).get()), true);
+                }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("aiController")){
+                    var fmeta = fields.get("aiController");
+                    assignValue(object, "aiController", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.resolveController(jsv.asString()), true);
+                }else if(fdata != null){
+                    if(checkField(fdata.field)) return;
 
-            var fields = parser.getJson().getFields(actualType);
-            var fdata = fields.get(field);
-            var fobj = object;
-            if(fdata != null){
-                if(checkField(fdata.field)) return;
+                    assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> {
+                        if(fv == null && !fdata.field.isAnnotationPresent(Nullable.class) && !(Vars.headless && ContentParser.implicitNullable.contains(fdata.field.getType()))){
+                            warn("Field '@' cannot be null.", fdata.field);
+                            return;
+                        }
+                        Reflect.set(fobj, fdata.field, fv);
+                    }, value, true);
+                }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
+                    Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
+                    boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
+                    Runnable resetCons = () -> {
+                        Reflect.set(Block.class, bl, "consumeBuilder", prevBuilder);
+                        bl.reinitializeConsumers();
+                        bl.hasItems = hadItems;
+                        bl.hasLiquids = hadLiquids;
+                        bl.hasPower = hadPower;
+                        bl.acceptsItems = acceptedItems;
+                    };
+                    reset(resetCons);
 
-                assignValue(object, field, new FieldData(fdata), () -> Reflect.get(fobj, fdata.field), fv -> {
-                    if(fv == null && !fdata.field.isAnnotationPresent(Nullable.class) && !(Vars.headless && ContentParser.implicitNullable.contains(fdata.field.getType()))){
-                        warn("Field '@' cannot be null.", fdata.field);
-                        return;
+                    try{
+                        bl.hasPower = false; //if a block doesn't have a power consumer, hasPower should be false. if it does, it will get set to true in reinitializeConsumers
+                        parser.readBlockConsumers(bl, jsv);
+                        bl.reinitializeConsumers();
+                    }catch(Throwable e){
+                        resetCons.run();
+                        Log.err(e);
+                        warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
                     }
-                    Reflect.set(fobj, fdata.field, fv);
-                }, value, true);
-            }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
-                modifiedField(bl, "consumeBuilder", Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy());
-                modifiedField(bl, "consumers", Reflect.<Consume[]>get(Block.class, bl, "consumers"));
-                boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
-                reset(() -> {
-                    bl.reinitializeConsumers();
-                    bl.hasItems = hadItems;
-                    bl.hasLiquids = hadLiquids;
-                    bl.hasPower = hadPower;
-                    bl.acceptsItems = acceptedItems;
-                });
-
-                try{
-                    parser.readBlockConsumers(bl, jsv);
-                    bl.reinitializeConsumers();
-                }catch(Throwable e){
-                    Log.err(e);
-                    warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
+                }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("type")){
+                    var fmeta = fields.get("constructor");
+                    assignValue(object, "constructor", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.unitType(jsv), true);
+                }else{
+                    warn("Unknown field '@' for class '@'", field, actualType.getSimpleName());
                 }
-            }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("type")){
-                var fmeta = fields.get("constructor");
-                assignValue(object, "constructor", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.unitType(jsv), true);
-            }else{
-                warn("Unknown field '@' for class '@'", field, actualType.getSimpleName());
             }
+        }finally{
+            visitStack.truncate(oldLength);
         }
     }
 
@@ -404,13 +647,13 @@ public class DataPatcher{
                     if(modify) modifiedField(object, field, getter.get());
 
                     //HACK: listen for creation of objects once
-                    parser.listeners.add((type, jsonData, result) -> created(result, object));
+                    parser.listeners.add((type, jsonData, result) -> created(result));
                     try{
                         setter.get(parser.getJson().readValue(metadata.type, metadata.elementType, jsv));
                     }catch(Throwable e){
                         warn("Failed to read value @.@ = @: (type = @ elementType = @)\n@", object, field, value, metadata.type, metadata.elementType, Strings.getSimpleMessages(e));
                     }
-                   parser.listeners.pop();
+                    parser.listeners.pop();
                 }else{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
@@ -463,7 +706,16 @@ public class DataPatcher{
                 return null;
             }
 
-            return new Object[]{object instanceof Seq s ? s.get(i) : Array.get(object, i), null};
+            Object prev = object instanceof Seq s ? s.get(i) : Array.get(object, i);
+            reset(() -> {
+                if(object instanceof Seq seq){
+                    seq.set(i, prev);
+                }else{
+                    Array.set(object, i, prev);
+                }
+            });
+
+            return new Object[]{prev, metadata != null ? new FieldData(object instanceof Seq<?> ? metadata.elementType : metadata.type.getComponentType(), null, null) : null};
         }else if(object instanceof ObjectMap map){
             Object key = convertKeyType(field, metadata.keyType);
             if(key == null){
@@ -512,12 +764,22 @@ public class DataPatcher{
             if(usedpatches.add(record)){
                 resetters.add(() -> {
                     try{
-                        record.field.set(record.target, record.value);
+                        record.field.set(record.target, value);
                     }catch(Exception e){
                         throw new RuntimeException(e);
                     }
                 });
             }
+        }else if(target instanceof Seq<?> || target.getClass().isArray()){
+            int i = Integer.parseInt(field);
+            resetters.add(() -> {
+
+                if(target instanceof Seq seq){
+                    seq.set(i, value);
+                }else{
+                    Array.set(target, i, value);
+                }
+            });
         }else{
             warn("Missing field " + field + " for object " + target);
         }
@@ -532,10 +794,20 @@ public class DataPatcher{
     }
 
     void warn(String error, Object... fmt){
+        warnContext(null, null, error, fmt);
+    }
+
+    void warnContext(@Nullable Content currentContent, @Nullable Fi currentFile, String error, Object... fmt){
         String formatted = Strings.format(error, fmt);
-        if(currentlyApplying != null){
-            currentlyApplying.warnings.add(formatted);
+
+        if(currentlyApplyingPatch != null){
+            currentlyApplyingPatch.warnings.add(formatted);
+        }else if(currentlyApplyingContent != null && (currentlyApplyingContent.content == null || currentlyApplyingContent.content.minfo.asset == null)){
+            currentlyApplyingContent.warnings.add(formatted);
+        }else if(currentContent != null && currentContent.minfo.asset != null){
+            currentContent.minfo.asset.warnings.add(formatted);
         }
+
         Log.warn("[ContentPatcher] " + formatted);
     }
 
@@ -545,27 +817,14 @@ public class DataPatcher{
 
     static Object copyArray(Object object){
         if(object instanceof int[] i) return i.clone();
-        if(object instanceof long[] i) return i.clone();
-        if(object instanceof short[] i) return i.clone();
-        if(object instanceof byte[] i) return i.clone();
-        if(object instanceof boolean[] i) return i.clone();
-        if(object instanceof char[] i) return i.clone();
-        if(object instanceof float[] i) return i.clone();
-        if(object instanceof double[] i) return i.clone();
-        return ((Object[])object).clone();
-    }
-
-    public static class PatchSet{
-        public String patch;
-        public JsonValue json;
-        public String name = "";
-        public boolean error;
-        public Seq<String> warnings = new Seq<>();
-
-        public PatchSet(String patch, JsonValue json){
-            this.patch = patch;
-            this.json = json;
-        }
+        else if(object instanceof long[] i) return i.clone();
+        else if(object instanceof short[] i) return i.clone();
+        else if(object instanceof byte[] i) return i.clone();
+        else if(object instanceof boolean[] i) return i.clone();
+        else if(object instanceof char[] i) return i.clone();
+        else if(object instanceof float[] i) return i.clone();
+        else if(object instanceof double[] i) return i.clone();
+        else return ((Object[])object).clone();
     }
 
     private static class FieldData{

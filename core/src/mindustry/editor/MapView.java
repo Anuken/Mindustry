@@ -233,6 +233,9 @@ public class MapView extends Element implements GestureListener{
 
     @Override
     public void draw(){
+        //can cause NaN
+        if(editor.width() == 0 || editor.height() == 0) return;
+
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;

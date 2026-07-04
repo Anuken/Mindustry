@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
+import mindustry.net.*;
 import mindustry.ui.*;
 
 import java.util.*;
@@ -42,7 +43,7 @@ public class HostDialog extends BaseDialog{
 
             cont.add().width(65f);
 
-            cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost"), val -> Core.settings.put("steampublichost", !val)).colspan(2).left()
+            cont.check("@steam.friendsonly", !Core.settings.getBool("steampublichost2"), val -> Core.settings.put("steampublichost2", !val)).colspan(2).left()
                 .with(c -> ui.addDescTooltip(c, "@steam.friendsonly.tooltip")).padBottom(15f).row();
         }
 
@@ -89,19 +90,21 @@ public class HostDialog extends BaseDialog{
         ui.loadfrag.show("@hosting");
         Time.runTask(5f, () -> {
             try{
+                if(steam){
+                    SteamAdmin.fetch();
+                }
+
                 net.host(Core.settings.getInt("port", port));
                 player.admin = true;
                 Events.fire(new HostEvent());
 
-                if(steam && Core.settings.getBool("steampublichost")){
+                if(steam && Core.settings.getBool("steampublichost2")){
                     if(Version.modifier.contains("beta") || Version.modifier.contains("alpha")){
-                        Core.settings.put("steampublichost", false);
+                        Core.settings.put("steampublichost2", false);
                         platform.updateLobby();
                         Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
                     }
                 }
-
-
             }catch(Exception e){
                 ui.showException(e.getMessage() != null && e.getMessage().toLowerCase(Locale.ROOT).contains("address already in use") ? "@server.error.addressinuse" : "@server.error", e);
             }

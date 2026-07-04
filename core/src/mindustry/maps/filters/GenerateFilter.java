@@ -12,7 +12,9 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-public abstract class GenerateFilter implements Cloneable{
+import java.io.*;
+
+public abstract class GenerateFilter implements Cloneable, Serializable{
     public int seed = 0;
 
     public void apply(Tiles tiles, GenerateInput in){

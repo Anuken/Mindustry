@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -226,7 +227,7 @@ public class SchematicsDialog extends BaseDialog{
                 TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 t.row();
-                t.button("@schematic.copy.import", Icon.copy, style, () -> {
+                t.button("@import.clipboard", Icon.copy, style, () -> {
                     dialog.hide();
                     try{
                         Schematic s = Schematics.readBase64(Core.app.getClipboardText());
@@ -241,23 +242,32 @@ public class SchematicsDialog extends BaseDialog{
                     }
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith(schematicBaseStart));
                 t.row();
-                t.button("@schematic.importfile", Icon.download, style, () -> platform.showFileChooser(true, schematicExtension, file -> {
+                t.button("@import.file", Icon.download, style, () -> FileChooser.open(schematicExtension).submitMulti(files -> {
                     dialog.hide();
 
-                    try{
-                        Schematic s = Schematics.read(file);
-                        s.removeSteamID();
-                        schematics.add(s);
-                        setup();
-                        showInfo(s);
-                        checkTags(s);
-                    }catch(Exception e){
-                        ui.showException(e);
+                    Schematic last = null;
+
+                    for(Fi file : files){
+                        try{
+                            Schematic s = Schematics.read(file);
+                            s.removeSteamID();
+                            schematics.add(s);
+                            checkTags(s);
+                            last = s;
+                        }catch(Exception e){
+                            ui.showException(e);
+                        }
                     }
+
+                    if(last != null){
+                        showInfo(last);
+                    }
+
+                    setup();
                 })).marginLeft(12f);
                 t.row();
                 if(steam){
-                    t.button("@schematic.browseworkshop", Icon.book, style, () -> {
+                    t.button("@workshop.browse", Icon.book, style, () -> {
                         dialog.hide();
                         platform.openWorkshop();
                     }).marginLeft(12f);
@@ -277,20 +287,20 @@ public class SchematicsDialog extends BaseDialog{
                 TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 if(steam && !s.hasSteamID()){
-                    t.button("@schematic.shareworkshop", Icon.book, style,
+                    t.button("@workshop.share", Icon.book, style,
                         () -> platform.publish(s)).marginLeft(12f);
                     t.row();
                     dialog.hide();
                 }
-                t.button("@schematic.copy", Icon.copy, style, () -> {
+                t.button("@copy.clipboard", Icon.copy, style, () -> {
                     dialog.hide();
                     ui.showInfoFade("@copied");
                     Core.app.setClipboardText(schematics.writeBase64(s));
                 }).marginLeft(12f);
                 t.row();
-                t.button("@schematic.exportfile", Icon.export, style, () -> {
+                t.button("@export.file", Icon.export, style, () -> {
                     dialog.hide();
-                    platform.export(s.name(), schematicExtension, file -> Schematics.write(s, file));
+                    FileChooser.export(s.name(), schematicExtension, file -> Schematics.write(s, file));
                 }).marginLeft(12f);
             });
         });
@@ -593,7 +603,6 @@ public class SchematicsDialog extends BaseDialog{
 
     void buildTags(Schematic schem, Table t, boolean name){
         t.clearChildren();
-        t.left();
 
         //sort by order in the main target array. the complexity of this is probably awful
         schem.labels.sort(s -> tags.indexOf(s));
@@ -755,14 +764,16 @@ public class SchematicsDialog extends BaseDialog{
 
         public void show(Schematic schem){
             cont.clear();
-            title.setText("[[" + Core.bundle.get("schematic") + "] " +schem.name());
+            title.setText("[[" + Core.bundle.get("schematic") + "] " + schem.name());
 
-            cont.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray).row();
-            cont.table(tags -> buildTags(schem, tags)).fillX().left().row();
-            cont.add(new SchematicImage(schem)).maxSize(800f).row();
+            Table inner = new Table();
+
+            inner.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray).row();
+            inner.table(tags -> buildTags(schem, tags)).fillX().pad(6).row();
+            inner.add(new SchematicImage(schem)).maxSize(800f).row();
 
             ItemSeq arr = schem.requirements();
-            cont.table(r -> {
+            inner.table(r -> {
                 int i = 0;
                 for(ItemStack s : arr){
                     r.image(s.item.uiIcon).left().size(iconMed);
@@ -776,12 +787,10 @@ public class SchematicsDialog extends BaseDialog{
                         r.row();
                     }
                 }
-            });
-            cont.row();
+            }).pad(6).row();
             float cons = schem.powerConsumption() * 60, prod = schem.powerProduction() * 60;
             if(!Mathf.zero(cons) || !Mathf.zero(prod)){
-                cont.table(t -> {
-
+                inner.table(t -> {
                     if(!Mathf.zero(prod)){
                         t.image(Icon.powerSmall).color(Pal.powerLight).padRight(3);
                         t.add("+" + Strings.autoFixed(prod, 2)).color(Pal.powerLight).left();
@@ -795,8 +804,16 @@ public class SchematicsDialog extends BaseDialog{
                         t.image(Icon.powerSmall).color(Pal.remove).padRight(3);
                         t.add("-" + Strings.autoFixed(cons, 2)).color(Pal.remove).left();
                     }
-                });
+                }).row();
             }
+
+            if(!schem.description().isEmpty()){
+                inner.add("[lightgray]" + schem.description()).wrap().padTop(20).growX().maxWidth(500).padLeft(8).padRight(8).row();
+            }
+
+            cont.pane(p -> {
+                p.add(inner).growX();
+            }).grow().scrollX(false).scrollY(true);
 
             buttons.clearChildren();
             buttons.defaults().size(Core.graphics.isPortrait() ? 150f : 210f, 64f);

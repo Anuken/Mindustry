@@ -49,8 +49,8 @@ public class WaveInfoDialog extends BaseDialog{
 
         addCloseButton();
 
-        buttons.button("@waves.edit", Icon.edit, () -> {
-            BaseDialog dialog = new BaseDialog("@waves.edit");
+        buttons.button("@edit.menu", Icon.edit, () -> {
+            BaseDialog dialog = new BaseDialog("@edit.menu");
             dialog.addCloseButton();
             dialog.setFillParent(false);
             dialog.cont.table(Tex.button, t -> {
@@ -313,7 +313,7 @@ public class WaveInfoDialog extends BaseDialog{
                                     int max = 20;
 
                                     if(spawner.getSpawns().size >= max){
-                                        p.add("[lightgray](first " + max + ")").colspan(cols).padBottom(4).row();
+                                        p.add(Core.bundle.format("waves.spawn.first", max)).colspan(cols).padBottom(4).row();
                                     }
 
                                     for(var spawn : spawner.getSpawns()){

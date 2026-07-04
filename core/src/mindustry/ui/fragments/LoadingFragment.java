@@ -4,11 +4,13 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.util.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
@@ -17,6 +19,7 @@ public class LoadingFragment{
     private TextButton button;
     private Bar bar;
     private Label nameLabel;
+    private @Nullable Runnable cancelListener;
     private float progValue;
 
     public void build(Group parent){
@@ -31,16 +34,25 @@ public class LoadingFragment{
             t.add().height(133f).row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
-            nameLabel = t.add("@loading").pad(10f).style(Styles.techLabel).get();
+            nameLabel = t.add("@loading").pad(10f).style(Styles.outlineLabel).get();
             t.row();
             t.add(new WarningBar()).growX().height(24f);
             t.row();
 
-            text("@loading");
+            nameLabel.setText("@loading");
 
             bar = t.add(new Bar()).pad(3).padTop(6).size(500f, 40f).visible(false).get();
             t.row();
-            button = t.button("@cancel", () -> {}).pad(20).size(250f, 70f).visible(false).get();
+            button = t.button("@cancel", () -> {
+                if(cancelListener != null){
+                    cancelListener.run();
+                }
+            }).pad(20).size(250f, 70f).visible(false).get();
+            button.keyDown(key -> {
+                if(cancelListener != null && (key == KeyCode.back || key == KeyCode.escape)){
+                    cancelListener.run();
+                }
+            });
             table = t;
         });
     }
@@ -66,15 +78,30 @@ public class LoadingFragment{
         }
     }
 
+    public void showProgressBar(){
+        if(!bar.visible){
+            setProgress(() -> progValue);
+        }
+    }
+
+    public boolean showingProgress(){
+        return bar.visible;
+    }
+
+
     public void setButton(Runnable listener){
         button.visible = true;
-        button.getListeners().remove(button.getListeners().size - 1);
-        button.clicked(listener);
+        button.requestKeyboard();
+        cancelListener = listener;
     }
 
     public void setText(String text){
-        text(text);
-        nameLabel.setColor(Pal.accent);
+        nameLabel.setText(text);
+    }
+
+    public void setText(String text, Color color){
+        nameLabel.setText(text);
+        nameLabel.setColor(color);
     }
 
     public void show(){
@@ -83,11 +110,12 @@ public class LoadingFragment{
 
     public void show(String text){
         button.visible = false;
-        nameLabel.setColor(Color.white);
+        cancelListener = null;
         bar.visible = false;
         table.clearActions();
         table.touchable = Touchable.enabled;
-        text(text);
+        nameLabel.setColor(Color.white);
+        nameLabel.setText(text);
         table.visible = true;
         table.color.a = 1f;
         table.toFront();
@@ -96,23 +124,13 @@ public class LoadingFragment{
     public void hide(){
         table.clearActions();
         table.toFront();
+        button.visible = false;
         table.touchable = Touchable.disabled;
         table.actions(Actions.fadeOut(0.5f), Actions.visible(false));
-    }
 
-    private void text(String text){
-        nameLabel.setText(text);
-
-        CharSequence realText = nameLabel.getText();
-
-        //fallback to the default font if characters are missing
-        //TODO this should happen everywhere
-        for(int i = 0; i < realText.length(); i++){
-            if(Fonts.tech.getData().getGlyph(realText.charAt(i)) == null){
-                nameLabel.setStyle(Styles.defaultLabel);
-                return;
-            }
+        if(Core.scene.getKeyboardFocus() == button){
+            Core.scene.setKeyboardFocus(null);
         }
-        nameLabel.setStyle(Styles.techLabel);
     }
+
 }

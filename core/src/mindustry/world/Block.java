@@ -24,6 +24,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.input.InputHandler.*;
 import mindustry.logic.*;
 import mindustry.mod.*;
 import mindustry.type.*;
@@ -41,11 +42,11 @@ import static mindustry.Vars.*;
 
 public class Block extends UnlockableContent implements Senseable{
     /** If true, buildings have an ItemModule. */
-    public boolean hasItems;
+    public @NoPatch boolean hasItems;
     /** If true, buildings have a LiquidModule. */
-    public boolean hasLiquids;
+    public @NoPatch boolean hasLiquids;
     /** If true, buildings have a PowerModule. */
-    public boolean hasPower;
+    public @NoPatch boolean hasPower;
     /** Flag for determining whether this block outputs liquid somewhere; used for connections. */
     public boolean outputsLiquid = false;
     /** Used by certain power blocks (nodes) to flag as non-consuming of power. True by default, even if this block has no power. */
@@ -66,12 +67,14 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsItems = false;
     /** If true, this block won't be affected by the onlyDepositCore rule. */
     public boolean alwaysAllowDeposit = false;
+    /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this block. Overrides the itemDepositCooldown if non-negative. */
+    public float depositCooldown = -1f;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
     public boolean separateItemCapacity = false;
     /** maximum items this block can carry (usually, this is per-type of item) */
     public int itemCapacity = 10;
-    /** maximum total liquids this block can carry if hasLiquids = true */
-    public float liquidCapacity = 10f;
+    /** maximum total liquids this block can carry if hasLiquids = true. Default value is 10, scales with max liquid consumption in ConsumeLiquid */
+    public float liquidCapacity = -1f;
     /** higher numbers increase liquid output speed; TODO remove and replace with better liquids system */
     public float liquidPressure = 1f;
     /** If true, this block outputs to its facing direction, when applicable.
@@ -222,10 +225,18 @@ public class Block extends UnlockableContent implements Senseable{
     public float placeOverlapRange = 50f;
     /** Multiplier of damage dealt to this block by tanks. Does not apply to crawlers. */
     public float crushDamageMultiplier = 1f;
+    /** If true, this block is instantly destroyed by tanks with crushFragile set to true. */
+    public boolean crushFragile = false;
     /** Max of timers used. */
     public int timers = 0;
-    /** Cache layer. Only used for 'cached' rendering. */
+    /** Cache layer. Only used for 'cached' rendering of blocks (not buildings). */
     public CacheLayer cacheLayer = CacheLayer.normal;
+    /** If true, draw() will be called on the building. */
+    public boolean drawDynamic = true;
+    /** If enabled, drawCached() will be called on the building. */
+    public boolean drawCached = false;
+    /** */
+    public BuildingCacheLayer buildingCacheLayer = BuildingCacheLayer.normal;
     /** Special flag; if false, floor will be drawn under this block even if it is cached. */
     public boolean fillsTile = true;
     /** If true, this block can be covered by darkness / fog even if synthetic. */
@@ -245,6 +256,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int unitCapModifier = 0;
     /** Whether the block can be tapped and selected to configure. */
     public boolean configurable;
+    /** Sound played when this block is configured. */
+    public Sound configureSound = Sounds.click;
     /** If true, this block does not have pointConfig with a transform called on map resize. */
     public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
@@ -255,6 +268,8 @@ public class Block extends UnlockableContent implements Senseable{
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
     public boolean logicConfigurable = false;
+    /** If true, configuration is delayed when playing the landing block buildup animation. This may be removed in the future! */
+    public boolean delayLandingConfig;
     /** Whether this block consumes touchDown events when tapped. */
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
@@ -309,11 +324,13 @@ public class Block extends UnlockableContent implements Senseable{
     /** Should the sound made when this block is deconstructed change in pitch. */
     public boolean breakPitchChange = true;
     /** Sound made when this block is built. */
-    public Sound placeSound = Sounds.place;
+    public Sound placeSound = Sounds.unset;
     /** Sound made when this block is deconstructed. */
-    public Sound breakSound = Sounds.breaks;
+    public Sound breakSound = Sounds.unset;
     /** Sounds made when this block is destroyed.*/
-    public Sound destroySound = Sounds.boom;
+    public Sound destroySound = Sounds.unset;
+    /** Volume of destruction sound. */
+    public float destroySoundVolume = 1f;
     /** Range of destroy sound. */
     public float destroyPitchMin = 1f, destroyPitchMax = 1f;
     /** How reflective this block is. */
@@ -427,13 +444,25 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void drawBase(Tile tile){
-        //delegates to entity unless it is null
+        //delegates to building unless it is null
         if(tile.build != null){
             tile.build.draw();
         }else{
             Draw.rect(
                 variants == 0 ? region :
                 variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))],
+            tile.drawx(), tile.drawy());
+        }
+    }
+
+    public void drawBaseCached(Tile tile){
+        //delegates to building unless it is null
+        if(tile.build != null){
+            tile.build.drawCached();
+        }else{
+            Draw.rect(
+            variants == 0 ? region :
+            variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))],
             tile.drawx(), tile.drawy());
         }
     }
@@ -500,9 +529,12 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float drawPlaceText(String text, int x, int y, boolean valid){
+        return drawPlaceText(text, x, y, valid ? Pal.accent : Pal.remove, true);
+    }
+
+    public float drawPlaceText(String text, int x, int y, Color color, boolean drawLine){
         if(renderer.pixelate) return 0;
 
-        Color color = valid ? Pal.accent : Pal.remove;
         Font font = Fonts.outline;
         GlyphLayout layout = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
@@ -516,10 +548,12 @@ public class Block extends UnlockableContent implements Senseable{
         float dx = x * tilesize + offset, dy = y * tilesize + offset + size * tilesize / 2f + 3;
         font.draw(text, dx, dy + layout.height + 1, Align.center);
         dy -= 1f;
-        Lines.stroke(2f, Color.darkGray);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
-        Lines.stroke(1f, color);
-        Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        if(drawLine){
+            Lines.stroke(2f, Color.darkGray);
+            Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+            Lines.stroke(1f, color);
+            Lines.line(dx - layout.width / 2f - 2f, dy, dx + layout.width / 2f + 1.5f, dy);
+        }
 
         font.setUseIntegerPositions(ints);
         font.setColor(Color.white);
@@ -543,7 +577,7 @@ public class Block extends UnlockableContent implements Senseable{
         Tile tile = world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
-            .sumf(other -> !floating && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
+            .sumf(other -> !floating && !placeableLiquid && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
     }
 
     public TextureRegion getDisplayIcon(Tile tile){
@@ -557,6 +591,11 @@ public class Block extends UnlockableContent implements Senseable{
     /** @return a custom minimap color for this or 0 to use default colors. */
     public int minimapColor(Tile tile){
         return 0;
+    }
+
+    public Color getColor(Tile tile){
+        int mc = minimapColor(tile);
+        return mc == 0 ? mapColor : Tmp.c3.set(mc);
     }
 
     public boolean outputsItems(){
@@ -721,6 +760,15 @@ public class Block extends UnlockableContent implements Senseable{
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
+
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+
+        if(consumeBuilder.size != 0){
+            for(var consume : consumeBuilder){
+                consume.apply(this);
+            }
+        }
     }
 
     public boolean consumesItem(Item item){
@@ -790,6 +838,16 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.reset();
     }
 
+    public void drawOtherPlayerPlan(BuildPlan plan, Eachable<BuildPlan> list, float alpha){
+        Draw.mixcol(Color.white, Mathf.absin(Time.globalTime, 6f, 0.15f));
+        Draw.alpha(alpha);
+        float prevScale = Draw.scl;
+        Draw.scl *= plan.animScale;
+        drawPlanRegion(plan, list);
+        Draw.scl = prevScale;
+        Draw.reset();
+    }
+
     public void drawPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         drawDefaultPlanRegion(plan, list);
     }
@@ -797,15 +855,27 @@ public class Block extends UnlockableContent implements Senseable{
     /** this is a different method so subclasses can call it even after overriding the base */
     public void drawDefaultPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
         TextureRegion reg = getPlanRegion(plan, list);
+        float a = Draw.getColorAlpha();
         Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate || !rotateDraw ? 0 : plan.rotation * 90);
 
         if(plan.worldContext && player != null && teamRegion != null && teamRegion.found()){
-            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);
+            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color, a);
             Draw.rect(teamRegions[player.team().id], plan.drawx(), plan.drawy());
-            Draw.color();
+            Draw.color(1f, 1f, 1f, a);
         }
 
         drawPlanConfig(plan, list);
+    }
+
+    public static BuildPlan findPlan(Eachable<BuildPlan> list, int x, int y, Boolf<BuildPlan> predicate){
+        return findPlan(list, x, y, 1, predicate);
+    }
+
+    public static BuildPlan findPlan(Eachable<BuildPlan> list, int x, int y, int size, Boolf<BuildPlan> predicate){
+        if(list instanceof QueryEachable q){
+            return q.find(x, y, size, predicate);
+        }
+        return null;
     }
 
     public TextureRegion getPlanRegion(BuildPlan plan, Eachable<BuildPlan> list){
@@ -826,7 +896,7 @@ public class Block extends UnlockableContent implements Senseable{
         Color color = content instanceof Item i ? i.color : content instanceof Liquid l ? l.color : null;
         if(color == null) return;
 
-        Draw.color(color);
+        Draw.color(color, Draw.getColorAlpha());
         Draw.rect(region, plan.drawx(), plan.drawy());
         Draw.color();
     }
@@ -837,6 +907,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
 
+    }
+
+    public float planConfigClipSize(){
+        return clipSize;
     }
 
     /** Transforms the internal position of this config using the specified function, and return the result. */
@@ -1249,6 +1323,10 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
+        if(databaseTag == null || databaseTag.isEmpty()){
+            databaseTag = category.name();
+        }
+
         super.postInit();
     }
 
@@ -1257,6 +1335,27 @@ public class Block extends UnlockableContent implements Senseable{
     @CallSuper
     public void init(){
         super.init();
+
+        if(destroySound == Sounds.unset){
+            destroySound =
+                size >= 3 ? Sounds.blockExplode3 :
+                size >= 2 ? new RandomSound(Sounds.blockExplode2, Sounds.blockExplode2Alt) :
+                new RandomSound(Sounds.blockExplode1, Sounds.blockExplode1Alt);
+        }
+
+        if(placeSound == Sounds.unset){
+            placeSound =
+                size >= 3 ? Sounds.blockPlace3 :
+                size >= 2 ? Sounds.blockPlace2 :
+                Sounds.blockPlace1;
+        }
+
+        if(breakSound == Sounds.unset){
+            breakSound =
+                size >= 3 ? Sounds.blockBreak3 :
+                size >= 2 ? Sounds.blockBreak2 :
+                Sounds.blockBreak1;
+        }
 
         //disable standard shadow
         if(customShadow){
@@ -1302,6 +1401,21 @@ public class Block extends UnlockableContent implements Senseable{
         if(hasLiquids && drawLiquidLight){
             emitLight = true;
             lightClipSize = Math.max(lightClipSize, size * 30f * 2f);
+        }
+
+        //some blocks don't have hasLiquids, but have liquid consumers/liquid capacity
+        if(liquidCapacity < 0){
+            float consumeAmount = 1f;
+            for(var cons : consumeBuilder){
+                if(cons instanceof ConsumeLiquidBase liq){
+                    consumeAmount = Math.max(consumeAmount, liq.amount * 60f);
+                }else if(cons instanceof ConsumeLiquids liq){
+                    for(var stack : liq.liquids){
+                        consumeAmount = Math.max(consumeAmount, stack.amount * 60f);
+                    }
+                }
+            }
+            liquidCapacity = Mathf.round(10f * consumeAmount);
         }
 
         if(emitLight){
@@ -1373,10 +1487,16 @@ public class Block extends UnlockableContent implements Senseable{
         hasConsumers = consumers.length > 0;
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];
+        if(outputsPower) hasPower = true;
 
         for(Consume cons : consumers){
             cons.apply(this);
         }
+    }
+
+    public void checkContentArrayCapacity(int items, int liquids){
+        if(liquidFilter.length != liquids) liquidFilter = Arrays.copyOf(liquidFilter, liquids);
+        if(itemFilter.length != items) itemFilter = Arrays.copyOf(itemFilter, items);
     }
 
     @Override
@@ -1420,7 +1540,7 @@ public class Block extends UnlockableContent implements Senseable{
         super.createIcons(packer);
 
         if(!synthetic()){
-            PixmapRegion image = Core.atlas.getPixmap(fullIcon);
+            PixmapRegion image = packer.get(fullIcon);
             mapColor.set(image.get(image.width/2, image.height/2));
         }
 
@@ -1431,7 +1551,7 @@ public class Block extends UnlockableContent implements Senseable{
             for(Team team : Team.all){
                 //if there's an override, don't generate anything
                 if(team.hasPalette && !Core.atlas.has(name + "-team-" + team.name)){
-                    var base = Core.atlas.getPixmap(teamRegion);
+                    var base = packer.get(teamRegion);
                     Pixmap out = new Pixmap(base.width, base.height);
 
                     for(int x = 0; x < base.width; x++){
@@ -1466,7 +1586,7 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(outlineIcon){
             AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1];
-            PixmapRegion region = Core.atlas.getPixmap(atlasRegion);
+            PixmapRegion region = packer.get(atlasRegion);
             Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
             Drawf.checkBleed(out);
             packer.add(PageType.main, atlasRegion.name, out);
@@ -1479,7 +1599,7 @@ public class Block extends UnlockableContent implements Senseable{
         for(var region : toOutline){
             if(region instanceof AtlasRegion atlas){
                 String regionName = atlas.name;
-                Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
+                Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
                 Drawf.checkBleed(outlined);
 
@@ -1489,19 +1609,19 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         if(gen.length > 1){
-            Pixmap base = Core.atlas.getPixmap(gen[0]).crop();
+            Pixmap base = packer.get(gen[0]).crop();
             for(int i = 1; i < gen.length; i++){
                 if(i == gen.length - 1 && last != null){
                     base.draw(last, 0, 0, true);
                 }else{
-                    base.draw(Core.atlas.getPixmap(gen[i]), true);
+                    base.draw(packer.get(gen[i]), true);
                 }
             }
             packer.add(PageType.main, "block-" + name + "-full", base);
 
             toDispose.add(base);
         }else{
-            if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", Core.atlas.getPixmap(gen[0]));
+            if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", packer.get(gen[0]));
         }
 
         toDispose.each(Pixmap::dispose);

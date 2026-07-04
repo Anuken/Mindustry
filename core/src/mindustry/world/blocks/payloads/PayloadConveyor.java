@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.ctype.Content;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -118,7 +119,10 @@ public class PayloadConveyor extends Block{
             }else{
                 next = null;
             }
+            checkBlocked();
+        }
 
+        void checkBlocked(){
             int ntrns = 1 + size/2;
             Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
             blocked = (next != null && next.solid() && !(next.block().outputsPayload || next.block().acceptsPayload)) || (this.next != null && this.next.payloadCheck(rotation));
@@ -156,6 +160,7 @@ public class PayloadConveyor extends Block{
                 boolean had = item != null;
 
                 if(valid && stepAccepted != curStep && item != null){
+                    checkBlocked();
                     if(next != null){
                         //trigger update forward
                         next.updateTile();
@@ -172,6 +177,7 @@ public class PayloadConveyor extends Block{
                         if(item.dump()){
                             item = null;
                             moved();
+                            NetServer.syncBuilding(this);
                         }
                     }
                 }

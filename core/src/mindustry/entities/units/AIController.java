@@ -4,6 +4,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.async.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -51,6 +53,13 @@ public class AIController implements UnitController{
         updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    public boolean hasStance(@Nullable UnitStance stance){
+        if(unit.controller() instanceof CommandAI ai){
+            return ai.hasStance(stance);
+        }
+        return false;
     }
 
     /** Called when the parent CommandAI changes its stance. */
@@ -264,6 +273,11 @@ public class AIController implements UnitController{
         return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
     }
 
+    public Teamc targetFlagActive(float x, float y, BlockFlag flag, boolean enemy){
+        if(unit.team == Team.derelict) return null;
+        return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag), t -> ((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput) && t.block.targetable);
+    }
+
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground && (unit.type.targetUnderBlocks || !t.block.underBullets));
     }
@@ -377,9 +391,10 @@ public class AIController implements UnitController{
 
         vec.setLength(speed * length);
 
-        if(arrive){
+        if(arrive && length > 0){
             Tmp.v3.set(-unit.vel.x / unit.type.accel * 2f, -unit.vel.y / unit.type.accel * 2f).add((target.getX() - unit.x), (target.getY() - unit.y));
-            if(unit.type.omniMovement){
+
+            if(unit.type.omniMovement || unit.type.rotateMoveFirst){
                 vec.add(Tmp.v3).limit(speed * length);
             }else{
                 //directly move the unit to prevent a backwards movement vector from messing things up

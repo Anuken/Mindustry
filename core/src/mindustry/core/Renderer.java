@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
-import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -40,7 +39,7 @@ public class Renderer implements ApplicationListener{
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, animateWater, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false;
+    public boolean animateShields, animateWater, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false, showPings = true, showOtherBuildPlans = true;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in, used by cutscenes */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -174,6 +173,8 @@ public class Renderer implements ApplicationListener{
         maxZoomInGame = settings.getFloat("maxzoomingamemultiplier", 1) * maxZoom;
         minZoomInGame = minZoom / settings.getFloat("minzoomingamemultiplier", 1);
         drawLight = settings.getBool("drawlight", true);
+        showPings = settings.getBool("showpings", true);
+        showOtherBuildPlans = settings.getBool("showotherbuildplans", true);
         pixelate = settings.getBool("pixelate");
 
         //don't bother drawing landing animation if core is null
@@ -196,6 +197,8 @@ public class Renderer implements ApplicationListener{
 
         camera.width = graphics.getWidth() / camerascale;
         camera.height = graphics.getHeight() / camerascale;
+
+        Lod.update();
 
         if(state.isMenu()){
             landTime = 0f;
@@ -318,7 +321,6 @@ public class Renderer implements ApplicationListener{
         Draw.proj(camera);
 
         blocks.checkChanges();
-        blocks.floor.checkChanges();
         blocks.processBlocks();
 
         Draw.sort(true);
@@ -416,7 +418,7 @@ public class Renderer implements ApplicationListener{
 
         Groups.draw.draw(Drawc::draw);
 
-        if(drawDebugHitboxes){
+        if(settings.getBool("drawhitboxes")){
             DebugCollisionRenderer.draw();
         }
 
@@ -568,11 +570,6 @@ public class Renderer implements ApplicationListener{
         launching = true;
         landTime = landCore.launchDuration();
 
-        Music music = landCore.launchMusic();
-        music.stop();
-        music.play();
-        music.setVolume(settings.getInt("musicvol") / 100f);
-
         landCore.beginLaunch(true);
     }
 
@@ -585,38 +582,47 @@ public class Renderer implements ApplicationListener{
             return;
         }
 
-        FrameBuffer buffer = new FrameBuffer(w, h);
+        try{
+            Lod.disable = true;
+            FrameBuffer buffer = new FrameBuffer(w, h);
 
-        drawWeather = false;
-        float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
-        disableUI = true;
-        camera.width = w;
-        camera.height = h;
-        camera.position.x = w / 2f + tilesize / 2f;
-        camera.position.y = h / 2f + tilesize / 2f;
-        buffer.begin();
-        draw();
-        Draw.flush();
-        byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
-        buffer.end();
-        disableUI = false;
-        camera.width = vpW;
-        camera.height = vpH;
-        camera.position.set(px, py);
-        drawWeather = true;
-        buffer.dispose();
+            drawWeather = false;
+            float vpW = camera.width, vpH = camera.height, px = camera.position.x, py = camera.position.y;
+            disableUI = true;
+            camera.width = w;
+            camera.height = h;
+            camera.position.x = w / 2f + tilesize / 2f;
+            camera.position.y = h / 2f + tilesize / 2f;
+            buffer.begin(Color.clear);
+            draw();
+            Draw.flush();
+            byte[] lines = ScreenUtils.getFrameBufferPixels(0, 0, w, h, true);
+            buffer.end();
+            disableUI = false;
+            camera.width = vpW;
+            camera.height = vpH;
+            camera.position.set(px, py);
+            drawWeather = true;
+            buffer.dispose();
 
-        Threads.thread(() -> {
-            for(int i = 0; i < lines.length; i += 4){
-                lines[i + 3] = (byte)255;
-            }
-            Pixmap fullPixmap = new Pixmap(w, h);
-            Buffers.copy(lines, 0, fullPixmap.pixels, lines.length);
-            Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
-            PixmapIO.writePng(file, fullPixmap);
-            fullPixmap.dispose();
-            app.post(() -> ui.showInfoFade(bundle.format("screenshot", file.toString())));
-        });
+            mainExecutor.submit(() -> {
+                for(int i = 0; i < lines.length; i += 4){
+                    lines[i + 3] = (byte)255;
+                }
+                Pixmap fullPixmap = new Pixmap(w, h);
+                Buffers.copy(lines, 0, fullPixmap.pixels, lines.length);
+                Fi file = screenshotDirectory.child("screenshot-" + Time.millis() + ".png");
+                PixmapIO.writePng(file, fullPixmap);
+                fullPixmap.dispose();
+                app.post(() -> ui.showInfoFade(bundle.format("screenshot", file.toString())));
+            });
+        }catch(Throwable e){
+            Log.err(e);
+            Vars.ui.showException("@screenshot.error", e);
+        }finally{
+            Lod.disable = false;
+        }
+
     }
 
     public static class EnvRenderer{

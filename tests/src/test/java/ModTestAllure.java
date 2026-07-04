@@ -24,7 +24,7 @@ public class ModTestAllure extends GenericModTest{
         assertNotNull(type, "A mod unit must be loaded.");
         assertTrue(type.weapons.size > 0, "A mod unit must have a weapon.");
 
-        Vars.world.loadMap(maps.loadInternalMap("groundZero"));
+        Vars.world.loadMap(maps.loadInternalMap("serpulo/groundZero"));
 
         Unit unit = type.spawn(0, 0);
 
