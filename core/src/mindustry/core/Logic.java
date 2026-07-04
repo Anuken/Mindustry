@@ -460,31 +460,34 @@ public class Logic implements ApplicationListener{
         Core.settings.manualSave();
     }
 
-    public boolean hasFixedTimestep(){
-        return Core.settings.getInt("buildingtimestep", 65) <= 60;
-    }
-
     protected void updateEntities(){
-        int timestep = Core.settings.getInt("buildingtimestep", 65);
-
         PerfCounter.entityUpdate.begin();
 
+        PerfCounter.entityMisc.begin();
         Groups.updatePooling();
-
         Groups.bullet.updatePhysics();
         Groups.unit.updatePhysics();
         Groups.all.update();
+        PerfCounter.entityMisc.end();
+
+        PerfCounter.unitUpdate.begin();
+        Groups.unit.update();
+        PerfCounter.unitUpdate.end();
+
+        PerfCounter.powerUpdate.begin();
+        if(!state.isEditor()) Groups.powerGraph.update();
+        PerfCounter.powerUpdate.end();
 
         PerfCounter.buildingUpdate.begin();
-        if(timestep > 60){
-            Groups.build.update();
-        }else{
-            Groups.build.fixedUpdate(timestep);
-        }
+        if(!state.isEditor()) Groups.build.update();
+        PerfCounter.buildingUpdate.end();
 
-        PerfCounter.buildingUpdate.begin();
+        PerfCounter.bulletUpdate.begin();
+        Groups.bullet.update();
 
         Groups.bullet.collide();
+        PerfCounter.bulletUpdate.end();
+
         PerfCounter.entityUpdate.end();
     }
 
@@ -492,6 +495,8 @@ public class Logic implements ApplicationListener{
     public void update(){
         PerfCounter.frame.end();
         PerfCounter.frame.begin();
+
+        PerfCounter.stateUpdate.begin();
 
         Events.fire(Trigger.update);
         universe.updateGlobal();
@@ -603,6 +608,8 @@ public class Logic implements ApplicationListener{
         }else if(netServer.isWaitingForPlayers() && runStateCheck){
             checkGameState();
         }
+
+        PerfCounter.stateUpdate.end(PerfCounter.entityUpdate.latestValueNs());
     }
 
     /** @return whether the wave timer is paused due to enemies */
