@@ -610,25 +610,25 @@ public class NetServer implements ApplicationListener{
         (player.isAdded() ? 4 : 0) |
         (player.con.hasBegunConnecting ? 8 : 0);
 
-        Call.debugStatusClient(player.con, flags, player.con.lastReceivedClientSnapshot, player.con.snapshotsSent);
-        Call.debugStatusClientUnreliable(player.con, flags, player.con.lastReceivedClientSnapshot, player.con.snapshotsSent);
+        Call.debugStatusClient(player.con, flags, player.con.lastReceivedClientSnapshot);
+        Call.debugStatusClientUnreliable(player.con, flags, player.con.lastReceivedClientSnapshot);
     }
 
     @Remote(variants = Variant.both, priority = PacketPriority.high)
-    public static void debugStatusClient(int value, int lastClientSnapshot, int snapshotsSent){
-        logClientStatus(true, value, lastClientSnapshot, snapshotsSent);
+    public static void debugStatusClient(int value, int lastClientSnapshot){
+        logClientStatus(true, value, lastClientSnapshot);
     }
 
     @Remote(variants = Variant.both, priority = PacketPriority.high, unreliable = true)
-    public static void debugStatusClientUnreliable(int value, int lastClientSnapshot, int snapshotsSent){
-        logClientStatus(false, value, lastClientSnapshot, snapshotsSent);
+    public static void debugStatusClientUnreliable(int value, int lastClientSnapshot){
+        logClientStatus(false, value, lastClientSnapshot);
     }
 
-    static void logClientStatus(boolean reliable, int value, int lastClientSnapshot, int snapshotsSent){
-        Log.info("@ Debug status received. disconnected = @, connected = @, added = @, begunConnecting = @ lastClientSnapshot = @, snapshotsSent = @",
+    static void logClientStatus(boolean reliable, int value, int lastClientSnapshot){
+        Log.info("@ Debug status received. disconnected = @, connected = @, added = @, begunConnecting = @ lastClientSnapshot = @",
         reliable ? "[RELIABLE]" : "[UNRELIABLE]",
         (value & 1) != 0, (value & 2) != 0, (value & 4) != 0, (value & 8) != 0,
-        lastClientSnapshot, snapshotsSent
+        lastClientSnapshot
         );
     }
 
@@ -1136,11 +1136,9 @@ public class NetServer implements ApplicationListener{
 
             Call.entitySnapshot((short)sent, syncStream.toByteArray());
         }
-
-        Groups.player.each(p -> p.con.snapshotsSent++);
     }
 
-    /** Checks isSyncHidden for only one player per team. Called if FoW is enabled but there is no custom syncHidden. */
+    /** Checks isSyncHidden for only one player per team. Called if FoW is enabled. */
     public void writeEntitySnapshotsTeam(Team team, Seq<Player> players) throws IOException{
         syncStream.reset();
 
@@ -1151,7 +1149,6 @@ public class NetServer implements ApplicationListener{
         for(Player player : players){
             //player.con must not be null here (the players seq must ONLY contain non-local connected clients)
             tempConnections.add(player.con);
-            player.con.snapshotsSent ++;
         }
 
         for(Syncc entity : Groups.sync){
@@ -1218,10 +1215,10 @@ public class NetServer implements ApplicationListener{
     }
 
     protected void writeEntity(Syncc entity, DataOutputStream dataStream) throws IOException{
-        dataStream.writeInt(entity.id()); //write id
-        dataStream.writeByte(entity.classId() & 0xFF); //write type ID
+        dataStream.writeInt(entity.id());
+        dataStream.writeByte(entity.classId() & 0xFF);
         entity.beforeWrite();
-        entity.writeSync(dataStreamWrites); //write entity itself
+        entity.writeSync(dataStreamWrites);
     }
 
     public String fixName(String name){
