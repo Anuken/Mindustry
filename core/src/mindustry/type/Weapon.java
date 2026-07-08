@@ -159,7 +159,7 @@ public class Weapon implements Cloneable{
     public @Nullable Effect shootOnDeathEffect = null;
     /** extra animated parts */
     public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
-    /** Can the weapon attack while the unit is boosting */
+    /** can this weapon attack while the owner is boosting. */
     public boolean canShootWhenBoosting = false;
 
     public Weapon(String name){
