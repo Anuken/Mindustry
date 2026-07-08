@@ -163,7 +163,7 @@ public class RepairBeamWeapon extends Weapon{
 
         HealBeamMount heal = (HealBeamMount)mount;
 
-        if(unit.canShoot()){
+        if(unit.canShoot(this)){
             float
                 weaponRotation = unit.rotation - 90,
                 wx = unit.x + Angles.trnsx(weaponRotation, x, y),
