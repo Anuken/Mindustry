@@ -77,7 +77,8 @@ allprojects{
         }
 
         hasSprites = {
-            return new File(rootDir, "core/assets/sprites/sprites.aatls").exists()
+            def file = new File(rootDir, "core/build/last_pack_version")
+            return new File(rootDir, "core/assets/sprites/sprites.aatls").exists() && file.exists() && file.text == versionNumber
         }
 
         getModifierString = {
@@ -346,6 +347,7 @@ project(":core"){
     }
 
     task assetsJar(type: Jar){
+        dependsOn ":tools:pack"
         archiveClassifier = 'assets'
 
         into('assets'){

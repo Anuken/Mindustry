@@ -377,7 +377,7 @@ public class SoundControl{
             //start thread with all the sources that were added during launch
             Core.app.post(() -> {
                 if(ambientThread != null){
-                    ambientThread.start();
+                    if(!ambientThread.isAlive()) ambientThread.start();
                     launchingAmbientThread = false;
                 }
             });

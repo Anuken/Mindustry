@@ -1682,7 +1682,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Update table alignment after configuring.*/
     public void updateTableAlign(Table table){
         Vec2 pos = Core.input.mouseScreen(x, y - block.size * tilesize / 2f - 1);
-        table.setPosition(pos.x, pos.y, Align.top);
+        table.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.top);
     }
 
     /** Returns whether a hand cursor should be shown over this block. */

@@ -213,9 +213,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     @Replace
-    public boolean isSyncHidden(Player player){
+    public boolean isSyncHidden(Team team){
         //shooting reveals position so bullets can be seen
-        return !isShooting() && inFogTo(player.team());
+        return !isShooting() && inFogTo(team);
     }
 
     @Override

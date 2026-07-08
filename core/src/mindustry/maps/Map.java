@@ -246,8 +246,6 @@ public class Map implements Comparable<Map>, Publishable{
     public String toString(){
         return "Map{" +
         "file='" + file + '\'' +
-        ", custom=" + custom +
-        ", tags=" + tags +
         '}';
     }
 }

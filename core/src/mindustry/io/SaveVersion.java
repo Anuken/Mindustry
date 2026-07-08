@@ -548,7 +548,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         for(int i = 0; i < total; i++){
             byte typeId = stream.readByte();
-            if(typeId < 0 || typeId >= DataAssetType.all.length) throw new IOException("Invalid asset type ID: " + typeId);
+            if(typeId < 0 || typeId >= DataAssetType.all.length) throw new IOException("Invalid asset type ID: " + typeId + ". You are likely loading trying to load a save from a newer version of the game, possibly a beta.");
 
             String path = stream.readUTF();
             boolean embedded = stream.readBoolean();
