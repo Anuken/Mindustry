@@ -1015,14 +1015,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
-
-        boolean canShoot = false;
-        for(var weapon : unit.type.weapons){
-            if(weapon.canShootWhenBoosting){
-                canShoot = true;
-                break;
-            }
-        }
+        boolean canBoostingShoot = type.getCanBoostingShoot();
 
         //reset target if:
         // - in the editor, or...
@@ -1037,7 +1030,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         float speed = unit.speed();
         float range = unit.hasWeapons() ? unit.range() : 0f;
         float mouseAngle = unit.angleTo(unit.aimX(), unit.aimY());
-        boolean aimCursor = omni && player.shooting && type.hasWeapons() && (!boosted || canShoot) && type.faceTarget;
+        boolean aimCursor = omni && player.shooting && type.hasWeapons() && (!boosted || canBoostingShoot) && type.faceTarget;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);
@@ -1092,7 +1085,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //autofire targeting
             if(manualShooting){
-                player.shooting = (!boosted || canShoot);
+                player.shooting = (!boosted || canBoostingShoot);
                 unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
             }else if(target == null){
                 player.shooting = false;
@@ -1117,13 +1110,13 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;
-                player.shooting = (!boosted || canShoot);
+                player.shooting = (!boosted || canBoostingShoot);
 
                 unit.aim(player.mouseX, player.mouseY);
             }
         }
 
-        unit.controlWeapons(player.shooting && (!boosted || canShoot));
+        unit.controlWeapons(player.shooting && (!boosted || canBoostingShoot));
     }
 
     //endregion

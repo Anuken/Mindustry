@@ -521,6 +521,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     protected float buildTime = -1f;
     protected @Nullable ItemStack[] totalRequirements, cachedRequirements, firstRequirements;
+    protected boolean canBoostingShoot = false;
 
     public UnitType(String name){
         super(name);
@@ -530,6 +531,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         constructor = EntityMapping.map(this.name);
         if(constructor == null) constructor = UnitEntity::create;
         selectionSize = 30f;
+    }
+
+    public boolean getCanBoostingShoot() {
+        return canBoostingShoot;
     }
 
     @Override
@@ -1058,6 +1063,8 @@ public class UnitType extends UnlockableContent implements Senseable{
                 w.otherSide = mapped.size - 1;
                 copy.otherSide = mapped.size - 2;
             }
+
+            if(w.canShootWhenBoosting) canBoostingShoot = true;
         }
         this.weapons = mapped;
 
@@ -1307,6 +1314,14 @@ public class UnitType extends UnlockableContent implements Senseable{
         pathCost = null;
         pathCostId = -1;
         initPathType();
+
+        canBoostingShoot = false;
+        for(Weapon w : weapons){
+            if(w.canShootWhenBoosting){
+                canBoostingShoot = true;
+                break;
+            }
+        }
     }
 
     public void beforeParse(){
