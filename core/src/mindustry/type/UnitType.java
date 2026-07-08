@@ -533,7 +533,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         selectionSize = 30f;
     }
 
-    public boolean getCanBoostingShoot() {
+    public boolean canBoostingShoot() {
         return canBoostingShoot;
     }
 
