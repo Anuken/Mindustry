@@ -191,15 +191,18 @@ public class ModsDialog extends BaseDialog{
                     t.button("@mod.import.file", Icon.file, bstyle, () -> {
                         dialog.hide();
 
-                        platform.showMultiFileChooser(file -> {
-                            try{
-                                mods.importMod(file);
-                                setup();
-                            }catch(Exception e){
-                                ui.showException(e.getMessage() != null && e.getMessage().toLowerCase(Locale.ROOT).contains("writable dex") ? "@error.moddex" : "", e);
-                                Log.err(e);
+                        FileChooser.open("zip", "jar").submitMulti(files -> {
+                            for(var file : files){
+                                try{
+                                    mods.importMod(file);
+                                }catch(Exception e){
+                                    ui.showException(e.getMessage() != null && e.getMessage().toLowerCase(Locale.ROOT).contains("writable dex") ? "@error.moddex" : "", e);
+                                    Log.err(e);
+                                }
                             }
-                        }, "zip", "jar");
+
+                            setup();
+                        });
                     }).margin(12f);
 
                     t.row();

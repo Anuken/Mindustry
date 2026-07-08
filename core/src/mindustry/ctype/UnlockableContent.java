@@ -138,7 +138,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public String displayDescription(){
-        return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
+        return minfo.mod == null || isPatchContent() ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
     }
 
     /** Checks stat initialization state. Call before displaying stats. */
@@ -173,7 +173,7 @@ public abstract class UnlockableContent extends MappableContent{
             if(!makeNew || !packer.has(name + "-outline")){
                 String regName = name + (makeNew ? "-outline" : "");
                 if(packer.registerOutlined(regName)){
-                    PixmapRegion base = Core.atlas.getPixmap(region);
+                    PixmapRegion base = packer.get(region);
                     var result = Pixmaps.outline(base, outlineColor, outlineRadius);
                     Drawf.checkBleed(result);
                     packer.add(page, regName, result);
@@ -185,7 +185,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
         if(region.found() && packer.registerOutlined(name)){
-            PixmapRegion base = Core.atlas.getPixmap(region);
+            PixmapRegion base = packer.get(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);
             packer.add(PageType.main, name, result);

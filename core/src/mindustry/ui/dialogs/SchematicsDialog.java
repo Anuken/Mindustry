@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
@@ -44,11 +45,29 @@ public class SchematicsDialog extends BaseDialog{
 
         tags = Core.settings.getJson("schematic-tags", Seq.class, String.class, Seq::new);
 
+        searchField = new TextField();
+        searchField.changed(() -> {
+            search = searchField.getText();
+            rebuildPane.run();
+        });
+
+        searchField.setMessageText("@schematic.search");
+        searchField.clicked(KeyCode.mouseRight, () -> {
+            if(!search.isEmpty()){
+                search = "";
+                searchField.clearText();
+                rebuildPane.run();
+            }
+        });
+
         shouldPause = true;
         addCloseButton();
         buttons.button("@schematic.import", Icon.download, this::showImport);
         makeButtonOverlay();
-        shown(this::setup);
+        shown(() -> {
+            searchField.setText(search = "");
+            setup();
+        });
         onResize(this::setup);
     }
 
@@ -58,26 +77,13 @@ public class SchematicsDialog extends BaseDialog{
             checkedTags = true;
         }
 
-        search = "";
-
         cont.top();
         cont.clear();
 
         cont.table(s -> {
             s.left();
             s.image(Icon.zoom);
-            searchField = s.field(search, res -> {
-                search = res;
-                rebuildPane.run();
-            }).growX().get();
-            searchField.setMessageText("@schematic.search");
-            searchField.clicked(KeyCode.mouseRight, () -> {
-                if(!search.isEmpty()){
-                    search = "";
-                    searchField.clearText();
-                    rebuildPane.run();
-                }
-            });
+            s.add(searchField).growX();
         }).fillX().padBottom(4);
 
         cont.row();
@@ -226,7 +232,7 @@ public class SchematicsDialog extends BaseDialog{
                 TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 t.row();
-                t.button("@schematic.copy.import", Icon.copy, style, () -> {
+                t.button("@load.clipboard", Icon.copy, style, () -> {
                     dialog.hide();
                     try{
                         Schematic s = Schematics.readBase64(Core.app.getClipboardText());
@@ -241,23 +247,32 @@ public class SchematicsDialog extends BaseDialog{
                     }
                 }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null || !Core.app.getClipboardText().startsWith(schematicBaseStart));
                 t.row();
-                t.button("@schematic.importfile", Icon.download, style, () -> platform.showFileChooser(true, schematicExtension, file -> {
+                t.button("@import.file", Icon.download, style, () -> FileChooser.open(schematicExtension).submitMulti(files -> {
                     dialog.hide();
 
-                    try{
-                        Schematic s = Schematics.read(file);
-                        s.removeSteamID();
-                        schematics.add(s);
-                        setup();
-                        showInfo(s);
-                        checkTags(s);
-                    }catch(Exception e){
-                        ui.showException(e);
+                    Schematic last = null;
+
+                    for(Fi file : files){
+                        try{
+                            Schematic s = Schematics.read(file);
+                            s.removeSteamID();
+                            schematics.add(s);
+                            checkTags(s);
+                            last = s;
+                        }catch(Exception e){
+                            ui.showException(e);
+                        }
                     }
+
+                    if(last != null){
+                        showInfo(last);
+                    }
+
+                    setup();
                 })).marginLeft(12f);
                 t.row();
                 if(steam){
-                    t.button("@schematic.browseworkshop", Icon.book, style, () -> {
+                    t.button("@workshop.browse", Icon.book, style, () -> {
                         dialog.hide();
                         platform.openWorkshop();
                     }).marginLeft(12f);
@@ -277,20 +292,20 @@ public class SchematicsDialog extends BaseDialog{
                 TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 if(steam && !s.hasSteamID()){
-                    t.button("@schematic.shareworkshop", Icon.book, style,
+                    t.button("@workshop.share", Icon.book, style,
                         () -> platform.publish(s)).marginLeft(12f);
                     t.row();
                     dialog.hide();
                 }
-                t.button("@schematic.copy", Icon.copy, style, () -> {
+                t.button("@copy.clipboard", Icon.copy, style, () -> {
                     dialog.hide();
                     ui.showInfoFade("@copied");
                     Core.app.setClipboardText(schematics.writeBase64(s));
                 }).marginLeft(12f);
                 t.row();
-                t.button("@schematic.exportfile", Icon.export, style, () -> {
+                t.button("@export.file", Icon.export, style, () -> {
                     dialog.hide();
-                    platform.export(s.name(), schematicExtension, file -> Schematics.write(s, file));
+                    FileChooser.export(s.name(), schematicExtension, file -> Schematics.write(s, file));
                 }).marginLeft(12f);
             });
         });

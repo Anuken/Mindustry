@@ -61,7 +61,7 @@ public class CustomRulesDialog extends BaseDialog{
         categoryNames = new Seq<>();
 
         buttons.button("@edit", Icon.pencil, () -> {
-            BaseDialog dialog = new BaseDialog("@waves.edit");
+            BaseDialog dialog = new BaseDialog("@edit.menu");
             dialog.addCloseButton();
             dialog.setFillParent(false);
 
@@ -69,7 +69,7 @@ public class CustomRulesDialog extends BaseDialog{
                 var style = Styles.cleart;
                 t.defaults().size(280f, 64f).pad(2f);
 
-                t.button("@waves.copy", Icon.copy, style, () -> {
+                t.button("@copy.clipboard", Icon.copy, style, () -> {
                     ui.showInfoFade("@copied");
 
                     //hack: don't write the spawns, they just waste space
@@ -80,7 +80,7 @@ public class CustomRulesDialog extends BaseDialog{
                     dialog.hide();
                 }).marginLeft(12f).row();
 
-                t.button("@waves.load", Icon.download, style, () -> {
+                t.button("@load.clipboard", Icon.download, style, () -> {
                     try{
                         Rules newRules = JsonIO.read(Rules.class, Core.app.getClipboardText());
                         //objectives and spawns are considered to be map-specific; don't use them

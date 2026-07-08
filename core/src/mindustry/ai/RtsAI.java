@@ -11,6 +11,7 @@ import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
+import mindustry.entities.comp.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -160,7 +161,7 @@ public class RtsAI{
         ay /= units.size;
 
         if(debug){
-            Vars.ui.showLabel("Squad: " + units.size, -1, 2f, ax, ay);
+            Vars.ui.showLabel("Squad: " + units.size, -1, 2f, ax, ay, WorldLabel.flagBackground | WorldLabel.flagAutoscale);
         }
 
         Building defend = null;
@@ -192,7 +193,7 @@ public class RtsAI{
                 defend = best;
 
                 if(debug){
-                    Vars.ui.showLabel("Defend, dst = " + (int)(best.dst(ax, ay)), -1, 8f, best.x, best.y);
+                    Vars.ui.showLabel("Defend, dst = " + (int)(best.dst(ax, ay)), -1, 8f, best.x, best.y, WorldLabel.flagBackground | WorldLabel.flagAutoscale);
                 }
 
                 if(best instanceof CoreBuild){

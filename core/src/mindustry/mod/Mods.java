@@ -33,7 +33,11 @@ import static mindustry.Vars.*;
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
     //it would be nice to parse semver and have syntax like "<1.0.5" here, but mods clearly don't use semver and it's an inconsistent mess
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1");
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with(
+    "ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1",
+    //new patch API as of build 159 breaks older versions of the patch editor
+    "patch-editor:1.10.1", "patch-editor:1.10.0", "patch-editor:1.9.5", "patch-editor:1.9.4", "patch-editor:1.9.3"
+    );
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -263,7 +267,7 @@ public class Mods implements Loadable{
 
                 @Override
                 public AtlasRegion find(String name){
-                    var base = packer.get(name);
+                    var base = packer.getPacked(name);
 
                     if(base != null){
                         var reg = new AtlasRegion(shadow.find(name).texture, base.x, base.y, base.width, base.height);
@@ -287,15 +291,15 @@ public class Mods implements Loadable{
 
                 @Override
                 public boolean has(String s){
-                    return shadow.has(s) || packer.get(s) != null;
+                    return shadow.has(s) || packer.getPacked(s) != null;
                 }
 
                 //return the *actual* pixmap regions, not the disposed ones.
                 @Override
                 public PixmapRegion getPixmap(AtlasRegion region){
-                    PixmapRegion out = packer.get(region.name);
+                    PixmapRegion out = packer.getPacked(region.name);
                     //this should not happen in normal situations
-                    if(out == null) return packer.get("error");
+                    if(out == null) return packer.getPacked("error");
                     return out;
                 }
             };
