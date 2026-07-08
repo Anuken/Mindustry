@@ -159,6 +159,8 @@ public class Weapon implements Cloneable{
     public @Nullable Effect shootOnDeathEffect = null;
     /** extra animated parts */
     public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
+    /** Can the weapon attack while the unit is boosting */
+    public boolean canShootWhenBoosting = false;
 
     public Weapon(String name){
         this.name = name;
@@ -290,7 +292,7 @@ public class Weapon implements Cloneable{
     }
 
     public void update(Unit unit, WeaponMount mount){
-        boolean can = unit.canShoot();
+        boolean can = unit.canShoot(this);
         float lastReload = mount.reload;
         mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier, 0);
         mount.recoil = Mathf.approachDelta(mount.recoil, 0, unit.reloadMultiplier / recoilTime);
