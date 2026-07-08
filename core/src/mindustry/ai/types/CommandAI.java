@@ -18,7 +18,6 @@ import static mindustry.Vars.*;
 public class CommandAI extends AIController{
     protected static final int maxCommandQueueSize = 50, avoidInterval = 10;
     protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2();
-    protected static final boolean[] noFound = {false};
     protected static final UnitPayload tmpPayload = new UnitPayload(null);
     protected static final int transferStateNone = 0, transferStateLoad = 1, transferStateUnload = 2;
 
@@ -322,24 +321,22 @@ public class CommandAI extends AIController{
                     timeSpentBlocked = 0f;
                 }
 
+                boolean unreachable = false;
+
                 //if the unit is next to the target, stop asking the pathfinder how to get there, it's a waste of CPU
                 //TODO maybe stop moving too?
                 if(withinAttackRange){
                     move = true;
-                    noFound[0] = false;
                     vecOut.set(vecMovePos);
                 }else{
-                    move &= controlPath.getPathPosition(unit, vecMovePos, targetPos, vecOut, noFound) && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                    var result = controlPath.getPathPosition(unit, vecMovePos, targetPos);
 
-                    //TODO: what to do when there's a target and it can't be reached?
-                    /*
-                    if(noFound[0] && attackTarget != null && attackTarget.within(unit, unit.type.range * 2f)){
-                        move = true;
-                        vecOut.set(targetPos);
-                    }*/
+                    unreachable = result.unreachable;
+                    move &= result.move && (!blockingUnit || timeSpentBlocked > maxBlockTime);
+                    if(result.move) vecOut.set(result.dest);
 
                     //do not wiggle in place
-                    if(unit.type.naval && move && unit.tileOn() == world.tileWorld(vecOut.x, vecOut.y)){
+                    if(unit.type.naval && result.next != null && !unit.canPass(result.next.x, result.next.y) && move && unit.tileOn() == world.tileWorld(vecOut.x, vecOut.y)){
                         move = false;
                     }
                 }
@@ -350,7 +347,7 @@ public class CommandAI extends AIController{
                 isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
 
                 //if the path is invalid, stop trying and record the end as unreachable
-                if(unit.team.isAI() && (noFound[0] || unit.isPathImpassable(World.toTile(vecMovePos.x), World.toTile(vecMovePos.y)))){
+                if(unit.team.isAI() && (unreachable || unit.isPathImpassable(World.toTile(vecMovePos.x), World.toTile(vecMovePos.y)))){
                     if(attackTarget instanceof Building build){
                         unreachableBuildings.addUnique(build.pos());
                     }
@@ -393,7 +390,7 @@ public class CommandAI extends AIController{
             //reached destination, end pathfinding
             if(attackTarget == null && (unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f)) ||
                 //for circling units, it doesn't need to reach the exact waypoint.
-                (!unit.type.omniMovement && !unit.type.rotateMoveFirst && !command.exactArrival && Angles.angleDist(unit.angleTo(vecMovePos), unit.rotation) > 60f &&
+                (!unit.type.omniMovement && unit.type.flying && !unit.type.rotateMoveFirst && !command.exactArrival && Angles.angleDist(unit.angleTo(vecMovePos), unit.rotation) > 60f &&
                     unit.within(vecMovePos, Math.min(50f, 360f / unit.type.rotateSpeed * unit.type.speed / (Mathf.pi * 2f)))))){
                 finishPath();
             }
