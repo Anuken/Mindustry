@@ -269,6 +269,16 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         }
 
         PerfCounter.update.end();
+
+        long rawUpdate = PerfCounter.update.latestValueNs();
+        for(var other : PerfCounter.displayedCounters){
+            if(other != PerfCounter.other) rawUpdate -= other.latestValueNs();
+        }
+        PerfCounter.other.add(rawUpdate);
+
+        for(var counter : PerfCounter.all){
+            counter.checkUpdate();
+        }
     }
 
     @Override

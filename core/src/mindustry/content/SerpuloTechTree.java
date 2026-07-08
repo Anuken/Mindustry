@@ -41,8 +41,8 @@ public class SerpuloTechTree{
 
                         node(itemBridge, () -> {
                             node(titaniumConveyor, Seq.with(new SectorComplete(crateredBattleground)), () -> {
-                                node(phaseConveyor, () -> {
-                                    node(massDriver, Seq.with(new SectorComplete(tarFields)), () -> {
+                                node(massDriver, Seq.with(new SectorComplete(tarFields)), () -> {
+                                    node(phaseConveyor, () -> {
 
                                     });
                                 });
@@ -53,8 +53,8 @@ public class SerpuloTechTree{
                                     });
                                 });
 
-                                node(armoredConveyor, () -> {
-                                    node(plastaniumConveyor, () -> {
+                                node(plastaniumConveyor, () -> {
+                                    node(armoredConveyor, () -> {
 
                                     });
                                 });

@@ -322,7 +322,20 @@ public class DesktopLauncher extends ClientLauncher{
         CrashHandler.handle(e, file -> {
             Throwable fc = Strings.getFinalCause(e);
             if(!fbgp){
-                message(causeString + "\nThe logs have been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage()));
+                String firstStackTraces = "";
+
+                try{
+                    var s = Seq.with(fc.getStackTrace());
+                    s.removeAll(st -> st.getClassName().contains("MethodAccessor") || st.getClassName().substring(st.getClassName().lastIndexOf(".") + 1).equals("Method"));
+                    s.truncate(3);
+                    firstStackTraces = "\n" + s.toString("\n", st -> {
+                        String className = st.getClassName();
+                        return className.substring(className.lastIndexOf(".") + 1) + "." + st.getMethodName() + ": " + st.getLineNumber();
+                    });
+                }catch(Throwable ignored){
+                }
+
+                message(causeString + "\nThe logs have been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage()) + firstStackTraces);
             }
         });
     }

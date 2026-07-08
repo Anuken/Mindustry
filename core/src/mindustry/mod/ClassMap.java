@@ -68,6 +68,7 @@ public class ClassMap{
         classes.put("SpaceLiquidBulletType", mindustry.entities.bullet.SpaceLiquidBulletType.class);
         classes.put("ExplosionEffect", mindustry.entities.effect.ExplosionEffect.class);
         classes.put("MultiEffect", mindustry.entities.effect.MultiEffect.class);
+        classes.put("NoiseEffect", mindustry.entities.effect.NoiseEffect.class);
         classes.put("ParticleEffect", mindustry.entities.effect.ParticleEffect.class);
         classes.put("RadialEffect", mindustry.entities.effect.RadialEffect.class);
         classes.put("SeqEffect", mindustry.entities.effect.SeqEffect.class);
@@ -117,6 +118,7 @@ public class ClassMap{
         classes.put("Publishable", mindustry.type.Publishable.class);
         classes.put("Sector", mindustry.type.Sector.class);
         classes.put("SectorRect", mindustry.type.Sector.SectorRect.class);
+        classes.put("SectorDifficulty", mindustry.type.SectorDifficulty.class);
         classes.put("SectorPreset", mindustry.type.SectorPreset.class);
         classes.put("StatusEffect", mindustry.type.StatusEffect.class);
         classes.put("TransitionHandler", mindustry.type.StatusEffect.TransitionHandler.class);
@@ -165,8 +167,6 @@ public class ClassMap{
         classes.put("BaseShieldBuild", mindustry.world.blocks.defense.BaseShield.BaseShieldBuild.class);
         classes.put("BuildTurret", mindustry.world.blocks.defense.BuildTurret.class);
         classes.put("BuildTurretBuild", mindustry.world.blocks.defense.BuildTurret.BuildTurretBuild.class);
-        classes.put("DirectionalForceProjector", mindustry.world.blocks.defense.DirectionalForceProjector.class);
-        classes.put("DirectionalForceProjectorBuild", mindustry.world.blocks.defense.DirectionalForceProjector.DirectionalForceProjectorBuild.class);
         classes.put("Door", mindustry.world.blocks.defense.Door.class);
         classes.put("DoorBuild", mindustry.world.blocks.defense.Door.DoorBuild.class);
         classes.put("ForceProjector", mindustry.world.blocks.defense.ForceProjector.class);
@@ -422,9 +422,6 @@ public class ClassMap{
         classes.put("Unloader", mindustry.world.blocks.storage.Unloader.class);
         classes.put("ContainerStat", mindustry.world.blocks.storage.Unloader.ContainerStat.class);
         classes.put("UnloaderBuild", mindustry.world.blocks.storage.Unloader.UnloaderBuild.class);
-        classes.put("DroneCenter", mindustry.world.blocks.units.DroneCenter.class);
-        classes.put("DroneCenterBuild", mindustry.world.blocks.units.DroneCenter.DroneCenterBuild.class);
-        classes.put("EffectDroneAI", mindustry.world.blocks.units.DroneCenter.EffectDroneAI.class);
         classes.put("Reconstructor", mindustry.world.blocks.units.Reconstructor.class);
         classes.put("ReconstructorBuild", mindustry.world.blocks.units.Reconstructor.ReconstructorBuild.class);
         classes.put("RepairTower", mindustry.world.blocks.units.RepairTower.class);

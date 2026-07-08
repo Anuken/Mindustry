@@ -743,7 +743,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null || build == null || player.dead()) return;
 
         //make sure player is allowed to control the building
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.buildSelect, action -> action.tile = build.tile)){
+        if(net.server() && (!state.rules.possessionAllowed && player.bestCore() != build  || !netServer.admins.allowAction(player, ActionType.buildSelect, action -> action.tile = build.tile))){
             throw new ValidateException(player, "Player cannot control a building.");
         }
 
@@ -1424,7 +1424,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     overlappingPlayer= player;
                 }
 
-                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f * Time.delta);
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f);
                 plan.block.drawOtherPlayerPlan(plan, player.planEachable, overlappingPlan == plan ? 0.7f : 0.25f);
             });
         });

@@ -173,6 +173,15 @@ public class AndroidLauncher extends AndroidApplication{
                                             throw new ArcRuntimeException(e);
                                         }
                                     }
+
+                                    @Override
+                                    public Writer writer(boolean append, String charset){
+                                        try{
+                                            return new OutputStreamWriter(write(append), charset);
+                                        }catch(IOException ex){
+                                            throw new ArcRuntimeException(ex);
+                                        }
+                                    }
                                 }).toArray(Fi.class);
 
                                 Core.app.post(() -> Core.app.post(() -> params.handleChooseResult(files)));

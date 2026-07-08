@@ -29,6 +29,12 @@ import java.util.*;
 /** The current implementation is awful. Consider it a proof of concept. */
 @SuppressWarnings("unchecked")
 public class DataPatcher{
+    private static ModMeta dpModMeta = new ModMeta(){{
+        name = internalName = "dp";
+    }};
+
+    public static final LoadedMod dpMod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, dpModMeta);
+
     public static final int maxImageSize = 2000;
     public static final int patchFormatVersion = 2;
 
@@ -37,10 +43,6 @@ public class DataPatcher{
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static DataPatcher currentDataPatcher;
     private static ContentParser parser = createParser();
-    private static  ModMeta dpModMeta = new ModMeta(){{
-        name = internalName = "dp";
-    }};
-    private static LoadedMod dpMod = new LoadedMod(new Fi("dp"), new Fi(""), null, null, dpModMeta);
 
     private boolean applied;
     private ContentLoader contentLoader;
@@ -106,49 +108,6 @@ public class DataPatcher{
             Attribute.map = oldAttributeMap;
         });
 
-        //patches are read first.
-        for(var set : patches){
-            set.warnings.clear();
-            set.error = false;
-
-            try{
-                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
-                if(!(someValue instanceof JsonValue value)) throw new SerializationException("Patch must be a JSON object.");
-
-                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
-                    JsonValue req = value.get("requiredPlanets");
-                    value.remove("requiredPlanets");
-
-                    //this should be ignored unless this instance is a dedicated server
-                    if(Vars.headless){
-                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
-                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
-                            continue;
-                        }
-                    }
-                }
-
-                set.json = value;
-                currentlyApplyingPatch = set;
-                visitStack.clear();
-
-                set.name = value.getString("name", "");
-                value.remove("name"); //patchsets can have a name, ignore it if present
-                for(var child : value){
-                    assign(root, child.name, child, null, null, null);
-                }
-                currentlyApplyingPatch = null;
-
-            }catch(Exception e){
-                set.error = true;
-                set.name = "";
-                set.warnings.add(Strings.getSimpleMessage(e));
-                currentlyApplyingPatch = null;
-
-                Log.err("Failed to apply patch: " + set.patch, e);
-            }
-        }
-
         if(!content.isEmpty()){
             content.sort();
 
@@ -197,18 +156,18 @@ public class DataPatcher{
 
             parser.finishParsing();
 
-            for(var errored : dpMod.erroredContent){
-                if(errored.minfo.error != null && errored.minfo.asset != null){
-                    errored.minfo.asset.warnings.add(errored.minfo.error);
-                }
-                Vars.content.remove(errored);
-            }
-
             addedContent.clear();
             Seq<Content> all = addedContent;
 
             for(var arr : Vars.content.getContentMap()){
                 all.addAll(arr.select(c -> c.minfo.mod == dpMod));
+            }
+
+            for(var errored : dpMod.erroredContent){
+                if(errored.minfo.error != null && errored.minfo.asset != null){
+                    errored.minfo.asset.warnings.add(errored.minfo.error);
+                }
+                Vars.content.remove(errored);
             }
 
             for(var cont : all){
@@ -257,6 +216,48 @@ public class DataPatcher{
             }
 
             if(reloadContentWorld) fixContentArrays();
+        }
+
+        for(var set : patches){
+            set.warnings.clear();
+            set.error = false;
+
+            try{
+                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                if(!(someValue instanceof JsonValue value)) throw new SerializationException("Patch must be a JSON object.");
+
+                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
+                    JsonValue req = value.get("requiredPlanets");
+                    value.remove("requiredPlanets");
+
+                    //this should be ignored unless this instance is a dedicated server
+                    if(Vars.headless){
+                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
+                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                            continue;
+                        }
+                    }
+                }
+
+                set.json = value;
+                currentlyApplyingPatch = set;
+                visitStack.clear();
+
+                set.name = value.getString("name", "");
+                value.remove("name"); //patchsets can have a name, ignore it if present
+                for(var child : value){
+                    assign(root, child.name, child, null, null, null);
+                }
+                currentlyApplyingPatch = null;
+
+            }catch(Exception e){
+                set.error = true;
+                set.name = "";
+                set.warnings.add(Strings.getSimpleMessage(e));
+                currentlyApplyingPatch = null;
+
+                Log.err("Failed to apply patch: " + set.patch, e);
+            }
         }
 
         afterCallbacks.each(Runnable::run);
@@ -600,6 +601,7 @@ public class DataPatcher{
                     Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
                     boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                     Runnable resetCons = () -> {
+                        if(bl.isPatchContent()) return; //useless
                         Reflect.set(Block.class, bl, "consumeBuilder", prevBuilder);
                         bl.reinitializeConsumers();
                         bl.hasItems = hadItems;

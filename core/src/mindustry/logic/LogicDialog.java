@@ -135,7 +135,7 @@ public class LogicDialog extends BaseDialog{
                         Core.app.setClipboardText(canvas.save());
                     }).marginLeft(12f).row();
 
-                    t.button("@import.clipboard", Icon.download, style, () -> {
+                    t.button("@load.clipboard", Icon.download, style, () -> {
                         dialog.hide();
                         try{
                             canvas.load(Core.app.getClipboardText().replace("\r\n", "\n"));

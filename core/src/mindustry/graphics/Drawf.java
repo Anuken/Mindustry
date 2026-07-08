@@ -515,14 +515,18 @@ public class Drawf{
     }
 
     public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale, boolean light){
+        laser(line, start, end, x, y, x2, y2, scale, light, true);
+    }
+
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale, boolean light, boolean useLod){
         float scl = 8f * scale * Draw.scl, rot = Mathf.angle(x2 - x, y2 - y);
         float vx = Mathf.cosDeg(rot) * scl, vy = Mathf.sinDeg(rot) * scl;
-        float lod = start.width * scale * start.scl() < 10f ? Lod.alpha1 : Lod.alpha2;
+        float lod = useLod ? (start.width * scale * start.scl() < 10f ? Lod.alpha1 : Lod.alpha2) : 1f;
         float a = Draw.getColorAlpha();
 
         if(a >= 1f/255f){
             if(lod > 0.0001f){
-                Draw.alpha(lod);
+                Draw.alpha(lod * a);
                 Draw.rect(start, x, y, start.width * scale * start.scl(), start.height * scale * start.scl(), rot + 180);
                 Draw.rect(end, x2, y2, end.width * scale * end.scl(), end.height * scale * end.scl(), rot);
                 Draw.alpha(a);

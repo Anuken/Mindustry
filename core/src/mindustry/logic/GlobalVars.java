@@ -38,8 +38,6 @@ public class GlobalVars{
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
 
-    public static final Seq<String> soundNames = new Seq<>();
-
     public void init(){
         putEntryOnly("sectionProcessor");
 
@@ -101,7 +99,6 @@ public class GlobalVars{
             for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
                 if(sound != Sounds.none && sound.file != null){
                     String name = sound.file.nameWithoutExtension();
-                    soundNames.add(name);
                     put("@sfx-" + name, Sounds.getSoundId(sound));
                 }
             }
@@ -301,6 +298,10 @@ public class GlobalVars{
         if(match == lvar){
             vars.remove(lvar.name);
         }
+    }
+
+    public void remove(String name){
+        vars.remove(name);
     }
 
     public LVar put(String name, Object value){

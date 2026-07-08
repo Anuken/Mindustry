@@ -630,6 +630,7 @@ public class TypeIO{
             int x = read.us();
             int y = read.us();
             Block block = Vars.content.block(read.us());
+            if(block == null) throw new ArcRuntimeException("Invalid block ID in block plans! Client is likely using an incorrectly configured mod.");
             int rotation = (block.rotate ? read.b() : 0);
             Object config = readClientPlanConfig(read);
             BuildPlan plan = new BuildPlan(x, y, rotation, block, config);

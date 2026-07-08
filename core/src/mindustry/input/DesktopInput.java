@@ -240,8 +240,14 @@ public class DesktopInput extends InputHandler{
         boolean detached = settings.getBool("detach-camera", false);
 
         if(!scene.hasField() && !scene.hasDialog()){
-            if(input.keyTap(Binding.debugHitboxes)){
-                drawDebugHitboxes = !drawDebugHitboxes;
+            if(input.keyTap(Binding.debugHitboxes)) Core.settings.toggle("drawhitboxes");
+
+            if(input.keyTap(Binding.teleportCursor) && (state.rules.editor || state.rules.infiniteResources)){
+                if(player.dead()){
+                    camera.position.set(input.mouseWorld());
+                }else{
+                    player.unit().set(input.mouseWorld());
+                }
             }
 
             if(input.keyTap(Binding.detachCamera)){

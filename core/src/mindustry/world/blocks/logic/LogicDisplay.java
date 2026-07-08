@@ -52,6 +52,7 @@ public class LogicDisplay extends Block{
 
     public int displaySize = 64;
     public float scaleFactor = 1f;
+    public Color backgroundColor = Pal.darkerMetal;
 
     static{
         Events.on(ResetEvent.class, e -> displays.clear());
@@ -135,7 +136,7 @@ public class LogicDisplay extends Block{
             if(buffer == null){
                 buffer = new FrameBuffer(displaySize, displaySize);
                 //clear the buffer - some OSs leave garbage in it
-                buffer.begin(Pal.darkerMetal);
+                buffer.begin(backgroundColor);
                 buffer.end();
             }
         }

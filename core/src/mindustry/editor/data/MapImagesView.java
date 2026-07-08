@@ -45,7 +45,7 @@ public class MapImagesView implements AssetView{
 
                         if(width > DataPatcher.maxImageSize || height > DataPatcher.maxImageSize){
                             ui.showErrorMessage(Core.bundle.format("asset.image.toolarge", width, height, DataPatcher.maxImageSize, DataPatcher.maxImageSize));
-                            return;
+                            continue;
                         }
 
                         String name = result.nameWithoutExtension();
@@ -53,7 +53,7 @@ public class MapImagesView implements AssetView{
                         var other = images.find(p -> p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name));
                         if(other != null){
                             ui.showErrorMessage(Core.bundle.format("asset.image.exists", other.name + " (" + other.path + ")"));
-                            return;
+                            continue;
                         }
 
                         byte[] hash = assetCache.add(bytes);
@@ -212,7 +212,7 @@ public class MapImagesView implements AssetView{
         inner.top().left();
 
         float size = 200f;
-        int cols = (int)Math.max(1, Core.graphics.getWidth() / Scl.scl(size + 12f));
+        int cols = (int)Math.max(1, (Core.graphics.getWidth() - Scl.scl(20f)) * 0.9f / Scl.scl(size + 14f));
         int i = 0;
         for(var image : getImages()){
             //showing generated images is confusing, so don't.

@@ -81,6 +81,7 @@ public class FileChooser{
             if(fileName == null){
                 fileName = "file." + extensions[0];
             }
+            fileName = Strings.sanitizeFilename(fileName);
         }
 
         /** Submits the request to handle a single file. */

@@ -319,7 +319,7 @@ public class NetClient implements ApplicationListener{
         //detect and kick for foul play
         if(player != null && player.con != null && !player.con.chatRate.allow(2000, Config.chatSpamLimit.num())){
             player.con.kick(KickReason.kick);
-            netServer.admins.blacklistDos(player.con.address);
+            player.con.blacklist();
             return;
         }
 
@@ -373,7 +373,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(called = Loc.client, variants = Variant.one)
     public static void connect(String ip, int port){
-        if(!steam && ip.startsWith("steam:")) return;
+        if(!steam && (ip.startsWith("steam:") || ip.startsWith("steamserver:"))) return;
         netClient.disconnectQuietly();
         logic.reset();
 
@@ -537,7 +537,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
+    @Remote(variants = Variant.both, priority = PacketPriority.low, unreliable = true)
     public static void entitySnapshot(short amount, byte[] data){
         try{
             netClient.lastSnapshotTimestamp = Time.millis();
@@ -591,7 +591,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
+    @Remote(priority = PacketPriority.low, unreliable = true)
     public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, byte tps, long rand0, long rand1, byte[] coreData){
         try{
             if(wave > state.wave){

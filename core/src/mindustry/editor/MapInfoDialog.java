@@ -118,13 +118,10 @@ public class MapInfoDialog extends BaseDialog{
 
                 r.row();
 
-                r.button("@patches", Icon.file, style, () -> {
+                r.button("@asset.title", Icon.fileCode, style, () -> {
                     hide();
                     patches.show();
-                }).marginLeft(10f);
-
-                //empty space
-                r.add().marginLeft(10f);
+                }).marginLeft(10f).colspan(2).width(460f).row();
             }).colspan(2).center();
 
             name.change();
@@ -132,6 +129,6 @@ public class MapInfoDialog extends BaseDialog{
             author.change();
 
             t.margin(16f);
-        });
+        }).growX().scrollX(false);
     }
 }

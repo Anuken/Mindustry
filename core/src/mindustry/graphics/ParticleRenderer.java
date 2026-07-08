@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 
 /** WIP experimental point-sprite based particle renderer. */
 public class ParticleRenderer{
-    static final boolean useAsync = true;
+    static final boolean useAsync = !OS.isIos && !OS.isAndroid;
     static final int maxParticles = 100_000, maxParticlesPerFrame = 25_000;
     static final int particleSize =
     1 + //time

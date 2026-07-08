@@ -129,6 +129,11 @@ public class NetServer implements ApplicationListener{
     private ObjectMap<String, Seq<Cons2<Player, byte[]>>> customBinaryPacketHandlers = new ObjectMap<>();
     /** Packet handlers for logic client data */
     private ObjectMap<String, Seq<Cons2<Player, Object>>> logicClientDataHandlers = new ObjectMap<>();
+    /** Reused Seq<Player> for writing entity snapshots per team. */
+    private Seq<Player> playersToSend = new Seq<>(false);
+    private Seq<NetConnection> tempConnections = new Seq<>(false);
+    /** Used for entity snapshot timing. */
+    public long snapshotSyncTime;
 
     public NetServer(){
 
@@ -164,6 +169,12 @@ public class NetServer implements ApplicationListener{
             String uuid = packet.uuid;
 
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address) || con.kicked || !con.isConnected()) return;
+
+            if(admins.checkUuidChanges(con.address, packet.uuid)){
+                Log.info("Banning IP @ due to more than @ ID changes in @ hour(s).", con.address, Config.uuidChangeLimit.num(), Config.uuidChangeTimePeriod.num());
+                con.kick(KickReason.banned);
+                return;
+            }
 
             if(con.hasBegunConnecting){
                 con.kick(KickReason.idInUse);
@@ -599,25 +610,25 @@ public class NetServer implements ApplicationListener{
         (player.isAdded() ? 4 : 0) |
         (player.con.hasBegunConnecting ? 8 : 0);
 
-        Call.debugStatusClient(player.con, flags, player.con.lastReceivedClientSnapshot, player.con.snapshotsSent);
-        Call.debugStatusClientUnreliable(player.con, flags, player.con.lastReceivedClientSnapshot, player.con.snapshotsSent);
+        Call.debugStatusClient(player.con, flags, player.con.lastReceivedClientSnapshot);
+        Call.debugStatusClientUnreliable(player.con, flags, player.con.lastReceivedClientSnapshot);
     }
 
     @Remote(variants = Variant.both, priority = PacketPriority.high)
-    public static void debugStatusClient(int value, int lastClientSnapshot, int snapshotsSent){
-        logClientStatus(true, value, lastClientSnapshot, snapshotsSent);
+    public static void debugStatusClient(int value, int lastClientSnapshot){
+        logClientStatus(true, value, lastClientSnapshot);
     }
 
     @Remote(variants = Variant.both, priority = PacketPriority.high, unreliable = true)
-    public static void debugStatusClientUnreliable(int value, int lastClientSnapshot, int snapshotsSent){
-        logClientStatus(false, value, lastClientSnapshot, snapshotsSent);
+    public static void debugStatusClientUnreliable(int value, int lastClientSnapshot){
+        logClientStatus(false, value, lastClientSnapshot);
     }
 
-    static void logClientStatus(boolean reliable, int value, int lastClientSnapshot, int snapshotsSent){
-        Log.info("@ Debug status received. disconnected = @, connected = @, added = @, begunConnecting = @ lastClientSnapshot = @, snapshotsSent = @",
+    static void logClientStatus(boolean reliable, int value, int lastClientSnapshot){
+        Log.info("@ Debug status received. disconnected = @, connected = @, added = @, begunConnecting = @ lastClientSnapshot = @",
         reliable ? "[RELIABLE]" : "[UNRELIABLE]",
         (value & 1) != 0, (value & 2) != 0, (value & 4) != 0, (value & 8) != 0,
-        lastClientSnapshot, snapshotsSent
+        lastClientSnapshot
         );
     }
 
@@ -1079,7 +1090,7 @@ public class NetServer implements ApplicationListener{
         }
     }
 
-    public void writeEntitySnapshot(Player player) throws IOException{
+    public void writeStateSnapshot() throws IOException{
         byte tps = (byte)Math.min(Core.graphics.getFramesPerSecond(), 255);
         syncStream.reset();
         int activeTeams = (byte)state.teams.present.count(t -> t.cores.size > 0);
@@ -1097,27 +1108,94 @@ public class NetServer implements ApplicationListener{
 
         dataStream.close();
 
-        //write basic state data.
-        Call.stateSnapshot(player.con, state.wavetime, state.wave, state.enemies, state.isPaused(), state.gameOver,
+        Call.stateSnapshot(state.wavetime, state.wave, state.enemies, state.isPaused(), state.gameOver,
         universe.seconds(), tps, GlobalVars.rand.seed0, GlobalVars.rand.seed1, syncStream.toByteArray());
+    }
 
+    /** Does not check isSyncHidden. Call this if no entities are hidden. */
+    public void writeEntitySnapshotsAll() throws IOException{
+        syncStream.reset();
+
+        int sent = 0;
+
+        for(Syncc entity : Groups.sync){
+            writeEntity(entity, dataStream);
+
+            sent++;
+
+            if(syncStream.size() > maxSnapshotSize){
+                dataStream.close();
+                Call.entitySnapshot((short)sent, syncStream.toByteArray());
+                sent = 0;
+                syncStream.reset();
+            }
+        }
+
+        if(sent > 0){
+            dataStream.close();
+
+            Call.entitySnapshot((short)sent, syncStream.toByteArray());
+        }
+    }
+
+    /** Checks isSyncHidden for only one player per team. Called if FoW is enabled. */
+    public void writeEntitySnapshotsTeam(Team team, Seq<Player> players) throws IOException{
         syncStream.reset();
 
         hiddenIds.clear();
         int sent = 0;
+        tempConnections.clear();
+
+        for(Player player : players){
+            //player.con must not be null here (the players seq must ONLY contain non-local connected clients)
+            tempConnections.add(player.con);
+        }
 
         for(Syncc entity : Groups.sync){
-            //TODO write to special list
-            if(entity.isSyncHidden(player)){
+            if(entity.isSyncHidden(team)){
                 hiddenIds.add(entity.id());
                 continue;
             }
 
-            //write all entities now
-            dataStream.writeInt(entity.id()); //write id
-            dataStream.writeByte(entity.classId() & 0xFF); //write type ID
-            entity.beforeWrite();
-            entity.writeSync(dataStreamWrites); //write entity itself
+            writeEntity(entity, dataStream);
+
+            sent++;
+
+            if(syncStream.size() > maxSnapshotSize){
+                dataStream.close();
+                sendEntitySnapshots(tempConnections, (short)sent, syncStream.toByteArray());
+                sent = 0;
+                syncStream.reset();
+            }
+        }
+
+        if(sent > 0){
+            dataStream.close();
+            sendEntitySnapshots(tempConnections, (short)sent, syncStream.toByteArray());
+        }
+
+        if(hiddenIds.size > 0){
+            var packet = new HiddenSnapshotCallPacket();
+            packet.ids = hiddenIds;
+            net.send(packet, tempConnections, false);
+        }
+    }
+
+    protected void sendEntitySnapshots(Seq<NetConnection> connections, short amount, byte[] data){
+        var packet = new EntitySnapshotCallPacket();
+        packet.amount = amount;
+        packet.data = data;
+        net.send(packet, connections, false);
+    }
+
+    /** Writes a custom snapshot containing player-local entities; this is for entities other players don't see. */
+    public void writeCustomEntitySnapshot(Player player, Iterable<Syncc> entities) throws IOException{
+        syncStream.reset();
+
+        int sent = 0;
+
+        for(Syncc entity : entities){
+            writeEntity(entity, dataStream);
 
             sent++;
 
@@ -1134,12 +1212,13 @@ public class NetServer implements ApplicationListener{
 
             Call.entitySnapshot(player.con, (short)sent, syncStream.toByteArray());
         }
+    }
 
-        if(hiddenIds.size > 0){
-            Call.hiddenSnapshot(player.con, hiddenIds);
-        }
-
-        player.con.snapshotsSent++;
+    protected void writeEntity(Syncc entity, DataOutputStream dataStream) throws IOException{
+        dataStream.writeInt(entity.id());
+        dataStream.writeByte(entity.classId() & 0xFF);
+        entity.beforeWrite();
+        entity.writeSync(dataStreamWrites);
     }
 
     public String fixName(String name){
@@ -1197,21 +1276,36 @@ public class NetServer implements ApplicationListener{
             Groups.player.each(p -> !p.isLocal(), player -> {
                 if(player.con == null || !player.con.isConnected()){
                     onDisconnect(player, "disappeared");
-                    return;
-                }
-
-                var connection = player.con;
-
-                if(Time.timeSinceMillis(connection.syncTime) < interval || !connection.hasConnected) return;
-
-                connection.syncTime = Time.millis();
-
-                try{
-                    writeEntitySnapshot(player);
-                }catch(IOException e){
-                    Log.err(e);
                 }
             });
+
+            if(Time.timeSinceMillis(snapshotSyncTime) >= interval){
+                snapshotSyncTime = Time.millis();
+
+                writeStateSnapshot();
+
+                if(Vars.state.rules.fog){
+                    //Serialize by teams
+                    for(Team team : Team.all){ //Not Teams.active, because players can be on inactive teams
+                        var tdata = team.data();
+                        playersToSend.selectFrom(tdata.players, p -> !p.isLocal() && p.con.hasConnected);
+                        if(!playersToSend.isEmpty()){
+                            writeEntitySnapshotsTeam(team, playersToSend);
+                        }
+                    }
+                }else{
+                    //Serialize once for all players
+                    writeEntitySnapshotsAll();
+                }
+
+                //write custom player-specific entities (usually labels)
+                for(Player player : Groups.player){
+                    if(player.con != null && player.con.hasConnected && player.con.localEntities.size > 0){
+                        writeCustomEntitySnapshot(player, player.con.localEntities);
+                    }
+                }
+            }
+
 
             if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && blockSyncTime.poll()){
                 writeBlockSnapshots();

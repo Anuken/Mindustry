@@ -243,21 +243,20 @@ public class Net{
     /** Send an object to all connected clients, or to the server if this is a client.*/
     public void send(Object object, boolean reliable){
         if(server){
-            for(NetConnection con : provider.getConnections()){
-                con.send(object, reliable);
-            }
+            provider.sendAllServer(object, reliable);
         }else{
             provider.sendClient(object, reliable);
         }
     }
 
+    /** Server bulk-send to several clients. */
+    public void send(Object object, Iterable<NetConnection> connections, boolean reliable){
+        provider.sendAllServer(object, connections, reliable);
+    }
+
     /** Send an object to everyone EXCEPT a certain client. Server-side only.*/
     public void sendExcept(NetConnection except, Object object, boolean reliable){
-        for(NetConnection con : getConnections()){
-            if(con != except){
-                con.send(object, reliable);
-            }
-        }
+        provider.sendExceptServer(except, object, reliable);
     }
 
     public @Nullable StreamBuilder getCurrentStream(){
@@ -413,6 +412,30 @@ public class Net{
 
     /** Networking implementation. */
     public interface NetProvider{
+
+        /** Sends a packet to a specific list of clients. */
+        default void sendAllServer(Object object, Iterable<NetConnection> connections, boolean reliable){
+            for(NetConnection con : connections){
+                con.send(object, reliable);
+            }
+        }
+
+        /** Sends a packet to all connected clients. */
+        default void sendAllServer(Object object, boolean reliable){
+            for(NetConnection con : getConnections()){
+                con.send(object, reliable);
+            }
+        }
+
+        /** Sends a packet to all connected clients, except the specified one. */
+        default void sendExceptServer(NetConnection except, Object object, boolean reliable){
+            for(NetConnection con : getConnections()){
+                if(con != except){
+                    con.send(object, reliable);
+                }
+            }
+        }
+
         /** Connect to a server. */
         void connectClient(String ip, int port, Runnable success) throws IOException;
 
