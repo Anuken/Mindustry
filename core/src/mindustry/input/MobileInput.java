@@ -1092,7 +1092,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
             //autofire targeting
             if(manualShooting){
-                player.shooting = !boosted;
+                player.shooting = (!boosted || canShoot);
                 unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
             }else if(target == null){
                 player.shooting = false;
@@ -1117,13 +1117,13 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 player.mouseX = intercept.x;
                 player.mouseY = intercept.y;
-                player.shooting = !boosted;
+                player.shooting = (!boosted || canShoot);
 
                 unit.aim(player.mouseX, player.mouseY);
             }
         }
 
-        unit.controlWeapons(player.shooting && !boosted);
+        unit.controlWeapons(player.shooting && (!boosted || canShoot));
     }
 
     //endregion

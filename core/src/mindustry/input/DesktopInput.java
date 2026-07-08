@@ -1006,7 +1006,7 @@ public class DesktopInput extends InputHandler{
         unit.movePref(movement);
 
         unit.aim(Core.input.mouseWorld());
-        unit.controlWeapons(true, player.shooting && !boosted);
+        unit.controlWeapons(true, player.shooting && (!boosted || canShoot));
 
         player.boosting = Core.input.keyDown(Binding.boost);
         player.mouseX = unit.aimX();
