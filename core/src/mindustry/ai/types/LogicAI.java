@@ -144,7 +144,7 @@ public class LogicAI extends AIController{
 
     @Override
     public boolean shouldShoot(){
-        return shoot && (!(unit.type.canBoost && boost) || unit.type.canBoostingShoot());
+        return shoot && (!(unit.type.canBoost && boost) || unit.type.canBoostingShoot);
     }
 
     //always aim for the main target
