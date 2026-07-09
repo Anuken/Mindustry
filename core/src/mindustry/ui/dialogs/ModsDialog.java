@@ -516,19 +516,64 @@ public class ModsDialog extends BaseDialog{
                             //textures are only requested when the rendering happens; this assists with culling
                             if(!textureCache.containsKey(repo)){
                                 textureCache.put(repo, last = Core.atlas.find("nomap"));
-                                Http.get("https://raw.githubusercontent.com/Anuken/MindustryMods/master/icons/" + repo.replace("/", "_"), res -> {
-                                    Pixmap pix = new Pixmap(res.getResult());
-                                    Core.app.post(() -> {
-                                        try{
-                                            var tex = new Texture(pix);
-                                            tex.setFilter(TextureFilter.linear);
-                                            textureCache.put(repo, new TextureRegion(tex));
-                                            pix.dispose();
-                                        }catch(Exception e){
-                                            Log.err(e);
-                                        }
-                                    });
-                                }, err -> {});
+
+                                if(mod.hasIcon){
+                                    Fi cacheFolder = Vars.mobile ? Core.files.cache("modIconCache"): dataDirectory.child("modIconCache");
+                                    cacheFolder.mkdirs();
+                                    Fi cacheFile = cacheFolder.child(Strings.sanitizeFilename(mod.repo + mod.lastUpdated) + ".png");
+
+                                    if(!cacheFile.exists()){ //fetch from Github
+                                        ConsT<HttpResponse, Exception> fetch = res -> {
+                                            byte[] bytes = res.getResult();
+                                            Pixmap pix = new Pixmap(bytes);
+                                            cacheFile.writeBytes(bytes);
+                                            Core.app.post(() -> {
+                                                try{
+                                                    var tex = new Texture(pix);
+                                                    tex.setFilter(TextureFilter.linear);
+                                                    textureCache.put(repo, new TextureRegion(tex));
+                                                    pix.dispose();
+                                                }catch(Exception e){
+                                                    Log.err(e);
+                                                }
+                                            });
+                                        };
+
+                                        String repoName = repo.replace("/", "_");
+
+                                        Http.get("https://raw.githubusercontent.com/Anuken/MindustryMods/master/icons/" + repoName)
+                                        .error(err -> {
+                                            //github ratelimited the client, try jsdelivr instead
+                                            if(!(err instanceof HttpStatusException s && s.status == HttpStatus.NOT_FOUND)){
+                                                Http.get("https://cdn.jsdelivr.net/gh/anuken/mindustrymods/icons/" + repoName)
+                                                .error(err2 -> {}) //nothing I can do about it
+                                                .timeout(15_000)
+                                                .submit(fetch);
+                                            }
+                                        })
+                                        .timeout(15_000)
+                                        .submit(fetch);
+                                    }else{ //load from cache
+                                        mainExecutor.submit(() -> {
+                                            try{
+                                                Pixmap pix = new Pixmap(cacheFile);
+                                                Core.app.post(() -> {
+                                                    try{
+                                                        var tex = new Texture(pix);
+                                                        tex.setFilter(TextureFilter.linear);
+                                                        textureCache.put(repo, new TextureRegion(tex));
+                                                        pix.dispose();
+                                                    }catch(Exception e){
+                                                        Log.err(e);
+                                                    }
+                                                });
+                                            }catch(Exception e){
+                                                Log.err(e);
+                                                cacheFile.delete();
+                                            }
+                                        });
+                                    }
+                                }
                             }
 
                             var next = textureCache.get(repo);

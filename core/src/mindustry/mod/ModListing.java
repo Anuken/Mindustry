@@ -3,7 +3,7 @@ package mindustry.mod;
 /** Mod listing as a data class. */
 public class ModListing{
     public String repo, name, internalName, author, lastUpdated, description, minGameVersion;
-    public boolean hasScripts, hasJava, iosCompatible, legacyCompatible;
+    public boolean hasScripts, hasJava, iosCompatible, legacyCompatible, hasIcon;
     public String[] contentTypes = {};
     public int stars;
 
