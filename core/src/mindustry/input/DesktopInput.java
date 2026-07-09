@@ -969,7 +969,7 @@ public class DesktopInput extends InputHandler{
         float xa = Core.input.axis(Binding.moveX);
         float ya = Core.input.axis(Binding.moveY);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
-        boolean canBoostingShoot = unit.type.canBoostingShoot();
+        boolean canBoostingShoot = unit.type.canBoostingShoot;
 
         if(settings.getBool("detach-camera")){
             Vec2 targetPos = camera.position;
@@ -1036,6 +1036,6 @@ public class DesktopInput extends InputHandler{
     @Override
     public boolean canShoot() {
         return block == null && !onConfigurable() && !isDroppingItem() && !player.unit().activelyBuilding() &&
-                (!(player.unit() instanceof Mechc && player.unit().isFlying()) || player.unit().type().canBoostingShoot()) && !player.unit().mining() && !commandMode;
+                (!(player.unit() instanceof Mechc && player.unit().isFlying()) || player.unit().type().canBoostingShoot) && !player.unit().mining() && !commandMode;
     }
 }

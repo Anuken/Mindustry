@@ -233,6 +233,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     forceMultiTarget = false,
     /** if false, this unit has no weapons that can attack. */
     canAttack = true,
+
+    /** If true, the unit can fire while boosting.  This field is only used for caching. */
+    canBoostingShoot = false,
     /** if true, this unit won't show up in the database or various other UIs. */
     hidden = false,
     /** if true, this unit is for internal use only and does not have a sprite generated. */
@@ -521,7 +524,6 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     protected float buildTime = -1f;
     protected @Nullable ItemStack[] totalRequirements, cachedRequirements, firstRequirements;
-    protected boolean canBoostingShoot = false;
 
     public UnitType(String name){
         super(name);
@@ -531,10 +533,6 @@ public class UnitType extends UnlockableContent implements Senseable{
         constructor = EntityMapping.map(this.name);
         if(constructor == null) constructor = UnitEntity::create;
         selectionSize = 30f;
-    }
-
-    public boolean canBoostingShoot() {
-        return canBoostingShoot;
     }
 
     @Override
