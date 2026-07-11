@@ -16,7 +16,7 @@ import mindustry.ui.*;
 
 import java.util.*;
 
-public class FileChooser extends BaseDialog{
+public class FileChooserDialog extends BaseDialog{
     private static final Fi homeDirectory = Core.files.absolute(Core.files.getExternalStoragePath());
     static Fi lastDirectory = Core.files.absolute(Core.settings.getString("lastDirectory", homeDirectory.absolutePath()));
 
@@ -30,7 +30,7 @@ public class FileChooser extends BaseDialog{
     private Cons<Fi> selectListener;
     private boolean open;
 
-    public FileChooser(String title, Boolf<Fi> filter, boolean open, Cons<Fi> result){
+    public FileChooserDialog(String title, Boolf<Fi> filter, boolean open, Cons<Fi> result){
         super(title);
         setFillParent(true);
         this.open = open;

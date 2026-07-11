@@ -33,7 +33,11 @@ import static mindustry.Vars.*;
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
     //it would be nice to parse semver and have syntax like "<1.0.5" here, but mods clearly don't use semver and it's an inconsistent mess
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1");
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with(
+    "ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1",
+    //new patch API as of build 159 breaks older versions of the patch editor
+    "patch-editor:1.10.1", "patch-editor:1.10.0", "patch-editor:1.9.5", "patch-editor:1.9.4", "patch-editor:1.9.3"
+    );
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -101,13 +105,18 @@ public class Mods implements Loadable{
 
     /** Imports an external mod file. Folders are not supported here. */
     public LoadedMod importMod(Fi file) throws IOException{
+        return importMod(file, true);
+    }
+
+    /** Imports an external mod file. Folders are not supported here. */
+    public LoadedMod importMod(Fi file, boolean forceEnable) throws IOException{
         //for some reason, android likes to add colons to file names, e.g. primary:ExampleJavaMod.jar, which breaks dexing
         String baseName = file.nameWithoutExtension().replace(':', '_').replace(' ', '_');
         String finalName = baseName;
         //find a name to prevent any name conflicts
         int count = 1;
         while(modDirectory.child(finalName + ".zip").exists()){
-            finalName = baseName + "" + count++;
+            finalName = baseName + count++;
         }
 
         Fi dest = modDirectory.child(finalName + ".zip");
@@ -122,7 +131,7 @@ public class Mods implements Loadable{
             lastOrderedMods = null;
             requiresReload = true;
             //enable the mod on import
-            Core.settings.put("mod-" + loaded.name + "-enabled", true);
+            if(forceEnable) Core.settings.put("mod-" + loaded.name + "-enabled", true);
             sortMods();
             //try to load the mod's icon so it displays on import
             Core.app.post(() -> loadIcon(loaded));
@@ -263,7 +272,7 @@ public class Mods implements Loadable{
 
                 @Override
                 public AtlasRegion find(String name){
-                    var base = packer.get(name);
+                    var base = packer.getPacked(name);
 
                     if(base != null){
                         var reg = new AtlasRegion(shadow.find(name).texture, base.x, base.y, base.width, base.height);
@@ -287,15 +296,15 @@ public class Mods implements Loadable{
 
                 @Override
                 public boolean has(String s){
-                    return shadow.has(s) || packer.get(s) != null;
+                    return shadow.has(s) || packer.getPacked(s) != null;
                 }
 
                 //return the *actual* pixmap regions, not the disposed ones.
                 @Override
                 public PixmapRegion getPixmap(AtlasRegion region){
-                    PixmapRegion out = packer.get(region.name);
+                    PixmapRegion out = packer.getPacked(region.name);
                     //this should not happen in normal situations
-                    if(out == null) return packer.get("error");
+                    if(out == null) return packer.getPacked("error");
                     return out;
                 }
             };
@@ -766,66 +775,7 @@ public class Mods implements Loadable{
     }
 
     private void downloadDependencies(Seq<String> toImport){
-        Seq<String> remaining = toImport.copy();
-        ui.mods.importDependencies(remaining, () -> {
-            toImport.removeAll(remaining);
-            if(toImport.any()) requiresReload = true;
-            displayDependencyImportStatus(remaining, toImport);
-        });
-    }
-
-    //TODO move to another class, Mods.java should not handle UI
-    private void displayDependencyImportStatus(Seq<String> failed, Seq<String> success){
-        new Dialog(""){{
-            setFillParent(true);
-            cont.margin(15);
-
-            cont.add("@mod.dependencies.status").color(Pal.accent).center();
-            cont.row();
-            cont.image().width(300f).pad(2).height(4f).color(Pal.accent);
-            cont.row();
-
-            cont.pane(p -> {
-                if(success.any()){
-                    p.add("@mod.dependencies.success").color(Pal.accent).wrap().fillX().left().labelAlign(Align.left);
-                    p.row();
-                    p.table(t -> {
-                        success.each(d -> {
-                            t.add("[accent] > []" + d).wrap().growX().left().labelAlign(Align.left);
-                            t.row();
-                        });
-                    }).growX().padBottom(8f).padLeft(8f);
-                    p.row();
-                }
-
-                if(failed.any()){
-                    p.add("@mod.dependencies.failure").color(Color.scarlet).wrap().fillX().left().labelAlign(Align.left);
-                    p.row();
-                    p.table(t -> {
-                        failed.each(d -> {
-                            t.add("[scarlet] > []" + d).wrap().growX().left().labelAlign(Align.left);
-                            t.row();
-                        });
-                    }).growX().padBottom(8f).padLeft(8f);
-                }
-            }).fillX();
-            cont.row();
-
-            if(success.any()){
-                cont.image().width(300f).pad(2).height(4f).color(Pal.accent);
-                cont.row();
-                cont.add("@mods.reloadexit").center();
-                cont.row();
-
-                hidden(() -> {
-                    Log.info("Exiting to reload mods after dependency auto-import.");
-                    Core.app.exit();
-                });
-            }
-
-            cont.button("@ok", this::hide).size(300, 50);
-            closeOnBack();
-        }}.show();
+        ui.mods.browser.downloadDependencies(toImport, results -> requiresReload |= results.any());
     }
 
     public void reload(){
@@ -1015,7 +965,13 @@ public class Mods implements Loadable{
         return result;
     }
 
+    //TODO: deprecate?
     public Seq<LoadedMod> list(){
+        return mods;
+    }
+
+    /** All mods, including disabled ones. */
+    public Seq<LoadedMod> getMods(){
         return mods;
     }
 

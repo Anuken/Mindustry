@@ -48,7 +48,7 @@ public class ScriptMainGenerator{
         classes.addAll(whitelist);
         classes.sort(Structs.comparing(Class::getName));
 
-        classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || Modifier.isPrivate(type.getModifiers())
+        classes.removeAll(type -> type.isSynthetic() || type.isAnonymousClass() || type.getCanonicalName() == null || type.getSimpleName().contains("Legacy") || Modifier.isPrivate(type.getModifiers())
         || blacklist.contains(s -> type.getName().startsWith(base + "." + s + ".")) || nameBlacklist.contains(type.getSimpleName()) || blacklist.contains(type.getPackage().getName()));
         classes.add(NetConnection.class, SaveIO.class, SystemCursor.class);
 

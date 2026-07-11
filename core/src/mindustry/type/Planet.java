@@ -141,6 +141,12 @@ public class Planet extends UnlockableContent{
     public String icon = "planet";
     /** Plays in the planet dialog when this planet is selected. */
     public Music launchMusic = Musics.launch;
+    /** Overrides random ambient music to be played. */
+    public @Nullable Seq<Music> ambientMusic;
+    /** Overrides music that is played in certain situations, like during boss waves or low core health. */
+    public @Nullable Seq<Music> darkMusic;
+    /** If true, this overrides the game setting to always play ambient music. */
+    public boolean alwaysPlayMusic = false;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */
@@ -188,7 +194,7 @@ public class Planet extends UnlockableContent{
     /** Statistics of this planet campaign. If statParent is not null, this planet shares the same stats as the parent. */
     private CampaignStats campaignStats = new CampaignStats();
 
-    public Planet(String name, Planet parent, float radius){
+    public Planet(String name, @Nullable Planet parent, float radius){
         super(name);
 
         this.radius = radius;
@@ -227,6 +233,18 @@ public class Planet extends UnlockableContent{
             }
 
             sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
+        }
+    }
+
+    @Override
+    public void removeContent(){
+        super.removeContent();
+
+        if(parent != null){
+            parent.children.remove(this);
+            parent.updateTotalRadius();
+            if(mesh != null) mesh.dispose();
+            if(cloudMesh != null) cloudMesh.dispose();
         }
     }
 

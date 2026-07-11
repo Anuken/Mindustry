@@ -414,7 +414,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 t.left();
                 t.margin(10f);
 
-                if(name.length() > 0) t.add(name + ":").color(Pal.accent);
+                if(name.length() > 0) t.add(name).color(Pal.accent);
                 t.add().growX();
 
                 Cell<ImageButton> remove = null;
@@ -486,21 +486,21 @@ public class MapObjectivesDialog extends BaseDialog{
                 buttons.defaults().size(160f, 64f).pad(2f);
                 buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
                 buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
-                buttons.button("@waves.edit", Icon.edit, () -> {
-                    BaseDialog dialog = new BaseDialog("@waves.edit");
+                buttons.button("@edit.menu", Icon.edit, () -> {
+                    BaseDialog dialog = new BaseDialog("@edit.menu");
                     dialog.addCloseButton();
                     dialog.setFillParent(false);
                     dialog.cont.table(Tex.button, t -> {
                         var style = Styles.cleart;
                         t.defaults().size(280f, 64f).pad(2f);
 
-                        t.button("@waves.copy", Icon.copy, style, () -> {
+                        t.button("@copy.clipboard", Icon.copy, style, () -> {
                             ui.showInfoFade("@copied");
                             Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
                             dialog.hide();
                         }).disabled(b -> canvas.objectives.isEmpty()).marginLeft(12f).row();
 
-                        t.button("@waves.load", Icon.download, style, () -> {
+                        t.button("@load.clipboard", Icon.download, style, () -> {
                             try{
                                 rebuildObjectives(new Seq<>(JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all));
                             }catch(Exception e){
