@@ -714,7 +714,7 @@ public class Turret extends ReloadTurret{
 
         protected void handleReload(){
             //turret always reloads regardless of whether it's targeting something
-            if(reloadWhileCharging || !charging() && reloadCounter < reload){
+            if((reloadWhileCharging || !charging()) && reloadCounter < reload){
                 //update the two reload related methods
                 updateReload();
                 updateCooling();
