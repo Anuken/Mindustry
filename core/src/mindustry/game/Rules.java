@@ -171,6 +171,8 @@ public class Rules{
     public @Nullable Seq<MusicContainer> darkMusic;
     /** If true, this overrides the game setting to always play ambient music. */
     public boolean alwaysPlayMusic = false;
+    /** If true, automatic music is disabled. */
+    public boolean disableMusic = false;
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
     /** Starting items put in cores. */

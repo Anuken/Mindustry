@@ -53,6 +53,8 @@ public class SoundControl{
 
         //only run music 10 seconds after a wave spawns
         Events.on(WaveEvent.class, e -> Time.run(Mathf.random(8f, 15f) * 60f, () -> {
+            if(state.rules.disableMusic) return;
+
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
 
             if(boss){
@@ -166,15 +168,17 @@ public class SoundControl{
             //this just fades out the last track to make way for ingame music
             silence();
 
-            if(alwaysPlayMusic()){
-                if(current == null){
-                    playRandom();
-                }
-            }else if(Time.timeSinceMillis(lastPlayed) > 1000 * musicInterval / 60f){
-                //chance to play it per interval
-                if(Mathf.chance(musicChance)){
-                    lastPlayed = Time.millis();
-                    playRandom();
+            if(!state.rules.disableMusic){
+                if(alwaysPlayMusic()){
+                    if(current == null){
+                        playRandom();
+                    }
+                }else if(Time.timeSinceMillis(lastPlayed) > 1000 * musicInterval / 60f){
+                    //chance to play it per interval
+                    if(Mathf.chance(musicChance)){
+                        lastPlayed = Time.millis();
+                        playRandom();
+                    }
                 }
             }
         }
@@ -192,6 +196,9 @@ public class SoundControl{
             current = null;
         }
         playOnce(music);
+        if(current == music){
+            silenced = true; //music played successfully, don't fade it out
+        }
     }
 
     public boolean isPlaying(){
