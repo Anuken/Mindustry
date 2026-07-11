@@ -195,8 +195,10 @@ public class SoundControl{
             current.stop();
             current = null;
         }
-        silenced = true; //don't fade it out
         playOnce(music);
+        if(current == music){
+            silenced = true; //music played successfully, don't fade it out
+        }
     }
 
     public boolean isPlaying(){
