@@ -1,11 +1,13 @@
 package mindustry.logic;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
@@ -1460,7 +1462,7 @@ public class LStatements{
 
     @RegisterStatement("spawn")
     public static class SpawnUnitStatement extends LStatement{
-        public String type = "@dagger", x = "10", y = "10", rotation = "90", team = "@sharded", result = "result";
+        public String type = "@dagger", x = "10", y = "10", rotation = "90", team = "@sharded", result = "result", effect = "true";
 
         @Override
         public void build(Table table){
@@ -1488,6 +1490,11 @@ public class LStatements{
 
             table.add(" rot ");
             fields(table, rotation, str -> rotation = str).left();
+
+            row(table);
+
+            table.add("effect ");
+            fields(table, effect, str -> effect = str).left();
         }
 
         @Override
@@ -1497,7 +1504,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), builder.var(result));
+            return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), builder.var(result), builder.var(effect));
         }
 
         @Override
@@ -2384,11 +2391,20 @@ public class LStatements{
             table.button(b -> {
                 b.image(Icon.pencilSmall);
 
+                Seq<String> soundNames = new Seq<>();
+
+                for(var entry : Core.assets.getAllEntries(Sound.class, new Seq<>())){
+                    if(entry.value != Sounds.none && entry.value.file != null){
+                        soundNames.add(Strings.getFileNameWithoutExtension(entry.key));
+                    }
+                }
+                soundNames.sort();
+
                 String soundName = id.startsWith("@sfx-") ? id.substring(5) : id;
-                b.clicked(() -> showSelect(b, GlobalVars.soundNames.toArray(String.class), soundName, t -> {
+                b.clicked(() -> showSelect(b, soundNames.toArray(String.class), soundName, t -> {
                     id = "@sfx-" + t;
                     build(table);
-                }, 2, cell -> cell.size(160, 50)));
+                }, 3, cell -> cell.size(170, 50)));
             }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
 
             row(table);

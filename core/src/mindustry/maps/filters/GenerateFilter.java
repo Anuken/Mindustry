@@ -172,7 +172,7 @@ public abstract class GenerateFilter implements Cloneable, Serializable{
             this.height = height;
         }
 
-        Tile tile(float x, float y){
+        public Tile tile(float x, float y){
             return buffer.get(Mathf.clamp((int)x, 0, width - 1), Mathf.clamp((int)y, 0, height - 1));
         }
 

@@ -94,10 +94,8 @@ public class MapAudioView implements AssetView{
 
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
                 ui.showConfirm("@asset.delete.confirm",  () -> {
-                    if(audioSource != null){
-                        audioSource.dispose();
-                    }
                     assets.remove(asset);
+                    state.data.reloadAudio();
                     diag.rebuild();
                 });
             }).size(h);
@@ -106,7 +104,7 @@ public class MapAudioView implements AssetView{
         }
 
         if(list.getChildren().isEmpty()){
-            list.add("@patch.none");
+            list.add("@none.found");
         }
 
         list.add(new Element(){
@@ -141,6 +139,9 @@ public class MapAudioView implements AssetView{
                         var other = state.data.getAssets(type).find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
                         if(other != null){
                             ui.showErrorMessage(Core.bundle.format("asset.exists", other.name + " (" + other.path + ")"));
+                            return;
+                        }else if(Core.assets.getOrNull("dp-" + name, Music.class) != null || Core.assets.getOrNull("dp-" + name, Sound.class) != null){
+                            ui.showErrorMessage(Core.bundle.format("asset.exists.audio", name));
                             return;
                         }
 

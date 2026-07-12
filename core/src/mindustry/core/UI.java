@@ -93,6 +93,11 @@ public class UI implements ApplicationListener, Loadable{
     private final IntMap<WorldLabel> labels = new IntMap<>();
 
     public UI(){
+        Events.on(ResetEvent.class, e -> {
+            labels.clear();
+            popups.clear();
+        });
+
         Fonts.loadFonts();
     }
 
@@ -447,12 +452,14 @@ public class UI implements ApplicationListener, Loadable{
             return;
         }
 
-        var label = labels.get(id, WorldLabel::create); // todo: pool?
+        var label = id == -1 ? WorldLabel.create() : labels.get(id, WorldLabel::create); // todo: pool?
+        label.id = Integer.MIN_VALUE; //arbitrary value that won't be synced to, it's fine if IDs conflict
         label.x = worldx;
         label.y = worldy;
         label.text = info;
         label.flags = (byte)flags; // flag | flag2 at call site turns it into an int so the flags param here has to be int or casting has to be done at every call site
-        label.duration = duration;
+        label.duration = duration == Float.MAX_VALUE ? -1 : duration; // prefer -1 to Float.MAX_VALUE so that the update() function isn't called every tick
+        if(id != -1 && label.duration >= 0 && label.expired == null) label.expired = () -> labels.remove(id); // only set once to prevent extra garbage for updated labels
         label.add();
     }
 

@@ -243,7 +243,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     bounded = true,
     /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
     naval = false,
-    /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
+    /** if false, RTS AI controlled units do not automatically attack things while moving. */
     autoFindTarget = true,
     /** If false, 'under' blocks like conveyors are not targeted. */
     targetUnderBlocks = true,
@@ -950,11 +950,6 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(lightRadius == -1){
             lightRadius = Math.max(60f, hitSize * 2.3f);
-        }
-
-        //if a status effects slows a unit when firing, don't shoot while moving.
-        if(autoFindTarget){
-            autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
         }
 
         if(flyingLayer < 0) flyingLayer = lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit;

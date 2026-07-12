@@ -159,7 +159,7 @@ public class Renderer implements ApplicationListener{
             baseTarget = Mathf.lerp(minZoom, maxZoom, control.input.logicCutsceneZoom);
         }
 
-        float dest = Mathf.clamp(Mathf.round(baseTarget, 0.5f), minScale(), maxScale());
+        float dest = Mathf.clamp(baseTarget, minScale(), maxScale());
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
         unitLaserOpacity = settings.getInt("unitlaseropacity") / 100f;
@@ -519,13 +519,11 @@ public class Renderer implements ApplicationListener{
     }
 
     public float minScale(){
-        if(control.input.logicCutscene) return Scl.scl(minZoom);
-        return Scl.scl(minZoomInGame);
+        return control.input.logicCutscene ? Scl.scl(minZoom) : Scl.scl(minZoomInGame);
     }
 
     public float maxScale(){
-        if(control.input.logicCutscene) return Mathf.round(Scl.scl(maxZoom));
-        return Mathf.round(Scl.scl(maxZoomInGame));
+        return (float)(control.input.logicCutscene ? Mathf.round(Scl.scl(maxZoom)) : Mathf.round(Scl.scl(maxZoomInGame)));
     }
 
     public float getScale(){

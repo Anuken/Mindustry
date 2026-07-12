@@ -135,6 +135,8 @@ tasks.register('pack'){
             into "../core/assets-raw/sprites_out/"
         }
 
+        new File(rootDir, "core/build/last_pack_version").text = versionNumber
+
         //run generation task; generate all needed sprites
         file(genFolder).mkdirs()
 
@@ -259,6 +261,14 @@ tasks.register('updateScripts', JavaExec){
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
     workingDir = "../"
+}
+
+tasks.register('fixMaps', JavaExec){
+    dependsOn classes
+    mainClass = "mindustry.tools.MapFixer"
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = "../core/assets"
 }
 
 tasks.register('updateBundles'){
