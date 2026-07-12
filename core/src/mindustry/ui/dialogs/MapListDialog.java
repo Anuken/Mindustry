@@ -41,6 +41,7 @@ public abstract class MapListDialog extends BaseDialog{
     searchModname = Core.settings.getBool("editorsearchmodname", false),
     prioritizeModded = Core.settings.getBool("editorprioritizemodded", false),
     prioritizeCustom = Core.settings.getBool("editorprioritizecustom", false),
+    prioritizeDate = Core.settings.getBool("editorprioritizedate", false),
     displayType;
     private Seq<String> planets = Core.settings.getJson("editorfilterplanets", Seq.class, String.class, Seq::new);
 
@@ -128,6 +129,12 @@ public abstract class MapListDialog extends BaseDialog{
 
         mapList.distinct();
 
+        //date priority depends on multiple map filters, so it's reset here instead of each button listener...
+        if(!showCustom && !showModded){
+            prioritizeDate = false;
+            Core.settings.put("editorprioritizedate", prioritizeDate);
+        }
+
         if(prioritizeModded){
             Seq<Map> ordered = new Seq<>();
             ordered.addAll(mapList.select(m -> m.mod != null).sortComparing(m -> m.mod.meta.displayName));
@@ -137,6 +144,11 @@ public abstract class MapListDialog extends BaseDialog{
             Seq<Map> ordered = new Seq<>();
             ordered.addAll(mapList.select(m -> m.custom)).sortComparing(m -> m.plainName());
             ordered.addAll(mapList.select(m -> !m.custom).sortComparing(m -> m.plainName()));
+            mapList = ordered;
+        }else if(prioritizeDate){
+            Seq<Map> ordered = new Seq<>();
+            ordered.addAll(mapList.select(m -> m.mod != null || m.custom).sort((m1, m2) -> Long.compare(m2.file.lastModified(), m1.file.lastModified())));
+            ordered.addAll(mapList.select(m -> m.mod == null && !m.custom).sortComparing(m -> m.plainName()));
             mapList = ordered;
         }else{
             mapList.sortComparing(m -> m.plainName());
@@ -238,22 +250,37 @@ public abstract class MapListDialog extends BaseDialog{
                     t.table(Tex.button, right ->{
                         right.button(ui.getIcon("players"), Styles.emptyTogglei, () -> {
                             prioritizeCustom = !prioritizeCustom;
-                            if(prioritizeModded){
+                            if(prioritizeModded || prioritizeDate){
                                 prioritizeModded = false;
+                                prioritizeDate = false;
                                 Core.settings.put("editorprioritizemodded", false);
+                                Core.settings.put("editorprioritizedate", false);
                             }
                             Core.settings.put("editorprioritizecustom", prioritizeCustom);
                             rebuildMaps();
                         }).size(60f).checked(b -> showCustom && prioritizeCustom).tooltip("@editor.filters.prioritizecustom").disabled(b -> !showCustom);
                         right.button(ui.getIcon("hammer"), Styles.emptyTogglei, () -> {
                             prioritizeModded = !prioritizeModded;
-                            if(prioritizeCustom){
+                            if(prioritizeCustom || prioritizeDate){
                                 prioritizeCustom = false;
+                                prioritizeDate = false;
                                 Core.settings.put("editorprioritizecustom", false);
+                                Core.settings.put("editorprioritizedate", false);
                             }
                             Core.settings.put("editorprioritizemodded", prioritizeModded);
                             rebuildMaps();
                         }).size(60f).checked(b-> showModded && prioritizeModded).tooltip("@editor.filters.prioritizemod").disabled(b -> !showModded);
+                        right.button(ui.getIcon("hourglass"), Styles.emptyTogglei, () -> {
+                            prioritizeDate = !prioritizeDate;
+                            if(prioritizeCustom || prioritizeModded){
+                                prioritizeCustom = false;
+                                prioritizeModded = false;
+                                Core.settings.put("editorprioritizecustom", false);
+                                Core.settings.put("editorprioritizemodded", false);
+                            }
+                            Core.settings.put("editorprioritizedate", prioritizeDate);
+                            rebuildMaps();
+                        }).size(60f).checked(b -> (showCustom || showModded) && prioritizeDate).tooltip("@editor.filters.prioritizedate").disabled(b -> !showCustom && !showModded);
                     });
                 }).expandX().pad(5f);
                 // Planet selection dialog similar to the tech tree selection menu
