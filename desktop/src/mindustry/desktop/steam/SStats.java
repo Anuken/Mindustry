@@ -14,14 +14,14 @@ public class SStats implements SteamUserStatsCallback{
     private int statSavePeriod = 2; //in minutes
 
     public SStats(){
+        service.init();
+
         Events.on(ClientLoadEvent.class, e -> {
             Timer.schedule(() -> {
                 if(updated){
                     stats.storeStats();
                 }
             }, statSavePeriod * 60, statSavePeriod * 60);
-
-            service.init();
         });
     }
 
