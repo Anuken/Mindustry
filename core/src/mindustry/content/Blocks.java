@@ -2091,7 +2091,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 280;
             speed = 0.08f;
-            displayedSpeed = 11f;
+            displayedSpeed = 10f;
         }};
 
         junction = new Junction("junction"){{
@@ -2100,6 +2100,7 @@ public class Blocks{
             capacity = 6;
             health = 30;
             buildCostMultiplier = 3f;
+            displayedSpeed = 10f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
