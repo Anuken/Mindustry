@@ -23,6 +23,7 @@ public class HeatConductor extends Block{
         update = solid = rotate = true;
         rotateDraw = false;
         size = 3;
+        noUpdateDisabled = true;
     }
 
     @Override
@@ -86,7 +87,7 @@ public class HeatConductor extends Block{
             if(lastHeatUpdate == Vars.state.updateId) return;
 
             lastHeatUpdate = Vars.state.updateId;
-            heat = calculateHeat(sideHeat, cameFrom);
+            heat = enabled ? calculateHeat(sideHeat, cameFrom) : 0f;
         }
 
         @Override

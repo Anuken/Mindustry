@@ -181,7 +181,6 @@ public class LoadDialog extends BaseDialog{
             }).left().growX().width(250f);
 
             modifyButton(button, slot);
-
             slots.add(button).uniformX().fillX().pad(4).padRight(8f).margin(10f);
 
             if(++i % maxwidth == 0){

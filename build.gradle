@@ -42,7 +42,7 @@ allprojects{
         if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
+        steamworksVersion = 'da41c05b7a2a44c8625ca0ba7d6ca1a2e73f621a'
         rhinoVersion = 'e74ac129d2bff72c1deb536d7d99a0dbb7046d2e'
 
         loadVersionProps = {

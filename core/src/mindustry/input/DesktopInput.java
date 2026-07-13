@@ -509,6 +509,10 @@ public class DesktopInput extends InputHandler{
             pollInputPlayer();
         }
 
+        if(Core.input.keyRelease(Binding.select)){
+            player.shooting = false;
+        }
+
         if(!Core.scene.hasMouse() && !ui.minimapfrag.shown()){
             Core.graphics.cursor(cursorType);
             changedCursor = cursorType != SystemCursor.arrow;
