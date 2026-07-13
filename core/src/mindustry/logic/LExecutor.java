@@ -1586,15 +1586,16 @@ public class LExecutor{
     }
 
     public static class SpawnUnitI implements LInstruction{
-        public LVar type, x, y, rotation, team, result;
+        public LVar type, x, y, rotation, team, result, effect;
 
-        public SpawnUnitI(LVar type, LVar x, LVar y, LVar rotation, LVar team, LVar result){
+        public SpawnUnitI(LVar type, LVar x, LVar y, LVar rotation, LVar team, LVar result, LVar effect){
             this.type = type;
             this.x = x;
             this.y = y;
             this.rotation = rotation;
             this.team = team;
             this.result = result;
+            this.effect = effect;
         }
 
         public SpawnUnitI(){
@@ -1609,7 +1610,13 @@ public class LExecutor{
             if(t != null && type.obj() instanceof UnitType type && !type.internal && Units.canCreate(t, type)){
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f), rotation.numf());
-                spawner.spawnEffect(unit);
+                if(effect.bool()){
+                    spawner.spawnEffect(unit);
+                }else{
+                    //manually call events
+                    unit.unloaded();
+                    Events.fire(new UnitSpawnEvent(unit));
+                }
                 result.setobj(unit);
             }
         }

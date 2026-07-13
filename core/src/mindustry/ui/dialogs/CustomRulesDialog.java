@@ -8,10 +8,12 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
-import mindustry.editor.BannedContentDialog;
+import mindustry.editor.*;
 import mindustry.game.*;
 import mindustry.game.Rules.*;
 import mindustry.gen.*;
@@ -217,7 +219,6 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.polygoncoreprotection", b -> rules.polygonCoreProtection = b, () -> rules.polygonCoreProtection);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
 
-
         category("environment");
         check("@rules.pauseDisabled", b -> rules.pauseDisabled = b, () -> rules.pauseDisabled);
         check("@rules.explosions", b -> rules.damageExplosions = b, () -> rules.damageExplosions);
@@ -249,6 +250,32 @@ public class CustomRulesDialog extends BaseDialog{
             current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
         }
 
+        category("music");
+
+        Boolp allowMusic = () -> !state.rules.disableMusic;
+        Func<String, Seq<MusicContainer>> parser = str -> {
+            try{
+                return Seq.map(new JsonReader().parse("[" + str + "]").asStringArray(), MusicContainer::new);
+            }catch(Throwable e){
+                return null;
+            }
+        };
+
+        check("@rules.alwaysplaymusic", b -> rules.alwaysPlayMusic = b, () -> rules.alwaysPlayMusic, allowMusic);
+        check("@rules.nomusic", b -> rules.disableMusic = b, () -> rules.disableMusic);
+
+        text("@rules.ambientmusic",
+            s -> state.rules.ambientMusic = s.trim().isEmpty() ? null : parser.get(s),
+            () -> rules.ambientMusic == null ? "" : rules.ambientMusic.toString(", "),
+            text -> parser.get(text) != null,
+        allowMusic);
+
+        text("@rules.darkmusic",
+            s -> state.rules.darkMusic = s.trim().isEmpty() ? null : parser.get(s),
+            () -> rules.darkMusic == null ? "" : rules.darkMusic.toString(", "),
+            text -> parser.get(text) != null,
+        allowMusic);
+
         category("planet");
         if(Core.bundle.get("rules.title.planet").toLowerCase().contains(ruleSearch)){
             current.table(Tex.button, t -> {
@@ -275,7 +302,6 @@ public class CustomRulesDialog extends BaseDialog{
                 }).group(group).checked(b -> rules.planet == Planets.sun);
             }).left().fill(false).expand(false, false).row();
         }
-
 
         category("teams");
         //not sure where else to put this
@@ -422,6 +448,21 @@ public class CustomRulesDialog extends BaseDialog{
             .padRight(50f)
             .update(a -> a.setDisabled(!condition.get()))
             .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left();
+        }).padTop(0);
+        ruleInfo(cell, text);
+        current.row();
+    }
+
+    public void text(String text, Cons<String> cons, Prov<String> prov, Boolf<String> valid, Boolp condition){
+        if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
+        var cell = current.table(t -> {
+            t.left();
+            t.add(text).left().padRight(5)
+            .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
+            t.field(prov.get(), cons)
+            .padRight(50f)
+            .update(a -> a.setDisabled(!condition.get()))
+            .valid(valid::get).width(300f).left();
         }).padTop(0);
         ruleInfo(cell, text);
         current.row();

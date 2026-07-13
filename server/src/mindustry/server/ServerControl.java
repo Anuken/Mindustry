@@ -31,6 +31,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import org.jline.reader.*;
 import org.jline.reader.impl.completer.*;
+import org.jline.terminal.*;
 
 import java.io.*;
 import java.net.*;
@@ -76,19 +77,28 @@ public class ServerControl implements ApplicationListener{
     private Fi dataAssetDirectory, rulesFile;
     private Seq<DataAsset> dataAssets = new Seq<>();
 
+    private boolean hasTerminal = false;
     private LineReader lineReader;
 
     public Runnable serverInput = () -> {
-        while(true){
-            try{
-                String line = lineReader.readLine("> ");
-                if(!line.isEmpty()){
-                    Core.app.post(() -> handleCommandString(line));
+        if(!hasTerminal){
+            Scanner scan = new Scanner(System.in);
+            while(scan.hasNext()){
+                String line = scan.nextLine();
+                Core.app.post(() -> handleCommandString(line));
+            }
+        }else{
+            while(true){
+                try{
+                    String line = lineReader.readLine("> ");
+                    if(!line.isEmpty()){
+                        Core.app.post(() -> handleCommandString(line));
+                    }
+                }catch(EndOfFileException | UserInterruptException e){
+                    Core.app.exit();
+                }catch(Exception e){
+                    Core.app.post(() -> { throw new ArcRuntimeException(e); });
                 }
-            }catch(EndOfFileException | UserInterruptException e){
-                Core.app.exit();
-            }catch(Exception e){
-                Core.app.post(() -> { throw new ArcRuntimeException(e); });
             }
         }
     };
@@ -131,6 +141,7 @@ public class ServerControl implements ApplicationListener{
         registerCommands();
 
         lineReader = LineReaderBuilder.builder().completer(new StringsCompleter(handler.getCommandList().map(c -> c.text))).build();
+        hasTerminal = !(Terminal.TYPE_DUMB.equals(lineReader.getTerminal().getType()) || Terminal.TYPE_DUMB_COLOR.equals(lineReader.getTerminal().getType()));
 
         Core.settings.defaults(
             "bans", "",
@@ -152,13 +163,17 @@ public class ServerControl implements ApplicationListener{
             if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
 
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
-            if(lineReader.isReading()){
-                lineReader.callWidget(LineReader.CLEAR);
-                lineReader.getTerminal().writer().println(result);
-                lineReader.callWidget(LineReader.REDRAW_LINE);
-                lineReader.callWidget(LineReader.REDISPLAY);
+            if(hasTerminal){
+                if(lineReader.isReading()){
+                    lineReader.callWidget(LineReader.CLEAR);
+                    lineReader.getTerminal().writer().println(result);
+                    lineReader.callWidget(LineReader.REDRAW_LINE);
+                    lineReader.callWidget(LineReader.REDISPLAY);
+                }else{
+                    lineReader.getTerminal().writer().println(result);
+                }
             }else{
-                lineReader.getTerminal().writer().println(result);
+                System.out.println(result);
             }
 
             if(Config.logging.bool()){

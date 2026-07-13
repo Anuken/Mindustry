@@ -99,7 +99,7 @@ public class DataImagePacker{
 
                 try{
                     Pixmap pixmap = new Pixmap(cacheFile);
-                    String name = regionPrefix + image.name;
+                    String name = (image.isGenerated() ? "" : regionPrefix) + image.name;
 
                     if(anyEnv && image.path.contains("blocks/environment/")){
                         if(!failedEnv.get()) envPacker.pack(name, pixmap);
