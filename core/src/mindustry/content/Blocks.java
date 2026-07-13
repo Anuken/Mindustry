@@ -2083,7 +2083,7 @@ public class Blocks{
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 90;
-            speed = 4.2f / 60f;
+            speed = 4.16f / 60f;
             itemCapacity = 12;
             displayedSpeed = 48f;
         }};
