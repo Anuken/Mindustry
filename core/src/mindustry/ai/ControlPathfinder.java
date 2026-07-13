@@ -83,6 +83,7 @@ public class ControlPathfinder implements Runnable{
     private static final int updateStepInterval = 200;
     private static final int updateFPS = 30;
     private static final int updateInterval = 1000 / updateFPS, invalidateCheckInterval = 1000;
+    private static final PathfindResult pathResult = new PathfindResult();
 
     static final int clusterSize = 12;
 
@@ -1086,14 +1087,42 @@ public class ControlPathfinder implements Runnable{
         return raycast(unit.team().id, unit.type.pathCost, x1, y1, x2, y2);
     }
 
-    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
-        return getPathPosition(unit, destination, destination, out, noResultFound);
+    public static class PathfindResult{
+        /** If true, the request cannot be satisfied. */
+        public boolean unreachable;
+        /** If true, the request is ready to execute. */
+        public boolean move;
+        /** If move is true, this is the next tile to move on. Don't use this unless you know what you are doing. */
+        public @Nullable Tile next;
+        /** Destination vector. Only valid if move is true. */
+        public Vec2 dest = new Vec2();
     }
 
+    @Deprecated
+    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
+        var result = getPathPosition(unit, destination, destination);
+        out.set(result.dest);
+        if(noResultFound != null) noResultFound[0] = result.unreachable;
+        return result.move;
+    }
+
+    @Deprecated
     public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination, Vec2 out, @Nullable boolean[] noResultFound){
-        if(noResultFound != null){
-            noResultFound[0] = false;
-        }
+        var result = getPathPosition(unit, destination, mainDestination);
+        out.set(result.dest);
+        if(noResultFound != null) noResultFound[0] = result.unreachable;
+        return result.move;
+    }
+
+    public PathfindResult getPathPosition(Unit unit, Vec2 destination){
+        return getPathPosition(unit, destination, destination);
+    }
+
+    public PathfindResult getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination){
+        pathResult.unreachable = false;
+        pathResult.move = false;
+        pathResult.next = null;
+        pathResult.dest.setZero();
 
         int costId = unit.type.pathCostId;
         PathCost cost = idToCost(costId);
@@ -1137,8 +1166,9 @@ public class ControlPathfinder implements Runnable{
 
         //if the destination can be trivially reached in a straight line, do that.
         if(raycastResult){
-            out.set(destination);
-            return true;
+            pathResult.dest.set(destination);
+            pathResult.move = true;
+            return pathResult;
         }
 
         boolean any = false;
@@ -1154,7 +1184,7 @@ public class ControlPathfinder implements Runnable{
             FieldCache fieldCache = null;
             try{
                 fieldCache = fields.get(fieldKey);
-            }catch(ArrayIndexOutOfBoundsException ignored){ //TODO fix this, rare crash due to remove() elsewhere
+            }catch(Exception ignored){ //TODO fix this, rare crash due to remove() elsewhere
             }
             if(fieldCache == null) fieldCache = request.oldCache;
 
@@ -1221,6 +1251,7 @@ public class ControlPathfinder implements Runnable{
                                     recalc = true;
                                     any = true;
                                 }
+                                pathResult.next = current;
 
                                 break;
                             }else{
@@ -1250,9 +1281,10 @@ public class ControlPathfinder implements Runnable{
                     if(showDebug && Core.graphics.getFrameId() % 30 == 0){
                         Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
                     }
-                    out.set(request.lastTargetTile.worldx(), request.lastTargetTile.worldy());
+                    pathResult.dest.set(request.lastTargetTile.worldx(), request.lastTargetTile.worldy());
+                    pathResult.move = true;
                     request.lastTile = recalc ? -1 : initialTileOn.pos();
-                    return true;
+                    return pathResult;
                 }
             }
         }else{
@@ -1272,16 +1304,16 @@ public class ControlPathfinder implements Runnable{
                 recalculatePath(f);
             });
 
-            return false;
+            pathResult.move = false;
+            return pathResult;
         }
 
-        if(noResultFound != null){
-            noResultFound[0] = request.notFound;
-        }
-        return false;
+        pathResult.move = false;
+        pathResult.unreachable = request.notFound;
+        return pathResult;
     }
 
-    private void recalculatePath(PathRequest request){
+    private void recalculatePath(ControlPathfinder.PathRequest request){
         initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % wwidth, request.destination / wwidth);
     }
 

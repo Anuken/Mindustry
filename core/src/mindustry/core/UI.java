@@ -25,6 +25,7 @@ import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.mod.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.ui.fragments.*;
@@ -47,6 +48,7 @@ public class UI implements ApplicationListener, Loadable{
     public PlayerListFragment listfrag;
     public LoadingFragment loadfrag;
     public HintsFragment hints;
+    public PerformanceFragment perffrag;
 
     public WidgetGroup menuGroup, hudGroup;
 
@@ -77,6 +79,7 @@ public class UI implements ApplicationListener, Loadable{
     public LogicDialog logic;
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
+    public CampaignRulesDialog campaignRules;
 
     public IntMap<Dialog> followUpMenus;
 
@@ -84,7 +87,17 @@ public class UI implements ApplicationListener, Loadable{
 
     private @Nullable Element lastAnnouncement;
 
+    /** Maps popups to ids so that they can be removed or updated by id. */
+    private final ObjectMap<String, Table> popups = new ObjectMap<>();
+    /** Maps labels to ids so that they can be removed or updated by id. */
+    private final IntMap<WorldLabel> labels = new IntMap<>();
+
     public UI(){
+        Events.on(ResetEvent.class, e -> {
+            labels.clear();
+            popups.clear();
+        });
+
         Fonts.loadFonts();
     }
 
@@ -111,11 +124,7 @@ public class UI implements ApplicationListener, Loadable{
         Core.scene = new Scene();
         Core.input.addProcessor(Core.scene);
 
-        int[] insets = Core.graphics.getSafeInsets();
-        Core.scene.marginLeft = insets[0];
-        Core.scene.marginRight = insets[1];
-        Core.scene.marginTop = insets[2];
-        Core.scene.marginBottom = insets[3];
+        updateMargins();
 
         Tex.load();
         Icon.load();
@@ -127,7 +136,7 @@ public class UI implements ApplicationListener, Loadable{
         Dialog.setHideAction(() -> sequence(fadeOut(0.1f)));
 
         Tooltips.getInstance().animations = false;
-        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black6).margin(4f).add(text));
+        Tooltips.getInstance().textProvider = text -> new Tooltip(t -> t.background(Styles.black8).margin(4f).add(text));
         if(mobile){
             Tooltips.getInstance().offsetY += Scl.scl(60f);
         }
@@ -137,7 +146,7 @@ public class UI implements ApplicationListener, Loadable{
             Core.app.post(() -> showErrorMessage("Failed to access local storage.\nSettings will not be saved."));
         });
 
-        ClickListener.clicked = () -> Sounds.press.play();
+        ClickListener.clicked = () -> Sounds.uiButton.play();
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
@@ -147,7 +156,7 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public Seq<AssetDescriptor> getDependencies(){
-        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", Font.class), new AssetDescriptor<>("default", Font.class));
+        return Seq.with(new AssetDescriptor<>(Control.class), new AssetDescriptor<>("outline", Font.class), new AssetDescriptor<>("default", Font.class), new AssetDescriptor<>(Mods.class));
     }
 
     @Override
@@ -190,6 +199,7 @@ public class UI implements ApplicationListener, Loadable{
         listfrag = new PlayerListFragment();
         loadfrag = new LoadingFragment();
         consolefrag = new ConsoleFragment();
+        perffrag = new PerformanceFragment();
 
         picker = new ColorPicker();
         effects = new EffectsDialog();
@@ -218,6 +228,7 @@ public class UI implements ApplicationListener, Loadable{
         logic = new LogicDialog();
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
+        campaignRules = new CampaignRulesDialog();
         followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
@@ -239,18 +250,34 @@ public class UI implements ApplicationListener, Loadable{
         listfrag.build(hudGroup);
         consolefrag.build(hudGroup);
         loadfrag.build(group);
+        perffrag.build(group);
         new FadeInFragment().build(group);
+    }
+
+    /** Updates scene margins based on safe insets and custom edge padding setting. */
+    public void updateMargins(){
+        int[] insets = Core.graphics.getSafeInsets();
+        int customPadding = (int)Scl.scl(Core.settings.getInt("uiEdgePadding", 0));
+
+        Core.scene.marginLeft = insets[0];
+        Core.scene.marginRight = insets[1];
+        Core.scene.marginTop = insets[2];
+        Core.scene.marginBottom = insets[3];
+
+        if(Core.graphics.getHeight() > Core.graphics.getWidth()){
+            Core.scene.marginTop += customPadding;
+            Core.scene.marginBottom += customPadding;
+        }else{
+            Core.scene.marginLeft += customPadding;
+            Core.scene.marginRight += customPadding;
+        }
     }
 
     @Override
     public void resize(int width, int height){
         if(Core.scene == null) return;
 
-        int[] insets = Core.graphics.getSafeInsets();
-        Core.scene.marginLeft = insets[0];
-        Core.scene.marginRight = insets[1];
-        Core.scene.marginTop = insets[2];
-        Core.scene.marginBottom = insets[3];
+        updateMargins();
 
         Core.scene.resize(width, height);
         Events.fire(new ResizeEvent());
@@ -393,35 +420,47 @@ public class UI implements ApplicationListener, Loadable{
     }
 
     /** Shows a label at some position on the screen. Does not fade. */
-    public void showInfoPopup(String info, float duration, int align, int top, int left, int bottom, int right){
+    public void showInfoPopup(@Nullable String info, @Nullable String id, float duration, int align, int top, int left, int bottom, int right){
+        if(info == null){ // null info allows deletion of old popups provided they have ids
+            var table = popups.remove(id);
+            if(table != null) table.remove();
+            return;
+        }
         Table table = new Table();
+        if(id != null){
+            Table old = popups.put(id, table);
+            if(old != null) old.remove();
+        }
         table.setFillParent(true);
         table.touchable = Touchable.disabled;
         table.update(() -> {
-            if(state.isMenu()) table.remove();
+            if(state.isMenu()){
+                table.remove();
+                if(id != null) popups.remove(id);
+            }
         });
-        table.actions(Actions.delay(duration), Actions.remove());
+        table.actions(Actions.delay(duration), Actions.remove(), Actions.run(() -> { if(id != null) popups.remove(id); }));
         table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
         Core.scene.add(table);
     }
 
     /** Shows a label in the world. This label is behind everything. Does not fade. */
-    public void showLabel(String info, float duration, float worldx, float worldy){
-        var table = new Table(Styles.black3).margin(4);
-        table.touchable = Touchable.disabled;
-        table.update(() -> {
-            if(state.isMenu()) table.remove();
-            Vec2 v = Core.camera.project(worldx, worldy);
-            table.setPosition(v.x, v.y, Align.center);
-        });
-        table.actions(Actions.delay(duration), Actions.remove());
-        table.add(info).style(Styles.outlineLabel);
-        table.pack();
-        table.act(0f);
-        //make sure it's at the back
-        Core.scene.root.addChildAt(0, table);
+    public void showLabel(@Nullable String info, int id, float duration, float worldx, float worldy, int flags){
+        if(info == null){ // null info allows deletion of old labels provided they have ids
+            var label = labels.remove(id);
+            if(label != null) label.remove();
+            return;
+        }
 
-        table.getChildren().first().act(0f);
+        var label = id == -1 ? WorldLabel.create() : labels.get(id, WorldLabel::create); // todo: pool?
+        label.id = Integer.MIN_VALUE; //arbitrary value that won't be synced to, it's fine if IDs conflict
+        label.x = worldx;
+        label.y = worldy;
+        label.text = info;
+        label.flags = (byte)flags; // flag | flag2 at call site turns it into an int so the flags param here has to be int or casting has to be done at every call site
+        label.duration = duration == Float.MAX_VALUE ? -1 : duration; // prefer -1 to Float.MAX_VALUE so that the update() function isn't called every tick
+        if(id != -1 && label.duration >= 0 && label.expired == null) label.expired = () -> labels.remove(id); // only set once to prevent extra garbage for updated labels
+        label.add();
     }
 
     public void showInfo(String info){
@@ -601,6 +640,10 @@ public class UI implements ApplicationListener, Loadable{
         t.update(() -> {
             t.setPosition(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f, Align.center);
             t.toFront();
+
+            if(state.isMenu() || !ui.hudfrag.shown){
+                t.remove();
+            }
         });
         t.actions(Actions.fadeOut(duration, Interp.pow4In), Actions.remove());
         t.pack();
@@ -670,7 +713,12 @@ public class UI implements ApplicationListener, Loadable{
     /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
      * @see UI#showMenu(String, String, String[][], Intc) */
     public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
-        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> callback.get(option));
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
+            callback.get(option);
+            if(!state.isGame()){
+                myself.hide();
+            }
+        });
         dialog.closeOnBack(() -> {
             followUpMenus.remove(menuId);
             callback.get(-1);

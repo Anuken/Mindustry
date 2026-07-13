@@ -2,6 +2,7 @@ package mindustry.world;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.math.geom.QuadTree.*;
@@ -17,6 +18,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 
 import static mindustry.Vars.*;
 
@@ -25,7 +27,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     private static final TilePreChangeEvent preChange = new TilePreChangeEvent();
     private static final TileFloorChangeEvent floorChange = new TileFloorChangeEvent();
     private static final TileOverlayChangeEvent overlayChange = new TileOverlayChangeEvent();;
+
     private static final ObjectSet<Building> tileSet = new ObjectSet<>();
+    private static final IntSet staleGraphs = new IntSet();
 
     /**
      * Extra data for specific blocks. Only saved if Block#saveData is true.
@@ -153,6 +157,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             return result;
         }
         return 0;
+    }
+
+    public boolean inMapArea(){
+        return !state.rules.limitMapArea || Rect.contains(state.rules.limitX , state.rules.limitY , state.rules.limitWidth, state.rules.limitHeight, x, y);
     }
 
     public float worldx(){
@@ -337,6 +345,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         circle(radius, (x, y) -> cons.get(world.rawTile(x, y)));
     }
 
+    public Color getFloorColor(){
+        return floor.getColor(this);
+    }
+
     public void recacheWall(){
         if(!headless && !world.isGenerating()){
             renderer.blocks.recacheWall(this);
@@ -452,7 +464,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /** @return whether the floor on this tile deals damage or can be drowned on. */
     public boolean dangerous(){
-        return !block.solid && (floor.isDeep() || floor.damageTaken > 0);
+        return !block.solid && (floor.isDeep() || floor.damages());
     }
 
     /**
@@ -802,11 +814,58 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     @Remote(called = Loc.server)
     public static void setTeams(int[] positions, Team team){
         if(positions == null) return;
+
+        staleGraphs.clear();
+        tileSet.clear();
+
         for(int pos : positions){
-            Tile tile = world.tile(pos);
-            if(tile != null && tile.build != null){
-                tile.build.changeTeam(team);
+            var build = world.build(pos);
+            if(build != null){
+                var power = build.power;
+                if(build.power != null){
+                    staleGraphs.add(build.power.graph.getID());
+
+                    for(int i = 0; i < power.links.size; i++){
+                        var other = world.build(power.links.items[i]);
+                        if(other != null && other.power != null){
+                            tileSet.add(other);
+                            staleGraphs.add(other.power.graph.getID());
+                        }
+                    }
+                }
+                build.changeTeam(team, false);
             }
+        }
+
+        for(var external : tileSet){
+            reflowPower(team, external);
+        }
+
+        //update power graphs in a second pass
+        for(int pos : positions){
+            var build = world.build(pos);
+            reflowPower(team, build);
+        }
+    }
+
+    private static void reflowPower(Team team, Building build){
+        if(build != null && build.power != null && staleGraphs.contains(build.power.graph.getID())){
+            for(int i = 0; i < build.power.links.size; i++){
+                var other = world.build(build.power.links.items[i]);
+
+                //only reflow links that were connected to the old power graph; ones that have a new one were already covered.
+                if(other != null && other.team != team && other.power != null && staleGraphs.contains(other.power.graph.getID())){
+                    build.power.links.removeIndex(i);
+                    other.power.links.removeValue(build.pos());
+
+                    new PowerGraph().reflow(other);
+
+                    i --;
+                }
+            }
+            new PowerGraph().reflow(build);
+
+            build.updatePowerGraph();
         }
     }
 

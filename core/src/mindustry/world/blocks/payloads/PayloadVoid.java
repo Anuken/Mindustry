@@ -9,7 +9,7 @@ import mindustry.graphics.*;
 
 public class PayloadVoid extends PayloadBlock{
     public Effect incinerateEffect = Fx.blastExplosion;
-    public Sound incinerateSound = Sounds.bang;
+    public Sound incinerateSound = Sounds.unitExplode1;
 
     public PayloadVoid(String name){
         super(name);

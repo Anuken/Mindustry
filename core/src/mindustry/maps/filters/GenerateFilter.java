@@ -12,7 +12,9 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-public abstract class GenerateFilter implements Cloneable{
+import java.io.*;
+
+public abstract class GenerateFilter implements Cloneable, Serializable{
     public int seed = 0;
 
     public void apply(Tiles tiles, GenerateInput in){
@@ -170,7 +172,7 @@ public abstract class GenerateFilter implements Cloneable{
             this.height = height;
         }
 
-        Tile tile(float x, float y){
+        public Tile tile(float x, float y){
             return buffer.get(Mathf.clamp((int)x, 0, width - 1), Mathf.clamp((int)y, 0, height - 1));
         }
 

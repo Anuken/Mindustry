@@ -14,6 +14,7 @@ import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
@@ -23,11 +24,12 @@ import static mindustry.Vars.*;
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
     /** Stat storage for this content. Initialized on demand. */
+    @NoPatch
     public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description & details. May be null. */
-    public @Nullable String description, details;
+    public @Nullable String description, details, credit;
     /** Whether this content is always unlocked in the tech tree. */
     public boolean alwaysUnlocked = false;
     /** Whether to show the description in the research dialog preview. */
@@ -59,11 +61,27 @@ public abstract class UnlockableContent extends MappableContent{
      * If shownPlanets is also empty, it will use Serpulo as the "default" tab.
      * */
     public ObjectSet<UnlockableContent> databaseTabs = new ObjectSet<>();
+    /**
+     * Content category. Defines the primary category of content classification in core database.
+     * For example, "block", "liquid", "unit".
+     * Uses getContentType().name() as a fallback when the value is null or empty.
+     * */
+    public @Nullable String databaseCategory;
+    /**
+     * Category tags. Secondary category of content classification in core database.
+     * For example, "turret", "wall" under databaseCategory "block", "core-unit", "ground-unit" under databaseCategory "units".
+     * Uses "default" as a fallback when the value is null or empty. When using "default", no extra tag label are displayed.
+     * */
+    public @Nullable String databaseTag;
+
     /** The tech tree node for this content, if applicable. Null if not part of a tech tree. */
+    @NoPatch
     public @Nullable TechNode techNode;
     /** Tech nodes for all trees that this content is part of. */
+    @NoPatch
     public Seq<TechNode> techNodes = new Seq<>();
     /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
+    @NoPatch
     protected boolean unlocked;
 
     public UnlockableContent(String name){
@@ -72,12 +90,16 @@ public abstract class UnlockableContent extends MappableContent{
         this.localizedName = Core.bundle.get(getContentType() + "." + this.name + ".name", this.name);
         this.description = Core.bundle.getOrNull(getContentType() + "." + this.name + ".description");
         this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
+        this.credit = Core.bundle.getOrNull(getContentType() + "." + this.name + ".credit");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
     }
 
     @Override
     public void postInit(){
         super.postInit();
+
+        if(databaseCategory == null || databaseCategory.isEmpty()) databaseCategory = getContentType().name();
+        if(databaseTag == null || databaseTag.isEmpty()) databaseTag = "default";
 
         databaseTabs.addAll(shownPlanets);
     }
@@ -95,6 +117,14 @@ public abstract class UnlockableContent extends MappableContent{
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
 
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+
+        //reset stats
+        stats = new Stats();
+    }
+
     public boolean isBanned(){
         return false;
     }
@@ -108,7 +138,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     public String displayDescription(){
-        return minfo.mod == null ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
+        return minfo.mod == null || isPatchContent() ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
     }
 
     /** Checks stat initialization state. Call before displaying stats. */
@@ -143,7 +173,7 @@ public abstract class UnlockableContent extends MappableContent{
             if(!makeNew || !packer.has(name + "-outline")){
                 String regName = name + (makeNew ? "-outline" : "");
                 if(packer.registerOutlined(regName)){
-                    PixmapRegion base = Core.atlas.getPixmap(region);
+                    PixmapRegion base = packer.get(region);
                     var result = Pixmaps.outline(base, outlineColor, outlineRadius);
                     Drawf.checkBleed(result);
                     packer.add(page, regName, result);
@@ -155,7 +185,7 @@ public abstract class UnlockableContent extends MappableContent{
 
     protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
         if(region.found() && packer.registerOutlined(name)){
-            PixmapRegion base = Core.atlas.getPixmap(region);
+            PixmapRegion base = packer.get(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);
             packer.add(PageType.main, name, result);

@@ -9,6 +9,7 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Tooltip.*;
+import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -28,6 +29,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.meta.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -123,6 +126,7 @@ public class PlacementFragment{
         toggler.remove();
         build(group);
         toggler.setZIndex(index);
+        lastDisplayState = null;
     }
 
     boolean updatePick(InputHandler input){
@@ -379,7 +383,7 @@ public class PlacementFragment{
                                 }
                                 String keyComboFinal = keyCombo;
                                 header.left();
-                                header.add(new Image(displayBlock.uiIcon)).size(8 * 4);
+                                header.add(new Image(displayBlock.uiIcon)).scaling(Scaling.fit).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(displayBlock) ? Core.bundle.get("block.unknown") : displayBlock.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
@@ -474,9 +478,9 @@ public class PlacementFragment{
 
                         Bits availableCommands = new Bits(content.unitCommands().size);
                         Bits availableStances = new Bits(content.unitStances().size);
+                        Bits activeTypes = new Bits(content.units().size), prevActiveTypes = new Bits(content.units().size);
 
                         u.left();
-                        int[] curCount = {0};
                         Bits usedCommands = new Bits(content.unitCommands().size);
                         var commands = new Seq<UnitCommand>();
 
@@ -484,7 +488,12 @@ public class PlacementFragment{
                         var stances = new Seq<UnitStance>();
                         var stancesOut = new Seq<UnitStance>();
 
+                        int[][] countBox = new int[1][0];
+
                         rebuildCommand = () -> {
+                            if(countBox[0].length != content.units().size) countBox[0] = new int[content.units().size];
+                            int[] counts = countBox[0];
+
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
@@ -492,8 +501,7 @@ public class PlacementFragment{
                                 usedStances.clear();
                                 commands.clear();
                                 stances.clear();
-
-                                int[] counts = new int[content.units().size];
+                                Arrays.fill(counts, 0);
 
                                 for(var unit : units){
                                     counts[unit.type.id] ++;
@@ -514,11 +522,17 @@ public class PlacementFragment{
 
                                 int col = 0;
                                 for(int i = 0; i < counts.length; i++){
+                                    int fi = i;
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
                                         unitlist.add(StatValues.stack(type, counts[i])).pad(4).with(b -> {
                                             b.clearListeners();
                                             b.addListener(Tooltips.getInstance().create(type.localizedName, false));
+
+                                            Label amountLabel = b.find("stack amount");
+                                            if(amountLabel != null){
+                                                amountLabel.setText(() -> counts[fi] + "");
+                                            }
 
                                             var listener = new ClickListener();
 
@@ -598,10 +612,15 @@ public class PlacementFragment{
 
                         u.update(() -> {
                             {
+                                if(countBox[0].length != content.units().size) countBox[0] = new int[content.units().size];
+                                int[] counts = countBox[0];
                                 activeCommands.clear();
                                 activeStances.clear();
                                 availableCommands.clear();
                                 availableStances.clear();
+                                activeTypes.clear();
+
+                                Arrays.fill(counts, 0);
 
                                 //find the command that all units have, or null if they do not share one
                                 for(var unit : control.input.selectedUnits){
@@ -609,6 +628,10 @@ public class PlacementFragment{
                                         activeCommands.set(cmd.command.id);
                                         activeStances.set(cmd.stances);
                                     }
+
+                                    counts[unit.type.id] ++;
+
+                                    activeTypes.set(unit.type.id);
 
                                     stancesOut.clear();
                                     unit.type.getUnitStances(unit, stancesOut);
@@ -622,12 +645,9 @@ public class PlacementFragment{
                                     }
                                 }
 
-                                int size = control.input.selectedUnits.size;
-                                if(curCount[0] != size || !usedCommands.equals(availableCommands) || !usedStances.equals(availableStances)){
-                                    if(!(curCount[0] + size == 0)){
-                                        rebuildCommand.run();
-                                    }
-                                    curCount[0] = size;
+                                if(!usedCommands.equals(availableCommands) || !usedStances.equals(availableStances) || !prevActiveTypes.equals(activeTypes)){
+                                    rebuildCommand.run();
+                                    prevActiveTypes.set(activeTypes);
                                 }
 
                                 //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
@@ -768,9 +788,9 @@ public class PlacementFragment{
 
         //check tile being hovered over
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(hoverTile != null){
+        if(hoverTile != null && hoverTile.inMapArea()){
             //if the tile has a building, display it
-            if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team())){
+            if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team()) && hoverTile.build.inMapArea()){
                 return nextFlowBuild = hoverTile.build;
             }
 

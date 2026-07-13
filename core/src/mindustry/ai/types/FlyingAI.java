@@ -2,7 +2,6 @@ package mindustry.ai.types;
 
 import arc.math.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
@@ -19,7 +18,7 @@ public class FlyingAI extends AIController{
 
         if(target != null && unit.hasWeapons()){
             if(unit.type.circleTarget){
-                circleAttack(120f);
+                circleAttack(unit.type.circleTargetRadius);
             }else{
                 moveTo(target, unit.type.range * 0.8f);
                 unit.lookAt(target);
@@ -28,30 +27,6 @@ public class FlyingAI extends AIController{
 
         if(target == null && state.rules.waves && unit.team == state.rules.defaultTeam){
             moveTo(getClosestSpawner(), state.rules.dropZoneRadius + 130f);
-        }
-    }
-
-    @Override
-    public Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
-        if(state.rules.randomWaveAI){
-            if(unit.team == Team.derelict) return null;
-            var list = enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag);
-            if(list.isEmpty()) return null;
-
-            Building closest = null;
-            float cdist = 0f;
-            for(Building t : list){
-                if(((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput) && t.block.targetable){
-                    float dst = t.dst2(x, y);
-                    if(closest == null || dst < cdist){
-                        closest = t;
-                        cdist = dst;
-                    }
-                }
-            }
-            return closest;
-        }else{
-            return super.targetFlag(x, y, flag, enemy);
         }
     }
 
@@ -76,7 +51,7 @@ public class FlyingAI extends AIController{
             rand.setSeed(unit.type.id + (state.rules.waves ? state.wave : unit.id));
             //try a few random flags first
             for(int attempt = 0; attempt < 5; attempt++){
-                Teamc result = targetFlag(x, y, randomTargets[rand.random(randomTargets.length - 1)], true);
+                Teamc result = targetFlagActive(x, y, randomTargets[rand.random(randomTargets.length - 1)], true);
                 if(result != null) return result;
             }
             //try the closest target
@@ -88,7 +63,7 @@ public class FlyingAI extends AIController{
                     Teamc result = target(x, y, range, air, ground);
                     if(result != null) return result;
                 }else if(ground){
-                    Teamc result = targetFlag(x, y, flag, true);
+                    Teamc result = targetFlagActive(x, y, flag, true);
                     if(result != null) return result;
                 }
             }

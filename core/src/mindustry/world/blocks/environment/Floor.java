@@ -68,6 +68,8 @@ public class Floor extends Block{
     public Block decoration = Blocks.air;
     /** Whether units can draw shadows over this. */
     public boolean canShadow = true;
+    /** If true, this floor ignores the obstructsLight flag of overlays. */
+    public boolean forceDrawLight = false;
     /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
     public boolean needsSurface = true;
     /** If true, cores can be placed on this floor. */
@@ -110,6 +112,7 @@ public class Floor extends Block{
         allowRectanglePlacement = true;
         instantBuild = true;
         ignoreBuildDarkness = true;
+        obstructsLight = false;
         placeEffect = Fx.rotateBlock;
     }
 
@@ -193,7 +196,7 @@ public class Floor extends Block{
         }
 
         if(isLiquid && walkSound == Sounds.none){
-            walkSound = Sounds.splash;
+            walkSound = Sounds.stepWater;
         }
     }
 
@@ -217,8 +220,8 @@ public class Floor extends Block{
 
         if(Core.atlas.has(name + "-edge")) return;
 
-        var image = Core.atlas.getPixmap(icons()[0]);
-        var edge = Core.atlas.getPixmap(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
+        var image = packer.get(icons()[0]);
+        var edge = packer.get(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
         Pixmap result = new Pixmap(edge.width, edge.height);
 
         for(int x = 0; x < edge.width; x++){

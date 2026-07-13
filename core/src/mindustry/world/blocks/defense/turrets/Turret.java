@@ -13,6 +13,7 @@ import arc.util.io.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
@@ -118,7 +119,9 @@ public class Turret extends ReloadTurret{
     /** Effect created when ammo is used. Not optional. */
     public Effect ammoUseEffect = Fx.none;
     /** Sound emitted when a single bullet is shot. */
-    public Sound shootSound = Sounds.shoot;
+    public Sound shootSound = Sounds.shootDuo;
+    /** Volume of shooting sound. */
+    public float shootSoundVolume = 1f;
     /** Sound emitted when shoot.firstShotDelay is >0 and shooting begins. */
     public Sound chargeSound = Sounds.none;
     /** The sound that this block makes while active. One sound loop. Do not overuse. */
@@ -182,6 +185,7 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.targetsGround, targetGround);
         if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
+        if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
     }
 
     @Override
@@ -256,6 +260,12 @@ public class Turret extends ReloadTurret{
         public abstract BulletType type();
     }
 
+
+    @Override
+    public boolean rotatedOutput(int x, int y){
+        return false;
+    }
+
     @Override
     public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, @Nullable Object config){
         super.placeEnded(tile, builder, rotation, config);
@@ -279,7 +289,7 @@ public class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = (BlockUnitc)UnitTypes.block.create(team);
-        public boolean wasShooting;
+        public boolean wasShooting, isShooting;
         public int queuedBullets = 0;
 
         public float heatReq;
@@ -303,6 +313,16 @@ public class Turret extends ReloadTurret{
             if(soundLoop != null){
                 soundLoop.stop();
             }
+        }
+
+        @Nullable
+        public UnlockableContent getAmmoContent(){
+            return null;
+        }
+
+        /** @return ammo as a fraction of capacity; used for direct turret control HUD */
+        public float getAmmoFraction(){
+            return 1f;
         }
 
         @Override
@@ -342,7 +362,14 @@ public class Turret extends ReloadTurret{
 
         @Override
         public boolean shouldConsume(){
-            return isShooting() || reloadCounter < reload;
+            return isShooting || reloadCounter < reload;
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(enabled && !hasAmmo()) return BlockStatus.noInput;
+
+            return super.status();
         }
 
         @Override
@@ -383,7 +410,7 @@ public class Turret extends ReloadTurret{
                 case rotation -> rotation;
                 case shootX -> World.conv(targetPos.x);
                 case shootY -> World.conv(targetPos.y);
-                case shooting -> isShooting() ? 1 : 0;
+                case shooting -> isShooting ? 1 : 0;
                 case progress -> progress();
                 default -> super.sense(sensor);
             };
@@ -400,7 +427,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isShooting(){
-            return alwaysShooting || (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return isShooting;
         }
 
         @Override
@@ -411,12 +438,16 @@ public class Turret extends ReloadTurret{
             return (Unit)unit;
         }
 
+        public boolean controlled(){
+            return unit.isPlayer();
+        }
+
         public boolean logicControlled(){
             return logicControlTime > 0;
         }
 
         public boolean isActive(){
-            return (target != null || wasShooting) && enabled;
+            return (target != null || wasShooting) && enabled && activationTimer <= 0;
         }
 
         public void targetPosition(Posc pos){
@@ -458,13 +489,18 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateTile(){
             if(!validateTarget()) target = null;
+            isShooting = alwaysShooting || (unit.controller() instanceof Player ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+
+            if(unit.isPlayer()){ //there's no reason to update this when a player isn't controlling it
+                unit.ammo(getAmmoFraction());
+            }
 
             if(soundLoop != null){
                 soundLoop.update(x, y, shouldActiveSound(), activeSoundVolume());
             }
 
-            float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
-            if(warmupTarget > 0 && !isControlled()){
+            float warmupTarget = (isShooting && canConsume()) || charging() ? 1f : 0f;
+            if(warmupTarget > 0 && !controlled()){
                 warmupHold = 1f;
             }
             if(warmupHold > 0f){
@@ -508,11 +544,7 @@ public class Turret extends ReloadTurret{
                 ((Building)this).rotation = Mathf.mod(Mathf.round(rotation / 90f), 4);
             }
 
-            //turret always reloads regardless of whether it's targeting something
-            if(reloadWhileCharging || !charging()){
-                updateReload();
-                updateCooling();
-            }
+            handleReload();
 
             if(state.rules.fog){
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
@@ -520,6 +552,11 @@ public class Turret extends ReloadTurret{
                     lastRangeChange = newRange;
                     fogControl.forceUpdate(team, this);
                 }
+            }
+
+            if(activationTimer > 0){
+                activationTimer -= Time.delta;
+                return;
             }
 
             if(hasAmmo()){
@@ -532,7 +569,7 @@ public class Turret extends ReloadTurret{
                 if(validateTarget()){
                     boolean canShoot;
 
-                    if(isControlled()){ //player behavior
+                    if(controlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());
                         canShoot = unit.isShooting();
                     }else if(logicControlled()){ //logic behavior
@@ -544,7 +581,7 @@ public class Turret extends ReloadTurret{
                         canShoot = within(target, range() + (target instanceof Sized hb ? hb.hitSize()/1.9f : 0f));
                     }
 
-                    if(!isControlled()){
+                    if(!controlled()){
                         unit.aimX(targetPos.x);
                         unit.aimY(targetPos.y);
                     }
@@ -579,8 +616,16 @@ public class Turret extends ReloadTurret{
             super.handleLiquid(source, liquid, amount);
         }
 
+        @Override
+        public boolean canConsume(){
+            if(heatRequirement > 0 && heatReq <= 0f){
+                return false;
+            }
+            return super.canConsume();
+        }
+
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
+            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || controlled() || logicControlled();
         }
 
         protected boolean canHeal(){
@@ -648,8 +693,13 @@ public class Turret extends ReloadTurret{
         /** @return whether the turret has ammo. */
         public boolean hasAmmo(){
             //skip first entry if it has less than the required amount of ammo
-            if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot && ammo.get(ammo.size - 2).amount >= ammoPerShot){
-                ammo.swap(ammo.size - 1, ammo.size - 2);
+            if(ammo.size >= 2 && ammo.peek().amount < ammoPerShot){
+                for(int i = 0; i < ammo.size; i ++){
+                    if(ammo.get(i).amount >= ammoPerShot){
+                        ammo.swap(ammo.size - 1, i);
+                        break;
+                    }
+                }
             }
 
             //used for "side-ammo" like gas in some turrets
@@ -662,11 +712,17 @@ public class Turret extends ReloadTurret{
             return queuedBullets > 0 && shoot.firstShotDelay > 0;
         }
 
+        protected void handleReload(){
+            //turret always reloads regardless of whether it's targeting something
+            if((reloadWhileCharging || !charging()) && reloadCounter < reload){
+                //update the two reload related methods
+                updateReload();
+                updateCooling();
+            }
+        }
+
         protected void updateReload(){
             reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
-
-            //cap reload for visual reasons
-            reloadCounter = Math.min(reloadCounter, reload);
         }
 
         @Override
@@ -695,7 +751,9 @@ public class Turret extends ReloadTurret{
                 type.chargeEffect.at(bulletX, bulletY, rotation);
             }
 
-            shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
+            ShootPattern pattern = type.shootPattern != null ? type.shootPattern : shoot;
+
+            pattern.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
                 int barrel = barrelCounter;
 
@@ -735,7 +793,7 @@ public class Turret extends ReloadTurret{
 
             (shootEffect == null ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             (smokeEffect == null ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
-            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
+            (type.shootSound != Sounds.none ? type.shootSound : shootSound).at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
 
             ammoUseEffect.at(
                 x - Angles.trnsx(rotation, ammoEjectBack),

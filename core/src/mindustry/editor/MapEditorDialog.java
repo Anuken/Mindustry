@@ -20,6 +20,7 @@ import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
+import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -93,7 +94,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.button("@editor.import", Icon.download, () -> createDialog("@editor.import",
                 "@editor.importmap", "@editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
                 "@editor.importfile", "@editor.importfile.description", Icon.file, (Runnable)() ->
-                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
+                FileChooser.open(mapExtension).submit(file -> ui.loadAnd(() -> {
                     maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
                             ui.showInfo("@editor.errorimage");
@@ -104,10 +105,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 })),
 
                 "@editor.importimage", "@editor.importimage.description", Icon.fileImage, (Runnable)() ->
-                platform.showFileChooser(true, "png", file ->
+                FileChooser.open("png").submit(file ->
                 ui.loadAnd(() -> {
                     try{
                         Pixmap pixmap = new Pixmap(file);
+                        //if you want to bypass the limit, use mods or the console; larger maps are not supported
+                        if(pixmap.width > MapResizeDialog.maxSize || pixmap.height > MapResizeDialog.maxSize){
+                            throw new Exception("Image is too large (maximum size is " + MapResizeDialog.maxSize + "x" + MapResizeDialog.maxSize + ")");
+                        }
                         editor.beginEdit(pixmap);
                         pixmap.dispose();
                     }catch(Exception e){
@@ -119,9 +124,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.button("@editor.export", Icon.upload, () -> createDialog("@editor.export",
             "@editor.exportfile", "@editor.exportfile.description", Icon.file,
-                (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
+                (Runnable)() -> FileChooser.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
             "@editor.exportimage", "@editor.exportimage.description", Icon.fileImage,
-                (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), "png", file -> {
+                (Runnable)() -> FileChooser.export(editor.tags.get("name", "unknown"), "png", file -> {
                     Pixmap out = MapIO.writeImage(editor.tiles());
                     file.writePng(out);
                     out.dispose();
@@ -214,11 +219,22 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         });
 
                         for(int i = 0; i < steps; i++){
+                            for(TeamData data : state.teams.getActive()){
+                                if(data.team.rules().fillItems && data.cores.size > 0){
+                                    var core = data.cores.first();
+                                    content.items().each(it -> {
+                                        if(it.isOnPlanet(Vars.state.getPlanet()) && !it.isHidden()){
+                                            core.items.set(it, core.getMaximumAccepted(it));
+                                        }
+                                    });
+                                }
+                            }
                             Time.update();
                             for(var build : builds){
                                 build.update();
                             }
                             Groups.powerGraph.update();
+                            Groups.bullet.update(); //needed for mass drivers...
                         }
 
                         //spawned units will cause havoc, so clear them
@@ -334,7 +350,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }
 
-            Groups.build.clear();
             Groups.weather.clear();
             logic.play();
 
@@ -383,6 +398,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         state.rules.allowEditRules = false;
         state.rules.objectiveFlags.clear();
         state.rules.objectives.each(MapObjective::reset);
+        state.stats = new GameStats();
         String name = editor.tags.get("name", "").trim();
         editor.tags.put("rules", JsonIO.write(state.rules));
         editor.tags.remove("width");
@@ -402,7 +418,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             infoDialog.show();
             Core.app.post(() -> ui.showErrorMessage("@editor.save.noname"));
         }else{
-            Map map = maps.all().find(m -> m.name().equals(name));
+            Map map = maps.all().find(m -> m.name().equalsIgnoreCase(name));
             if(map != null && !map.custom && !map.workshop){
                 handleSaveBuiltin(map);
             }else{
@@ -412,7 +428,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     editor.tags.put("steamid", map.tags.get("steamid"));
                     workshop = true;
                 }
-                returned = maps.saveMap(editor.tags);
+                returned = maps.saveMap(editor.tags, false);
                 if(workshop){
                     returned.workshop = workshop;
                 }
@@ -771,7 +787,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void tryExit(){
-        ui.showConfirm("@confirm", "@editor.unsaved", this::hide);
+        ui.showConfirm("@confirm", "@editor.unsaved", () -> {
+            //clears data patches
+            logic.reset();
+            hide();
+        });
     }
 
     private void addBlockSelection(Table cont){
@@ -811,6 +831,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }).growX().row();
         cont.add(pane).expandY().growX().top().left();
 
+        rebuildBlockSelection("");
+    }
+
+    public void rebuildBlockSelection(){
         rebuildBlockSelection("");
     }
 

@@ -3,6 +3,7 @@ package mindustry.world.blocks.campaign;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -52,6 +53,10 @@ public class LandingPad extends Block{
     public float liquidPad = 2f;
     public Color bottomColor = Pal.darkerMetal;
 
+    public float landSoundVolume = 0.75f;
+    //impact timing must be exactly equal to arrivalDuration
+    public Sound landSound = Sounds.padLand;
+
     public LandingPad(String name){
         super(name);
 
@@ -66,7 +71,7 @@ public class LandingPad extends Block{
         lightRadius = 90f;
 
         config(Item.class, (LandingPadBuild build, Item item) -> {
-            if(!build.accessible()) return;
+            if(!build.accessible() || !item.isOnPlanet(state.getPlanet()) || !item.unlockedNow()) return;
 
             build.config = item;
         });
@@ -145,6 +150,7 @@ public class LandingPad extends Block{
             arriving = config;
             arrivingTimer = 0f;
             liquidRemoved = 0f;
+            landSound.at(x, y, 1f, landSoundVolume);
 
             if(state.isCampaign() && !isFake()){
                 state.rules.sector.info.importCooldownTimers.put(config, 0f);
@@ -175,6 +181,7 @@ public class LandingPad extends Block{
                 }
 
                 waiting.each((item, pads) -> {
+                    pads.removeAll(l -> l.config != item);
                     if(pads.size > 0){
                         pads.sort(p -> p.priority);
 
@@ -331,7 +338,7 @@ public class LandingPad extends Block{
                         Call.landingPadLanded(tile);
                     }else{
                         //queue landing for next frame
-                        waiting.get(config, Seq::new).add(this);
+                        waiting.get(config, () -> new Seq<>(false)).add(this);
                     }
                 }
             }
