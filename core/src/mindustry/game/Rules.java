@@ -173,6 +173,8 @@ public class Rules{
     public boolean alwaysPlayMusic = false;
     /** If true, automatic music is disabled. */
     public boolean disableMusic = false;
+    /** Multiplier for music volume (max value is 1). */
+    public float musicVolume = 1f;
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
     /** Starting items put in cores. */

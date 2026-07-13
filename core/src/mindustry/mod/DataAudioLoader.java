@@ -16,13 +16,15 @@ public class DataAudioLoader{
     private Seq<Sound> loadedSounds = new Seq<>();
     private Seq<Music> loadedMusic = new Seq<>();
     private ObjectSet<String> registered = new ObjectSet<>();
+    private ObjectMap<Fi, String> fileToName = new ObjectMap<>();
 
     public void load(Seq<SoundAsset> sounds, Seq<MusicAsset> musics){
 
         int nextSoundId = soundIdOffset + 1;
 
         for(var asset : sounds){
-            if(registered.contains(prefix + asset.name)){
+            String realName = prefix + asset.name;
+            if(registered.contains(realName)){
                 Log.warn("Duplicate audio file: " + asset.name);
                 continue;
             }
@@ -35,14 +37,16 @@ public class DataAudioLoader{
 
             if(Vars.headless || !Core.audio.initialized() || sound.file == null) continue;
 
-            Vars.logicVars.put("@sfx-" + prefix + asset.name, nextSoundId - 1, false);
+            Vars.logicVars.put("@sfx-" + realName, nextSoundId - 1, false);
 
-            Core.assets.addAsset(prefix + asset.name, Sound.class, sound);
-            registered.add(prefix + asset.name);
+            Core.assets.addAsset(realName, Sound.class, sound);
+            registered.add(realName);
+            fileToName.put(file, realName);
         }
 
         for(var asset : musics){
-            if(registered.contains(prefix + asset.name)){
+            String realName = prefix + asset.name;
+            if(registered.contains(realName)){
                 Log.warn("Duplicate audio file: " + asset.name);
                 continue;
             }
@@ -52,9 +56,15 @@ public class DataAudioLoader{
 
             if(Vars.headless || !Core.audio.initialized() || music.file == null) continue;
 
-            Core.assets.addAsset(prefix + asset.name, Music.class, music);
-            registered.add(prefix + asset.name);
+            Core.assets.addAsset(realName, Music.class, music);
+            registered.add(realName);
+            fileToName.put(file, realName);
         }
+    }
+
+    /** @return proper extension-less audio name of the specified cached file, including prefix */
+    public @Nullable String getName(Fi file){
+        return fileToName.get(file);
     }
 
     public void unload(){
@@ -80,5 +90,6 @@ public class DataAudioLoader{
         loadedSounds.clear();
         loadedMusic.clear();
         registered.clear();
+        fileToName.clear();
     }
 }

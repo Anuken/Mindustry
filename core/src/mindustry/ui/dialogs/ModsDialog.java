@@ -93,7 +93,6 @@ public class ModsDialog extends BaseDialog{
             for(var entry : list){
                 var mod = repoToMod.get(entry.repo);
                 if(mod != null){
-                    Log.info("FOUND: " + mod);
                     modToListing.put(mod, entry);
                     if(Strings.checkNewerSemver(entry.version, mod.meta.version)) withUpdates.add(mod);
                 }

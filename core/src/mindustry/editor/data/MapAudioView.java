@@ -54,10 +54,7 @@ public class MapAudioView implements AssetView{
                         m.play();
                     }else if(audioSource instanceof Sound s){
                         lastPlaying = s;
-                        var bus = s.bus;
-                        s.bus = control.sound.uiBus;
-                        s.play();
-                        s.bus = bus;
+                        s.play(control.sound.uiBus);
                     }
                 }).update(i -> i.getStyle().imageUp = audioSource != null && audioSource.countPlaying() > 0 ? Icon.pause : Icon.play).size(h);
             }

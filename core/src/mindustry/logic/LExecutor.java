@@ -1782,6 +1782,7 @@ public class LExecutor{
                 case lighting -> state.rules.lighting = value.bool();
                 case canGameOver -> state.rules.canGameOver = value.bool();
                 case pauseDisabled -> state.rules.pauseDisabled = value.bool();
+                case musicVolume -> state.rules.musicVolume = Mathf.clamp(value.numf());
                 case mapArea -> {
                     int x = p1.numi(), y = p2.numi(), w = p3.numi(), h = p4.numi();
                     if(!checkMapArea(x, y, w, h, false)){

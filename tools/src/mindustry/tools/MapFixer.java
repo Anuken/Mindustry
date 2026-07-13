@@ -3,15 +3,20 @@ package mindustry.tools;
 import arc.*;
 import arc.backend.headless.*;
 import arc.files.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.editor.*;
+import mindustry.game.MapObjectives.*;
 import mindustry.io.*;
-import mindustry.maps.*;
+import mindustry.logic.LExecutor.*;
 import mindustry.maps.Map;
+import mindustry.maps.*;
 import mindustry.net.*;
 import mindustry.type.*;
+import mindustry.world.blocks.logic.LogicBlock.*;
 
 import java.util.*;
 
@@ -66,16 +71,61 @@ public class MapFixer{
                 Map map = maps.all().find(m -> m.file.absolutePath().equals(f.absolutePath()));
                 if(map == null) return;
 
+                boolean isHidden = f.path().contains("/hidden/");
+
                 SectorPreset preset = content.sectors().find(s -> s.generator.map.file.absolutePath().equals(f.absolutePath()));
                 if(preset == null) return;
+
+                //uniquely broken (TODO: remove and fix 263)
+                if(preset.sector.planet == Planets.serpulo && preset.sector.id == 263) return;
 
                 String targetName = preset.requireUnlock ? preset.localizedName : f.nameWithoutExtension();
 
                 editor.beginEdit(map);
                 boolean changed = false;
 
-                if(!state.rules.bannedBlocks.isEmpty()) Log.warn("@: Banned blocks found: @", map.name(), state.rules.bannedBlocks);
-                if(!state.rules.bannedUnits.isEmpty()) Log.warn("@: Banned units found: @", map.name(), state.rules.bannedUnits);
+                if(!state.rules.bannedBlocks.isEmpty()){
+                    Log.warn("@: Banned blocks found: @", map.name(), state.rules.bannedBlocks);
+
+                    if(isHidden){
+                        state.rules.bannedBlocks.clear();
+                        changed = true;
+                    }
+                }
+                if(!state.rules.bannedUnits.isEmpty()){
+                    Log.warn("@: Banned units found: @", map.name(), state.rules.bannedUnits);
+
+                    if(isHidden){
+                        state.rules.bannedUnits.clear();
+                        changed = true;
+                    }
+                }
+
+                Seq<TimerObjective> timers = state.rules.objectives.all.select(m -> m instanceof TimerObjective && !m.hidden && ((TimerObjective)m).text != null &&
+                !((TimerObjective)m).text.isEmpty() && !((TimerObjective)m).text.contains("@")).as();
+
+                if(!timers.isEmpty()){
+                    Log.warn("@: Unlocalized objectives: @", map.name(), timers.toString(", ", t -> "'" + t.text + "'"));
+                    if(isHidden){
+                        changed = true;
+                        timers.each(t -> t.hidden = true);
+                    }
+                }
+
+                Seq<LogicBuild> logicBlocks = state.teams.getActive().flatMap(t -> t.getBuildings(Blocks.worldProcessor)).as();
+                for(var build : logicBlocks){
+                    boolean printsFound = false;
+                    for(var inst : build.executor.instructions){
+                        if(inst instanceof PrintI p && p.value.obj() != null && !String.valueOf(p.value.obj()).startsWith("@")){
+                            Log.info("@: suspicious processor print: @", map.name(), p.value.objval);
+                            printsFound = true;
+                        }
+                    }
+                    if(printsFound && isHidden){
+                        build.code = Seq.with(build.code.split("\n")).removeAll(b -> b.startsWith("message") || b.startsWith("print")).toString("\n");
+                        changed = true;
+                    }
+                }
 
                 if(state.wave > 1){
                     Log.warn("@: Wave is @, but should be 1.", map.name(), state.wave);
@@ -92,6 +142,12 @@ public class MapFixer{
                 if(!map.name().equals(targetName)){
                     Log.info("Changed name: '@' -> '@'", map.name(), targetName);
                     map.tags.put("name", targetName);
+                    changed = true;
+                }
+
+                if(isHidden && !state.rules.attackMode && state.rules.winWave <= 1){
+                    Log.warn("@: Attack mode not enabled.",  map.name());
+                    state.rules.attackMode = true;
                     changed = true;
                 }
 
