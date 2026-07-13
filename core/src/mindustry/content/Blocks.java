@@ -2100,7 +2100,6 @@ public class Blocks{
             capacity = 6;
             health = 30;
             buildCostMultiplier = 3f;
-            displayedSpeed = 10f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
