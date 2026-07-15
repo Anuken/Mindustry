@@ -315,7 +315,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
     public void fileDropped(Fi file){
         if(OS.isIos || OS.isAndroid) return;
 
-        if(file.extension().equalsIgnoreCase(saveExtension) || file.extension().equalsIgnoreCase(schematicExtension)){
+        if(file.extEquals(saveExtension) || file.extEquals(schematicExtension)){
             handleFileImport(file);
         }
     }
@@ -338,6 +338,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }else{
                     SaveMeta meta = SaveIO.getMeta(file);
                     if(!meta.isMap()){ //open save
+                        //not sure if this is a great idea but leaving the editor open would lead to catastrophic bugs
+                        if(ui.editor.isShown()) ui.editor.hide();
+
                         if(meta.rules.sector == null){
                             SaveSlot slot = control.saves.importSave(file);
                             ui.load.runLoadSave(slot);
@@ -345,9 +348,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                             ui.showErrorMessage("@save.nocampaign");
                         }
                     }else{ //open map
-                        if(!ui.maps.isShown()){
-                            ui.maps.show();
-                        }
+                        if(!ui.maps.isShown()) ui.maps.show();
                         ui.maps.tryImportMap(file, result -> ui.maps.showMap(result));
                     }
                 }
