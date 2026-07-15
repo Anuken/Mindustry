@@ -167,7 +167,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     protected void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
-        makeOutline(page, packer, region, makeNew, outlineColor, outlineRadius, 0);
+        makeOutline(packer, region, makeNew, outlineColor, outlineRadius, 0);
     }
 
     protected void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius, int padding){

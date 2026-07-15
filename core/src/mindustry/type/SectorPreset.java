@@ -124,7 +124,7 @@ public class SectorPreset extends UnlockableContent{
         super.createIcons(packer);
 
         if(outline && uiIcon.found() && uiIcon != Icon.terrain.getRegion()){
-            makeOutline(PageType.ui, packer, uiIcon, true, outlineColor, outlineRadius, outlineRadius);
+            makeOutline(packer, uiIcon, true, outlineColor, outlineRadius, outlineRadius);
         }
     }
 
