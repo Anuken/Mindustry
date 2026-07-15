@@ -267,8 +267,8 @@ public class Maps{
         }
     }
 
-    /** Import a map, then save it. This updates all values and stored data necessary. */
-    public void importMap(Fi file) throws IOException{
+    /** Imports a map, then saves it. This updates all values and stored data necessary. */
+    public Map importMap(Fi file) throws IOException{
         Fi dest = findFile(file.name());
         file.copyTo(dest);
 
@@ -288,6 +288,8 @@ public class Maps{
         if(error[0] != null){
             throw new IOException(error[0]);
         }
+
+        return map;
     }
 
     /** Attempts to run the following code;

@@ -2,6 +2,7 @@ package mindustry.ui.dialogs;
 
 import arc.*;
 import arc.files.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -44,53 +45,60 @@ public class EditorMapsDialog extends MapListDialog{
             FileChooser.open(mapExtension).submitMulti(files -> {
                 ui.loadAnd(() -> {
                     for(Fi file : files){
-                        maps.tryCatchMapError(() -> {
-                            if(MapIO.isImage(file)){
-                                ui.showErrorMessage("@editor.errorimage");
-                                return;
-                            }
-
-                            Map map = MapIO.createMap(file, true);
-
-                            //when you attempt to import a save, it will have no name, so generate one
-                            String name = map.tags.get("name", () -> {
-                                String result = "unknown";
-                                int number = 0;
-                                while(maps.byName(result + number++) != null) ;
-                                return result + number;
-                            });
-
-                            //this will never actually get called, but it remains just in case
-                            if(name == null){
-                                ui.showErrorMessage("@editor.errorname");
-                                return;
-                            }
-
-                            Map conflict = maps.all().find(m -> m.name().equalsIgnoreCase(name));
-
-                            if(conflict != null && !conflict.custom){
-                                ui.showInfo(Core.bundle.format("editor.import.exists", name));
-                            }else if(conflict != null){
-                                ui.showConfirm("@confirm", Core.bundle.format("editor.overwrite.confirm", map.name()), () -> {
-                                    maps.tryCatchMapError(() -> {
-                                        maps.removeMap(conflict);
-                                        maps.importMap(map.file);
-                                        setup();
-                                    });
-                                });
-                            }else{
-                                maps.importMap(map.file);
-                                setup();
-                            }
-                        });
+                        tryImportMap(file, null);
                     }
                 });
             });
         }).size(210f, 64f);
     }
 
+    public void tryImportMap(Fi file, @Nullable Cons<Map> success){
+        maps.tryCatchMapError(() -> {
+            if(MapIO.isImage(file)){
+                ui.showErrorMessage("@editor.errorimage");
+                return;
+            }
+
+            Map map = MapIO.createMap(file, true);
+
+            //when you attempt to import a save, it will have no name, so generate one
+            String name = map.tags.get("name", () -> {
+                String result = "unknown";
+                int number = 0;
+                while(maps.byName(result + number++) != null) ;
+                return result + number;
+            });
+
+            //this will never actually get called, but it remains just in case
+            if(name == null){
+                ui.showErrorMessage("@editor.errorname");
+                return;
+            }
+
+            Map conflict = maps.all().find(m -> m.name().equalsIgnoreCase(name));
+
+            if(conflict != null && !conflict.custom){
+                ui.showInfo(Core.bundle.format("editor.import.exists", name));
+            }else if(conflict != null){
+                ui.showConfirm("@confirm", Core.bundle.format("editor.overwrite.confirm", map.name()), () -> {
+                    maps.tryCatchMapError(() -> {
+                        maps.removeMap(conflict);
+                        var imported = maps.importMap(map.file);
+                        setup();
+
+                        if(success != null) success.get(imported);
+                    });
+                });
+            }else{
+                var imported = maps.importMap(map.file);
+                setup();
+                if(success != null) success.get(imported);
+            }
+        });
+    }
+
     @Override
-    void showMap(Map map){
+    public void showMap(Map map){
         BaseDialog dialog = activeDialog = new BaseDialog("@editor.mapinfo");
         dialog.addCloseButton();
 

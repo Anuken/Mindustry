@@ -212,7 +212,7 @@ public class LCanvas extends Table{
             seq.clear();
 
             float totalHeight = getChildren().sumf(e -> e.getPrefHeight() + space);
-            if(height != totalHeight || width != Scl.scl(targetWidth)){
+            if(!Mathf.equal(height, totalHeight, 1f) || !Mathf.equal(width, Scl.scl(targetWidth), 1f)){
                 height = prefHeight = totalHeight;
                 width = prefWidth = Scl.scl(targetWidth);
                 invalidateHierarchy();
