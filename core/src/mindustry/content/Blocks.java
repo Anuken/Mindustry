@@ -6642,6 +6642,7 @@ public class Blocks{
             requirements(Category.units, with(Items.beryllium, 70, Items.silicon, 70, Items.oxide, 25, Items.graphite, 50));
             regionSuffix = "-dark";
             itemCapacity = 100;
+            itemBuffer = itemCapacity - 20;
             consumePower(1f);
             size = 3;
             deconstructSpeed = 3f;
@@ -6655,6 +6656,7 @@ public class Blocks{
             requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 50));
             regionSuffix = "-dark";
             itemCapacity = 320;
+            itemBuffer = itemCapacity - 20;
             consumePower(3f);
             size = 5;
             deconstructSpeed = 6f;

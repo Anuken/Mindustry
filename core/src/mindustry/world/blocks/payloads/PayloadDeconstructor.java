@@ -19,8 +19,8 @@ public class PayloadDeconstructor extends PayloadBlock{
     public float maxPayloadSize = 4;
     public float deconstructSpeed = 2.5f;
     public int dumpRate = 4;
-    /** Any payload with build requirements exceeding (itemCapacity - itemBuffer) is accepted regardless. */
-    public int itemBuffer = 20;
+    /** Any payload with build requirements equalling or exceeding this value is accepted regardless. */
+    public int itemBuffer = 0;
 
     public PayloadDeconstructor(String name){
         super(name);
@@ -133,7 +133,7 @@ public class PayloadDeconstructor extends PayloadBlock{
                     if(items.get(req.item) + realAmount >= itemCapacity) isFull = true;
 
                     //if the payload's requirements are too large within the buffer, receive anyway.
-                    if(realAmount + itemBuffer >= itemCapacity){
+                    if(realAmount >= itemBuffer){
                         isFull = false;
                         break;
                     }
