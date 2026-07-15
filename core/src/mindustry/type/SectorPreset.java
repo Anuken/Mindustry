@@ -2,11 +2,14 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.maps.generators.*;
 import mindustry.mod.Mods.*;
 
@@ -41,6 +44,10 @@ public class SectorPreset extends UnlockableContent{
     public int originalPosition;
     /** Sectors that prevent this sector from being landed on until they are completed. */
     public Seq<Sector> shieldSectors = new Seq<>();
+    /** Set to false to disable outline generation. */
+    public boolean outline = true;
+    public int outlineRadius = 5;
+    public Color outlineColor = Pal.gray;
 
     private @Nullable String fileName;
 
@@ -109,6 +116,15 @@ public class SectorPreset extends UnlockableContent{
         //note that sectors can only have one visual shield target
         for(var other : shieldSectors){
             other.shieldTarget = sector;
+        }
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+
+        if(outline && uiIcon.found() && uiIcon != Icon.terrain.getRegion()){
+            makeOutline(PageType.ui, packer, uiIcon, true, outlineColor, outlineRadius, outlineRadius);
         }
     }
 

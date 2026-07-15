@@ -59,8 +59,15 @@ public class MapAudioView implements AssetView{
                 }).update(i -> i.getStyle().imageUp = audioSource != null && audioSource.countPlaying() > 0 ? Icon.pause : Icon.play).size(h);
             }
 
+            float w = (mobile ? 390f : 450f);
             list.table(Styles.grayPanel, in -> {
-                in.add("[accent]" + asset.name + "\n" + "[lightgray][[" + (audioSource == null ? "?" : UI.formatTime(audioSource.getLength() * 60f)) + "]").labelAlign(Align.left).grow();
+                in.table(v -> {
+                    v.left();
+                    v.add("[accent]" + asset.name).labelAlign(Align.left).left().ellipsis(true).width(w / 2f);
+                    v.row();
+                    v.add("[lightgray][[" + (audioSource == null ? "?" : UI.formatTime(audioSource.getLength() * 60f)) + "]").left();
+                }).width(w / 2f).tooltip("dp-" + asset.name.replace(' ', '_'));
+
                 if(audioSource instanceof Music m){
                     var slider = new Slider(0f, m.getLength(), 0.1f, false);
                     slider.moved(value -> {
@@ -85,7 +92,7 @@ public class MapAudioView implements AssetView{
 
                     in.stack(slider, label).growX().height(42f);
                 }
-            }).size(mobile ? 390f : 450f, h).margin(10f);
+            }).size(w, h).margin(10f);
 
             list.button(Icon.export, Styles.graySquarei, Vars.iconMed, () -> FileChooser.export(asset.name, Strings.getFileExtension(asset.path), file::copyTo)).size(h).disabled(file == null);
 

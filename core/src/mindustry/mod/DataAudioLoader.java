@@ -23,7 +23,7 @@ public class DataAudioLoader{
         int nextSoundId = soundIdOffset + 1;
 
         for(var asset : sounds){
-            String realName = prefix + asset.name;
+            String realName = prefix + asset.name.replace(' ', '_');
             if(registered.contains(realName)){
                 Log.warn("Duplicate audio file: " + asset.name);
                 continue;
@@ -45,7 +45,7 @@ public class DataAudioLoader{
         }
 
         for(var asset : musics){
-            String realName = prefix + asset.name;
+            String realName = prefix + asset.name.replace(' ', '_');
             if(registered.contains(realName)){
                 Log.warn("Duplicate audio file: " + asset.name);
                 continue;
