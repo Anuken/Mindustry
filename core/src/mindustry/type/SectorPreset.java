@@ -9,7 +9,6 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.maps.generators.*;
 import mindustry.mod.Mods.*;
 
