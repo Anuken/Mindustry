@@ -101,6 +101,18 @@ public class MapFixer{
                     }
                 }
 
+                if(state.rules.infiniteResources){
+                    Log.warn("@: infinite resources enabled!", map.name());
+                    state.rules.infiniteResources = false;
+                    changed = true;
+                }
+
+                if(state.rules.instantBuild){
+                    Log.warn("@: instant building enabled!", map.name());
+                    state.rules.instantBuild = false;
+                    changed = true;
+                }
+
                 Seq<TimerObjective> timers = state.rules.objectives.all.select(m -> m instanceof TimerObjective && !m.hidden && ((TimerObjective)m).text != null &&
                 !((TimerObjective)m).text.isEmpty() && !((TimerObjective)m).text.contains("@")).as();
 

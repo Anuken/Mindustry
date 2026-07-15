@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
@@ -343,6 +344,11 @@ public class SoundControl{
         if(cached == null) cached = Core.assets.getOrNull(name + ".mp3", Music.class);
         if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".ogg", Music.class);
         if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".mp3", Music.class);
+        if(cached == null && Vars.mods.orderedMods().any()){ //try loading a modded file
+            String path = FileTree.getAudioPath("music/" + name);
+            if(path == null) return null;
+            return Vars.tree.loadMusic(name);
+        }
         return cached;
     }
 

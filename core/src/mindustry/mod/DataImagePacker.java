@@ -99,7 +99,8 @@ public class DataImagePacker{
 
                 try{
                     Pixmap pixmap = new Pixmap(cacheFile);
-                    String name = (image.isGenerated() ? "" : regionPrefix) + image.name;
+                    //don't add the double dp prefix, only add it if it's not already present
+                    String name = (image.isGenerated() && image.name.contains("-dp-") ? "" : regionPrefix) + image.name;
 
                     packer.pack(name, pixmap);
 
