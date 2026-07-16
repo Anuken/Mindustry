@@ -418,6 +418,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             stack.item = item;
             stack.amount = Mathf.clamp((int)value, 0, type.itemCapacity);
         }
+        if(content instanceof StatusEffect effect){
+            setDuration(effect, value);
+        }
     }
 
     @Override

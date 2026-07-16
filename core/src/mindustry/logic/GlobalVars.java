@@ -137,7 +137,7 @@ public class GlobalVars{
         }
 
         for(StatusEffect effect : Vars.content.statusEffects()){
-            put("@" + effect.name, effect);
+            put("@status-" + effect.name, effect);
         }
 
         for(var entry : Colors.getColors().entries()){
