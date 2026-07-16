@@ -1570,8 +1570,6 @@ public class LStatements{
         public boolean clear;
         public String effect = "@status-wet", unit = "unit", duration = "10";
 
-        private static @Nullable String[] statusNames;
-
         @Override
         public void build(Table table){
             table.clearChildren();
@@ -1581,11 +1579,10 @@ public class LStatements{
                 build(table);
             }).size(80f, 40f).pad(4f).color(table.color);
 
-            if(statusNames == null){
-                statusNames = content.statusEffects().map(s -> "@status-" + s.name).toArray(String.class);
-            }
-
-            TextField field = field(table, effect, str -> effect = str).width(240f).get();
+            TextField field = field(table, effect, str -> {
+                effect = str;
+                build(table);
+            }).width(240f).wrap().get();
             table.button(b -> {
                 b.image(Icon.pencilSmall);
                 b.clicked(() -> showSelectTable(b, (t, hide) -> {
@@ -1594,6 +1591,7 @@ public class LStatements{
                         if(status == StatusEffects.none) continue;
                         t.button(status.name, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
                             effect = "@status-" + status.name;
+                            build(table);
                             field.setText(effect);
                             hide.run();
                         }).size(240f, 40f).marginLeft(5f).padLeft(-1f).row();
@@ -1601,20 +1599,28 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-2f).color(table.color);
 
-            table.add(clear ? " from " : " to ");
-
             row(table);
 
-            fields(table, unit, str -> unit = str);
+            table.add(clear ? " from " : " to ").left();
 
-            if(!clear && !(content.statusEffect(effect) != null && content.statusEffect(effect).permanent)){
+            fields(table, unit, str -> unit = str).left();
 
-                table.add(" for ");
+            if(!clear && !isPermanent()){
+                row(table);
 
-                fields(table, duration, str -> duration = str);
+                table.add(" for ").left();
 
-                table.add(" sec");
+                fields(table, duration, str -> duration = str).left();
+
+                table.add(" sec").left();
             }
+        }
+
+        private boolean isPermanent(){
+            if(!effect.startsWith("@status-")) return false;
+            StatusEffect status = content.statusEffect(effect.substring(8));
+            if(status == null) return false;
+            return status.permanent;
         }
 
         @Override
