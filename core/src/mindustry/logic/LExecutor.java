@@ -1723,10 +1723,9 @@ public class LExecutor{
 
     public static class ApplyEffectI implements LInstruction{
         public boolean clear;
-        public String effect;
-        public LVar unit, duration;
+        public LVar effect, unit, duration;
 
-        public ApplyEffectI(boolean clear, String effect, LVar unit, LVar duration){
+        public ApplyEffectI(boolean clear, LVar effect, LVar unit, LVar duration){
             this.clear = clear;
             this.effect = effect;
             this.unit = unit;
@@ -1740,11 +1739,11 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            if(unit.obj() instanceof Unit unit && content.statusEffect(effect) != null){
+            if(unit.obj() instanceof Unit unit && effect.obj() instanceof StatusEffect effect){
                 if(clear){
-                    unit.unapply(content.statusEffect(effect));
+                    unit.unapply(effect);
                 }else{
-                    unit.apply(content.statusEffect(effect), duration.numf() * 60f);
+                    unit.apply(effect, duration.numf() * 60f);
                 }
             }
         }
