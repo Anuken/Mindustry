@@ -2076,8 +2076,8 @@ public class Blocks{
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
-            speed = 0.0961f;
-            displayedSpeed = 12f;
+            speed = 0.0801f;
+            displayedSpeed = 10f;
         }};
 
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
@@ -2091,8 +2091,8 @@ public class Blocks{
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 280;
-            speed = 0.0961f;
-            displayedSpeed = 12f;
+            speed = 0.0801f;
+            displayedSpeed = 10f;
         }};
 
         junction = new Junction("junction"){{
