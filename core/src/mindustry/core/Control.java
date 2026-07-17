@@ -96,7 +96,7 @@ public class Control implements ApplicationListener, Loadable{
                     
                     Save data may randomly get deleted or corrupted. [accent]Make sure you back up your save before playing.[]
                     Unless you know what you're doing, play the stable (v8) version instead.
-                    """).growX().maxWidth(Math.min(graphics.getWidth() / Scl.scl(1f), 600f)).labelAlign(Align.center);
+                    """).growX().wrap().maxWidth(Math.min(graphics.getWidth() / Scl.scl(1f) - Scl.scl(10f), Scl.scl(600f))).labelAlign(Align.center);
                     diag.cont.row();
                     diag.cont.check("@dontshowagain", v -> settings.put(key, v));
 
