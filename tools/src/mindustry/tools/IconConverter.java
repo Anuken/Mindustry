@@ -14,11 +14,11 @@ public class IconConverter{
         Process for adding an icon to the font:
 
         //CONVERTING A PNG INTO A SVG
-        1. Add your png to core\assets-raw\icons\
+        1. Add your png to core/assets-raw/icons/
         2. Run gradle tools:pack. This will add the png to icons.properties
         3. If you haven't done it already, download inkscape and add in path enviroment variables your inkscape installation so "inkscape --etc" commands can run
-        4. Run gradle tools:icongen. This step will not work if you havent done step 3
-        5. Locate your icon.svg under core\assets-raw\fontgen\extra\
+        4. Run gradle tools:icongen. This step will not work if you haven't done step 3
+        5. Locate your icon.svg under core/assets-raw/fontgen/extra/
         6. Often generated icons cannot be read by fontello correctly ("If image looks not as expected please convert to compound path manually..."), follow the steps in the wiki linked (https://github.com/fontello/fontello/wiki/How-to-use-custom-images#importing-svg-images)
 
         //ADDING TO FONTS
@@ -27,7 +27,7 @@ public class IconConverter{
         3. Click on your new fontello icon to select it. If selected the icon circle should show a red outline
         4. Export the config and font file ("Download webfont" button), replace the old config
         5. Intall FontForge if you havent done it already
-        6. Take the font (.ttf) from the zip, open it in FontForge, and merge it into font.woff (Element -> Merge fonts) inside core\assets\fonts\. You will be prompted whether you want to keep the existing kerning, usually select Yes
+        6. Take the font (.ttf) from the zip, open it in FontForge, and merge it into font.woff (Element -> Merge fonts) inside core/assets/fonts/. You will be prompted whether you want to keep the existing kerning, usually select Yes
         7. Optionally, go view -> go to (the 0x unicode index, or search by name) to check if the icon has been added
         8. Go to file -> generate fonts, uncheck font validation, click generate and replace the old font.woff. Saving the sfd file is not necessary
         9. Repeat steps 6 and 8 for icon.ttf
