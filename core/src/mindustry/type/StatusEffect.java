@@ -235,7 +235,7 @@ public class StatusEffect extends UnlockableContent{
         super.createIcons(packer);
 
         if(outline){
-            makeOutline(packer, uiIcon, true, Pal.gray, 3);
+            makeOutline(packer, uiIcon, false, Pal.gray, 3);
         }
     }
 

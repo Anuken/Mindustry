@@ -419,14 +419,16 @@ public class PlacementFragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if((!displayBlock.isPlaceable() || !player.isBuilder()) && !state.rules.editor){
-                                topTable.row();
-                                topTable.table(b -> {
-                                    b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : !displayBlock.supportsEnv(state.rules.env) ? "@unsupported.environment" : "@banned").width(190f).wrap();
-                                    b.left();
-                                }).padTop(2).left();
-                            }
+                            topTable.row();
+                            topTable.collapser(b -> {
+                                b.left();
+                                b.marginTop(2f);
+                                b.image(Icon.cancel).padRight(2).color(Color.scarlet);
+                                b.label(() -> {
+                                    var reason = getUnplaceableReason(displayBlock);
+                                    return reason == null ? "" : reason;
+                                }).width(190f).wrap();
+                            }, () -> getUnplaceableReason(displayBlock) != null).left();
 
                         }else if(hovered != null){
                             //show hovered item, whatever that may be
@@ -746,6 +748,16 @@ public class PlacementFragment{
                 });
             });
         });
+    }
+
+    @Nullable String getUnplaceableReason(Block block){
+        if(block == null) return null;
+        if(!player.isBuilder()) return "@unit.nobuild";
+        if(state.isEditor()) return null; //always placeable in editor as long as there's a builder
+        if(!block.supportsEnv(state.rules.env)) return "@unsupported.environment";
+        if(block.isBanned()) return "@banned";
+        if(block.isOverPlacementLimit(player.team())) return Core.bundle.format("block.limit", state.rules.blockLimits.get(block));
+        return null;
     }
 
     Seq<Category> getCategories(){

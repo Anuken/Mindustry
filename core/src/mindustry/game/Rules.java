@@ -181,6 +181,8 @@ public class Rules{
     public Seq<ItemStack> loadout = ItemStack.list(Items.copper, 100);
     /** Weather events that occur here. */
     public Seq<WeatherEntry> weather = new Seq<>(1);
+    /** Block placement limits by type. */
+    public ObjectIntMap<Block> blockLimits = new ObjectIntMap<>();
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
     /** Units that cannot be built. */

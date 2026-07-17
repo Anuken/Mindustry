@@ -335,6 +335,10 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                         if(ui.editor.isShown()) ui.editor.hide();
 
                         if(meta.rules.sector == null){
+                            //not sure if this is a great idea, but leaving the editor open would lead to catastrophic bugs
+                            if(ui.editor.isShown()) ui.editor.hide();
+                            if(ui.maps.isShown()) ui.maps.hide();
+
                             SaveSlot slot = control.saves.importSave(file);
                             ui.load.runLoadSave(slot);
                         }else{

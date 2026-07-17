@@ -146,6 +146,7 @@ public class CustomRulesDialog extends BaseDialog{
         main.clear();
         main.left().defaults().fillX().left();
         main.row();
+        main.marginRight(25f);
 
         category("waves");
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
