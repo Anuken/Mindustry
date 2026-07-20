@@ -218,7 +218,10 @@ public class DataPatcher{
             if(reloadContentWorld) fixContentArrays();
         }
 
-        for(var set : patches){
+        var patchIt = patches.iterator();
+        while(patchIt.hasNext()){
+            PatchAsset set = patchIt.next();
+
             set.warnings.clear();
             set.error = false;
 
@@ -234,6 +237,7 @@ public class DataPatcher{
                     if(Vars.headless){
                         String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
                         if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                            patchIt.remove();
                             continue;
                         }
                     }
