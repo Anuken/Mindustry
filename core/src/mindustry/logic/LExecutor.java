@@ -691,6 +691,7 @@ public class LExecutor{
             if(target instanceof Senseable se){
                 if(sense instanceof Content co){
                     to.setnum(se.sense(co));
+                    return;
                 }else if(sense instanceof LAccess la){
                     Object objOut = se.senseObject(la);
 
@@ -701,6 +702,7 @@ public class LExecutor{
                         //object output
                         to.setobj(objOut);
                     }
+                    return;
                 }
             }else{
                 if(sense == LAccess.size || sense == LAccess.bufferSize){
@@ -712,9 +714,10 @@ public class LExecutor{
                         return;
                     }
                 }
-
-                to.setobj(null);
             }
+
+            //unrecognized or unhandled property
+            to.setobj(null);
         }
     }
 
