@@ -995,6 +995,11 @@ public class LStatements{
         public String value = "x", compare = "false";
 
         @Override
+        public boolean useWrapping(){
+            return false;
+        }
+
+        @Override
         public void build(Table table){
             table.add("if ").padLeft(4);
 

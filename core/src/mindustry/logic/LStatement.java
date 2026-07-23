@@ -60,6 +60,10 @@ public abstract class LStatement{
         return read.size == 0 ? null : read.first();
     }
 
+    public boolean useWrapping(){
+        return true;
+    }
+
     public boolean hidden(){
         return false;
     }
@@ -122,12 +126,12 @@ public abstract class LStatement{
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, s -> setter.get(sanitize(s)))
-            .size(144f, 40f).pad(2f).color(table.color);
+            .size(180f, 40f).pad(2f).color(table.color);
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
         table.add(desc).padLeft(10).left().self(this::param);
-        return field(table, value, setter).width(85f).padRight(10).left();
+        return field(table, value, setter).width(100f).padRight(10).left();
     }
 
     /** Puts the text and field in one table, taking up one cell. */
@@ -136,7 +140,7 @@ public abstract class LStatement{
         table.table(t -> {
             t.setColor(table.color);
             t.add(desc).padLeft(10).left().self(this::param);
-            result[0] = field(t, value, setter).width(85f).padRight(10).left();
+            result[0] = field(t, value, setter).width(100f).padRight(10).left();
         });
 
         return result[0];

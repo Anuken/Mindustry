@@ -101,7 +101,7 @@ public class LCanvas extends Table{
     }
 
     public void rebuild(){
-        targetWidth = useRows() ? 400f : 900f;
+        targetWidth = Math.max(400f, Core.graphics.getWidth() / Scl.scl(1f) * 0.95f - Scl.scl(80f));
         float s = pane != null ? pane.getVisualScrollY() : 0f;
         String toLoad = statements != null ? save() : null;
 
@@ -492,12 +492,14 @@ public class LCanvas extends Table{
 
             row();
 
-            table(t -> {
-                t.left();
-                t.marginLeft(4);
-                t.setColor(color);
-                st.build(t);
-            }).pad(4).padTop(2).left().grow();
+            Table t = st.useWrapping() ? new WrapTable() : new Table();
+
+            t.left();
+            t.marginLeft(4);
+            t.setColor(color);
+            st.build(t);
+
+            add(t).pad(4).padTop(2).left().grow();
 
             marginBottom(7);
         }
