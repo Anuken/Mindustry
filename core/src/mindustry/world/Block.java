@@ -1028,6 +1028,14 @@ public class Block extends UnlockableContent implements Senseable{
         return state.rules.isBanned(this);
     }
 
+    public boolean isOverPlacementLimit(Team team){
+        if(!state.rules.editor && !team.isAI()){
+            int limit = state.rules.blockLimits.get(this, 0);
+            return limit > 0 && team.data().getBuildings(this).size >= limit;
+        }
+        return false;
+    }
+
     /** @return whether this block supports a specific environment. */
     public boolean supportsEnv(int env){
         return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
@@ -1586,18 +1594,20 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(outlineIcon){
             AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1];
-            PixmapRegion region = packer.get(atlasRegion);
-            Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
-            Drawf.checkBleed(out);
-            packer.add(PageType.main, atlasRegion.name, out);
-            toDispose.add(out);
+            if(atlasRegion.found()){
+                PixmapRegion region = packer.get(atlasRegion);
+                Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
+                Drawf.checkBleed(out);
+                packer.add(PageType.main, atlasRegion.name, out);
+                toDispose.add(out);
+            }
         }
 
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
         for(var region : toOutline){
-            if(region instanceof AtlasRegion atlas){
+            if(region instanceof AtlasRegion atlas && atlas.found()){
                 String regionName = atlas.name;
                 Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
@@ -1608,20 +1618,22 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        if(gen.length > 1){
-            Pixmap base = packer.get(gen[0]).crop();
-            for(int i = 1; i < gen.length; i++){
-                if(i == gen.length - 1 && last != null){
-                    base.draw(last, 0, 0, true);
-                }else{
-                    base.draw(packer.get(gen[i]), true);
+        if(gen.length > 0 && gen[0] != null && gen[0].found()){
+            if(gen.length > 1){
+                Pixmap base = packer.get(gen[0]).crop();
+                for(int i = 1; i < gen.length; i++){
+                    if(i == gen.length - 1 && last != null){
+                        base.draw(last, 0, 0, true);
+                    }else{
+                        base.draw(packer.get(gen[i]), true);
+                    }
                 }
-            }
-            packer.add(PageType.main, "block-" + name + "-full", base);
+                packer.add(PageType.main, "block-" + name + "-full", base);
 
-            toDispose.add(base);
-        }else{
-            if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", packer.get(gen[0]));
+                toDispose.add(base);
+            }else{
+                if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", packer.get(gen[0]));
+            }
         }
 
         toDispose.each(Pixmap::dispose);

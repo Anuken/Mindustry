@@ -243,7 +243,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     bounded = true,
     /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
     naval = false,
-    /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
+    /** if false, RTS AI controlled units do not automatically attack things while moving. */
     autoFindTarget = true,
     /** If false, 'under' blocks like conveyors are not targeted. */
     targetUnderBlocks = true,
@@ -952,11 +952,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             lightRadius = Math.max(60f, hitSize * 2.3f);
         }
 
-        //if a status effects slows a unit when firing, don't shoot while moving.
-        if(autoFindTarget){
-            autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
-        }
-
         if(flyingLayer < 0) flyingLayer = lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit;
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget |= weapons.size <= 1 && !forceMultiTarget;
@@ -1475,15 +1470,15 @@ public class UnitType extends UnlockableContent implements Senseable{
         float scl = xscl;
         if(unit.inFogTo(Vars.player.team())) return;
 
-        if(buildSpeed > 0f){
+        boolean isPayload = !unit.isAdded();
+
+        if(buildSpeed > 0f && !isPayload){
             unit.drawBuilding();
         }
 
-        if(unit.mining()){
+        if(unit.mining() && !isPayload){
             drawMining(unit);
         }
-
-        boolean isPayload = !unit.isAdded();
 
         Mechc mech = unit instanceof Mechc m ? m : null;
         Segmentc seg = unit instanceof Segmentc c ? c : null;

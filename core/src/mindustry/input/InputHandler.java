@@ -1,7 +1,6 @@
 package mindustry.input;
 
 import arc.*;
-import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -1990,10 +1989,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (config.isShown() && config.getSelected().onConfigureBuildTapped(build) && build.shouldShowConfigure(player))){
-                AudioBus oldBus = build.block.configureSound.bus;
-                build.block.configureSound.bus = control.sound.uiBus;
-                build.block.configureSound.at(build);
-                build.block.configureSound.bus = oldBus;
+                build.block.configureSound.at(build.x, build.y, 1f, 1f, control.sound.uiBus);
                 config.showConfig(build);
             }
             //otherwise...

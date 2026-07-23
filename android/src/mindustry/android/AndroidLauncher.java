@@ -16,8 +16,7 @@ import arc.struct.*;
 import arc.util.*;
 import dalvik.system.*;
 import mindustry.*;
-import mindustry.game.Saves.*;
-import mindustry.io.*;
+import mindustry.game.EventType.*;
 import mindustry.net.*;
 import mindustry.ui.*;
 import mindustry.ui.FileChooser.*;
@@ -222,7 +221,9 @@ public class AndroidLauncher extends AndroidApplication{
             hideStatusBar = true;
             useGL30 = true;
         }});
-        checkFiles(getIntent());
+
+        var intent = getIntent();
+        Events.on(ClientLoadEvent.class, u -> handleIntent(intent));
 
         try{
             //new external folder
@@ -280,54 +281,45 @@ public class AndroidLauncher extends AndroidApplication{
         }
     }
 
-    private void checkFiles(Intent intent){
+    @Override
+    protected void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
+
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent){
+        if(intent == null) return;
+
         try{
             Uri uri = intent.getData();
             if(uri != null){
-                File myFile = null;
                 String scheme = uri.getScheme();
-                if(scheme.equals("file")){
-                    String fileName = uri.getEncodedPath();
-                    myFile = new File(fileName);
-                }else if(!scheme.equals("content")){
-                    //error
-                    return;
-                }
-                boolean save = uri.getPath().endsWith(saveExtension);
-                boolean map = uri.getPath().endsWith(mapExtension);
-                InputStream inStream;
-                if(myFile != null) inStream = new FileInputStream(myFile);
-                else inStream = getContentResolver().openInputStream(uri);
-                Core.app.post(() -> Core.app.post(() -> {
-                    if(save){ //open save
-                        System.out.println("Opening save.");
-                        Fi file = Core.files.local("temp-save." + saveExtension);
-                        file.write(inStream, false);
-                        if(SaveIO.isSaveValid(file)){
-                            try{
-                                SaveSlot slot = control.saves.importSave(file);
-                                ui.load.runLoadSave(slot);
-                            }catch(IOException e){
-                                ui.showException("@save.import.fail", e);
-                            }
-                        }else{
-                            ui.showErrorMessage("@save.import.invalid");
-                        }
-                    }else if(map){ //open map
-                        Fi file = Core.files.local("temp-map." + mapExtension);
-                        file.write(inStream, false);
+
+                //clear data (not sure if necessary?)
+                intent.setAction(Intent.ACTION_MAIN);
+                intent.setData(null);
+                setIntent(intent);
+
+                if("mindustry".equalsIgnoreCase(scheme)){ //open a server URL
+
+                    String host = uri.getHost();
+                    int port = uri.getPort();
+
+                    if(host != null && !host.isEmpty()){
                         Core.app.post(() -> {
-                            System.out.println("Opening map.");
-                            if(!ui.editor.isShown()){
-                                ui.editor.show();
-                            }
-                            ui.editor.beginEditMap(file);
+                            ui.showConfirm(Core.bundle.format("servers.connect.confirm", host), () -> ui.join.connect(host, port != -1 ? port : 6567));
                         });
                     }
-                }));
+                }else{ //open a save file
+                    Fi file = Core.files.cache("imported");
+                    file.write(getContentResolver().openInputStream(uri), false);
+
+                    ClientLauncher.handleFileImport(file);
+                }
             }
-        }catch(IOException e){
-            e.printStackTrace();
+        }catch(Throwable e){
+            Log.err(e);
         }
     }
 

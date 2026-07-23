@@ -24,6 +24,10 @@ if(hasProperty("localRhino") || localProperties.getOrDefault("localRhino", "fals
     includeBuild("../rhino")
 }
 
+if(hasProperty("localSteamworks") || localProperties.getOrDefault("localSteamworks", "false") == "true"){
+    includeBuild("../steamworks4j")
+}
+
 if(!hasProperty("noLocalArc")){
     if(new File(rootDir.parent, 'Arc').exists()){
         println("Compiling with localArc")

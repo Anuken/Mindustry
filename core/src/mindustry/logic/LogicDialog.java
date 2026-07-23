@@ -351,6 +351,7 @@ public class LogicDialog extends BaseDialog{
         this.privileged = privileged;
         this.forceRestart = false;
         canvas.statements.clearChildren();
+        canvas.pane.setScrollYForce(0f);
         canvas.rebuild();
         canvas.privileged = privileged;
         try{

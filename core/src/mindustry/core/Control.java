@@ -740,7 +740,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.set(State.paused);
             }
 
-            if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown() && !ui.minimapfrag.shown()){
+            if((input instanceof DesktopInput ? Core.input.keyTap(Binding.menu) : Core.input.keyTap(KeyCode.back)) && !ui.restart.isShown() && !ui.minimapfrag.shown()){
                 if(ui.chatfrag.shown()){
                     ui.chatfrag.hide();
                 }else if(!ui.paused.isShown() && !scene.hasDialog()){

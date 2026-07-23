@@ -517,7 +517,9 @@ public class CommandAI extends AIController{
 
     @Override
     public void hit(Bullet bullet){
-        if(unit.team.isAI() && bullet.owner instanceof Teamc teamc && teamc.team() != unit.team && attackTarget == null &&
+        if(unit.team.isAI() && 
+           //excluding bullets
+           (!(bullet.owner instanceof Bullet) && bullet.owner instanceof Teamc teamc) && teamc.team() != unit.team && attackTarget == null &&
             //can only counter-attack every few seconds to prevent rapidly changing targets
             !(teamc instanceof Unit u && !u.checkTarget(unit.type.targetAir, unit.type.targetGround)) && timer.get(timerTarget4, 60f * 10f)){
             commandTarget(teamc, true);

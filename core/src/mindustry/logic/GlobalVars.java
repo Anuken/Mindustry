@@ -30,7 +30,7 @@ public class GlobalVars{
     //non-constants that depend on state
     private static LVar
         varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer,
-        varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile, varClientMusicPlaying;
+        varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile, varClientMusicPlaying, varClientCurrentMusic;
 
     private ObjectMap<String, LVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
@@ -88,6 +88,7 @@ public class GlobalVars{
         varClientTeam = putEntry("@clientTeam", 0, true);
         varClientMobile = putEntry("@clientMobile", 0, true);
         varClientMusicPlaying = putEntry("@clientMusicPlaying", 0, true);
+        varClientCurrentMusic = putEntry("@clientCurrentMusic", null, true);
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
@@ -213,6 +214,10 @@ public class GlobalVars{
             varClientTeam.numval = player.team().id;
             varClientMobile.numval = mobile ? 1 : 0;
             varClientMusicPlaying.numval = control.sound.isPlaying() ? 1 : 0;
+
+            var music = control.sound.getCurrent();
+            String dpName = music == null || music.file == null ? null : state.data.getAudioName(music.file);
+            varClientCurrentMusic.objval = music == null || music.file == null ? null : (dpName == null ? music.file.nameWithoutExtension() : dpName);
         }
     }
 

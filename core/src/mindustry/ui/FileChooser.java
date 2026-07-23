@@ -14,7 +14,7 @@ public class FileChooser{
 
     public static void export(String name, String extension, FileWriter writer){
         if(!ios){
-            FileChooser.save(extension).name(name).submit(file -> {
+            FileChooser.save(extension).name(name.endsWith("." + extension) ? name : name + "." + extension).submit(file -> {
                 ui.loadAnd(() -> {
                     try{
                         writer.write(file);
