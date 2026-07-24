@@ -89,6 +89,7 @@ public class EnvRenderers{
             Draw.blend();
         });
 
+        Core.assets.load("sprites/noiseAlphaCircle.png", Texture.class);
         Core.assets.load("sprites/distortAlpha.png", Texture.class, new TextureParameter(){{
             magFilter = TextureFilter.linear;
             minFilter = TextureFilter.mipMapLinearLinear;
