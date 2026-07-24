@@ -174,7 +174,7 @@ public class UnitTypes{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
                     lifetime = 120f - (35f - 8f) / 2f;
-                    maxRange = 213f;
+                    maxRange = 240f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -3688,7 +3688,7 @@ public class UnitTypes{
                     hitSound = Sounds.none;
                     width = 18f;
                     height = 24f;
-                    rangeOverride = 330f;
+                    rangeOverride = 385f;
 
                     lightColor = trailColor = hitColor = backColor = Pal.techBlue;
                     lightRadius = 40f;
