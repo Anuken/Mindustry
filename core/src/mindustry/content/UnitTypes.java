@@ -173,7 +173,7 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 120f - (35f - 8f) / 2f;
+                    lifetime = 120f;
                     maxRange = 240f;
                     width = height = 14f;
                     collides = true;
@@ -3680,7 +3680,7 @@ public class UnitTypes{
 
                 bullet = new ArtilleryBulletType(5.5f, 260){{
                     collidesTiles = collides = true;
-                    lifetime = 60f;
+                    lifetime = 70f;
                     shootEffect = Fx.shootBigColor;
                     smokeEffect = Fx.shootSmokeSquareBig;
                     frontColor = Color.white;
