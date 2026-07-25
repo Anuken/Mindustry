@@ -3,7 +3,7 @@ package mindustry.desktop;
 import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
-import arc.backend.sdl.jni.*;
+import org.lwjgl.sdl.*;
 import arc.discord.*;
 import arc.discord.DiscordRPC.*;
 import arc.filedialogs.*;
@@ -521,6 +521,6 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     private static void message(String message){
-        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
+        SDLMessageBox.SDL_ShowSimpleMessageBox(SDLMessageBox.SDL_MESSAGEBOX_ERROR, "oh no", message, 0L);
     }
 }

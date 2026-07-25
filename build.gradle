@@ -270,7 +270,7 @@ project(":desktop"){
 
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
-        implementation arcModule("backends:backend-sdl")
+        implementation arcModule("backends:backend-sdl3")
     }
 }
 
