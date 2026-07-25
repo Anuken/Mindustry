@@ -1402,8 +1402,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }else if(texture instanceof UnlockableContent u){
             out.set(u.fullIcon);
         }else if(texture instanceof LogicDisplayBuild d && d.isAdded()){
-            d.ensureBuffer();
-            d.getBufferRegion(out);
+            d.rootDisplay.ensureBuffer();
+            d.rootDisplay.getBufferRegion(out);
         }else if(texture instanceof CanvasBuild c && c.isAdded()){
             c.updateTexture();
             if(c.texture != null) out.set(c.texture);
