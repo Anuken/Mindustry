@@ -11,10 +11,15 @@ import java.util.*;
 import static mindustry.Vars.*;
 
 public class LiquidModule extends BlockModule{
-    private static final int windowSize = 6;
-    private static final Interval flowTimer = new Interval(2);
-    private static final float pollScl = 10f;
 
+    /** Total number of samples of flow rate that are taken. */
+    public static int flowWindowSize = 6;
+    /** Interval between which samples are added to the window, in ticks. */
+    public static float flowPollInterval = 10f;
+    /** Visual refresh rate of the value, in ticks. Doesn't affect values, just reduces high-frequency flickering. */
+    public static float flowVisualRefreshInterval = 15f;
+
+    private static final Interval flowTimer = new Interval(2);
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;
     private static float[] displayFlow;
@@ -26,12 +31,12 @@ public class LiquidModule extends BlockModule{
     private @Nullable WindowedMean[] flow;
 
     public void updateFlow(){
-        if(flowTimer.get(1, pollScl)){
+        if(flowTimer.get(1, flowPollInterval)){
             if(flow == null){
                 if(cacheFlow == null || cacheFlow.length != liquids.length){
                     cacheFlow = new WindowedMean[liquids.length];
                     for(int i = 0; i < liquids.length; i++){
-                        cacheFlow[i] = new WindowedMean(windowSize);
+                        cacheFlow[i] = new WindowedMean(flowWindowSize);
                     }
                     cacheSums = new float[liquids.length];
                     displayFlow = new float[liquids.length];
@@ -58,7 +63,7 @@ public class LiquidModule extends BlockModule{
                 cacheSums[i] = 0;
 
                 if(updateFlow){
-                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / pollScl : -1;
+                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / flowVisualRefreshInterval : -1;
                 }
             }
         }

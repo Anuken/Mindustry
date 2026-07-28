@@ -808,7 +808,7 @@ public class NetServer implements ApplicationListener{
 
         if(!player.dead()){
             unit.controlWeapons(shooting, shooting);
-            unit.aim(pointerX, pointerY);
+            unit.aim(pointerX, pointerY, true);
             unit.mineTile = mining;
 
             long elapsed = Math.min(Time.timeSinceMillis(con.lastReceivedClientTime), 1500);

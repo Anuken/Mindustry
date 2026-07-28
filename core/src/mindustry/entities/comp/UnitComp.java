@@ -342,6 +342,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     (pay.payloads().isEmpty() ? 0 :
                     pay.payloads().count(p -> p instanceof BuildPayload bp && bp.build.block == b)) : 0;
         }
+        if(content instanceof StatusEffect s){
+            return hasEffect(s) ? getDuration(s) / 60 : 0;
+        }
         return Float.NaN;
     }
 
@@ -414,6 +417,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(content instanceof Item item){
             stack.item = item;
             stack.amount = Mathf.clamp((int)value, 0, type.itemCapacity);
+        }
+        if(content instanceof StatusEffect effect){
+            setDuration(effect, (float)value * 60f);
         }
     }
 

@@ -157,6 +157,10 @@ public class ShieldArcAbility extends Ability{
     /** State. */
     protected float widthScale, alpha;
 
+    public float scaledMax(Unit unit){
+        return max * Vars.state.rules.unitHealth(unit.team);
+    }
+
     @Override
     public void addStats(Table t){
         super.addStats(t);
@@ -174,7 +178,7 @@ public class ShieldArcAbility extends Ability{
     @Override
     public void update(Unit unit){
 
-        if(data < max){
+        if(data < scaledMax(unit)){
             data += Time.delta * regen;
         }
 
@@ -197,7 +201,7 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void created(Unit unit){
-        data = max;
+        data = scaledMax(unit);
     }
 
     @Override
@@ -229,6 +233,6 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> data / max)).row();
+        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> data / scaledMax(unit))).row();
     }
 }

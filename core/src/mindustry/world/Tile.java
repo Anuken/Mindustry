@@ -467,6 +467,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return !block.solid && (floor.isDeep() || floor.damages());
     }
 
+    public boolean isDeep(){
+        return block == Blocks.air && floor.isDeep();
+    }
+
     /**
      * Iterates through the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
      * The result contains all linked tiles, including this tile itself.

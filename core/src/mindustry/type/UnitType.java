@@ -1470,15 +1470,15 @@ public class UnitType extends UnlockableContent implements Senseable{
         float scl = xscl;
         if(unit.inFogTo(Vars.player.team())) return;
 
-        if(buildSpeed > 0f){
+        boolean isPayload = !unit.isAdded();
+
+        if(buildSpeed > 0f && !isPayload){
             unit.drawBuilding();
         }
 
-        if(unit.mining()){
+        if(unit.mining() && !isPayload){
             drawMining(unit);
         }
-
-        boolean isPayload = !unit.isAdded();
 
         Mechc mech = unit instanceof Mechc m ? m : null;
         Segmentc seg = unit instanceof Segmentc c ? c : null;
