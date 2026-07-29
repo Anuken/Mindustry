@@ -467,6 +467,7 @@ public class JoinDialog extends BaseDialog{
 
                     boolean needsSort = false;
 
+                    //hub servers are ignored
                     if(!sortPing && !Strings.stripColors(res.name).toLowerCase(Locale.ROOT).contains("hub") && groupTable[0].userObject instanceof Integer count){
                         //hack: apply large numerical offset to favorite servers
                         int actualCount = (count >= favoriteCountOffset ? res.players + favoriteCountOffset : res.players);
