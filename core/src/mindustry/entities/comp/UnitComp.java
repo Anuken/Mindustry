@@ -29,6 +29,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
+import static java.lang.Float.NaN;
 import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
@@ -304,9 +305,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             case selectedRotation -> controller instanceof Player p ? p.selectedRotation : 0;
-            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : Float.NaN;
-            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : Float.NaN;
-            default -> Float.NaN;
+            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : NaN;
+            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : NaN;
+            default -> NaN;
         };
     }
 
@@ -345,7 +346,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(content instanceof StatusEffect s){
             return hasEffect(s) ? getDuration(s) / 60 : 0;
         }
-        return Float.NaN;
+        return NaN;
     }
 
     @Override
@@ -658,6 +659,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public void update(){
 
         type.update(self());
+
+        // Sometimes becomes NaN at extreme delta
+        if(Float.isNaN(x) || Float.isNaN(y)){
+            remove();
+            return;
+        }
 
         //update bounds
 
