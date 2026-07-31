@@ -92,7 +92,7 @@ public class ShieldArcAbility extends Ability{
             }else if(paramField.pushUnits && !(!unit.isFlying() && paramUnit.isFlying())){
 
                 float reach = paramField.radius + paramField.width;
-                float overlapDst = reach - unit.dst(paramPos.x, paramPos.y);
+                float overlapDst = reach - unit.dst(paramPos);
 
                 if(overlapDst > 0){
                     //only nullify velocity if it's heading towards the shield
@@ -100,7 +100,7 @@ public class ShieldArcAbility extends Ability{
                         unit.vel.setZero();
                     }
                     // get out
-                    unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst + 0.01f));
+                    unit.move(Tmp.v1.set(unit).sub(paramPos).setLength(overlapDst + 0.01f));
 
                     if(Mathf.chanceDelta(0.3f * Time.delta)){
                         paramField.pushEffect.at(unit.x, unit.y, paramUnit.team.color);
