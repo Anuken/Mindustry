@@ -44,7 +44,7 @@ public class NetClient implements ApplicationListener{
         planSyncTime = Timekeeper.ofSeconds(0.5f),
         pingTime = Timekeeper.ofSeconds(1f);
     private static final Reads dataReads = new Reads(null);
-    private static final JsonValue tmpJsonMap = new JsonValue(ValueType.object);
+    private static final Jval tmpJsonMap = Jval.newObject();
 
     private long ping;
     //private Interval timer = new Interval(5);

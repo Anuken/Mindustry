@@ -150,7 +150,7 @@ public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData){
+    public void read(Json json, Jval jsonData){
         total = 0;
         for(Item item : Vars.content.items()){
             values[item.id] = jsonData.getInt(item.name, 0);

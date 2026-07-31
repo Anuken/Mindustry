@@ -227,10 +227,10 @@ public class DataPatcher{
 
             try{
                 Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
-                if(!(someValue instanceof JsonValue value)) throw new SerializationException("Patch must be a JSON object.");
+                if(!(someValue instanceof Jval value)) throw new SerializationException("Patch must be a JSON object.");
 
                 if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
-                    JsonValue req = value.get("requiredPlanets");
+                    Jval req = value.get("requiredPlanets");
                     value.remove("requiredPlanets");
 
                     //this should be ignored unless this instance is a dedicated server
@@ -412,7 +412,7 @@ public class DataPatcher{
             visit(object);
 
             if(object == root){
-                if(value instanceof JsonValue jval && jval.isObject()){
+                if(value instanceof Jval jval && jval.isObject()){
                     for(var child : jval){
                         assign(root, field + "." + child.name, child, null, null, null);
                     }
@@ -425,7 +425,7 @@ public class DataPatcher{
                     var meta = new FieldData(metadata.type.isArray() ? metadata.type.getComponentType() : metadata.elementType, null, null);
                     boolean multiAdd;
 
-                    if(value instanceof JsonValue jval && jval.isArray()){
+                    if(value instanceof Jval jval && jval.isArray()){
                         meta = metadata;
                         multiAdd = true;
                     }else{
@@ -508,7 +508,7 @@ public class DataPatcher{
                 var meta = new FieldData(metadata.elementType, null, null);
                 boolean multiAdd;
 
-                if(value instanceof JsonValue jval && jval.isArray()){
+                if(value instanceof Jval jval && jval.isArray()){
                     meta = metadata;
                     multiAdd = true;
                 }else{
@@ -536,7 +536,7 @@ public class DataPatcher{
                 var copy = map.copy();
                 reset(() -> map.set(copy));
 
-                if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
+                if(value instanceof Jval jval && jval.isString() && (jval.asString().equals("-"))){
                     //removal syntax:
                     //"value": "-"
                     map.remove(key);
@@ -557,14 +557,14 @@ public class DataPatcher{
                 var copy = map.copy();
                 reset(() -> map.set(copy));
 
-                if(value instanceof JsonValue jval && jval.isString() && (jval.asString().equals("-"))){
+                if(value instanceof Jval jval && jval.isString() && (jval.asString().equals("-"))){
                     //removal syntax:
                     //"value": "-"
                     map.remove(key, 0f);
                 }else{
                     assignValue(object, field, new FieldData(float.class, null, null), () -> map.get(key, 0f), val -> map.put(key, (Float)val), value, false);
                 }
-            }else if(object instanceof Attributes map && value instanceof JsonValue jval){
+            }else if(object instanceof Attributes map && value instanceof Jval jval){
                 Attribute key = Attribute.getOrNull(field);
                 if(key == null){
                     warn("Unknown attribute: '@'", field);
@@ -585,10 +585,10 @@ public class DataPatcher{
                 var fdata = fields.get(field);
                 var fobj = object;
 
-                if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("controller")){
+                if(value instanceof Jval jsv && object instanceof UnitType && field.equals("controller")){
                     var fmeta = fields.get("controller");
                     assignValue(object, "controller", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), (Func<Unit, UnitController>)(u -> parser.resolveController(jsv.asString()).get()), true);
-                }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("aiController")){
+                }else if(value instanceof Jval jsv && object instanceof UnitType && field.equals("aiController")){
                     var fmeta = fields.get("aiController");
                     assignValue(object, "aiController", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.resolveController(jsv.asString()), true);
                 }else if(fdata != null){
@@ -601,7 +601,7 @@ public class DataPatcher{
                         }
                         Reflect.set(fobj, fdata.field, fv);
                     }, value, true);
-                }else if(value instanceof JsonValue jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
+                }else if(value instanceof Jval jsv && object instanceof Block bl && jsv.isObject() && field.equals("consumes")){
                     Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
                     boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                     Runnable resetCons = () -> {
@@ -624,7 +624,7 @@ public class DataPatcher{
                         Log.err(e);
                         warn("Failed to read consumers for '@': @", bl, Strings.getSimpleMessage(e));
                     }
-                }else if(value instanceof JsonValue jsv && object instanceof UnitType && field.equals("type")){
+                }else if(value instanceof Jval jsv && object instanceof UnitType && field.equals("type")){
                     var fmeta = fields.get("constructor");
                     assignValue(object, "constructor", new FieldData(fmeta), () -> Reflect.get(fobj, fmeta.field), val -> Reflect.set(fobj, fmeta.field, val), parser.unitType(jsv), true);
                 }else{
@@ -640,7 +640,7 @@ public class DataPatcher{
         Object prevValue = getter.get();
 
         try{
-            if(value instanceof JsonValue jsv){ //setting values from object
+            if(value instanceof Jval jsv){ //setting values from object
                if(prevValue == null || !jsv.isObject() || (jsv.has("type") && metadata.type != MappableContent.class) || (metadata != null && metadata.type == Attributes.class)){
                     if(UnlockableContent.class.isAssignableFrom(metadata.type) && jsv.isObject()){
                         warn("New content must not be instantiated: @", jsv);

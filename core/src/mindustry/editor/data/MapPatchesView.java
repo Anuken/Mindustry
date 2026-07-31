@@ -147,7 +147,7 @@ public class MapPatchesView implements AssetView{
         }
     }
 
-    int countFields(JsonValue value){
+    int countFields(Jval value){
         if(value.isObject() || value.isArray()){
             int sum = 0;
             for(var child : value){

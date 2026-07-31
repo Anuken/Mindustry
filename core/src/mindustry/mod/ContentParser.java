@@ -236,13 +236,13 @@ public class ContentParser{
 
             PartProgress base = (PartProgress)field(PartProgress.class, data.getString("type"));
 
-            JsonValue opval =
+            Jval opval =
                 data.has("operation") ? data.get("operation") :
                 data.has("op") ? data.get("op") : null;
 
             //no singular operation, check for multi-operation
             if(opval == null){
-                JsonValue opsVal =
+                Jval opsVal =
                     data.has("operations") ? data.get("operations") :
                     data.has("ops") ? data.get("ops") : null;
 
@@ -250,9 +250,9 @@ public class ContentParser{
                     if(!opsVal.isArray()) throw new RuntimeException("Chained PartProgress operations must be an array.");
                     int i = 0;
                     while(true){
-                        JsonValue val = opsVal.get(i);
+                        Jval val = opsVal.get(i);
                         if(val == null) break;
-                        JsonValue op = val.has("operation") ? val.get("operation") :
+                        Jval op = val.has("operation") ? val.get("operation") :
                             val.has("op") ? val.get("op") : null;
 
                         base = parseProgressOp(base, op.asString(), val);
@@ -427,7 +427,7 @@ public class ContentParser{
         }
 
         @Override
-        public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
+        public <T> T readValue(Class<T> type, Class elementType, Jval jsonData, Class keyType){
             T t = internalRead(type, elementType, jsonData, keyType);
             if(t != null && !Reflect.isWrapper(t.getClass()) && (type == null || !type.isPrimitive())){
                 checkNullFields(t);
@@ -438,7 +438,7 @@ public class ContentParser{
             return t;
         }
 
-        private <T> T internalRead(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
+        private <T> T internalRead(Class<T> type, Class elementType, Jval jsonData, Class keyType){
             if(type != null){
                 if(classParsers.containsKey(type)){
                     try{
@@ -521,8 +521,8 @@ public class ContentParser{
         }
     };
 
-    public void readBlockConsumers(Block block, JsonValue value){
-        for(JsonValue child : value){
+    public void readBlockConsumers(Block block, Jval value){
+        for(Jval child : value){
             switch(child.name){
                 case "remove" -> {
                     String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
@@ -643,7 +643,7 @@ public class ContentParser{
                 unit.beforeParse();
                 //add reconstructor type
                 if(value.has("requirements")){
-                    JsonValue rec = value.remove("requirements");
+                    Jval rec = value.remove("requirements");
 
                     UnitReq req = parser.readValue(UnitReq.class, rec);
 
@@ -671,7 +671,7 @@ public class ContentParser{
 
                 //read extra default waves
                 if(value.has("waves")){
-                    JsonValue waves = value.remove("waves");
+                    Jval waves = value.remove("waves");
                     SpawnGroup[] groups = parser.readValue(SpawnGroup[].class, waves);
                     for(SpawnGroup group : groups){
                         group.type = unit;
@@ -785,7 +785,7 @@ public class ContentParser{
                 value.remove("planet");
 
                 if(value.has("rules")){
-                    JsonValue r = value.remove("rules");
+                    Jval r = value.remove("rules");
                     if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
                     preset.rules = rules -> {
                         try{
@@ -842,7 +842,7 @@ public class ContentParser{
             }
 
             if(value.has("rules")){
-                JsonValue r = value.remove("rules");
+                Jval r = value.remove("rules");
                 if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
                 planet.ruleSetter = rules -> {
                     try{
@@ -884,7 +884,7 @@ public class ContentParser{
         }
     );
 
-    Prov<Unit> unitType(JsonValue value){
+    Prov<Unit> unitType(Jval value){
         if(value == null) return UnitEntity::create;
         return switch(value.asString()){
             case "flying" -> UnitEntity::create;
@@ -901,7 +901,7 @@ public class ContentParser{
         };
     }
 
-    private String getString(JsonValue value, String key){
+    private String getString(Jval value, String key){
         if(value.has(key)){
             return value.getString(key);
         }else{
@@ -909,7 +909,7 @@ public class ContentParser{
         }
     }
 
-    private String getType(JsonValue value){
+    private String getType(Jval value){
         return getString(value, "type");
     }
 
@@ -936,7 +936,7 @@ public class ContentParser{
         };
     }
 
-    private void readBundle(ContentType type, String name, JsonValue value){
+    private void readBundle(ContentType type, String name, Jval value){
         UnlockableContent cont = allowPatching && locate(type, name) instanceof UnlockableContent ? locate(type, name) : null;
 
         String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
@@ -1033,7 +1033,7 @@ public class ContentParser{
         currentMod = mod;
 
         var rawValue = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
-        if(!(rawValue instanceof JsonValue value)) throw new SerializationException("Content JSON must be an object, not a single value.");
+        if(!(rawValue instanceof Jval value)) throw new SerializationException("Content JSON must be an object, not a single value.");
 
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
@@ -1112,7 +1112,7 @@ public class ContentParser{
         return null;
     }
 
-    private GenericMesh[] parseMeshes(Planet planet, JsonValue array){
+    private GenericMesh[] parseMeshes(Planet planet, Jval array){
         var res = new GenericMesh[array.size];
         for(int i = 0; i < array.size; i++){
             //yes get is O(n) but it's practically irrelevant here
@@ -1121,7 +1121,7 @@ public class ContentParser{
         return res;
     }
 
-    private GenericMesh parseMesh(Planet planet, JsonValue data){
+    private GenericMesh parseMesh(Planet planet, Jval data){
         if(data.isArray()){
             return new MultiMesh(parseMeshes(planet, data));
         }
@@ -1158,7 +1158,7 @@ public class ContentParser{
         };
     }
 
-    private PartProgress parseProgressOp(PartProgress base, String op, JsonValue data){
+    private PartProgress parseProgressOp(PartProgress base, String op, Jval data){
         //I have to hard-code this, no easy way of getting parameter names, unfortunately
         return switch(op){
             case "inv" -> base.inv();
@@ -1222,7 +1222,7 @@ public class ContentParser{
         return controller::get;
     }
 
-    Object field(Class<?> type, JsonValue value){
+    Object field(Class<?> type, Jval value){
         return field(type, value.asString());
     }
 
@@ -1236,7 +1236,7 @@ public class ContentParser{
             throw new RuntimeException(e);
         }
     }
-    Object fieldOpt(Class<?> type, JsonValue value){
+    Object fieldOpt(Class<?> type, Jval value){
         try{
             return type.getField(value.asString()).get(null);
         }catch(Exception e){
@@ -1262,19 +1262,19 @@ public class ContentParser{
         });
     }
 
-    private void readFields(Object object, JsonValue jsonMap, boolean stripType){
+    private void readFields(Object object, Jval jsonMap, boolean stripType){
         if(stripType) jsonMap.remove("type");
         readFields(object, jsonMap);
     }
 
-    void readFields(Object object, JsonValue jsonMap){
+    void readFields(Object object, Jval jsonMap){
         if(!jsonMap.isObject()) throw new SerializationException("Expecting an object, but found: '" + jsonMap + "'");
-        JsonValue research = jsonMap.remove("research");
+        Jval research = jsonMap.remove("research");
 
         toBeParsed.remove(object);
         var type = object.getClass();
         var fields = parser.getFields(type);
-        for(JsonValue child = jsonMap.child; child != null; child = child.next){
+        for(Jval child = jsonMap.child; child != null; child = child.next){
             FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
@@ -1475,11 +1475,11 @@ public class ContentParser{
     }
 
     private interface FieldParser{
-        Object parse(Class<?> type, JsonValue value) throws Exception;
+        Object parse(Class<?> type, Jval value) throws Exception;
     }
 
     private interface TypeParser<T extends Content>{
-        T parse(String mod, String name, JsonValue value) throws Exception;
+        T parse(String mod, String name, Jval value) throws Exception;
     }
 
     //intermediate class for parsing
@@ -1492,7 +1492,7 @@ public class ContentParser{
     }
 
     public interface ParseListener{
-        void parsed(Class<?> type, JsonValue jsonData, Object result);
+        void parsed(Class<?> type, Jval jsonData, Object result);
     }
 
 }

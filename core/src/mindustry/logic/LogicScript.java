@@ -64,7 +64,7 @@ public class LogicScript implements JsonSerializable{
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData){
+    public void read(Json json, Jval jsonData){
         if(jsonData.isObject()){
             timeout = Math.min(maxTimeoutMs, jsonData.getInt("timeout", 0));
             resetVars = jsonData.getBoolean("resetVars", false);

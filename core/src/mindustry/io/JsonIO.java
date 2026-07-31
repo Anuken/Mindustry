@@ -100,7 +100,7 @@ public class JsonIO{
             }
 
             @Override
-            public MusicContainer read(Json json, JsonValue jsonData, Class type){
+            public MusicContainer read(Json json, Jval jsonData, Class type){
                 return new MusicContainer(jsonData.isString() ? jsonData.asString() : "");
             }
         });
@@ -112,7 +112,7 @@ public class JsonIO{
             }
 
             @Override
-            public Color read(Json json, JsonValue jsonData, Class type){
+            public Color read(Json json, Jval jsonData, Class type){
                 if(jsonData.isString()){
                     return Color.valueOf(jsonData.asString());
                 }
@@ -129,7 +129,7 @@ public class JsonIO{
             }
 
             @Override
-            public Sector read(Json json, JsonValue jsonData, Class type){
+            public Sector read(Json json, Jval jsonData, Class type){
                 String name = jsonData.asString();
                 int idx = name.lastIndexOf('-');
                 return Vars.content.<Planet>getByName(ContentType.planet, name.substring(0, idx)).sectors.get(Integer.parseInt(name.substring(idx + 1)));
@@ -143,7 +143,7 @@ public class JsonIO{
             }
 
             @Override
-            public SectorPreset read(Json json, JsonValue jsonData, Class type){
+            public SectorPreset read(Json json, Jval jsonData, Class type){
                 return Vars.content.getByName(ContentType.sector, jsonData.asString());
             }
         });
@@ -155,7 +155,7 @@ public class JsonIO{
             }
 
             @Override
-            public Liquid read(Json json, JsonValue jsonData, Class type){
+            public Liquid read(Json json, Jval jsonData, Class type){
                 if(jsonData.asString() == null) return Liquids.water;
                 Liquid i = Vars.content.getByName(ContentType.liquid, jsonData.asString());
                 return i == null ? Liquids.water : i;
@@ -169,7 +169,7 @@ public class JsonIO{
             }
 
             @Override
-            public Attribute read(Json json, JsonValue jsonData, Class type){
+            public Attribute read(Json json, Jval jsonData, Class type){
                 return Attribute.get(jsonData.asString());
             }
         });
@@ -181,7 +181,7 @@ public class JsonIO{
             }
 
             @Override
-            public Item read(Json json, JsonValue jsonData, Class type){
+            public Item read(Json json, Jval jsonData, Class type){
                 if(jsonData.asString() == null) return Items.copper;
                 Item i = Vars.content.getByName(ContentType.item, jsonData.asString());
                 return i == null ? Items.copper : i;
@@ -195,7 +195,7 @@ public class JsonIO{
             }
 
             @Override
-            public Team read(Json json, JsonValue jsonData, Class type){
+            public Team read(Json json, Jval jsonData, Class type){
                 return Team.get(jsonData.asInt());
             }
         });
@@ -207,7 +207,7 @@ public class JsonIO{
             }
 
             @Override
-            public Block read(Json json, JsonValue jsonData, Class type){
+            public Block read(Json json, Jval jsonData, Class type){
                 Block block = Vars.content.getByName(ContentType.block, jsonData.asString());
                 if(block == null) block = Vars.content.getByName(ContentType.block, SaveVersion.fallback.get(jsonData.asString(), ""));
                 return block == null ? Blocks.air : block;
@@ -221,7 +221,7 @@ public class JsonIO{
             }
 
             @Override
-            public Planet read(Json json, JsonValue jsonData, Class type){
+            public Planet read(Json json, Jval jsonData, Class type){
                 if(jsonData.asString() == null){
                     return null;
                 }
@@ -237,7 +237,7 @@ public class JsonIO{
             }
 
             @Override
-            public Weather read(Json json, JsonValue jsonData, Class type){
+            public Weather read(Json json, Jval jsonData, Class type){
                 return Vars.content.getByName(ContentType.weather, jsonData.asString());
             }
         });
@@ -249,7 +249,7 @@ public class JsonIO{
             }
 
             @Override
-            public UnitType read(Json json, JsonValue jsonData, Class type){
+            public UnitType read(Json json, Jval jsonData, Class type){
                 if(jsonData.asString() == null) return UnitTypes.dagger;
                 UnitType u = Vars.content.getByName(ContentType.unit, jsonData.asString());
                 return u == null ? UnitTypes.dagger : u;
@@ -266,7 +266,7 @@ public class JsonIO{
             }
 
             @Override
-            public ItemStack read(Json json, JsonValue jsonData, Class type){
+            public ItemStack read(Json json, Jval jsonData, Class type){
                 return new ItemStack(json.getSerializer(Item.class).read(json, jsonData.get("item"), Item.class), jsonData.getInt("amount"));
             }
         });
@@ -278,7 +278,7 @@ public class JsonIO{
             }
 
             @Override
-            public UnlockableContent read(Json json, JsonValue jsonData, Class type){
+            public UnlockableContent read(Json json, Jval jsonData, Class type){
                 if(jsonData.isNull()) return null;
                 String str = jsonData.asString();
                 var map = Vars.content.byName(str);
@@ -309,7 +309,7 @@ public class JsonIO{
             }
 
             @Override
-            public MapObjectives read(Json json, JsonValue data, Class type){
+            public MapObjectives read(Json json, Jval data, Class type){
                 var exec = new MapObjectives();
                 // First iteration to instantiate the objectives.
                 for(var value = data.child; value != null; value = value.next){

@@ -426,8 +426,8 @@ public class Rules{
         }
 
         @Override
-        public void read(Json json, JsonValue jsonData){
-            for(JsonValue value : jsonData){
+        public void read(Json json, Jval jsonData){
+            for(Jval value : jsonData){
                 values[Integer.parseInt(value.name)] = json.readValue(TeamRule.class, value);
             }
         }

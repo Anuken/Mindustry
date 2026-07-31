@@ -50,7 +50,7 @@ public class Attributes implements JsonSerializable{
     }
 
     @Override
-    public void read(Json json, JsonValue data){
+    public void read(Json json, Jval data){
         check();
         for(Attribute at : Attribute.all){
             arr[at.id] = data.getFloat(at.name, 0);

@@ -128,7 +128,7 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
     }
 
     @Override
-    public void read(Json json, JsonValue data){
+    public void read(Json json, Jval data){
         String tname = data.getString("type", "dagger");
 
         type = content.unit(LegacyIO.unitMap.get(tname, tname));

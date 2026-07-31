@@ -806,7 +806,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void read(Json json, JsonValue jsonData){
+        public void read(Json json, Jval jsonData){
             json.readFields(this, jsonData);
             if(jsonData.has("textureName")) setTexture(jsonData.getString("textureName"));
         }
@@ -1442,7 +1442,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void read(Json json, JsonValue jsonData){
+        public void read(Json json, Jval jsonData){
             if(jsonData.has("string")){
                 value = jsonData.get("string").asString();
             }else if(jsonData.has("content")){

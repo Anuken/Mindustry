@@ -9,8 +9,6 @@ import arc.util.Timer;
 import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
-import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
@@ -396,7 +394,7 @@ public class ServerControl implements ApplicationListener{
         });
     }
 
-    JsonValue readRulesFile(){
+    Jval readRulesFile(){
         return JsonIO.json.fromJson(null, Jval.read(rulesFile.readString()).toString(Jformat.plain));
     }
 
@@ -690,7 +688,7 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
-            JsonValue base = readRulesFile();
+            Jval base = readRulesFile();
 
             if(arg.length == 0){
                 info("Rules:\n@", Jval.read(base.toJson(OutputType.minimal)).toString(Jformat.hjson));
@@ -718,10 +716,10 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     try{
-                        JsonValue value = new JsonReader().parse(arg[2]);
+                        Jval value = new JsonReader().parse(arg[2]);
                         value.name = arg[1];
 
-                        JsonValue parent = new JsonValue(ValueType.object);
+                        Jval parent = new Jval(ValueType.object);
                         parent.addChild(value);
 
                         JsonIO.json.readField(state.rules, value.name, parent);

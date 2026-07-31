@@ -4,19 +4,18 @@ import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 
 import java.io.*;
 import java.util.*;
 
 public class PatchAsset extends DataAsset{
-    private static final JsonValue emptyValue = new JsonValue("error");
+    private static final Jval emptyValue = Jval.valueOf("error");
 
     /** Raw string value, containing original formatting. */
     public String patch = "";
     /** Parsed JSON value. Can be an empty error value if parsing failed. */
-    public JsonValue json = emptyValue;
+    public Jval json = emptyValue;
     /** True if an error was encountered. */
     public boolean error;
     /** Warnings encountered during patching. */
