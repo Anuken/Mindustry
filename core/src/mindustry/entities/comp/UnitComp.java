@@ -685,7 +685,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(x > right - tilesize) dx -= (x - (right - tilesize))/warpDst;
                 if(y > top - tilesize) dy -= (y - (top - tilesize))/warpDst;
 
-                velAddNet(dx * Time.delta, dy * Time.delta);
+                //cap velocity to prevent infinity when using timecontrol or similar mods
+                float maxMagnitude = 10f / Math.max(Time.delta, 1f);
+
+                velAddNet(Mathf.clamp(dx * Time.delta, -maxMagnitude, maxMagnitude), Mathf.clamp(dy * Time.delta, -maxMagnitude, maxMagnitude));
                 float margin = tilesize * 1f;
                 x = Mathf.clamp(x, left - margin, right - tilesize + margin);
                 y = Mathf.clamp(y, bot - margin, top - tilesize + margin);
