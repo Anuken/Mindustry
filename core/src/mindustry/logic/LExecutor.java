@@ -232,7 +232,7 @@ public class LExecutor{
             if(!exec.privileged && !state.rules.logicUnitControl) return;
 
             Object unitObj = exec.unit.obj();
-            LogicAI ai = UnitControlI.checkLogicAI(exec, unitObj);
+            LogicAI ai = UnitControlI.checkLogicAI(exec, unitObj, true);
 
             if(unitObj instanceof Unit unit && ai != null){
                 ai.controlTimer = LogicAI.logicControlTimeout;
@@ -318,13 +318,12 @@ public class LExecutor{
         }
 
         /** Checks is a unit is valid for logic AI control, and returns the controller. */
-        @Nullable
-        public static LogicAI checkLogicAI(LExecutor exec, Object unitObj){
+        public static @Nullable LogicAI checkLogicAI(LExecutor exec, Object unitObj, boolean control){
             if(unitObj instanceof Unit unit && unit.isValid() && exec.unit.obj() == unit && (unit.team == exec.team || exec.privileged) && unit.controller().isLogicControllable()){
                 if(unit.controller() instanceof LogicAI la){
                     la.controller = exec.thisv.building();
                     return la;
-                }else{
+                }else if(control){
                     var la = new LogicAI();
                     la.controller = exec.thisv.building();
 
@@ -344,11 +343,12 @@ public class LExecutor{
             if(!exec.privileged && !state.rules.logicUnitControl) return;
 
             Object unitObj = exec.unit.obj();
-            LogicAI ai = checkLogicAI(exec, unitObj);
+            boolean control = type != LUnitControl.unbind && type != LUnitControl.within;
+            LogicAI ai = checkLogicAI(exec, unitObj, control);
 
             //only control standard AI units
-            if(unitObj instanceof Unit unit && ai != null){
-                ai.controlTimer = LogicAI.logicControlTimeout;
+            if(unitObj instanceof Unit unit && (ai != null || !control)){
+                if(ai != null) ai.controlTimer = LogicAI.logicControlTimeout;
                 float x1 = World.unconv(p1.numf()), y1 = World.unconv(p2.numf()), d1 = World.unconv(p3.numf());
 
                 switch(type){
@@ -370,8 +370,9 @@ public class LExecutor{
                         }
                     }
                     case unbind -> {
-                        //TODO is this a good idea? will allocate
-                        unit.resetController();
+                        if(unit.controller() instanceof LogicAI){
+                            unit.resetController();
+                        }
                     }
                     case within -> {
                         p4.setnum(unit.within(x1, y1, d1) ? 1 : 0);
@@ -756,7 +757,7 @@ public class LExecutor{
             LogicAI ai = null;
 
             if(base instanceof Ranged r && (exec.privileged || r.team() == exec.team) &&
-                ((base instanceof Building b && (!b.block.privileged || exec.privileged)) || (ai = UnitControlI.checkLogicAI(exec, base)) != null)){ //must be a building or a controllable unit
+                ((base instanceof Building b && (!b.block.privileged || exec.privileged)) || (ai = UnitControlI.checkLogicAI(exec, base, true)) != null)){ //must be a building or a controllable unit
                 float range = r.range();
 
                 Healthc targeted;
