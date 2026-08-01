@@ -799,7 +799,7 @@ public class LogicBlock extends Block{
 
             if(privileged){
                 write.s(Mathf.clamp(ipt, 1, maxInstructionsPerTick));
-            } else {
+            }else{
                 write.s(ipt == instructionsPerTick ? 0 : Mathf.clamp(ipt, 1, instructionsPerTick));
             }
 
