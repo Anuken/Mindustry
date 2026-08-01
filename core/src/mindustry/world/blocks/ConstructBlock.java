@@ -306,7 +306,7 @@ public class ConstructBlock extends Block{
             progress = Mathf.clamp(progress + maxProgress);
 
             if(progress >= 1f || state.rules.infiniteResources){
-                boolean canFinish = true;
+                boolean canFinish = !current.isOverPlacementLimit(team);
 
                 //look at leftover resources to consume, get them from the core if necessary, delay building if not
                 if(!infinite){

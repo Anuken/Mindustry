@@ -200,7 +200,7 @@ public class Menus{
     }
 
     //internal use only
-    @Remote
+    @Remote(variants = Variant.both)
     public static void removeWorldLabel(int id){
         var label = Groups.label.getByID(id);
         if(label != null){

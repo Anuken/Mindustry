@@ -13,13 +13,18 @@ import static mindustry.Vars.*;
 public class ItemModule extends BlockModule{
     public static final ItemModule empty = new ItemModule();
 
-    private static final int windowSize = 12;
+    /** Total number of samples of flow rate that are taken. */
+    public static int flowWindowSize = 12;
+    /** Interval between which samples are added to the window, in ticks. */
+    public static float flowPollInterval = 10f;
+    /** Visual refresh rate of the value, in ticks. Doesn't affect values, just reduces high-frequency flickering. */
+    public static float flowVisualRefreshInterval = 15f;
+
     private static WindowedMean[] cacheFlow;
     private static float[] cacheSums;
     private static float[] displayFlow;
     private static final Bits cacheBits = new Bits();
     private static final Interval flowTimer = new Interval(2);
-    private static final float pollScl = 10f;
 
     protected int[] items = new int[content.items().size];
     protected int total;
@@ -41,13 +46,13 @@ public class ItemModule extends BlockModule{
 
     public void updateFlow(){
         //update the flow at N fps at most
-        if(flowTimer.get(1, pollScl)){
+        if(flowTimer.get(1, flowPollInterval)){
 
             if(flow == null){
                 if(cacheFlow == null || cacheFlow.length != items.length){
                     cacheFlow = new WindowedMean[items.length];
                     for(int i = 0; i < items.length; i++){
-                        cacheFlow[i] = new WindowedMean(windowSize);
+                        cacheFlow[i] = new WindowedMean(flowWindowSize);
                     }
                     cacheSums = new float[items.length];
                     displayFlow = new float[items.length];
@@ -64,7 +69,7 @@ public class ItemModule extends BlockModule{
                 flow = cacheFlow;
             }
 
-            boolean updateFlow = flowTimer.get(15);
+            boolean updateFlow = flowTimer.get(flowVisualRefreshInterval);
 
             for(int i = 0; i < items.length; i++){
                 flow[i].add(cacheSums[i]);
@@ -74,7 +79,7 @@ public class ItemModule extends BlockModule{
                 cacheSums[i] = 0;
 
                 if(updateFlow){
-                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / pollScl : -1;
+                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / flowPollInterval : -1;
                 }
             }
         }

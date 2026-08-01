@@ -259,6 +259,7 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
+        public @Nullable ObjectIntMap<String> linkMap;
         public boolean checkedDuplicates = false;
         
         public int ipt = instructionsPerTick;
@@ -363,6 +364,7 @@ public class LogicBlock extends Block{
         }
 
         public void updateCode(String str, boolean keep, Cons<LAssembler> assemble){
+            linkMap = null;
             if(str != null){
                 code = str;
 
@@ -479,11 +481,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
-            //load up code from read()
-            if(loadBlock != null){
-                loadBlock.run();
-                loadBlock = null;
-            }
+            checkReadCode();
 
             executor.team = team;
 
@@ -602,12 +600,31 @@ public class LogicBlock extends Block{
             if(position.isobj && position.objval instanceof String varName){
                 LVar ret = executor.optionalVar(varName);
                 if(ret == null){
-                    output.setnum(Double.NaN);
+                    output.setobj(optionalLink(varName));
                     return;
                 }
                 if(output.constant) return;
                 output.set(ret);
+            }else{
+                int index = position.numi();
+                output.setobj(index >= 0 && index < executor.links.length ? executor.links[index] : null);
             }
+        }
+
+        public @Nullable Building optionalLink(String name){
+            if(name == null || name.isEmpty()) return null;
+            // Quick check the name can even be a link to avoid building/using the map needlessly
+            char ch = name.charAt(name.length() - 1);
+            if(ch < '0' || ch > '9') return null;
+
+            if(linkMap == null){
+                linkMap = new ObjectIntMap<>();
+                for(int i = 0; i < links.size; i++){
+                    linkMap.put(links.get(i).name, i);
+                }
+            }
+            int index = linkMap.get(name, -1);
+            return index >= 0 && index < links.size && links.get(index).valid ? links.get(index).lastBuild : null;
         }
 
         @Override
@@ -822,6 +839,18 @@ public class LogicBlock extends Block{
             }
 
             write.f(accumulator);
+        }
+
+        public void checkReadCode(){
+            if(loadBlock != null){
+                loadBlock.run();
+                loadBlock = null;
+            }
+        }
+
+        @Override
+        public void afterReadAll(){
+            checkReadCode();
         }
 
         @Override

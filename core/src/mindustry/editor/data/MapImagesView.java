@@ -263,6 +263,11 @@ public class MapImagesView implements AssetView{
                         ui.showTextInput("@save.rename", "@patch.path", image.path, res -> {
                             if(!res.endsWith(".png")) res = res + ".png";
 
+                            if(!DataAsset.validPath(res)){
+                                ui.showErrorMessage("@asset.path.invalid");
+                                return;
+                            }
+
                             Fi fi = new Fi(res);
                             String name = fi.nameWithoutExtension();
                             String path = fi.pathWithoutExtension();

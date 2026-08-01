@@ -24,4 +24,9 @@ public class MusicContainer{
 
         return cached = SoundControl.findMusic(name);
     }
+
+    @Override
+    public String toString(){
+        return name;
+    }
 }

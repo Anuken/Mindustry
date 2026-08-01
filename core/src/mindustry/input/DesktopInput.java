@@ -64,7 +64,7 @@ public class DesktopInput extends InputHandler{
     private boolean changedCursor, pressedCommandRect;
 
     boolean showHint(){
-        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
+        return ui.hudfrag.shown() && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
             (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
     }
 
@@ -105,7 +105,7 @@ public class DesktopInput extends InputHandler{
 
         //schematic controls
         group.fill(t -> {
-            t.visible(() -> ui.hudfrag.shown && lastSchematic != null && !selectPlans.isEmpty());
+            t.visible(() -> ui.hudfrag.shown() && lastSchematic != null && !selectPlans.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -242,7 +242,7 @@ public class DesktopInput extends InputHandler{
         if(!scene.hasField() && !scene.hasDialog()){
             if(input.keyTap(Binding.debugHitboxes)) Core.settings.toggle("drawhitboxes");
 
-            if(input.keyTap(Binding.teleportCursor) && (state.rules.editor || state.rules.infiniteResources)){
+            if(input.keyTap(Binding.teleportCursor) && (state.rules.editor || state.rules.infiniteResources) && !net.client()){
                 if(player.dead()){
                     camera.position.set(input.mouseWorld());
                 }else{
@@ -466,7 +466,13 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(state.isMenu() || Core.scene.hasDialog()) return;
+        if(state.isMenu() || Core.scene.hasDialog()){
+            if(!Core.input.keyDown(Binding.select)) player.shooting = false;
+            if(mode == breaking && !Core.input.keyDown(Binding.breakBlock)) mode = none;
+            if(mode == placing && !Core.input.keyDown(Binding.select)) mode = none;
+
+            return;
+        }
 
         //zoom camera
         if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonalPlacement)) && !ui.chatfrag.shown() && !ui.consolefrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
@@ -997,7 +1003,7 @@ public class DesktopInput extends InputHandler{
 
         unit.movePref(movement);
 
-        unit.aim(Core.input.mouseWorld());
+        unit.aim(input.mouseWorldX(), input.mouseWorldY(), true);
         unit.controlWeapons(true, player.shooting && !boosted);
 
         player.boosting = Core.input.keyDown(Binding.boost);

@@ -6,17 +6,17 @@ import arc.assets.loaders.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.audio.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.game.*;
 import mindustry.game.Saves.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -24,9 +24,6 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.ui.*;
-
-import java.io.*;
-import java.util.zip.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -189,6 +186,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
         assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
+
+        Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> t.setWrap(TextureWrap.repeat);
     }
 
     @Override
@@ -314,32 +313,50 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
     @Override
     public void fileDropped(Fi file){
-        if(OS.isIos) return;
+        if(OS.isIos || OS.isAndroid) return;
 
-        if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
+        if(file.extEquals(saveExtension) || file.extEquals(schematicExtension)){
+            handleFileImport(file);
+        }
+    }
+
+    public static void runOnClientLoad(Runnable run){
+        if(clientLoaded){
+            run.run();
+        }else{
+            Events.on(ClientLoadEvent.class, e -> run.run());
+        }
+    }
+
+    /** Can be called from any thread. The file must exist and not have any permission nonsense guarding it. */
+    public static void handleFileImport(Fi file){
+        Core.app.post(() -> {
             try{
-                if(SaveIO.isSaveValid(file)){
-                    SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
-                    if(meta.tags.containsKey("name")){
-                        //is map
-                        if(!ui.editor.isShown()){
-                            ui.editor.show();
-                        }
-
-                        ui.editor.beginEditMap(file);
-                    }else if(meta.rules.sector == null){ //don't allow importing campaign saves, they are broken
-                        SaveSlot slot = control.saves.importSave(file);
-                        ui.load.runLoadSave(slot);
-                    }else{
-                        ui.showErrorMessage("@save.nocampaign");
-                    }
+                if(Schematics.isSchematic(file)){
+                    ui.schematics.show();
+                    ui.schematics.importAndShow(file);
                 }else{
-                    ui.showErrorMessage("@save.import.invalid");
+                    SaveMeta meta = SaveIO.getMeta(file);
+                    if(!meta.isMap()){ //open save
+                        if(meta.rules.sector == null){
+                            //not sure if this is a great idea, but leaving the editor open would lead to catastrophic bugs
+                            if(ui.editor.isShown()) ui.editor.hide();
+                            if(ui.maps.isShown()) ui.maps.hide();
+
+                            SaveSlot slot = control.saves.importSave(file);
+                            ui.load.runLoadSave(slot);
+                        }else{
+                            ui.showErrorMessage("@save.nocampaign");
+                        }
+                    }else{ //open map
+                        if(!ui.maps.isShown()) ui.maps.show();
+                        ui.maps.tryImportMap(file, result -> ui.maps.showMap(result));
+                    }
                 }
             }catch(Throwable e){
-                ui.showException("@save.import.fail", e);
+                Log.err("Failed to import file", e);
+                ui.showException("@save.import.invalid", e);
             }
-        }
-
+        });
     }
 }
