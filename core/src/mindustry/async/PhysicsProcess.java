@@ -137,7 +137,7 @@ public class PhysicsProcess implements AsyncProcess{
     public static class PhysicRef{
         public Unit entity;
         public PhysicsBody body;
-        //x or y at simulation start step
+        //position before simulation start
         public float startX, startY;
         public int lastLayer;
 
@@ -158,7 +158,6 @@ public class PhysicsProcess implements AsyncProcess{
         private final QuadTree<PhysicsBody> tree;
         private final Seq<PhysicsBody> bodies = new Seq<>(false, 16, PhysicsBody.class);
         private final Seq<PhysicsBody> seq = new Seq<>(PhysicsBody.class);
-        //private final Rect rect = new Rect();
         private final Vec2 vec = new Vec2();
         private final Rand rand = new Rand();
 
@@ -180,7 +179,6 @@ public class PhysicsProcess implements AsyncProcess{
             var bodyItems = bodies.items;
             int bodySize = bodies.size;
 
-            //mobile has weak CPU cores, and there's no need for high fidelity sims in multiplayer
             int iterations = Vars.net.client() || OS.isMobile ? mobileIterations : desktopIterations;
 
             for(int iter = 0; iter < iterations; iter++){
