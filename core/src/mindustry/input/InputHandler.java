@@ -887,10 +887,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void updateSelectQuadtree(){
-        selectPlanTree.clear();
-        for(var plan : selectPlans){
-            selectPlanTree.insert(plan);
-        }
+        selectPlanTree.fill(selectPlans);
     }
 
     /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
@@ -1406,10 +1403,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         plan.animScale = prev.animScale;
                     }
                 }
-                player.previewPlanTree.clear();
-                for(BuildPlan plan : plans){
-                    player.previewPlanTree.insert(plan);
-                }
+                player.previewPlanTree.fill(plans);
             }
 
             BuildPlan current = player.isBuilder() ? player.unit().buildPlan() : null;
