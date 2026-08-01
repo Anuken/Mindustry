@@ -866,7 +866,7 @@ public class LogicBlock extends Block{
 
             if(!privileged && revision >= 5){
                 short iptR = read.s();
-                if (iptR != 0) {
+                if(iptR != 0){
                     ipt = Mathf.clamp(iptR, 1, instructionsPerTick);
                 }
             }
