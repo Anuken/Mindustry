@@ -2,6 +2,7 @@ package mindustry.maps.generators;
 
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -15,7 +16,7 @@ import mindustry.world.blocks.storage.CoreBlock.*;
 import static mindustry.Vars.*;
 
 public class FileMapGenerator implements WorldGenerator{
-    public final Map map;
+    public final @Nullable Map map;
     public final SectorPreset preset;
 
     public FileMapGenerator(String mapName, SectorPreset preset){
@@ -50,7 +51,7 @@ public class FileMapGenerator implements WorldGenerator{
         this.preset = preset;
     }
 
-    public FileMapGenerator(Map map, SectorPreset preset){
+    public FileMapGenerator(@Nullable Map map, SectorPreset preset){
         this.map = map;
         this.preset = preset;
     }

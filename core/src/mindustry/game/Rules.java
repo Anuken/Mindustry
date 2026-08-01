@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.graphics.g3d.*;
@@ -164,12 +165,24 @@ public class Rules{
     public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
     public @Nullable Sector sector;
+    /** Overrides random ambient music to be played. */
+    public @Nullable Seq<MusicContainer> ambientMusic;
+    /** Overrides music that is played in certain situations, like during boss waves or low core health. */
+    public @Nullable Seq<MusicContainer> darkMusic;
+    /** If true, this overrides the game setting to always play ambient music. */
+    public boolean alwaysPlayMusic = false;
+    /** If true, automatic music is disabled. */
+    public boolean disableMusic = false;
+    /** Multiplier for music volume (max value is 1). */
+    public float musicVolume = 1f;
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
     /** Starting items put in cores. */
     public Seq<ItemStack> loadout = ItemStack.list(Items.copper, 100);
     /** Weather events that occur here. */
     public Seq<WeatherEntry> weather = new Seq<>(1);
+    /** Block placement limits by type. */
+    public ObjectIntMap<Block> blockLimits = new ObjectIntMap<>();
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
     /** Units that cannot be built. */
@@ -236,6 +249,23 @@ public class Rules{
     /** Copies this ruleset exactly. Not efficient at all, do not use often. */
     public Rules copy(){
         return JsonIO.copy(this);
+    }
+
+    /**
+     * When a map is played, it uses rules from the rules dialog, which cannot contain patched content, since it doesn't exist at that point in time.
+     * This means that any existing rules containing patched content will contain garbage or empty data.
+     * This function copies original map rule data from {@param source} (obtained after map load) that may contain new content into this ruleset.
+     * */
+    public void retainContentFields(Rules source){
+        //these fields can't be modified in the custom rules anyway, so force-overwriting them is fine
+        spawns = source.spawns;
+        objectives = source.objectives;
+        weather = source.weather;
+
+        //TODO: this overwrites banned blocks/units and loadouts if someone set it in custom rules when playing; there isn't a good way to avoid this
+        if(Seq.with(source.bannedBlocks).contains(Content::isPatchContent)) bannedBlocks = source.bannedBlocks;
+        if(Seq.with(source.bannedUnits).contains(Content::isPatchContent)) bannedUnits = source.bannedUnits;
+        if(source.loadout.contains(i -> i.item.isPatchContent())) loadout = source.loadout;
     }
 
     /** Returns the gamemode that best fits these rules. */

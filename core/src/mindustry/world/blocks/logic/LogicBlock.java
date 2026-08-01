@@ -56,6 +56,8 @@ public class LogicBlock extends Block{
         group = BlockGroup.logic;
         schematicPriority = 5;
         ignoreResizeConfig = true;
+        drawCached = true;
+        drawDynamic = false;
 
         //universal, no real requirements
         envEnabled = Env.any;
@@ -257,8 +259,9 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
+        public @Nullable ObjectIntMap<String> linkMap;
         public boolean checkedDuplicates = false;
-        //dynamic only for privileged processors
+        
         public int ipt = instructionsPerTick;
         /** Display name, for convenience. This is currently only available for world processors. */
         public @Nullable String tag;
@@ -361,6 +364,7 @@ public class LogicBlock extends Block{
         }
 
         public void updateCode(String str, boolean keep, Cons<LAssembler> assemble){
+            linkMap = null;
             if(str != null){
                 code = str;
 
@@ -477,11 +481,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
-            //load up code from read()
-            if(loadBlock != null){
-                loadBlock.run();
-                loadBlock = null;
-            }
+            checkReadCode();
 
             executor.team = team;
 
@@ -512,6 +512,7 @@ public class LogicBlock extends Block{
                     var cur = world.build(l.x, l.y);
 
                     boolean valid = validLink(cur);
+                    Block lastBlock = (l.lastBuild == null ? null : l.lastBuild.block);
                     if(l.lastBuild == null) l.lastBuild = cur;
                     if(valid != l.valid || l.lastBuild != cur){
                         l.lastBuild = cur;
@@ -521,10 +522,12 @@ public class LogicBlock extends Block{
                         l.trySet(executor, null); //always clear old variable, it may get a new name
 
                         if(valid){
-                            //this prevents conflicts
-                            l.name = "";
-                            //finds a new matching name after toggling
-                            l.name = findLinkName(cur.block);
+
+                            if(lastBlock != null && cur.block != lastBlock){
+                                l.logicVar = null; //name was reassigned because block type changed, the old cached logic var is no longer relevant
+                                l.name = "";
+                                l.name = findLinkName(cur.block);
+                            }
 
                             //remove redundant links
                             links.removeAll(o -> {
@@ -547,11 +550,7 @@ public class LogicBlock extends Block{
             if(changed){
                 updateLinks();
             }
-
-            if(!privileged){
-                ipt = instructionsPerTick;
-            }
-
+            
             if(state.rules.disableWorldProcessors && privileged) return;
 
             if(enabled && executor.initialized()){
@@ -573,6 +572,8 @@ public class LogicBlock extends Block{
         }
 
         public void updateLinks(){
+            if(linksVar == null) return;
+
             int valids = links.count(l -> l.valid);
             executor.links = new Building[valids];
             executor.linkIds.clear();
@@ -599,12 +600,31 @@ public class LogicBlock extends Block{
             if(position.isobj && position.objval instanceof String varName){
                 LVar ret = executor.optionalVar(varName);
                 if(ret == null){
-                    output.setnum(Double.NaN);
+                    output.setobj(optionalLink(varName));
                     return;
                 }
                 if(output.constant) return;
                 output.set(ret);
+            }else{
+                int index = position.numi();
+                output.setobj(index >= 0 && index < executor.links.length ? executor.links[index] : null);
             }
+        }
+
+        public @Nullable Building optionalLink(String name){
+            if(name == null || name.isEmpty()) return null;
+            // Quick check the name can even be a link to avoid building/using the map needlessly
+            char ch = name.charAt(name.length() - 1);
+            if(ch < '0' || ch > '9') return null;
+
+            if(linkMap == null){
+                linkMap = new ObjectIntMap<>();
+                for(int i = 0; i < links.size; i++){
+                    linkMap.put(links.get(i).name, i);
+                }
+            }
+            int index = linkMap.get(name, -1);
+            return index >= 0 && index < links.size && links.get(index).valid ? links.get(index).lastBuild : null;
         }
 
         @Override
@@ -754,7 +774,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 4;
+            return 5;
         }
 
         @Override
@@ -796,6 +816,8 @@ public class LogicBlock extends Block{
 
             if(privileged){
                 write.s(Mathf.clamp(ipt, 1, maxInstructionsPerTick));
+            }else{
+                write.s(ipt == instructionsPerTick ? 0 : Mathf.clamp(ipt, 1, instructionsPerTick));
             }
 
             TypeIO.writeString(write, tag);
@@ -817,6 +839,18 @@ public class LogicBlock extends Block{
             }
 
             write.f(accumulator);
+        }
+
+        public void checkReadCode(){
+            if(loadBlock != null){
+                loadBlock.run();
+                loadBlock = null;
+            }
+        }
+
+        @Override
+        public void afterReadAll(){
+            checkReadCode();
         }
 
         @Override
@@ -857,6 +891,13 @@ public class LogicBlock extends Block{
 
             if(privileged && revision >= 2){
                 ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
+            }
+
+            if(!privileged && revision >= 5){
+                short iptR = read.s();
+                if(iptR != 0){
+                    ipt = Mathf.clamp(iptR, 1, instructionsPerTick);
+                }
             }
 
             if(revision >= 3){

@@ -91,12 +91,12 @@ public class MapGenerateDialog extends BaseDialog{
                 p.table(Tex.button, in -> {
                     in.defaults().size(280f, 60f).left();
 
-                    in.button("@waves.copy", Icon.copy, style, () -> {
+                    in.button("@copy.clipboard", Icon.copy, style, () -> {
                         dialog.hide();
 
                         Core.app.setClipboardText(JsonIO.write(filters));
                     }).marginLeft(12f).row();
-                    in.button("@waves.load", Icon.download, style, () -> {
+                    in.button("@load.clipboard", Icon.download, style, () -> {
                         dialog.hide();
                         try{
                             filters.set(JsonIO.read(Seq.class, Core.app.getClipboardText()));

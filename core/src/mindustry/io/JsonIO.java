@@ -6,6 +6,7 @@ import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import mindustry.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
@@ -19,11 +20,7 @@ import java.io.*;
 
 @SuppressWarnings("unchecked")
 public class JsonIO{
-    private static final CustomJson jsonBase = new CustomJson();
-
     public static final Json json = new Json(){
-        { apply(this); }
-
         @Override
         public void writeValue(Object value, Class knownType, Class elementType){
             if(value instanceof MappableContent c){
@@ -79,8 +76,9 @@ public class JsonIO{
         return json.fromJson(type, string.replace("io.anuke.", ""));
     }
 
-    public static <T> T read(Class<T> type, T base, String string){
-        return jsonBase.fromBaseJson(type, base, string.replace("io.anuke.", ""));
+    public static <T> T read(T base, String string){
+        json.readFields(base, new JsonReader().parse(string.replace("io.anuke.", "")));
+        return base;
     }
 
     public static String print(String in){
@@ -89,12 +87,23 @@ public class JsonIO{
 
     public static void classTag(String tag, Class<?> type){
         json.addClassTag(tag, type);
-        jsonBase.addClassTag(tag, type);
     }
 
-    static void apply(Json json){
+    static{
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
+
+        json.setSerializer(MusicContainer.class, new Serializer<>(){
+            @Override
+            public void write(Json json, MusicContainer object, Class knownType){
+                json.writeValue(object.name);
+            }
+
+            @Override
+            public MusicContainer read(Json json, JsonValue jsonData, Class type){
+                return new MusicContainer(jsonData.isString() ? jsonData.asString() : "");
+            }
+        });
 
         json.setSerializer(Color.class, new Serializer<>(){
             @Override
@@ -341,30 +350,6 @@ public class JsonIO{
         for(var filter : Maps.allFilterTypes){
             var i = filter.get();
             json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Filter", "")), i.getClass());
-        }
-    }
-
-    static class CustomJson extends Json{
-        private Object baseObject;
-
-        { apply(this); }
-
-        @Override
-        public <T> T fromJson(Class<T> type, String json){
-            return fromBaseJson(type, null, json);
-        }
-
-        public <T> T fromBaseJson(Class<T> type, T base, String json){
-            this.baseObject = base;
-            return readValue(type, null, new JsonReader().parse(json));
-        }
-
-        @Override
-        protected Object newInstance(Class type){
-            if(baseObject == null || baseObject.getClass() != type){
-                return super.newInstance(type);
-            }
-            return baseObject;
         }
     }
 }

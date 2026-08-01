@@ -243,7 +243,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     bounded = true,
     /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
     naval = false,
-    /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
+    /** if false, RTS AI controlled units do not automatically attack things while moving. */
     autoFindTarget = true,
     /** If false, 'under' blocks like conveyors are not targeted. */
     targetUnderBlocks = true,
@@ -528,6 +528,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         // Try to immediately resolve the Unit constructor based on EntityMapping entry, if it is set.
         // This is the default Vanilla behavior - it won't work properly for mods (see comment in `init()`)!
         constructor = EntityMapping.map(this.name);
+        if(constructor == null) constructor = UnitEntity::create;
         selectionSize = 30f;
     }
 
@@ -951,11 +952,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             lightRadius = Math.max(60f, hitSize * 2.3f);
         }
 
-        //if a status effects slows a unit when firing, don't shoot while moving.
-        if(autoFindTarget){
-            autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
-        }
-
         if(flyingLayer < 0) flyingLayer = lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit;
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget |= weapons.size <= 1 && !forceMultiTarget;
@@ -1231,7 +1227,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         for(var region : toOutline){
             if(region instanceof AtlasRegion atlas && !Core.atlas.has(atlas.name + "-outline")){
                 String regionName = atlas.name;
-                Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
+                Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
                 Drawf.checkBleed(outlined);
 
@@ -1267,7 +1263,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         if(sample instanceof Tankc){
-            PixmapRegion pix = Core.atlas.getPixmap(treadRegion);
+            PixmapRegion pix = packer.get(treadRegion);
 
             for(int r = 0; r < treadRects.length; r++){
                 Rect treadRect = treadRects[r];
@@ -1435,6 +1431,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             case armor -> armor;
             case range -> World.conv(maxRange);
             case size -> hitSize / tilesize;
+            case flying -> flying ? 1f : 0f;
             case itemCapacity -> itemCapacity;
             case speed -> speed * 60f / tilesize;
             case payloadCapacity -> sample instanceof Payloadc ? payloadCapacity / tilePayload : 0f;
@@ -1473,15 +1470,15 @@ public class UnitType extends UnlockableContent implements Senseable{
         float scl = xscl;
         if(unit.inFogTo(Vars.player.team())) return;
 
-        if(buildSpeed > 0f){
+        boolean isPayload = !unit.isAdded();
+
+        if(buildSpeed > 0f && !isPayload){
             unit.drawBuilding();
         }
 
-        if(unit.mining()){
+        if(unit.mining() && !isPayload){
             drawMining(unit);
         }
-
-        boolean isPayload = !unit.isAdded();
 
         Mechc mech = unit instanceof Mechc m ? m : null;
         Segmentc seg = unit instanceof Segmentc c ? c : null;

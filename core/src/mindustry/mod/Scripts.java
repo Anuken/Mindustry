@@ -81,6 +81,10 @@ public class Scripts implements Disposable{
         return new float[capacity];
     }
 
+    public Class<?> getClass(Object object){
+        return object == null ? null : object.getClass();
+    }
+
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;
         run(file.readString(), mod.name + "/" + file.name(), true);

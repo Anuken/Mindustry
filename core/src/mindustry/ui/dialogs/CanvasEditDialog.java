@@ -43,9 +43,9 @@ public class CanvasEditDialog extends BaseDialog{
 
         addCloseButton(160f);
 
-        buttons.button("@import", Icon.image, () -> platform.showFileChooser(true, "png", this::importFrom));
+        buttons.button("@import", Icon.image, () -> FileChooser.open("png", "jpeg").submit(this::importFrom));
 
-        buttons.button("@export", Icon.export, () -> platform.showFileChooser(false, "png", this::exportTo));
+        buttons.button("@export", Icon.export, () -> FileChooser.export("canvas", "png", this::exportTo));
 
         hidden(() -> {
             save();
