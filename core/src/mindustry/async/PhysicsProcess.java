@@ -13,6 +13,8 @@ import mindustry.gen.*;
 import java.util.concurrent.*;
 
 public class PhysicsProcess implements AsyncProcess{
+    static final int mobileIterations = 1, desktopIterations = 1;
+
     public static final int
     layers = 4,
     layerGround = 0,
@@ -46,6 +48,26 @@ public class PhysicsProcess implements AsyncProcess{
     public void begin(){
         if(physics == null) return;
         boolean local = !Vars.net.client();
+
+        PerfCounter.unitPhysicsAsync.begin();
+        //wait for every layer's async step to finish before touching body positions
+        for(int i = 0; i < futures.size; i++){
+            try{
+                futures.items[i].get();
+            }catch(InterruptedException | ExecutionException e){
+                throw new RuntimeException(e);
+            }
+        }
+        futures.clear();
+        PerfCounter.unitPhysicsAsync.end();
+
+        //move entities
+        for(PhysicRef ref : refs){
+            Physicsc entity = ref.entity;
+
+            //move by delta
+            entity.move(ref.body.x - ref.startX, ref.body.y - ref.startY);
+        }
 
         var items = refs.items;
 
@@ -82,28 +104,8 @@ public class PhysicsProcess implements AsyncProcess{
     }
 
     @Override
-    public void end(){
-        if(physics == null) return;
-
-        PerfCounter.unitPhysicsAsync.begin();
-        //wait for every layer's async step to finish before touching body positions
-        for(int i = 0; i < futures.size; i++){
-            try{
-                futures.items[i].get();
-            }catch(InterruptedException | ExecutionException e){
-                throw new RuntimeException(e);
-            }
-        }
-        futures.clear();
-        PerfCounter.unitPhysicsAsync.end();
-
-        //move entities
-        for(PhysicRef ref : refs){
-            Physicsc entity = ref.entity;
-
-            //move by delta
-            entity.move(ref.body.x - ref.startX, ref.body.y - ref.startY);
-        }
+    public boolean shouldProcess(){
+        return false;
     }
 
     @Override
@@ -172,7 +174,7 @@ public class PhysicsProcess implements AsyncProcess{
             int bodySize = bodies.size;
 
             //mobile has weak CPU cores, and there's no need for high fidelity sims in multiplayer
-            int iterations = Vars.net.client() || OS.isMobile ? 1 : 2;
+            int iterations = Vars.net.client() || OS.isMobile ? mobileIterations : desktopIterations;
 
             for(int iter = 0; iter < iterations; iter++){
                 tree.fill(bodies);
