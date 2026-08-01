@@ -442,7 +442,8 @@ public class HudFragment{
                     });
 
                     select.image().color(Pal.gray).width(4f).fillY();
-                }).visible(() -> !control.input.logicHideHud);
+                    //there is no back button on iOS, so the menu has to be shown at all times.
+                }).visible(() -> OS.isIos || !control.input.logicHideHud);
 
                 cont.row();
                 cont.image().height(4f).color(Pal.gray).fillX();
