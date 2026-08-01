@@ -1,6 +1,7 @@
 package mindustry.entities.abilities;
 
 import arc.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -30,6 +31,10 @@ public class ForceFieldAbility extends Ability{
     /** Rotation of shield. */
     public float rotation = 0f;
 
+    public Sound breakSound = Sounds.shieldBreakSmall;
+    public Sound hitSound = Sounds.shieldHit;
+    public float hitSoundVolume = 0.12f;
+
     /** State. */
     protected float radiusScale, alpha;
     protected boolean wasBroken = true;
@@ -37,11 +42,12 @@ public class ForceFieldAbility extends Ability{
     private static float realRad;
     private static Unit paramUnit;
     private static ForceFieldAbility paramField;
-    private static final Cons<Bullet> shieldConsumer = trait -> {
-        if(trait.team != paramUnit.team && trait.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, trait.x(), trait.y()) && paramUnit.shield > 0){
-            trait.absorb();
-            Fx.absorb.at(trait);
-            paramUnit.shield -= trait.type().shieldDamage(trait);
+    private static final Cons<Bullet> shieldConsumer = b -> {
+        if(b.team != paramUnit.team && b.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, b.x(), b.y()) && paramUnit.shield > 0){
+            b.absorb();
+            Fx.absorb.at(b);
+            paramField.hitSound.at(b.x, b.y, 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
+            paramUnit.shield -= b.type().shieldDamage(b);
             paramField.alpha = 1f;
         }
     };
@@ -64,6 +70,10 @@ public class ForceFieldAbility extends Ability{
 
     ForceFieldAbility(){}
 
+    public float scaledMax(Unit unit){
+        return max * Vars.state.rules.unitHealth(unit.team);
+    }
+
     @Override
     public void addStats(Table t){
         super.addStats(t);
@@ -82,11 +92,12 @@ public class ForceFieldAbility extends Ability{
             unit.shield -= cooldown * regen;
 
             Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+            breakSound.at(unit.x, unit.y);
         }
 
         wasBroken = unit.shield <= 0f;
 
-        if(unit.shield < max){
+        if(unit.shield < scaledMax(unit)){
             unit.shield += Time.delta * regen;
         }
 
@@ -110,6 +121,7 @@ public class ForceFieldAbility extends Ability{
         //self-destructing units can have a shield on death
         if(unit.shield > 0f && !wasBroken){
             Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+            breakSound.at(unit.x, unit.y);
         }
     }
 
@@ -136,12 +148,12 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / max)).row();
+        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / scaledMax(unit))).row();
     }
 
     @Override
     public void created(Unit unit){
-        unit.shield = max;
+        unit.shield = scaledMax(unit);
     }
 
     public void checkRadius(Unit unit){

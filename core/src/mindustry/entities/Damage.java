@@ -107,9 +107,9 @@ public class Damage{
             float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
-                var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                 int f = i;
                 Time.run(i * 2f, () -> {
+                    var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                     if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
                         damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
                     }
@@ -215,45 +215,45 @@ public class Damage{
 
         //return either the length when not enough things were pierced,
         //or the last pierced object if there were enough blockages
-        return Math.min(distances.size < pierceCap || pierceCap < 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+        return Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
     }
 
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
         float resultLength = findPierceLength(b, pierceCap, laser, length);
 
-        collideLine(b, b.team, b.type.hitEffect, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
+        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
 
         b.fdata = resultLength;
 
         return resultLength;
     }
 
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length){
-        collideLine(hitter, team, effect, x, y, angle, length, false);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length){
+        collideLine(hitter, team, x, y, angle, length, false);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large){
-        collideLine(hitter, team, effect, x, y, angle, length, large, true);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large){
+        collideLine(hitter, team, x, y, angle, length, large, true);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser){
-        collideLine(hitter, team, effect, x, y, angle, length, large, laser, -1);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser){
+        collideLine(hitter, team, x, y, angle, length, large, laser, -1);
     }
 
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, Effect effect, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
         length = findLength(hitter, length, laser, pierceCap);
         hitter.fdata = length;
 
@@ -498,6 +498,11 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source){
+        damage(team, x, y, radius, damage, complete, air, ground, scaled, source, 1);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source, float armorMult){
         Cons<Unit> cons = unit -> {
             if(unit.team == team  || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))){
                 return;
@@ -506,7 +511,11 @@ public class Damage{
             boolean dead = unit.dead;
 
             float amount = calculateDamage(scaled ? Math.max(0, unit.dst(x, y) - unit.type.hitSize/2) : unit.dst(x, y), radius, damage);
-            unit.damage(amount);
+            if(armorMult != 1){
+                unit.damageArmorMult(amount, armorMult);
+            }else{
+                unit.damage(amount);
+            }
 
             if(source != null){
                 Events.fire(bulletDamageEvent.set(unit, source));
@@ -545,8 +554,10 @@ public class Damage{
         tileDamage(team, x, y, baseRadius, damage, null);
     }
 
-    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage, @Nullable Bullet source){
+    public static void tileDamage(Team team, int tx, int ty, float baseRadius, float damage, @Nullable Bullet source){
         Time.run(0f, () -> {
+            int x = Mathf.clamp(tx, -100, world.width() + 100), y = Mathf.clamp(ty, -100, world.height() + 100);
+
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
             //why? because otherwise the building would absorb everything in one cell, which means much less damage than a nearby explosion.

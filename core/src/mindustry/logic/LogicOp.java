@@ -11,6 +11,7 @@ public enum LogicOp{
     div("/", (a, b) -> a / b),
     idiv("//", (a, b) -> Math.floor(a / b)),
     mod("%", (a, b) -> a % b),
+    emod("%%", (a, b) -> ((a % b) + b) % b),
     pow("^", Math::pow),
 
     equal("==", (a, b) -> Math.abs(a - b) < 0.000001 ? 1 : 0, (a, b) -> Structs.eq(a, b) ? 1 : 0),
@@ -24,6 +25,7 @@ public enum LogicOp{
 
     shl("<<", (a, b) -> (long)a << (long)b),
     shr(">>", (a, b) -> (long)a >> (long)b),
+    ushr(">>>", (a, b) -> (long)a >>> (long)b),
     or("or", (a, b) -> (long)a | (long)b),
     and("b-and", (a, b) -> (long)a & (long)b),
     xor("xor", (a, b) -> (long)a ^ (long)b),

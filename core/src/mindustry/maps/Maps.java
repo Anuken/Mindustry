@@ -40,6 +40,8 @@ public class Maps{
     private static String[] defaultMapNames = {"maze", "fortress", "labyrinth", "islands", "tendrils", "caldera", "wasteland", "shattered", "fork", "triad", "mudFlats", "moltenLake", "archipelago", "debrisField", "domain", "veins", "glacier", "passage"};
     /** Maps tagged as PvP */
     private static String[] pvpMaps = {"veins", "glacier", "passage"};
+    /** If true, the defaultMapNames are prefixed with default/ */
+    private static boolean useDefaultFolder = true;
 
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
@@ -92,7 +94,12 @@ public class Maps{
 
     /** Returns a list of only default maps. */
     public Seq<Map> defaultMaps(){
-        return maps.select(m -> !m.custom);
+        return maps.select(m -> !m.custom && m.mod == null);
+    }
+
+    /** Returns a list of only modded maps. */
+    public Seq<Map> moddedMaps(){
+        return maps.select(m -> m.mod != null);
     }
 
     public Map byName(String name){
@@ -126,7 +133,7 @@ public class Maps{
         //defaults; must work
         try{
             for(String name : defaultMapNames){
-                Fi file = Core.files.internal("maps/" + name + "." + mapExtension);
+                Fi file = Core.files.internal((useDefaultFolder ? "maps/default/" : "maps/") + name + "." + mapExtension);
                 loadMap(file, false);
             }
         }catch(IOException e){
@@ -182,11 +189,15 @@ public class Maps{
         load();
     }
 
+    public Map saveMap(ObjectMap<String, String> baseTags){
+        return saveMap(baseTags, true);
+    }
+
     /**
      * Save a custom map to the directory. This updates all values and stored data necessary.
      * The tags are copied to prevent mutation later.
      */
-    public Map saveMap(ObjectMap<String, String> baseTags){
+    public Map saveMap(ObjectMap<String, String> baseTags, boolean embedAssets){
 
         try{
             StringMap tags = new StringMap(baseTags);
@@ -212,7 +223,7 @@ public class Maps{
             //create map, write it, etc etc etc
             Map map = new Map(file, world.width(), world.height(), tags, true);
             fogControl.resetFog();
-            MapIO.writeMap(file, map);
+            MapIO.writeMap(file, map, embedAssets);
 
             if(!headless){
                 //reset attributes
@@ -238,10 +249,13 @@ public class Maps{
                 }
 
                 Pixmap pix = MapIO.generatePreview(world.tiles);
-                mainExecutor.submit(() -> map.previewFile().writePng(pix));
                 writeCache(map);
 
                 map.texture = new Texture(pix);
+                mainExecutor.submit(() -> {
+                    map.previewFile().writePng(pix);
+                    pix.dispose();
+                });
             }
             maps.add(map);
             maps.sort();
@@ -253,8 +267,8 @@ public class Maps{
         }
     }
 
-    /** Import a map, then save it. This updates all values and stored data necessary. */
-    public void importMap(Fi file) throws IOException{
+    /** Imports a map, then saves it. This updates all values and stored data necessary. */
+    public Map importMap(Fi file) throws IOException{
         Fi dest = findFile(file.name());
         file.copyTo(dest);
 
@@ -274,6 +288,8 @@ public class Maps{
         if(error[0] != null){
             throw new IOException(error[0]);
         }
+
+        return map;
     }
 
     /** Attempts to run the following code;

@@ -14,6 +14,8 @@ import arc.util.io.*;
 import arc.util.pooling.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.logic.*;
+import mindustry.mod.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -22,8 +24,9 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class MessageBlock extends Block{
-    //don't change this too much unless you want to run into issues with packet sizes
-    public int maxTextLength = 220;
+    /** writeUTF maximum UTF-8 length per char is 3, so 3*400 = 1200 bytes, the max string byte size */
+    @NoPatch
+    public int maxTextLength = 400;
     public int maxNewlines = 24;
 
     public MessageBlock(String name){
@@ -67,7 +70,7 @@ public class MessageBlock extends Block{
         return accessible();
     }
 
-    public class MessageBuild extends Building{
+    public class MessageBuild extends Building implements LReadable{
         public StringBuilder message = new StringBuilder();
 
         @Override
@@ -106,13 +109,13 @@ public class MessageBlock extends Block{
         public void buildConfiguration(Table table){
             table.button(Icon.pencil, Styles.cleari, () -> {
                 if(mobile){
-                    var contents = this.message.toString();
+                    var contents = message;
                     Core.input.getTextInput(new TextInput(){{
-                        text = contents;
+                        text = contents.toString();
                         multiline = true;
                         maxLength = maxTextLength;
                         accepted = str -> {
-                            if(!str.equals(text)) configure(str);
+                            if(!str.contentEquals(contents)) configure(str);
                         };
                     }});
                 }else{
@@ -135,7 +138,7 @@ public class MessageBlock extends Block{
                     dialog.cont.row();
                     dialog.cont.label(() -> a.getText().length() + " / " + maxTextLength).color(Color.lightGray);
                     dialog.buttons.button("@ok", () -> {
-                        if(!a.getText().equals(message.toString())) configure(a.getText());
+                        if(!a.getText().contentEquals(message)) configure(a.getText());
                         dialog.hide();
                     }).size(130f, 60f);
                     dialog.update(() -> {
@@ -163,6 +166,25 @@ public class MessageBlock extends Block{
         @Override
         public Cursor getCursor(){
             return !accessible() ? SystemCursor.arrow : super.getCursor();
+        }
+
+        @Override
+        public boolean readable(LExecutor exec){
+            return isValid();
+        }
+
+        @Override
+        public void read(LVar position, LVar output){
+            int address = position.numi();
+            output.setnum(address < 0 || address >= message.length() ? Double.NaN : message.charAt(address));
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            return switch(sensor){
+                case bufferSize -> message.length();
+                default -> super.sense(sensor);
+            };
         }
 
         @Override

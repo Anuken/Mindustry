@@ -7,6 +7,7 @@ import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
@@ -46,6 +47,20 @@ public class Saves{
         });
     }
 
+    private void clearOldMegabaseSectors(){
+        IntSet serpuloRemoval = IntSet.with(27, 245, 244, 243, 242, 247, 246, 237, 150, 157, 138, 251, 103);
+
+        //clear old megabase sectors from the beta period
+        saves.removeAll(s -> {
+            if(s.getSector() != null && s.getSector().planet == Planets.serpulo && serpuloRemoval.contains(s.getSector().id) && s.meta.build < 157 && s.meta.build > 146){
+                s.getSector().clearInfo();
+                s.file.delete();
+                return true;
+            }
+            return false;
+        });
+    }
+
     public void load(){
         saves.clear();
 
@@ -70,9 +85,36 @@ public class Saves{
             }
         }
 
+        clearOldMegabaseSectors();
+
         lastSectorSave = saves.find(s -> s.isSector() && s.getName().equals(Core.settings.getString("last-sector-save", "<none>")));
 
-        ObjectSet<Sector> infoToClear = new ObjectSet<>(), remapped = new ObjectSet<>();
+        class Remap{
+            //file in the temp folder
+            Fi sourceFile;
+            //slot of source sector to move file for
+            SaveSlot slot;
+            Sector sourceSector;
+            //sector info from source sector to move into
+            SectorInfo sourceInfo;
+
+            //file to copy to
+            Fi destFile;
+            //destination sector to move to
+            Sector destSector;
+
+            Remap(SaveSlot slot, Fi sourceFile, Sector sourceSector, SectorInfo sourceInfo, Fi destFile, Sector destSector){
+                this.slot = slot;
+                this.sourceFile = sourceFile;
+                this.sourceSector = sourceSector;
+                this.sourceInfo = sourceInfo;
+                this.destFile = destFile;
+                this.destSector = destSector;
+            }
+        }
+
+        Seq<Remap> remaps = new Seq<>();
+        ObjectSet<Sector> remapped = new ObjectSet<>();
 
         //automatically assign sector save slots
         for(SaveSlot slot : saves){
@@ -102,22 +144,13 @@ public class Saves{
                     if(!slot.file.equals(getSectorFile(remapTarget))){
                         Log.info("Remapping sector: @ -> @ (@)", sector.id, remapTarget.id, remapTarget.preset);
 
-                        sector.loadInfo();
-                        //overwrite the target sector's info with the save's info
-                        Core.settings.putJson(remapTarget.planet.name + "-s-" + remapTarget.id + "-info", sector.info);
-                        remapTarget.loadInfo();
-
-                        //queue a clear of the sector that had its data moved
-                        infoToClear.add(sector);
-                        //add to the remapped list (if it was remapped, don't clear it!)
-                        remapped.add(remapTarget);
-
-                        remapTarget.save = slot;
                         try{
-                            Fi target = getSectorFile(remapTarget);
-                            //move over save file
-                            slot.file.moveTo(target);
-                            slot.file = target;
+                            SectorInfo info = Core.settings.getJson(sector.planet.name + "-s-" + sector.id + "-info", SectorInfo.class, SectorInfo::new);
+                            Fi tmpRemapFile = saveDirectory.child("remap_" + sector.planet.name + "_" + sector.id + "." + saveExtension);
+                            slot.file.moveTo(tmpRemapFile);
+
+                            remaps.add(new Remap(slot, tmpRemapFile, sector, info, getSectorFile(remapTarget), remapTarget));
+                            remapped.add(remapTarget);
                         }catch(Exception e){
                             Log.err("Failed to move sector files when remapping: " + sector.id + " -> " + remapTarget.id, e);
                         }
@@ -125,6 +158,7 @@ public class Saves{
 
                     remapTarget.save = slot;
                     slot.meta.rules.sector = remapTarget;
+
                 }else{
                     if(sector.save != null){
                         Log.warn("Sector @ has two corresponding saves: @ and @", sector, sector.save.file, slot.file);
@@ -134,10 +168,28 @@ public class Saves{
             }
         }
 
-        for(var sector : infoToClear){
-           if(!remapped.contains(sector)){
-               sector.clearInfo();
-           }
+        //process remaps later to allow swaps of sectors
+        for(var remap : remaps){
+            if(remap.sourceSector.planet == Planets.serpulo) Vars.hadSerpuloRemaps = true;
+            var remapTarget = remap.destSector;
+
+            //overwrite the target sector's info with the save's info
+            Core.settings.putJson(remapTarget.planet.name + "-s-" + remapTarget.id + "-info", remap.sourceInfo);
+            remapTarget.loadInfo();
+
+            remapTarget.save = remap.slot;
+            try{
+                //move file from tmp directory back into the correct location
+                remap.sourceFile.moveTo(remap.destFile);
+                remap.slot.file = remap.destFile;
+            }catch(Exception e){
+                Log.err("Failed to move back sector files when remapping: " + remap.sourceSector.id + " -> " + remapTarget.id, e);
+            }
+
+            //clear the info, assuming it wasn't a sector that got mapped to
+            if(!remapped.contains(remap.sourceSector)){
+                remap.sourceSector.clearInfo();
+            }
         }
     }
 
@@ -153,7 +205,11 @@ public class Saves{
         if(current != null && state.isGame()
         && !(state.isPaused() && Core.scene.hasDialog())){
             if(lastTimestamp != 0){
-                totalPlaytime += Time.timeSinceMillis(lastTimestamp);
+                long change = Time.timeSinceMillis(lastTimestamp);
+                totalPlaytime += change;
+                if(state.isCampaign()){
+                    state.getPlanet().stats().playtime += change;
+                }
             }
             lastTimestamp = Time.millis();
         }
@@ -394,6 +450,14 @@ public class Saves{
             Core.settings.put("save-" + index() + "-autosave", save);
         }
 
+        public boolean isBeingPlayed(){
+            return getCurrent() == this;
+        }
+
+        public boolean hasExternalAssets(){
+            return meta.tags.getBool("hasExternalAssets");
+        }
+
         public void importFile(Fi from) throws IOException{
             try{
                 from.copyTo(file);
@@ -408,7 +472,13 @@ public class Saves{
 
         public void exportFile(Fi to) throws IOException{
             try{
-                file.copyTo(to);
+                if(isBeingPlayed() && hasExternalAssets()){
+                    SaveIO.write(to, new SaveOptions(){{
+                        embedAssets = true;
+                    }});
+                }else{
+                    file.copyTo(to);
+                }
             }catch(Exception e){
                 throw new IOException(e);
             }

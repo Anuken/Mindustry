@@ -1,6 +1,8 @@
 package mindustry.net;
 
 import arc.*;
+import arc.files.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -11,11 +13,14 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.maps.Map;
+import mindustry.mod.*;
+import mindustry.mod.data.*;
 import mindustry.net.Administration.*;
 import mindustry.type.*;
 
 import java.io.*;
 import java.nio.*;
+import java.nio.channels.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -36,6 +41,9 @@ public class NetworkIO{
                     }
                 }
             }
+
+            //data patches must be first, as rules can involve patched content
+            SaveIO.getSaveWriter().writeDataPatches(stream, false);
 
             stream.writeUTF(JsonIO.write(state.rules));
             stream.writeUTF(JsonIO.write(state.mapLocales));
@@ -64,6 +72,8 @@ public class NetworkIO{
 
         try(DataInputStream stream = new DataInputStream(is)){
             Time.clear();
+            SaveIO.getSaveWriter().readDataPatches(stream, new SaveReadState(world.context));
+
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
             state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
@@ -92,6 +102,64 @@ public class NetworkIO{
             throw new RuntimeException(e);
         }finally{
             content.setTemporaryMapper(null);
+        }
+    }
+
+    public static void writeRequiredAssets(OutputStream os, Seq<DataAsset> assets){
+
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeInt(assets.size);
+            //can't use iterator as this seq might be accessed by multiple threads
+            for(int i = 0; i < assets.size; i ++){
+                var asset = assets.get(i);
+                if(asset.byteHash == null) throw new RuntimeException("Invalid asset (missing hash): " + asset.path);
+                stream.write(asset.byteHash);
+            }
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Seq<String> readRequiredAssets(InputStream is){
+        Seq<String> result = new Seq<>();
+        byte[] bytes = new byte[32];
+        try(DataInputStream stream = new DataInputStream(is)){
+            int amount = stream.readInt();
+            for(int i = 0; i < amount; i++){
+                stream.readFully(bytes);
+                result.add(DataAssetCache.encodeHash(bytes));
+            }
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    public static void writeAssets(OutputStream os, Seq<DataAsset> assets){
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeInt(assets.size);
+            for(var asset : assets){
+                Fi file = asset.getCacheFileNoNull();
+                byte[] bytes = file.readBytes();
+                stream.writeInt(bytes.length);
+                stream.write(bytes);
+            }
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void loadAssets(InputStream is) throws IOException{
+        try(DataInputStream stream = new DataInputStream(is)){
+            int amount = stream.readInt();
+            for(int i = 0; i < amount; i++){
+                int len = stream.readInt();
+                byte[] bytes = new byte[len];
+                stream.readFully(bytes);
+                assetCache.add(bytes);
+            }
+        }catch(ClosedChannelException ignored){
+            //happens when the input stream is closed externally
         }
     }
 
@@ -128,7 +196,8 @@ public class NetworkIO{
         int version = buffer.getInt();
         String vertype = readString(buffer);
 
-        Gamemode gamemode = Gamemode.all[buffer.get()];
+        byte mode = buffer.get();
+        Gamemode gamemode = Gamemode.all[mode < Gamemode.all.length ? mode : 0];
         int limit = buffer.getInt();
 
         String description = readString(buffer);

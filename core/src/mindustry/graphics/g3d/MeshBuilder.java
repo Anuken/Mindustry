@@ -8,14 +8,14 @@ import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 
 public class MeshBuilder{
-    private static final boolean gl30 = Core.gl30 != null;
+    private static final boolean packNormals = Core.gl30 != null && (Core.app.isMobile() || Core.graphics.getGLVersion().atLeast(3, 3));
     private static volatile float[] tmpHeights = new float[14580]; //highest amount of corners in vanilla
 
     /** Note that the resulting icosphere does not have normals or a color. */
     public static Mesh buildIcosphere(int divisions, float radius){
         MeshResult result = Icosphere.create(divisions);
 
-        Mesh mesh = begin(result.vertices.size / 3, result.indices.size, false, false);
+        Mesh mesh = begin(result.vertices.size / 3, result.indices.size, false, false, false);
 
         if(result.vertices.size >= 65535) throw new RuntimeException("Due to index size limits, only meshes with a maximum of 65535 vertices are supported. If you want more than that, make your own non-indexed mesh builder.");
 
@@ -89,9 +89,11 @@ public class MeshBuilder{
             generator.seed = generator.baseSeed;
         }
 
-        if(grid.tiles.length * 6 >= 65535) throw new RuntimeException("Due to index size limits, only meshes with a maximum of 65535 vertices are supported. If you want more than that, make your own non-indexed mesh builder.");
+        boolean emit = mesher.isEmissive();
 
-        Mesh mesh = begin(grid.tiles.length * 6, grid.tiles.length * 4 * 3, true, true);
+        boolean indexed = grid.tiles.length * 6 < 65535;
+
+        Mesh mesh = begin(indexed ? grid.tiles.length * 6 : grid.tiles.length * 12, indexed ? grid.tiles.length * 4 * 3 : 0, true, emit);
 
         float[] heights;
 
@@ -103,13 +105,12 @@ public class MeshBuilder{
 
         //cache heights in an array to prevent redundant calls to getHeight
         for(int i = 0; i < grid.corners.length; i++){
-            heights[i] = mesher.getHeight(grid.corners[i].v);
+            heights[i] = (1f + mesher.getHeight(grid.corners[i].v) * intensity) * radius;
         }
-
         int position = 0;
 
-        short[] shorts = new short[12];
-        float[] floats = new float[3 + (gl30 ? 1 : 3) + 1 + 1];
+        short[] shorts = indexed ? new short[12] : null;
+        float[] floats = new float[3 + (packNormals ? 1 : 3) + 1 + (emit ? 1 : 0)];
         Vec3 nor = new Vec3();
 
         Color tmpCol = new Color();
@@ -122,9 +123,9 @@ public class MeshBuilder{
             Corner[] c = tile.corners;
 
             float
-            h1 = (1f + heights[c[0].id] * intensity) * radius,
-            h2 = (1f + heights[c[2].id] * intensity) * radius,
-            h3 = (1f + heights[c[4].id] * intensity) * radius;
+            h1 = heights[c[0].id],
+            h2 = heights[c[2].id],
+            h3 = heights[c[4].id];
 
             Vec3
             v1 = c[0].v,
@@ -140,52 +141,74 @@ public class MeshBuilder{
             tmpCol.set(1f, 1f, 1f, 1f);
             mesher.getColor(tile.v, tmpCol);
             float color = tmpCol.toFloatBits();
-            tmpCol.set(0f, 0f, 0f, 0f);
-            mesher.getEmissiveColor(tile.v, tmpCol);
-            float emissive = tmpCol.toFloatBits();
 
-            for(var corner : c){
-                float height = (1f + heights[corner.id] * intensity) * radius;
+            float emissive = 0f;
 
-                vert(mesh, floats, corner.v.x * height, corner.v.y * height, corner.v.z * height, nor, color, emissive);
+            if(emit){
+                tmpCol.set(0f, 0f, 0f, 0f);
+                mesher.getEmissiveColor(tile.v, tmpCol);
+                emissive = tmpCol.toFloatBits();
             }
 
-            shorts[0] = (short)(position);
-            shorts[1] = (short)(position + 1);
-            shorts[2] = (short)(position + 2);
+            if(indexed){
+                for(var corner : c){
+                    float height = heights[corner.id];
 
-            shorts[3] = (short)(position);
-            shorts[4] = (short)(position + 2);
-            shorts[5] = (short)(position + 3);
+                    vert(mesh, floats, corner.v.x * height, corner.v.y * height, corner.v.z * height, nor, color, emissive);
+                }
 
-            shorts[6] = (short)(position);
-            shorts[7] = (short)(position + 3);
-            shorts[8] = (short)(position + 4);
+                shorts[0] = (short)(position);
+                shorts[1] = (short)(position + 1);
+                shorts[2] = (short)(position + 2);
 
-            if(c.length > 5){
-                shorts[9] = (short)(position);
-                shorts[10] = (short)(position + 4);
-                shorts[11] = (short)(position + 5);
+                shorts[3] = (short)(position);
+                shorts[4] = (short)(position + 2);
+                shorts[5] = (short)(position + 3);
+
+                shorts[6] = (short)(position);
+                shorts[7] = (short)(position + 3);
+                shorts[8] = (short)(position + 4);
+
+                if(c.length > 5){
+                    shorts[9] = (short)(position);
+                    shorts[10] = (short)(position + 4);
+                    shorts[11] = (short)(position + 5);
+                }
+
+                mesh.getIndicesBuffer().put(shorts, 0, c.length > 5 ? 12 : 9);
+
+                position += c.length;
+            }else{
+                verts(mesh, floats, c[0].v, heights[c[0].id], c[1].v, heights[c[1].id], c[2].v, heights[c[2].id], nor, color, emissive);
+                verts(mesh, floats, c[0].v, heights[c[0].id], c[2].v, heights[c[2].id], c[3].v, heights[c[3].id], nor, color, emissive);
+                verts(mesh, floats, c[0].v, heights[c[0].id], c[3].v, heights[c[3].id], c[4].v, heights[c[4].id], nor, color, emissive);
+
+                if(c.length > 5){
+                    verts(mesh, floats, c[0].v, heights[c[0].id], c[4].v, heights[c[4].id], c[5].v, heights[c[5].id], nor, color, emissive);
+                }
             }
-
-            mesh.getIndicesBuffer().put(shorts, 0, c.length > 5 ? 12 : 9);
-            position += c.length;
         }
 
         return end(mesh);
     }
 
     private static Mesh begin(int vertices, int indices, boolean normal, boolean emissive){
+        return begin(vertices, indices, normal, emissive, true);
+    }
+
+    private static Mesh begin(int vertices, int indices, boolean normal, boolean emissive, boolean color){
         Seq<VertexAttribute> attributes = Seq.with(
         VertexAttribute.position3
         );
 
         if(normal){
             //only GL30 supports GL_INT_2_10_10_10_REV
-            attributes.add(gl30 ? VertexAttribute.packedNormal : VertexAttribute.normal);
+            attributes.add(packNormals ? VertexAttribute.packedNormal : VertexAttribute.normal);
         }
 
-        attributes.add(VertexAttribute.color);
+        if(color){
+            attributes.add(VertexAttribute.color);
+        }
 
         if(emissive){
             attributes.add(new VertexAttribute(4, GL20.GL_UNSIGNED_BYTE, true, "a_emissive"));
@@ -213,21 +236,8 @@ public class MeshBuilder{
         return mesh;
     }
 
-    private static void normal(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 out){
-        float
-        x = v2.x - v1.x,
-        y = v2.y - v1.y,
-        z = v2.z - v1.z,
-        vx = v3.x - v1.x,
-        vy = v3.y - v1.y,
-        vz = v3.z - v1.z;
-
-        float
-        cx = y * vz - z * vy,
-        cy = z * vx - x * vz,
-        cz = x * vy - y * vx;
-
-        out.set(cx, cy, cz).nor();
+    private static Vec3 normal(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 out){
+        return out.set(v2).sub(v1).crs(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z).nor();
     }
 
     private static void normal(float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z, Vec3 out){
@@ -247,32 +257,39 @@ public class MeshBuilder{
         out.set(cx, cy, cz).nor();
     }
 
+    private static void verts(Mesh mesh, float[] floats, Vec3 a, float h1, Vec3 b, float h2, Vec3 c, float h3, Vec3 normal, float color, float emissive){
+        vert(mesh, floats, a.x * h1, a.y * h1, a.z * h1, normal, color, emissive);
+        vert(mesh, floats, b.x * h2, b.y * h2, b.z * h2, normal, color, emissive);
+        vert(mesh, floats, c.x * h3, c.y * h3, c.z * h3, normal, color, emissive);
+    }
+
     private static void vert(Mesh mesh, float[] floats, float x, float y, float z, Vec3 normal, float color, float emissive){
         floats[0] = x;
         floats[1] = y;
         floats[2] = z;
 
-        if(gl30){
+        if(packNormals){
             floats[3] = packNormals(normal.x, normal.y, normal.z);
 
             floats[4] = color;
-            floats[5] = emissive;
+            if(floats.length > 5) floats[5] = emissive;
         }else{
             floats[3] = normal.x;
-            floats[4] = normal.x;
-            floats[5] = normal.x;
+            floats[4] = normal.y;
+            floats[5] = normal.z;
 
             floats[6] = color;
-            floats[7] = emissive;
+            if(floats.length > 7) floats[7] = emissive;
         }
 
         mesh.getVerticesBuffer().put(floats);
     }
 
     private static float packNormals(float x, float y, float z){
-        int xs = x < 0 ? 1 : 0;
-        int ys = y < 0 ? 1 : 0;
-        int zs = z < 0 ? 1 : 0;
+        int xs = x < -1f/512f ? 1 : 0;
+        int ys = y < -1f/512f ? 1 : 0;
+        int zs = z < -1f/512f ? 1 : 0;
+
         int vi =
         zs << 29 | ((int)(z * 511 + (zs << 9)) & 511) << 20 |
         ys << 19 | ((int)(y * 511 + (ys << 9)) & 511) << 10 |

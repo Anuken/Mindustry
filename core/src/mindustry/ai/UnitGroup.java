@@ -158,7 +158,7 @@ public class UnitGroup{
     }
 
     private void updateRaycast(int index, Vec2 dest, Vec2 v1){
-        if(collisionLayer != PhysicsProcess.layerFlying){
+        if(collisionLayer != PhysicsProcess.layerFlying && originalPositions != null && positions != null){
 
             //coordinates in world space
             float

@@ -80,7 +80,7 @@ public class BurstDrill extends Drill{
 
             if(invertTime > 0f) invertTime -= delta() / invertedTime;
 
-            if(timer(timerDump, dumpTime)){
+            if(timer(timerDump, dumpTime / timeScale)){
                 dump(items.has(dominantItem) ? dominantItem : null);
             }
 

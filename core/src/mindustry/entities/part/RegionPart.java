@@ -92,13 +92,14 @@ public class RegionPart extends DrawPart{
         float preXscl = Draw.xscl, preYscl = Draw.yscl;
         Draw.xscl *= xScl + gx;
         Draw.yscl *= yScl + gy;
+        float prevMixCol = Draw.getMixColorPacked(), prevCol = Draw.getColorPacked();
 
         for(int s = 0; s < len; s++){
             //use specific side if necessary
             int i = params.sideOverride == -1 ? s : params.sideOverride;
 
             //can be null
-            var region = drawRegion ? regions[Math.min(i, regions.length - 1)] : null;
+            var region = drawRegion && regions.length > 0 ? regions[Math.min(i, regions.length - 1)] : null;
             float sign = (i == 0 ? 1 : -1) * params.sideMultiplier;
             Tmp.v1.set((x + mx) * sign, y + my).rotateRadExact((params.rotation - 90) * Mathf.degRad);
 
@@ -149,8 +150,8 @@ public class RegionPart extends DrawPart{
             Draw.xscl *= sign;
         }
 
-        Draw.color();
-        Draw.mixcol();
+        Draw.color(prevCol);
+        Draw.mixcol(prevMixCol);
 
         Draw.z(z);
 

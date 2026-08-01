@@ -17,6 +17,7 @@ import mindustry.game.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -46,6 +47,10 @@ public class MapObjectivesDialog extends BaseDialog{
 
             if(field != null && field.isAnnotationPresent(Multiline.class)){
                 cont.area(get.get(), set).height(100f).growX();
+            }else if(field != null && field.isAnnotationPresent(LogicCode.class)){
+                cont.button(b -> b.image(Icon.pencil).size(iconSmall), () -> {
+                    ui.logic.show(get.get(), null, true, set::get);
+                }).pad(4f);
             }else{
                 cont.field(get.get(), set).growX();
             }
@@ -280,6 +285,20 @@ public class MapObjectivesDialog extends BaseDialog{
             });
         }));
 
+        setInterpreter(Alignment.class, int.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            Alignment align = field.getAnnotation(Alignment.class);
+            name(cont, name, remover, indexer);
+            cont.button(b -> {
+                b.label(() -> LStatement.alignToName.get(get.get(), "center"));
+                b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
+            }, () -> {});
+        });
+
+        setInterpreter(TextureHolder.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            name(cont, name, remover, indexer);
+            cont.field(String.valueOf(get.get().value), s -> get.get().value = s).growX();
+        });
+
         // Types that use the default interpreter. It would be nice if all types could use it, but I don't know how to reliably prevent classes like [? extends Content] from using it.
         for(var obj : MapObjectives.allObjectiveTypes) setInterpreter(obj.get().getClass(), defaultInterpreter());
         for(var mark : MapObjectives.allMarkerTypes) setInterpreter(mark.get().getClass(), defaultInterpreter());
@@ -395,7 +414,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 t.left();
                 t.margin(10f);
 
-                if(name.length() > 0) t.add(name + ":").color(Pal.accent);
+                if(name.length() > 0) t.add(name).color(Pal.accent);
                 t.add().growX();
 
                 Cell<ImageButton> remove = null;
@@ -467,21 +486,21 @@ public class MapObjectivesDialog extends BaseDialog{
                 buttons.defaults().size(160f, 64f).pad(2f);
                 buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
                 buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
-                buttons.button("@waves.edit", Icon.edit, () -> {
-                    BaseDialog dialog = new BaseDialog("@waves.edit");
+                buttons.button("@edit.menu", Icon.edit, () -> {
+                    BaseDialog dialog = new BaseDialog("@edit.menu");
                     dialog.addCloseButton();
                     dialog.setFillParent(false);
                     dialog.cont.table(Tex.button, t -> {
                         var style = Styles.cleart;
                         t.defaults().size(280f, 64f).pad(2f);
 
-                        t.button("@waves.copy", Icon.copy, style, () -> {
+                        t.button("@copy.clipboard", Icon.copy, style, () -> {
                             ui.showInfoFade("@copied");
                             Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
                             dialog.hide();
                         }).disabled(b -> canvas.objectives.isEmpty()).marginLeft(12f).row();
 
-                        t.button("@waves.load", Icon.download, style, () -> {
+                        t.button("@load.clipboard", Icon.download, style, () -> {
                             try{
                                 rebuildObjectives(new Seq<>(JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all));
                             }catch(Exception e){
@@ -535,10 +554,7 @@ public class MapObjectivesDialog extends BaseDialog{
         if(
         objectives.any() && (
         // If the objectives were previously programmatically made...
-        objectives.contains(obj -> obj.editorX == -1 || obj.editorY == -1) ||
-        // ... or some idiot somehow made it not work...
-        objectives.contains(obj -> !canvas.tilemap.createTile(obj))
-        )){
+        objectives.contains(obj -> obj.editorX == -999 || obj.editorY == -999))){
             // ... then rebuild the structure.
             canvas.clearObjectives();
 
@@ -563,6 +579,8 @@ public class MapObjectivesDialog extends BaseDialog{
                     if(i >= objectives.size) break loop;
                 }
             }
+        }else{
+            objectives.each(o -> canvas.tilemap.createTile(o.editorX, o.editorY, o, true));
         }
 
         canvas.objectives.set(objectives);

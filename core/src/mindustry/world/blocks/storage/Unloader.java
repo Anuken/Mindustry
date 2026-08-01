@@ -14,6 +14,8 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.blocks.storage.StorageBlock.*;
 import mindustry.world.meta.*;
 
 import java.util.*;
@@ -24,6 +26,7 @@ public class Unloader extends Block{
     public @Load(value = "@-center", fallback = "unloader-center") TextureRegion centerRegion;
 
     public float speed = 1f;
+    public boolean allowCoreUnload = true;
 
     /** Cached result of content.items() */
     static Item[] allItems;
@@ -40,6 +43,8 @@ public class Unloader extends Block{
         noUpdateDisabled = true;
         clearOnDoubleTap = true;
         unloadable = false;
+        drawCached = true;
+        drawDynamic = false;
 
         config(Item.class, (UnloaderBuild tile, Item item) -> tile.sortItem = item);
         configClear((UnloaderBuild tile) -> tile.sortItem = null);
@@ -94,6 +99,8 @@ public class Unloader extends Block{
         protected final Comparator<ContainerStat> comparator = (x, y) -> {
             //sort so it gives priority for blocks that can only either receive or give (not both), and then by load, and then by last use
             //highest = unload from, lowest = unload to
+            int unloadCore = Boolean.compare(!x.notStorage, !y.notStorage); //priority to core and core containers always
+            if(unloadCore != 0) return unloadCore;
             int unloadPriority = Boolean.compare(x.canUnload && !x.canLoad, y.canUnload && !y.canLoad); //priority to receive if it cannot give
             if(unloadPriority != 0) return unloadPriority;
             int loadPriority = Boolean.compare(x.canUnload || !x.canLoad, y.canUnload || !y.canLoad); //priority to give if it cannot receive
@@ -138,8 +145,8 @@ public class Unloader extends Block{
                 if(!other.interactable(team)) continue; //avoid blocks of the wrong team
 
                 //partial check
-                boolean canLoad = !(other.block instanceof StorageBlock);
-                boolean canUnload = other.canUnload() && other.items != null;
+                boolean canLoad = !(other instanceof CoreBuild || other instanceof StorageBuild);
+                boolean canUnload = other.canUnload() && (allowCoreUnload || canLoad || (other instanceof StorageBuild b && b.linkedCore == null)) && other.items != null;
 
                 if(canLoad || canUnload){ //avoid blocks that can neither give nor receive items
                     var pb = Pools.obtain(ContainerStat.class, ContainerStat::new);
@@ -155,7 +162,6 @@ public class Unloader extends Block{
         public void updateTile(){
             if(((unloadTimer += delta()) < speed) || (possibleBlocks.size < 2)) return;
             Item item = null;
-            boolean any = false;
 
             if(sortItem != null){
                 if(isPossibleItem(sortItem)) item = sortItem;
@@ -187,39 +193,65 @@ public class Unloader extends Block{
                 }
 
                 possibleBlocks.sort(comparator);
+                unloadAccumulate(item);
+            }else{
+                unloadTimer = Math.min(unloadTimer, speed);
+            }
+        }
 
+        //allow dumping regardless of framerate. The expensive checks such as isPossibleItem() are still dependant on update()
+        public void unloadAccumulate(Item item){
+            if(item == null) return;
+
+            boolean any = false;
+            var pbi = possibleBlocks.items;
+            int pbs = possibleBlocks.size;
+
+            while(unloadTimer >= speed){
                 dumpingTo = null;
                 dumpingFrom = null;
 
                 //choose the building to accept the item
                 for(int i = 0; i < pbs; i++){
-                    if(pbi[i].canLoad){
-                        dumpingTo = pbi[i];
+                    var pb = pbi[i];
+                    if(pb.canLoad && pb.building.acceptItem(this, item)){
+                        dumpingTo = pb;
                         break;
                     }
                 }
 
                 //choose the building to take the item from
                 for(int i = pbs - 1; i >= 0; i--){
-                    if(pbi[i].canUnload){
-                        dumpingFrom = pbi[i];
+                    var pb = pbi[i];
+                    if(pb.canUnload && pb.building.canUnload() && pb.building.items != null && pb.building.items.has(item)){
+                        dumpingFrom = pb;
                         break;
                     }
                 }
 
+                if(dumpingFrom == null || dumpingTo == null) break;
+
+                var from = dumpingFrom.building;
+                var to = dumpingTo.building;
+
+                int fromMax = from.getMaximumAccepted(item);
+                int toMax = to.getMaximumAccepted(item);
+                dumpingFrom.loadFactor = fromMax == 0 || from.items == null ? 0f : from.items.get(item) / (float)fromMax;
+                dumpingTo.loadFactor = toMax == 0 || to.items == null ? 0f : to.items.get(item) / (float)toMax;
+
                 //trade the items
-                if(dumpingFrom != null && dumpingTo != null && (dumpingFrom.loadFactor != dumpingTo.loadFactor || !dumpingFrom.canLoad)){
-                    dumpingTo.building.handleItem(this, item);
-                    dumpingFrom.building.removeStack(item, 1);
-                    dumpingTo.lastUsed = 0;
-                    dumpingFrom.lastUsed = 0;
+                if(dumpingFrom.loadFactor != dumpingTo.loadFactor || !dumpingFrom.canLoad){
+                    to.handleItem(this, item);
+                    from.removeStack(item, 1);
+                    dumpingTo.lastUsed = dumpingFrom.lastUsed = 0;
+                    unloadTimer -= speed;
                     any = true;
+                }else{
+                    break;
                 }
             }
 
-            if(any){
-                unloadTimer %= speed;
-            }else{
+            if(!any){
                 unloadTimer = Math.min(unloadTimer, speed);
             }
         }
@@ -237,6 +269,13 @@ public class Unloader extends Block{
         public void drawSelect(){
             super.drawSelect();
             drawItemSelection(sortItem);
+        }
+
+        @Override
+        public void configured(Unit builder, Object value){
+            super.configured(builder, value);
+
+            if(!headless) recache();
         }
 
         @Override

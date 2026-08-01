@@ -12,6 +12,7 @@ import mindustry.entities.*;
 import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
@@ -41,7 +42,7 @@ public class VariableReactor extends PowerGenerator{
         explosionRadius = 16;
         explosionDamage = 1500;
         explodeEffect = new MultiEffect(Fx.bigShockwave, new WrapEffect(Fx.titanSmoke, Color.valueOf("e3ae6f")));
-        explodeSound = Sounds.explosionbig;
+        explodeSound = Sounds.explosionReactor2;
 
         explosionPuddles = 70;
         explosionPuddleRange = tilesize * 6f;
@@ -149,6 +150,12 @@ public class VariableReactor extends PowerGenerator{
         @Override
         public float heatRequirement(){
             return maxHeat;
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return heat;
+            return super.sense(sensor);
         }
 
         @Override

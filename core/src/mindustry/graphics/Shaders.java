@@ -33,7 +33,7 @@ public class Shaders{
     public static AtmosphereShader atmosphere;
     public static ShockwaveShader shockwave;
     public static MeshShader mesh;
-    public static Shader unlit;
+    public static Shader unlit, unlitWhite;
     public static Shader screenspace;
 
     public static void init(){
@@ -70,6 +70,7 @@ public class Shaders{
         planetGrid = new PlanetGridShader();
         atmosphere = new AtmosphereShader();
         unlit = new LoadShader("planet", "unlit");
+        unlitWhite = new LoadShader("planet", "unlitwhite");
         screenspace = new LoadShader("screenspace", "screenspace");
 
         //disabled for now...
@@ -144,6 +145,7 @@ public class Shaders{
             camDir.set(renderer.planets.cam.direction).rotate(Vec3.Y, planet.getRotation());
 
             setUniformf("u_alpha", alpha);
+            setUniformf("u_emissive", 0f);
             setUniformf("u_lightdir", lightDir);
             setUniformf("u_ambientColor", ambientColor.r, ambientColor.g, ambientColor.b);
         }

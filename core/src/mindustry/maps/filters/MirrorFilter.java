@@ -47,6 +47,7 @@ public class MirrorFilter extends GenerateFilter{
                 in.block = tile.block();
             }
             in.overlay = tile.overlay();
+            in.packedData = tile.getPackedData();
         }
     }
 

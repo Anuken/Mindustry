@@ -255,7 +255,12 @@ public class MapObjectivesCanvas extends WidgetGroup{
             float dist = Math.abs(x1 - x2) / 2f;
             float cx1 = x1 + dist;
             float cx2 = x2 - dist;
-            Lines.curve(x1, y1, cx1, y1, cx2, y2, x2, y2, Math.max(4, (int) (Mathf.dst(x1, y1, x2, y2) / 4f)));
+
+            if(Mathf.equal(y1, y2, 0.1f)){
+                Lines.line(x1, y1, x2, y2);
+            }else{
+                Lines.curve(x1, y1, cx1, y1, cx2, y2, x2, y2, Math.max(4, (int) (Mathf.dst(x1, y1, x2, y2) / 4f)));
+            }
 
             float progress = (Time.time % (60 * 4)) / (60 * 4);
 
@@ -279,7 +284,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
             }
 
             for(var other : children){
-                if(other instanceof ObjectiveTile tile && tile != ignore && Tmp.r2.set(tile.tx, tile.ty, objWidth, objHeight).overlaps(Tmp.r1)){
+                if(other instanceof ObjectiveTile tile && tile != ignore && Tmp.r2.set(tile.obj.editorX, tile.obj.editorY, objWidth, objHeight).overlaps(Tmp.r1)){
                     return false;
                 }
             }
@@ -292,7 +297,11 @@ public class MapObjectivesCanvas extends WidgetGroup{
         }
 
         public boolean createTile(int x, int y, MapObjective obj){
-            if(!validPlace(x, y, null)) return false;
+            return createTile(x, y, obj, false);
+        }
+
+        public boolean createTile(int x, int y, MapObjective obj, boolean force){
+            if(!force && !validPlace(x, y, null)) return false;
 
             ObjectiveTile tile = new ObjectiveTile(obj, x, y);
             tile.pack();
@@ -331,7 +340,6 @@ public class MapObjectivesCanvas extends WidgetGroup{
 
         public class ObjectiveTile extends Table{
             public final MapObjective obj;
-            public int tx, ty;
 
             public final Mover mover;
             public final Connector conParent, conChildren;
@@ -383,8 +391,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
             }
 
             public void pos(int x, int y){
-                tx = obj.editorX = x;
-                ty = obj.editorY = y;
+                obj.editorX = x;
+                obj.editorY = y;
                 this.x = x * unitSize;
                 this.y = y * unitSize;
             }
@@ -430,8 +438,8 @@ public class MapObjectivesCanvas extends WidgetGroup{
                     moving = ObjectiveTile.this;
                     moving.toFront();
 
-                    prevX = moving.tx;
-                    prevY = moving.ty;
+                    prevX = moving.obj.editorX;
+                    prevY = moving.obj.editorY;
 
                     // Convert to world pos first because the button gets dragged too.
                     Vec2 pos = event.listenerActor.localToStageCoordinates(Tmp.v1.set(x, y));

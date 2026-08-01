@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
@@ -65,6 +66,11 @@ public class LVar{
         return isobj ? objval != null ? 1 : 0 : invalid(numval) ? 0 : (float)numval;
     }
 
+    /** @return float number converted from tile (logic) to world coordinates */
+    public float numfWorld(){
+        return World.unconv(numf());
+    }
+
     /** Get float value from variable, convert null to NaN to handle it differently in some instructions */
     public float numfOrNan(){
         return isobj ? objval != null ? 1 : Float.NaN : invalid(numval) ? 0 : (float)numval;
@@ -101,8 +107,22 @@ public class LVar{
         isobj = true;
     }
 
+    public void set(LVar other){
+        isobj = other.isobj;
+        // Setting a non-numeric value to @counter must preserve its numeric field
+        if(isobj){
+            objval = other.objval;
+        }else{
+            numval = invalid(other.numval) ? 0 : other.numval;
+        }
+    }
+
     public static boolean invalid(double d){
         return Double.isNaN(d) || Double.isInfinite(d);
     }
 
+    @Override
+    public String toString(){
+        return name + ": " + (isobj ? objval : numval) + (constant ? " [const]" : "");
+    }
 }

@@ -19,6 +19,7 @@ const floatp = method => new Floatp(){get: method}
 const cons = method => new Cons(){get: method}
 const prov = method => new Prov(){get: method}
 const func = method => new Func(){get: method}
+const getRealClass = value => Vars.mods.getScripts().getClass(value);
 
 const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effect.EffectRenderer({render: renderer}))
 Call = Packages.mindustry.gen.Call
@@ -41,6 +42,11 @@ function extend(/*Base, ..., def*/){
     return instance
 }
 
+importPackage(Packages.java.lang)
+const Arrays = Packages.java.util.Arrays
+//commonly used inner classes that are moved out so JS mods can be more compatible with v8 and v9
+const TextureFilter = Packages.arc.graphics.Texture.TextureFilter
+const TextureWrap = Packages.arc.graphics.Texture.TextureWrap
 importPackage(Packages.arc)
 importPackage(Packages.arc.audio)
 importPackage(Packages.arc.files)
@@ -75,6 +81,7 @@ importPackage(Packages.mindustry.content)
 importPackage(Packages.mindustry.core)
 importPackage(Packages.mindustry.ctype)
 importPackage(Packages.mindustry.editor)
+importPackage(Packages.mindustry.editor.data)
 importPackage(Packages.mindustry.entities)
 importPackage(Packages.mindustry.entities.abilities)
 importPackage(Packages.mindustry.entities.bullet)
@@ -95,10 +102,10 @@ importPackage(Packages.mindustry.maps.filters)
 importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
 importPackage(Packages.mindustry.mod)
+importPackage(Packages.mindustry.mod.data)
 importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.service)
 importPackage(Packages.mindustry.type)
-importPackage(Packages.mindustry.type.ammo)
 importPackage(Packages.mindustry.type.unit)
 importPackage(Packages.mindustry.type.weapons)
 importPackage(Packages.mindustry.type.weather)
@@ -114,7 +121,6 @@ importPackage(Packages.mindustry.world.blocks.defense.turrets)
 importPackage(Packages.mindustry.world.blocks.distribution)
 importPackage(Packages.mindustry.world.blocks.environment)
 importPackage(Packages.mindustry.world.blocks.heat)
-importPackage(Packages.mindustry.world.blocks.legacy)
 importPackage(Packages.mindustry.world.blocks.liquid)
 importPackage(Packages.mindustry.world.blocks.logic)
 importPackage(Packages.mindustry.world.blocks.payloads)
@@ -158,6 +164,7 @@ const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
 const CoreChangeEvent = Packages.mindustry.game.EventType.CoreChangeEvent
 const BuildTeamChangeEvent = Packages.mindustry.game.EventType.BuildTeamChangeEvent
+const TileOverlayChangeEvent = Packages.mindustry.game.EventType.TileOverlayChangeEvent
 const TileFloorChangeEvent = Packages.mindustry.game.EventType.TileFloorChangeEvent
 const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const TilePreChangeEvent = Packages.mindustry.game.EventType.TilePreChangeEvent
@@ -185,6 +192,7 @@ const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
 const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
+const DataPatchLoadEvent = Packages.mindustry.game.EventType.DataPatchLoadEvent
 const WorldLoadEndEvent = Packages.mindustry.game.EventType.WorldLoadEndEvent
 const WorldLoadBeginEvent = Packages.mindustry.game.EventType.WorldLoadBeginEvent
 const WorldLoadEvent = Packages.mindustry.game.EventType.WorldLoadEvent
@@ -195,8 +203,6 @@ const ModContentLoadEvent = Packages.mindustry.game.EventType.ModContentLoadEven
 const AtlasPackEvent = Packages.mindustry.game.EventType.AtlasPackEvent
 const ContentInitEvent = Packages.mindustry.game.EventType.ContentInitEvent
 const BlockInfoEvent = Packages.mindustry.game.EventType.BlockInfoEvent
-const CoreItemDeliverEvent = Packages.mindustry.game.EventType.CoreItemDeliverEvent
-const TurretAmmoDeliverEvent = Packages.mindustry.game.EventType.TurretAmmoDeliverEvent
 const LineConfirmEvent = Packages.mindustry.game.EventType.LineConfirmEvent
 const TurnEvent = Packages.mindustry.game.EventType.TurnEvent
 const WaveEvent = Packages.mindustry.game.EventType.WaveEvent

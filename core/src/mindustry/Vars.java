@@ -9,6 +9,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
@@ -27,6 +28,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -50,13 +52,15 @@ public class Vars implements Loadable{
     /** Min game version for all mods. */
     public static final int minModGameVersion = 136;
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
-    public static final int minJavaModGameVersion = 147;
+    public static final int minJavaModGameVersion = 154;
+    /** If true, a button to view sector submission threads is shown. */
+    public static boolean showSectorSubmissions = false;
     /** If true, the BE server list is always used. */
     public static boolean forceBeServers = false;
     /** If true, mod code and scripts do not run. For internal testing only. This WILL break mods if enabled. */
     public static boolean skipModCode = false;
     /** Default accessible content types used for player-selectable icons. */
-    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit};
+    public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit, ContentType.status};
     /** Default rule environment. */
     public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
     /** Wall darkness radius. */
@@ -77,24 +81,34 @@ public class Vars implements Loadable{
     public static final String discordURL = "https://discord.gg/mindustry";
     /** Link to the wiki's modding guide.*/
     public static final String modGuideURL = "https://mindustrygame.github.io/wiki/modding/1-modding/";
+    /** Link to the wiki's patch guide.*/
+    public static final String patchesGuideURL = "https://mindustrygame.github.io/wiki/datapatches/";
     /** URLs to the JSON file containing all the BE servers. Only queried in BE. */
     public static final String[] serverJsonBeURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_be.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_be.json"};
-    /** URLs to the JSON file containing all the stable servers.  */
+    /** URLs to the JSON file containing all the stable servers. */
     public static final String[] serverJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryServerList/master/servers_v8.json", "https://cdn.jsdelivr.net/gh/anuken/mindustryserverlist/servers_v8.json"};
-    /** URLs to the JSON files containing the list of mods.  */
+    /** URLs to the JSON files containing the list of mods. */
     public static final String[] modJsonURLs = {"https://raw.githubusercontent.com/Anuken/MindustryMods/master/mods.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrymods/mods.json"};
-    /** URL of the github issue report template.*/
+    /** URLs to the JSON file containing players banned from Steam. */
+    public static final String[] steamBansURLs = {"https://raw.githubusercontent.com/Anuken/MindustrySteamBans/master/data.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrysteambans/data.json"};
+    /** URL of the github issue report template. */
     public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
+    /** cached server list - only used if defaultServers have not been fetched */
+    public static final Seq<ServerGroup> cachedServers = Seq.with();
     /** maximum openGL errors logged */
     public static final int maxGlErrors = 100;
     /** maximum size of any block, do not change unless you know what you're doing */
     public static final int maxBlockSize = 16;
     /** maximum distance between mine and core that supports automatic transferring */
     public static final float mineTransferRange = 220f;
+    /** maximum number of preview plans for remote players */
+    public static final int maxPlayerPreviewPlans = 1000;
     /** max chat message length */
     public static final int maxTextLength = 150;
+    /** max length of ping marker text */
+    public static final int maxPingTextLength = 40;
     /** max player name length in bytes */
     public static final int maxNameLength = 40;
     /** displayed item size when ingame. */
@@ -164,9 +178,11 @@ public class Vars implements Loadable{
     /** multicast group for discovery.*/
     public static final String multicastGroup = "227.2.7.7";
     /** Maximum delta time. If the actual delta time (*60) between frames is higher than this number, the game will start to slow down. */
-    public static float maxDeltaClient = 6f, maxDeltaServer = 10f;
+    public static float maxDeltaClient = 4f, maxDeltaServer = 4f;
     /** whether the graphical game client has loaded */
     public static boolean clientLoaded = false;
+    /** whether the serpulo campaign sectors were remapped (older save) */
+    public static boolean hadSerpuloRemaps = false;
     /** max GL texture size */
     public static int maxTextureSize = 2048;
     /** Maximum schematic size.*/
@@ -200,6 +216,12 @@ public class Vars implements Loadable{
     /** Whether to draw shadows of blocks at map edges and static blocks.
      * Do not change unless you know exactly what you are doing.*/
     public static boolean enableDarkness = true;
+    /** Whether to draw avoidance fields. */
+    public static boolean debugDrawAvoidance = false;
+    /** Whether the on-disk server file cache has been loaded. */
+    public static boolean loadedServerCache = false;
+    /** Whether the server list has been fetched from Github. */
+    public static boolean fetchedServers = false;
     /** application data directory, equivalent to {@link Settings#getDataDirectory()} */
     public static Fi dataDirectory;
     /** data subdirectory used for screenshots */
@@ -208,6 +230,8 @@ public class Vars implements Loadable{
     public static Fi customMapDirectory;
     /** data subdirectory used for custom map previews */
     public static Fi mapPreviewDirectory;
+    /** directory for extracted assets */
+    public static Fi assetCacheDirectory;
     /** tmp subdirectory for map conversion */
     public static Fi tmpDirectory;
     /** data subdirectory used for saves */
@@ -220,6 +244,8 @@ public class Vars implements Loadable{
     public static Fi bebuildDirectory;
     /** file used to store launch ID */
     public static Fi launchIDFile;
+    /** local cache of server list */
+    public static Fi serverCacheFile;
     /** empty map, indicates no current map */
     public static Map emptyMap;
     /** empty tile for payloads */
@@ -237,7 +263,7 @@ public class Vars implements Loadable{
     public static Locale[] locales;
 
     //the main executor will only have at most [cores] number of threads active
-    public static ExecutorService mainExecutor = Threads.executor("Main Executor", OS.cores);
+    public static ExecutorService mainExecutor = Core.executor;
 
     public static FileTree tree = new FileTree();
     public static Net net;
@@ -253,6 +279,9 @@ public class Vars implements Loadable{
     public static BaseRegistry bases;
     public static GlobalVars logicVars;
     public static MapEditor editor;
+    public static AvoidanceProcess avoidance;
+    public static PhysicsProcess unitPhysics;
+    public static DataAssetCache assetCache;
     public static GameService service = new GameService();
 
     public static Universe universe;
@@ -283,7 +312,6 @@ public class Vars implements Loadable{
         Groups.init();
 
         if(loadLocales){
-            //load locales
             String[] stra = Core.files.internal("locales").readString().split("\n");
             locales = new Locale[stra.length];
             for(int i = 0; i < locales.length; i++){
@@ -313,8 +341,10 @@ public class Vars implements Loadable{
         saveDirectory = dataDirectory.child("saves/");
         tmpDirectory = dataDirectory.child("tmp/");
         modDirectory = dataDirectory.child("mods/");
+        assetCacheDirectory = dataDirectory.child("assetCache");
         schematicDirectory = dataDirectory.child("schematics/");
         bebuildDirectory = dataDirectory.child("be_builds/");
+        serverCacheFile = dataDirectory.child("server_list.json");
         emptyMap = new Map(new StringMap());
 
         if(tree == null) tree = new FileTree();
@@ -337,6 +367,7 @@ public class Vars implements Loadable{
         fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();
+        assetCache = new DataAssetCache();
         javaPath =
             new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
             Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() : // Unix
@@ -349,12 +380,15 @@ public class Vars implements Loadable{
         ios = Core.app.isIOS();
         android = Core.app.isAndroid();
 
+        becontrol.init();
+
         modDirectory.mkdirs();
 
         Events.on(ContentInitEvent.class, e -> {
             emptyTile = new Tile(Short.MAX_VALUE - 20, Short.MAX_VALUE - 20);
         });
 
+        assetCache.load();
         mods.load();
         maps.load();
     }
@@ -375,6 +409,9 @@ public class Vars implements Loadable{
 
     /** Cleans up after a successful launch. */
     public static void finishLaunch(){
+        Core.settings.put("lastBuild", Version.build);
+        Core.settings.put("lastBuildString", Version.buildString());
+
         if(launchIDFile != null){
             launchIDFile.delete();
         }
@@ -419,8 +456,18 @@ public class Vars implements Loadable{
 
         settings.setAppName(appName);
 
+        loadFileLogger(settings.getDataDirectory().child("last_log.txt"));
+    }
+
+    public static void loadFileLogger(Fi file){
+        if(loadedFileLogger) return;
+
+        if(!file.parent().exists()){
+            file.parent().mkdirs();
+        }
+
         try{
-            Writer writer = settings.getDataDirectory().child("last_log.txt").writer(false);
+            Writer writer = file.writer(false);
             LogHandler log = Log.logger;
             Log.logger = (level, text) -> {
                 log.log(level, text);
@@ -445,7 +492,7 @@ public class Vars implements Loadable{
         settings.setJson(JsonIO.json);
         settings.setAppName(appName);
 
-        if(steam || (Version.modifier != null && Version.modifier.contains("steam"))){
+        if(steam || Version.isSteam){
             settings.setDataDirectory(Core.files.local("saves/"));
         }
 
@@ -481,7 +528,7 @@ public class Vars implements Loadable{
             Log.info("NOTE: external translation bundle has been loaded.");
 
             if(!headless){
-                Time.run(10f, () -> ui.showInfo("Note: You have successfully loaded an external translation bundle.\n[accent]" + handle.absolutePath()));
+                Time.run(10f, () -> ui.showInfo(Core.bundle.format("bundle.external", handle.absolutePath())));
             }
         }catch(Throwable e){
             //no external bundle found
@@ -514,6 +561,14 @@ public class Vars implements Loadable{
                     bundle.getProperties().put(s, Strings.stripColors(defBundle.get(s)).replaceAll("\\S", router));
                 }
             }
+        }
+
+        StringMap globalBundle = new StringMap();
+        PropertiesUtils.load(globalBundle, files.internal("bundles/global.properties").reader("UTF-8"));
+        bundle.getProperties().putAll(globalBundle);
+
+        if(!headless){
+            app.post(Fonts::loadExtraFonts);
         }
     }
 }
