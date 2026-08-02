@@ -92,11 +92,11 @@ public class ContentParser{
             return Attribute.add(attr);
         });
         put(Attributes.class, (type, data) -> {
-            if(!data.isObject()){
+            if(!(data instanceof JsonMap map)){
                 throw new IllegalArgumentException("Attribute definitions must be objects, e.g. {heat: 10}");
             }
             Attributes attr = new Attributes();
-            for(var entry : data.asObject()){
+            for(var entry : map){
                 Attribute value = Attribute.exists(entry.key) ? Attribute.get(entry.key) : Attribute.add(entry.key);
                 attr.set(value, entry.value.asFloat());
             }
@@ -449,9 +449,9 @@ public class ContentParser{
                 }
 
                 //try to parse env bits
-                if((type == int.class || type == Integer.class) && jsonData.isArray()){
+                if((type == int.class || type == Integer.class) && jsonData instanceof JsonArray arr){
                     int value = 0;
-                    for(var str : jsonData.asArray()){
+                    for(var str : arr){
                         if(!str.isString()) throw new SerializationException("Integer bitfield values must all be strings. Found: " + str);
                         String field = str.asString();
                         value |= Reflect.<Integer>get(Env.class, field);
@@ -487,8 +487,7 @@ public class ContentParser{
                 }
 
                 //try to parse Rect as array
-                if(type == Rect.class && jsonData.isArray() && jsonData.asArray().size == 4){
-                    JsonArray arr = jsonData.asArray();
+                if(type == Rect.class && jsonData instanceof JsonArray arr && arr.size == 4){
                     return (T)new Rect(arr.get(0).asFloat(), arr.get(1).asFloat(), arr.get(2).asFloat(), arr.get(3).asFloat());
                 }
 
