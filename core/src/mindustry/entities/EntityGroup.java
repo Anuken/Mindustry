@@ -217,6 +217,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         return tree;
     }
 
+    public Seq<T> rawSeq(){
+        return array;
+    }
+
     /** Resizes the internal quadtree, if it is enabled.*/
     public void resize(float x, float y, float w, float h){
         if(tree != null){
