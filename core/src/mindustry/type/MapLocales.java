@@ -20,14 +20,14 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
 
     @Override
     public void read(Json json, Jval jsonData){
-        for(Jval value : jsonData){
+        for(var entry : jsonData.asObject()){
             StringMap map = new StringMap();
 
-            for(Jval child = value.child; child != null; child = child.next){
-                map.put(child.name, json.readValue(String.class, null, child));
+            for(var innerEntry : entry.value.asObject()){
+                map.put(innerEntry.key, innerEntry.value.asString());
             }
 
-            put(value.name, map);
+            put(entry.key, map);
         }
     }
 

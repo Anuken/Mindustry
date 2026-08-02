@@ -69,6 +69,6 @@ public class PatchAsset extends DataAsset{
     @Override
     public String toString(){
         //the json can be a single 'error' value if it failed to parse
-        return !json.isObject() ? patch : json.prettyPrint(OutputType.minimal, 2);
+        return !json.isObject() ? patch : json.toString(Jformat.hjson);
     }
 }

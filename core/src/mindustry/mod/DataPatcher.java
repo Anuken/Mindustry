@@ -249,8 +249,8 @@ public class DataPatcher{
 
                 set.name = value.getString("name", "");
                 value.remove("name"); //patchsets can have a name, ignore it if present
-                for(var child : value){
-                    assign(root, child.name, child, null, null, null);
+                for(var entry : value.asObject()){
+                    assign(root, entry.key, entry.value, null, null, null);
                 }
                 currentlyApplyingPatch = null;
 
@@ -413,8 +413,8 @@ public class DataPatcher{
 
             if(object == root){
                 if(value instanceof Jval jval && jval.isObject()){
-                    for(var child : jval){
-                        assign(root, field + "." + child.name, child, null, null, null);
+                    for(var entry : jval.asObject()){
+                        assign(root, field + "." + entry.key, entry.value, null, null, null);
                     }
                 }else{
                     warn("Content '@' cannot be assigned.", field);
@@ -661,14 +661,14 @@ public class DataPatcher{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
 
-                    for(var child : jsv){
-                        if(child.name != null){
-                            assign(prevValue, child.name, child,
+                    for(var entry : jsv.asObject()){
+                        if(entry.key != null){
+                            assign(prevValue, entry.key, entry.value,
                             metadata != null && (metadata.type == ObjectMap.class || metadata.type == ObjectFloatMap.class) ? metadata :
                             metadata != null && metadata.type == Seq.class ? new FieldData(metadata.elementType, null, null) :
                             metadata != null && metadata.type.isArray() ? new FieldData(metadata.type.getComponentType(), null, null) :
-                            !childFields.containsKey(child.name) ? null :
-                            new FieldData(childFields.get(child.name)), object, field);
+                            !childFields.containsKey(entry.key) ? null :
+                            new FieldData(childFields.get(entry.key)), object, field);
                         }
                     }
                 }

@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
+import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
@@ -25,7 +26,7 @@ public class JsonIO{
         public void writeValue(Object value, Class knownType, Class elementType){
             if(value instanceof MappableContent c){
                 try{
-                    getWriter().value(c.name);
+                    writer.value(c.name);
                 }catch(IOException e){
                     throw new RuntimeException(e);
                 }
@@ -56,7 +57,7 @@ public class JsonIO{
     }
 
     public static <T> T readBytes(Class<T> type, Class<?> elementType, DataInputStream input) throws IOException{
-        return json.readValue(type, elementType, new UBJsonReader().parseWihoutClosing(input));
+        return json.readValue(type, elementType, UBJson.read(input));
     }
 
     public static String write(Object object){
@@ -77,12 +78,12 @@ public class JsonIO{
     }
 
     public static <T> T read(T base, String string){
-        json.readFields(base, new JsonReader().parse(string.replace("io.anuke.", "")));
+        json.readFields(base, Jval.read(string.replace("io.anuke.", "")));
         return base;
     }
 
     public static String print(String in){
-        return json.prettyPrint(in);
+        return Jval.read(in).toString(Jformat.hjson);
     }
 
     public static void classTag(String tag, Class<?> type){
@@ -312,7 +313,7 @@ public class JsonIO{
             public MapObjectives read(Json json, Jval data, Class type){
                 var exec = new MapObjectives();
                 // First iteration to instantiate the objectives.
-                for(var value = data.child; value != null; value = value.next){
+                for(var value : data.asArray()){
                     //glenn why did you implement this in the least backwards compatible way possible
                     //the old objectives had lowercase class tags, now they're uppercase and either way I can't deserialize them without errors
                     if(value.has("class") && Character.isLowerCase(value.getString("class").charAt(0))){
@@ -333,8 +334,8 @@ public class JsonIO{
 
                 // Second iteration to map the parents.
                 int i = 0;
-                for(var value = data.child; value != null; value = value.next, i++){
-                    for(var parent = value.get("parents").child; parent != null; parent = parent.next){
+                for(var entry : data.asArray()){
+                    for(var parent : entry.get("parents").asArray()){
                         int val = parent.asInt();
                         if(val >= 0 && val < exec.all.size){
                             exec.all.get(i).parents.add(exec.all.get(val));

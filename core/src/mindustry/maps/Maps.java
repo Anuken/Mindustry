@@ -366,7 +366,7 @@ public class Maps{
         if(groups == null) return "[]";
 
         StringWriter buffer = new StringWriter();
-        JsonIO.json.setWriter(new JsonWriter(buffer));
+        JsonIO.json.setWriter(new StringJsonWriter(buffer));
 
         JsonIO.json.writeArrayStart();
         for(int i = 0; i < groups.size; i++){
