@@ -99,7 +99,8 @@ public class DataImagePacker{
 
                 try{
                     Pixmap pixmap = new Pixmap(cacheFile);
-                    String name = regionPrefix + image.name;
+                    //don't add the double dp prefix, only add it if it's not already present
+                    String name = (image.isGenerated() && image.name.contains("-dp-") ? "" : regionPrefix) + image.name;
 
                     if(anyEnv && image.path.contains("blocks/environment/")){
                         if(!failedEnv.get()) envPacker.pack(name, pixmap);

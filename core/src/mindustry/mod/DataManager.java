@@ -21,6 +21,10 @@ public class DataManager{
     private Seq<DataAsset> orderedAssets = new Seq<>();
     private Seq<DataAsset> orderedExternalAssets = new Seq<>();
 
+    public @Nullable String getAudioName(Fi file){
+        return file == null ? null : soundLoader.getName(file);
+    }
+
     public void reloadContent(boolean reloadArrays){
 
         patcher.unapply(reloadArrays);

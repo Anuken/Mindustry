@@ -23,6 +23,11 @@ public class NoiseEffect extends Effect{
     public float layerColorMul = 0.9f;
     public Texture tex;
 
+    {
+        //noise effects must not be clipped
+        clip = Float.MAX_VALUE;
+    }
+
     @Override
     public void render(EffectContainer e){
         if(tex == null){

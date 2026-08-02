@@ -32,20 +32,24 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
     public byte flags = flagBackground | flagOutline;
     /** If not null, this label gets set to the parent position with x, y used as offsets. */
     public @Nullable Posc parent;
-    /** Duration in seconds. Ignored if zero or negative. */
-    public transient float duration;
+    /** Duration in seconds. Ignored if negative */
+    public transient float duration = -1;
+    public transient @Nullable Runnable expired;
 
     @Replace
     public float clipSize(){
         if(parent != null) return Float.MAX_VALUE;
-        return text.length() * 10f * fontSize;
+        return text == null ? 0f : text.length() * 10f * fontSize;
     }
 
     @Override
     public void update(){
-        if(duration > 0){
+        if(duration >= 0){
             duration -= Time.delta / 60f;
-            if(duration <= 0) hide();
+            if(duration <= 0){
+                hide();
+                if(expired != null) expired.run();
+            }
         }
     }
 
@@ -60,6 +64,7 @@ public abstract class WorldLabelComp implements Posc, Drawc, Syncc{
     }
 
     public static void drawAt(String text, float x, float y, float layer, int flags, float fontSize, int align, int lineAlign){
+        if(text == null) return;
         Draw.z(layer);
         float z = Drawf.text();
 

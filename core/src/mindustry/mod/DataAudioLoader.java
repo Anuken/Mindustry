@@ -4,6 +4,7 @@ import arc.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.mod.data.*;
@@ -14,13 +15,20 @@ public class DataAudioLoader{
 
     private Seq<Sound> loadedSounds = new Seq<>();
     private Seq<Music> loadedMusic = new Seq<>();
-    private Seq<String> registered = new Seq<>();
+    private ObjectSet<String> registered = new ObjectSet<>();
+    private ObjectMap<Fi, String> fileToName = new ObjectMap<>();
 
     public void load(Seq<SoundAsset> sounds, Seq<MusicAsset> musics){
 
         int nextSoundId = soundIdOffset + 1;
 
         for(var asset : sounds){
+            String realName = prefix + asset.name.replace(' ', '_');
+            if(registered.contains(realName)){
+                Log.warn("Duplicate audio file: " + asset.name);
+                continue;
+            }
+
             Fi file = asset.getCacheFile();
             Sound sound = Vars.headless || file == null ? new Sound() : Sound.createStream(file);
             loadedSounds.add(sound);
@@ -29,20 +37,34 @@ public class DataAudioLoader{
 
             if(Vars.headless || !Core.audio.initialized() || sound.file == null) continue;
 
-            Core.assets.addAsset(prefix + asset.name, Sound.class, sound);
-            registered.add(prefix + asset.name);
+            Vars.logicVars.put("@sfx-" + realName, nextSoundId - 1, false);
+
+            Core.assets.addAsset(realName, Sound.class, sound);
+            registered.add(realName);
+            fileToName.put(file, realName);
         }
 
         for(var asset : musics){
+            String realName = prefix + asset.name.replace(' ', '_');
+            if(registered.contains(realName)){
+                Log.warn("Duplicate audio file: " + asset.name);
+                continue;
+            }
             Fi file = asset.getCacheFile();
             Music music = Vars.headless || file == null ? new Music() : Music.create(file);
             loadedMusic.add(music);
 
             if(Vars.headless || !Core.audio.initialized() || music.file == null) continue;
 
-            Core.assets.addAsset(prefix + asset.name, Music.class, music);
-            registered.add(prefix + asset.name);
+            Core.assets.addAsset(realName, Music.class, music);
+            registered.add(realName);
+            fileToName.put(file, realName);
         }
+    }
+
+    /** @return proper extension-less audio name of the specified cached file, including prefix */
+    public @Nullable String getName(Fi file){
+        return fileToName.get(file);
     }
 
     public void unload(){
@@ -57,12 +79,17 @@ public class DataAudioLoader{
 
         if(!Vars.headless){
            for(String reg : registered){
-               Core.assets.unload(reg);
+               Vars.logicVars.remove("@sfx-" + reg);
+               try{
+                   Core.assets.unload(reg);
+               }catch(Exception ignored){ //unloading shouldn't throw an error, but ignore it just in case
+               }
            }
         }
 
         loadedSounds.clear();
         loadedMusic.clear();
         registered.clear();
+        fileToName.clear();
     }
 }
