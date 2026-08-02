@@ -143,6 +143,7 @@ public class DataImagePacker{
             }
         }
 
+        printStats(packer);
         packer.forceDispose();
 
         //getRegions is intentionally not modified, it's a hassle to manage, O(n) to unapply, and not used anywhere important. there's no point.
@@ -160,34 +161,21 @@ public class DataImagePacker{
         }
     }
 
-    public void printStats(PixmapPacker mainPacker, PixmapPacker envPacker){
+    public void printStats(PixmapPacker packer){
         if(Log.level != LogLevel.debug) return;
-        for(PixmapPacker packer : new PixmapPacker[]{mainPacker, envPacker}){
-            if(packer == null) continue;
 
-            int total = packer.getPages().sum(p -> p.rects.size);
-            Log.debug("[Patch Atlas] " +  (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&lc (" + total + " sprites)", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
-            int i = 0;
-            for(var page : packer.getPages()){
-                float totalArea = 0;
-                for(var region : page.getRects().values()){
-                    totalArea += region.area();
-                }
-
-                Log.debug("[Patch Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
-
-                i ++;
+        int total = packer.getPages().sum(p -> p.rects.size);
+        Log.debug("[Patch Atlas] " +  (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&lc (" + total + " sprites)", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
+        int i = 0;
+        for(var page : packer.getPages()){
+            float totalArea = 0;
+            for(var region : page.getRects().values()){
+                totalArea += region.area();
             }
-        }
-    }
 
-    static class PackResult{
-        String name;
-        Pixmap pixmap;
+            Log.debug("[Patch Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
 
-        public PackResult(String name, Pixmap pixmap){
-            this.name = name;
-            this.pixmap = pixmap;
+            i ++;
         }
     }
 }
