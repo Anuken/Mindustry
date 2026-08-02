@@ -27,8 +27,11 @@ public class PhysicsProcess implements AsyncProcess{
     private Seq<PhysicRef> refs = new Seq<>(false, 20, PhysicRef.class);
     private Seq<Future<?>> futures = new Seq<>(false, layers, Future.class);
 
+    private static volatile long maxPhysicsTime = 0;
+
     public void add(Unit unit){
         if(unit == null || unit.type == null || !unit.type.physics || unit.hasPhysicsRef) return;
+        if(physics == null) init();
 
         unit.hasPhysicsRef = true;
 
@@ -49,7 +52,8 @@ public class PhysicsProcess implements AsyncProcess{
         if(physics == null) return;
         boolean local = !Vars.net.client();
 
-        PerfCounter.unitPhysicsAsync.begin();
+        PerfCounter.unitPhysicsWait.begin();
+
         //wait for every layer's async step to finish before touching body positions
         for(int i = 0; i < futures.size; i++){
             try{
@@ -59,7 +63,10 @@ public class PhysicsProcess implements AsyncProcess{
             }
         }
         futures.clear();
-        PerfCounter.unitPhysicsAsync.end();
+
+        PerfCounter.unitPhysicsWait.end();
+        PerfCounter.unitPhysicsAsync.add(maxPhysicsTime);
+        maxPhysicsTime = 0;
 
         //move entities
         for(PhysicRef ref : refs){
@@ -131,7 +138,7 @@ public class PhysicsProcess implements AsyncProcess{
     public static class PhysicRef{
         public Unit entity;
         public PhysicsBody body;
-        //x or y at simulation start step
+        //position before simulation start
         public float startX, startY;
         public int lastLayer;
 
@@ -152,7 +159,6 @@ public class PhysicsProcess implements AsyncProcess{
         private final QuadTree<PhysicsBody> tree;
         private final Seq<PhysicsBody> bodies = new Seq<>(false, 16, PhysicsBody.class);
         private final Seq<PhysicsBody> seq = new Seq<>(PhysicsBody.class);
-        //private final Rect rect = new Rect();
         private final Vec2 vec = new Vec2();
         private final Rand rand = new Rand();
 
@@ -169,11 +175,11 @@ public class PhysicsProcess implements AsyncProcess{
         }
 
         public void update(){
+            long begin = Time.nanos();
 
             var bodyItems = bodies.items;
             int bodySize = bodies.size;
 
-            //mobile has weak CPU cores, and there's no need for high fidelity sims in multiplayer
             int iterations = Vars.net.client() || OS.isMobile ? mobileIterations : desktopIterations;
 
             for(int iter = 0; iter < iterations; iter++){
@@ -231,6 +237,8 @@ public class PhysicsProcess implements AsyncProcess{
                     body.collided = true;
                 }
             }
+
+            maxPhysicsTime = Math.max(maxPhysicsTime, Time.timeSinceNanos(begin));
         }
 
         public static class PhysicsBody implements QuadTreeObject{

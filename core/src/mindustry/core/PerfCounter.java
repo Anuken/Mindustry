@@ -16,6 +16,7 @@ public enum PerfCounter{
     powerUpdate,
     unitUpdate,
     unitPhysicsAsync,
+    unitPhysicsWait,
     bulletUpdate,
     ui,
     render;
