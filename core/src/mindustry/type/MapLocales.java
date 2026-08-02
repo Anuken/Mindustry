@@ -12,9 +12,9 @@ import static arc.Core.*;
 public class MapLocales extends ObjectMap<String, StringMap> implements JsonSerializable{
 
     @Override
-    public void write(Json json){
+    public void write(Json json, JsonWriter writer){
         for(var entry : entries()){
-            json.writeValue(entry.key, entry.value, StringMap.class, String.class);
+            json.writeValue(writer, entry.key, entry.value, StringMap.class, String.class);
         }
     }
 

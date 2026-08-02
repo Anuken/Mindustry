@@ -366,15 +366,17 @@ public class Maps{
         if(groups == null) return "[]";
 
         StringWriter buffer = new StringWriter();
-        JsonIO.json.setWriter(new StringJsonWriter(buffer));
+        StringJsonWriter writer = new StringJsonWriter(buffer);
 
-        JsonIO.json.writeArrayStart();
+        writer.writeArrayStart();
+
         for(int i = 0; i < groups.size; i++){
-            JsonIO.json.writeObjectStart(SpawnGroup.class, SpawnGroup.class);
-            groups.get(i).write(JsonIO.json);
-            JsonIO.json.writeObjectEnd();
+            JsonIO.json.writeObjectStart(writer, SpawnGroup.class, SpawnGroup.class);
+            groups.get(i).write(JsonIO.json, writer);
+            JsonIO.json.writeObjectEnd(writer);
         }
-        JsonIO.json.writeArrayEnd();
+
+        writer.writeArrayEnd();
         return buffer.toString();
     }
 

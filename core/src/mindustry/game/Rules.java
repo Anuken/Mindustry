@@ -417,10 +417,10 @@ public class Rules{
         }
 
         @Override
-        public void write(Json json){
+        public void write(Json json, JsonWriter writer){
             for(Team team : Team.all){
                 if(values[team.id] != null){
-                    json.writeValue(team.id + "", values[team.id], TeamRule.class);
+                    json.writeValue(writer, team.id + "", values[team.id], TeamRule.class);
                 }
             }
         }

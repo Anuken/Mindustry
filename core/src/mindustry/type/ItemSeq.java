@@ -141,10 +141,10 @@ public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
     }
 
     @Override
-    public void write(Json json){
+    public void write(Json json, JsonWriter writer){
         for(Item item : Vars.content.items()){
             if(values[item.id] != 0){
-                json.writeValue(item.name, values[item.id]);
+                json.writeValue(writer, item.name, values[item.id]);
             }
         }
     }

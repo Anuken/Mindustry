@@ -109,22 +109,22 @@ public class SpawnGroup implements JsonSerializable, Cloneable{
     }
 
     @Override
-    public void write(Json json){
+    public void write(Json json, JsonWriter writer){
         if(type == null) type = UnitTypes.dagger;
-        json.writeValue("type", type.name);
-        if(begin != 0) json.writeValue("begin", begin);
-        if(end != never) json.writeValue("end", end);
-        if(spacing != 1) json.writeValue("spacing", spacing);
-        if(max != 40) json.writeValue("max", max);
-        if(unitScaling != never) json.writeValue("scaling", unitScaling);
-        if(shields != 0) json.writeValue("shields", shields);
-        if(shieldScaling != 0) json.writeValue("shieldScaling", shieldScaling);
-        if(unitAmount != 1) json.writeValue("amount", unitAmount);
-        if(effect != null) json.writeValue("effect", effect.name);
-        if(spawn != -1) json.writeValue("spawn", spawn);
-        if(payloads != null && payloads.any()) json.writeValue("payloads", payloads.map(u -> u.name).toArray(String.class));
-        if(items != null && items.amount > 0) json.writeValue("items", items);
-        if(team != null) json.writeValue("team", team.id);
+        json.writeValue(writer, "type", type.name);
+        if(begin != 0) json.writeValue(writer, "begin", begin);
+        if(end != never) json.writeValue(writer, "end", end);
+        if(spacing != 1) json.writeValue(writer, "spacing", spacing);
+        if(max != 40) json.writeValue(writer, "max", max);
+        if(unitScaling != never) json.writeValue(writer, "scaling", unitScaling);
+        if(shields != 0) json.writeValue(writer, "shields", shields);
+        if(shieldScaling != 0) json.writeValue(writer, "shieldScaling", shieldScaling);
+        if(unitAmount != 1) json.writeValue(writer, "amount", unitAmount);
+        if(effect != null) json.writeValue(writer, "effect", effect.name);
+        if(spawn != -1) json.writeValue(writer, "spawn", spawn);
+        if(payloads != null && payloads.any()) json.writeValue(writer, "payloads", payloads.map(u -> u.name).toArray(String.class));
+        if(items != null && items.amount > 0) json.writeValue(writer, "items", items);
+        if(team != null) json.writeValue(writer, "team", team.id);
     }
 
     @Override

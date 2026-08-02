@@ -57,10 +57,10 @@ public class LogicScript implements JsonSerializable{
     }
 
     @Override
-    public void write(Json json){
-        json.writeValue("script", script);
-        if(timeout > 0) json.writeValue("timeout", timeout);
-        if(resetVars) json.writeValue("resetVars", resetVars);
+    public void write(Json json, JsonWriter writer){
+        json.writeValue(writer, "script", script);
+        if(timeout > 0) json.writeValue(writer, "timeout", timeout);
+        if(resetVars) json.writeValue(writer, "resetVars", resetVars);
     }
 
     @Override

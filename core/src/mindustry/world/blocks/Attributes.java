@@ -40,11 +40,11 @@ public class Attributes implements JsonSerializable{
     }
 
     @Override
-    public void write(Json json){
+    public void write(Json json, JsonWriter writer){
         check();
         for(Attribute at : Attribute.all){
             if(arr[at.id] != 0){
-                json.writeValue(at.name, arr[at.id]);
+                json.writeValue(writer, at.name, arr[at.id]);
             }
         }
     }
