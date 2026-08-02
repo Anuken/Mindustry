@@ -395,7 +395,7 @@ public class ServerControl implements ApplicationListener{
     }
 
     Jval readRulesFile(){
-        return JsonIO.json.fromJson(null, Jval.read(rulesFile.readString()).toString(Jformat.plain));
+        return JsonIO.json.fromJson(null, rulesFile);
     }
 
     void loadDataAssets(){
