@@ -691,7 +691,7 @@ public class ServerControl implements ApplicationListener{
             Jval base = readRulesFile();
 
             if(arg.length == 0){
-                info("Rules:\n@", Jval.read(base.toJson(OutputType.minimal)).toString(Jformat.hjson));
+                info("Rules:\n@", base.toString(Jformat.hjson));
             }else if(arg.length == 1){
                 err("Invalid usage. Specify which rule to remove or add.");
             }else{
@@ -716,24 +716,19 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     try{
-                        Jval value = new JsonReader().parse(arg[2]);
-                        value.name = arg[1];
+                        String name = arg[1];
+                        Jval value = Jval.read(arg[2]);
+                        base.put(name, value);
 
-                        Jval parent = new Jval(ValueType.object);
-                        parent.addChild(value);
+                        JsonIO.json.readField(state.rules, name, base);
 
-                        JsonIO.json.readField(state.rules, value.name, parent);
-                        if(base.has(value.name)){
-                            base.remove(value.name);
-                        }
-                        base.addChild(arg[1], value);
                         info("Changed rule: @", value.toString().replace("\n", " "));
                     }catch(Throwable e){
                         err("Error parsing rule JSON: @", e.getMessage());
                     }
                 }
 
-                rulesFile.writeString(Jval.read(base.toString()).toString(Jformat.hjson));
+                rulesFile.writeString(base.toString(Jformat.hjson));
                 Call.setRules(state.rules);
             }
         });
