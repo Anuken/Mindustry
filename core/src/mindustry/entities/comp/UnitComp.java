@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.async.*;
@@ -29,6 +30,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
+import static java.lang.Float.NaN;
 import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
@@ -304,9 +306,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             case selectedRotation -> controller instanceof Player p ? p.selectedRotation : 0;
-            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : Float.NaN;
-            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : Float.NaN;
-            default -> Float.NaN;
+            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : NaN;
+            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : NaN;
+            default -> NaN;
         };
     }
 
@@ -345,7 +347,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(content instanceof StatusEffect s){
             return hasEffect(s) ? getDuration(s) / 60 : 0;
         }
-        return Float.NaN;
+        return NaN;
     }
 
     @Override
@@ -604,6 +606,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             team.data().updateCount(type, -1);
         }
 
+        Vars.unitPhysics.add(self());
+
     }
 
     @Override
@@ -659,6 +663,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         type.update(self());
 
+        // Sometimes becomes NaN at extreme delta
+        if(Float.isNaN(x) || Float.isNaN(y)){
+            remove();
+            return;
+        }
+
         //update bounds
 
         if(type.bounded){
@@ -682,7 +692,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(x > right - tilesize) dx -= (x - (right - tilesize))/warpDst;
                 if(y > top - tilesize) dy -= (y - (top - tilesize))/warpDst;
 
-                velAddNet(dx * Time.delta, dy * Time.delta);
+                //cap velocity to prevent infinity when using timecontrol or similar mods
+                float maxMagnitude = 10f / Math.max(Time.delta, 1f);
+
+                velAddNet(Mathf.clamp(dx * Time.delta, -maxMagnitude, maxMagnitude), Mathf.clamp(dy * Time.delta, -maxMagnitude, maxMagnitude));
                 float margin = tilesize * 1f;
                 x = Mathf.clamp(x, left - margin, right - tilesize + margin);
                 y = Mathf.clamp(y, bot - margin, top - tilesize + margin);

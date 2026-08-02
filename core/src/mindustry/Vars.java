@@ -280,6 +280,7 @@ public class Vars implements Loadable{
     public static GlobalVars logicVars;
     public static MapEditor editor;
     public static AvoidanceProcess avoidance;
+    public static PhysicsProcess unitPhysics = new PhysicsProcess();
     public static DataAssetCache assetCache;
     public static GameService service = new GameService();
 
