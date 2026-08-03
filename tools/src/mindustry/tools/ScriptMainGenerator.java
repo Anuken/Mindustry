@@ -10,6 +10,10 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
+import arc.util.serialization.Jval.*;
+import com.github.javaparser.*;
+import com.github.javaparser.ast.body.*;
 import com.google.common.reflect.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -21,7 +25,6 @@ import java.io.*;
 import java.lang.reflect.*;
 
 public class ScriptMainGenerator{
-
     public static void main(String[] args) throws Exception{
         String base = "mindustry";
         Seq<String> blacklist = Seq.with("tools", "arc.flabel.effects");
@@ -109,10 +112,96 @@ public class ScriptMainGenerator{
 
         for(Class<?> c : mapped){
             cdef.append("        classes.put(\"").append(c.getSimpleName()).append("\", ").append(c.getCanonicalName()).append(".class);\n");
+            writeSchema(c);
         }
 
         new Fi("core/src/mindustry/mod/ClassMap.java").writeString(classTemplate.replace("$CLASSES$", cdef.toString()));
         Log.info("Generated @ class mappings.", mapped.size);
+    }
+
+    static ObjectMap<String, Fi> classNameToFile = new ObjectMap<>();
+    static JavaParser parser = new JavaParser();
+    static ObjectMap<Class, TypeDeclaration<?>> decls = new ObjectMap<>();
+
+    //schema generation: useful for docs but currently unused
+    static void writeSchema(Class<?> type) throws Exception{
+        if(Building.class.isAssignableFrom(type) || type.getSuperclass() == null) return;
+
+        Jval val = Jval.newObject();
+
+        var typeDec = getTypeDecl(type);
+        if(typeDec == null){
+            Log.warn("No type found for class: " + type);
+            return;
+        }
+
+        if(type.getSuperclass() != null) val.put("superclass", type.getSuperclass().getCanonicalName());
+
+        if(typeDec.getJavadoc().isPresent()){
+            val.put("doc", typeDec.getJavadoc().get().toText());
+        }
+
+        for(var field : type.getFields()){
+            if(Modifier.isStatic(field.getModifiers())) continue;
+            Jval inner = Jval.newObject();
+            inner.put("type", field.getType().getCanonicalName());
+            if(field.isAnnotationPresent(Nullable.class)) inner.put("nullable", true);
+
+            //TODO: doc comment if present - does not work
+            var root = getTypeDecl(field.getDeclaringClass());
+            if(root != null) root.getFieldByName(field.getName()).ifPresent(fdec -> {
+                String doc = determineJavadoc(fdec, fdec.getVariables().getFirst().orElseThrow());
+                if(doc != null){
+                    inner.put("doc", doc);
+                }
+            });
+
+            val.put(field.getName(), inner);
+        }
+        Fi dir = new Fi("build/schemas/" + type.getCanonicalName() + ".json");
+        dir.writeString(val.toString(Jformat.formatted));
+    }
+
+    private static @Nullable TypeDeclaration<?> getTypeDecl(Class<?> type){
+        return decls.get(type, () -> {
+            if(classNameToFile.isEmpty()){
+                new Fi("core/src").walk(f -> {
+                    if(f.extEquals("java")){
+                        classNameToFile.put(f.nameWithoutExtension(), f);
+                    }
+                });
+            }
+
+            var file = classNameToFile.get(type.getSimpleName());
+            if(file == null && type.getEnclosingClass() != null) file = classNameToFile.get(type.getEnclosingClass().getSimpleName());
+
+            if(file == null){
+                Log.warn("Missing file for class: " + type);
+                return null;
+            }
+
+            var cu = parser.parse(file.read()).getResult().orElseThrow();
+
+            return cu.findAll(TypeDeclaration.class).stream()
+            .filter(t -> t.getFullyQualifiedName().isPresent()
+            ? t.getFullyQualifiedName().get().equals(type.getCanonicalName())
+            : t.getNameAsString().equals(type.getSimpleName()))
+            .findFirst()
+            .orElse(null);
+        });
+    }
+
+    private static String determineJavadoc(FieldDeclaration field, VariableDeclarator variable){
+        String s = null;
+        if(variable.getComment().isPresent()){
+            s = variable.getComment().get().getContent();
+        }else if(field.getJavadoc().isPresent()){
+            s = field.getJavadoc().get().toText();
+        }
+        if(s != null){
+            if(s.endsWith("\n")) s = s.substring(0, s.length() - 1);
+        }
+        return s;
     }
 
     public static Seq<Class> getClasses(String packageName) throws Exception{
