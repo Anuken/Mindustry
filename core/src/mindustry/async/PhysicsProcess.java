@@ -66,6 +66,7 @@ public class PhysicsProcess implements AsyncProcess{
 
         PerfCounter.unitPhysicsWait.end();
         PerfCounter.unitPhysicsAsync.add(maxPhysicsTime);
+        maxPhysicsTime = 0;
 
         //move entities
         for(PhysicRef ref : refs){
