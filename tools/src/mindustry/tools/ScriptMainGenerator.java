@@ -144,16 +144,15 @@ public class ScriptMainGenerator{
         for(var field : type.getFields()){
             if(Modifier.isStatic(field.getModifiers())) continue;
             Jval inner = Jval.newObject();
-            inner.put("type", field.getType().getCanonicalName());
+            inner.put("type", field.getGenericType().getTypeName());
+
             if(field.isAnnotationPresent(Nullable.class)) inner.put("nullable", true);
 
-            //TODO: doc comment if present - does not work
             var root = getTypeDecl(field.getDeclaringClass());
             if(root != null) root.getFieldByName(field.getName()).ifPresent(fdec -> {
-                String doc = determineJavadoc(fdec, fdec.getVariables().getFirst().orElseThrow());
-                if(doc != null){
-                    inner.put("doc", doc);
-                }
+                String[] docAndDefault = determineJavadocAndDefault(field, fdec, fdec.getVariables().getFirst().orElseThrow());
+                if(docAndDefault[0] != null) inner.put("doc", docAndDefault[0]);
+                if(docAndDefault[1] != null) inner.put("default", docAndDefault[1]);
             });
 
             val.put(field.getName(), inner);
@@ -191,17 +190,46 @@ public class ScriptMainGenerator{
         });
     }
 
-    private static String determineJavadoc(FieldDeclaration field, VariableDeclarator variable){
-        String s = null;
+    private static String[] determineJavadocAndDefault(Field baseField, FieldDeclaration field, VariableDeclarator variable){
+        String doc = null;
         if(variable.getComment().isPresent()){
-            s = variable.getComment().get().getContent();
+            doc = variable.getComment().get().getContent();
         }else if(field.getJavadoc().isPresent()){
-            s = field.getJavadoc().get().toText();
+            doc = field.getJavadoc().get().toText();
         }
-        if(s != null){
-            if(s.endsWith("\n")) s = s.substring(0, s.length() - 1);
+        if(doc != null){
+            if(doc.endsWith("\n")) doc = doc.substring(0, doc.length() - 1);
         }
-        return s;
+        var initValue = variable.getInitializer().isEmpty() ? null : variable.getInitializer().get().toString();
+
+        if(initValue != null){
+            //array init
+            if(initValue.equals("{}")){
+                initValue = "[]";
+            }
+
+            //special array init
+            if(initValue.contains("new") && initValue.contains("[") && initValue.contains("]")){
+                initValue = "[]";
+            }
+
+            //field
+            if(initValue.contains(".") && !(baseField.getType().isArray())){
+                var split = initValue.split("\\.");
+                initValue = split[split.length - 1];
+            }
+
+            //remove f suffix
+            if(variable.getTypeAsString().equals("float") && initValue.endsWith("f")){
+                initValue = initValue.substring(0, initValue.length() - 1);
+            }
+
+            //remove lambdas/code
+            if(initValue.contains("->") || initValue.contains("(") || initValue.contains(")")){
+                initValue = null;
+            }
+        }
+        return new String[]{doc, initValue};
     }
 
     public static Seq<Class> getClasses(String packageName) throws Exception{
