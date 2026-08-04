@@ -1,0 +1,7 @@
+{
+  "doc": "Base class for progress functions used to animate part transforms. The concrete operation is chosen by 'type' (see PartProgress's static methods for the full list: inv, slope, clamp, delay, sustain, shorten, compress, add, blend, mul, min, sin, absin, mod, loop, curve).",
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

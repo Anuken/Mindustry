@@ -1,0 +1,12 @@
+{
+  "doc": "Loops progress over a fixed time period.",
+  "superclass": "PartProgress",
+  "time":{
+    "type": "float",
+    "doc": "Length of one loop cycle."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

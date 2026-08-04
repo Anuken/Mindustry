@@ -1,0 +1,16 @@
+{
+  "doc": "Multiplies by a constant or another PartProgress's value. Set exactly one of 'amount' or 'other'.",
+  "superclass": "PartProgress",
+  "amount":{
+    "type": "float",
+    "doc": "Constant multiplier."
+  },
+  "other":{
+    "type": "PartProgress",
+    "doc": "Another progress function whose value is multiplied instead of a constant."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

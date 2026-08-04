@@ -1,0 +1,8 @@
+{
+  "doc": "Current unscaled value of Time.time.",
+  "superclass": "PartProgress",
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "doc": "Rises to and sustains progress at a plateau.",
+  "superclass": "PartProgress",
+  "offset":{
+    "type": "float",
+    "doc": "Progress offset before rising.",
+    "default": "0"
+  },
+  "grow":{
+    "type": "float",
+    "doc": "Duration of the rise to the plateau.",
+    "default": "0"
+  },
+  "sustain":{
+    "type": "float",
+    "doc": "Length of the sustained plateau."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

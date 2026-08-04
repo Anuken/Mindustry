@@ -1,0 +1,16 @@
+{
+  "doc": "Blends between this progress and another PartProgress by a fixed amount.",
+  "superclass": "PartProgress",
+  "other":{
+    "type": "PartProgress",
+    "doc": "Progress function to blend with."
+  },
+  "amount":{
+    "type": "float",
+    "doc": "Blend factor toward 'other'."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "doc": "Adds a constant or another PartProgress's value to this one. Set exactly one of 'amount' or 'other'.",
+  "superclass": "PartProgress",
+  "amount":{
+    "type": "float",
+    "doc": "Constant amount to add."
+  },
+  "other":{
+    "type": "PartProgress",
+    "doc": "Another progress function whose value is added instead of a constant."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

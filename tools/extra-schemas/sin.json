@@ -1,0 +1,21 @@
+{
+  "doc": "Applies a sine wave to progress.",
+  "superclass": "PartProgress",
+  "offset":{
+    "type": "float",
+    "doc": "Phase offset.",
+    "default": "0"
+  },
+  "scl":{
+    "type": "float",
+    "doc": "Scale (frequency) of the wave."
+  },
+  "mag":{
+    "type": "float",
+    "doc": "Magnitude (amplitude) of the wave."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

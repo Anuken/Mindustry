@@ -1,0 +1,8 @@
+{
+  "doc": "Reload of the weapon - 1 right after shooting, 0 when ready to fire.",
+  "superclass": "PartProgress",
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

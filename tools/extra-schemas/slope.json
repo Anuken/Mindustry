@@ -1,0 +1,8 @@
+{
+  "doc": "Slopes progress: rises to 1 then falls back to 0.",
+  "superclass": "PartProgress",
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

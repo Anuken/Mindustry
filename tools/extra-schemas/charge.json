@@ -1,0 +1,8 @@
+{
+  "doc": "Weapon charge, 0 when beginning to charge, 1 when finished.",
+  "superclass": "PartProgress",
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}
