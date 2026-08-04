@@ -41,6 +41,7 @@ public class UiBuilder{
         protected T prop(UiKey key, boolean value){ entries.add(new Entry(key, value)); return self(); }
 
         public T id(String id){ return prop(UiKey.id, id); }
+        public T condition(String cond){ return prop(UiKey.condition, cond); }
         public T grow(){ return prop(UiKey.grow, true); }
         public T growX(){ return prop(UiKey.growX, true); }
         public T growY(){ return prop(UiKey.growY, true); }

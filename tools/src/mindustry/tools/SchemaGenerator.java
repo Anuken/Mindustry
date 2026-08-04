@@ -40,9 +40,11 @@ public class SchemaGenerator{
             var all = Vars.content.getBy(type);
             if(type.contentClass != null && all.size > 0 && all.first() instanceof UnlockableContent){
                 mappings.put(type.name(), type.contentClass.getCanonicalName());
-                var arr = Jval.newArray();
-                all.<UnlockableContent>as().each(c -> arr.asArray().add(Jval.valueOf(c.name)));
-                root.asObject().put(type.name(), arr);
+                var values = Jval.newObject();
+                all.<UnlockableContent>as().each(c -> {
+                    values.put(c.name, Jval.valueOf((c.getClass().isAnonymousClass() ? c.getClass().getSuperclass() : c.getClass()).getCanonicalName()));
+                });
+                root.asObject().put(type.name(), values);
             }
         }
         root.put("mappings", mappings);
@@ -68,7 +70,7 @@ public class SchemaGenerator{
         }
 
         for(var field : type.getFields()){
-            if(Modifier.isStatic(field.getModifiers())) continue;
+            if(Modifier.isStatic(field.getModifiers()) || field.getDeclaringClass() != type) continue;
             Jval inner = Jval.newObject();
             inner.put("type", field.getGenericType().getTypeName());
 

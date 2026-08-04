@@ -46,6 +46,9 @@ public class UiTreeBuilder{
                     continue;
                 }
 
+                String cond = node.str(UiKey.condition);
+                if(cond != null && !evalCondition(cond)) continue; // condition false - node is not added at all
+
                 Cell<?> cell = addNode(table, entry.key, node, ctx);
                 if(cell == null) continue; // unknown/unsupported node - skip for forward compat
 
@@ -251,6 +254,33 @@ public class UiTreeBuilder{
         var result = Icon.icons.get(name);
         if(result == null) return Core.atlas.drawable("error");
         return result;
+    }
+
+    /** Evaluates a condition string: "portrait", "landscape", or "width|height >=|>|<|<= number". */
+    private static boolean evalCondition(String cond){
+        cond = cond.trim();
+        if(cond.equals("portrait")) return Core.graphics.isPortrait();
+        if(cond.equals("landscape")) return !Core.graphics.isPortrait();
+
+        String[] parts = cond.split("\\s+");
+        if(parts.length != 3) return true; // malformed - don't block layout
+
+        float dim = switch(parts[0]){
+            case "width" -> Core.scene.getWidth() / Scl.scl(1f);
+            case "height" -> Core.scene.getHeight() / Scl.scl(1f);
+            default -> 0f;
+        };
+        float num = Strings.parseFloat(parts[2], Float.NaN);
+
+        if(Float.isNaN(num)) return true;
+
+        return switch(parts[1]){
+            case ">=" -> dim >= num;
+            case ">" -> dim > num;
+            case "<=" -> dim <= num;
+            case "<" -> dim < num;
+            default -> true;
+        };
     }
 
     private static int parseAlign(String value){
