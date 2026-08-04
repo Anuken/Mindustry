@@ -103,7 +103,10 @@ public class Menus{
         MenuDialog dialog = menuDialogs.get(id);
         if(dialog == null) return;
         Element element = dialog.idToElement.get(tableId);
-        if(!(element instanceof Table table)) return;
+        Table table = element instanceof Table t ? t : null;
+        if(table == null && element instanceof ScrollPane pane && pane.getChildren().size > 0 && pane.getChildren().first() instanceof Table t) table = t;
+        if(table == null) return;
+
         table.clear();
         var newElements = UiTreeBuilder.build(table, builder, result -> {
             //forward results to original listener
@@ -112,7 +115,6 @@ public class Menus{
         //save new element IDs
         dialog.idToElement.putAll(newElements);
     }
-
 
     @Remote(variants = Variant.both)
     public static void hideMenuBuilder(int menuId) {

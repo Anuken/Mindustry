@@ -232,6 +232,7 @@ public class UiBuilder{
         public LabelBuilder text(String text){ return prop(UiKey.text, text); }
         public LabelBuilder wrap(){ return prop(UiKey.wrap, true); }
         public LabelBuilder style(String style){ return prop(UiKey.style, style); }
+        public LabelBuilder labelAlign(String align){ return prop(UiKey.labelAlign, align); }
     }
 
     public static class ImageBuilder extends NodeBuilder<ImageBuilder>{
@@ -265,6 +266,7 @@ public class UiBuilder{
         public FieldBuilder hint(String hint){ return prop(UiKey.hint, hint); }
         public FieldBuilder maxLength(int length){ return prop(UiKey.maxLength, (float)length); }
         public FieldBuilder style(String style){ return prop(UiKey.style, style); }
+        public FieldBuilder enter(String result){ return prop(UiKey.enter, result); }
     }
 
     public static class CheckBuilder extends NodeBuilder<CheckBuilder>{

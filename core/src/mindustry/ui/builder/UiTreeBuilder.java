@@ -2,10 +2,11 @@ package mindustry.ui.builder;
 
 import arc.*;
 import arc.func.*;
+import arc.input.*;
 import arc.scene.*;
+import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
-import arc.scene.ui.Button.*;
 import arc.scene.ui.CheckBox.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.Label.*;
@@ -17,6 +18,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.ui.builder.UiBuilder.*;
 
 /** Builds a UI into an existing Table from a NodeBuilder tree. */
@@ -92,8 +94,10 @@ public class UiTreeBuilder{
                 yield table.add(pane);
             }
             case label -> {
-                Label label = new Label(node.str(UiKey.text, "")); // Label resolves @bundle keys itself
+                Label label = new Label(node.str(UiKey.text, ""));
                 label.setWrap(node.bool(UiKey.wrap));
+                String labelAlign = node.str(UiKey.labelAlign);
+                if(labelAlign != null) label.setAlignment(parseAlign(labelAlign));
                 applyStyle(node, LabelStyle.class, label::setStyle);
                 yield table.add(label);
             }
@@ -111,6 +115,7 @@ public class UiTreeBuilder{
             case button -> {
                 TextButton btn = new TextButton(node.str(UiKey.text, ""));
                 applyStyle(node, TextButtonStyle.class, btn::setStyle);
+
                 String icon = node.str(UiKey.icon);
                 if(icon != null){
                     btn.add(new Image(findDrawable(icon)).setScaling(Scaling.fit)).size(32f);
@@ -131,7 +136,9 @@ public class UiTreeBuilder{
                 String hint = node.str(UiKey.hint);
                 if(hint != null) field.setMessageText(hint);
                 Float maxLen = node.num(UiKey.maxLength);
-                if(maxLen != null) field.setMaxLength(maxLen.intValue());
+                field.setMaxLength(maxLen == null ? 1000 : Math.min(maxLen.intValue(), 1000));
+                String enter = node.str(UiKey.enter);
+                if(enter != null) field.keyDown(KeyCode.enter, () -> fireResult(ctx, enter));
                 applyStyle(node, TextFieldStyle.class, field::setStyle);
                 yield table.add(field);
             }
@@ -148,12 +155,31 @@ public class UiTreeBuilder{
                 Float def = node.num(UiKey.defaultValue);
                 if(def != null) slider.setValue(def);
                 applyStyle(node, SliderStyle.class, slider::setStyle);
-                yield table.add(slider);
+
+                String text = node.str(UiKey.text);
+                boolean useBundle = text != null && text.length() > 0 && text.charAt(0) == '@';
+                String bundleKey = useBundle ? text.substring(1) : null;
+
+                Label label = new Label(() -> {
+                    String formatted = Strings.autoFixed(slider.getValue(), 2);
+                    if(bundleKey != null){
+                        return Core.bundle.format(bundleKey, formatted);
+                    }else if(text != null){
+                        return text + ": " + formatted;
+                    }else{
+                        return formatted;
+                    }
+                });
+                label.setAlignment(Align.center);
+                label.touchable = Touchable.disabled;
+                label.setStyle(Styles.outlineLabel);
+                yield table.add(new Stack(slider, label));
             }
             case space -> table.add();
             case buttonTable -> {
                 Button btn = new Button();
-                applyStyle(node, ButtonStyle.class, btn::setStyle);
+                //can use any button style
+                if(!applyStyle(node, TextButtonStyle.class, btn::setStyle)) applyStyle(node, ImageButtonStyle.class, btn::setStyle);
                 Cell<Button> cell = table.add(btn);
                 buildInto(btn, node.entries, ctx); // build the button's own contents into it, like table/pane
                 wireButton(btn, node, ctx);
@@ -164,11 +190,15 @@ public class UiTreeBuilder{
     }
 
     /** Looks up a style by the node's "style" value (if set) and applies it via the given setter; no-op if absent/unknown. */
-    private static <S> void applyStyle(NodeBuilder<?> node, Class<S> styleType, Cons<S> setter){
+    private static <S> boolean applyStyle(NodeBuilder<?> node, Class<S> styleType, Cons<S> setter){
         String name = node.str(UiKey.style);
-        if(name == null) return;
+        if(name == null) return false;
         S style = UiStyleLookup.get(styleType, name);
-        if(style != null) setter.get(style);
+        if(style != null){
+            setter.get(style);
+            return true;
+        }
+        return false;
     }
 
     /** Sets up the click callback and button group, if present.*/
@@ -182,20 +212,23 @@ public class UiTreeBuilder{
 
         String result = node.str(UiKey.clicked);
         if(result != null && ctx != null && ctx.resultListener != null){
-            element.clicked(() -> {
-                MenuResult res = new MenuResult(result);
-                for(var entry : ctx.idElements){
-                    Element el = entry.value;
-                    if(el instanceof Slider s) res.values.put(entry.key, s.getValue());
-                    else if(el instanceof TextField f) res.values.put(entry.key, f.getText());
-                    else if(el instanceof CheckBox c) res.values.put(entry.key, c.isChecked());
-                    //the only thing distinguishing buttons that can be checked is that they have a style for it; it's just not visible otherwise.
-                    else if(el instanceof Button b && b.getStyle().checked != null) res.values.put(entry.key, b.isChecked());
-                }
-                ctx.resultListener.get(res);
-            });
+            element.clicked(() -> fireResult(ctx, result));
         }
 
+    }
+
+    private static void fireResult(BuildContext ctx, String result){
+        MenuResult res = new MenuResult(result);
+        for(var entry : ctx.idElements){
+            Element el = entry.value;
+            if(el instanceof Slider s) res.values.put(entry.key, s.getValue());
+            else if(el instanceof Stack stack && stack.getChildren().contains(e -> e instanceof Slider)) res.values.put(entry.key, ((Slider)stack.getChildren().find(e -> e instanceof Slider)).getValue());
+            else if(el instanceof TextField f) res.values.put(entry.key, f.getText());
+            else if(el instanceof CheckBox c) res.values.put(entry.key, c.isChecked());
+            //the only thing distinguishing buttons that can be checked is that they have a style for it; it's just not visible otherwise.
+            else if(el instanceof Button b && b.getStyle().checked != null) res.values.put(entry.key, b.isChecked());
+        }
+        ctx.resultListener.get(res);
     }
 
     /** Properties that apply to the table itself rather than to a cell (found loose in a table's body). */
@@ -284,18 +317,18 @@ public class UiTreeBuilder{
     }
 
     private static int parseAlign(String value){
-        int result = 0;
-        for(String part : value.split("\\s+")){
-            result |= switch(part){
-                case "top" -> Align.top;
-                case "bottom" -> Align.bottom;
-                case "left" -> Align.left;
-                case "right" -> Align.right;
-                case "center" -> Align.center;
-                default -> 0;
-            };
-        }
-        return result == 0 ? Align.center : result;
+        return switch(value){
+            case "center" -> Align.center;
+            case "top" -> Align.top;
+            case "bottom" -> Align.bottom;
+            case "left" -> Align.left;
+            case "right" -> Align.right;
+            case "topLeft" -> Align.topLeft;
+            case "topRight" -> Align.topRight;
+            case "bottomLeft", "botLeft" -> Align.bottomLeft;
+            case "bottomRight", "botRight" -> Align.bottomRight;
+            default -> Align.center;
+        };
     }
 
     private static class BuildContext{

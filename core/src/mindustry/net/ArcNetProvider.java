@@ -27,7 +27,7 @@ import java.util.concurrent.*;
 import static mindustry.Vars.*;
 
 public class ArcNetProvider implements NetProvider{
-    public static final int clientReadBufferSize = 20_000;
+    public static final int clientReadBufferSize = 25_000;
 
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);

@@ -45,6 +45,7 @@ public class UiDslParser{
 
         //TODO: throws on the client upon invalid value, that's probably fine?
         UiKey key = UiKey.valueOf(ident);
+
         //TODO hack: everything before the row ordinal is a node type
         boolean isNodeType = key.ordinal() < UiKey.row.ordinal();
         skipWs();
