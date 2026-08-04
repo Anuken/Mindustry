@@ -21,6 +21,7 @@ import java.io.*;
 import java.lang.reflect.*;
 
 public class ScriptMainGenerator{
+
     public static void main(String[] args) throws Exception{
         String base = "mindustry";
         Seq<String> blacklist = Seq.with("tools", "arc.flabel.effects");
@@ -56,7 +57,7 @@ public class ScriptMainGenerator{
         ObjectSet<String> used = ObjectSet.with();
 
         StringBuilder result = new StringBuilder("//Generated class. Do not modify.\n");
-        result.append("\n").append(new Fi("core/assets/scripts/base.js").readString()).append("\n");
+        result.append("\n").append(new Fi("scripts/base.js").readString()).append("\n");
         for(Class type : classes){
             if(used.contains(type.getPackage().getName()) || nopackage.contains(s -> type.getName().startsWith(s))) continue;
             result.append("importPackage(Packages.").append(type.getPackage().getName()).append(")\n");
@@ -69,7 +70,7 @@ public class ScriptMainGenerator{
             result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getName().replace('$', '.')).append("\n");
         }
 
-        new Fi("core/assets/scripts/global.js").writeString(result.toString());
+        new Fi("scripts/global.js").writeString(result.toString());
 
         //map simple name to type
         Seq<String> packages = Seq.with(
@@ -111,8 +112,12 @@ public class ScriptMainGenerator{
             SchemaGenerator.writeSchema(c);
         }
 
-        new Fi("core/src/mindustry/mod/ClassMap.java").writeString(classTemplate.replace("$CLASSES$", cdef.toString()));
+        SchemaGenerator.finalizeSchemas(mapped);
+
+        new Fi("../../core/src/mindustry/mod/ClassMap.java").writeString(classTemplate.replace("$CLASSES$", cdef.toString()));
         Log.info("Generated @ class mappings.", mapped.size);
+
+        SchemaGenerator.writeDefaultContent();
     }
     public static Seq<Class> getClasses(String packageName) throws Exception{
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();

@@ -2,12 +2,17 @@ package mindustry.tools;
 
 import arc.files.*;
 import arc.func.*;
+import arc.graphics.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
 import com.github.javaparser.*;
 import com.github.javaparser.ast.body.*;
+import mindustry.*;
+import mindustry.ctype.*;
+import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -15,17 +20,37 @@ import mindustry.world.*;
 import java.lang.reflect.*;
 
 public class SchemaGenerator{
-    static ObjectMap<String, Fi> classNameToFile = new ObjectMap<>();
     static JavaParser parser = new JavaParser();
-    static ObjectMap<Class, TypeDeclaration<?>> decls = new ObjectMap<>();
+    static ObjectMap<String, Fi> classNameToFile = new ObjectMap<>();
+    static ObjectMap<Class<?>, TypeDeclaration<?>> decls = new ObjectMap<>();
     static ObjectMap<Class<?>, Seq<Cons<Jval>>> customInjectors = new ObjectMap<>();
+    static ObjectSet<Class<?>> generatedEnums = new ObjectSet<>();
+    static Fi outputDir = new Fi("../../build/schemas/");
 
     static{
         registerBuiltinSchemas();
+        outputDir.mkdirs();
+    }
+
+    public static void writeDefaultContent(){
+        HeadlessSetup.setup();
+        var root = Jval.newObject();
+        var mappings = Jval.newObject();
+        for(ContentType type : ContentType.all){
+            var all = Vars.content.getBy(type);
+            if(type.contentClass != null && all.size > 0 && all.first() instanceof UnlockableContent){
+                mappings.put(type.name(), type.contentClass.getCanonicalName());
+                var arr = Jval.newArray();
+                all.<UnlockableContent>as().each(c -> arr.asArray().add(Jval.valueOf(c.name)));
+                root.asObject().put(type.name(), arr);
+            }
+        }
+        root.put("mappings", mappings);
+        outputDir.child("allContent.json").writeString(root.toString(Jformat.formatted));
     }
 
     //called from ScriptMainGenerator
-    public static void writeSchema(Class<?> type) throws Exception{
+    public static void writeSchema(Class<?> type){
         if(Building.class.isAssignableFrom(type) || type.getSuperclass() == null) return;
 
         Jval val = Jval.newObject();
@@ -49,6 +74,10 @@ public class SchemaGenerator{
 
             if(field.isAnnotationPresent(Nullable.class)) inner.put("nullable", true);
 
+            if(field.getType().isEnum()){
+                writeEnumSchema(field.getType());
+            }
+
             var root = getTypeDecl(field.getDeclaringClass());
             if(root != null) root.getFieldByName(field.getName()).ifPresent(fdec -> {
                 String[] docAndDefault = determineJavadocAndDefault(field, fdec, fdec.getVariables().getFirst().orElseThrow());
@@ -64,8 +93,28 @@ public class SchemaGenerator{
             injector.get(val);
         }
 
-        Fi dir = new Fi("build/schemas/" + type.getCanonicalName() + ".json");
-        dir.writeString(val.toString(Jformat.formatted));
+        outputDir.child(type.getCanonicalName() + ".json").writeString(val.toString(Jformat.formatted));
+    }
+
+    //writes a schema for an enum type the first time it's encountered as a field value; subsequent calls are no-ops
+    private static void writeEnumSchema(Class<?> enumType){
+        if(!generatedEnums.add(enumType)) return;
+
+        Jval val = Jval.newObject();
+        val.put("superclass", "Enum"); //TODO: should this be java.lang.Enum?
+
+        var typeDec = getTypeDecl(enumType);
+        if(typeDec != null && typeDec.getJavadoc().isPresent()){
+            val.put("doc", typeDec.getJavadoc().get().toText());
+        }
+
+        Jval values = Jval.newArray();
+        for(var constant : enumType.getEnumConstants()){
+            values.add(((Enum<?>)constant).name());
+        }
+        val.put("values", values);
+
+        outputDir.child(enumType.getCanonicalName() + ".json").writeString(val.toString(Jformat.formatted));
     }
 
     //registers an injector adding/overwriting fields on type's generated schema, for JSON keys with no real backing field
@@ -79,16 +128,259 @@ public class SchemaGenerator{
     }
 
     //writes a schema for a type with no backing Java class at all
-    public static void writeFakeSchema(String name, String val){
-        Fi file = new Fi("build/schemas/" + name + ".json");
+    public static void writeSchema(String name, String val){
+        Fi file = outputDir.child(name + ".json");
         file.writeString(val);
     }
 
+    static void writePartSchema(String name, String val){
+        Jval base = Jval.read(val);
+        base.add("ops", field("Seq<mindustry.entities.part.DrawPart$PartProgress>", "Consecutive operations."));
+
+        writeSchema(name, base.toString(Jformat.formatted));
+    }
+
+    static void finalizeSchemas(Seq<Class<?>> allClasses){
+        writeSchema("TemplateUnitType", """
+        {
+          "doc": "Template for unit types.",
+          "superclass": "Enum",
+          "values": [%TYPES%]
+        }
+        """.replace("%TYPES%",  allClasses.select(UnitType.class::isAssignableFrom).toString(", ", t -> "\"" + t.getSimpleName() + "\"")));
+
+        writePartSchema("mindustry.entities.part.DrawPart$PartProgress", """
+        {
+          "doc": "Base class for progress functions used to animate part transforms. The concrete operation is chosen by 'type' (see PartProgress's static methods for the full list: inv, slope, clamp, delay, sustain, shorten, compress, add, blend, mul, min, sin, absin, mod, loop, curve)."
+        }
+        """);
+
+        writePartSchema("reload", """
+        {
+          "doc": "Reload of the weapon - 1 right after shooting, 0 when ready to fire.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("smoothReload", """
+        {
+          "doc": "Reload, but smoothed out, so there is no sudden jump between 0-1.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("warmup", """
+        {
+          "doc": "Weapon warmup, 0 when not firing, 1 when actively shooting. Not equivalent to heat.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("charge", """
+        {
+          "doc": "Weapon charge, 0 when beginning to charge, 1 when finished.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("recoil", """
+        {
+          "doc": "Weapon recoil with no curve applied.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("heat", """
+        {
+          "doc": "Weapon heat, 1 when just fired, 0 when it has cooled down (duration depends on weapon).",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("life", """
+        {
+          "doc": "Lifetime fraction, 0 to 1. Only for missiles.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("time", """
+        {
+          "doc": "Current unscaled value of Time.time.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("inv", """
+        {
+          "doc": "Inverts progress (1 - progress).",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("slope", """
+        {
+          "doc": "Slopes progress: rises to 1 then falls back to 0.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("clamp", """
+        {
+          "doc": "Clamps progress to the [0, 1] range.",
+          "superclass": "PartProgress"
+        }
+        """);
+
+        writePartSchema("delay", """
+        {
+          "doc": "Delays progress by a fixed amount.",
+          "superclass": "PartProgress",
+          "amount": { "type": "float", "doc": "Amount to delay progress by." }
+        }
+        """);
+
+        writePartSchema("sustain", """
+        {
+          "doc": "Rises to and sustains progress at a plateau.",
+          "superclass": "PartProgress",
+          "offset": { "type": "float", "doc": "Progress offset before rising.", "default": "0" },
+          "grow": { "type": "float", "doc": "Duration of the rise to the plateau.", "default": "0" },
+          "sustain": { "type": "float", "doc": "Length of the sustained plateau." }
+        }
+        """);
+
+        writePartSchema("shorten", """
+        {
+          "doc": "Shortens the progress range by a fixed amount.",
+          "superclass": "PartProgress",
+          "amount": { "type": "float", "doc": "Amount to shorten progress by." }
+        }
+        """);
+
+        writePartSchema("compress", """
+        {
+          "doc": "Compresses progress into the [start, end] sub-range.",
+          "superclass": "PartProgress",
+          "start": { "type": "float", "doc": "Start of the compressed range." },
+          "end": { "type": "float", "doc": "End of the compressed range." }
+        }
+        """);
+
+        writePartSchema("add", """
+        {
+          "doc": "Adds a constant or another PartProgress's value to this one. Set exactly one of 'amount' or 'other'.",
+          "superclass": "PartProgress",
+          "amount": { "type": "float", "doc": "Constant amount to add." },
+          "other": { "type": "PartProgress", "doc": "Another progress function whose value is added instead of a constant." }
+        }
+        """);
+
+        writePartSchema("blend", """
+        {
+          "doc": "Blends between this progress and another PartProgress by a fixed amount.",
+          "superclass": "PartProgress",
+          "other": { "type": "PartProgress", "doc": "Progress function to blend with." },
+          "amount": { "type": "float", "doc": "Blend factor toward 'other'." }
+        }
+        """);
+
+        writePartSchema("mul", """
+        {
+          "doc": "Multiplies by a constant or another PartProgress's value. Set exactly one of 'amount' or 'other'.",
+          "superclass": "PartProgress",
+          "amount": { "type": "float", "doc": "Constant multiplier." },
+          "other": { "type": "PartProgress", "doc": "Another progress function whose value is multiplied instead of a constant." }
+        }
+        """);
+
+        writePartSchema("min", """
+        {
+          "doc": "Takes the minimum of this progress and another PartProgress.",
+          "superclass": "PartProgress",
+          "other": { "type": "PartProgress", "doc": "Progress function to compare against." }
+        }
+        """);
+
+        writePartSchema("sin", """
+        {
+          "doc": "Applies a sine wave to progress.",
+          "superclass": "PartProgress",
+          "offset": { "type": "float", "doc": "Phase offset.", "default": "0" },
+          "scl": { "type": "float", "doc": "Scale (frequency) of the wave." },
+          "mag": { "type": "float", "doc": "Magnitude (amplitude) of the wave." }
+        }
+        """);
+
+        writePartSchema("absin", """
+        {
+          "doc": "Applies an absolute-value sine wave to progress.",
+          "superclass": "PartProgress",
+          "scl": { "type": "float", "doc": "Scale (frequency) of the wave." },
+          "mag": { "type": "float", "doc": "Magnitude (amplitude) of the wave." }
+        }
+        """);
+
+        writePartSchema("mod", """
+        {
+          "doc": "Wraps progress modulo a fixed amount.",
+          "superclass": "PartProgress",
+          "amount": { "type": "float", "doc": "Modulus to wrap progress by." }
+        }
+        """);
+
+        writePartSchema("loop", """
+        {
+          "doc": "Loops progress over a fixed time period.",
+          "superclass": "PartProgress",
+          "time": { "type": "float", "doc": "Length of one loop cycle." }
+        }
+        """);
+
+        writePartSchema("curve", """
+        {
+          "doc": "Applies an interpolation curve to progress, or slices out a sub-range and interpolates within it. Set either 'interp', or both 'offset' and 'duration'.",
+          "superclass": "PartProgress",
+          "interp": { "type": "arc.util.Interp", "doc": "Interpolation curve to apply directly to progress." },
+          "offset": { "type": "float", "doc": "Start of the sub-range to slice out." },
+          "duration": { "type": "float", "doc": "Length of the sub-range to slice out." }
+        }
+        """);
+    }
+
     private static void registerBuiltinSchemas(){
+        injectCustomField(UnitType.class, "type", field("JsonUnitType", "Type of the unit that is created.", false));
+        injectCustomField(UnitType.class, "template", field("TemplateUnitType", "UnitType template class.", false));
+        injectCustomField(UnitType.class, "defaultController", field(AIController.class.getCanonicalName(), "Unconditional controller; always assigned, even if on the player team. This overwrites RTS AI.", false));
+        injectCustomField(UnitType.class, "aiController", field(AIController.class.getCanonicalName(), "Controller used when the unit is not on the player team.", false));
+
+        writeSchema("JsonUnitType", """
+        {
+          "doc": "Type of unit that is created.",
+          "superclass": "Enum",
+          "values": ["flying", "mech", "legs", "naval", "payload", "missile", "tank", "hover", "tether", "crawl"]
+        }
+        """);
+
+        writeSchema(Interp.class.getCanonicalName(), """
+        {
+          "doc": "Various types of interpolation.",
+          "superclass": "Enum",
+          "values": [%VALUES%]
+        }
+        """.replace("%VALUES%",  Seq.with(Interp.class.getFields()).toString(", ", t -> "\"" + t.getName() + "\"")));
+
+        writeSchema(Blending.class.getCanonicalName(), """
+        {
+          "doc": "Handles sprite blending.",
+          "superclass": "Enum",
+          "values": ["normal", "additive", "disabled"]
+        }
+        """);
 
         injectCustomField(Planet.class, "sectorSize", field("int", "Planet sector subdivisions.", false));
 
-        writeFakeSchema("Consumes", """
+        writeSchema("Consumes", """
         {
           "doc": "Things that the block consumes.",
           "remove": {"type": "java.lang.String[]", "doc": "Removes consumers instead of adding one: 'all', or a type name from this list, e.g. 'items'."},
@@ -113,7 +405,7 @@ public class SchemaGenerator{
 
         injectCustomField(Block.class, "consumes", field("Consumes", "Things that the block consumes.", true));
 
-        writeFakeSchema("Research", """
+        writeSchema("Research", """
         {
           "doc": "Tech tree placement for this content. Also accepts a plain string, treated as 'parent'.",
           "parent": {"type": "mindustry.ctype.UnlockableContent", "doc": "Name of the parent tech tree node; required unless 'root' is true."},
@@ -129,6 +421,10 @@ public class SchemaGenerator{
         for(var type : Seq.with(Block.class, Liquid.class, UnitType.class, Item.class, StatusEffect.class, Planet.class, Weather.class, SectorPreset.class)){
             injectCustomField(type, "research", field("Research", "Tech tree research dependencies.", true));
         }
+    }
+
+    private static Jval field(String type, String doc){
+        return field(type, doc, false, null);
     }
 
     private static Jval field(String type, String doc, boolean nullable){
@@ -147,7 +443,7 @@ public class SchemaGenerator{
     private static @Nullable TypeDeclaration<?> getTypeDecl(Class<?> type){
         return decls.get(type, () -> {
             if(classNameToFile.isEmpty()){
-                new Fi("core/src").walk(f -> {
+                new Fi("../../core/src").walk(f -> {
                     if(f.extEquals("java")){
                         classNameToFile.put(f.nameWithoutExtension(), f);
                     }
