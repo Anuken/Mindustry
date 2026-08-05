@@ -39,6 +39,7 @@ public class UiHotReload{
     static void reload(Fi file, BaseDialog dialog){
         try{
             dialog.cont.clear();
+            dialog.cont.background(null);
             UiTreeBuilder.build(dialog.cont, UiBuilder.parse(file.readString()), result -> {
                 Vars.ui.showInfo(result.toString());
             });
