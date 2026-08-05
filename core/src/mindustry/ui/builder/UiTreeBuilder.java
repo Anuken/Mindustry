@@ -2,6 +2,7 @@ package mindustry.ui.builder;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
@@ -15,6 +16,7 @@ import arc.scene.ui.Slider.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
+import arc.scene.utils.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
@@ -258,6 +260,8 @@ public class UiTreeBuilder{
                 case uniform -> cell.uniform();
                 case uniformX -> cell.uniformX();
                 case uniformY -> cell.uniformY();
+                //not a cell property, technically, only applies to buttons/sliders/text fields
+                case disabled -> { if(cell.get() instanceof Disableable d) d.setDisabled(true); }
                 default -> {}
             }
         }else{
@@ -276,6 +280,9 @@ public class UiTreeBuilder{
                 case padRight -> cell.padRight((Float)value);
                 case align -> cell.align(parseAlign((String)value));
                 case colspan -> cell.colspan(((Float)value).intValue());
+                case color -> { //technically not a layout property, but all elements have it, so it's applied here
+                    if(value instanceof String s) cell.color(Strings.parseColor(s, Color.white));
+                }
                 default -> {}
             }
         }

@@ -1,5 +1,6 @@
 package mindustry.ui.builder;
 
+import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -68,6 +69,8 @@ public class UiBuilder{
         public T uniform(){ return prop(UiKey.uniform, true); }
         public T uniformX(){ return prop(UiKey.uniformX, true); }
         public T uniformY(){ return prop(UiKey.uniformY, true); }
+        public T color(Color color){ return prop(UiKey.color, color.toString()); }
+        public T color(String colorHex){ return prop(UiKey.color, colorHex); }
 
         public void write(Writes out){
             out.b(type.ordinal());
@@ -249,6 +252,7 @@ public class UiBuilder{
         public ButtonBuilder icon(String icon){ return prop(UiKey.icon, icon); }
         public ButtonBuilder style(String style){ return prop(UiKey.style, style); }
         public ButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
+        public ButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
     }
 
     public static class ImageButtonBuilder extends NodeBuilder<ImageButtonBuilder>{
@@ -257,6 +261,7 @@ public class UiBuilder{
         public ImageButtonBuilder icon(String icon){ return prop(UiKey.icon, icon); }
         public ImageButtonBuilder style(String style){ return prop(UiKey.style, style); }
         public ImageButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
+        public ImageButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
     }
 
     public static class FieldBuilder extends NodeBuilder<FieldBuilder>{
@@ -267,6 +272,7 @@ public class UiBuilder{
         public FieldBuilder maxLength(int length){ return prop(UiKey.maxLength, (float)length); }
         public FieldBuilder style(String style){ return prop(UiKey.style, style); }
         public FieldBuilder enter(String result){ return prop(UiKey.enter, result); }
+        public FieldBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
     }
 
     public static class CheckBuilder extends NodeBuilder<CheckBuilder>{
@@ -275,6 +281,7 @@ public class UiBuilder{
         public CheckBuilder text(String text){ return prop(UiKey.text, text); }
         public CheckBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
         public CheckBuilder style(String style){ return prop(UiKey.style, style); }
+        public CheckBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
     }
 
     public static class SliderBuilder extends NodeBuilder<SliderBuilder>{
@@ -285,6 +292,7 @@ public class UiBuilder{
         public SliderBuilder step(float step){ return prop(UiKey.step, step); }
         public SliderBuilder defaultValue(float value){ return prop(UiKey.defaultValue, value); }
         public SliderBuilder style(String style){ return prop(UiKey.style, style); }
+        public SliderBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
     }
 
     public static class SpaceBuilder extends NodeBuilder<SpaceBuilder>{
@@ -301,5 +309,6 @@ public class UiBuilder{
         public ButtonTableBuilder style(String style){ return prop(UiKey.style, style); }
         public ButtonTableBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ButtonTableBuilder margin(float m){ return prop(UiKey.margin, m); }
+        public ButtonTableBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
     }
 }

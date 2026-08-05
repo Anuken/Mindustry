@@ -1,16 +1,11 @@
 {
-  "doc": "Multiplies by a constant or another PartProgress's value. Set exactly one of 'amount' or 'other'.",
-  "superclass": "PartProgress",
-  "amount":{
+  "doc": "Multiplies by a constant or another PartProgress's value. Set exactly one of 'amount' or 'other'. Applied via PartProgress's 'op'/'operation' field (e.g. `op: mul`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "amount": {
     "type": "float",
     "doc": "Constant multiplier."
   },
-  "other":{
-    "type": "PartProgress",
+  "other": {
+    "type": "mindustry.entities.part.DrawPart$PartProgress",
     "doc": "Another progress function whose value is multiplied instead of a constant."
-  },
-  "ops":{
-    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
-    "doc": "Consecutive operations."
   }
 }
