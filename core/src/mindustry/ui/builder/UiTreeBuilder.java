@@ -180,6 +180,8 @@ public class UiTreeBuilder{
                 Button btn = new Button();
                 //can use any button style
                 if(!applyStyle(node, TextButtonStyle.class, btn::setStyle)) applyStyle(node, ImageButtonStyle.class, btn::setStyle);
+                Float margin = node.num(UiKey.margin);
+                if(margin != null) btn.margin(margin);
                 Cell<Button> cell = table.add(btn);
                 buildInto(btn, node.entries, ctx); // build the button's own contents into it, like table/pane
                 wireButton(btn, node, ctx);

@@ -300,5 +300,6 @@ public class UiBuilder{
 
         public ButtonTableBuilder style(String style){ return prop(UiKey.style, style); }
         public ButtonTableBuilder clicked(String result){ return prop(UiKey.clicked, result); }
+        public ButtonTableBuilder margin(float m){ return prop(UiKey.margin, m); }
     }
 }
