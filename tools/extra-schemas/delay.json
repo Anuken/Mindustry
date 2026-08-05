@@ -1,0 +1,12 @@
+{
+  "doc": "Delays progress by a fixed amount.",
+  "superclass": "PartProgress",
+  "amount":{
+    "type": "float",
+    "doc": "Amount to delay progress by."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "doc": "Compresses progress into the [start, end] sub-range.",
+  "superclass": "PartProgress",
+  "start":{
+    "type": "float",
+    "doc": "Start of the compressed range."
+  },
+  "end":{
+    "type": "float",
+    "doc": "End of the compressed range."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

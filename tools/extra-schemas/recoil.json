@@ -1,0 +1,8 @@
+{
+  "doc": "Weapon recoil with no curve applied.",
+  "superclass": "PartProgress",
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

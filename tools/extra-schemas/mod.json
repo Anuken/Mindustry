@@ -1,0 +1,12 @@
+{
+  "doc": "Wraps progress modulo a fixed amount.",
+  "superclass": "PartProgress",
+  "amount":{
+    "type": "float",
+    "doc": "Modulus to wrap progress by."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

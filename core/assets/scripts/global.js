@@ -110,6 +110,7 @@ importPackage(Packages.mindustry.type.unit)
 importPackage(Packages.mindustry.type.weapons)
 importPackage(Packages.mindustry.type.weather)
 importPackage(Packages.mindustry.ui)
+importPackage(Packages.mindustry.ui.builder)
 importPackage(Packages.mindustry.ui.dialogs)
 importPackage(Packages.mindustry.ui.fragments)
 importPackage(Packages.mindustry.ui.layout)
@@ -182,6 +183,7 @@ const SectorCaptureEvent = Packages.mindustry.game.EventType.SectorCaptureEvent
 const ClientChatEvent = Packages.mindustry.game.EventType.ClientChatEvent
 const PlayerChatEvent = Packages.mindustry.game.EventType.PlayerChatEvent
 const TextInputEvent = Packages.mindustry.game.EventType.TextInputEvent
+const MenuBuilderOptionChooseEvent = Packages.mindustry.game.EventType.MenuBuilderOptionChooseEvent
 const MenuOptionChooseEvent = Packages.mindustry.game.EventType.MenuOptionChooseEvent
 const ClientServerConnectEvent = Packages.mindustry.game.EventType.ClientServerConnectEvent
 const ClientPreConnectEvent = Packages.mindustry.game.EventType.ClientPreConnectEvent

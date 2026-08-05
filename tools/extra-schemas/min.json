@@ -1,0 +1,12 @@
+{
+  "doc": "Takes the minimum of this progress and another PartProgress.",
+  "superclass": "PartProgress",
+  "other":{
+    "type": "PartProgress",
+    "doc": "Progress function to compare against."
+  },
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}

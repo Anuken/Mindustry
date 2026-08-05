@@ -1,0 +1,8 @@
+{
+  "doc": "Inverts progress (1 - progress).",
+  "superclass": "PartProgress",
+  "ops":{
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
+    "doc": "Consecutive operations."
+  }
+}
