@@ -10,6 +10,7 @@ public class UiBuilder{
 
     public static TableBuilder parse(String source){ return UiDslParser.parse(source); }
     public static TableBuilder table(){ return new TableBuilder(); }
+    public static StackBuilder stack(){ return new StackBuilder(); }
     public static PaneBuilder pane(){ return new PaneBuilder(); }
     public static LabelBuilder label(String text){ return new LabelBuilder().text(text); }
     public static ImageBuilder image(){ return new ImageBuilder(); }
@@ -98,6 +99,7 @@ public class UiBuilder{
             return switch(type){
                 case table -> new TableBuilder();
                 case pane -> new PaneBuilder();
+                case stack -> new StackBuilder();
                 case label -> new LabelBuilder();
                 case image -> new ImageBuilder();
                 case button -> new ButtonBuilder();
@@ -218,6 +220,10 @@ public class UiBuilder{
             entries.add(new Entry(child.type, child));
             return self();
         }
+    }
+
+    public static class StackBuilder extends ContainerBuilder<StackBuilder>{
+        StackBuilder(){ super(UiKey.stack); }
     }
 
     public static class TableBuilder extends ContainerBuilder<TableBuilder>{
