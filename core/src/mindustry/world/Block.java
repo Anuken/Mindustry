@@ -182,7 +182,7 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Item itemDrop = null;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    /** Array of affinities to certain things. */
+    /** Affinities for floors. */
     public Attributes attributes = new Attributes();
     /** Health per square tile that this block occupies; essentially, this is multiplied by size * size. Overridden if health is > 0. If <0, the default is 40. */
     public float scaledHealth = -1;

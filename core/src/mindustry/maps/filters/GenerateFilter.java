@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import arc.util.noise.*;
+import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -12,9 +13,7 @@ import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-import java.io.*;
-
-public abstract class GenerateFilter implements Cloneable, Serializable{
+public abstract class GenerateFilter implements Cloneable, AllowSerialization{
     public int seed = 0;
 
     public void apply(Tiles tiles, GenerateInput in){

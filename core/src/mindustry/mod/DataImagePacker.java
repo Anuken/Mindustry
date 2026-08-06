@@ -172,10 +172,10 @@ public class DataImagePacker{
     public void unload(){
         if(patchAtlas != null){
             for(var texture : patchAtlas.getTextures()){
-                patchAtlas.getTextures().remove(texture);
+                if(texture != null) patchAtlas.getTextures().remove(texture);
             }
             for(var region : patchAtlas.getRegions()){
-                patchAtlas.getRegionMap().remove(region.name);
+                if(region != null) patchAtlas.getRegionMap().remove(region.name);
             }
 
             patchAtlas.dispose();
