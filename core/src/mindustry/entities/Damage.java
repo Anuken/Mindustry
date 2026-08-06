@@ -477,7 +477,7 @@ public class Damage{
 
             // Should the chance be per unit or for the whole shot?
             // current: per unit
-            entity.apply(effect, duration, chance);
+            entity.apply(effect, duration, false, chance);
         };
 
         rect.setSize(radius * 2).setCenter(x, y);

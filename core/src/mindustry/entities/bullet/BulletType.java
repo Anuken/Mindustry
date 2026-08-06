@@ -512,7 +512,7 @@ public class BulletType extends Content implements Cloneable{
             Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
             if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
-            unit.apply(status, statusDuration, statusChance);
+            unit.apply(status, statusDuration, false, statusChance);
 
             Events.fire(bulletDamageEvent.set(unit, b));
         }

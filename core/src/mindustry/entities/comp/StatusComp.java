@@ -39,7 +39,11 @@ abstract class StatusComp implements Posc{
     }
 
     public void apply(StatusEffect effect, float duration, boolean shorten){
-        applyStatus(effect, duration, shorten, 1f);
+        apply(effect, duration, shorten, 1f);
+    }
+
+    public void apply(StatusEffect effect, float duration, boolean shorten, float statusChance){
+        applyStatus(effect, duration, shorten, statusChance);
     }
 
     public float getDuration(StatusEffect effect){
