@@ -126,7 +126,12 @@ public class UiDslParser{
         StringBuilder sb = new StringBuilder();
         while(!atEnd() && peek() != '"'){
             char c = src.charAt(pos);
-            if(c == '\\' && pos + 1 < src.length()){ sb.append(src.charAt(pos + 1)); pos += 2; continue; }
+            if(c == '\\' && pos + 1 < src.length()){
+                char next = src.charAt(pos + 1);
+                sb.append(next == 'n' ? '\n' : next); //parse \n
+                pos += 2;
+                continue;
+            }
             sb.append(c);
             pos++;
         }
