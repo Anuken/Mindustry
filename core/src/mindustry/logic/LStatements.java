@@ -1595,7 +1595,7 @@ public class LStatements{
                     t.left();
                     for(StatusEffect status : content.statusEffects()){
                         if(status == StatusEffects.none) continue;
-                        t.button(status.name, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
+                        t.button(status.localizedName, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
                             effect = "@status-" + status.name;
                             build(table);
                             field.setText(effect);
@@ -1607,7 +1607,7 @@ public class LStatements{
 
             row(table);
 
-            table.add(token(clear ? " from " : " to ")).left();
+            table.add(token(clear ? "from" : "to")).left();
 
             fields(table, unit, str -> unit = str).left();
 
