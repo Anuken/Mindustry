@@ -512,7 +512,9 @@ public class BulletType extends Content implements Cloneable{
             Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
             if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
-            unit.apply(status, statusDuration, false, statusChance);
+            // Use statusChance from data if present (lightning bullets pass it), otherwise use type default
+            float sc = b.data instanceof Float f ? f : statusChance;
+            unit.apply(status, statusDuration, false, sc);
 
             Events.fire(bulletDamageEvent.set(unit, b));
         }

@@ -52,12 +52,9 @@ public class Lightning{
         Seq<Vec2> lines = new Seq<>();
         bhit = false;
 
-        // Store original statusChance and set it for lightning bullets
-        float originalStatusChance = hitCreate.statusChance;
-        hitCreate.statusChance = statusChance;
-
         for(int i = 0; i < length / 2; i++){
-            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
+            // Pass resolved statusChance via data field so created lightning bullets inherit it
+            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, statusChance);
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             if(lines.size > 1){
@@ -102,8 +99,5 @@ public class Lightning{
         }
 
         Fx.lightning.at(x, y, rotation, color, lines);
-
-        // Restore original statusChance
-        hitCreate.statusChance = originalStatusChance;
     }
 }
