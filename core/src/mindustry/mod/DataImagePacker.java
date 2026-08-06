@@ -175,7 +175,10 @@ public class DataImagePacker{
                 if(texture != null) patchAtlas.getTextures().remove(texture);
             }
             for(var region : patchAtlas.getRegions()){
-                if(region != null) patchAtlas.getRegionMap().remove(region.name);
+                if(region != null){
+                    patchAtlas.getRegionMap().remove(region.name);
+                    patchAtlas.getDrawables().remove(region.name);
+                }
             }
 
             patchAtlas.dispose();

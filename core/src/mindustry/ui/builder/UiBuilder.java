@@ -172,6 +172,11 @@ public class UiBuilder{
             for(Entry e : entries) if(e.key == key && e.value instanceof Boolean b) return b;
             return def;
         }
+
+        @Override
+        public String toString(){
+            return UiDslWriter.write(this);
+        }
     }
 
     static class Entry{
