@@ -65,7 +65,8 @@ launchIPadSimulator.dependsOn build
 launchIOSDevice.dependsOn build
 createIPA.dependsOn build
 createIPA.dependsOn copyNatives
-createIPA.dependsOn "tools:pack"
+createIPA.dependsOn ":tools:pack"
+createIPA.dependsOn ":core:preGen"
 
 robovm{
     archs = "arm64"
