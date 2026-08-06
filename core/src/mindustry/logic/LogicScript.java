@@ -1,11 +1,9 @@
 package mindustry.logic;
 
 import arc.util.*;
-import arc.util.serialization.*;
-import arc.util.serialization.Json.*;
 
 //TODO: this isn't used in the game yet
-public class LogicScript implements JsonSerializable{
+public class LogicScript{
     public static final int defaultTimeoutMs = 200, maxTimeoutMs = 2000;
 
     /** Timeout in milliseconds. 0 = default timeout. */
@@ -56,6 +54,7 @@ public class LogicScript implements JsonSerializable{
         }
     }
 
+    /*
     @Override
     public void write(Json json){
         json.writeValue("script", script);
@@ -72,5 +71,5 @@ public class LogicScript implements JsonSerializable{
         }else{
             script = jsonData.asString();
         }
-    }
+    }*/
 }

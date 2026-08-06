@@ -267,6 +267,16 @@ public class TileableLogicDisplay extends LogicDisplay{
             }
         }
 
+        @Override
+        public void ensureBuffer() {
+            if(buffer == null){
+                buffer = new FrameBuffer(32 * tilesWidth - 2 * frameSize, 32 * tilesHeight - 2 * frameSize);
+                //clear the buffer - some OSs leave garbage in it
+                buffer.begin(backgroundColor);
+                buffer.end();
+            }
+        }
+
         public void updateOthers(){
             for(int i = 0; i < 4; i++){
                 Tile other = tile.nearby(Geometry.d8edge(i));

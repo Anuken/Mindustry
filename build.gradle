@@ -475,7 +475,8 @@ project(":tools"){
         implementation arcModule("natives:natives-freetype-desktop")
         implementation arcModule("backends:backend-headless")
 
-        implementation("com.google.guava:guava:33.3.1-jre")
+        implementation "com.google.guava:guava:33.3.1-jre"
+        implementation 'com.github.javaparser:javaparser-core:3.28.2'
     }
 }
 

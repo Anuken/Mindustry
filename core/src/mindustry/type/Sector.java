@@ -123,7 +123,7 @@ public class Sector{
     }
 
     public boolean isShielded(){
-        return preset != null && preset.shieldSectors.size > 0 && preset.shieldSectors.contains(s -> !s.isCaptured());
+        return preset != null && preset.shieldSectors.size > 0 && !isCaptured() && preset.shieldSectors.contains(s -> !s.isCaptured());
     }
 
     public boolean isAttacked(){

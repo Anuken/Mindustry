@@ -92,7 +92,7 @@ public class ShieldArcAbility extends Ability{
             }else if(paramField.pushUnits && !(!unit.isFlying() && paramUnit.isFlying())){
 
                 float reach = paramField.radius + paramField.width;
-                float overlapDst = reach - unit.dst(paramPos.x, paramPos.y);
+                float overlapDst = reach - unit.dst(paramPos);
 
                 if(overlapDst > 0){
                     //only nullify velocity if it's heading towards the shield
@@ -100,7 +100,7 @@ public class ShieldArcAbility extends Ability{
                         unit.vel.setZero();
                     }
                     // get out
-                    unit.move(Tmp.v1.set(unit).sub(paramUnit).setLength(overlapDst + 0.01f));
+                    unit.move(Tmp.v1.set(unit).sub(paramPos).setLength(overlapDst + 0.01f));
 
                     if(Mathf.chanceDelta(0.3f * Time.delta)){
                         paramField.pushEffect.at(unit.x, unit.y, paramUnit.team.color);
@@ -157,6 +157,10 @@ public class ShieldArcAbility extends Ability{
     /** State. */
     protected float widthScale, alpha;
 
+    public float scaledMax(Unit unit){
+        return max * Vars.state.rules.unitHealth(unit.team);
+    }
+
     @Override
     public void addStats(Table t){
         super.addStats(t);
@@ -174,7 +178,7 @@ public class ShieldArcAbility extends Ability{
     @Override
     public void update(Unit unit){
 
-        if(data < max){
+        if(data < scaledMax(unit)){
             data += Time.delta * regen;
         }
 
@@ -197,7 +201,7 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void created(Unit unit){
-        data = max;
+        data = scaledMax(unit);
     }
 
     @Override
@@ -229,6 +233,6 @@ public class ShieldArcAbility extends Ability{
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> data / max)).row();
+        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> data / scaledMax(unit))).row();
     }
 }

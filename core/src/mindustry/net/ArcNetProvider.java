@@ -27,6 +27,8 @@ import java.util.concurrent.*;
 import static mindustry.Vars.*;
 
 public class ArcNetProvider implements NetProvider{
+    public static final int clientReadBufferSize = 25_000;
+
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
 
@@ -59,7 +61,7 @@ public class ArcNetProvider implements NetProvider{
             packetSpamLimit = Config.packetSpamLimit.num();
         });
 
-        client = new Client(16384, 16384, new PacketSerializer()){
+        client = new Client(16384, clientReadBufferSize, new PacketSerializer()){
             @Override
             public void handleNetException(ArcNetException e){
                 //allow occasional UDP network errors
@@ -107,7 +109,8 @@ public class ArcNetProvider implements NetProvider{
             }
         });
 
-        server = new Server(32768, 16384, new PacketSerializer());
+        //include extra 16kb headroom for when the write buffer is full
+        server = new Server(clientReadBufferSize + 16_000, 16384, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();

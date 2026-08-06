@@ -260,8 +260,13 @@ public class MapImagesView implements AssetView{
                     b.defaults().size((size - 10f) / 4f);
                     var istyle = Styles.emptyi;
                     b.button(Icon.pencil, istyle, () -> {
-                        ui.showTextInput("@save.rename", "@patch.path", image.path, res -> {
+                        ui.showTextInput("@save.rename", "@patch.path", 1000, image.path, res -> {
                             if(!res.endsWith(".png")) res = res + ".png";
+
+                            if(!DataAsset.validPath(res)){
+                                ui.showErrorMessage("@asset.path.invalid");
+                                return;
+                            }
 
                             Fi fi = new Fi(res);
                             String name = fi.nameWithoutExtension();

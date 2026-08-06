@@ -1,24 +1,16 @@
 package mindustry.tools;
 
 import arc.*;
-import arc.backend.headless.*;
 import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.content.*;
-import mindustry.core.*;
-import mindustry.editor.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.io.*;
 import mindustry.logic.LExecutor.*;
-import mindustry.maps.Map;
 import mindustry.maps.*;
-import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
-
-import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -32,36 +24,8 @@ public class MapFixer{
         .findAll(f -> f.extEquals("msav"))
         .map(f -> f.path().replace(".msav", "").replace("maps/", "")).toArray(String.class));
 
-        ApplicationCore core = new ApplicationCore(){
-            @Override
-            public void setup(){
-                Core.settings.setDataDirectory(new Fi("../../tools/build/test_data"));
-                Core.bundle = I18NBundle.createBundle(Core.files.internal("bundles/bundle"), Locale.ENGLISH);
-                headless = true;
-                net = new Net(null);
-                tree = new FileTree();
-                Vars.init();
-                world = new World();
-                content.createBaseContent();
-                mods.loadScripts();
-                content.createModContent();
-
-                add(logic = new Logic());
-                add(netServer = new NetServer());
-
-                content.init();
-                editor = new MapEditor();
-            }
-
-            @Override
-            public void init(){
-                super.init();
-
-                fixMapNames();
-            }
-        };
-
-        new HeadlessApplication(core);
+        HeadlessSetup.setup();
+        fixMapNames();
     }
 
     static void fixMapNames(){

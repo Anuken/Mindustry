@@ -136,6 +136,10 @@ public class GlobalVars{
             put("@" + weather.name, weather);
         }
 
+        for(StatusEffect effect : Vars.content.statusEffects()){
+            put("@status-" + effect.name, effect);
+        }
+
         for(var entry : Colors.getColors().entries()){
             //ignore uppercase variants, they are duplicates
             if(Character.isUpperCase(entry.key.charAt(0))) continue;

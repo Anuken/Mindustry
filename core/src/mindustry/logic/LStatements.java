@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -327,7 +328,7 @@ public class LStatements{
                         }
                     });
                 }));
-            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2f).color(table.color);
         }
 
         @Override
@@ -1573,9 +1574,7 @@ public class LStatements{
     @RegisterStatement("status")
     public static class ApplyStatusStatement extends LStatement{
         public boolean clear;
-        public String effect = "wet", unit = "unit", duration = "10";
-
-        private static @Nullable String[] statusNames;
+        public String effect = "@status-wet", unit = "unit", duration = "10";
 
         @Override
         public void build(Table table){
@@ -1586,32 +1585,48 @@ public class LStatements{
                 build(table);
             }).size(80f, 40f).pad(4f).color(table.color);
 
-            if(statusNames == null){
-                statusNames = content.statusEffects().map(s -> s.name).toArray(String.class);
-            }
-
+            TextField field = field(table, effect, str -> {
+                effect = str;
+                build(table);
+            }).width(240f).wrap().get();
             table.button(b -> {
-                b.label(() -> token(effect)).grow().wrap().labelAlign(Align.center).center();
-                b.clicked(() -> showSelect(b, statusNames, effect, o -> {
-                    effect = o;
-                    build(table);
-                }, 2, c -> c.size(120f, 38f)));
-            }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
-
-            table.add(token(clear ? "from" : "to"));
+                b.image(Icon.pencilSmall);
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.left();
+                    for(StatusEffect status : content.statusEffects()){
+                        if(status == StatusEffects.none) continue;
+                        t.button(status.name, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
+                            effect = "@status-" + status.name;
+                            build(table);
+                            field.setText(effect);
+                            hide.run();
+                        }).size(240f, 40f).marginLeft(5f).padLeft(-1f).row();
+                    }
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2f).color(table.color);
 
             row(table);
 
-            fields(table, unit, str -> unit = str);
+            table.add(token(clear ? " from " : " to ")).left();
 
-            if(!clear && !(content.statusEffect(effect) != null && content.statusEffect(effect).permanent)){
+            fields(table, unit, str -> unit = str).left();
 
-                table.add(token("for"));
+            if(!clear && !isPermanent()){
+                row(table);
 
-                fields(table, duration, str -> duration = str);
+                table.add(token("for")).left();
 
-                table.add(token("sec"));
+                fields(table, duration, str -> duration = str).left();
+
+                table.add(token("sec")).left();
             }
+        }
+
+        private boolean isPermanent(){
+            if(!effect.startsWith("@status-")) return false;
+            StatusEffect status = content.statusEffect(effect.substring(8));
+            if(status == null) return false;
+            return status.permanent;
         }
 
         @Override
@@ -1621,7 +1636,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new ApplyEffectI(clear, effect, builder.var(unit), builder.var(duration));
+            return new ApplyEffectI(clear, builder.var(effect), builder.var(unit), builder.var(duration));
         }
 
         @Override
@@ -1913,10 +1928,14 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, CutsceneAction.all, action, o -> {
                     action = o;
                     rebuild(table);
-                }));
-            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
+                }, 3, cell -> cell.size(120f, 40f)));
+            }, Styles.logict, () -> {}).size(120f, 40f).padLeft(2).color(table.color);
 
             switch(action){
+                case active, getHud -> {
+                    table.add(" result ");
+                    fields(table, p1, str -> p1 = str);
+                }
                 case pan -> {
                     table.add(" x ");
                     fields(table, p1, str -> p1 = str);
@@ -1930,6 +1949,16 @@ public class LStatements{
                 }
                 case zoom -> {
                     table.add(token("level"));
+                    fields(table, p1, str -> p1 = str);
+                }
+                case shake -> {
+                    table.add(" amount ");
+                    fields(table, p1, str -> p1 = str);
+                    table.add(" duration ");
+                    fields(table, p2, str -> p2 = str);
+                }
+                case setHud -> {
+                    table.add(" shown ");
                     fields(table, p1, str -> p1 = str);
                 }
             }
@@ -2060,18 +2089,13 @@ public class LStatements{
         }
 
         @Override
-        public boolean privileged(){
-            return true;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new SetRateI(builder.var(amount));
         }
 
         @Override
         public LCategory category(){
-            return LCategory.world;
+            return LCategory.control;
         }
     }
 
@@ -2312,6 +2336,17 @@ public class LStatements{
                             if(++c % 6 == 0) i.row();
                         }
                     }),
+                    //status effects
+                    new Table(i -> {
+                        i.left();
+                        for(StatusEffect status : Vars.content.statusEffects()){
+                            if(!status.unlockedNow() || !status.show || status == StatusEffects.none) continue;
+                            i.button(status.name, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
+                                stype("@status-" + status.name);
+                                hide.run();
+                            }).size(240f, 40f).marginLeft(5f).row();
+                        }
+                    }),
                     //sensors
                     new Table(i -> {
                         for(LAccess property : LAccess.settable){
@@ -2323,7 +2358,7 @@ public class LStatements{
                     })
                     };
 
-                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.tree};
+                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.effect, Icon.tree};
                     Stack stack = new Stack(tables[selected]);
                     ButtonGroup<Button> group = new ButtonGroup<>();
 
@@ -2341,7 +2376,7 @@ public class LStatements{
                         }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
-                    t.add(stack).colspan(3).width(240f).left();
+                    t.add(stack).colspan(icons.length).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
