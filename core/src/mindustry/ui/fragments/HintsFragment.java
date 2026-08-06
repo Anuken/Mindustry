@@ -42,7 +42,7 @@ public class HintsFragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
+        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown();
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -252,18 +252,13 @@ public class HintsFragment{
             () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
         ),
 
-        generator(
-            () -> control.input.block == Blocks.combustionGenerator,
-            () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)
-        ),
-
         rebuildSelect(
             () -> state.rules.defaultTeam.data().plans.size >= 10,
             () -> control.input.isRebuildSelecting()
         ),
 
         guardian(
-            () -> state.boss() != null && isSerpulo() && state.boss().armor >= 4,
+            () -> state.boss() != null && isSerpulo() && state.boss().armor >= 4 && Blocks.salvo.unlocked() && !state.boss().isFlying(),
             () -> state.boss() == null
         ),
 

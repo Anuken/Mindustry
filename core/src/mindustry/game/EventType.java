@@ -6,9 +6,12 @@ import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.graphics.MultiPacker;
+import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
+import mindustry.ui.builder.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -78,16 +81,18 @@ public class EventType{
     public static class TurnEvent{}
     /** Called when the player places a line, mobile or desktop.*/
     public static class LineConfirmEvent{}
-    /** Called when a turret receives ammo, but only when the tutorial is active! */
-    public static class TurretAmmoDeliverEvent{}
-    /** Called when a core receives ammo, but only when the tutorial is active! */
-    public static class CoreItemDeliverEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
     /** Called *after* all content has been initialized. */
     public static class ContentInitEvent{}
     /** Called *after* all content has been added to the atlas, but before its pixmaps are disposed. */
-    public static class AtlasPackEvent{}
+    public static class AtlasPackEvent{
+        public final MultiPacker multiPacker;
+
+        public AtlasPackEvent(MultiPacker multiPacker){
+          this.multiPacker = multiPacker;
+        }
+    }
     /** Called *after* all mod content has been loaded, but before it has been initialized. */
     public static class ModContentLoadEvent{}
     /** Called when the client game is first loaded. */
@@ -104,12 +109,12 @@ public class EventType{
     /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
     public static class WorldLoadEndEvent{}
 
-    /** Called when a save loads custom patches. {@link #patches} can be modified in the event handler. */
-    public static class ContentPatchLoadEvent{
-        public final Seq<String> patches;
+    /** Called when a save loads custom data patches. {@link #assets} can be modified in the event handler. The array may be empty. */
+    public static class DataPatchLoadEvent{
+        public final Seq<DataAsset> assets;
 
-        public ContentPatchLoadEvent(Seq<String> patches){
-            this.patches = patches;
+        public DataPatchLoadEvent(Seq<DataAsset> assets){
+            this.assets = assets;
         }
     }
 
@@ -201,6 +206,19 @@ public class EventType{
             this.player = player;
             this.menuId = menuId;
             this.option = option;
+        }
+    }
+
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuBuilderOptionChooseEvent{
+        public final Player player;
+        public final int menuId;
+        public final MenuResult result;
+
+        public MenuBuilderOptionChooseEvent(Player player, int menuId, MenuResult result){
+            this.player = player;
+            this.menuId = menuId;
+            this.result = result;
         }
     }
 

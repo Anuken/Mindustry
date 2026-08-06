@@ -1,6 +1,7 @@
 package mindustry.ai.types;
 
 import arc.util.*;
+import mindustry.ai.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -28,11 +29,15 @@ public class RepairAI extends AIController{
             unit.controlWeapons(false);
         }
 
+        boolean hold = hasStance(UnitStance.holdPosition);
+
         if(target != null && target instanceof Building b && b.team == unit.team){
-            if(unit.type.circleTarget){
-                circleAttack(unit.type.circleTargetRadius);
-            }else if(!target.within(unit, unit.type.range * 0.65f)){
-                moveTo(target, unit.type.range * 0.65f);
+            if(!hold){
+                if(unit.type.circleTarget){
+                    circleAttack(unit.type.circleTargetRadius);
+                }else if(!target.within(unit, unit.type.range * 0.65f)){
+                    moveTo(target, unit.type.range * 0.65f);
+                }
             }
 
             if(!unit.type.circleTarget){
@@ -41,7 +46,7 @@ public class RepairAI extends AIController{
         }
 
         //not repairing
-        if(!(target instanceof Building)){
+        if(!(target instanceof Building) && !hold){
             if(timer.get(timerTarget4, 40)){
                 avoid = target(unit.x, unit.y, fleeRange, true, true);
             }

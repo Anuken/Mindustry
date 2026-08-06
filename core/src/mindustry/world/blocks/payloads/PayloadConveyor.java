@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.ctype.Content;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -31,7 +32,6 @@ public class PayloadConveyor extends Block{
         rotate = true;
         update = true;
         outputsPayload = true;
-        noUpdateDisabled = true;
         acceptsUnitPayloads = true;
         priority = TargetPriority.transport;
         envEnabled |= Env.space | Env.underwater;
@@ -118,7 +118,10 @@ public class PayloadConveyor extends Block{
             }else{
                 next = null;
             }
+            checkBlocked();
+        }
 
+        void checkBlocked(){
             int ntrns = 1 + size/2;
             Tile next = tile.nearby(Geometry.d4(rotation).x * ntrns, Geometry.d4(rotation).y * ntrns);
             blocked = (next != null && next.solid() && !(next.block().outputsPayload || next.block().acceptsPayload)) || (this.next != null && this.next.payloadCheck(rotation));
@@ -131,19 +134,20 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void updateTile(){
-            if(!enabled) return;
 
-            if(item != null){
-                item.update(null, this);
+            if(enabled){
+                if(item != null) item.update(null, this);
+                lastInterp = curInterp;
+                curInterp = fract();
+                //rollover skip
+                if(lastInterp > curInterp) lastInterp = 0f;
+                progress = time() % moveTime;
             }
 
-            lastInterp = curInterp;
-            curInterp = fract();
-            //rollover skip
-            if(lastInterp > curInterp) lastInterp = 0f;
-            progress = time() % moveTime;
-
             updatePayload();
+
+            if(!enabled) return;
+
             if(item != null && next == null){
                 PayloadBlock.pushOutput(item, progress / moveTime);
             }
@@ -156,6 +160,7 @@ public class PayloadConveyor extends Block{
                 boolean had = item != null;
 
                 if(valid && stepAccepted != curStep && item != null){
+                    checkBlocked();
                     if(next != null){
                         //trigger update forward
                         next.updateTile();
@@ -172,6 +177,7 @@ public class PayloadConveyor extends Block{
                         if(item.dump()){
                             item = null;
                             moved();
+                            NetServer.syncBuilding(this);
                         }
                     }
                 }
@@ -312,7 +318,8 @@ public class PayloadConveyor extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            read.f(); //why is progress written?
+            //for derelicts
+            progress = read.f();
             itemRotation = read.f();
             item = Payload.read(read);
         }

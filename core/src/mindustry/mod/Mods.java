@@ -32,7 +32,12 @@ import static mindustry.Vars.*;
 
 public class Mods implements Loadable{
     private static final String[] metaFiles = {"mod.json", "mod.hjson", "plugin.json", "plugin.hjson"};
-    private static final ObjectSet<String> blacklistedMods = ObjectSet.with("ui-lib", "braindustry");
+    //it would be nice to parse semver and have syntax like "<1.0.5" here, but mods clearly don't use semver and it's an inconsistent mess
+    private static final ObjectSet<String> blacklistedMods = ObjectSet.with(
+    "ui-lib", "braindustry", "schema", "scheme-size:1.0.5", "scheme-size:1.0.4", "scheme-size:1.0.3", "scheme-size:1.0.1", "scheme-size:1.0.0", "scheme-size:1.1.0", "scheme-size:1.0.4.1",
+    //new patch API as of build 159 breaks older versions of the patch editor
+    "patch-editor:1.10.1", "patch-editor:1.10.0", "patch-editor:1.9.5", "patch-editor:1.9.4", "patch-editor:1.9.3"
+    );
 
     private Json json = new Json();
     private @Nullable Scripts scripts;
@@ -100,13 +105,18 @@ public class Mods implements Loadable{
 
     /** Imports an external mod file. Folders are not supported here. */
     public LoadedMod importMod(Fi file) throws IOException{
+        return importMod(file, true);
+    }
+
+    /** Imports an external mod file. Folders are not supported here. */
+    public LoadedMod importMod(Fi file, boolean forceEnable) throws IOException{
         //for some reason, android likes to add colons to file names, e.g. primary:ExampleJavaMod.jar, which breaks dexing
         String baseName = file.nameWithoutExtension().replace(':', '_').replace(' ', '_');
         String finalName = baseName;
         //find a name to prevent any name conflicts
         int count = 1;
         while(modDirectory.child(finalName + ".zip").exists()){
-            finalName = baseName + "" + count++;
+            finalName = baseName + count++;
         }
 
         Fi dest = modDirectory.child(finalName + ".zip");
@@ -121,7 +131,7 @@ public class Mods implements Loadable{
             lastOrderedMods = null;
             requiresReload = true;
             //enable the mod on import
-            Core.settings.put("mod-" + loaded.name + "-enabled", true);
+            if(forceEnable) Core.settings.put("mod-" + loaded.name + "-enabled", true);
             sortMods();
             //try to load the mod's icon so it displays on import
             Core.app.post(() -> loadIcon(loaded));
@@ -160,6 +170,8 @@ public class Mods implements Loadable{
 
             packSprites(packer, sprites, mod, true, tasks, textureResize);
             packSprites(packer, overrides, mod, false, tasks, textureResize);
+
+            if(mod.main != null) mod.main.packSprites(packer);
 
             Log.debug("Packed @ images for mod '@'.", sprites.size + overrides.size, mod.meta.name);
             totalSprites[0] += sprites.size + overrides.size;
@@ -260,7 +272,7 @@ public class Mods implements Loadable{
 
                 @Override
                 public AtlasRegion find(String name){
-                    var base = packer.get(name);
+                    var base = packer.getPacked(name);
 
                     if(base != null){
                         var reg = new AtlasRegion(shadow.find(name).texture, base.x, base.y, base.width, base.height);
@@ -284,15 +296,15 @@ public class Mods implements Loadable{
 
                 @Override
                 public boolean has(String s){
-                    return shadow.has(s) || packer.get(s) != null;
+                    return shadow.has(s) || packer.getPacked(s) != null;
                 }
 
                 //return the *actual* pixmap regions, not the disposed ones.
                 @Override
                 public PixmapRegion getPixmap(AtlasRegion region){
-                    PixmapRegion out = packer.get(region.name);
+                    PixmapRegion out = packer.getPacked(region.name);
                     //this should not happen in normal situations
-                    if(out == null) return packer.get("error");
+                    if(out == null) return packer.getPacked("error");
                     return out;
                 }
             };
@@ -336,7 +348,7 @@ public class Mods implements Loadable{
 
             packer.printStats();
 
-            Events.fire(new AtlasPackEvent());
+            Events.fire(new AtlasPackEvent(packer));
 
             packer.dispose();
 
@@ -352,13 +364,17 @@ public class Mods implements Loadable{
 
     private void loadIcon(LoadedMod mod){
         //try to load icon for each mod that can have one
-        if(mod.root.child("icon.png").exists() && !headless){
-            try{
-                mod.iconTexture = new Texture(mod.root.child("icon.png"));
-                mod.iconTexture.setFilter(TextureFilter.linear);
-            }catch(Throwable t){
-                Log.err("Failed to load icon for mod '" + mod.name + "'.", t);
-            }
+        if(headless) return;
+
+        Fi icon = mod.root.child("icon.png");
+        if(!icon.exists()) icon = mod.root.child("preview.png");
+        if(!icon.exists()) return;
+
+        try{
+            mod.iconTexture = new Texture(icon);
+            mod.iconTexture.setFilter(TextureFilter.linear);
+        }catch(Throwable t){
+            Log.err("Failed to load icon for mod '@'.", mod.name, t);
         }
     }
 
@@ -370,6 +386,8 @@ public class Mods implements Loadable{
             String
             baseName = file.nameWithoutExtension(),
             regionName = baseName.contains(".") ? baseName.substring(0, baseName.indexOf(".")) : baseName;
+
+            if(baseName.isEmpty()) continue; //fixes #11855 in case anyone tries to do it again
 
             if(!prefix && !Core.atlas.has(regionName)){
                 Log.warn("Sprite '@' in mod '@' attempts to override a non-existent sprite.", regionName, mod.name);
@@ -757,66 +775,7 @@ public class Mods implements Loadable{
     }
 
     private void downloadDependencies(Seq<String> toImport){
-        Seq<String> remaining = toImport.copy();
-        ui.mods.importDependencies(remaining, () -> {
-            toImport.removeAll(remaining);
-            if(toImport.any()) requiresReload = true;
-            displayDependencyImportStatus(remaining, toImport);
-        });
-    }
-
-    //TODO move to another class, Mods.java should not handle UI
-    private void displayDependencyImportStatus(Seq<String> failed, Seq<String> success){
-        new Dialog(""){{
-            setFillParent(true);
-            cont.margin(15);
-
-            cont.add("@mod.dependencies.status").color(Pal.accent).center();
-            cont.row();
-            cont.image().width(300f).pad(2).height(4f).color(Pal.accent);
-            cont.row();
-
-            cont.pane(p -> {
-                if(success.any()){
-                    p.add("@mod.dependencies.success").color(Pal.accent).wrap().fillX().left().labelAlign(Align.left);
-                    p.row();
-                    p.table(t -> {
-                        success.each(d -> {
-                            t.add("[accent] > []" + d).wrap().growX().left().labelAlign(Align.left);
-                            t.row();
-                        });
-                    }).growX().padBottom(8f).padLeft(8f);
-                    p.row();
-                }
-
-                if(failed.any()){
-                    p.add("@mod.dependencies.failure").color(Color.scarlet).wrap().fillX().left().labelAlign(Align.left);
-                    p.row();
-                    p.table(t -> {
-                        failed.each(d -> {
-                            t.add("[scarlet] > []" + d).wrap().growX().left().labelAlign(Align.left);
-                            t.row();
-                        });
-                    }).growX().padBottom(8f).padLeft(8f);
-                }
-            }).fillX();
-            cont.row();
-
-            if(success.any()){
-                cont.image().width(300f).pad(2).height(4f).color(Pal.accent);
-                cont.row();
-                cont.add("@mods.reloadexit").center();
-                cont.row();
-
-                hidden(() -> {
-                    Log.info("Exiting to reload mods after dependency auto-import.");
-                    Core.app.exit();
-                });
-            }
-
-            cont.button("@ok", this::hide).size(300, 50);
-            closeOnBack();
-        }}.show();
+        ui.mods.browser.downloadDependencies(toImport, results -> requiresReload |= results.any());
     }
 
     public void reload(){
@@ -1006,7 +965,13 @@ public class Mods implements Loadable{
         return result;
     }
 
+    //TODO: deprecate?
     public Seq<LoadedMod> list(){
+        return mods;
+    }
+
+    /** All mods, including disabled ones. */
+    public Seq<LoadedMod> getMods(){
         return mods;
     }
 
@@ -1183,7 +1148,8 @@ public class Mods implements Loadable{
                 !skipModLoading() &&
                 Core.settings.getBool("mod-" + baseName + "-enabled", true) &&
                 Version.isAtLeast(meta.minGameVersion) &&
-                (meta.getMinMajor() >= minJavaModGameVersion || headless) &&
+                (meta.getMinMajor() >= minJavaModGameVersion || headless || meta.legacyCompatible) &&
+                !meta.isBlacklisted() &&
                 !skipModCode &&
                 initialize
             ){
@@ -1321,12 +1287,12 @@ public class Mods implements Loadable{
 
         /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
         public boolean isBlacklisted(){
-            return blacklistedMods.contains(name);
+            return meta.isBlacklisted();
         }
 
         /** @return whether this mod is outdated, i.e. not compatible with v8. */
         public boolean isOutdated(){
-            return getMinMajor() < (isJava() ? minJavaModGameVersion : minModGameVersion);
+            return getMinMajor() < (isJava() ? minJavaModGameVersion : minModGameVersion) && !meta.legacyCompatible;
         }
 
         public int getMinMajor(){
@@ -1427,8 +1393,15 @@ public class Mods implements Loadable{
         public float texturescale = 1.0f;
         /** If true, bleeding is skipped and no content icons are generated. */
         public boolean pregenerated;
-        /** If set, load the mod content in this order by content names */
+        /** If set, load the mod content in this order by content names. */
         public String[] contentOrder;
+        /** Mod from an older major version that is compatible with the latest one as well. */
+        public boolean legacyCompatible;
+
+        /** Some mods are known to cause issues with the game; this detects and returns whether a mod is manually blacklisted. */
+        public boolean isBlacklisted(){
+            return blacklistedMods.contains(name) || blacklistedMods.contains(name + ":" + version);
+        }
 
         public String shortDescription(){
             return Strings.truncate(subtitle == null ? (description == null || description.length() > maxModSubtitleLength ? "" : description) : subtitle, maxModSubtitleLength, "...");

@@ -176,7 +176,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Base abstract class for any in-map objective. */
-    public static abstract class MapObjective{
+    public static abstract class MapObjective implements AllowSerialization{
         public boolean hidden;
         public @Nullable @Multiline String details;
         public @Nullable @LogicCode String completionLogicCode;
@@ -209,9 +209,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             state.rules.objectiveFlags.addAll(flagsAdded);
             completed = true;
 
-            if(completionLogicCode != null && !completionLogicCode.isEmpty()){
-                LExecutor.runLogicScript(completionLogicCode);
-            }
+            LExecutor.runLogicScript(completionLogicCode);
         }
 
         /** @return true if all {@link #parents} are completed, rendering this objective able to execute. */
@@ -1255,6 +1253,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             if(fetchedRegion == null) setTexture(texture.value);
             prepareTexture(this, texture.value);
 
+            float width = this.width, height = this.height;
+
             // Zero width/height scales marker to original texture's size
             if(Mathf.equal(width, 0f)) width = fetchedRegion.width * fetchedRegion.scl() * Draw.xscl;
             if(Mathf.equal(height, 0f)) height = fetchedRegion.height * fetchedRegion.scl() * Draw.yscl;
@@ -1401,8 +1401,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }else if(texture instanceof UnlockableContent u){
             out.set(u.fullIcon);
         }else if(texture instanceof LogicDisplayBuild d && d.isAdded()){
-            d.ensureBuffer();
-            d.getBufferRegion(out);
+            d.rootDisplay.ensureBuffer();
+            d.rootDisplay.getBufferRegion(out);
         }else if(texture instanceof CanvasBuild c && c.isAdded()){
             c.updateTexture();
             if(c.texture != null) out.set(c.texture);

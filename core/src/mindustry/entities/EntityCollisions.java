@@ -121,13 +121,9 @@ public class EntityCollisions{
 
     @SuppressWarnings("unchecked")
     public <T extends Hitboxc> void updatePhysics(EntityGroup<T> group){
-        var tree = group.tree();
-        tree.clear();
+        group.tree().fill(group.rawSeq());
 
-        group.each(s -> {
-            s.updateLastPosition();
-            tree.insert(s);
-        });
+        group.each(Hitboxc::updateLastPosition);
     }
 
     public static boolean legsSolid(int x, int y){

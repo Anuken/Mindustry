@@ -224,6 +224,10 @@ public abstract class LStatement{
     }
 
     protected static void showSelectTable(Button b, Cons2<Table, Runnable> hideCons){
+        showSelectTable(b, hideCons, () -> {});
+    }
+
+    protected static void showSelectTable(Button b, Cons2<Table, Runnable> hideCons, Runnable hideCallback){
         Table t = new Table(Tex.paneSolid){
             @Override
             public float getPrefHeight(){
@@ -243,6 +247,7 @@ public abstract class LStatement{
         Runnable hide = () -> {
             Core.app.post(hitter::remove);
             t.actions(Actions.fadeOut(0.3f, Interp.fade), Actions.remove());
+            hideCallback.run();
         };
 
         hitter.fillParent = true;
@@ -256,6 +261,7 @@ public abstract class LStatement{
                 Core.app.post(() -> {
                     hitter.remove();
                     t.remove();
+                    hideCallback.run();
                 });
                 return;
             }

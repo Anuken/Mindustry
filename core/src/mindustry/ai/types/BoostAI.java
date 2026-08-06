@@ -16,6 +16,8 @@ public class BoostAI extends AIController{
             if(ai.attackTarget != null && unit.within(ai.attackTarget, unit.range())){
                 unit.command().command(UnitCommand.moveCommand);
             }
+        }else{
+            unit.updateBoosting(true, true);
         }
     }
 }

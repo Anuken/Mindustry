@@ -103,7 +103,6 @@ public class BuildPayload implements Payload{
     @Override
     public void set(float x, float y, float rotation){
         build.set(x, y);
-        build.payloadRotation = rotation;
     }
 
     @Override
