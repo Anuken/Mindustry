@@ -53,7 +53,6 @@ public class Lightning{
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){
-            // Pass resolved statusChance via data field so created lightning bullets inherit it
             hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, statusChance);
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
