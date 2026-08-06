@@ -43,7 +43,6 @@ public class UiDslParser{
             return;
         }
 
-        //TODO: throws on the client upon invalid value, that's probably fine?
         UiKey key;
         try{
             key = UiKey.valueOf(ident);

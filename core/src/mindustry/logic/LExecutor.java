@@ -124,6 +124,7 @@ public class LExecutor{
     public void load(LAssembler builder){
         stop = false;
         nameMap = null;
+        //retain constants that are links, which, by convention, don't start with @ (builtin) or _ (numeric constant)
         vars = builder.vars.values().toSeq().retainAll(var -> !var.constant || var.name.charAt(0) != '_' && var.name.charAt(0) != '@').toArray(LVar.class);
         for(int i = 0; i < vars.length; i++){
             vars[i].id = i;
