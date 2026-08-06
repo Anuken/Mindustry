@@ -34,12 +34,12 @@ abstract class StatusComp implements Posc{
     }
 
     /** Adds a status effect to this unit. */
-    public void apply(StatusEffect effect, float duration, boolean shorten){
-        apply(effect, duration, shorten)
+    public void apply(StatusEffect effect, float duration){
+        apply(effect, duration, false);
     }
 
-    public void apply(StatusEffect effect, float duration){
-        applyStatus(effect, duration, false, 1f);
+    public void apply(StatusEffect effect, float duration, boolean shorten){
+        applyStatus(effect, duration, shorten, 1f);
     }
 
     public float getDuration(StatusEffect effect){
@@ -60,7 +60,7 @@ abstract class StatusComp implements Posc{
         }
 
         // Don't apply if the chance fails
-        // TODO: Multiple applications if chance > 1f ?
+        // TODO: Multiple applications if chance > 1f ? only useful for reactive effects
         if(!Mathf.chance(chance)) return;
 
         //unlock status effects regardless of whether they were applied to friendly units
