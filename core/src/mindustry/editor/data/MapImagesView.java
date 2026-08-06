@@ -296,6 +296,7 @@ public class MapImagesView implements AssetView{
                     b.button(Icon.trash, istyle, () -> {
                         ui.showConfirm("@asset.image.delete.confirm", () -> {
                             Core.atlas.getRegionMap().remove(regionPrefix + image.name);
+                            Core.atlas.getDrawables().remove(regionPrefix + image.name);
                             getImages().remove(image);
                             diag.rebuild();
                         });
