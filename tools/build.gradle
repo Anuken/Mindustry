@@ -181,7 +181,7 @@ tasks.register('updateScripts', JavaExec){
     mainClass = "mindustry.tools.ScriptMainGenerator"
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
-    workingDir = "../"
+    workingDir = "../core/assets"
 }
 
 tasks.register('fixMaps', JavaExec){

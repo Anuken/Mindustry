@@ -11,6 +11,7 @@ import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
+import mindustry.ui.builder.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -21,6 +22,7 @@ public class EventType{
     public enum Trigger{
         shock,
         cannotUpgrade,
+        fireCreate,
         openConsole,
         blastFreeze,
         impactPower,
@@ -205,6 +207,19 @@ public class EventType{
             this.player = player;
             this.menuId = menuId;
             this.option = option;
+        }
+    }
+
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuBuilderOptionChooseEvent{
+        public final Player player;
+        public final int menuId;
+        public final MenuResult result;
+
+        public MenuBuilderOptionChooseEvent(Player player, int menuId, MenuResult result){
+            this.player = player;
+            this.menuId = menuId;
+            this.result = result;
         }
     }
 

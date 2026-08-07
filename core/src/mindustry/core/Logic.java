@@ -461,31 +461,38 @@ public class Logic implements ApplicationListener{
     }
 
     protected void updateEntities(){
+        boolean editor = state.isEditor();
+
         PerfCounter.entityUpdate.begin();
 
         PerfCounter.entityMisc.begin();
         Groups.updatePooling();
         Groups.bullet.updatePhysics();
         Groups.unit.updatePhysics();
-        Groups.all.update();
+        Groups.player.update();
+        Groups.effect.update();
+        if(!editor) Groups.all.update();
         PerfCounter.entityMisc.end();
 
         PerfCounter.unitUpdate.begin();
-        Groups.unit.update();
+        if(editor){
+            Groups.unit.update(Unitc::isPlayer);
+        }else{
+            Groups.unit.update();
+        }
         PerfCounter.unitUpdate.end();
 
         PerfCounter.powerUpdate.begin();
-        if(!state.isEditor()) Groups.powerGraph.update();
+        if(!editor) Groups.powerGraph.update();
         PerfCounter.powerUpdate.end();
 
         PerfCounter.buildingUpdate.begin();
-        if(!state.isEditor()) Groups.build.update();
+        if(!editor) Groups.build.update();
         PerfCounter.buildingUpdate.end();
 
         PerfCounter.bulletUpdate.begin();
-        Groups.bullet.update();
-
-        Groups.bullet.collide();
+        if(!editor) Groups.bullet.update();
+        if(!editor) Groups.bullet.collide();
         PerfCounter.bulletUpdate.end();
 
         PerfCounter.entityUpdate.end();

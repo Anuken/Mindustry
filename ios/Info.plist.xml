@@ -28,6 +28,8 @@
         <string>????</string>
         <key>CFBundleVersion</key>
         <string>${app.build}</string>
+        <key>ITSAppUsesNonExemptEncryption</key>
+        <false/>
         <key>LSRequiresIPhoneOS</key>
         <true/>
         <key>UIViewControllerBasedStatusBarAppearance</key>

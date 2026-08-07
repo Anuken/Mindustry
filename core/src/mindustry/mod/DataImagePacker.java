@@ -164,7 +164,6 @@ public class DataImagePacker{
         Core.atlas.getTextures().addAll(patchAtlas.getTextures());
         Core.atlas.getRegionMap().putAll(patchAtlas.getRegionMap());
         //getRegions is intentionally not modified, it's a hassle to manage, O(n) to unapply, and not used anywhere important. there's no point.
-        //the drawable map isn't used, and thus not modified either
 
         Log.debug("[Patch Atlas] Time to pack: @ms", Time.elapsed());
     }
@@ -172,10 +171,13 @@ public class DataImagePacker{
     public void unload(){
         if(patchAtlas != null){
             for(var texture : patchAtlas.getTextures()){
-                patchAtlas.getTextures().remove(texture);
+                if(texture != null) patchAtlas.getTextures().remove(texture);
             }
             for(var region : patchAtlas.getRegions()){
-                patchAtlas.getRegionMap().remove(region.name);
+                if(region != null){
+                    patchAtlas.getRegionMap().remove(region.name);
+                    patchAtlas.getDrawables().remove(region.name);
+                }
             }
 
             patchAtlas.dispose();
