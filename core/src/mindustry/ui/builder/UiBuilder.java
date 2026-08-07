@@ -265,6 +265,7 @@ public class UiBuilder{
         public ButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
         public ButtonBuilder group(String group){ return prop(UiKey.group, group); }
+        public ButtonBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 
     public static class ImageButtonBuilder extends NodeBuilder<ImageButtonBuilder>{
@@ -275,6 +276,7 @@ public class UiBuilder{
         public ImageButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ImageButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
         public ImageButtonBuilder group(String group){ return prop(UiKey.group, group); }
+        public ImageButtonBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 
     public static class FieldBuilder extends NodeBuilder<FieldBuilder>{
@@ -325,5 +327,6 @@ public class UiBuilder{
         public ButtonTableBuilder margin(float m){ return prop(UiKey.margin, m); }
         public ButtonTableBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
         public ButtonTableBuilder group(String group){ return prop(UiKey.group, group); }
+        public ButtonTableBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 }
