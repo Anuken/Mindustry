@@ -30,8 +30,10 @@ public class NuclearReactor extends PowerGenerator{
     public float itemDuration = 120;
     /** heating per frame * fullness */
     public float heating = 0.01f;
-    /** max heat this block can output per side */
+    /** max heat this block can output */
     public float heatOutput = 12f;
+    /** whether to scale heat output (not base heat!) with timescale */
+    public boolean scaleHeat = true;
     /** rate at which heat progress increases */
     public float heatWarmupRate = 1f;
     /** rate at which fuel consumption scales with heat */
@@ -102,6 +104,7 @@ public class NuclearReactor extends PowerGenerator{
         public float heat;
         public float heatLastFrame;
         public float heatProgress;
+        public float heatOutScaled = heatOutput;
         public float flash;
         public float smoothLight;
 
@@ -137,6 +140,7 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
+            if(scaleHeat) heatOutScaled = Mathf.approachDelta(heatOutScaled, heatOutput * timeScale, heatWarmupRate * delta());
             heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * ((enabled && productionEfficiency > 0) ? 1f : 0f), heatWarmupRate * delta()) : 0f;
 
             if(heat >= 0.999f){
@@ -147,7 +151,7 @@ public class NuclearReactor extends PowerGenerator{
 
         @Override
         public float heatFrac(){
-            return heatProgress / heatOutput;
+            return heatProgress / heatOutScaled;
         }
 
         @Override
@@ -195,15 +199,22 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(heat);
+            write.f(heatOutScaled);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             heat = read.f();
+            if(revision >= 2) heatOutScaled = read.f();
         }
     }
 }
