@@ -148,7 +148,10 @@ public class KeybindDialog extends Dialog{
             rebindAxis = false;
         }
     }
-
+    
+    private String getKeyName(KeyCode code){
+        return bundle.get("key." + code.name(), code.getName());
+    }
     private void openDialog( KeyBind name){
         rebindDialog = new Dialog(rebindAxis ? bundle.get("keybind.press.axis") : bundle.get("keybind.press"));
 
