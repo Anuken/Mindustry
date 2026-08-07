@@ -22,6 +22,7 @@ public class EventType{
     public enum Trigger{
         shock,
         cannotUpgrade,
+        fireCreate,
         openConsole,
         blastFreeze,
         impactPower,

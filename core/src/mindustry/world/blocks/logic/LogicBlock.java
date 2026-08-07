@@ -91,7 +91,11 @@ public class LogicBlock extends Block{
             int x = lbuild.tileX(), y = lbuild.tileY();
             int oldSize = entity.links.size;
 
-            entity.links.removeAll(l -> world.build(l.x, l.y) == lbuild);
+            entity.links.removeAll(l -> {
+                boolean remove = world.build(l.x, l.y) == lbuild;
+                if(remove) l.trySet(entity.executor, null);
+                return remove;
+            });
 
             if(oldSize > entity.links.size){ //check whether any were removed
                 //re-enable the target when unlinking
@@ -99,10 +103,12 @@ public class LogicBlock extends Block{
                     lbuild.enabled = true;
                 }
             }else{
-                entity.links.add(new LogicLink(x, y, entity.findLinkName(lbuild.block), true));
+                LogicLink link = new LogicLink(x, y, entity.findLinkName(lbuild.block), true);
+                link.trySet(entity.executor, lbuild);
+                entity.links.add(link);
             }
 
-            entity.updateCode(entity.code, true, null);
+            entity.updateLinks();
         });
     }
 
@@ -233,18 +239,10 @@ public class LogicBlock extends Block{
 
         public void trySet(LExecutor exec, Object value){
             if(logicVar != null){
-                logicVar.setconst(value);
+                logicVar.setlink(value);
             }else{
-                var foundVar = exec.optionalVar(name);
-                if(foundVar != null){
-                    if(value != null){
-                        //should now become const as it is now a valid link
-                        //note: this will never become non-const even if invalidated
-                        //there isn't really a good reason to use these variables anyway, and it is an edge case
-                        foundVar.constant = true;
-                    }
-                    foundVar.setconst(value);
-                }
+                logicVar = exec.optionalVar(name);
+                if(logicVar != null) logicVar.setlink(value);
             }
         }
 

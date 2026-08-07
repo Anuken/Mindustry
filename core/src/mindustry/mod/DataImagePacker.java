@@ -147,7 +147,6 @@ public class DataImagePacker{
         packer.forceDispose();
 
         //getRegions is intentionally not modified, it's a hassle to manage, O(n) to unapply, and not used anywhere important. there's no point.
-        //the drawable map isn't used, and thus not modified either
 
         Log.debug("[Patch Atlas] Time to pack: @ms", Time.elapsed());
     }
@@ -156,6 +155,7 @@ public class DataImagePacker{
         if(addedRegions != null){
             for(var region : addedRegions){
                 Core.atlas.getRegionMap().remove(region.name);
+                Core.atlas.getDrawables().remove(region.name);
             }
             addedRegions = null;
         }
