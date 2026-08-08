@@ -92,7 +92,7 @@ public class MapFixer{
 
                 { //'escelating' typo check
                     Seq<TimerObjective> timers = state.rules.objectives.all.select(m -> m instanceof TimerObjective t && !m.hidden && t.text != null &&
-                    !t.text.isEmpty() && t.text.trim().equals("@objective.enemyescalating")).as();
+                    !t.text.isEmpty() && t.text.trim().equals("@objective.enemyescelating")).as();
 
                     if(!timers.isEmpty()){
                         Log.warn("@: Typo in objective: @", map.name(), timers.toString(", ", t -> "'" + t.text + "'"));
