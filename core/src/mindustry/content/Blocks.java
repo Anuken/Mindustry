@@ -2083,14 +2083,15 @@ public class Blocks{
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.silicon, 1, Items.graphite, 1));
             health = 90;
-            speed = 4f / 60f;
-            itemCapacity = 10;
+            speed = 4.16f / 60f;
+            itemCapacity = 12;
+            displayedSpeed = 48f;
         }};
 
         armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 280;
-            speed = 0.08f;
+            speed = 0.0801f;
             displayedSpeed = 10f;
         }};
 
@@ -2239,6 +2240,7 @@ public class Blocks{
             //TODO different base speed/item capacity?
             speed = 5f / 60f;
             itemCapacity = 10;
+            displayedSpeed = 48f;
 
             outputRouter = false;
             hasPower = true;
