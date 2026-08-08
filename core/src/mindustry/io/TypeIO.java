@@ -24,6 +24,8 @@ import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
+import mindustry.ui.builder.*;
+import mindustry.ui.builder.UiBuilder.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.payloads.*;
@@ -268,6 +270,81 @@ public class TypeIO{
         };
     }
 
+    public static void writeUiBuilder(Writes writes, NodeBuilder<?> node){
+        node.write(writes);
+    }
+
+    public static NodeBuilder<?> readUiBuilder(Reads reads){
+        return NodeBuilder.read(reads);
+    }
+
+    public static void writeMenuResult(Writes writes, MenuResult result){
+        writes.l(result.token);
+
+        writeString(writes, result.result);
+
+        writes.s(Math.min(MenuResult.maxTotalValues, result.values.size));
+        int i = 0;
+        for(var entry : result.values){
+            if(++i > MenuResult.maxTotalValues){
+                break;
+            }
+
+            writes.str(entry.key);
+            if(entry.value instanceof Float f){
+                writes.b(0);
+                writes.f(f);
+            }else if(entry.value instanceof Boolean b){
+                writes.b(1);
+                writes.bool(b);
+            }else if(entry.value instanceof String s){
+                writes.b(2);
+                writes.str(s);
+            }else{
+                throw new ArcRuntimeException("Unknown object type: " + entry.value);
+            }
+        }
+    }
+
+    public static MenuResult readMenuResult(Reads read){
+        MenuResult result = new MenuResult();
+
+        result.token = read.l();
+
+        //would be nice to count bytes but sadly that's not really viable here
+        int remainingChars = MenuResult.maxTotalStringLen;
+
+        byte exists = read.b();
+        if(exists != 0){
+            result.result = read.str(MenuResult.maxResultLen);
+            remainingChars -= result.result.length();
+        } //else, no result, remains null
+
+        int entries = read.us();
+        if(entries > MenuResult.maxTotalValues) throw new ArcRuntimeException("UI result entry count exceeds max entries: " + entries);
+
+        for(int i = 0; i < entries; i++){
+            if(remainingChars <= 0) throw new ArcRuntimeException("Too many long strings in MenuResult, reduce your amount of elements/IDs.");
+            String key = read.str(Math.min(remainingChars, MenuResult.maxValueLen));
+            remainingChars -= key.length();
+
+            byte type = read.b();
+
+            switch(type){
+                case 0 -> result.values.put(key, read.f());
+                case 1 ->  result.values.put(key, read.bool());
+                case 2 -> {
+                    if(remainingChars <= 0) throw new ArcRuntimeException("Too many long strings in MenuResult, reduce your amount of elements/IDs.");
+                    String value = read.str(Math.min(remainingChars, MenuResult.maxValueLen));
+                    remainingChars -= value.length();
+                    result.values.put(key, value);
+                }
+                default -> throw new ArcRuntimeException("Unknown UI entry type: " + type);
+            }
+        }
+        return result;
+    }
+
     public static void writePayload(Writes writes, Payload payload){
         Payload.write(payload, writes);
     }
@@ -314,6 +391,12 @@ public class TypeIO{
 
     public static Ability[] readAbilities(Reads read, Ability[] abilities){
         byte len = read.b();
+
+        if(len != abilities.length){
+            abilities = new Ability[len];
+            for(int i = 0; i < len; i++) abilities[i] = new EmptyDataAbility();
+        }
+
         for(int i = 0; i < len; i++){
             float data = read.f();
             if(abilities.length > i){
@@ -519,7 +602,7 @@ public class TypeIO{
     public static Queue<BuildPlan> readPlansQueue(Reads read){
         int used = read.i();
         if(used == -1) return null;
-        if(used >= maxArraySize) throw new RuntimeException("Queue too long: " + used);
+        //this is ONLY used in saves, so don't enforce a max size, it can be anything.
         var out = new Queue<BuildPlan>();
         for(int i = 0; i < used; i++){
             out.add(readPlan(read));
@@ -624,6 +707,7 @@ public class TypeIO{
             int x = read.us();
             int y = read.us();
             Block block = Vars.content.block(read.us());
+            if(block == null) throw new ArcRuntimeException("Invalid block ID in block plans! Client is likely using an incorrectly configured mod.");
             int rotation = (block.rotate ? read.b() : 0);
             Object config = readClientPlanConfig(read);
             BuildPlan plan = new BuildPlan(x, y, rotation, block, config);
@@ -1178,6 +1262,22 @@ public class TypeIO{
         int[] out = new int[length];
         for(int i = 0; i < length; i++){
             out[i] = read.i();
+        }
+        return out;
+    }
+
+    public static void writeShorts(Writes write, short[] ints){
+        write.s((short)ints.length);
+        for(short i : ints){
+            write.s(i);
+        }
+    }
+
+    public static short[] readShorts(Reads read){
+        short length = read.s();
+        short[] out = new short[length];
+        for(int i = 0; i < length; i++){
+            out[i] = read.s();
         }
         return out;
     }

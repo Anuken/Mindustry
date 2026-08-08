@@ -63,7 +63,7 @@ public class ContinuousTurret extends Turret{
 
         @Override
         public boolean shouldConsume(){
-            return isShooting();
+            return isShooting;
         }
 
         @Override
@@ -72,16 +72,19 @@ public class ContinuousTurret extends Turret{
         }
 
         @Override
-        public void updateTile(){
-            super.updateTile();
-
+        public float getAmmoFraction(){
             //TODO unclean way of calculating ammo fraction to display
             float ammoFract = efficiency;
             if(findConsumer(f -> f instanceof ConsumeLiquidBase) instanceof ConsumeLiquid cons){
                 ammoFract = Math.min(ammoFract, liquids.get(cons.liquid) / liquidCapacity);
             }
 
-            unit.ammo(unit.type().ammoCapacity * ammoFract);
+            return ammoFract;
+        }
+
+        @Override
+        public void updateTile(){
+            super.updateTile();
 
             bullets.removeAll(b -> !b.bullet.isAdded() || b.bullet.type == null || b.bullet.owner != this);
 
@@ -120,7 +123,7 @@ public class ContinuousTurret extends Turret{
                 entry.bullet.damage = entry.bullet.type.damage * Math.min(efficiency, 1f) * timeScale * entry.bullet.damageMultiplier();
             }
 
-            if(isShooting() && hasAmmo()){
+            if(isShooting && hasAmmo()){
                 entry.bullet.time = entry.bullet.lifetime * entry.bullet.type.optimalLifeFract * Math.min(shootWarmup, efficiency);
                 entry.bullet.keepAlive = true;
             }

@@ -1,5 +1,5 @@
 name: Bug report
-description: The type of device you were playing on
+description: An issue with the game.
 labels: ["bug"]
 
 body:

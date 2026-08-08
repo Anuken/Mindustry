@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.async.*;
@@ -29,6 +30,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
+import static java.lang.Float.NaN;
 import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
@@ -38,7 +40,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     static final float warpDst = 8f;
 
     @Import boolean dead, disarmed;
-    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, ammo, dragMultiplier, armorOverride, speedMultiplier;
+    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, dragMultiplier, armorOverride, speedMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
@@ -202,6 +204,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return rotation;
     }
 
+    public float ammof(){
+        return 1f;
+    }
+
     @Override
     public boolean displayable(){
         return type.hoverable;
@@ -209,9 +215,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     @Replace
-    public boolean isSyncHidden(Player player){
+    public boolean isSyncHidden(Team team){
         //shooting reveals position so bullets can be seen
-        return !isShooting() && inFogTo(player.team());
+        return !isShooting() && inFogTo(team);
     }
 
     @Override
@@ -265,8 +271,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case health -> health;
             case shield -> shield;
             case maxHealth -> maxHealth;
-            case ammo -> !state.rules.unitAmmo ? type.ammoCapacity : ammo;
-            case ammoCapacity -> type.ammoCapacity;
+            case flying -> isFlying() ? 1f : 0f;
             case x -> World.conv(x);
             case y -> World.conv(y);
             case velocityX -> vel.x * 60f / tilesize;
@@ -301,9 +306,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             case selectedRotation -> controller instanceof Player p ? p.selectedRotation : 0;
-            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : Float.NaN;
-            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : Float.NaN;
-            default -> Float.NaN;
+            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : NaN;
+            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : NaN;
+            default -> NaN;
         };
     }
 
@@ -339,7 +344,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                     (pay.payloads().isEmpty() ? 0 :
                     pay.payloads().count(p -> p instanceof BuildPayload bp && bp.build.block == b)) : 0;
         }
-        return Float.NaN;
+        if(content instanceof StatusEffect s){
+            return hasEffect(s) ? getDuration(s) / 60 : 0;
+        }
+        return NaN;
     }
 
     @Override
@@ -411,6 +419,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(content instanceof Item item){
             stack.item = item;
             stack.amount = Mathf.clamp((int)value, 0, type.itemCapacity);
+        }
+        if(content instanceof StatusEffect effect){
+            setDuration(effect, (float)value * 60f);
         }
     }
 
@@ -534,10 +545,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         this.hitSize = type.hitSize;
 
         if(mounts().length != type.weapons.size) setupWeapons(type);
-        if(abilities.length != type.abilities.size){
+        if(abilities.length != type.abilities.size || (abilities.length > 0 && abilities[0] instanceof EmptyDataAbility)){
+            var old = abilities;
             abilities = new Ability[type.abilities.size];
             for(int i = 0; i < type.abilities.size; i ++){
                 abilities[i] = type.abilities.get(i).copy();
+                if(i < old.length){
+                    abilities[i].data = old[i].data;
+                }
             }
         }
         if(controller == null) controller(type.createController(self()));
@@ -590,6 +605,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             Call.unitCapDeath(self());
             team.data().updateCount(type, -1);
         }
+
+        Vars.unitPhysics.add(self());
 
     }
 
@@ -646,6 +663,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         type.update(self());
 
+        // Sometimes becomes NaN at extreme delta
+        if(Float.isNaN(x) || Float.isNaN(y)){
+            remove();
+            return;
+        }
+
         //update bounds
 
         if(type.bounded){
@@ -669,7 +692,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(x > right - tilesize) dx -= (x - (right - tilesize))/warpDst;
                 if(y > top - tilesize) dy -= (y - (top - tilesize))/warpDst;
 
-                velAddNet(dx * Time.delta, dy * Time.delta);
+                //cap velocity to prevent infinity when using timecontrol or similar mods
+                float maxMagnitude = 10f / Math.max(Time.delta, 1f);
+
+                velAddNet(Mathf.clamp(dx * Time.delta, -maxMagnitude, maxMagnitude), Mathf.clamp(dy * Time.delta, -maxMagnitude, maxMagnitude));
                 float margin = tilesize * 1f;
                 x = Mathf.clamp(x, left - margin, right - tilesize + margin);
                 y = Mathf.clamp(y, bot - margin, top - tilesize + margin);
@@ -744,16 +770,6 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(!type.supportsEnv(state.rules.env) && !dead){
             Call.unitEnvDeath(self());
             team.data().updateCount(type, -1);
-        }
-
-        if(state.rules.unitAmmo && ammo < type.ammoCapacity - 0.0001f){
-            resupplyTime += Time.delta;
-
-            //resupply only at a fixed interval to prevent lag
-            if(resupplyTime > 10f){
-                type.ammoType.resupply(self());
-                resupplyTime = 0f;
-            }
         }
 
         for(Ability a : abilities){

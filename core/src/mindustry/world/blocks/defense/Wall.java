@@ -5,11 +5,13 @@ import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -27,6 +29,10 @@ public class Wall extends Block{
     public boolean flashHit;
     public Color flashColor = Color.white;
     public Sound deflectSound = Sounds.none;
+    /** If true, this block uses autotiling; variants are not supported. See https://github.com/GglLfr/tile-gen*/
+    public boolean autotile = false;
+
+    protected TextureRegion[] autotileRegions;
 
     public Wall(String name){
         super(name);
@@ -55,8 +61,21 @@ public class Wall extends Block{
     }
 
     @Override
+    public void load(){
+        super.load();
+
+        if(autotile){
+            autotileRegions = TileBitmask.load(name);
+        }
+    }
+
+    @Override
     public void init(){
         if(size == 2 && destroySound == Sounds.unset) destroySound = Sounds.blockExplodeWall;
+        if(!flashHit){
+            drawDynamic = false;
+        }
+        drawCached = true;
         super.init();
     }
 
@@ -66,16 +85,68 @@ public class Wall extends Block{
     }
 
     public class WallBuild extends Building{
-        public float hit;
+        protected int autotileBits;
+        protected float hit;
+
+        protected void updateAutotileBits(){
+            int prev = autotileBits;
+            autotileBits = 0;
+            for(int i = 0; i < 8; i++){
+                int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
+                Tile other = tile.nearby(dx * size, dy * size);
+                if(other != null && other.build != null && other.build.block == block && other.build.team == team){
+                    autotileBits |= (1 << i);
+                }
+            }
+            if(prev != autotileBits) recache();
+        }
+
+        protected void updateOtherBits(){
+            for(int i = 0; i < 8; i++){
+                int dx = Geometry.d8[i].x, dy = Geometry.d8[i].y;
+                Tile other = tile.nearby(dx * size, dy * size);
+                if(other != null && other.build != null && other.isCenter() && other.build.block == block && other.build.team == team && other.build instanceof WallBuild w){
+                    w.updateAutotileBits();
+                }
+            }
+        }
+
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            if(autotile) updateAutotileBits();
+        }
+
+        @Override
+        public void onProximityRemoved(){
+            super.onProximityRemoved();
+
+            if(autotile) updateOtherBits();
+        }
+
+        @Override
+        public void onProximityAdded(){
+            super.onProximityAdded();
+
+            if(autotile && !world.isGenerating()) updateOtherBits();
+        }
+
+        @Override
+        public void drawCached(){
+            if(autotile){
+                TextureRegion region = autotileRegions[TileBitmask.values[autotileBits]];
+                Draw.rect(region, x, y);
+            }else{
+                super.draw();
+            }
+        }
 
         @Override
         public void draw(){
-            super.draw();
 
             //draw flashing white overlay if enabled
-            if(flashHit){
-                if(hit < 0.0001f) return;
-
+            if(flashHit && hit >= 0.001f){
                 Draw.color(flashColor);
                 Draw.alpha(hit * 0.5f);
                 Draw.blend(Blending.additive);

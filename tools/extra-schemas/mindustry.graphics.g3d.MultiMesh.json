@@ -1,0 +1,7 @@
+{
+  "superclass": "java.lang.Object",
+  "meshes": {
+    "type": "mindustry.graphics.g3d.GenericMesh[]",
+    "doc": "Meshes to render together, in order. Required - no default."
+  }
+}

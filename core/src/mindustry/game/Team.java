@@ -125,7 +125,7 @@ public class Team implements Comparable<Team>, Senseable{
 
     /** @return whether unit factories should be active, according to the game rule. */
     public boolean activateUnitFactories(){
-        return state.tick >= rules().unitFactoryActivationDelay;
+        return state.tick >= state.rules.unitActivationDelay(this);
     }
 
     public Seq<CoreBuild> cores(){

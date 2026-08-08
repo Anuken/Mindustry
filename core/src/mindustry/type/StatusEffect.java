@@ -172,7 +172,7 @@ public class StatusEffect extends UnlockableContent{
 
     }
 
-    protected void trans(StatusEffect effect, TransitionHandler handler){
+    public void trans(StatusEffect effect, TransitionHandler handler){
         transitions.put(effect, handler);
     }
 
@@ -236,7 +236,7 @@ public class StatusEffect extends UnlockableContent{
         super.createIcons(packer);
 
         if(outline){
-            makeOutline(PageType.ui, packer, uiIcon, true, Pal.gray, 3);
+            makeOutline(PageType.ui, packer, uiIcon, false, Pal.gray, 3);
         }
     }
 

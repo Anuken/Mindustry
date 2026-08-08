@@ -234,6 +234,9 @@ public class Build{
             return false;
         }
 
+        //check limits for non-AI teams
+        if(type.isOverPlacementLimit(team)) return false;
+
         int offsetx = -(type.size - 1) / 2;
         int offsety = -(type.size - 1) / 2;
 
