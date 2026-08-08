@@ -117,6 +117,10 @@ public class BulletType extends Content implements Cloneable{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 8f;
+    /** Chance for this bullet to apply a status effect */
+    public float statusChance = 1f;
+    /** Chance for lightning chains to apply a status effect. If -1, uses the parent bullet's statusChance instead. */
+    public float lightningStatusChance = -1f;
     /** Turret only. If false, blocks will not be targeted. */
     public boolean targetBlocks = true;
     /** Turret only. If false, missiles will not be targeted. */
@@ -508,7 +512,9 @@ public class BulletType extends Content implements Cloneable{
             Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
             if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
-            unit.apply(status, statusDuration);
+            // Use statusChance from data if present (lightning bullets pass it), otherwise use type default
+            float sc = b.data instanceof Float f ? f : statusChance;
+            unit.apply(status, statusDuration, false, sc);
 
             Events.fire(bulletDamageEvent.set(unit, b));
         }
@@ -595,7 +601,7 @@ public class BulletType extends Content implements Cloneable{
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b, armorMultiplier);
 
             if(status != StatusEffects.none){
-                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround, statusChance);
             }
 
             if(heals()){

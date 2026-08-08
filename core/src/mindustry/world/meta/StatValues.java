@@ -724,6 +724,13 @@ public class StatValues{
 
                     if(type.lightning > 0){
                         sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
+                        if(type.status != StatusEffects.none && type.lightningStatusChance > 0f){
+                            sep(bt,
+                            (type.lightningStatusChance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(type.lightningStatusChance * 100f, 4)) : "") +
+                            (type.status.hasEmoji() ? type.status.emoji() + " " : "") + "[stat]" + type.status.localizedName +
+                            (type.status.reactive ? "" : "[lightgray] ~ [stat]" + Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))
+                            ).with(c -> withTooltip(c, type.status));
+                        }
                     }
 
                     if(type instanceof LaserBulletType b && b.lightningSpacing > 0){
@@ -787,9 +794,13 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
                     }
 
-                    if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.hasEmoji() ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" +
-                            Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))).with(c -> withTooltip(c, type.status));
+                    // It is redundant to show the status effect if it can't be applied
+                    if(type.status != StatusEffects.none && type.statusChance > 0f){
+                        sep(bt,
+                                (type.statusChance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(type.statusChance * 100f, 4)) : "") +
+                                        (type.status.hasEmoji() ? type.status.emoji() + " " : "") + "[stat]" + type.status.localizedName +
+                                        (type.status.reactive ? "" : "[lightgray] ~ [stat]" + Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))
+                        ).with(c -> withTooltip(c, type.status));
                     }
 
                     if(!type.targetMissiles){
