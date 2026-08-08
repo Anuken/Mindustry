@@ -1,22 +1,17 @@
 {
-  "doc": "Rises to and sustains progress at a plateau.",
-  "superclass": "PartProgress",
-  "offset":{
+  "doc": "Rises to and sustains progress at a plateau. Applied via PartProgress's 'op'/'operation' field (e.g. `op: sustain`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "offset": {
     "type": "float",
     "doc": "Progress offset before rising.",
     "default": "0"
   },
-  "grow":{
+  "grow": {
     "type": "float",
     "doc": "Duration of the rise to the plateau.",
     "default": "0"
   },
-  "sustain":{
+  "sustain": {
     "type": "float",
     "doc": "Length of the sustained plateau."
-  },
-  "ops":{
-    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress>",
-    "doc": "Consecutive operations."
   }
 }

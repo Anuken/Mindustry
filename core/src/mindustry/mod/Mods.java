@@ -14,6 +14,7 @@ import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
+import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -923,6 +924,8 @@ public class Mods implements Loadable{
 
         //this finishes parsing content fields
         parser.finishParsing();
+
+        UnitStance.loadAfterMods();
 
         Events.fire(new ModContentLoadEvent());
     }

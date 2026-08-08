@@ -728,6 +728,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     @Override
+    public boolean displayable(){
+        return (drop() != null && block == Blocks.air) || wallDrop() != null || (floor().liquidDrop != null && block == Blocks.air);
+    }
+
+    @Override
     public float getX(){
         return drawx();
     }
