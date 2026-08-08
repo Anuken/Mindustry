@@ -282,7 +282,7 @@ public class Logic implements ApplicationListener{
 
                     for(ItemStack stack : state.rules.loadout){
                         //make sure to cap storage
-                        entity.items.add(stack.item, Math.min(stack.amount, entity.storageCapacity - entity.items.get(stack.item)));
+                        entity.items.add(stack.item, Math.min(stack.amount, entity.capacity() - entity.items.get(stack.item)));
                     }
                 }
             }

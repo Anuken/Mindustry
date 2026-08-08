@@ -328,8 +328,15 @@ public class MapEditorDialog extends Dialog implements Disposable{
         ui.loadAnd(() -> {
             lastSavedRules = state.rules;
             hide();
+
+            Teams data = new Teams();
+            //keep the old itemCap for each team, otherwise it breaks
+            state.teams.active.each(t ->
+                data.get(t.team).itemCap = t.itemCap
+            );
+            state.teams = data;
+
             //only reset the player; logic.reset() will clear entities, which we do not want
-            state.teams = new Teams();
             player.reset();
             state.rules = Gamemode.editor.apply(lastSavedRules.copy());
             state.rules.limitMapArea = false;

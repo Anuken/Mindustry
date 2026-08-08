@@ -366,7 +366,7 @@ public class ConstructBlock extends Block{
 
                 if(clampedAmount > 0 && accumulated > 0){ //if it's positive, add it to the core
                     if(core != null && requirements[i].item.unlockedNowHost()){ //only accept items that are unlocked
-                        int accepting = Math.min(accumulated, core.storageCapacity - core.items.get(requirements[i].item));
+                        int accepting = Math.min(accumulated, core.capacity() - core.items.get(requirements[i].item));
                         //transfer items directly, as this is not production.
                         if(!state.rules.infiniteResources) core.items.add(requirements[i].item, accepting);
                         itemsLeft[i] += accepting;
@@ -387,7 +387,7 @@ public class ConstructBlock extends Block{
                         int remaining = target - itemsLeft[i];
 
                         if(requirements[i].item.unlockedNowHost()){
-                            core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.storageCapacity - core.items.get(requirements[i].item)));
+                            core.items.add(requirements[i].item, Mathf.clamp(remaining, 0, core.capacity() - core.items.get(requirements[i].item)));
                         }
                         itemsLeft[i] = target;
                     }
