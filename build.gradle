@@ -42,8 +42,8 @@ allprojects{
         if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
-        rhinoVersion = '54b75cbd1207ef1fd5cff517cbd188e763c85baa'
+        steamworksVersion = 'da41c05b7a2a44c8625ca0ba7d6ca1a2e73f621a'
+        rhinoVersion = 'e74ac129d2bff72c1deb536d7d99a0dbb7046d2e'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -77,7 +77,8 @@ allprojects{
         }
 
         hasSprites = {
-            return new File(rootDir, "core/assets/sprites/sprites.aatls").exists()
+            def file = new File(rootDir, "core/build/last_pack_version")
+            return new File(rootDir, "core/assets/sprites/sprites.aatls").exists() && file.exists() && file.text == versionNumber
         }
 
         getModifierString = {
@@ -325,6 +326,7 @@ project(":core"){
         from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
         from zipTree("../server/build/libs/server-release.jar")
         from files("src/")
+        from files("../../Arc/natives/natives-desktop/libs")
         from files("../../Arc/arc-core/src/")
         from files("../../Arc/extensions/arcnet/src/")
         from files("../../Arc/extensions/g3d/src/")
@@ -346,6 +348,7 @@ project(":core"){
     }
 
     task assetsJar(type: Jar){
+        dependsOn ":tools:pack"
         archiveClassifier = 'assets'
 
         into('assets'){
@@ -472,7 +475,8 @@ project(":tools"){
         implementation arcModule("natives:natives-freetype-desktop")
         implementation arcModule("backends:backend-headless")
 
-        implementation("com.google.guava:guava:33.3.1-jre")
+        implementation "com.google.guava:guava:33.3.1-jre"
+        implementation 'com.github.javaparser:javaparser-core:3.28.2'
     }
 }
 

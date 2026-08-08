@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.TaskQueue;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -69,8 +70,7 @@ public class Pathfinder implements Runnable{
 
     //water
     (team, tile) ->
-    (!PathTile.liquid(tile) || (PathTile.solid(tile) && (PathTile.team(tile) == team || PathTile.team(tile) == 0)) ? 7000 : 1) +
-    PathTile.health(tile) * 5 +
+    (!PathTile.liquid(tile) || (PathTile.solid(tile) && (PathTile.team(tile) == team || PathTile.team(tile) == 0)) ? 7000 : 1 + PathTile.health(tile) * 5) +
     (PathTile.nearGround(tile) || PathTile.nearSolid(tile) ? 14 : 0) +
     (PathTile.deep(tile) ? 0 : 1) +
     (PathTile.damages(tile) ? 35 : 0),
@@ -220,18 +220,19 @@ public class Pathfinder implements Runnable{
 
     /** Packs a tile into its internal representation. */
     public int packTile(Tile tile){
-        boolean nearLiquid = false, nearSolid = false, nearLegSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.floor().isDeep(), nearDeep = allDeep;
+        boolean nearLiquid = false, nearSolid = false, nearLegSolid = false, nearGround = false, solid = tile.solid(), allDeep = tile.isDeep(), nearDeep = allDeep;
 
         for(int i = 0; i < 4; i++){
             Tile other = tile.nearby(i);
             if(other != null){
                 Floor floor = other.floor();
                 boolean osolid = other.solid();
-                if(floor.isLiquid && floor.isDeep()) nearLiquid = true;
+                boolean deep = other.isDeep();
+                if(floor.isLiquid && deep) nearLiquid = true;
                 //TODO potentially strange behavior when teamPassable is false for other teams?
                 if(osolid && !other.block().teamPassable) nearSolid = true;
                 if(!floor.isLiquid) nearGround = true;
-                if(!floor.isDeep()){
+                if(!deep){
                     allDeep = false;
                 }else{
                     nearDeep = true;
@@ -249,7 +250,7 @@ public class Pathfinder implements Runnable{
         if(allDeep){
             for(int i = 0; i < 4; i++){
                 Tile other = tile.nearby(Geometry.d8edge[i]);
-                if(other != null && !other.floor().isDeep()){
+                if(other != null && !other.isDeep()){
                     allDeep = false;
                     break;
                 }
@@ -262,13 +263,13 @@ public class Pathfinder implements Runnable{
         tile.build == null || !solid || tile.block() instanceof CoreBlock ? 0 : Math.min((int)(tile.build.health / 40), 80),
         tid == 0 && tile.build != null && state.rules.coreCapture ? 255 : tid, //use teamid = 255 when core capture is enabled to mark out derelict structures
         solid,
-        tile.floor().isLiquid,
+        tile.floor().isLiquid && tile.block() == Blocks.air,
         tile.legSolid(),
         nearLiquid,
         nearGround,
         nearSolid,
         nearLegSolid,
-        tile.floor().isDeep(),
+        tile.isDeep(),
         tile.floor().damages(),
         allDeep,
         nearDeep,

@@ -1,0 +1,11 @@
+{
+  "superclass": "java.lang.Object",
+  "mesh": {
+    "type": "mindustry.graphics.g3d.GenericMesh",
+    "doc": "Wrapped mesh to render with the extra transform applied. Required - no default."
+  },
+  "mat": {
+    "type": "arc.math.geom.Mat3D",
+    "doc": "Extra transform matrix applied on top of the wrapped mesh's own transform. Required - no default."
+  }
+}

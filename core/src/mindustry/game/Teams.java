@@ -429,7 +429,7 @@ public class Teams{
             if(type == null) return;
             unitCount = Math.max(amount + unitCount, 0);
             if(typeCounts == null || typeCounts.length <= type.id){
-                typeCounts = new int[Vars.content.units().size];
+                typeCounts = typeCounts == null ? new int[Vars.content.units().size] : Arrays.copyOf(typeCounts, Vars.content.units().size);
             }
             typeCounts[type.id] = Math.max(amount + typeCounts[type.id], 0);
         }
