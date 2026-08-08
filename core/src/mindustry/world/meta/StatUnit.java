@@ -22,6 +22,7 @@ public class StatUnit{
     powerUnits = new StatUnit("powerUnits", "[accent]" + Iconc.power + "[]"),
     powerEquilibrium = new StatUnit("powerEquilibrium"),
     heatUnits = new StatUnit("heatUnits", "[red]" + Iconc.waves + "[]"),
+    heatUnitsPerSide = new StatUnit("heatUnitsPerSide", "[red]" + Iconc.waves + "[]"),
     degrees = new StatUnit("degrees"),
     seconds = new StatUnit("seconds"),
     minutes = new StatUnit("minutes"),
