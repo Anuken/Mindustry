@@ -77,14 +77,27 @@ public class MapFixer{
                     changed = true;
                 }
 
-                Seq<TimerObjective> timers = state.rules.objectives.all.select(m -> m instanceof TimerObjective && !m.hidden && ((TimerObjective)m).text != null &&
-                !((TimerObjective)m).text.isEmpty() && !((TimerObjective)m).text.contains("@")).as();
+                { //unlocalized check
+                    Seq<TimerObjective> timers = state.rules.objectives.all.select(m -> m instanceof TimerObjective t && !m.hidden && t.text != null &&
+                    !t.text.isEmpty() && !t.text.contains("@")).as();
 
-                if(!timers.isEmpty()){
-                    Log.warn("@: Unlocalized objectives: @", map.name(), timers.toString(", ", t -> "'" + t.text + "'"));
-                    if(isHidden){
+                    if(!timers.isEmpty()){
+                        Log.warn("@: Unlocalized objectives: @", map.name(), timers.toString(", ", t -> "'" + t.text + "'"));
+                        if(isHidden){
+                            changed = true;
+                            timers.each(t -> t.hidden = true);
+                        }
+                    }
+                }
+
+                { //'escelating' typo check
+                    Seq<TimerObjective> timers = state.rules.objectives.all.select(m -> m instanceof TimerObjective t && !m.hidden && t.text != null &&
+                    !t.text.isEmpty() && t.text.trim().equals("@objective.enemyescalating")).as();
+
+                    if(!timers.isEmpty()){
+                        Log.warn("@: Typo in objective: @", map.name(), timers.toString(", ", t -> "'" + t.text + "'"));
                         changed = true;
-                        timers.each(t -> t.hidden = true);
+                        timers.each(t -> t.text = "@objective.enemyescalating");
                     }
                 }
 
