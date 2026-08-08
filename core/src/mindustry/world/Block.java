@@ -386,6 +386,8 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Team forceTeam;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
+    /** Maximum number of instantTransfer consecutive blocks. */
+    public int maxConsecutive = 2;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
     /** If true, this derelict block can be repair by clicking it. */
@@ -652,7 +654,8 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         if(instantTransfer){
-            stats.add(Stat.maxConsecutive, 2, StatUnit.none);
+            stats.add(Stat.itemsMoved, StatUnit.instant.localized());
+            stats.add(Stat.maxConsecutive, maxConsecutive, StatUnit.none);
         }
 
         for(var c : consumers){
@@ -661,7 +664,10 @@ public class Block extends UnlockableContent implements Senseable{
 
         //Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
-        if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+        if(hasItems){
+            if(itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+            else if (instantTransfer || itemCapacity == 0) stats.add(Stat.itemCapacity, Core.bundle.format("none") + ". " + Core.bundle.format("unabletoclog"));
+        }
     }
 
     public <T extends Building> void addBar(String name, Func<T, Bar> sup){
