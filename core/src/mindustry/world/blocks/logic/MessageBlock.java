@@ -212,7 +212,7 @@ public class MessageBlock extends Block{
         @Override
         public void updateTableAlign(Table table){
             Vec2 pos = Core.input.mouseScreen(x, y + size * tilesize / 2f + 1);
-            table.setPosition(pos.x, pos.y, Align.bottom);
+            table.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.bottom);
         }
 
         @Override
