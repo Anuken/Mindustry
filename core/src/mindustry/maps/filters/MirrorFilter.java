@@ -57,29 +57,33 @@ public class MirrorFilter extends GenerateFilter{
     @Override
     public void draw(Image image){
         super.draw(image);
-        drawRect(image, Tmp.r1);
+        getDrawRect(image, Tmp.r1);
         if(Tmp.r1.width <= 0f || Tmp.r1.height <= 0f) return;
 
         float px = Tmp.r1.x + Mathf.clamp(axisX, 0f, 1f) * Tmp.r1.width;
         float py = Tmp.r1.y + Mathf.clamp(axisY, 0f, 1f) * Tmp.r1.height;
 
-        Tmp.v1.trns(angle - 90, 1f);
+        Tmp.v1.trns(angle - 90, 99999f);
         clipHalfLine(Tmp.v1, Tmp.r1.x - px, Tmp.r1.y - py, Tmp.r1.x + Tmp.r1.width - px, Tmp.r1.y + Tmp.r1.height - py);
         Tmp.v2.set(Tmp.v1).scl(-1f); //opposite of v1
+        clipHalfLine(Tmp.v2, Tmp.r1.x - px, Tmp.r1.y - py, Tmp.r1.x + Tmp.r1.width - px, Tmp.r1.y + Tmp.r1.height - py);
 
         Tmp.v1.add(px + image.x, py + image.y);
         Tmp.v2.add(px + image.x, py + image.y);
 
+        Lines.stroke(Scl.scl(8f), Pal.darkerGray);
+        Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
         Lines.stroke(Scl.scl(3f), Pal.accent);
         Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+
         Draw.color(Pal.accent);
+        Fill.circle(px + image.x, py + image.y, Scl.scl(6f));
+        Draw.color(Pal.darkerGray);
         Fill.circle(px + image.x, py + image.y, Scl.scl(4f));
-        Draw.color(Pal.darkestGray);
-        Fill.circle(px + image.x, py + image.y, Scl.scl(1.8f));
         Draw.reset();
     }
 
-    public static void drawRect(Image image, Rect out){
+    public static void getDrawRect(Image image, Rect out){
         if(image == null || image.getDrawable() == null || out == null){
             if(out != null) out.set(0f, 0f, 0f, 0f);
             return;

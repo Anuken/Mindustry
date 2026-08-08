@@ -203,7 +203,7 @@ public class MapGenerateDialog extends BaseDialog{
     MirrorFilter hit(float x, float y){
         if(preview == null) return null;
 
-        MirrorFilter.drawRect(preview, dragRect);
+        MirrorFilter.getDrawRect(preview, dragRect);
         if(dragRect.width <= 0f || dragRect.height <= 0f) return null;
 
         MirrorFilter out = null;
@@ -236,7 +236,7 @@ public class MapGenerateDialog extends BaseDialog{
     void drag(float x, float y){
         if(preview == null || dragging == null) return;
 
-        MirrorFilter.drawRect(preview, dragRect);
+        MirrorFilter.getDrawRect(preview, dragRect);
         if(dragRect.width <= 0f || dragRect.height <= 0f) return;
 
         //convert preview coordinates back into normalized axis coordinates
