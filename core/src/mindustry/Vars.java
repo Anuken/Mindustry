@@ -105,7 +105,7 @@ public class Vars implements Loadable{
     public static final float mineTransferRange = 220f;
     /** maximum number of preview plans for remote players */
     public static final int maxPlayerPreviewPlans = 1000;
-    /** max chat message length */
+    /** default max chat message length */
     public static final int maxTextLength = 150;
     /** max length of ping marker text */
     public static final int maxPingTextLength = 40;
