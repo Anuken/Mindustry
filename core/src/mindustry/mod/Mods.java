@@ -876,10 +876,11 @@ public class Mods implements Loadable{
                 for(ContentType type : ContentType.all){
                     String lower = type.name().toLowerCase(Locale.ROOT);
                     //search both the proper folder name (e.g. "weather", "statuses") and the old nonsensical folder names ("weathers", "status")
-                    Fi[] folders = {contentRoot.child(lower + (lower.endsWith("s") ? "" : "s")), contentRoot.child(type.folderName)};
+                    String oldName = lower + (lower.endsWith("s") ? "" : "s");
+                    Fi[] folders = {oldName.equals(type.folderName) ? null : contentRoot.child(oldName), contentRoot.child(type.folderName)};
 
                     for(Fi folder : folders){
-                        if(folder.exists()){
+                        if(folder != null && folder.exists()){
                             for(Fi file : folder.findAll(f -> f.extEquals("json") || f.extEquals("hjson"))){
 
                                 //if this is part of the ordered content, put it aside to be dealt with later
