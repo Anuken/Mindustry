@@ -55,9 +55,6 @@ public class MemoryBlock extends Block{
         /** Marks a memory slot as being stored in {@code numberMemory} (insted of {@code objectMemory}) */
         private static final Object sentinel = new Object();
 
-        /** Block of code to run after load. */
-        private @Nullable Runnable loadBlock;
-
         /** Objects stored in this memory building */
         private Object[] objectMemory = new Object[memoryCapacity];
 
@@ -152,10 +149,10 @@ public class MemoryBlock extends Block{
             for(int i = 0; i < objectMemory.length; i++){
                 Object value = objectMemory[i];
                 if(value == sentinel){
-                    value = numberMemory[i];
+                    TypeIO.writeObject(write, numberMemory[i]);
+                }else{
+                    TypeIO.writeObject(write, value);
                 }
-
-                TypeIO.writeObject(write, value);
             }
         }
 
@@ -176,35 +173,34 @@ public class MemoryBlock extends Block{
                 return;
             }
 
-            //memory contents need to be temporarily stored in an array until they can be used
-            Object[] values = new Object[Math.min(amount, objectMemory.length)];
+            //read all data, but ignore anything not fitting inside this memory building
             for(int i = 0; i < amount; i++){
-                Object value = TypeIO.readObjectBoxed(read, true);
-                if(i < values.length) values[i] = value;
-            }
-
-            loadBlock = () -> {
-                //load up the memory contents that were stored
-                for(int i = 0; i < values.length; i++){
-                    Object value = values[i];
-                    if (value instanceof Boxed<?> boxed) value = boxed.unbox();
-
-                    if(value instanceof Number num){
+                byte type = read.b();
+                if(type == TypeIO.doubleType){
+                    //same logic as readObject, but prevents boxing
+                    double value = read.d();
+                    if(i < objectMemory.length){
                         objectMemory[i] = sentinel;
-                        numberMemory[i] = num.doubleValue();
-                    }else{
+                        numberMemory[i] = value;
+                    }
+                }else{
+                    Object value = TypeIO.readObject(read, true, null, false, true, type);
+                    if(i < objectMemory.length){
                         objectMemory[i] = value;
                     }
                 }
-            };
+            }
         }
 
         @Override
         public void afterReadAll(){
             super.afterReadAll();
-            if(loadBlock != null){
-                loadBlock.run();
-                loadBlock = null;
+            //unbox any memory contents which require it
+            for(int i = 0; i < objectMemory.length; i++){
+                //skips sentinel objects
+                if(objectMemory[i] instanceof Boxed<?> boxed){
+                    objectMemory[i] = boxed.unbox();
+                }
             }
         }
     }
