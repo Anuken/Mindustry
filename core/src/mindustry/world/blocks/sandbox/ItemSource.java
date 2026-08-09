@@ -28,6 +28,8 @@ public class ItemSource extends Block{
         noUpdateDisabled = true;
         envEnabled = Env.any;
         clearOnDoubleTap = true;
+        drawCached = true;
+        drawDynamic = false;
 
         config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);
@@ -97,6 +99,15 @@ public class ItemSource extends Block{
                 produced(outputItem);
                 items.set(outputItem, 0);
                 counter -= limit;
+            }
+        }
+
+        @Override
+        public void configured(Unit builder, Object value){
+            super.configured(builder, value);
+
+            if(!headless){
+                recache();
             }
         }
 

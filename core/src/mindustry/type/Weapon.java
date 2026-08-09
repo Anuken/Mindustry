@@ -35,8 +35,6 @@ public class Weapon implements Cloneable{
     public Effect ejectEffect = Fx.none;
     /** whether weapon should appear in the stats of a unit with this weapon */
     public boolean display = true;
-    /** whether to consume ammo when ammo is enabled in rules */
-    public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
     public boolean mirror = true;
     /** whether to flip the weapon's sprite when rendering. internal use only - do not set! */
@@ -157,6 +155,8 @@ public class Weapon implements Cloneable{
     public float shootStatusDuration = 60f * 5f;
     /** whether this weapon should fire when its owner dies */
     public boolean shootOnDeath = false;
+    /** If not null and shootOnDeath == true, overrides the weapon's shoot effect only when its owner dies. */
+    public @Nullable Effect shootOnDeathEffect = null;
     /** extra animated parts */
     public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
 
@@ -432,7 +432,6 @@ public class Weapon implements Cloneable{
         if(mount.shoot && //must be shooting
         can && //must be able to shoot
         !(bullet.killShooter && mount.totalShots > 0) && //if the bullet kills the shooter, you should only ever be able to shoot once
-        (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
         velLen >= minShootVelocity && //check velocity requirements
@@ -442,11 +441,6 @@ public class Weapon implements Cloneable{
             shoot(unit, mount, bulletX, bulletY, shootAngle);
 
             mount.reload = reload;
-
-            if(useAmmo){
-                unit.ammo--;
-                if(unit.ammo < 0) unit.ammo = 0;
-            }
         }
     }
 
@@ -516,9 +510,11 @@ public class Weapon implements Cloneable{
             initialShootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
         }
 
-        ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
-        bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
-        bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+        if(mount.allowShootEffects){
+            ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
+            bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+            bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+        }
 
         unit.vel.add(Tmp.v1.trns(shootAngle + 180f, bullet.recoil));
         Effect.shake(shake, shake, bulletX, bulletY);

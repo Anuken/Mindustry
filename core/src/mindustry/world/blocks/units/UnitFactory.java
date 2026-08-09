@@ -29,6 +29,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class UnitFactory extends UnitBlock{
@@ -105,6 +107,12 @@ public class UnitFactory extends UnitBlock{
         }
 
         consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+    }
+
+    @Override
+    public void checkContentArrayCapacity(int items, int liquids){
+        super.checkContentArrayCapacity(items, liquids);
+        if(capacities.length != items) capacities = Arrays.copyOf(capacities, items);
     }
 
     @Override
@@ -437,7 +445,13 @@ public class UnitFactory extends UnitBlock{
         @Override
         public boolean shouldConsume(){
             if(currentPlan == -1) return false;
-            return enabled && payload == null;
+            return enabled && payload == null && team.activateUnitFactories();
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(!team.activateUnitFactories()) return BlockStatus.inactiveUnitFactory;
+            return super.status();
         }
 
         @Override

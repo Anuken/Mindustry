@@ -30,7 +30,7 @@ public enum ConditionOp{
 
     public boolean test(LVar va, LVar vb){
         if(this == ConditionOp.strictEqual){
-            return va.isobj == vb.isobj && ((va.isobj && va.objval == vb.objval) || (!va.isobj && va.numval == vb.numval));
+            return va.isobj == vb.isobj && ((va.isobj && Structs.eq(va.objval, vb.objval)) || (!va.isobj && va.numval == vb.numval));
         }
         if(objFunction != null && va.isobj && vb.isobj){
             //use object function if both are objects

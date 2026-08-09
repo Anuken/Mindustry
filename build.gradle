@@ -4,7 +4,7 @@ buildscript{
     ext{
         arcHash = property("archash")
 
-        localArc = !project.hasProperty("release") && new File(rootDir.parent, 'Arc').exists() && !project.hasProperty("noLocalArc")
+        localArc = new File(rootDir.parent, 'Arc').exists() && !project.hasProperty("noLocalArc")
 
         arcModule = { String name ->
             //skip to last submodule
@@ -17,8 +17,7 @@ buildscript{
         mavenLocal()
         mavenCentral()
         google()
-        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven{ url 'https://jitpack.io' }
+        maven{ url = 'https://jitpack.io' }
     }
 
     dependencies{
@@ -28,8 +27,8 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "2.1.10"
-    id "org.jetbrains.kotlin.kapt" version "2.1.10"
+    id "org.jetbrains.kotlin.jvm" version "2.3.20"
+    id "org.jetbrains.kotlin.kapt" version "2.3.20"
 }
 
 allprojects{
@@ -40,11 +39,11 @@ allprojects{
 
     ext{
         versionNumber = '8'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'beta'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
-        steamworksVersion = '0b86023401880bb5e586bc404bedbaae9b1f1c94'
-        rhinoVersion = '54b75cbd1207ef1fd5cff517cbd188e763c85baa'
+        steamworksVersion = 'da41c05b7a2a44c8625ca0ba7d6ca1a2e73f621a'
+        rhinoVersion = 'e74ac129d2bff72c1deb536d7d99a0dbb7046d2e'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -78,7 +77,8 @@ allprojects{
         }
 
         hasSprites = {
-            return new File(rootDir, "core/assets/sprites/sprites.aatls").exists()
+            def file = new File(rootDir, "core/build/last_pack_version")
+            return new File(rootDir, "core/assets/sprites/sprites.aatls").exists() && file.exists() && file.text == versionNumber
         }
 
         getModifierString = {
@@ -181,12 +181,11 @@ allprojects{
     repositories{
         mavenLocal()
         mavenCentral()
-        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven{ url 'https://jitpack.io' }
+        maven{ url = "https://central.sonatype.com/repository/maven-snapshots" }
+        maven{ url = 'https://jitpack.io' }
     }
 
-    tasks.register('clearCache'){
+    task clearCache{
         doFirst{
             delete{
                 delete "$rootDir/core/assets/cache"
@@ -195,7 +194,7 @@ allprojects{
     }
 
     tasks.withType(JavaCompile){
-        targetCompatibility = 8
+        targetCompatibility = JavaVersion.VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
         options.encoding = "UTF-8"
         options.compilerArgs += ["-Xlint:deprecation"]
@@ -216,16 +215,32 @@ allprojects{
 
 configure(project(":annotations")){
     tasks.withType(JavaCompile){
-        targetCompatibility = 8
-        sourceCompatibility = 8
+        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
         options.fork = true
+
+        options.compilerArgs.addAll([
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED",
+            "--add-exports", "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+            "--add-exports", "java.base/sun.reflect.annotation=ALL-UNNAMED"
+        ])
     }
 }
 
 //compile with java 8 compatibility for everything except the annotation project
 configure(subprojects - project(":annotations") - project(":tests")){
     tasks.withType(JavaCompile){
-        options.compilerArgs.addAll(['--release', '8'])
+        options.compilerArgs.addAll(['--release', '17'])
     }
 
     tasks.withType(Javadoc){
@@ -246,6 +261,8 @@ project(":desktop"){
         implementation project(":core")
         implementation arcModule("extensions:profiling")
         implementation arcModule("extensions:discord")
+        implementation arcModule("natives:natives-filedialogs")
+        implementation arcModule("extensions:filedialogs")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
 
@@ -253,8 +270,7 @@ project(":desktop"){
 
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
-        implementation arcModule("backends:backend-sdl3")
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
+        implementation arcModule("backends:backend-sdl")
     }
 }
 
@@ -266,13 +282,13 @@ project(":core"){
     kapt{
         javacOptions{
             option("-source", "17")
-            option("-target", "1.8")
+            option("-target", "17")
         }
     }
 
     compileJava.options.fork = true
 
-    tasks.register('preGen'){
+    task preGen{
         outputs.upToDateWhen{ false }
         generateLocales()
         writeVersion()
@@ -280,7 +296,7 @@ project(":core"){
         writePlugins()
     }
 
-    tasks.register('copyChangelog'){
+    task copyChangelog{
         doLast{
             def props = loadVersionProps()
             def androidVersion = props['androidBuildCode'].toInteger() - 2
@@ -288,9 +304,9 @@ project(":core"){
             def notice = "[This is a truncated changelog, see Github for full notes]"
             def maxLength = 460
 
-            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]") }
+            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
             def result = ""
-            androidLogList.forEach{ line ->
+            androidLogList.forEach{line ->
                 if(result.length() + line.length() + 1 < maxLength){
                     result += line + "\n"
                 }
@@ -304,24 +320,54 @@ project(":core"){
         }
     }
 
-    tasks.register('sourcesJar', Jar){
-        dependsOn classes
+    task depsJar(type: Jar, dependsOn: [classes, ":server:dist"]){
+        archiveClassifier = 'deps'
+        from files(sourceSets.main.output.classesDirs)
+        from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
+        from zipTree("../server/build/libs/server-release.jar")
+        from files("src/")
+        from files("../../Arc/natives/natives-desktop/libs")
+        from files("../../Arc/arc-core/src/")
+        from files("../../Arc/extensions/arcnet/src/")
+        from files("../../Arc/extensions/g3d/src/")
+        from files("../../Arc/extensions/flabel/src/")
+        from files("../../Arc/extensions/freetype/src/")
+        from files("../server/src/")
+
+        exclude("META-INF/**")
+        exclude("vfxshaders/**")
+        exclude("maps/**")
+        exclude("baseparts/**")
+        exclude("vfxshaders/**")
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes){
         archiveClassifier = 'sources'
         from sourceSets.main.allSource
     }
 
-    tasks.register('assetsJar', Jar){
+    task assetsJar(type: Jar){
         dependsOn ":tools:pack"
         archiveClassifier = 'assets'
-        from files("assets"){
-            exclude "config", "cache", "music", "sounds", "sprites/fallback"
+
+        into('assets'){
+            from 'assets'
+            exclude 'config', 'cache', 'music', 'sounds', 'sprites/fallback'
+        }
+
+        into('assets-raw/sprites'){
+            from 'assets-raw/sprites_out'
+            include '**/*.png'
         }
     }
 
-    tasks.register('musicJar', Jar){
+    task musicJar(type: Jar){
         archiveClassifier = 'music'
-        from files("assets"){
-            include "music/*", "sounds/*"
+
+        into('assets'){
+            from 'assets'
+            include '**/*.ogg', '**/*.mp3'
         }
     }
 
@@ -339,7 +385,6 @@ project(":core"){
         if(localArc && debugged()) api arcModule("extensions:recorder")
         if(localArc) api arcModule(":extensions:packer")
 
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
         compileOnly project(":annotations")
         if(!project.hasProperty("noKapt")) kapt project(":annotations")
     }
@@ -384,7 +429,7 @@ project(":server"){
     dependencies{
         implementation project(":core")
         implementation arcModule("backends:backend-headless")
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
+        implementation 'org.jline:jline:4.0.0'
     }
 }
 
@@ -398,6 +443,7 @@ project(":tests"){
         testImplementation arcModule("backends:backend-headless")
         testImplementation "org.json:json:20230618"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
+        testRuntimeOnly "org.junit.platform:junit-platform-launcher"
     }
 
     tasks.withType(JavaCompile){
@@ -409,6 +455,7 @@ project(":tests"){
     test{
         //fork every test so mods don't interact with each other
         forkEvery = 1
+        jvmArgs = ["-XX:+HeapDumpOnOutOfMemoryError"]
         useJUnitPlatform()
         workingDir = new File("../core/assets")
         testLogging{
@@ -428,8 +475,8 @@ project(":tools"){
         implementation arcModule("natives:natives-freetype-desktop")
         implementation arcModule("backends:backend-headless")
 
-        implementation("com.google.guava:guava:33.3.1-jre")
-        annotationProcessor 'com.github.Anuken:jabel:0.9.0'
+        implementation "com.google.guava:guava:33.3.1-jre"
+        implementation 'com.github.javaparser:javaparser-core:3.28.2'
     }
 }
 
@@ -452,17 +499,13 @@ configure([":core", ":server"].collect{project(it)}){
         publications{
             maven(MavenPublication){
                 from components.java
-                //TODO: uncomment this once the jitpack packing is fixed (currently depends on a newer glibc version)
-                //if(project.name == "core"){
-                //    artifact(tasks.named("assetsJar"))
-                //}
             }
         }
     }
 }
 
-tasks.register('deployAll'){
-    tasks.register('cleanDeployOutput'){
+task deployAll{
+    task cleanDeployOutput{
         doFirst{
             if(getBuildVersion() == "custom build" || getBuildVersion() == "") throw new IllegalArgumentException("----\n\nSET A BUILD NUMBER FIRST!\n\n----")
             if(!project.hasProperty("release")) throw new IllegalArgumentException("----\n\nSET THE RELEASE PROJECT PROPERTY FIRST!\n\n----")
@@ -476,7 +519,6 @@ tasks.register('deployAll'){
     dependsOn cleanDeployOutput
     dependsOn "desktop:packrLinux64"
     dependsOn "desktop:packrWindows64"
-    dependsOn "desktop:packrWindows32"
     dependsOn "desktop:packrMacOS"
     if(versionModifier != "steam"){
         dependsOn "server:deploy"
@@ -484,11 +526,11 @@ tasks.register('deployAll'){
     }
 }
 
-tasks.register('resolveDependencies'){
+task resolveDependencies{
     doLast{
         rootProject.allprojects{ project ->
             Set<Configuration> configurations = project.buildscript.configurations + project.configurations
-            configurations.findAll{ c -> c.canBeResolved }.forEach{ c -> c.resolve() }
+            configurations.findAll{c -> c.canBeResolved}.forEach{c -> c.resolve()}
         }
     }
 }

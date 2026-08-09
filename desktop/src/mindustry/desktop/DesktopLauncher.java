@@ -3,19 +3,19 @@ package mindustry.desktop;
 import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
+import arc.backend.sdl.jni.*;
 import arc.discord.*;
 import arc.discord.DiscordRPC.*;
+import arc.filedialogs.*;
 import arc.files.*;
-import arc.func.*;
 import arc.math.*;
 import arc.profiling.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.serialization.*;
-import com.codedisaster.steamworks.*;
 import mindustry.*;
-import mindustry.core.Version;
+import mindustry.core.*;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -25,10 +25,10 @@ import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
 import mindustry.type.*;
+import mindustry.ui.*;
+import mindustry.ui.FileChooser.*;
 import mindustry.ui.dialogs.*;
-import org.lwjgl.*;
-import org.lwjgl.sdl.*;
-import org.lwjgl.system.*;
+import steamworks.*;
 
 import java.io.*;
 
@@ -43,7 +43,12 @@ public class DesktopLauncher extends ClientLauncher{
 
     public static void main(String[] arg){
         try{
+            Version.init();
             Vars.loadLogger();
+            Vars.loadFileLogger(new Fi(Version.isSteam ? "saves" : OS.getAppDataDirectoryString(appName)).child("last_log.txt"));
+
+            check32Bit();
+            checkJavaVersion();
 
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
                 title = "Mindustry";
@@ -111,18 +116,45 @@ public class DesktopLauncher extends ClientLauncher{
         }
     }
 
+    static void checkJavaVersion(){
+        if(OS.javaVersionNumber < 17){
+            //this is technically a lie: Java 25 isn't actually required (17 is), but I want people to get the highest available version they can.
+            //Java 25 *might* be required in the future for FFM bindings.
+            ErrorDialog.show("Java 25 is required to run Mindustry. Your version: " + OS.javaVersionNumber + "\n" +
+            "\n" +
+            "Please uninstall your current Java version, and download Java 25.\n" +
+            "\n" +
+            "It is recommended to download Java from adoptium.net.\n" +
+            "Do not download from java.com, as that will give you Java 8 by default.");
+        }
+    }
+
+    static void check32Bit(){
+        if(OS.isWindows && !OS.is64Bit){
+            String versionWarning = "";
+
+            if(Version.isSteam){
+                versionWarning = "\n\nIf you are unable to upgrade, consider switching to the legacy v7 branch on Steam, which is the last release that supported 32-bit windows:\n(properties -> betas -> select version-7.0 in the drop-down box).";
+            }else if(OS.javaVersion.equals("1.8.0_151-1-ojdkbuild")){ //version string of JVM packaged with the 32-bit version of the game on itch/steam
+                versionWarning = "\n\nMake sure you have downloaded the 64-bit version of the game, not the 32-bit one.";
+            }else if(OS.javaVersionNumber < 25){
+                //technically, java 25 isn't required yet, but it might be in the future, so tell users to get that one
+                versionWarning = "\n\nYour current Java version is: " + OS.javaVersionNumber + ". To run the game, upgrade to Java 25 on a 64-bit machine.";
+            }
+
+            ErrorDialog.show("You are running a 32-bit installation of Windows and/or a 32-bit JVM. 32-bit windows is no longer supported." + versionWarning);
+        }
+    }
+
     public DesktopLauncher(String[] args){
         this.args = args;
 
-        Version.init();
-        boolean useSteam = Version.modifier.contains("steam");
-
         if(useDiscord){
+            Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
             Threads.daemon(() -> {
                 try{
                     DiscordRPC.connect(discordID);
                     Log.info("Initialized Discord rich presence.");
-                    Runtime.getRuntime().addShutdownHook(new Thread(DiscordRPC::close));
                 }catch(NoDiscordClientException none){
                     //don't log if no client is found
                     useDiscord = false;
@@ -133,8 +165,7 @@ public class DesktopLauncher extends ClientLauncher{
             });
         }
 
-        if(useSteam){
-
+        if(Version.isSteam){
             Events.on(ClientLoadEvent.class, event -> {
                 if(steamError != null){
                     Core.app.post(() -> Core.app.post(() -> Core.app.post(() -> {
@@ -291,68 +322,81 @@ public class DesktopLauncher extends ClientLauncher{
         CrashHandler.handle(e, file -> {
             Throwable fc = Strings.getFinalCause(e);
             if(!fbgp){
-                message(causeString + "\nThe logs have been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage()));
+                String firstStackTraces = "";
+
+                try{
+                    var s = Seq.with(fc.getStackTrace());
+                    s.removeAll(st -> st.getClassName().contains("MethodAccessor") || st.getClassName().substring(st.getClassName().lastIndexOf(".") + 1).equals("Method"));
+                    s.truncate(3);
+                    firstStackTraces = "\n" + s.toString("\n", st -> {
+                        String className = st.getClassName();
+                        return className.substring(className.lastIndexOf(".") + 1) + "." + st.getMethodName() + ": " + st.getLineNumber();
+                    });
+                }catch(Throwable ignored){
+                }
+
+                message(causeString + "\nThe logs have been saved in:\n" + file.getAbsolutePath() + "\n" + fc.getClass().getSimpleName().replace("Exception", "") + (fc.getMessage() == null ? "" : ":\n" + fc.getMessage()) + firstStackTraces);
             }
         });
     }
 
     @Override
-    public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
-        showNativeFileChooser(open, cons, extension);
-    }
+    public void showFileChooser(FileChooserParams params){
+        Threads.daemon(() -> {
+            try{
+                FileDialogs.loadNatives();
+                var ext = params.extensions;
 
-    @Override
-    public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-        showNativeFileChooser(true, cons, extensions);
-    }
-
-    void showNativeFileChooser(boolean open, Cons<Fi> cons, String... shownExtensions){
-        String[] ext = shownExtensions == null || shownExtensions.length == 0 ? new String[]{""} : shownExtensions;
-
-        SDL_DialogFileFilter.Buffer filters = SDL_DialogFileFilter.calloc(ext.length);
-        try(MemoryStack stack = MemoryStack.stackPush()){
-            for(int i = 0; i < ext.length; i++){
-                String extName = ext[i];
-
-                var filter = SDL_DialogFileFilter.calloc(stack)
-                .name(MemoryUtil.memUTF8(extName.isEmpty() ? "All Files" : "." + extName + " files"))
-                .pattern(MemoryUtil.memUTF8(extName.isEmpty() ? "*" : extName));
-
-                filters.put(i, filter);
-            }
-        }
-        SDL_DialogFileCallbackI callback = (userData, files, filter) -> {
-            if(files != 0){
-                PointerBuffer pointerBuffer = MemoryUtil.memPointerBuffer(files, 1);
-                long firstFile = pointerBuffer.get();
-                if(firstFile != 0){
-                    String result = MemoryUtil.memUTF8(firstFile);
-
-                    if(result.isEmpty() || result.equals("\n")) return;
-                    if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
-                    if(result.contains("\n")) return;
-
-                    Fi file = Core.files.absolute(result);
-                    Core.app.post(() -> {
-                        FileChooser.setLastDirectory(file.isDirectory() ? file : file.parent());
-
-                        if(!open){
-                            cons.get(file.parent().child(file.nameWithoutExtension() + "." + ext[0]));
-                        }else{
-                            cons.get(file);
-                        }
-                    });
+                String result;
+                String[] patterns = new String[ext.length];
+                for(int i = 0; i < ext.length; i++){
+                    patterns[i] = "*." + ext[i];
                 }
+
+                //on MacOS, .msav is not properly recognized until I put garbage into the array?
+                if(patterns.length == 1 && OS.isMac && params.open){
+                    patterns = new String[]{"", "*." + ext[0]};
+                }
+
+                if(params.open){
+                    result = FileDialogs.openFileDialog(params.title, FileChooserDialog.getLastDirectory().absolutePath() + "/", patterns, "." + ext[0] + " files", params.allowMultiple);
+                }else{
+                    result = FileDialogs.saveFileDialog(params.title, FileChooserDialog.getLastDirectory().child(params.fileName).absolutePath(), patterns, "." + ext[0] + " files");
+                }
+
+                if(result == null) return;
+
+                if(result.length() > 1 && result.contains("\n")){
+                    result = result.split("\n")[0];
+                }
+
+                //cancelled selection, ignore result
+                if(result.isEmpty() || result.equals("\n")) return;
+                if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
+
+                Fi[] resultFiles = Seq.with(result.split("\\|")).map(Core.files::absolute).toArray(Fi.class);
+
+                if(result.isEmpty()) return;
+
+                Core.app.post(() -> {
+                    FileChooserDialog.setLastDirectory(resultFiles[0].isDirectory() ? resultFiles[0] : resultFiles[0].parent());
+
+                    if(!params.open){
+                        Fi single = resultFiles[0];
+                        //fix extension to match filters
+                        if(!Structs.contains(params.extensions, single::extEquals)){
+                            single = single.parent().child(single.nameWithoutExtension() + "." + ext[0]);
+                        }
+                        params.handleChooseResult(single);
+                    }else{
+                        params.handleChooseResult(resultFiles);
+                    }
+                });
+            }catch(Throwable error){
+                Log.err("Failed to execute native file chooser", error);
+                Core.app.post(() -> FileChooser.showFallbackFileChooser(params));
             }
-        };
-
-        if(open){
-            SDLDialog.SDL_ShowOpenFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath(), false);
-        }else{
-            SDLDialog.SDL_ShowSaveFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooser.getLastDirectory().absolutePath() + "/" + "export." + ext[0]);
-        }
-
-        filters.free();
+        });
     }
 
     @Override
@@ -477,6 +521,6 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     private static void message(String message){
-        SDLMessageBox.SDL_ShowSimpleMessageBox(SDLMessageBox.SDL_MESSAGEBOX_ERROR, "oh no", message, 0);
+        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
     }
 }
