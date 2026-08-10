@@ -660,6 +660,7 @@ public class DataPatcher{
                 }else{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
+                    visit(prevValue);
 
                     for(var child : jsv){
                         if(child.name != null){
