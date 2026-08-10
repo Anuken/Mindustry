@@ -22,6 +22,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
+import mindustry.world.modules.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -318,6 +319,7 @@ public class DataPatcher{
     public static void fixContentArrays(){
         if(!needsArrayFix) return;
         int items = Vars.content.items().size, liquids = Vars.content.liquids().size;
+        ItemModule.empty.checkArrayCapacity(items);
 
         //block item/liquid filter
         for(var block : Vars.content.blocks()){
