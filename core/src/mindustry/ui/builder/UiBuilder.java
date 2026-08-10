@@ -264,6 +264,8 @@ public class UiBuilder{
         public ButtonBuilder style(String style){ return prop(UiKey.style, style); }
         public ButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
+        public ButtonBuilder group(String group){ return prop(UiKey.group, group); }
+        public ButtonBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 
     public static class ImageButtonBuilder extends NodeBuilder<ImageButtonBuilder>{
@@ -273,6 +275,8 @@ public class UiBuilder{
         public ImageButtonBuilder style(String style){ return prop(UiKey.style, style); }
         public ImageButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ImageButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
+        public ImageButtonBuilder group(String group){ return prop(UiKey.group, group); }
+        public ImageButtonBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 
     public static class FieldBuilder extends NodeBuilder<FieldBuilder>{
@@ -293,6 +297,7 @@ public class UiBuilder{
         public CheckBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
         public CheckBuilder style(String style){ return prop(UiKey.style, style); }
         public CheckBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
+        public CheckBuilder group(String group){ return prop(UiKey.group, group); }
     }
 
     public static class SliderBuilder extends NodeBuilder<SliderBuilder>{
@@ -321,5 +326,7 @@ public class UiBuilder{
         public ButtonTableBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ButtonTableBuilder margin(float m){ return prop(UiKey.margin, m); }
         public ButtonTableBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
+        public ButtonTableBuilder group(String group){ return prop(UiKey.group, group); }
+        public ButtonTableBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 }
