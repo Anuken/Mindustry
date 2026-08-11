@@ -94,7 +94,6 @@ public class Item extends UnlockableContent implements Senseable{
 
             Events.run(Trigger.update, () -> {
                 int frame = (int)(Time.globalTime / frameTime) % regions.length;
-
                 fullIcon.set(regions[frame]);
                 uiIcon.set(regions[frame]);
             });

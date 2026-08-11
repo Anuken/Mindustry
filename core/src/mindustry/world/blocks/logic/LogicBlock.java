@@ -128,7 +128,7 @@ public class LogicBlock extends Block{
 
     public static String getLinkName(Block block){
         String name = block.name;
-        if(name.contains("-")){
+        if(name.indexOf('-') != -1){
             String[] split = name.split("-");
             //filter out 'large' at the end of block names
             if(split.length >= 2 && (split[split.length - 1].equals("large") || Strings.canParseFloat(split[split.length - 1]))){
@@ -259,7 +259,7 @@ public class LogicBlock extends Block{
         public Seq<LogicLink> links = new Seq<>();
         public @Nullable ObjectIntMap<String> linkMap;
         public boolean checkedDuplicates = false;
-        
+
         public int ipt = instructionsPerTick;
         /** Display name, for convenience. This is currently only available for world processors. */
         public @Nullable String tag;
@@ -521,7 +521,9 @@ public class LogicBlock extends Block{
 
                         if(valid){
 
-                            if(lastBlock != null && cur.block != lastBlock){
+                            if((lastBlock != null && cur.block != lastBlock) ||
+                                //links don't store the type of block they used to be in saves, so when a link becomes valid, the only way to make sure the name is correct is an expensive string startsWith check
+                                (lastBlock == null && !l.name.startsWith(getLinkName(cur.block)))){
                                 l.logicVar = null; //name was reassigned because block type changed, the old cached logic var is no longer relevant
                                 l.name = "";
                                 l.name = findLinkName(cur.block);
@@ -548,7 +550,7 @@ public class LogicBlock extends Block{
             if(changed){
                 updateLinks();
             }
-            
+
             if(state.rules.disableWorldProcessors && privileged) return;
 
             if(enabled && executor.initialized()){

@@ -140,6 +140,9 @@ public class Unloader extends Block{
             Pools.freeAll(possibleBlocks, true);
             possibleBlocks.clear();
 
+            //check item length for data patches - this method is called upon world load; keep it out of the update loop
+            if(allItems.length != content.items().size) allItems = content.items().toArray(Item.class);
+
             for(int i = 0; i < proximity.size; i++){
                 var other = proximity.get(i);
                 if(!other.interactable(team)) continue; //avoid blocks of the wrong team
