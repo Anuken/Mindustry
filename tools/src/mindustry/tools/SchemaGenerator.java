@@ -15,6 +15,7 @@ import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.Objectives.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -65,7 +66,17 @@ public class SchemaGenerator{
             return;
         }
 
-        if(type.getSuperclass() != null) val.put("superclass", type.getSuperclass().getCanonicalName());
+        if(Modifier.isAbstract(type.getModifiers())){
+            val.put("abstract", true);
+        }
+
+        if(type.getSuperclass() != null){
+            val.put("superclass", type.getSuperclass().getCanonicalName());
+        }
+
+        if(Objective.class.isAssignableFrom(type)){
+            val.put("superclass", Objective.class.getCanonicalName());
+        }
 
         if(typeDec.getJavadoc().isPresent()){
             val.put("doc", typeDec.getJavadoc().get().toText());
@@ -74,7 +85,7 @@ public class SchemaGenerator{
         for(var field : type.getFields()){
             if(Modifier.isStatic(field.getModifiers()) || field.getDeclaringClass() != type) continue;
             Jval inner = Jval.newObject();
-            inner.put("type", field.getGenericType().getTypeName());
+            inner.put("type", field.getGenericType().getTypeName().replace('$', '.'));
 
             if(field.isAnnotationPresent(Nullable.class)) inner.put("nullable", true);
 
@@ -150,6 +161,14 @@ public class SchemaGenerator{
         }
         """.replace("%TYPES%",  allClasses.select(UnitType.class::isAssignableFrom).toString(", ", t -> "\"" + t.getSimpleName() + "\"")));
 
+        writeSchema(BuildVisibility.class.getCanonicalName(), """
+        {
+          "doc": "Types of block build visibility.",
+          "superclass": "Enum",
+          "values": [%VALUES%]
+        }
+        """.replace("%VALUES%",  Seq.with(BuildVisibility.class.getFields()).toString(", ", t -> "\"" + t.getName() + "\"")));
+
         writeSchema(Interp.class.getCanonicalName(), """
         {
           "doc": "All types of interpolation.",
@@ -157,6 +176,14 @@ public class SchemaGenerator{
           "values": [%VALUES%]
         }
         """.replace("%VALUES%",  Seq.with(Interp.class.getFields()).toString(", ", t -> "\"" + t.getName() + "\"")));
+
+        writeSchema(AIController.class.getCanonicalName(), """
+        {
+          "doc": "Type of unit AI",
+          "superclass": "Enum",
+          "values": [%VALUES%]
+        }
+        """.replace("%VALUES%",  decls.keys().toSeq().select(AIController.class::isAssignableFrom).toString(", ", t -> "\"" + t.getSimpleName() + "\"")));
 
         writeSchema("allTeams", """
         {
@@ -186,6 +213,7 @@ public class SchemaGenerator{
         }
         """.replace("%VALUES%",  Seq.with(Sounds.class.getFields()).select(f -> f.getType() == Sound.class).toString(", ", t -> "\"" + t.getName() + "\"")));
 
+
         new Fi("../../tools/extra-schemas").copyFilesTo(outputDir);
     }
 
@@ -194,6 +222,7 @@ public class SchemaGenerator{
         injectCustomField(UnitType.class, "template", field("TemplateUnitType", "UnitType template class.", false));
         injectCustomField(UnitType.class, "defaultController", field(AIController.class.getCanonicalName(), "Unconditional controller; always assigned, even if on the player team. This overwrites RTS AI.", false));
         injectCustomField(UnitType.class, "aiController", field(AIController.class.getCanonicalName(), "Controller used when the unit is not on the player team.", false));
+        injectCustomField(UnitType.class, "controller", field(AIController.class.getCanonicalName(), "Controller used when the unit is not on the player team. Equivalent to aiController.", false));
 
         injectCustomField(Planet.class, "sectorSize", field("int", "Planet sector subdivisions.", false));
 
