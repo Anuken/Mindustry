@@ -1,5 +1,6 @@
 package mindustry.tools;
 
+import arc.audio.*;
 import arc.files.*;
 import arc.func.*;
 import arc.math.*;
@@ -10,12 +11,15 @@ import arc.util.serialization.Jval.*;
 import com.github.javaparser.*;
 import com.github.javaparser.ast.body.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.meta.*;
 
 import java.lang.reflect.*;
 
@@ -41,9 +45,7 @@ public class SchemaGenerator{
             if(type.contentClass != null && all.size > 0 && all.first() instanceof UnlockableContent){
                 mappings.put(type.name(), type.contentClass.getCanonicalName());
                 var values = Jval.newObject();
-                all.<UnlockableContent>as().each(c -> {
-                    values.put(c.name, Jval.valueOf((c.getClass().isAnonymousClass() ? c.getClass().getSuperclass() : c.getClass()).getCanonicalName()));
-                });
+                all.<UnlockableContent>as().each(c -> values.put(c.name, Jval.valueOf((c.getClass().isAnonymousClass() ? c.getClass().getSuperclass() : c.getClass()).getCanonicalName())));
                 root.asObject().put(type.name(), values);
             }
         }
@@ -150,11 +152,39 @@ public class SchemaGenerator{
 
         writeSchema(Interp.class.getCanonicalName(), """
         {
-          "doc": "Various types of interpolation.",
+          "doc": "All types of interpolation.",
           "superclass": "Enum",
           "values": [%VALUES%]
         }
         """.replace("%VALUES%",  Seq.with(Interp.class.getFields()).toString(", ", t -> "\"" + t.getName() + "\"")));
+
+        writeSchema("allTeams", """
+        {
+          "doc": "All team names.",
+          "values": [%VALUES%]
+        }
+        """.replace("%VALUES%",  Seq.with(Team.class.getFields()).select(f -> f.getType() == Team.class).toString(", ", t -> "\"" + t.getName() + "\"")));
+
+        writeSchema("allEffects", """
+        {
+          "doc": "All preset effect names.",
+          "values": [%VALUES%]
+        }
+        """.replace("%VALUES%",  Seq.with(Fx.class.getFields()).select(f -> f.getType() == Effect.class).toString(", ", t -> "\"" + t.getName() + "\"")));
+
+        writeSchema("allAttributes", """
+        {
+          "doc": "All attribute names.",
+          "values": [%VALUES%]
+        }
+        """.replace("%VALUES%",  Seq.with(Attribute.class.getFields()).select(f -> f.getType() == Attribute.class).toString(", ", t -> "\"" + t.getName() + "\"")));
+
+        writeSchema("allSounds", """
+        {
+          "doc": "All preset sound names.",
+          "values": [%VALUES%]
+        }
+        """.replace("%VALUES%",  Seq.with(Sounds.class.getFields()).select(f -> f.getType() == Sound.class).toString(", ", t -> "\"" + t.getName() + "\"")));
 
         new Fi("../../tools/extra-schemas").copyFilesTo(outputDir);
     }
