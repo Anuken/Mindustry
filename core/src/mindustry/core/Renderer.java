@@ -4,7 +4,6 @@ import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
@@ -480,7 +479,7 @@ public class Renderer implements ApplicationListener{
                 backgroundBuffer = new FrameBuffer(size, size);
             }
 
-            if(resized || backgroundBuffer.resizeCheck(size, size)){
+            if(resized || backgroundBuffer.resize(size, size)){
                 backgroundBuffer.begin(Color.clear);
 
                 var params = state.rules.planetBackground;
@@ -497,7 +496,7 @@ public class Renderer implements ApplicationListener{
             }
 
             float drawSize = Math.max(camera.width, camera.height);
-            Draw.rect(Draw.wrap(backgroundBuffer.getTexture()), camera.position.x, camera.position.y, drawSize, -drawSize);
+            Draw.rect(Draw.wrap(backgroundBuffer.texture), camera.position.x, camera.position.y, drawSize, -drawSize);
         }
 
         if(state.rules.customBackgroundCallback != null && customBackgrounds.containsKey(state.rules.customBackgroundCallback)){

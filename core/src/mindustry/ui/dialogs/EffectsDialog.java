@@ -142,7 +142,7 @@ public class EffectsDialog extends BaseDialog{
 
         @Override
         protected void draw(Texture texture, float[] spriteVertices, int offset, int count){
-            for(int i = offset; i < count; i += SpriteBatch.VERTEX_SIZE){
+            for(int i = offset; i < count; i += SpriteBatch.vertexSize){
                 max(spriteVertices[i], spriteVertices[i + 1]);
             }
         }

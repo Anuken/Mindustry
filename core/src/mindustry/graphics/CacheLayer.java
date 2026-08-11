@@ -1,7 +1,6 @@
 package mindustry.graphics;
 
 import arc.graphics.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 

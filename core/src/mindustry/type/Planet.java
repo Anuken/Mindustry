@@ -71,6 +71,8 @@ public class Planet extends UnlockableContent{
     public float orbitRadius;
     /** Total radius of this planet and all its children. */
     public float totalRadius;
+    /** Scaling of the 'shell' where sectors are projected around hte planet. */
+    public float outlineScale = 1.17f;
     /** Time for the planet to orbit around the sun once, in seconds. One year. */
     public float orbitTime;
     /** Time for the planet to perform a full revolution, in seconds. One day. */
@@ -168,7 +170,7 @@ public class Planet extends UnlockableContent{
     /** Loads the mesh. Clientside only. Defaults to a boring sphere mesh. */
     public Prov<GenericMesh> meshLoader = () -> new ShaderSphereMesh(this, Shaders.unlitWhite, 2), cloudMeshLoader = () -> null;
     /** Loads the planet grid outline mesh. Clientside only. */
-    public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineRad * radius);
+    public Prov<Mesh> gridMeshLoader = () -> MeshBuilder.buildPlanetGrid(grid, outlineColor, outlineScale * radius);
 
     /** If set, this planet will have the same stats as its parent. Use for shared campaigns. */
     public @Nullable Planet statParent;
@@ -563,7 +565,7 @@ public class Planet extends UnlockableContent{
         Color color = Tmp.c1.set(base).a((base.a + 0.3f + Mathf.absin(Time.globalTime, 5f, 0.3f)) * alpha);
 
         float r1 = radius;
-        float r2 = outlineRad * radius + 0.001f;
+        float r2 = sector.planet.outlineScale * radius + 0.001f;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
@@ -584,7 +586,7 @@ public class Planet extends UnlockableContent{
 
     /** Draws sector plane. Supply the batch with {@link Gl#triangles triangle} vertices. */
     public void fill(VertexBatch3D batch, Sector sector, Color color, float offset){
-        float rr = outlineRad * radius + offset;
+        float rr = sector.planet.outlineScale * radius + offset;
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner c = sector.tile.corners[i], next = sector.tile.corners[(i+1) % sector.tile.corners.length];
             batch.tri(Tmp.v31.set(c.v).setLength(rr), Tmp.v32.set(next.v).setLength(rr), Tmp.v33.set(sector.tile.v).setLength(rr), color);
@@ -593,7 +595,7 @@ public class Planet extends UnlockableContent{
 
     /** Draws sector when selected. Supply the batch with {@link Gl#triangles triangle} vertices. */
     public void drawSelection(VertexBatch3D batch, Sector sector, Color color, float stroke, float length){
-        float arad = (outlineRad + length) * radius;
+        float arad = (sector.planet.outlineScale + length) * radius;
 
         for(int i = 0; i < sector.tile.corners.length; i++){
             Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
@@ -624,7 +626,7 @@ public class Planet extends UnlockableContent{
         }
 
         //render sector grid
-        float scaledOutlineRad = outlineRad * radius;
+        float scaledOutlineRad = params.planet.outlineScale * radius;
         Mesh mesh = gridMesh;
         Shader shader = Shaders.planetGrid;
         Vec3 tile = intersect(cam.getMouseRay(), scaledOutlineRad);
@@ -638,9 +640,9 @@ public class Planet extends UnlockableContent{
     }
 
     /** Draws an arc from one point to another on the planet. */
-    public void drawArc(VertexBatch3D batch, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
+    public void drawArc(Planet planet, VertexBatch3D batch, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
         //increase curve height when on opposite side of planet, so it doesn't tunnel through
-        float scaledOutlineRad = outlineRad * radius;
+        float scaledOutlineRad = planet.outlineScale * radius;
         float dot = 1f - (Tmp.v32.set(a).nor().dot(Tmp.v33.set(b).nor()) + 1f)/2f;
 
         Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
@@ -660,9 +662,9 @@ public class Planet extends UnlockableContent{
     }
 
     /** Draws an arc from one point to another on the planet. Has thickness. */
-    public void drawArcLine(VertexBatch3D batch, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount, float stroke){
+    public void drawArcLine(Planet planet, VertexBatch3D batch, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount, float stroke){
         //increase curve height when on opposite side of planet, so it doesn't tunnel through
-        float scaledOutlineRad = outlineRad * radius;
+        float scaledOutlineRad = planet.outlineScale * radius;
         float dot = 1f - (Tmp.v32.set(a).nor().dot(Tmp.v33.set(b).nor()) + 1f)/2f;
 
         Vec3 avg = Tmp.v31.set(b).add(a).scl(0.5f);
@@ -694,7 +696,7 @@ public class Planet extends UnlockableContent{
     }
 
     public Vec3 project(Sector sector, Camera3D cam, Vec3 out){
-        return cam.project(out.set(sector.tile.v).setLength(outlineRad * radius).rotate(Vec3.Y, -getRotation()).add(position));
+        return cam.project(out.set(sector.tile.v).setLength(sector.planet.outlineScale * radius).rotate(Vec3.Y, -getRotation()).add(position));
     }
 
     public void setPlane(Sector sector, PlaneBatch3D projector){
@@ -703,7 +705,7 @@ public class Planet extends UnlockableContent{
 
         projector.setPlane(
             //origin on sector position
-            Tmp.v33.set(sector.tile.v).setLength((outlineRad + length) * radius).rotate(Vec3.Y, rotation).add(position),
+            Tmp.v33.set(sector.tile.v).setLength((sector.planet.outlineScale + length) * radius).rotate(Vec3.Y, rotation).add(position),
             //face up
             sector.plane.project(Tmp.v32.set(sector.tile.v).add(Vec3.Y)).sub(sector.tile.v, radius).rotate(Vec3.Y, rotation).nor(),
             //right vector

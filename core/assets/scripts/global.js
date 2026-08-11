@@ -45,8 +45,8 @@ function extend(/*Base, ..., def*/){
 importPackage(Packages.java.lang)
 const Arrays = Packages.java.util.Arrays
 //commonly used inner classes that are moved out so JS mods can be more compatible with v8 and v9
-const TextureFilter = Packages.arc.graphics.Texture.TextureFilter
-const TextureWrap = Packages.arc.graphics.Texture.TextureWrap
+const TextureFilter = Packages.arc.graphics.TextureFilter
+const TextureWrap = Packages.arc.graphics.TextureWrap
 importPackage(Packages.arc)
 importPackage(Packages.arc.audio)
 importPackage(Packages.arc.files)
@@ -54,7 +54,6 @@ importPackage(Packages.arc.flabel)
 importPackage(Packages.arc.func)
 importPackage(Packages.arc.graphics)
 importPackage(Packages.arc.graphics.g2d)
-importPackage(Packages.arc.graphics.gl)
 importPackage(Packages.arc.input)
 importPackage(Packages.arc.math)
 importPackage(Packages.arc.math.geom)
@@ -93,6 +92,7 @@ importPackage(Packages.mindustry.game)
 importPackage(Packages.mindustry.gen)
 importPackage(Packages.mindustry.graphics)
 importPackage(Packages.mindustry.graphics.g3d)
+importPackage(Packages.mindustry.graphics.shaders)
 importPackage(Packages.mindustry.input)
 importPackage(Packages.mindustry.io)
 importPackage(Packages.mindustry.io.versions)

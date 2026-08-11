@@ -3,7 +3,6 @@ package mindustry.game;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -801,12 +800,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
-        public void write(Json json){
-            json.writeFields(this);
+        public void write(Json json, JsonWriter writer){
+            json.writeFields(writer, this);
         }
 
         @Override
-        public void read(Json json, JsonValue jsonData){
+        public void read(Json json, Jval jsonData){
             json.readFields(this, jsonData);
             if(jsonData.has("textureName")) setTexture(jsonData.getString("textureName"));
         }
@@ -1431,18 +1430,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public Object value = "white";
 
         @Override
-        public void write(Json json){
+        public void write(Json json, JsonWriter writer){
             if(value instanceof String s){
-                json.writeValue("string", s);
+                json.writeValue(writer, "string", s);
             }else if(value instanceof UnlockableContent c){
-                json.writeValue("content", c.name);
+                json.writeValue(writer, "content", c.name);
             }else if(value instanceof Building b){
-                json.writeValue("building", b.pos());
+                json.writeValue(writer, "building", b.pos());
             }
         }
 
         @Override
-        public void read(Json json, JsonValue jsonData){
+        public void read(Json json, Jval jsonData){
             if(jsonData.has("string")){
                 value = jsonData.get("string").asString();
             }else if(jsonData.has("content")){

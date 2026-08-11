@@ -2,9 +2,7 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 
@@ -16,7 +14,7 @@ public class Pixelator implements Disposable{
     private float px, py, pre;
 
     {
-        buffer.getTexture().setFilter(TextureFilter.nearest, TextureFilter.nearest);
+        buffer.texture.setFilter(TextureFilter.nearest, TextureFilter.nearest);
     }
 
     public void drawPixelate(){

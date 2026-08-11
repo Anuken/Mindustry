@@ -6,7 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
+import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -232,7 +232,7 @@ public class ApplicationTests{
         for(String file : files){
             try{
                 String str = Core.files.absolute("./../../" + file).readString();
-                assertEquals(ValueType.array, new JsonReader().parse(str).type());
+                assertEquals(Jtype.array, Jval.read(str).getType());
                 assertTrue(Jval.read(str).isArray());
                 JSONArray array = new JSONArray(str);
                 assertTrue(array.length() > 0);

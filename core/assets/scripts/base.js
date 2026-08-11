@@ -43,5 +43,5 @@ function extend(/*Base, ..., def*/){
 importPackage(Packages.java.lang)
 const Arrays = Packages.java.util.Arrays
 //commonly used inner classes that are moved out so JS mods can be more compatible with v8 and v9
-const TextureFilter = Packages.arc.graphics.Texture.TextureFilter
-const TextureWrap = Packages.arc.graphics.Texture.TextureWrap
+const TextureFilter = Packages.arc.graphics.TextureFilter
+const TextureWrap = Packages.arc.graphics.TextureWrap

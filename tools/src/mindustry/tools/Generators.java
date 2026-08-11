@@ -521,37 +521,6 @@ public class Generators{
             }
         });
 
-        MultiPacker packer = new MultiPacker(){
-            @Override
-            public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
-                String prefix = type == PageType.main ? "" : "../" + type.name() + "/";
-                Log.info("@ | @x@", prefix + name, region.width, region.height);
-                //save(region.pixmap, prefix + name);
-            }
-        };
-
-        //TODO !!!!! currently just an experiment
-
-        if(false)
-        generate("all-icons", () -> {
-            for(Seq<Content> arr : content.getContentMap()){
-                for(Content cont : arr){
-                    if(cont instanceof UnlockableContent && !(cont instanceof Planet)){
-                        UnlockableContent unlock = (UnlockableContent)cont;
-
-                        if(unlock.generateIcons){
-                            try{
-                                unlock.createIcons(packer);
-                            }catch(IllegalArgumentException e){
-                                Log.err(e);
-                                Log.err("Skip: @", unlock.name);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
         generate("unit-icons", () -> content.units().each(type -> {
             if(type.internal && !type.internalGenerateSprites) return; //internal hidden units don't generate
 

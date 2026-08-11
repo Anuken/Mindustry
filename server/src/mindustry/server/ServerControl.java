@@ -9,8 +9,6 @@ import arc.util.Timer;
 import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
-import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
@@ -396,8 +394,8 @@ public class ServerControl implements ApplicationListener{
         });
     }
 
-    JsonValue readRulesFile(){
-        return JsonIO.json.fromJson(null, Jval.read(rulesFile.readString()).toString(Jformat.plain));
+    Jval readRulesFile(){
+        return JsonIO.json.fromJson(null, rulesFile);
     }
 
     void loadDataAssets(){
@@ -690,10 +688,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
-            JsonValue base = readRulesFile();
+            Jval base = readRulesFile();
 
             if(arg.length == 0){
-                info("Rules:\n@", Jval.read(base.toJson(OutputType.minimal)).toString(Jformat.hjson));
+                info("Rules:\n@", base.toString(Jformat.hjson));
             }else if(arg.length == 1){
                 err("Invalid usage. Specify which rule to remove or add.");
             }else{
@@ -718,24 +716,19 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     try{
-                        JsonValue value = new JsonReader().parse(arg[2]);
-                        value.name = arg[1];
+                        String name = arg[1];
+                        Jval value = Jval.read(arg[2]);
+                        base.put(name, value);
 
-                        JsonValue parent = new JsonValue(ValueType.object);
-                        parent.addChild(value);
+                        JsonIO.json.readField(state.rules, name, base);
 
-                        JsonIO.json.readField(state.rules, value.name, parent);
-                        if(base.has(value.name)){
-                            base.remove(value.name);
-                        }
-                        base.addChild(arg[1], value);
                         info("Changed rule: @", value.toString().replace("\n", " "));
                     }catch(Throwable e){
                         err("Error parsing rule JSON: @", e.getMessage());
                     }
                 }
 
-                rulesFile.writeString(Jval.read(base.toString()).toString(Jformat.hjson));
+                rulesFile.writeString(base.toString(Jformat.hjson));
                 Call.setRules(state.rules);
             }
         });

@@ -256,7 +256,7 @@ public class CustomRulesDialog extends BaseDialog{
         Boolp allowMusic = () -> !rules.disableMusic;
         Func<String, Seq<MusicContainer>> parser = str -> {
             try{
-                return Seq.map(new JsonReader().parse("[" + str + "]").asStringArray(), MusicContainer::new);
+                return Jval.read("[" + str + "]").asArray().map( j -> new MusicContainer(j.asString()));
             }catch(Throwable e){
                 return null;
             }

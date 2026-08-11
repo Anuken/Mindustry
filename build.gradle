@@ -38,8 +38,8 @@ allprojects{
     group = 'com.github.Anuken'
 
     ext{
-        versionNumber = '8'
-        if(!project.hasProperty("versionModifier")) versionModifier = 'release'
+        versionNumber = '9'
+        if(!project.hasProperty("versionModifier")) versionModifier = 'alpha'
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = 'da41c05b7a2a44c8625ca0ba7d6ca1a2e73f621a'
@@ -259,10 +259,7 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
-        implementation arcModule("extensions:profiling")
         implementation arcModule("extensions:discord")
-        implementation arcModule("natives:natives-filedialogs")
-        implementation arcModule("extensions:filedialogs")
         implementation arcModule("natives:natives-desktop")
         implementation arcModule("natives:natives-freetype-desktop")
 
@@ -270,7 +267,7 @@ project(":desktop"){
 
         implementation "com.github.Anuken:steamworks4j:$steamworksVersion"
 
-        implementation arcModule("backends:backend-sdl")
+        implementation arcModule("backends:backend-sdl3")
     }
 }
 
@@ -378,11 +375,9 @@ project(":core"){
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
-        api arcModule("extensions:g3d")
         api arcModule("extensions:fx")
         api arcModule("extensions:arcnet")
         api "com.github.Anuken:rhino:$rhinoVersion"
-        if(localArc && debugged()) api arcModule("extensions:recorder")
         if(localArc) api arcModule(":extensions:packer")
 
         compileOnly project(":annotations")

@@ -16,6 +16,7 @@ public class DataManager{
     private DataImagePacker packer = new DataImagePacker();
     private DataAudioLoader soundLoader = new DataAudioLoader();
     private DataBundleLoader bundleLoader = new DataBundleLoader();
+    private DataEmojiLoader emojiLoader = new DataEmojiLoader();
 
     private ObjectMap<DataAssetType, Seq<DataAsset>> assets = new ObjectMap<>();
     private Seq<DataAsset> orderedAssets = new Seq<>();
@@ -79,9 +80,9 @@ public class DataManager{
         UnlockableContent[] currentContent = {null};
         String[] currentHash = {null};
 
-        MultiPacker saver = new MultiPacker(false){
+        MultiPacker saver = new MultiPacker(0){
             @Override
-            public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
+            public void add(String name, PixmapRegion region, int[] splits, int[] pads){
                 try{
                     if(region.pixmap.width > 2000) throw new IllegalArgumentException("Max image size exceeded");
 
@@ -104,11 +105,6 @@ public class DataManager{
             @Override
             public boolean has(String name){
                 return imageMap.containsKey(name);
-            }
-
-            @Override
-            public boolean has(PageType type, String name){
-                return has(name);
             }
 
             @Override
@@ -179,7 +175,7 @@ public class DataManager{
         packer.unload();
         packer.pack(getImages());
 
-        rebuildOrderedAssets();
+        reloadEmojis();
     }
 
     public void reloadImages(Seq<ImageAsset> images){
@@ -191,6 +187,13 @@ public class DataManager{
     public void reloadAudio(){
         soundLoader.unload();
         soundLoader.load(getSounds(), getMusic());
+
+        rebuildOrderedAssets();
+    }
+
+    public void reloadEmojis(){
+        emojiLoader.unload();
+        emojiLoader.load(getEmojis());
 
         rebuildOrderedAssets();
     }
@@ -212,6 +215,7 @@ public class DataManager{
         }
 
         patcher.apply(getPatches(), getContent());
+        emojiLoader.load(getEmojis());
 
         rebuildOrderedAssets();
     }
@@ -223,6 +227,7 @@ public class DataManager{
             packer.unload();
         }
         soundLoader.unload();
+        emojiLoader.unload();
 
         assets.clear();
         orderedAssets.clear();
@@ -308,5 +313,9 @@ public class DataManager{
 
     public Seq<ContentAsset> getContent(){
         return getAssets(DataAssetType.content);
+    }
+
+    public Seq<EmojiAsset> getEmojis(){
+        return getAssets(DataAssetType.emoji);
     }
 }

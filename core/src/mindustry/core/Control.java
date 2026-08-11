@@ -8,6 +8,7 @@ import arc.input.*;
 import arc.math.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -73,12 +74,39 @@ public class Control implements ApplicationListener, Loadable{
 
         //show dialog saying that mod loading was skipped.
         Events.on(ClientLoadEvent.class, e -> {
+            checkAutoUnlocks();
+
             if(Vars.mods.skipModLoading() && Vars.mods.list().any()){
                 Time.runTask(4f, () -> {
                     ui.showInfo("@mods.initfailed");
                 });
             }
-            checkAutoUnlocks();
+
+            Time.runTask(5f, () -> {
+                String key = "v9-warning-alpha1";
+
+                if(!settings.getBool(key)){
+                    //I am not bothering to localize this since it will be removed and rewritten eventually
+                    BaseDialog diag = new BaseDialog("Alpha Version Warning");
+                    diag.cont.add(
+                    """
+                    You are playing the [accent]alpha[] version of Mindustry v9. There is [accent]no new content[], only internal changes.
+                    
+                    You will experience crashes and other unstable behavior. Most Java mods will not work.
+                    
+                    Save data may randomly get deleted or corrupted. [accent]Make sure you back up your save before playing.[]
+                    Unless you know what you're doing, play the stable (v8) version instead.
+                    """).growX().wrap().maxWidth(Math.min(graphics.getWidth() / Scl.scl(1f) - Scl.scl(10f), Scl.scl(600f))).labelAlign(Align.center);
+                    diag.cont.row();
+                    diag.cont.check("@dontshowagain", v -> settings.put(key, v));
+
+                    diag.buttons.button("@ok", Icon.ok, () -> {
+                        diag.hide();
+                    }).size(200f, 64f);
+
+                    diag.show();
+                }
+            });
         });
 
         Events.on(StateChangeEvent.class, event -> {
