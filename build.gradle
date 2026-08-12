@@ -534,3 +534,9 @@ task resolveDependencies{
         }
     }
 }
+
+if(System.getProperty("compileMethodParams") != null){
+    project(":core").tasks.withType(JavaCompile).configureEach{
+        options.compilerArgs << '-parameters'
+    }
+}
