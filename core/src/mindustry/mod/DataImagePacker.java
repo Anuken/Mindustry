@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
+import mindustry.game.EventType.*;
 import mindustry.mod.data.*;
 
 import java.io.*;
@@ -20,8 +21,12 @@ import java.util.concurrent.atomic.*;
 /** Manages data patch images. */
 public class DataImagePacker{
     public static final String regionPrefix = "dp-";
+    /** Prefix for images pushed dynamically by the server via {@link #addTexture(String, byte[])}, as opposed to map/mod data patches. */
+    public static final String serverRegionPrefix = "net-";
 
     private @Nullable TextureAtlas patchAtlas;
+    /** Textures added at runtime via addTexture(), keyed by their unprefixed name. Tracked separately from patchAtlas so they can be added/removed individually. */
+    private ObjectMap<String, Texture> serverImages = new ObjectMap<>();
 
     /** Packs a new set of images. If images are already packed, disposes of the old ones. */
     public void pack(Seq<ImageAsset> images){
@@ -183,6 +188,62 @@ public class DataImagePacker{
             patchAtlas.dispose();
             patchAtlas = null;
         }
+
+        serverImages.each((name, texture) -> {
+            Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
+            Core.atlas.getTextures().remove(texture);
+            texture.dispose();
+            Core.atlas.getDrawables().remove(serverRegionPrefix + name);
+
+        });
+        serverImages.clear();
+    }
+
+    /** Decodes PNG bytes and registers them into the atlas under "netRegionPrefix + name", replacing any existing image with the same name. Safe to call from any thread. */
+    public void addTexture(String name, byte[] pngData){
+        Vars.mainExecutor.submit(() -> {
+            Pixmap pixmap;
+            try{
+                pixmap = new Pixmap(pngData);
+            }catch(Throwable e){
+                Log.err("Invalid server-provided image data for '" + name + "'", e);
+                return;
+            }
+
+            if(pixmap.width > DataPatcher.maxImageSize || pixmap.height > DataPatcher.maxImageSize){
+                Log.err("Server-provided image '" + name + "' exceeds max size of " + DataPatcher.maxImageSize);
+                pixmap.dispose();
+                return;
+            }
+
+            Core.app.post(() -> {
+                removeTexture(name);
+
+                Texture texture = new Texture(pixmap);
+                pixmap.dispose();
+
+                var region = new TextureAtlas.AtlasRegion(texture, 0, 0, texture.width, texture.height);
+                region.name = serverRegionPrefix + name;
+
+                serverImages.put(name, texture);
+                Core.atlas.getTextures().add(texture);
+                Core.atlas.getRegionMap().put(serverRegionPrefix + name, region);
+
+                //fired with the full atlas region name
+                Events.fire(new TextureStreamEvent(serverRegionPrefix + name));
+            });
+        });
+    }
+
+    /** Removes a texture previously added with {@link #addTexture} */
+    public void removeTexture(String name){
+        Texture texture = serverImages.remove(name);
+        if(texture != null){
+            Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
+            Core.atlas.getTextures().remove(texture);
+            texture.dispose();
+            Core.atlas.getDrawables().remove(serverRegionPrefix + name);
+        }
     }
 
     public void printStats(PixmapPacker mainPacker, PixmapPacker envPacker){
@@ -203,16 +264,6 @@ public class DataImagePacker{
 
                 i ++;
             }
-        }
-    }
-
-    static class PackResult{
-        String name;
-        Pixmap pixmap;
-
-        public PackResult(String name, Pixmap pixmap){
-            this.name = name;
-            this.pixmap = pixmap;
         }
     }
 }
