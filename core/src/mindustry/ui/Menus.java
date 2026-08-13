@@ -83,7 +83,9 @@ public class Menus{
             }
         };
 
-        dialog.idToElement = UiTreeBuilder.build(dialog.cont, builder, dialog.originalListener);
+        var result = UiTreeBuilder.build(dialog.cont, builder, dialog.originalListener);
+        dialog.idToElement = result.idElements;
+        dialog.addImages(result.images);
 
         var oldDialog = menuDialogs.remove(id);
 
@@ -108,12 +110,13 @@ public class Menus{
         if(table == null) return;
 
         table.clear();
-        var newElements = UiTreeBuilder.build(table, builder, result -> {
+        var result = UiTreeBuilder.build(table, builder, res -> {
             //forward results to original listener
-            dialog.originalListener.get(result);
+            dialog.originalListener.get(res);
         });
-        //save new element IDs
-        dialog.idToElement.putAll(newElements);
+        //save new element IDs and images
+        dialog.idToElement.putAll(result.idElements);
+        dialog.addImages(result.images);
     }
 
     @Remote(variants = Variant.both)
@@ -388,11 +391,30 @@ public class Menus{
     static class MenuDialog extends BaseDialog{
         //retained for easy lookup if an element needs to be replaced
         ObjectMap<String, Element> idToElement;
+        //every streamed image built into this dialog, keyed by the region name
+        ObjectMap<String, Seq<Image>> images = new ObjectMap<>();
         Cons<MenuResult> originalListener;
         boolean wasHidden;
 
+        static{
+            // refresh images that are received after the dialog is already opened
+            Events.on(TextureStreamEvent.class, e -> {
+                for(var dialog : menuDialogs.values()){
+                    var imgs = dialog.images.get(e.name);
+                    if(imgs != null){
+                        var drawable = Core.atlas.drawable(e.name);
+                        imgs.each(img -> img.setDrawable(drawable));
+                    }
+                }
+            });
+        }
+
         public MenuDialog(){
             super("");
+        }
+
+        void addImages(ObjectMap<String, Seq<Image>> images){
+            images.each((region, imgs) -> this.images.get(region, Seq::new).addAll(imgs));
         }
     }
 

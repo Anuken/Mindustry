@@ -7,6 +7,7 @@ import arc.graphics.g2d.TextureAtlas.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.mod.data.*;
@@ -186,6 +187,18 @@ public class DataManager{
         if(images != getImages()) getImages().set(images);
 
         reloadImages();
+    }
+
+    /** Adds/replaces a single image pushed by the server at runtime, independent of map/mod data patches.
+     * Use {@link mindustry.core.NetServer#sendTexture} to send a texture to connected clients. */
+    public void addTexture(String name, byte[] pngData){
+        if(!Vars.headless) packer.addTexture(name, pngData);
+    }
+
+    /** Removes a texture previously added with {@link #addTexture}. */
+    @Remote(variants = Variant.both)
+    public static void removeTexture(String name){
+        if(!Vars.headless) Vars.state.data.packer.removeTexture(name);
     }
 
     public void reloadAudio(){
