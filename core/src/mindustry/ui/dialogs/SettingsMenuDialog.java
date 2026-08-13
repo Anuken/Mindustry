@@ -405,7 +405,6 @@ public class SettingsMenuDialog extends BaseDialog{
         game.checkPref("savecreate", true);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
-        game.checkPref("smartconveyorbridges", true);
         game.checkPref("hints", true);
 
         if(!mobile){
