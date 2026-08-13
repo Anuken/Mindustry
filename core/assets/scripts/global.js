@@ -206,6 +206,7 @@ const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
 const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
+const TextureStreamEvent = Packages.mindustry.game.EventType.TextureStreamEvent
 const DataPatchLoadEvent = Packages.mindustry.game.EventType.DataPatchLoadEvent
 const WorldLoadEndEvent = Packages.mindustry.game.EventType.WorldLoadEndEvent
 const WorldLoadBeginEvent = Packages.mindustry.game.EventType.WorldLoadBeginEvent
