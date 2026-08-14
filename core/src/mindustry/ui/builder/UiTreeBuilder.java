@@ -99,7 +99,7 @@ public class UiTreeBuilder{
 
                         var element = addNode(entry.key, child, ctx);
                         if(element == null) continue; // unknown/unsupported node - skip for forward compat
-                        String id = node.str(UiKey.id);
+                        String id = child.str(UiKey.id);
 
                         if(id != null){
                             element.name = id;
