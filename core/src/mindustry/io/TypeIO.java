@@ -165,33 +165,11 @@ public class TypeIO{
     /** Read the {@code ObjectType} of the next object. */
     public static ObjectType readObjectType(Reads read){
         byte type = read.b();
-        return switch (type){
-            case 0 -> ObjectType.Null;
-            case 1 -> ObjectType.Integer;
-            case 2 -> ObjectType.Long;
-            case 3 -> ObjectType.Float;
-            case 4 -> ObjectType.String;
-            case 5 -> ObjectType.Content;
-            case 6 -> ObjectType.IntSeq;
-            case 7 -> ObjectType.Point2;
-            case 8 -> ObjectType.PointArray;
-            case 9 -> ObjectType.TechNode;
-            case 10 -> ObjectType.Boolean;
-            case 11 -> ObjectType.Double;
-            case 12 -> ObjectType.Building;
-            case 13 -> ObjectType.LAccess;
-            case 14 -> ObjectType.ByteArray;
-            case 15 -> ObjectType.Legacy;
-            case 16 -> ObjectType.BooleanArray;
-            case 17 -> ObjectType.Unit;
-            case 18 -> ObjectType.Vec2Array;
-            case 19 -> ObjectType.Vec2;
-            case 20 -> ObjectType.Team;
-            case 21 -> ObjectType.IntArray;
-            case 22 -> ObjectType.ObjectArray;
-            case 23 -> ObjectType.UnitCommand;
-            default -> throw new IllegalArgumentException("Unknown object type: " + type);
-        };
+        if(0 <= type && type < ObjectType.all.length){
+            return ObjectType.all[type];
+        }
+
+        throw new IllegalArgumentException("Unknown object type: " + type);
     }
 
     public static @Nullable Object readObject(Reads read){
@@ -1436,6 +1414,8 @@ public class TypeIO{
         IntArray        ((byte)21),
         ObjectArray     ((byte)22),
         UnitCommand     ((byte)23);
+
+        static final ObjectType[] all = values();
 
         final byte identifier;
 
