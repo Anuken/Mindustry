@@ -167,10 +167,8 @@ public class DataImagePacker{
 
         serverImages.each((name, texture) -> {
             Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
-            Core.atlas.getTextures().remove(texture);
-            texture.dispose();
             Core.atlas.getDrawables().remove(serverRegionPrefix + name);
-
+            texture.dispose();
         });
         serverImages.clear();
     }
@@ -202,7 +200,6 @@ public class DataImagePacker{
                 region.name = serverRegionPrefix + name;
 
                 serverImages.put(name, texture);
-                Core.atlas.getTextures().add(texture);
                 Core.atlas.getRegionMap().put(serverRegionPrefix + name, region);
 
                 //fired with the full atlas region name
@@ -216,9 +213,8 @@ public class DataImagePacker{
         Texture texture = serverImages.remove(name);
         if(texture != null){
             Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
-            Core.atlas.getTextures().remove(texture);
-            texture.dispose();
             Core.atlas.getDrawables().remove(serverRegionPrefix + name);
+            texture.dispose();
         }
     }
 
