@@ -785,6 +785,44 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
+    /** Fills an area. x2/y2 are inclusive.*/
+    @Remote(called = Loc.server)
+    public static void fillTileBlocks(int x, int y, int x2, int y2, Block block, Team team){
+        for(int tx = x; tx <= x2; tx++){
+            for(int ty = y; ty <= y2; ty++){
+                Tile tile = world.tile(tx, ty);
+                if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
+                tile.setBlock(block, team, 0);
+            }
+        }
+    }
+
+    /** Fills an area. x2/y2 are inclusive.*/
+    @Remote(called = Loc.server)
+    public static void fillTileFloors(int x, int y, int x2, int y2, Block block){
+        if(!(block instanceof Floor floor)) return;
+        for(int tx = x; tx <= x2; tx++){
+            for(int ty = y; ty <= y2; ty++){
+                Tile tile = world.tile(tx, ty);
+                if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
+                tile.setFloor(floor);
+            }
+        }
+    }
+
+    /** Fills an area. x2/y2 are inclusive.*/
+    @Remote(called = Loc.server)
+    public static void fillTileOverlays(int x, int y, int x2, int y2, Block block){
+        if(!(block instanceof OverlayFloor floor)) return;
+        for(int tx = x; tx <= x2; tx++){
+            for(int ty = y; ty <= y2; ty++){
+                Tile tile = world.tile(tx, ty);
+                if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
+                tile.setOverlay(floor);
+            }
+        }
+    }
+
     @Remote(called = Loc.server)
     public static void setFloor(Tile tile, Block floor, Block overlay){
         tile.setFloor(floor.asFloor());

@@ -33,6 +33,7 @@ public class ScriptMainGenerator{
 
         Seq<Class<?>> classes = Seq.withArrays(
             getClasses("mindustry"),
+            getClasses("arc"),
             getClasses("arc.func"),
             getClasses("arc.struct"),
             getClasses("arc.scene"),

@@ -1933,7 +1933,7 @@ public class Fx{
             float angle = rand.random(360f);
             float lenRand = rand.random(0.5f, 1.2f);
             Tmp.v1.trns(angle, circleRad);
- 
+
             for(int s : Mathf.signs){
                 Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fout() * 10f, e.fout() * 10f * lenRand + 8f, angle + 90f + s * 90f);
             }
@@ -2807,12 +2807,7 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
-        if(e.data instanceof ForceFieldAbility ab){
-            Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
-            return;
-        }
-
-        Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
+        Lines.poly(e.x, e.y, e.data instanceof Integer i ? i : 6, e.rotation + e.fin());
     }).followParent(true),
 
     arcShieldBreak = new Effect(40, e -> {

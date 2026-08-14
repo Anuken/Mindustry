@@ -91,7 +91,7 @@ public class ForceFieldAbility extends Ability{
         if(unit.shield <= 0f && !wasBroken){
             unit.shield -= cooldown * regen;
 
-            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), sides);
             breakSound.at(unit.x, unit.y);
         }
 
@@ -120,7 +120,7 @@ public class ForceFieldAbility extends Ability{
 
         //self-destructing units can have a shield on death
         if(unit.shield > 0f && !wasBroken){
-            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), sides);
             breakSound.at(unit.x, unit.y);
         }
     }

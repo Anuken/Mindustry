@@ -20,20 +20,21 @@ import arc.scene.utils.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.mod.*;
 import mindustry.ui.*;
 import mindustry.ui.builder.UiBuilder.*;
 
 /** Builds a UI into an existing Table from a NodeBuilder tree. */
 public class UiTreeBuilder{
 
-    public static ObjectMap<String, Element> build(Table root, NodeBuilder<?> builder){
+    public static BuildResult build(Table root, NodeBuilder<?> builder){
         return build(root, builder, null);
     }
 
-    public static ObjectMap<String, Element> build(Table root, NodeBuilder<?> builder, @Nullable Cons<MenuResult> resultListener){
+    public static BuildResult build(Table root, NodeBuilder<?> builder, @Nullable Cons<MenuResult> resultListener){
         BuildContext ctx = new BuildContext(resultListener);
         buildInto(root, builder.entries, ctx);
-        return ctx.idElements;
+        return new BuildResult(ctx.idElements, ctx.images);
     }
 
     private static void buildInto(Table table, Seq<Entry> entries, BuildContext ctx){
@@ -98,7 +99,7 @@ public class UiTreeBuilder{
 
                         var element = addNode(entry.key, child, ctx);
                         if(element == null) continue; // unknown/unsupported node - skip for forward compat
-                        String id = node.str(UiKey.id);
+                        String id = child.str(UiKey.id);
 
                         if(id != null){
                             element.name = id;
@@ -125,7 +126,10 @@ public class UiTreeBuilder{
                 yield label;
             }
             case image -> {
-                Image image = new Image(findDrawable(node.str(UiKey.region, node.str(UiKey.icon, "error"))));
+                String region = node.str(UiKey.region, node.str(UiKey.icon, "error"));
+                Image image = new Image(findDrawable(region, node.str(UiKey.placeholder)));
+                // track server-streamed images so that they can be reloaded when streaming finishes
+                if(region.startsWith(DataImagePacker.serverRegionPrefix)) ctx.images.get(region, Seq::new).add(image);
                 String scl = node.str(UiKey.scaling);
                 if(scl != null){
                     try{
@@ -141,7 +145,10 @@ public class UiTreeBuilder{
 
                 String icon = node.str(UiKey.icon);
                 if(icon != null){
-                    btn.add(new Image(findDrawable(icon)).setScaling(Scaling.fit)).size(32f);
+                    Image iconImage = new Image(findDrawable(icon, node.str(UiKey.placeholder))).setScaling(Scaling.fit);
+                    // track server-streamed images so that they can be reloaded when streaming finishes
+                    if(icon.startsWith(DataImagePacker.serverRegionPrefix)) ctx.images.get(icon, Seq::new).add(iconImage);
+                    btn.add(iconImage).size(32f);
                     btn.getCells().reverse();
                 }
                 wireButton(btn, node, ctx);
@@ -149,7 +156,9 @@ public class UiTreeBuilder{
             }
             case imageButton -> {
                 String icon = node.str(UiKey.icon);
-                ImageButton btn = new ImageButton(icon != null ? findDrawable(icon) : null);
+                ImageButton btn = new ImageButton(icon != null ? findDrawable(icon, node.str(UiKey.placeholder)) : null);
+                // track server-streamed images so that they can be reloaded when streaming finishes
+                if(icon != null && icon.startsWith(DataImagePacker.serverRegionPrefix)) ctx.images.get(icon, Seq::new).add(btn.getImage());
                 applyStyle(node, ImageButtonStyle.class, btn::setStyle);
                 wireButton(btn, node, ctx);
                 yield btn;
@@ -308,13 +317,20 @@ public class UiTreeBuilder{
     }
 
     private static Drawable findDrawable(String name){
+        return findDrawable(name, "error");
+    }
+
+    /** @param placeholder shown instead of the error sprite if {@code name} isn't streamed from the server yet */
+    private static Drawable findDrawable(String name, @Nullable String placeholder){
         if(Core.atlas.has(name)){
             return Core.atlas.drawable(name);
         }
         //icons are a fallback (TODO: bad idea?)
         var result = Icon.icons.get(name);
-        if(result == null) return Core.atlas.drawable("error");
-        return result;
+        if(result != null) return result;
+
+        if(placeholder != null) return findDrawable(placeholder, null);
+        return Core.atlas.drawable("nomap"); // no placeholder provided, use the default of the map preview texture
     }
 
     /** Evaluates a condition string: "portrait", "landscape", or "width|height >=|>|<|<= number". */
@@ -363,6 +379,7 @@ public class UiTreeBuilder{
         final @Nullable Cons<MenuResult> resultListener;
         final ObjectMap<String, Element> idElements = new ObjectMap<>();
         final ObjectMap<String, ButtonGroup<Button>> buttonGroups = new ObjectMap<>();
+        final ObjectMap<String, Seq<Image>> images = new ObjectMap<>();
 
         BuildContext(@Nullable Cons<MenuResult> resultListener){
             this.resultListener = resultListener;
@@ -370,6 +387,17 @@ public class UiTreeBuilder{
 
         ButtonGroup<Button> group(String name){
             return buttonGroups.get(name, ButtonGroup::new);
+        }
+    }
+
+    /** Result of building a NodeBuilder: named elements (those with an explicit id), plus any server-streamed images, keyed by region name */
+    public static class BuildResult{
+        public final ObjectMap<String, Element> idElements;
+        public final ObjectMap<String, Seq<Image>> images;
+
+        BuildResult(ObjectMap<String, Element> idElements, ObjectMap<String, Seq<Image>> images){
+            this.idElements = idElements;
+            this.images = images;
         }
     }
 }

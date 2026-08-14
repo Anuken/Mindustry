@@ -552,6 +552,38 @@ public class NetServer implements ApplicationListener{
         debug("Packed @ of world data to @ (@ / @)", Strings.formatByteCount(stream.size()), player.name, player.con.address, player.uuid());
     }
 
+    /**
+     * Streams a texture to a single connected client. This may take some time if the image is large or if the connection is poor.
+     * Make sure to call {@link mindustry.mod.DataManager#removeTexture} when the image is no longer needed to prevent resource leaks.
+     * Use {@link PixmapIO#writePngBytes} to get Pixmap bytes. Respect {@link mindustry.mod.DataPatcher#maxImageSize}. */
+    public void sendTexture(NetConnection con, String name, byte[] pngData){
+        mainExecutor.submit(() -> {
+            var stream = packTexture(name, pngData);
+            con.sendStreamAsync(new TextureStream(), stream);
+        });
+    }
+
+    /** Streams a texture to every connected client. See {@link #sendTexture(NetConnection, String, byte[])} for more info. */
+    public void sendTexture(String name, byte[] pngData){
+        mainExecutor.submit(() -> {
+            var stream = packTexture(name, pngData);
+            for(NetConnection con : net.getConnections()){
+                con.sendStreamAsync(new TextureStream(), stream);
+            }
+        });
+    }
+
+    private ByteArrayOutputStream packTexture(String name, byte[] pngData){
+        var stream = new ByteArrayOutputStream();
+        try(DataOutputStream out = new DataOutputStream(stream)){
+            out.writeUTF(name);
+            out.write(pngData);
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        return stream;
+    }
+
     public void addPacketHandler(String type, Cons2<Player, String> handler){
         customPacketHandlers.get(type, Seq::new).add(handler);
     }

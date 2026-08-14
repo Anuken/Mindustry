@@ -48,15 +48,27 @@ const Arrays = Packages.java.util.Arrays
 const TextureFilter = Packages.arc.graphics.TextureFilter
 const TextureWrap = Packages.arc.graphics.TextureWrap
 importPackage(Packages.arc)
+importPackage(Packages.arc.assets)
+importPackage(Packages.arc.assets.loaders)
 importPackage(Packages.arc.audio)
+importPackage(Packages.arc.backend.headless)
 importPackage(Packages.arc.files)
 importPackage(Packages.arc.flabel)
+importPackage(Packages.arc.freetype)
 importPackage(Packages.arc.func)
+importPackage(Packages.arc.fx)
+importPackage(Packages.arc.fx.filters)
+importPackage(Packages.arc.fx.util)
 importPackage(Packages.arc.graphics)
+importPackage(Packages.arc.graphics.g3d)
 importPackage(Packages.arc.graphics.g2d)
 importPackage(Packages.arc.input)
 importPackage(Packages.arc.math)
 importPackage(Packages.arc.math.geom)
+importPackage(Packages.arc.mock)
+importPackage(Packages.arc.net)
+importPackage(Packages.arc.net.dns)
+importPackage(Packages.arc.packer)
 importPackage(Packages.arc.scene)
 importPackage(Packages.arc.scene.actions)
 importPackage(Packages.arc.scene.event)
@@ -194,6 +206,7 @@ const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
 const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
+const TextureStreamEvent = Packages.mindustry.game.EventType.TextureStreamEvent
 const DataPatchLoadEvent = Packages.mindustry.game.EventType.DataPatchLoadEvent
 const WorldLoadEndEvent = Packages.mindustry.game.EventType.WorldLoadEndEvent
 const WorldLoadBeginEvent = Packages.mindustry.game.EventType.WorldLoadBeginEvent
