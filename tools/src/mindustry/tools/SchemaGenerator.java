@@ -16,6 +16,7 @@ import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
+import mindustry.game.Objectives.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
