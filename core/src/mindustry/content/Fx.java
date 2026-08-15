@@ -2807,6 +2807,10 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
+        if(e.data instanceof ForceProjector f){
+            Lines.poly(e.x, e.y, f.sides, e.rotation + e.fin(), f.shieldRotation);
+            return;
+        }
         Lines.poly(e.x, e.y, e.data instanceof Integer i ? i : 6, e.rotation + e.fin());
     }).followParent(true),
 
