@@ -2807,15 +2807,11 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
-        if(e.data instanceof ForceFieldAbility ab){
-            Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
+        if(e.data instanceof ForceProjector f){
+            Lines.poly(e.x, e.y, f.sides, e.rotation + e.fin(), f.shieldRotation);
             return;
-        }else if(e.data instanceof ForceProjector ab){
-            Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.shieldRotation);
-            return;
-        }else{
-            Lines.poly(e.x, e.y, e.data instanceof Integer i ? i : 6, e.rotation + e.fin());
         }
+        Lines.poly(e.x, e.y, e.data instanceof Integer i ? i : 6, e.rotation + e.fin());
     }).followParent(true),
 
     arcShieldBreak = new Effect(40, e -> {
