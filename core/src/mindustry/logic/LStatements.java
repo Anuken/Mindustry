@@ -1500,7 +1500,7 @@ public class LStatements{
 
             row(table);
 
-            table.add("effect ");
+            table.add("effect");
             fields(table, effect, str -> effect = str).left();
         }
 
