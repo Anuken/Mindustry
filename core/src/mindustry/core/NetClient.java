@@ -165,6 +165,16 @@ public class NetClient implements ApplicationListener{
             Call.requestAssets(missing.toArray());
         });
 
+        net.handleClient(TextureStream.class, data -> {
+            try(DataInputStream in = new DataInputStream(data.stream)){
+                String name = in.readUTF();
+                byte[] pngData = in.readAllBytes();
+                if(!headless) state.data.addTexture(name, pngData);
+            }catch(IOException e){
+                Log.err("Failed to read server texture stream", e);
+            }
+        });
+
         net.handleClient(StreamBegin.class, data -> {
             boolean isWorld = data.type == Net.packetIdWorldStream, isAssets = data.type == Net.packetIdAssetStream;
 

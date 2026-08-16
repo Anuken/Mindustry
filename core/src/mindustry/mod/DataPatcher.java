@@ -22,6 +22,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
+import mindustry.world.modules.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -318,6 +319,7 @@ public class DataPatcher{
     public static void fixContentArrays(){
         if(!needsArrayFix) return;
         int items = Vars.content.items().size, liquids = Vars.content.liquids().size;
+        ItemModule.empty.checkArrayCapacity(items);
 
         //block item/liquid filter
         for(var block : Vars.content.blocks()){
@@ -660,6 +662,7 @@ public class DataPatcher{
                 }else{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
+                    visit(prevValue);
 
                     for(var child : jsv){
                         if(child.name != null){

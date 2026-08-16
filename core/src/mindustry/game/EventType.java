@@ -22,6 +22,7 @@ public class EventType{
     public enum Trigger{
         shock,
         cannotUpgrade,
+        fireCreate,
         openConsole,
         blastFreeze,
         impactPower,
@@ -115,6 +116,15 @@ public class EventType{
 
         public DataPatchLoadEvent(Seq<DataAsset> assets){
             this.assets = assets;
+        }
+    }
+
+    /** Called when a new texture is received from the server via {@link mindustry.core.NetServer#sendTexture}. */
+    public static class TextureStreamEvent {
+        public final String name;
+
+        public TextureStreamEvent(String name){
+            this.name = name;
         }
     }
 
