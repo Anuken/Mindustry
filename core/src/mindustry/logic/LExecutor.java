@@ -124,7 +124,8 @@ public class LExecutor{
     public void load(LAssembler builder){
         stop = false;
         nameMap = null;
-        vars = builder.vars.values().toSeq().retainAll(var -> !var.constant).toArray(LVar.class);
+        //retain constants that are links, which, by convention, don't start with @ (builtin) or _ (numeric constant)
+        vars = builder.vars.values().toSeq().retainAll(var -> !var.constant || var.name.charAt(0) != '_' && var.name.charAt(0) != '@').toArray(LVar.class);
         for(int i = 0; i < vars.length; i++){
             vars[i].id = i;
         }
@@ -1039,8 +1040,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
-                d.flushCommands(exec.graphicsBuffer);
+            if(target.building() instanceof LDrawable d && d.drawable(exec)){
+                d.draw(exec.graphicsBuffer);
             }
             exec.graphicsBuffer.clear();
         }
@@ -1175,9 +1176,8 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
-                d.message.setLength(0);
-                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), ((MessageBlock)d.block).maxTextLength));
+            if(target.building() instanceof LPrintable d && d.printable(exec)){
+                d.print(exec.textBuffer);
             }
             exec.textBuffer.setLength(0);
 

@@ -244,7 +244,7 @@ public class EntityProcess extends BaseProcessor{
                 Stype repr = types.first();
                 String groupType = repr.annotation(Component.class).base() ? baseName(repr) : interfaceName(repr);
 
-                String name = group.name().startsWith("g") ? group.name().substring(1) : group.name();
+                String name = group.name();
 
                 boolean collides = an.collide();
                 groupDefs.add(new GroupDefinition(name,
