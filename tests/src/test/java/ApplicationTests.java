@@ -1,6 +1,7 @@
 import arc.*;
 import arc.backend.headless.*;
 import arc.files.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -22,6 +23,7 @@ import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
@@ -289,6 +291,27 @@ public class ApplicationTests{
                 assertEquals(world.tile(x, y).build, world.tile(bx, by).build);
             }
         }
+    }
+
+    @Test
+    void setBlockMultiblockSensorCoords(){
+        createMap();
+        state.set(State.playing);
+
+        LExecutor.runLogicScript("setblock block @container 5.5 5.5 @derelict 0");
+        assertEquals(Blocks.container, world.tile(5, 5).block());
+        assertEquals(5, world.tile(5, 5).build.tileX());
+        assertEquals(5, world.tile(5, 5).build.tileY());
+
+        world.tile(5, 5).setBlock(Blocks.air);
+
+        LExecutor.runLogicScript("setblock block @container 5.6 5.6 @derelict 0");
+        assertEquals(Blocks.container, world.tile(5, 5).block());
+
+        world.tile(5, 5).setBlock(Blocks.air);
+
+        LExecutor.runLogicScript("setblock block @vault 3 3 @derelict 0");
+        assertEquals(Blocks.vault, world.tile(3, 3).block());
     }
 
     @Test

@@ -1584,8 +1584,16 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            Tile tile = world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
-            if(tile != null && block.obj() instanceof Block b){
+            if(!(block.obj() instanceof Block b)) return;
+
+            Tile tile;
+            if(layer == TileLayer.block){
+                tile = world.tile(World.toTile(World.unconv(x.numf()) - b.offset), World.toTile(World.unconv(y.numf()) - b.offset));
+            }else{
+                tile = world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
+            }
+
+            if(tile != null){
                 switch(layer){
                     case ore -> {
                         if((b instanceof OverlayFloor || b == Blocks.air) && tile.overlay() != b) tile.setOverlayNet(b);
