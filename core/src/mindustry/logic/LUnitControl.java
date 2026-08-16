@@ -29,4 +29,11 @@ public enum LUnitControl{
     LUnitControl(String... params){
         this.params = params;
     }
+
+    public String symbol() {
+        return switch (this) {
+            case unbind -> "decontrol";
+            default -> this.name();
+        };
+    }
 }
