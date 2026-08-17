@@ -344,7 +344,7 @@ public class LExecutor{
             if(!exec.privileged && !state.rules.logicUnitControl) return;
 
             Object unitObj = exec.unit.obj();
-            boolean control = type != LUnitControl.unbind && type != LUnitControl.within;
+            boolean control = type != LUnitControl.decontrol && type != LUnitControl.within;
             LogicAI ai = checkLogicAI(exec, unitObj, control);
 
             //only control standard AI units
@@ -370,7 +370,7 @@ public class LExecutor{
                             unit.clearBuilding();
                         }
                     }
-                    case unbind -> {
+                    case decontrol -> {
                         if(unit.controller() instanceof LogicAI){
                             unit.resetController();
                         }

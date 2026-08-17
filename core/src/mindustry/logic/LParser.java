@@ -81,6 +81,9 @@ public class LParser{
                 tokens[1] = "@status-" + tokens[1];
             }
         }
+        if(tokens[0].equals("ucontrol") && tokens[1].equals("unbind")){
+            tokens[1] = "decontrol";
+        }
     }
 
     /** Reads the next statement until EOL/EOF. */

@@ -21,19 +21,12 @@ public enum LUnitControl{
     deconstruct("x", "y"),
     getBlock("x", "y", "type", "building", "floor"),
     within("x", "y", "radius", "result"),
-    unbind;
+    decontrol;
 
     public final String[] params;
     public static final LUnitControl[] all = values();
 
     LUnitControl(String... params){
         this.params = params;
-    }
-
-    public String symbol() {
-        return switch (this) {
-            case unbind -> "decontrol";
-            default -> this.name();
-        };
     }
 }

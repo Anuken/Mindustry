@@ -1129,7 +1129,7 @@ public class LStatements{
             table.add(" ");
 
             table.button(b -> {
-                b.label(() -> type.symbol());
+                b.label(() -> type.name());
                 b.clicked(() -> showSelect(b, Structs.filter(LUnitControl.class, LUnitControl.all, t ->
                     t == LUnitControl.build ? state.rules.logicUnitBuild :
                     t == LUnitControl.deconstruct ? state.rules.logicUnitDeconstruct :
