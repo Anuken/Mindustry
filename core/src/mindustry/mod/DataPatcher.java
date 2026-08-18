@@ -8,7 +8,6 @@ import arc.util.serialization.Json.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
-import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.part.*;
@@ -93,7 +92,7 @@ public class DataPatcher{
     public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content, boolean reloadContentWorld){
         //if you're un-applying data patches, and it throws an error, just crash. this is not recoverable.
         if(applied){
-            unapply(reloadContentWorld);
+            unapply();
             applied = false;
         }
 
@@ -131,8 +130,7 @@ public class DataPatcher{
                 Fi file = new Fi(asset.path);
 
                 //this is very important for resizing various arrays used in the game
-                //checking for blocks is also important, as those can be added/removed, and corresponding blocks need to be updated
-                if(asset.type == ContentType.item || asset.type == ContentType.liquid || asset.type == ContentType.block){
+                if((asset.type == ContentType.item || asset.type == ContentType.liquid)){
                     needsArrayFix = true;
                 }
 
@@ -335,44 +333,15 @@ public class DataPatcher{
         if(!Vars.headless && Vars.ui != null && Vars.ui.editor != null && Vars.ui.editor.isShown()){
             int wh = Vars.world.width() * Vars.world.height();
             for(int i = 0; i < wh; i++){
-                Tile tile = Vars.world.tiles.geti(i);
-
-                //stale checks for floor/overlay
-                if(tile.floor().removed) tile.setFloor(getReplacementBlock(tile.floor()).asFloor());
-                if(tile.overlay().removed) tile.setOverlay(getReplacementBlock(tile.overlay()).asFloor());
-
-                if(tile.block().removed){
-                    Block mapped = getReplacementBlock(tile.block());
-                    //tile refers to stale content; get rid of it.
-                    if(mapped == Blocks.air){
-                        tile.remove();
-                    }else{
-                        //update internal reference of block to point to the new one with correct ID
-                        tile.updateBlockReference(mapped);
-                    }
-                }
-
-                var b = tile.build;
-                if(b == null || !tile.isCenter()) continue;
-                if(b.items != null) b.items.checkArrayCapacity(items);
-                if(b.liquids != null) b.liquids.checkArrayCapacity(items);
+                var b = Vars.world.tiles.geti(i).build;
+                if(b != null && b.items != null) b.items.checkArrayCapacity(items);
+                if(b != null && b.liquids != null) b.liquids.checkArrayCapacity(items);
             }
         }
 
         //TODO: this doesn't do anything about extensive ItemSeq usage across the codebase, which is limited to the campaign
         //TODO: this also doesn't change sectors
         needsArrayFix = false;
-    }
-
-    private static Block getReplacementBlock(Block existing){
-        Block other = Vars.content.block(existing.name);
-        if(other == null) return Blocks.air;
-        //make sure they are type compatible
-        if(other.getClass() == existing.getClass()){
-            return other;
-        }
-        //could not find an equivalent, clear it
-        return Blocks.air;
     }
 
     void visit(Object object){

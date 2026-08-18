@@ -171,7 +171,7 @@ public class MapContentView implements AssetView{
         }
 
         if(list.getChildren().isEmpty()){
-            list.add("@none.found");
+            list.add("@patch.none");
         }
     }
 
