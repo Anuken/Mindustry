@@ -28,7 +28,6 @@ public class DataManager{
 
     public void reloadContent(boolean reloadArrays){
 
-        patcher.unapply(reloadArrays);
         patcher.apply(getPatches(), getContent(), reloadArrays);
 
         rebuildOrderedAssets();
