@@ -5,6 +5,8 @@ import arc.math.Mathf;
 import mindustry.entities.Effect;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import arc.graphics.Color;
+import arc.graphics.g2d.Fill;
 
 import static arc.graphics.g2d.Draw.*;
 import static arc.math.Angles.trnsx;
