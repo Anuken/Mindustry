@@ -426,6 +426,7 @@ public class ArcNetProvider implements NetProvider{
 
         @Override
         public void sendStream(Streamable stream){
+            //listeners are processed in the order they're added and each reads into the buffer greedily before the next gets a turn, so concurrent streams are sent in FIFO order
             connection.addListener(new InputStreamSender(stream.stream, 1024){
                 int id;
 

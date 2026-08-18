@@ -554,34 +554,36 @@ public class NetServer implements ApplicationListener{
 
     /**
      * Streams a texture to a single connected client. This may take some time if the image is large or if the connection is poor.
-     * Make sure to call {@link mindustry.mod.DataManager#removeTexture} when the image is no longer needed to prevent resource leaks.
-     * Use {@link PixmapIO#writePngBytes} to get Pixmap bytes. Respect {@link mindustry.mod.DataPatcher#maxImageSize}. */
+     * Make sure to call {@link #removeTexture(NetConnection, String)} when the image is no longer needed to prevent resource leaks.
+     * Use {@link PixmapIO#writePngBytes} to get Pixmap bytes. Respect {@link mindustry.mod.DataPatcher#maxImageSize}.
+     * Should be called on main thread to ensure correct ordering of sends (multiple with same name), and removals (remove called right after adding). */
     public void sendTexture(NetConnection con, String name, byte[] pngData){
-        mainExecutor.submit(() -> {
-            var stream = packTexture(name, pngData);
-            con.sendStreamAsync(new TextureStream(), stream);
-        });
-    }
-
-    /** Streams a texture to every connected client. See {@link #sendTexture(NetConnection, String, byte[])} for more info. */
-    public void sendTexture(String name, byte[] pngData){
-        mainExecutor.submit(() -> {
-            var stream = packTexture(name, pngData);
-            for(NetConnection con : net.getConnections()){
-                con.sendStreamAsync(new TextureStream(), stream);
-            }
-        });
-    }
-
-    private ByteArrayOutputStream packTexture(String name, byte[] pngData){
         var stream = new ByteArrayOutputStream();
-        try(DataOutputStream out = new DataOutputStream(stream)){
-            out.writeUTF(name);
-            out.write(pngData);
-        }catch(IOException e){
-            throw new RuntimeException(e);
+        NetworkIO.packTexture(stream, name, pngData);
+        con.sendStreamAsync(new TextureStream(), stream);
+    }
+
+    /** Streams a texture to every connected client.
+     * See {@link #sendTexture(NetConnection, String, byte[])} for more info. */
+    public void sendTexture(String name, byte[] pngData){
+        var stream = new ByteArrayOutputStream();
+        NetworkIO.packTexture(stream, name, pngData);
+        for(NetConnection con : net.getConnections()){
+            con.sendStreamAsync(new TextureStream(), stream);
         }
-        return stream;
+    }
+
+    /** Removes a texture previously sent with {@link #sendTexture(NetConnection, String, byte[])} from a single client.
+     * If called while the texture is in use, it will be replaced with a black rectangle. Do not do this.
+     * Should be called on main thread for the same reasons as sendTexture. */
+    public void removeTexture(NetConnection con, String name){
+        sendTexture(con, name, Streams.emptyBytes);
+    }
+
+    /** Removes a texture previously sent with {@link #sendTexture(String, byte[])} from every connected client.
+     * See {@link #removeTexture(NetConnection, String)} for more info. */
+    public void removeTexture(String name){
+        sendTexture(name, Streams.emptyBytes);
     }
 
     public void addPacketHandler(String type, Cons2<Player, String> handler){
