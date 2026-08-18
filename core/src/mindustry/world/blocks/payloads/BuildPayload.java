@@ -10,6 +10,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import static mindustry.Vars.*;
 
@@ -36,6 +37,7 @@ public class BuildPayload implements Payload{
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
         build.dropped();
+        if(build instanceof CoreBlock.CoreBuild core) state.teams.registerCore(core);
     }
 
     @Override
@@ -60,6 +62,7 @@ public class BuildPayload implements Payload{
     public void destroyed(){
         build.dead = true;
         build.onDestroyed();
+        build.afterDestroyed();
     }
 
     @Override
