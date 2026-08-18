@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.struct.Seq;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -42,7 +43,7 @@ public class BuildPayload implements Payload{
         tile.setBlock(build.block, build.team, rotation, () -> build);
         if(build instanceof CoreBlock.CoreBuild core){
             core.onRemoved();
-            time.build.placed();
+            tile.build.placed();
         }
         build.dropped();
     }
