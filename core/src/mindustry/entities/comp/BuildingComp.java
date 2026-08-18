@@ -1386,7 +1386,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     /** @return whether this building is in a payload */
     public boolean isPayload(){
-        return tile.isPayload;
+        return tile == emptyTile;
     }
 
     /**
@@ -2249,7 +2249,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         dead = true;
         Events.fire(new BlockDestroyEvent(tile));
         onDestroyed();
-        if(tile.isPayload || tile == emptyTile){
+        if(tile == emptyTile){
             tile.remove();
         }
         remove();
