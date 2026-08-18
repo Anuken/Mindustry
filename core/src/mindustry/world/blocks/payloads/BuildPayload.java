@@ -62,7 +62,12 @@ public class BuildPayload implements Payload{
     public void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
         if(unitHolder != null && (!build.block.updateInUnits || (!state.rules.unitPayloadUpdate && !build.block.alwaysUpdateInUnits))) return;
 
-        build.tile = emptyTile;
+        Tile payloadTile = emptyTile.payload();
+        payloadTile.x = (int) (build.x / 8);
+        payloadTile.y = (int) (build.y / 8);
+        payloadTile.setBlock(build.block, build.team, 0, () -> build);
+
+        build.tile = payloadTile;
         build.updatePayload(unitHolder, buildingHolder);
         if(build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
     }

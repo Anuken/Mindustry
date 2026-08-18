@@ -42,6 +42,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     /** Tile entity, usually null. */
     public @Nullable Building build;
     public short x, y;
+    public boolean isPayload = false;
     protected Block block;
     protected Floor floor;
     protected Floor overlay;
@@ -67,6 +68,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public Tile(int x, int y, int floor, int overlay, int wall){
         this(x, y, content.block(floor), content.block(overlay), content.block(wall));
+    }
+
+    public Tile payload() {
+        isPayload = true;
+        return this;
     }
 
     /** Returns this tile's position as a packed point. */
