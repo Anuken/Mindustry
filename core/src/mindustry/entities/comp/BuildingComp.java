@@ -2249,7 +2249,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         dead = true;
         Events.fire(new BlockDestroyEvent(tile));
         onDestroyed();
-        if(tile.isPayload || tile == emptyTile){
+        if(!tile.isPayload){
             tile.remove();
         }
         remove();
