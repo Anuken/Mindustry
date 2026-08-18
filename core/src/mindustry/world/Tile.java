@@ -196,6 +196,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return overlay;
     }
 
+    /** Internal method for data patches - do not use!! */
+    public void updateBlockReference(Block block){
+        this.block = block;
+    }
+
     @SuppressWarnings("unchecked")
     public <T extends Block> T cblock(){
         return (T)block;

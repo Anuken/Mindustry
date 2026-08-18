@@ -20,6 +20,7 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 import java.lang.annotation.*;
 import java.util.*;
+import java.util.regex.*;
 
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.EntityDef",
@@ -29,6 +30,11 @@ import java.util.*;
 "mindustry.annotations.Annotations.TypeIOHandler"
 })
 public class EntityProcess extends BaseProcessor{
+    static final Pattern selfParamPattern = Pattern.compile("this\\.<(.*)>self\\(\\)");
+    static final Pattern selfPattern = Pattern.compile("self\\(\\)");
+    static final Pattern yieldPattern = Pattern.compile(" yield ");
+    static final Pattern missingPattern = Pattern.compile("\\/\\*missing\\*\\/");
+
     Seq<EntityDefinition> definitions = new Seq<>();
     Seq<GroupDefinition> groupDefs = new Seq<>();
     Seq<Stype> baseComponents;
@@ -77,12 +83,12 @@ public class EntityProcess extends BaseProcessor{
                 for(Smethod elem : component.methods()){
                     if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
                     //get all statements in the method, store them
-                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString()
-                        .replaceAll("this\\.<(.*)>self\\(\\)", "this") //fix parameterized self() calls
-                        .replaceAll("self\\(\\)", "this") //fix self() calls
-                        .replaceAll(" yield ", "") //fix enchanced switch
-                        .replaceAll("\\/\\*missing\\*\\/", "var") //fix vars
-                    );
+                    String body = elem.tree().getBody().toString();
+                    body = selfParamPattern.matcher(body).replaceAll("this"); //fix parameterized self() calls
+                    body = selfPattern.matcher(body).replaceAll("this"); //fix self() calls
+                    body = yieldPattern.matcher(body).replaceAll(""); //fix enhanced switch
+                    body = missingPattern.matcher(body).replaceAll("var"); //fix vars
+                    methodBlocks.put(elem.descString(), body);
                 }
             }
 
@@ -566,7 +572,15 @@ public class EntityProcess extends BaseProcessor{
                         String blockName = elem.up().getSimpleName().toString().toLowerCase().replace("comp", "");
 
                         //skip empty blocks
-                        if(str.replace("{", "").replace("\n", "").replace("}", "").replace("\t", "").replace(" ", "").isEmpty()){
+                        boolean empty = true;
+                        for(int i = 0; i < str.length(); i++){
+                            char c = str.charAt(i);
+                            if(c != '{' && c != '}' && c != '\n' && c != '\t' && c != ' '){
+                                empty = false;
+                                break;
+                            }
+                        }
+                        if(empty){
                             continue;
                         }
 
