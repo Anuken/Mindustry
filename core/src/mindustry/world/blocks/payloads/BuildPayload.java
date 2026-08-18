@@ -20,7 +20,7 @@ public class BuildPayload implements Payload{
 
     public BuildPayload(Block block, Team team){
         this.build = block.newBuilding().create(block, team);
-        this.build.tile = emptyTile;
+        this.build.tile = emptyTile.payload();
         build.proximity = new Seq<>(true, 6, Building.class);
         if(build instanceof CoreBlock.CoreBuild core) state.teams.registerCore(core);
     }
@@ -62,7 +62,10 @@ public class BuildPayload implements Payload{
     public void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){
         if(unitHolder != null && (!build.block.updateInUnits || (!state.rules.unitPayloadUpdate && !build.block.alwaysUpdateInUnits))) return;
 
-        build.tile = emptyTile;
+        Tile payloadTile = new Tile((int)build.x / 8, (int)build.y / 8).payload();
+        payloadTile.setBlock(build.block, build.team, build.rotation, () -> build);
+
+        build.tile = payloadTile;
         build.updatePayload(unitHolder, buildingHolder);
         if(build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
     }
