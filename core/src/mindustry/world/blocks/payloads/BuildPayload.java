@@ -20,10 +20,14 @@ public class BuildPayload implements Payload{
     public BuildPayload(Block block, Team team){
         this.build = block.newBuilding().create(block, team);
         this.build.tile = emptyTile;
+        build.proximity = new Seq<>(true, 6, Building.class);
+        if(build instanceof CoreBlock.CoreBuild core) state.teams.registerCore(core);
     }
 
     public BuildPayload(Building build){
         this.build = build;
+        build.proximity = new Seq<>(true, 6, Building.class);
+        if(build instanceof CoreBlock.CoreBuild core) state.teams.registerCore(core);
     }
 
     public Block block(){
@@ -36,8 +40,11 @@ public class BuildPayload implements Payload{
 
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
+        if(build instanceof CoreBlock.CoreBuild core){
+            core.onRemoved();
+            time.build.placed();
+        }
         build.dropped();
-        if(build instanceof CoreBlock.CoreBuild core) state.teams.registerCore(core);
     }
 
     @Override
@@ -56,6 +63,7 @@ public class BuildPayload implements Payload{
 
         build.tile = emptyTile;
         build.updatePayload(unitHolder, buildingHolder);
+        if(build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
     }
 
     @Override
@@ -63,6 +71,7 @@ public class BuildPayload implements Payload{
         build.dead = true;
         build.onDestroyed();
         build.afterDestroyed();
+        if(build instanceof CoreBlock.CoreBuild core) core.onRemoved();
     }
 
     @Override
