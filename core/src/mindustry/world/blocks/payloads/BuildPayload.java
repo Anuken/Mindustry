@@ -63,8 +63,8 @@ public class BuildPayload implements Payload{
         if(unitHolder != null && (!build.block.updateInUnits || (!state.rules.unitPayloadUpdate && !build.block.alwaysUpdateInUnits))) return;
 
         Tile payloadTile = emptyTile.payload();
-        payloadTile.x = (int) (build.x / 8);
-        payloadTile.y = (int) (build.y / 8);
+        payloadTile.x = (short) (build.x / 8);
+        payloadTile.y = (short) (build.y / 8);
         payloadTile.setBlock(build.block, build.team, 0, () -> build);
 
         build.tile = payloadTile;
