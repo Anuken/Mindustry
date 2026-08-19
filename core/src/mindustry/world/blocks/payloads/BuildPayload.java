@@ -120,7 +120,7 @@ public class BuildPayload implements Payload{
     public void set(float x, float y, float rotation){
         build.set(x, y);
         Tile payloadTile = new Tile((int)x / 8, (int)y / 8).payload();
-        if(build != null) payloadTile.setBlock(build.block, build.team, rotation, () -> build);
+        if(build != null) payloadTile.setBlock(build.block, build.team, build.rotation, () -> build);
         build.tile = payloadTile;
     }
 
