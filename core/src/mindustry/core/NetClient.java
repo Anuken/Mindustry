@@ -169,7 +169,11 @@ public class NetClient implements ApplicationListener{
             try(DataInputStream in = new DataInputStream(data.stream)){
                 String name = in.readUTF();
                 byte[] pngData = in.readAllBytes();
-                if(!headless) state.data.addTexture(name, pngData);
+                if(!headless){
+                    //empty image data means we're removing the texture instead. see NetServer.removeTexture()
+                    if(pngData.length == 0) state.data.removeTexture(name);
+                    else state.data.addTexture(name, pngData);
+                }
             }catch(IOException e){
                 Log.err("Failed to read server texture stream", e);
             }
