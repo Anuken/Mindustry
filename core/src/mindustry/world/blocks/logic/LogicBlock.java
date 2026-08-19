@@ -48,6 +48,15 @@ public class LogicBlock extends Block{
     public int maxInstructionsPerTick = 40;
     public float range = 8 * 10;
 
+
+    /** Number of frames to draw, -1 to disable. */
+    public int frames = -1;
+    /** Ticks between frames. */
+    public float interval = 5f;
+    /** If true, frames wil alternate back and forth in a sine wave. */
+    public boolean sine = true;
+    public TextureRegion[] regions;
+
     public LogicBlock(String name){
         super(name);
         update = true;
@@ -56,8 +65,6 @@ public class LogicBlock extends Block{
         group = BlockGroup.logic;
         schematicPriority = 5;
         ignoreResizeConfig = true;
-        drawCached = true;
-        drawDynamic = false;
 
         //universal, no real requirements
         envEnabled = Env.any;
@@ -223,6 +230,20 @@ public class LogicBlock extends Block{
         return config;
     }
 
+    @Override
+    public void load() {
+        super.load();
+        drawCached = frames <= 0;
+        drawDynamic = frames > 0;
+
+        if(frames > 0){
+            regions = new TextureRegion[frames];
+            for (int i = 0; i < frames; i++) {
+                regions[i] = Core.atlas.find(name + "-frame" + i);
+            }
+        }
+    }
+
     public static class LogicLink{
         public boolean valid;
         public int x, y;
@@ -268,6 +289,8 @@ public class LogicBlock extends Block{
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
+
+        public float totalProgress;
 
         {
             executor.privileged = privileged;
@@ -569,6 +592,8 @@ public class LogicBlock extends Block{
                 // may get out of sync with the accumulator increase.
                 accumulator += edelta() * ipt;
             }
+
+            if(enabled) totalProgress += Time.delta;
         }
 
         public void updateLinks(){
@@ -679,6 +704,17 @@ public class LogicBlock extends Block{
                     build.block.drawPlaceText(l.name, build.tileX(), build.tileY(), true);
                 }
             }
+        }
+
+        @Override
+        public void draw() {
+            Draw.rect(block.region, x, y, drawrot());
+            if(frames > 0){
+                Draw.rect(sine ? regions[(int)Mathf.absin(totalProgress, interval, frames - 0.001f)] :
+                                regions[(int)((totalProgress / interval) % frames)],
+                        x, y);
+            }
+            drawTeamTop();
         }
 
         @Override
