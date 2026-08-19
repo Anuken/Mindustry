@@ -100,7 +100,8 @@ public interface Payload extends Position{
             BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
             payload.build.readAll(read, version);
-            payload.build.tile = emptyTile.payload();
+            payload.build.tile = new Tile((int)payload.build.x / 8, (int)payload.build.y / 8).payload();
+
             return (T)payload;
         }else if(type == payloadUnit){
             byte id = read.b();

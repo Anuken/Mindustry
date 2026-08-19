@@ -43,7 +43,6 @@ public class BuildPayload implements Payload{
         tile.setBlock(build.block, build.team, rotation, () -> build);
         if(build instanceof CoreBlock.CoreBuild core){
             core.onRemoved();
-            tile.build.placed();
         }
         build.dropped();
     }
@@ -120,6 +119,9 @@ public class BuildPayload implements Payload{
     @Override
     public void set(float x, float y, float rotation){
         build.set(x, y);
+        Tile payloadTile = new Tile((int)x / 8, (int)y / 8).payload();
+        if(build != null) payloadTile.setBlock(build.block, build.team, rotation, () -> build);
+        build.tile = payloadTile;
     }
 
     @Override
@@ -137,10 +139,7 @@ public class BuildPayload implements Payload{
             z >= Layer.flyingUnitLow + 1f ? z :
             0.0011f + Math.min(Mathf.clamp((z - prevZ)/100f, -0.0009f, 0.9f) + prevZ, Layer.flyingUnitLow - 1f)
         );
-        Tile payloadTile = new Tile((int)build.x / 8, (int)build.y / 8).payload();
-        if(build != null) payloadTile.setBlock(build.block, build.team, build.rotation, () -> build);
-
-        build.tile = payloadTile;
+        build.tile = emptyTile;
         build.payloadDraw();
         Draw.zTransform();
         Draw.z(prevZ);

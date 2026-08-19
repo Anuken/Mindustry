@@ -750,7 +750,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     @Override
     public String toString(){
-        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (build == null ? "null" : (build.getClass().getSimpleName())) + ":" + team();
+        return floor.name + ":" + block.name + ":" + overlay + "[" + x + "," + y + "] " + "entity=" + (build == null ? "null" : (build.getClass().getSimpleName())) + ":" + team() + " isPayload=" + isPayload;
     }
 
     //remote utility methods
