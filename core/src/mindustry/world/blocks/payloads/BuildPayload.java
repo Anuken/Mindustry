@@ -103,7 +103,7 @@ public class BuildPayload implements Payload{
     @Override
     public void remove(){
         build.remove();
-        if(build instanceof CoreBlock.CoreBuild core) core.onRemoved();
+        //if(build instanceof CoreBlock.CoreBuild core) core.onRemoved();
     }
 
     @Override
