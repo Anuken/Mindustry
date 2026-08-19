@@ -1,6 +1,7 @@
 package mindustry.entities.effect;
 
 import arc.Core;
+import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import mindustry.entities.Effect;
 import mindustry.graphics.Layer;
@@ -20,7 +21,7 @@ public class CasingEffect extends Effect {
             doubled = false,
             drawFill = false;
     public Color[] colors = {};
-    public TextrueRegion casing;
+    public TextureRegion casing;
 
     public CasingEffect() {
         layer(Layer.bullet);
