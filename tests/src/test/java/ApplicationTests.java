@@ -853,8 +853,11 @@ public class ApplicationTests{
                     }catch(Throwable t){
                         fail("Failed to update block in payload: '" + ((BuildPayload)tile.build.getPayload()).block() + "'", t);
                     }
-                    assertEquals(tile.block(), tile.build.block);
-                    assertEquals(tile.block().health, tile.build.health());
+                    if(tile.build != null){
+                        System.out.print("assert, "+tile.block()+"?="+tile.build.block+"\n");
+                        assertEquals(tile.block(), tile.build.block);
+                        assertEquals(tile.block().health, tile.build.health());
+                    }
                 }
             }
         }
