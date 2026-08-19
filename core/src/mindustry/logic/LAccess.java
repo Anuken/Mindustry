@@ -63,6 +63,7 @@ public enum LAccess{
     type,
     flag,
     flying,
+    naval,
     controlled,
     controller,
     name,
