@@ -27,7 +27,9 @@ public class DataImagePacker{
 
     private @Nullable Seq<AtlasRegion> addedRegions;
     /** Textures added at runtime via addTexture(), keyed by their unprefixed name. Tracked separately from patchAtlas so they can be added/removed individually. */
-    private ObjectMap<String, Texture> serverImages = new ObjectMap<>();
+    private final ObjectMap<String, Texture> serverImages = new ObjectMap<>();
+    /** Single threaded executor so that concurrent calls always complete in FIFO order. */
+    private final ExecutorService textureExecutor = Threads.executor("Server Texture Streamer", 1);
 
     /** Packs a new set of images. If images are already packed, disposes of the old ones. */
     public void pack(Seq<ImageAsset> images){
@@ -175,7 +177,7 @@ public class DataImagePacker{
 
     /** Decodes PNG bytes and registers them into the atlas under "netRegionPrefix + name", replacing any existing image with the same name. Safe to call from any thread. */
     public void addTexture(String name, byte[] pngData){
-        Vars.mainExecutor.submit(() -> {
+        textureExecutor.execute(() -> {
             Pixmap pixmap;
             try{
                 pixmap = new Pixmap(pngData);
@@ -208,8 +210,8 @@ public class DataImagePacker{
         });
     }
 
-    /** Removes a texture previously added with {@link #addTexture} */
-    public void removeTexture(String name){
+    /** Removes a texture previously added with {@link #addTexture}. Must be called on the main thread. */
+    private void removeTexture(String name){
         Texture texture = serverImages.remove(name);
         if(texture != null){
             Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
@@ -219,6 +221,12 @@ public class DataImagePacker{
     }
 
     public void printStats(PixmapPacker packer){
+    /** Queues a texture for removal. Will run after any pending {@link #addTexture} calls so that races do not occur. */
+    public void removeTextureQueued(String name){
+        textureExecutor.execute(() -> Core.app.post(() -> removeTexture(name)));
+    }
+
+    public void printStats(PixmapPacker mainPacker, PixmapPacker envPacker){
         if(Log.level != LogLevel.debug) return;
 
         int total = packer.getPages().sum(p -> p.rects.size);

@@ -34,15 +34,21 @@ public class ShieldArcAbility extends Ability{
                 //translate bullet back to where it was upon collision
                 b.trns(-b.vel.x, -b.vel.y);
 
-                float penX = Math.abs(paramPos.x - b.x), penY = Math.abs(paramPos.y - b.y);
-
-                if(penX > penY){
-                    b.vel.x *= -1;
-                    b.vel.y *= paramField.reflectVel;
-                }else{
-                    b.vel.y *= -1;
-                    b.vel.x *= paramField.reflectVel;
+                float nx = b.x - paramPos.x, ny = b.y - paramPos.y;
+                float nlen = Mathf.len(nx, ny);
+                if(nlen > 0.0001f){
+                    nx /= nlen;
+                    ny /= nlen;
                 }
+
+                float dot = b.vel.x * nx + b.vel.y * ny;
+                float rx = b.vel.x - 2f * dot * nx;
+                float ry = b.vel.y - 2f * dot * ny;
+                float outDot = rx * nx + ry * ny;
+                float normalX = outDot * nx, normalY = outDot * ny;
+                float tangX = rx - normalX, tangY = ry - normalY;
+
+                b.vel.set(normalX + tangX * paramField.reflectVel, normalY + tangY * paramField.reflectVel);
 
                 b.owner = paramUnit;
                 b.team = paramUnit.team;
