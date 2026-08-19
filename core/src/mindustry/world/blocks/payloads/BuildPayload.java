@@ -41,7 +41,7 @@ public class BuildPayload implements Payload{
 
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
-        tile.build.placed();
+        ((CoreBlock.CoreBuild)tile.build).placed();
         if(build instanceof CoreBlock.CoreBuild core) {
             core.onRemoved();
         }
@@ -103,7 +103,7 @@ public class BuildPayload implements Payload{
     @Override
     public void remove(){
         build.remove();
-        //if(build instanceof CoreBlock.CoreBuild core) core.onRemoved();
+        if(build instanceof CoreBlock.CoreBuild core) core.onRemoved();
     }
 
     @Override
