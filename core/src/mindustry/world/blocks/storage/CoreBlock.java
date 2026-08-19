@@ -83,6 +83,7 @@ public class CoreBlock extends StorageBlock{
         envEnabled |= Env.space;
         drawCached = false;
         drawDynamic = true;
+        canPickup = false;
 
         //support everything
         replaceable = false;
@@ -621,8 +622,8 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public boolean canPickup(){
-            //cores can never be picked up
-            return false;
+            //cores can be picked up
+            return super.canPickup();
         }
 
         @Override
