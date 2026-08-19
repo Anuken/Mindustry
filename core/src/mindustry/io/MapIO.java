@@ -97,7 +97,7 @@ public class MapIO{
                 public void setBlock(Block type){
                     //do not super.setBlock as that affects the current world
                     this.block = type;
-                    this.build = type.newBuilding().init(this, this.team(), block.update && !state.isEditor(), 0);
+                    this.build = type.newBuilding().init(this, this.team(), false, 0);
                     int c = colorFor(type, Blocks.air, Blocks.air, team());
                     if(c != black){
                         walls.setRaw(x, floors.height - 1 - y, c);
