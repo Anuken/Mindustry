@@ -92,8 +92,7 @@ public class CoreBlock extends StorageBlock{
 
     @Remote(called = Loc.server)
     public static void playerSpawn(Building build, Player player){
-        if(player == null || !(build instanceof CoreBuild)) return;
-        CoreBuild core = (CoreBuild) build;
+        if(player == null || !(build instanceof CoreBuild core)) return;
 
         UnitType spawnType = ((CoreBlock)core.block).unitType;
         if(core.wasVisible){
