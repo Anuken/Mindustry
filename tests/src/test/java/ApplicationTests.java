@@ -854,7 +854,7 @@ public class ApplicationTests{
                         fail("Failed to update block in payload: '" + ((BuildPayload)tile.build.getPayload()).block() + "'", t);
                     }
                     if(tile.build != null){
-                        System.out.print("assert, "+tile.block()+"?="+tile.build.block+"\n");
+                        System.out.print("assert|"+tile.block()+"?="+tile.build.block+"\n");
                         assertEquals(tile.block(), tile.build.block);
                         assertEquals(tile.block().health, tile.build.health());
                     }
