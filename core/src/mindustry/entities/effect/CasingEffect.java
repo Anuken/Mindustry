@@ -20,6 +20,7 @@ public class CasingEffect extends Effect {
             doubled = false,
             drawFill = false;
     public Color[] colors = {};
+    public TextrueRegion casing;
 
     public CasingEffect() {
         layer(Layer.bullet);
@@ -61,6 +62,11 @@ public class CasingEffect extends Effect {
     }
 
     @Override
+    public void init() {
+        if (casing == null) casing = Core.atlas.find("casing");
+    }
+
+    @Override
     public void render(EffectContainer e) {
         if(colors.length < 3){
             color(Pal.lightOrange, Pal.lightishGray, Pal.lightishGray, e.fin());
@@ -90,7 +96,7 @@ public class CasingEffect extends Effect {
                     width, height, rot + e.fin() * 50f * i
             );
         }else{
-            rect(Core.atlas.find("casing"),
+            rect(casing,
                     e.x + trnsx(lr, len) + Mathf.randomSeedRange(e.id + i + 7, 3f * e.fin()),
                     e.y + trnsy(lr, len) + Mathf.randomSeedRange(e.id + i + 8, 3f * e.fin()),
                     width, height, rot + e.fin() * 50f * i
