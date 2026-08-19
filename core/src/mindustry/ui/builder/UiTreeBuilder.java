@@ -105,6 +105,9 @@ public class UiTreeBuilder{
                             element.name = id;
                             ctx.idElements.put(id, element);
                         }
+                        String colorStr = child.str(UiKey.color); // Apply color if provided
+                        if(colorStr != null) element.setColor(Strings.parseColor(colorStr, Color.white));
+
                         stack.add(element);
                     }
                 }
