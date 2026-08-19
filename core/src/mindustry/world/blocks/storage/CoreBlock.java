@@ -91,8 +91,9 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Remote(called = Loc.server)
-    public static void playerSpawn(Tile tile, Player player){
-        if(player == null || tile == null || !(tile.build instanceof CoreBuild core)) return;
+    public static void playerSpawn(Tile tile, Player player, CoreBuild build, boolean payload){
+        if(player == null || tile == null || (!payload && !(tile.build instanceof CoreBuild)) || (payload && build == null)) return;
+        CoreBuild core = payload ? build : (CoreBuild) tile.build;
 
         UnitType spawnType = ((CoreBlock)core.block).unitType;
         if(core.wasVisible){
@@ -586,7 +587,7 @@ public class CoreBlock extends StorageBlock{
             //do not try to respawn in unsupported environments at all
             if(!unitType.supportsEnv(state.rules.env) || !allowSpawn) return;
 
-            Call.playerSpawn(tile, player);
+            Call.playerSpawn(tile, player, this, isPayload());
         }
 
         @Override
