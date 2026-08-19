@@ -41,7 +41,8 @@ public class BuildPayload implements Payload{
 
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
-        if(build instanceof CoreBlock.CoreBuild core){
+        tile.build.placed();
+        if(build instanceof CoreBlock.CoreBuild core) {
             core.onRemoved();
         }
         build.dropped();
