@@ -1664,6 +1664,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case armor -> armor;
             case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;
