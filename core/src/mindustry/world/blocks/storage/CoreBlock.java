@@ -91,8 +91,9 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Remote(called = Loc.server)
-    public static void playerSpawn(Tile tile, Player player){
-        if(player == null || tile == null || !(tile.build instanceof CoreBuild core)) return;
+    public static void playerSpawn(CoreBuild core, Player player){
+        if(player == null || core.tile == null) return;
+
 
         UnitType spawnType = ((CoreBlock)core.block).unitType;
         if(core.wasVisible){
@@ -102,7 +103,7 @@ public class CoreBlock extends StorageBlock{
         player.set(core);
 
         if(!net.client()){
-            Unit unit = spawnType.create(tile.team());
+            Unit unit = spawnType.create(core.team());
             //reset reload so that the player can't shoot immediately
             for(var mount : unit.mounts){
                 mount.reload = mount.weapon.reload;
@@ -586,7 +587,7 @@ public class CoreBlock extends StorageBlock{
             //do not try to respawn in unsupported environments at all
             if(!unitType.supportsEnv(state.rules.env) || !allowSpawn) return;
 
-            Call.playerSpawn(tile, player);
+            Call.playerSpawn(this, player);
         }
 
         @Override
