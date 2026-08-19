@@ -220,13 +220,12 @@ public class DataImagePacker{
         }
     }
 
-    public void printStats(PixmapPacker packer){
     /** Queues a texture for removal. Will run after any pending {@link #addTexture} calls so that races do not occur. */
     public void removeTextureQueued(String name){
         textureExecutor.execute(() -> Core.app.post(() -> removeTexture(name)));
     }
 
-    public void printStats(PixmapPacker mainPacker, PixmapPacker envPacker){
+    public void printStats(PixmapPacker packer){
         if(Log.level != LogLevel.debug) return;
 
         int total = packer.getPages().sum(p -> p.rects.size);
