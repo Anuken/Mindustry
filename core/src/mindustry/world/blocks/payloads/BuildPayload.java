@@ -137,7 +137,10 @@ public class BuildPayload implements Payload{
             z >= Layer.flyingUnitLow + 1f ? z :
             0.0011f + Math.min(Mathf.clamp((z - prevZ)/100f, -0.0009f, 0.9f) + prevZ, Layer.flyingUnitLow - 1f)
         );
-        build.tile = emptyTile;
+        Tile payloadTile = new Tile((int)build.x / 8, (int)build.y / 8).payload();
+        if(build != null) payloadTile.setBlock(build.block, build.team, build.rotation, () -> build);
+
+        build.tile = payloadTile;
         build.payloadDraw();
         Draw.zTransform();
         Draw.z(prevZ);
