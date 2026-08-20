@@ -26,7 +26,7 @@ public class BuildPayload implements Payload{
     public BuildPayload(Building build){
         this.build = build;
         if(build instanceof CoreBlock.CoreBuild core){
-            core.items = core.payloadItems;
+            core.items.set(core.payloadItems);
             core.payloadItems = new ItemModule();
         }
     }

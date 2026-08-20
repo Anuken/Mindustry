@@ -635,7 +635,7 @@ public class CoreBlock extends StorageBlock{
                 ((StorageBuild)t).linkedCore = null;
             });
             proximity.clear();
-            payloadItems = items;
+            payloadItems = items.copy();
 
             for(Building other : state.teams.cores(team)){
                 if(other.tile == tile) continue;
