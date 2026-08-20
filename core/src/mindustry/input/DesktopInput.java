@@ -976,14 +976,6 @@ public class DesktopInput extends InputHandler{
         float ya = Core.input.axis(Binding.moveY);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
 
-        boolean canShoot = false;
-        for(var weapon : unit.type.weapons){
-            if(weapon.canShootWhenBoosting){
-                canShoot = true;
-                break;
-            }
-        }
-
         if(settings.getBool("detach-camera")){
             Vec2 targetPos = camera.position;
 
@@ -1001,7 +993,7 @@ public class DesktopInput extends InputHandler{
         }
 
         float mouseAngle = Angles.mouseAngle(unit.x, unit.y);
-        boolean aimCursor = omni && player.shooting && unit.type.hasWeapons() && unit.type.faceTarget && (!boosted || canShoot);
+        boolean aimCursor = omni && player.shooting && unit.type.hasWeapons() && unit.type.faceTarget && !boosted;
 
         if(aimCursor){
             unit.lookAt(mouseAngle);

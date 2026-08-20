@@ -691,7 +691,7 @@ public class PlacementFragment{
                             t.row();
                             control.input.buildPlacementUI(t);
                         }).name("inputTable").growX();
-                    }).growX().fillY().bottom().touchable(Touchable.enabled);
+                    }).fillY().bottom().touchable(Touchable.enabled);
                     blockCatTable.table(categories -> {
                         categories.bottom();
                         categories.add(new Image(Styles.black6){

@@ -54,7 +54,6 @@ public class BuildPayload implements Payload{
         return build.block;
     }
 
-    @Override
     public void afterPickedUp() {
         updateCoreStorage();
         if(build instanceof CoreBlock.CoreBuild core){
@@ -63,7 +62,6 @@ public class BuildPayload implements Payload{
         }
     }
 
-    @Override
     public void afterDroped(Tile tile) {
         updateCoreStorage();
         if(tile.build instanceof CoreBlock.CoreBuild core){
@@ -74,7 +72,7 @@ public class BuildPayload implements Payload{
 
     public void updateCoreStorage() {
         if(build instanceof CoreBlock.CoreBuild core){
-            for (CoreBlock.CoreBuild other : state.teams.cores(core.team)) {
+            for(CoreBlock.CoreBuild other : state.teams.cores(core.team)){
                 other.storageCapacity = core.storageCapacity;
             }
             core.items.set(core.payloadItems);
@@ -88,7 +86,7 @@ public class BuildPayload implements Payload{
         build.tile = emptyTile;
         build.updatePayload(unitHolder, buildingHolder);
         if(build instanceof CoreBlock.CoreBuild core){
-            for (CoreBlock.CoreBuild other : state.teams.cores(core.team)) {
+            for(CoreBlock.CoreBuild other : state.teams.cores(core.team)){
                 other.storageCapacity = core.storageCapacity;
             }
             core.onProximityUpdate();

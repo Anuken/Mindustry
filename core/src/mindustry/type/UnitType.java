@@ -234,8 +234,6 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** if false, this unit has no weapons that can attack. */
     canAttack = true,
 
-    /** If true, the unit can fire while boosting.  This field is only used for caching. */
-    canBoostingShoot = false,
     /** if true, this unit won't show up in the database or various other UIs. */
     hidden = false,
     /** if true, this unit is for internal use only and does not have a sprite generated. */
@@ -743,11 +741,11 @@ public class UnitType extends UnlockableContent implements Senseable{
             table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
             if(net.active() && ai.controller != null && ai.controller.lastAccessed != null){
                 table.row();
-                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).width(260f).wrap().left();
+                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).growX().wrap().left();
             }
         }else if(net.active() && unit.lastCommanded != null){
             table.row();
-            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).width(260f).wrap().left();
+            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).growX().wrap().left();
         }
 
         table.row();
@@ -1056,8 +1054,6 @@ public class UnitType extends UnlockableContent implements Senseable{
                 w.otherSide = mapped.size - 1;
                 copy.otherSide = mapped.size - 2;
             }
-
-            if(w.canShootWhenBoosting) canBoostingShoot = true;
         }
         this.weapons = mapped;
 
@@ -1307,14 +1303,6 @@ public class UnitType extends UnlockableContent implements Senseable{
         pathCost = null;
         pathCostId = -1;
         initPathType();
-
-        canBoostingShoot = false;
-        for(Weapon w : weapons){
-            if(w.canShootWhenBoosting){
-                canBoostingShoot = true;
-                break;
-            }
-        }
     }
 
     public void beforeParse(){

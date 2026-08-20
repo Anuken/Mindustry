@@ -76,12 +76,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         aimY = y;
     }
 
-    boolean canShoot(Weapon weapon){
-        return !disarmed && weapon.canShootWhenBoosting;
-    }
-
     boolean canShoot(){
-        return !disarmed || type.canBoostingShoot;
+        return !disarmed;
     }
 
     @Override

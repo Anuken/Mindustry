@@ -1650,7 +1650,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
             if(net.active() && lastAccessed != null){
                 table.row();
-                table.add(Core.bundle.format("lastaccessed", lastAccessed)).width(260f).wrap().left();
+                table.add(Core.bundle.format("lastaccessed", lastAccessed)).growX().wrap().left();
             }
 
             table.marginBottom(-5);
