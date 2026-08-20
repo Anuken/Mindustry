@@ -4,7 +4,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.struct.Seq;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -12,6 +11,7 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock;
+import mindustry.world.modules.ItemModule;
 
 import static mindustry.Vars.*;
 
@@ -21,14 +21,14 @@ public class BuildPayload implements Payload{
     public BuildPayload(Block block, Team team){
         this.build = block.newBuilding().create(block, team);
         this.build.tile = emptyTile;
-        build.proximity = new Seq<>(true, 6, Building.class);
-        if(build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
     }
 
     public BuildPayload(Building build){
         this.build = build;
-        build.proximity = new Seq<>(true, 6, Building.class);
-        if(build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
+        if(build instanceof CoreBlock.CoreBuild core){
+            core.items = core.payloadItems;
+            core.payloadItems = new ItemModule();
+        }
     }
 
     public Block block(){
@@ -41,8 +41,6 @@ public class BuildPayload implements Payload{
 
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
-        if(build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
-        if(tile.build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
         if(build instanceof CoreBlock.CoreBuild core) core.onRemoved();
         build.dropped();
     }
@@ -55,6 +53,24 @@ public class BuildPayload implements Payload{
     @Override
     public UnlockableContent content(){
         return build.block;
+    }
+
+    @Override
+    public void afterPickedUp() {
+        updateCoreStorage();
+    }
+
+    @Override
+    public void afterDroped() {
+        updateCoreStorage();
+    }
+
+    public void updateCoreStorage() {
+        if(build instanceof CoreBlock.CoreBuild core){
+            for (CoreBlock.CoreBuild other : state.teams.cores(core.team)) {
+                other.storageCapacity = core.storageCapacity;
+            }
+        }
     }
 
     @Override

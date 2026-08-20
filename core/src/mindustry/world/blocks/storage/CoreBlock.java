@@ -261,6 +261,7 @@ public class CoreBlock extends StorageBlock{
         public float iframes = -1f;
         public float thrusterTime = 0f;
         public @Nullable Vec2 commandPos;
+        public ItemModule payloadItems = new ItemModule();
 
         protected float cloudSeed, landParticleTimer;
 
@@ -624,6 +625,22 @@ public class CoreBlock extends StorageBlock{
         public boolean canPickup(){
             //cores can be picked up
             return super.canPickup();
+        }
+
+        @Override
+        public void pickedUp() {
+            storageCapacity = itemCapacity;
+            proximity.each(this::owns, t -> {
+                t.items = new ItemModule();
+                ((StorageBuild)t).linkedCore = null;
+            });
+            proximity.clear();
+            payloadItems = items;
+
+            for(Building other : state.teams.cores(team)){
+                if(other.tile == tile) continue;
+                storageCapacity += other.block.itemCapacity + other.proximity.sum(e -> owns(other, e) ? e.block.itemCapacity : 0);
+            }
         }
 
         @Override

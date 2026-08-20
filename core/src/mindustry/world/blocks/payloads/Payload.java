@@ -58,6 +58,10 @@ public interface Payload extends Position{
 
     default void destroyed(){};
 
+    default void afterDroped(){}
+
+    default void afterPickedUp(){};
+
     /** writes the payload for saving. */
     void write(Writes write);
 
