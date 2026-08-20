@@ -233,7 +233,6 @@ public class UnitType extends UnlockableContent implements Senseable{
     forceMultiTarget = false,
     /** if false, this unit has no weapons that can attack. */
     canAttack = true,
-
     /** if true, this unit won't show up in the database or various other UIs. */
     hidden = false,
     /** if true, this unit is for internal use only and does not have a sprite generated. */
@@ -741,11 +740,11 @@ public class UnitType extends UnlockableContent implements Senseable{
             table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
             if(net.active() && ai.controller != null && ai.controller.lastAccessed != null){
                 table.row();
-                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).growX().wrap().left();
+                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).width(260f).wrap().left();
             }
         }else if(net.active() && unit.lastCommanded != null){
             table.row();
-            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).growX().wrap().left();
+            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).width(260f).wrap().left();
         }
 
         table.row();

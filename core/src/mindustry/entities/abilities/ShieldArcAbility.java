@@ -39,16 +39,16 @@ public class ShieldArcAbility extends Ability{
                 if(nlen > 0.0001f) {
                     nx /= nlen;
                     ny /= nlen;
-
-                    float dot = b.vel.x * nx + b.vel.y * ny;
-                    float rx = b.vel.x - 2f * dot * nx;
-                    float ry = b.vel.y - 2f * dot * ny;
-                    float outDot = rx * nx + ry * ny;
-                    float normalX = outDot * nx, normalY = outDot * ny;
-                    float tangX = rx - normalX, tangY = ry - normalY;
-
-                    b.vel.set(normalX + tangX * paramField.reflectVel, normalY + tangY * paramField.reflectVel);
                 }
+
+                float dot = b.vel.x * nx + b.vel.y * ny;
+                float rx = b.vel.x - 2f * dot * nx;
+                float ry = b.vel.y - 2f * dot * ny;
+                float outDot = rx * nx + ry * ny;
+                float normalX = outDot * nx, normalY = outDot * ny;
+                float tangX = rx - normalX, tangY = ry - normalY;
+
+                b.vel.set(normalX + tangX * paramField.reflectVel, normalY + tangY * paramField.reflectVel);
 
                 b.owner = paramUnit;
                 b.team = paramUnit.team;

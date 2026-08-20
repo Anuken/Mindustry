@@ -1015,7 +1015,6 @@ public class MobileInput extends InputHandler implements GestureListener{
         boolean allowHealing = type.canHeal;
         boolean validHealTarget = allowHealing && target instanceof Building b && b.isValid() && target.team() == unit.team && b.damaged() && target.within(unit, type.range);
         boolean boosted = (unit instanceof Mechc && unit.isFlying());
-
         //reset target if:
         // - in the editor, or...
         // - it's both an invalid standard target and an invalid heal target
