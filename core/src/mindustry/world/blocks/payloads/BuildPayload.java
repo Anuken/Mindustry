@@ -58,6 +58,7 @@ public class BuildPayload implements Payload{
     public void afterPickedUp() {
         updateCoreStorage();
         if(build instanceof CoreBlock.CoreBuild core){
+            state.teams.registerCore(core);
             core.items.set(core.payloadItems);
         }
     }
@@ -66,7 +67,7 @@ public class BuildPayload implements Payload{
     public void afterDroped(Tile tile) {
         updateCoreStorage();
         if(tile.build instanceof CoreBlock.CoreBuild core){
-            core.items.set(core.payloadItems);
+            state.teams.registerCore(core);
             core.payloadItems = new ItemModule();
         }
     }
@@ -76,6 +77,7 @@ public class BuildPayload implements Payload{
             for (CoreBlock.CoreBuild other : state.teams.cores(core.team)) {
                 other.storageCapacity = core.storageCapacity;
             }
+            core.items.set(core.payloadItems);
         }
     }
 
