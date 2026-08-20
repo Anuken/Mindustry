@@ -56,7 +56,7 @@ public class PayloadVoid extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            if(payload instanceof BuildPayload bp && !(bp.build instanceof CoreBlock.CoreBuild)) return false;
+            if(payload instanceof BuildPayload bp && bp.build instanceof CoreBlock.CoreBuild) return false;
             return super.acceptPayload(source, payload);
         }
 
