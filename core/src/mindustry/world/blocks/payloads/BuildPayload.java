@@ -25,10 +25,6 @@ public class BuildPayload implements Payload{
 
     public BuildPayload(Building build){
         this.build = build;
-        if(build instanceof CoreBlock.CoreBuild core){
-            core.items.set(core.payloadItems);
-            //core.payloadItems = new ItemModule();
-        }
     }
 
     public Block block(){
@@ -58,6 +54,10 @@ public class BuildPayload implements Payload{
     @Override
     public void afterPickedUp() {
         updateCoreStorage();
+        if(build instanceof CoreBlock.CoreBuild core){
+            core.items.set(core.payloadItems);
+            //core.payloadItems = new ItemModule();
+        }
     }
 
     @Override
