@@ -85,7 +85,12 @@ public class BuildPayload implements Payload{
 
         build.tile = emptyTile;
         build.updatePayload(unitHolder, buildingHolder);
-        if(build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
+        if(build instanceof CoreBlock.CoreBuild core){
+            for (CoreBlock.CoreBuild other : state.teams.cores(core.team)) {
+                other.storageCapacity = core.storageCapacity;
+            }
+            core.onProximityUpdate();
+        }
     }
 
     @Override
