@@ -169,7 +169,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
             Building tile = b.build;
             int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
             on = Vars.world.tile(tx, ty);
-            return on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false);
+            return on != null && Build.payloadPlace(tile, tile.team, tx, ty, tile.rotation, false, true);
         }else if(payload instanceof UnitPayload p){
             var u = p.unit;
             return !(!u.canPass(World.toTile(x + Tmp.v1.x), World.toTile(y + Tmp.v1.y)) || Units.count(x, y, u.physicSize(), o -> o.isGrounded() && o.hitSize > 14f) > 1);
