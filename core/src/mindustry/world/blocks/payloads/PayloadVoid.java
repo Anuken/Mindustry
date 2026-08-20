@@ -6,6 +6,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.world.blocks.storage.CoreBlock;
 
 public class PayloadVoid extends PayloadBlock{
     public Effect incinerateEffect = Fx.blastExplosion;
@@ -51,6 +52,11 @@ public class PayloadVoid extends PayloadBlock{
         @Override
         public boolean acceptUnitPayload(Unit unit){
             return true;
+        }
+
+        @Override
+        public boolean acceptPayload(Building source, Payload payload){
+            return payload instanceof BuildPayload bp && !(bp.build instanceof CoreBlock.CoreBuild);
         }
 
         @Override
