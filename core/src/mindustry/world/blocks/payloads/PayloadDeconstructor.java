@@ -11,6 +11,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import static mindustry.Vars.*;
 
@@ -102,7 +103,13 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return deconstructing == null && this.payload == null && super.acceptPayload(source, payload) && payload.requirements().length > 0 && payload.fits(maxPayloadSize);
+            return
+            deconstructing == null &&
+            this.payload == null &&
+            super.acceptPayload(source, payload) &&
+            payload.requirements().length > 0 &&
+            payload.fits(maxPayloadSize) &&
+            (payload instanceof BuildPayload bp && !(bp.build instanceof CoreBlock.CoreBuild));
         }
 
         @Override
