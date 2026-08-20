@@ -41,13 +41,14 @@ public class BuildPayload implements Payload{
 
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
+        if(build instanceof CoreBlock.CoreBuild core) core.onProximityUpdate();
         if(tile.build instanceof CoreBlock.CoreBuild core) updateCores(core);
         if(build instanceof CoreBlock.CoreBuild core) core.onRemoved();
         build.dropped();
     }
 
     public void updateCores(CoreBlock.CoreBuild core) {
-        state.teams.registerCore(core);
+        core.onProximityUpdate();
         for(CoreBlock.CoreBuild other : state.teams.cores(core.team)){
             other.onProximityUpdate();
         }
