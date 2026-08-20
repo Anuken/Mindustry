@@ -67,7 +67,7 @@ public class BuildPayload implements Payload{
     public void afterDroped(Tile tile) {
         updateCoreStorage();
         if(tile.build instanceof CoreBlock.CoreBuild core){
-            state.teams.registerCore(core);
+            core.onProximityUpdate();
             core.payloadItems = new ItemModule();
         }
     }
