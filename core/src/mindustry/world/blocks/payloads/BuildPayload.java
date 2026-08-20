@@ -56,13 +56,16 @@ public class BuildPayload implements Payload{
         updateCoreStorage();
         if(build instanceof CoreBlock.CoreBuild core){
             core.items.set(core.payloadItems);
-            //core.payloadItems = new ItemModule();
         }
     }
 
     @Override
     public void afterDroped() {
         updateCoreStorage();
+        if(build instanceof CoreBlock.CoreBuild core){
+            core.items.set(core.payloadItems);
+            core.payloadItems = new ItemModule();
+        }
     }
 
     public void updateCoreStorage() {
