@@ -629,13 +629,13 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void pickedUp() {
+            payloadItems = items.copy();
             storageCapacity = itemCapacity;
             proximity.each(this::owns, t -> {
                 t.items = new ItemModule();
                 ((StorageBuild)t).linkedCore = null;
             });
             proximity.clear();
-            payloadItems = items.copy();
 
             for(Building other : state.teams.cores(team)){
                 if(other.tile == tile) continue;
