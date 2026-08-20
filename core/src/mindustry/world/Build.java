@@ -14,6 +14,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.ConstructBlock.*;
+import mindustry.world.blocks.payloads.BuildPayload;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
 import static mindustry.Vars.*;
@@ -261,6 +262,100 @@ public class Build{
                         (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
                     type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
                 (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
+                ) return false;
+            }
+        }
+
+        if(state.rules.placeRangeCheck && checkCoreRadius && !state.isEditor() && getEnemyOverlap(type, team, x, y) != null){
+            return false;
+        }
+
+        return true;
+    }
+
+    /** @return whether a tile can be placed at this location by this team. */
+    public static boolean payloadPlace(Building building, Team team, int x, int y, int rotation, boolean checkVisible, boolean checkCoreRadius){
+        Block type = building.block;
+        //the wave team can build whatever they want as long as it's visible - banned blocks are not applicable
+        if(type == null || (!state.rules.editor && (checkVisible && (!type.environmentBuildable() || (!type.isPlaceable() && !(state.rules.waves && team == state.rules.waveTeam && type.isVisible())))))){
+            return false;
+        }
+
+        if(!state.rules.editor && checkCoreRadius){
+            //find closest core, if it doesn't match the team, placing is not legal
+            if(state.rules.polygonCoreProtection){
+                float mindst = Float.MAX_VALUE;
+                CoreBuild closest = null;
+                for(TeamData data : state.teams.active){
+                    if(!data.team.rules().protectCores){
+                        continue;
+                    }
+
+                    for(CoreBuild tile : data.cores){
+                        float dst = tile.dst2(x * tilesize + type.offset, y * tilesize + type.offset);
+                        if(dst < mindst){
+                            closest = tile;
+                            mindst = dst;
+                        }
+                    }
+                }
+                if(closest != null && closest.team != team){
+                    return false;
+                }
+            }else if(state.teams.anyEnemyCoresWithinBuildRadius(team, x * tilesize + type.offset, y * tilesize + type.offset)){
+                return false;
+            }
+        }
+
+        Tile tile = world.tile(x, y);
+
+        if(tile == null) return false;
+
+        if(!type.canPlaceOn(tile, team, rotation) && !(building instanceof CoreBuild)){
+            return false;
+        }
+
+        //floors have different checks
+        if(type.isFloor()){
+            return type.isOverlay() ? tile.overlay() != type : tile.floor() != type;
+        }
+
+        //campaign darkness check
+        if(!type.ignoreBuildDarkness && world.getDarkness(x, y) >= 3){
+            return false;
+        }
+
+        if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
+            return false;
+        }
+
+        //check limits for non-AI teams
+        if(type.isOverPlacementLimit(team)) return false;
+
+        int offsetx = -(type.size - 1) / 2;
+        int offsety = -(type.size - 1) / 2;
+
+        for(int dx = 0; dx < type.size; dx++){
+            for(int dy = 0; dy < type.size; dy++){
+                int wx = dx + offsetx + tile.x, wy = dy + offsety + tile.y;
+
+                Tile check = world.tile(wx, wy);
+
+                if(
+                        check == null || //nothing there
+                                (type.size == 2 && world.getDarkness(wx, wy) >= 3) ||
+                                (state.rules.staticFog && state.rules.fog && !fogControl.isDiscovered(team, wx, wy)) ||
+                                (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
+                                (!state.rules.derelictRepair && check.team() == Team.derelict && check.build != null) ||
+                                (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate && !((type == check.block && team != Team.derelict && check.team() == Team.derelict))) || //same block, same rotation
+                                !check.interactable(team) || //cannot interact
+                                !check.floor().placeableOn && !type.ignoreBuildDarkness || //solid floor
+                                //when you have a payload, you cannot place blocks on things, even if normal placement rules allow it. this is a hack that assumes checkVisible = true means it's coming from a payload
+                                (!checkVisible && checkCoreRadius && !check.block().alwaysReplace) || //replacing a block that should be replaced (e.g. payload placement)
+                                !(((type.canReplace(check.block()) || (check.build != null && check.build.canBeReplaced(type)) || (type == check.block && team != Team.derelict && check.team() == Team.derelict)) || //can replace type OR can replace derelict block of same type
+                                        (check.build instanceof ConstructBuild build && build.current == type && check.centerX() == tile.x && check.centerY() == tile.y)) && //same type in construction
+                                        type.bounds(tile.x, tile.y, Tmp.r1).grow(0.01f).contains(check.block.bounds(check.centerX(), check.centerY(), Tmp.r2))) || //no replacement
+                                (type.requiresWater && check.floor().liquidDrop != Liquids.water) //requires water but none found
                 ) return false;
             }
         }
