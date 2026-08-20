@@ -37,7 +37,10 @@ public class BuildPayload implements Payload{
 
     public void place(Tile tile, int rotation){
         tile.setBlock(build.block, build.team, rotation, () -> build);
-        if(build instanceof CoreBlock.CoreBuild core) core.onRemoved();
+        if(build instanceof CoreBlock.CoreBuild core){
+            core.payloadItems = core.items.copy();
+            core.onRemoved();
+        }
         build.dropped();
     }
 
@@ -60,9 +63,9 @@ public class BuildPayload implements Payload{
     }
 
     @Override
-    public void afterDroped() {
+    public void afterDroped(Tile tile) {
         updateCoreStorage();
-        if(build instanceof CoreBlock.CoreBuild core){
+        if(tile.build instanceof CoreBlock.CoreBuild core){
             core.items.set(core.payloadItems);
             core.payloadItems = new ItemModule();
         }

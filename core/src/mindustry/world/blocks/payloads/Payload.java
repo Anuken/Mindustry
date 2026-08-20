@@ -58,7 +58,7 @@ public interface Payload extends Position{
 
     default void destroyed(){};
 
-    default void afterDroped(){}
+    default void afterDroped(Tile tile){}
 
     default void afterPickedUp(){};
 
