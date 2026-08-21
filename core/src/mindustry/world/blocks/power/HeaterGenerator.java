@@ -52,11 +52,9 @@ public class HeaterGenerator extends ConsumeGenerator{
         public void updateTile(){
             super.updateTile();
 
-            float approachHeat = heatOutput * (scaleHeat ? timeScale : 1f);
-
-            //heat approaches target at the same speed regardless of efficiency. HeatOutput is scaled smoothly just like heat
-            heat = Mathf.approachDelta(heat, approachHeat * efficiency, warmupRate * delta());
-            heatOutScaled = Mathf.approachDelta(heatOutScaled, approachHeat, warmupRate * delta());
+            float approachHeat = HeatBlock.approachHeatOutput(heatOutput, scaleHeat, timeScale);
+            heat = HeatBlock.approachHeat(heat, approachHeat * efficiency, warmupRate * delta());
+            heatOutScaled = HeatBlock.approachHeat(heatOutScaled, approachHeat, warmupRate * delta());
         }
 
         @Override

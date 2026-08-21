@@ -30,7 +30,7 @@ public class NuclearReactor extends PowerGenerator{
     public float itemDuration = 120;
     /** heating per frame * fullness */
     public float heating = 0.01f;
-    /** max heat this block can output */
+    /** max heat this block can output per side */
     public float heatOutput = 12f;
     /** whether to scale heat output (not base heat!) with timescale */
     public boolean scaleHeat = true;
@@ -140,8 +140,11 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
-            if(scaleHeat) heatOutScaled = Mathf.approachDelta(heatOutScaled, heatOutput * timeScale, heatWarmupRate * delta());
-            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * ((enabled && productionEfficiency > 0) ? 1f : 0f), heatWarmupRate * delta()) : 0f;
+
+            float approachHeat = HeatBlock.approachHeatOutput(heatOutput, scaleHeat, timeScale);
+            float targetHeat = heat * approachHeat * ((enabled && productionEfficiency > 0) ? 1f : 0f);
+            heatOutScaled = HeatBlock.approachHeat(heatOutScaled, approachHeat, heatWarmupRate * delta());
+            heatProgress = HeatBlock.approachHeat(heatProgress, targetHeat, heatWarmupRate * delta());
 
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);
