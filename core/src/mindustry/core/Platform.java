@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.files.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.util.serialization.*;
 import mindustry.mod.*;
@@ -85,13 +84,11 @@ public interface Platform{
     default void updateRPC(){
     }
 
-    /** Must be a base64 string 8 bytes in length. */
+    /** Must be a base64 string 16 bytes in length (a version 1 UUID). */
     default String getUUID(){
         String uuid = Core.settings.getString("uuid", "");
-        if(uuid.isEmpty()){
-            byte[] result = new byte[8];
-            new Rand().nextBytes(result);
-            uuid = new String(Base64Coder.encode(result));
+        if(uuid.isEmpty() || Base64Coder.decode(uuid).length != 16){
+            uuid = new String(Base64Coder.encode(UUIDv1.generate()));
             Core.settings.put("uuid", uuid);
             return uuid;
         }

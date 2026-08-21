@@ -9,7 +9,6 @@ import mindustry.core.*;
 import mindustry.io.*;
 
 import java.io.*;
-import java.util.zip.*;
 
 /** Class for storing all packets. */
 public class Packets{
@@ -157,11 +156,7 @@ public class Packets{
             TypeIO.writeString(buffer, locale);
             TypeIO.writeString(buffer, usid);
 
-            byte[] b = Base64Coder.decode(uuid);
-            buffer.b(b);
-            CRC32 crc = new CRC32();
-            crc.update(Base64Coder.decode(uuid), 0, b.length);
-            buffer.l(crc.getValue());
+            buffer.b(Base64Coder.decode(uuid));
 
             buffer.b(mobile ? (byte)1 : 0);
             buffer.i(color);

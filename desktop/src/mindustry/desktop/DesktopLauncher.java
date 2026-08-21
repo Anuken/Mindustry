@@ -505,21 +505,6 @@ public class DesktopLauncher extends ClientLauncher{
         }
     }
 
-    @Override
-    public String getUUID(){
-        if(steam){
-            try{
-                byte[] result = new byte[8];
-                new Rand(SVars.user.user.getSteamID().getAccountID()).nextBytes(result);
-                return new String(Base64Coder.encode(result));
-            }catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-
-        return super.getUUID();
-    }
-
     private static void message(String message){
         SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
     }
