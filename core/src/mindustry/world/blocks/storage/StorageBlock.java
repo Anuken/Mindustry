@@ -48,7 +48,7 @@ public class StorageBlock extends Block{
     }
 
     public class StorageBuild extends Building{
-        public @Nullable Building linkedCore;
+        public @Nullable CoreBuild linkedCore;
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -63,10 +63,10 @@ public class StorageBlock extends Block{
         @Override
         public void handleItem(Building source, Item item){
             if(linkedCore != null){
-                if(linkedCore.items.get(item) >= ((CoreBuild)linkedCore).storageCapacity){
+                if(linkedCore.items.get(item) >= team.data().itemCap){
                     incinerateEffect(this, source);
                 }
-                ((CoreBuild)linkedCore).noEffect = true;
+                linkedCore.noEffect = true;
                 linkedCore.handleItem(source, item);
             }else{
                 super.handleItem(source, item);

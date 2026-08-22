@@ -221,7 +221,7 @@ public class Sector{
         if(isBeingPlayed()){
             if(state.rules.defaultTeam.core() != null){
                 ItemModule storage = state.rules.defaultTeam.items();
-                int cap = state.rules.defaultTeam.core().storageCapacity;
+                int cap = state.rules.defaultTeam.data().itemCap;
                 items.each((item, amount) -> storage.add(item, Math.min(cap - storage.get(item), amount)));
             }
         }else if(hasBase()){
