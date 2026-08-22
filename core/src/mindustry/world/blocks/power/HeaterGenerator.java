@@ -12,6 +12,8 @@ import mindustry.world.meta.*;
 public class HeaterGenerator extends ConsumeGenerator{
     public float heatOutput = 10f;
     public float warmupRate = 0.15f;
+    /** Whether to scale heat output with timescale. */
+    public boolean scaleHeat = true;
 
     public HeaterGenerator(String name){
         super(name);
@@ -19,7 +21,7 @@ public class HeaterGenerator extends ConsumeGenerator{
         drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
         rotateDraw = false;
         rotate = true;
-        canOverdrive = false;
+        canOverdrive = true;
         drawArrow = true;
     }
 
@@ -39,23 +41,25 @@ public class HeaterGenerator extends ConsumeGenerator{
     public void setBars(){
         super.setBars();
 
-        addBar("heat", (HeaterGeneratorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat / heatOutput));
+        addBar("heat", (HeaterGeneratorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> Mathf.clamp(entity.heat / entity.heatOutScaled)));
     }
 
     public class HeaterGeneratorBuild extends ConsumeGeneratorBuild implements HeatBlock{
         public float heat;
+        public float heatOutScaled = heatOutput;
 
         @Override
         public void updateTile(){
             super.updateTile();
 
-            //heat approaches target at the same speed regardless of efficiency
-            heat = Mathf.approachDelta(heat, heatOutput * efficiency, warmupRate * delta());
+            float approachHeat = HeatBlock.approachHeatOutput(heatOutput, scaleHeat, timeScale);
+            heat = HeatBlock.approachHeat(heat, approachHeat * efficiency, warmupRate * delta());
+            heatOutScaled = HeatBlock.approachHeat(heatOutScaled, approachHeat, warmupRate * delta());
         }
 
         @Override
         public float heatFrac(){
-            return heat / heatOutput;
+            return heat / heatOutScaled;
         }
 
         @Override
@@ -70,15 +74,22 @@ public class HeaterGenerator extends ConsumeGenerator{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(heat);
+            write.f(heatOutScaled);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             heat = read.f();
+            if(revision >= 2) heatOutScaled = read.f();
         }
     }
 }

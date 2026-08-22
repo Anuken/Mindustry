@@ -51,6 +51,10 @@ public class Turret extends ReloadTurret{
     public boolean consumeAmmoOnce = true;
     /** Minimum input heat required to fire. */
     public float heatRequirement = -1f;
+    /** Rate at which required heat updates on timescale changes. */
+    public float warmupHeatRate = 0.15f;
+    /** Whether to scale required heat with timescale. */
+    public boolean scaleHeat = true;
     /** Maximum efficiency possible, if this turret uses heat. */
     public float maxHeatEfficiency = 3f;
 
@@ -195,9 +199,9 @@ public class Turret extends ReloadTurret{
         if(heatRequirement > 0){
             addBar("heat", (TurretBuild entity) ->
             new Bar(() ->
-            Core.bundle.format("bar.heatpercent", (int)entity.heatReq, (int)(Math.min(entity.heatReq / heatRequirement, maxHeatEfficiency) * 100)),
+            Core.bundle.format("bar.heatpercent", (int)entity.heatReq, (int)(Math.min(entity.heatReq / entity.requiredHeat, maxHeatEfficiency) * 100)),
             () -> Pal.lightOrange,
-            () -> entity.heatReq / heatRequirement));
+            () -> Mathf.clamp(entity.heatReq / entity.requiredHeat)));
         }
     }
 
@@ -293,6 +297,7 @@ public class Turret extends ReloadTurret{
         public int queuedBullets = 0;
 
         public float heatReq;
+        public float requiredHeat = heatRequirement;
         public float[] sideHeat = new float[4];
 
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
@@ -536,6 +541,7 @@ public class Turret extends ReloadTurret{
             }
 
             if(heatRequirement > 0){
+                requiredHeat = Mathf.approachDelta(requiredHeat, heatRequirement * (scaleHeat ? timeScale : 1f), warmupHeatRate * delta());
                 heatReq = calculateHeat(sideHeat);
             }
 
@@ -669,7 +675,7 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateEfficiencyMultiplier(){
             if(heatRequirement > 0){
-                efficiency *= Math.min(Math.max(heatReq / heatRequirement, cheating() ? 1f : 0f), maxHeatEfficiency);
+                efficiency *= Math.min(Math.max(heatReq / requiredHeat, cheating() ? 1f : 0f), maxHeatEfficiency);
             }
         }
 
@@ -834,6 +840,7 @@ public class Turret extends ReloadTurret{
             super.write(write);
             write.f(reloadCounter);
             write.f(rotation);
+            write.f(requiredHeat);
         }
 
         @Override
@@ -844,11 +851,14 @@ public class Turret extends ReloadTurret{
                 reloadCounter = read.f();
                 rotation = read.f();
             }
+            if(revision >= 2){
+                requiredHeat = read.f();
+            }
         }
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override

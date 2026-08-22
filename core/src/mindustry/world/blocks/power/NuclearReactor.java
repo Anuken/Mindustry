@@ -32,6 +32,8 @@ public class NuclearReactor extends PowerGenerator{
     public float heating = 0.01f;
     /** max heat this block can output per side */
     public float heatOutput = 12f;
+    /** whether to scale heat output (not base heat!) with timescale */
+    public boolean scaleHeat = true;
     /** rate at which heat progress increases */
     public float heatWarmupRate = 1f;
     /** rate at which fuel consumption scales with heat */
@@ -102,6 +104,7 @@ public class NuclearReactor extends PowerGenerator{
         public float heat;
         public float heatLastFrame;
         public float heatProgress;
+        public float heatOutScaled = heatOutput;
         public float flash;
         public float smoothLight;
 
@@ -137,7 +140,11 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
-            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * ((enabled && productionEfficiency > 0) ? 1f : 0f), heatWarmupRate * delta()) : 0f;
+
+            float approachHeat = HeatBlock.approachHeatOutput(heatOutput, scaleHeat, timeScale);
+            float targetHeat = heat * approachHeat * ((enabled && productionEfficiency > 0) ? 1f : 0f);
+            heatOutScaled = HeatBlock.approachHeat(heatOutScaled, approachHeat, heatWarmupRate * delta());
+            heatProgress = HeatBlock.approachHeat(heatProgress, targetHeat, heatWarmupRate * delta());
 
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);
@@ -147,7 +154,7 @@ public class NuclearReactor extends PowerGenerator{
 
         @Override
         public float heatFrac(){
-            return heatProgress / heatOutput;
+            return heatProgress / heatOutScaled;
         }
 
         @Override
@@ -195,15 +202,22 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(heat);
+            write.f(heatOutScaled);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
             heat = read.f();
+            if(revision >= 2) heatOutScaled = read.f();
         }
     }
 }

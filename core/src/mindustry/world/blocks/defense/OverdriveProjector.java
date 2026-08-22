@@ -107,7 +107,7 @@ public class OverdriveProjector extends Block{
                 float realRange = range + phaseHeat * phaseRangeBoost;
 
                 charge = 0f;
-                indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 1f));
+                indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 10f));
             }
 
             if(efficiency > 0){

@@ -21,6 +21,9 @@ import static mindustry.Vars.*;
 
 public class VariableReactor extends PowerGenerator{
     public float maxHeat = 100f;
+    public float warmupRate = 0.15f;
+    /** Whether to scale required heat with timescale. */
+    public boolean scaleHeat = true;
     /** How quickly instability moves towards 1, per frame. */
     public float unstableSpeed = 1f / 60f / 3f;
     public float warmupSpeed = 0.1f;
@@ -58,9 +61,9 @@ public class VariableReactor extends PowerGenerator{
 
         addBar("heat", (VariableReactorBuild entity) ->
             new Bar(() ->
-            Core.bundle.format("bar.heatpercent", (int)entity.heat, (int)(Mathf.clamp(entity.heat / maxHeat) * 100)),
+            Core.bundle.format("bar.heatpercent", (int)entity.heat, (int)(Mathf.clamp(entity.heat / entity.requiredHeat) * 100)),
             () -> Pal.lightOrange,
-            () -> entity.heat / maxHeat));
+            () -> Mathf.clamp(entity.heat / entity.requiredHeat)));
     }
 
     @Override
@@ -73,10 +76,11 @@ public class VariableReactor extends PowerGenerator{
     //TODO: draw warmup fraction on block?
     public class VariableReactorBuild extends GeneratorBuild implements HeatConsumer{
         public float[] sideHeat = new float[4];
-        public float heat = 0f, instability, totalProgress, warmup, flash;
+        public float heat = 0f, requiredHeat = maxHeat, instability, totalProgress, warmup, flash;
 
         @Override
         public void updateTile(){
+            requiredHeat = maxHeat * timeScale;
             heat = calculateHeat(sideHeat);
 
             productionEfficiency = efficiency;
@@ -128,7 +132,7 @@ public class VariableReactor extends PowerGenerator{
             //at this stage efficiency = how much coolant is provided
 
             //target efficiency value
-            float target = Mathf.clamp(heat / maxHeat);
+            float target = Mathf.clamp(heat / requiredHeat);
 
             //fraction of coolant provided (from what is needed)
             float efficiencyMet = Mathf.clamp(Mathf.zero(target) ? 1f : efficiency / target);
@@ -149,7 +153,7 @@ public class VariableReactor extends PowerGenerator{
 
         @Override
         public float heatRequirement(){
-            return maxHeat;
+            return requiredHeat;
         }
 
         @Override
@@ -159,12 +163,18 @@ public class VariableReactor extends PowerGenerator{
         }
 
         @Override
+        public byte version(){
+            return 1;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
 
             write.f(heat);
             write.f(instability);
             write.f(warmup);
+            write.f(requiredHeat);
         }
 
         @Override
@@ -174,6 +184,9 @@ public class VariableReactor extends PowerGenerator{
             heat = read.f();
             instability = read.f();
             warmup = read.f();
+            if(revision >= 1){
+                requiredHeat = read.f();
+            }
         }
     }
 }
