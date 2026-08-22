@@ -2,9 +2,9 @@ package mindustry.logic;
 
 public enum LMarkerControl{
     remove,
-    world("true/false"),
-    minimap("true/false"),
-    autoscale("true/false"),
+    world("truefalse"),
+    minimap("truefalse"),
+    autoscale("truefalse"),
     pos("x", "y"),
     endPos("x", "y"),
     drawLayer("layer"),

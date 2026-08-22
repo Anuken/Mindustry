@@ -73,7 +73,7 @@ public class EffectsDialog extends BaseDialog{
 
                 t.stack(
                 new EffectCell(entry, cl),
-                new Table(af -> af.add(entry.name).grow().labelAlign(Align.bottomLeft).style(Styles.outlineLabel).bottom().left())
+                new Table(af -> af.add(LStatement.token(entry.name)).grow().labelAlign(Align.bottomLeft).style(Styles.outlineLabel).bottom().left())
                 ).size(size).with(a -> {
                     a.clicked(() -> {
                         if(listener != null){
