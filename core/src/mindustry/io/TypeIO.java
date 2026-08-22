@@ -41,119 +41,135 @@ import static mindustry.Vars.*;
 public class TypeIO{
     private static final int maxArraySize = 1000, maxByteArraySize = 40_000, maxSyncedPlans = 20;
 
+    /** Write an object, prepending its {@code ObjectType}. */
     public static void writeObject(Writes write, Object object){
         if(object == null){
-            write.b((byte)0);
+            write.b(ObjectType.Null.identifier);
         }else if(object instanceof Integer i){
-            write.b((byte)1);
+            write.b(ObjectType.Integer.identifier);
             write.i(i);
         }else if(object instanceof Long l){
-            write.b((byte)2);
+            write.b(ObjectType.Long.identifier);
             write.l(l);
         }else if(object instanceof Float f){
-            write.b((byte)3);
+            write.b(ObjectType.Float.identifier);
             write.f(f);
         }else if(object instanceof String s){
-            write.b((byte)4);
+            write.b(ObjectType.String.identifier);
             writeString(write, s);
         }else if(object instanceof Content map){
-            write.b((byte)5);
+            write.b(ObjectType.Content.identifier);
             write.b((byte)map.getContentType().ordinal());
             write.s(map.id);
         }else if(object instanceof IntSeq arr){
             if(arr.size > maxArraySize) throw new ArcRuntimeException("Array size too large: " + arr.size);
-            write.b((byte)6);
+            write.b(ObjectType.IntSeq.identifier);
             write.s((short)arr.size);
             for(int i = 0; i < arr.size; i++){
                 write.i(arr.items[i]);
             }
         }else if(object instanceof Point2 p){
-            write.b((byte)7);
+            write.b(ObjectType.Point2.identifier);
             write.i(p.x);
             write.i(p.y);
         }else if(object instanceof Point2[] p){
             //255 is the limit here, because it's a byte for some reason
             if(p.length > 255) throw new ArcRuntimeException("Array size too large: " + p.length);
-            write.b((byte)8);
+            write.b(ObjectType.PointArray.identifier);
             write.b(p.length);
             for(Point2 point2 : p){
                 write.i(point2.pack());
             }
         }else if(object instanceof TechNode map){
-            write.b(9);
+            write.b(ObjectType.TechNode.identifier);
             write.b((byte)map.content.getContentType().ordinal());
             write.s(map.content.id);
         }else if(object instanceof Boolean b){
-            write.b((byte)10);
+            write.b(ObjectType.Boolean.identifier);
             write.bool(b);
         }else if(object instanceof Double d){
-            write.b((byte)11);
-            write.d(d);
+            writeObject(write, d.doubleValue());
         }else if(object instanceof Building b){
-            write.b(12);
+            write.b(ObjectType.Building.identifier);
             write.i(b.pos());
         }else if(object instanceof BuildingBox b){
-            write.b(12);
+            write.b(ObjectType.Building.identifier);
             write.i(b.pos);
         }else if(object instanceof LAccess l){
-            write.b((byte)13);
+            write.b(ObjectType.LAccess.identifier);
             write.s(l.ordinal());
         }else if(object instanceof byte[] b){
             if(b.length > maxByteArraySize) throw new ArcRuntimeException("Array size too large: " + b.length);
-            write.b((byte)14);
+            write.b(ObjectType.ByteArray.identifier);
             write.i(b.length);
             write.b(b);
         }else if(object instanceof boolean[] b){
             if(b.length > maxArraySize) throw new ArcRuntimeException("Array size too large: " + b.length);
 
-            write.b(16);
+            write.b(ObjectType.BooleanArray.identifier);
             write.i(b.length);
             for(boolean bool : b){
                 write.bool(bool);
             }
         }else if(object instanceof Unit u){
-            write.b(17);
+            write.b(ObjectType.Unit.identifier);
             write.i(u.id);
         }else if(object instanceof UnitBox u){
-            write.b(17);
+            write.b(ObjectType.Unit.identifier);
             write.i(u.id);
         }else if(object instanceof Vec2[] vecs){
             if(vecs.length > maxArraySize) throw new ArcRuntimeException("Array size too large: " + vecs.length);
 
-            write.b(18);
+            write.b(ObjectType.Vec2Array.identifier);
             write.s(vecs.length);
             for(Vec2 v : vecs){
                 write.f(v.x);
                 write.f(v.y);
             }
         }else if(object instanceof Vec2 v){
-            write.b((byte)19);
+            write.b(ObjectType.Vec2.identifier);
             write.f(v.x);
             write.f(v.y);
         }else if(object instanceof Team t){
-            write.b((byte)20);
+            write.b(ObjectType.Team.identifier);
             write.b(t.id);
         }else if(object instanceof int[] i){
             if(i.length > maxArraySize) throw new ArcRuntimeException("Array size too large: " + i.length);
 
-            write.b((byte)21);
+            write.b(ObjectType.IntArray.identifier);
             writeInts(write, i);
         }else if(object instanceof Object[] objs){
             if(objs.length > maxArraySize) throw new ArcRuntimeException("Array size too large: " + objs.length);
 
-            write.b((byte)22);
+            write.b(ObjectType.ObjectArray.identifier);
             write.i(objs.length);
             for(Object obj : objs){
                 writeObject(write, obj);
             }
         }else if(object instanceof UnitCommand command){
-            write.b(23);
+            write.b(ObjectType.UnitCommand.identifier);
             write.s(command.id);
         }else if(object instanceof Bullet b || object instanceof Seq<?> s){ //write bullets as null
             write.b((byte)0);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
+    }
+
+    /** Overload of {@code writeObject(Writes, Object)} which prevents boxing. */
+    public static void writeObject(Writes write, double object){
+        write.b(ObjectType.Double.identifier);
+        write.d(object);
+    }
+
+    /** Read the {@code ObjectType} of the next object. */
+    public static ObjectType readObjectType(Reads read){
+        byte type = read.b();
+        if(0 <= type && type < ObjectType.all.length){
+            return ObjectType.all[type];
+        }
+
+        throw new IllegalArgumentException("Unknown object type: " + type);
     }
 
     public static @Nullable Object readObject(Reads read){
@@ -178,16 +194,20 @@ public class TypeIO{
     }
 
     public static @Nullable Object readObject(Reads read, boolean box, @Nullable ContentMapper mapper, boolean safe, boolean allowArrays){
+        ObjectType type = readObjectType(read);
+        return readObject(read, box, mapper, safe, allowArrays, type);
+    }
+
+    public static @Nullable Object readObject(Reads read, boolean box, @Nullable ContentMapper mapper, boolean safe, boolean allowArrays, ObjectType type){
         //use a much lower array size limit for build plans
         int maxArraySize = safe ? TypeIO.maxArraySize : 200;
 
-        byte type = read.b();
         return switch(type){
-            case 0 -> null;
-            case 1 -> read.i();
-            case 2 -> read.l();
-            case 3 -> read.f();
-            case 4 -> {
+            case Null -> null;
+            case Integer -> read.i();
+            case Long -> read.l();
+            case Float -> read.f();
+            case String -> {
                 byte exists = read.b();
                 if(exists != 0){
                     //in a safe context, strings can only be 1200 chars
@@ -196,8 +216,8 @@ public class TypeIO{
                     yield null;
                 }
             }
-            case 5 -> mapper == null ? content.getByID(ContentType.all[read.b()], read.s()) : mapper.get(ContentType.all[read.b()], read.s());
-            case 6 -> {
+            case Content -> mapper == null ? content.getByID(ContentType.all[read.b()], read.s()) : mapper.get(ContentType.all[read.b()], read.s());
+            case IntSeq -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 short len = read.s();
                 if(len > maxArraySize) throw new RuntimeException("Invalid array size: " + len);
@@ -205,20 +225,20 @@ public class TypeIO{
                 for(int i = 0; i < len; i ++) arr.add(read.i());
                 yield arr;
             }
-            case 7 -> new Point2(read.i(), read.i());
-            case 8 -> {
+            case Point2 -> new Point2(read.i(), read.i());
+            case PointArray -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.ub();
                 Point2[] out = new Point2[len];
                 for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i());
                 yield out;
             }
-            case 9 -> content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
-            case 10 -> read.bool();
-            case 11 -> read.d();
-            case 12 -> !box ? world.build(read.i()) : new BuildingBox(read.i());
-            case 13 -> LAccess.all[read.s()];
-            case 14 -> {
+            case TechNode -> content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
+            case Boolean -> read.bool();
+            case Double -> read.d();
+            case Building -> !box ? world.build(read.i()) : new BuildingBox(read.i());
+            case LAccess -> LAccess.all[read.s()];
+            case ByteArray -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.i();
                 if(len > maxByteArraySize) throw new RuntimeException("Invalid array size: " + len);
@@ -228,11 +248,11 @@ public class TypeIO{
                 yield bytes;
             }
             //unit command
-            case 15 -> {
+            case Legacy -> {
                 read.b();
                 yield null;
             }
-            case 16 -> {
+            case BooleanArray -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.i();
                 if(len > maxArraySize) throw new RuntimeException("Invalid array size: " + len);
@@ -241,8 +261,8 @@ public class TypeIO{
                 for(int i = 0; i < len; i ++) bools[i] = read.bool();
                 yield bools;
             }
-            case 17 -> !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
-            case 18 -> {
+            case Unit -> !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
+            case Vec2Array -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.s();
                 if(len > maxArraySize) throw new RuntimeException("Invalid array size: " + len);
@@ -251,10 +271,10 @@ public class TypeIO{
                 for(int i = 0; i < len; i ++) out[i] = new Vec2(read.f(), read.f());
                 yield out;
             }
-            case 19 -> new Vec2(read.f(), read.f());
-            case 20 -> Team.all[read.ub()];
-            case 21 -> readInts(read);
-            case 22 -> {
+            case Vec2 -> new Vec2(read.f(), read.f());
+            case Team -> Team.all[read.ub()];
+            case IntArray -> readInts(read);
+            case ObjectArray -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.i();
                 if(len > maxArraySize) throw new RuntimeException("Invalid array size: " + len);
@@ -265,8 +285,8 @@ public class TypeIO{
                 }
                 yield objs;
             }
-            case 23 -> content.unitCommand(read.us());
-            default -> throw new IllegalArgumentException("Unknown object type: " + type);
+            case UnitCommand -> content.unitCommand(read.us());
+            default -> throw new IllegalArgumentException("Unknown object type: " + type.identifier);
         };
     }
 
@@ -1365,6 +1385,42 @@ public class TypeIO{
             return new String(bytes, charset);
         }else{
             return null;
+        }
+    }
+
+    /** Type of a written object. */
+    public static enum ObjectType{
+        Null            ((byte)0),
+        Integer         ((byte)1),
+        Long            ((byte)2),
+        Float           ((byte)3),
+        String          ((byte)4),
+        Content         ((byte)5),
+        IntSeq          ((byte)6),
+        Point2          ((byte)7),
+        PointArray      ((byte)8),
+        TechNode        ((byte)9),
+        Boolean         ((byte)10),
+        Double          ((byte)11),
+        Building        ((byte)12),
+        LAccess         ((byte)13),
+        ByteArray       ((byte)14),
+        Legacy          ((byte)15),
+        BooleanArray    ((byte)16),
+        Unit            ((byte)17),
+        Vec2Array       ((byte)18),
+        Vec2            ((byte)19),
+        Team            ((byte)20),
+        IntArray        ((byte)21),
+        ObjectArray     ((byte)22),
+        UnitCommand     ((byte)23);
+
+        static final ObjectType[] all = values();
+
+        final byte identifier;
+
+        private ObjectType(byte identifier){
+            this.identifier = identifier;
         }
     }
 
