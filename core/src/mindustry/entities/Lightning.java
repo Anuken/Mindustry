@@ -19,9 +19,14 @@ public class Lightning{
     private static final Rect rect = new Rect();
     private static final Seq<Unit> entities = new Seq<>();
     private static final IntSet hit = new IntSet();
+    private static final Seq<Building> buildings = new Seq<>();
+    private static final Vec2 nextPosition = new Vec2();
     private static final int maxChain = 8;
     private static final float hitRange = 30f;
-    private static boolean bhit = false;
+    private static final float spawnHitRange = 5f;
+    private static boolean makeBullet = true;
+    private static boolean buildingHit = false;
+    private static boolean insulatedHit = false;
     private static int lastSeed = 0;
 
     /** Create a lighting branch at a location. Use Team.derelict to damage everyone. */
@@ -44,51 +49,149 @@ public class Lightning{
         hit.clear();
 
         Seq<Vec2> lines = new Seq<>();
-        bhit = false;
+        makeBullet = true;
+        int hitCount = 0;
+        insulatedHit = false;
 
+        //special case, can there be a unit or building when it first spawns?
+        if(hitter != null && hitter.type.pierceCap > 0){
+            Tile tile = world.tile(World.toTile(x), World.toTile(y));
+            if(tile != null && tile.build != null && tile.team() != team){
+                buildings.add(tile.build);
+                hitCount++;
+            }else{
+                entities.clear();
+                rect.setSize(spawnHitRange).setCenter(x, y);
+                Units.nearbyEnemies(team, rect, u -> makeBullet = !u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround));
+            }
+        }
+
+        buildings.clear();
         for(int i = 0; i < length / 2; i++){
-            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
+            //generate bullet and insert lightning position for drawing
+            if(makeBullet){
+                hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
+            }
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
-            if(lines.size > 1){
-                bhit = false;
-                Vec2 from = lines.get(lines.size - 2);
-                Vec2 to = lines.get(lines.size - 1);
-                World.raycastEach(World.toTile(from.getX()), World.toTile(from.getY()), World.toTile(to.getX()), World.toTile(to.getY()), (wx, wy) -> {
-
-                    Tile tile = world.tile(wx, wy);
-                    if(tile != null && (tile.build != null && tile.build.isInsulated()) && tile.team() != team){
-                        bhit = true;
-                        //snap it instead of removing
-                        lines.get(lines.size - 1).set(wx * tilesize, wy * tilesize);
-                        return true;
-                    }
-                    return false;
-                });
-                if(bhit) break;
+            //stop lightning generation if hit conditions are met, pierceCap considers number of objects hit (not total hits)
+            if(insulatedHit) break;
+            if(hitter != null && hitter.type.pierceCap > 0 && hitCount >= hitter.type.pierceCap){
+                break;
             }
+            makeBullet = true;
 
+            //find entities to hit
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
-            if(hit.size < maxChain){
+            if(hit.size < maxChain || (hitter != null && hit.size <= hitter.type.pierceCap)){
                 Units.nearbyEnemies(team, rect, u -> {
                     if(!hit.contains(u.id()) && (hitter == null || u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround))){
                         entities.add(u);
                     }
                 });
             }
-
             Unit furthest = Geometry.findFurthest(x, y, entities);
 
+            //generate the next position
+            boolean unitHit = false;
             if(furthest != null){
+                //if the collision exists, set nextPosition to entity
+                unitHit = true;
                 hit.add(furthest.id());
-                x = furthest.x();
-                y = furthest.y();
+                nextPosition.x = furthest.x();
+                nextPosition.y = furthest.y();
             }else{
+                //otherwise, move lightning forward as normal
                 rotation += random.range(20f);
-                x += Angles.trnsx(rotation, hitRange / 2f);
-                y += Angles.trnsy(rotation, hitRange / 2f);
+                nextPosition.x = x + Angles.trnsx(rotation, hitRange / 2f);
+                nextPosition.y = y + Angles.trnsy(rotation, hitRange / 2f);
             }
+
+            //if the lightning has to collide with the first building it meets
+            if(hitter != null && !hitter.type.canLightningJump){
+
+                //check for buildings from current (x,y) to next position (nextPosition)
+                buildingHit = false;
+                insulatedHit = false;
+                World.raycastEachWorld(x, y, nextPosition.getX(), nextPosition.getY(), (wx, wy) -> {
+                    Tile tile = world.tile(wx, wy);
+                    if(tile != null && tile.build != null && tile.team() != team){
+                        if(!buildings.contains(tile.build)){
+                            if(tile.build.isInsulated()){
+                                insulatedHit = true;
+                            }
+                            buildings.add(tile.build);
+                            //if the collision exists, override nextPosition to building
+                            nextPosition.x = wx * tilesize;
+                            nextPosition.y = wy * tilesize;
+                            makeBullet = true;
+                            buildingHit = true;
+                            return true;
+                        }else if(!hitter.type.canLightningMHitBuild){
+                            makeBullet = false;
+                        }
+                    }
+                    return false;
+                });
+
+                //handle case if a unit was initially meant to be hit, but detects a building along the way
+                if(unitHit){
+                    if(!makeBullet){
+                        Tile tile = world.tile(World.toTile(nextPosition.getX()), World.toTile(nextPosition.getY()));
+                        if(tile == null || tile.build == null || tile.team() == team){
+                            //make the bullet since the detected building was an ignored multi-hit
+                            makeBullet = true;
+                        }else{
+                            //otherwise, it will not hit the unit as it's on top of a building.
+                            unitHit = false;
+                        }
+                    }else if(buildingHit){
+                        //for first time hit, the unit is still a candidate for further chaining
+                        hit.remove(furthest.id());
+                        unitHit = false;
+                    }
+                }
+
+            }else{
+
+                //handling insulation for lightning jumps
+                insulatedHit = false;
+                World.raycastEachWorld(x, y, nextPosition.getX(), nextPosition.getY(), (wx, wy) -> {
+                    Tile tile = world.tile(wx, wy);
+                    if(tile != null && tile.build != null && tile.team() != team && tile.build.isInsulated()){
+                        insulatedHit = true;
+                        //if the collision exists, override nextPosition to building
+                        nextPosition.x = wx * tilesize;
+                        nextPosition.y = wy * tilesize;
+                        return true;
+                    }
+                    return false;
+                });
+
+                //check if a building exists at the targeted location hit
+                if(!unitHit && !insulatedHit){
+                    Tile tile = world.tile(World.toTile(nextPosition.getX()), World.toTile(nextPosition.getY()));
+                    if(tile != null && tile.build != null && tile.team() != team){
+                        if(!buildings.contains(tile.build)){
+                            buildings.add(tile.build);
+                            buildingHit = true;
+                        }else if(hitter != null && !hitter.type.canLightningMHitBuild){
+                            makeBullet = false;
+                        }
+                    }
+                }
+
+            }
+
+            //check if the lightning has hit anything
+            if(unitHit || (hitter != null && hitter.type.pierceBuilding && buildingHit)){
+                hitCount++;
+            }
+
+            //make the next position to current
+            x = nextPosition.getX();
+            y = nextPosition.getY();
         }
 
         Fx.lightning.at(x, y, rotation, color, lines);
