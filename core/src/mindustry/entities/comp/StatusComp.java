@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.graphics.*;
+import arc.math.Mathf;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
@@ -34,7 +35,15 @@ abstract class StatusComp implements Posc{
 
     /** Adds a status effect to this unit. */
     public void apply(StatusEffect effect, float duration){
-        applyStatus(effect, duration, false);
+        apply(effect, duration, false);
+    }
+
+    public void apply(StatusEffect effect, float duration, boolean shorten){
+        apply(effect, duration, shorten, 1f);
+    }
+
+    public void apply(StatusEffect effect, float duration, boolean shorten, float statusChance){
+        applyStatus(effect, duration, shorten, statusChance);
     }
 
     public float getDuration(StatusEffect effect){
@@ -43,16 +52,20 @@ abstract class StatusComp implements Posc{
     }
 
     public void setDuration(StatusEffect effect, float duration){
-        applyStatus(effect, duration, true);
+        applyStatus(effect, duration, true, 1f);
     }
 
-    private void applyStatus(StatusEffect effect, float duration, boolean shorten){
+    private void applyStatus(StatusEffect effect, float duration, boolean shorten, float chance){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
 
         if(shorten && duration == 0){
             if(hasEffect(effect)) unapply(effect);
             return;
         }
+
+        // Don't apply if the chance fails
+        // TODO: Multiple applications if chance > 1f ? only useful for reactive effects
+        if(!Mathf.chance(chance)) return;
 
         //unlock status effects regardless of whether they were applied to friendly units
         if(state.isCampaign()){
