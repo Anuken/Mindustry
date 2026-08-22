@@ -92,6 +92,7 @@ public class LogicDisplay extends Block{
         public @Nullable Mat transform;
         public long operations;
         public int index = -1;
+        public boolean processing = false;
 
         @Override
         public void draw(){
@@ -156,6 +157,25 @@ public class LogicDisplay extends Block{
         public void processCommands(){
             //don't bother processing commands if displays are off
             if(!commands.isEmpty() && buffer != null){
+                processing = true;
+
+                //force update of off-screen displays used as a source in commandImage
+                for (int i = 0; i < commands.size; i++){
+                    long c = commands.get(i);
+                    if(DisplayCmd.type(c) != commandImage) continue;
+                    int packed = (DisplayCmd.p4(c) << 10) | DisplayCmd.p1(c);
+                    int ctype = packed & 0x1F;
+                    if(ctype != displayDrawType) continue;
+
+                    int id = packed >> 5;
+                    if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
+                        LogicDisplayBuild source = displays.get(id).rootDisplay;
+                        if(source.isAdded() && !source.processing){
+                            source.rootDisplay.processCommands();
+                        }
+                    }
+                }
+
                 Draw.draw(Draw.z(), () -> {
                     if(buffer == null || commands.isEmpty()) return;
 
@@ -224,6 +244,8 @@ public class LogicDisplay extends Block{
                     Draw.trans(Tmp.m2);
                     Draw.reset();
                 });
+
+                processing = false;
             }
         }
 
