@@ -1,6 +1,7 @@
 package mindustry.entities.units;
 
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.audio.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -56,5 +57,13 @@ public class WeaponMount{
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;
         this.rotation = weapon.baseRotation;
+    }
+
+    public void read(Reads read){
+
+    }
+
+    public void write(Writes write){
+
     }
 }

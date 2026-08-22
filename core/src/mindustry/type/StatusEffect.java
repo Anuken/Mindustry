@@ -1,5 +1,6 @@
 package mindustry.type;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
@@ -67,6 +68,8 @@ public class StatusEffect extends UnlockableContent{
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
     public boolean outline = true;
+    /** Type of status entry to be used. */
+    public Prov<StatusEntry> entryType = StatusEntry::new;
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */

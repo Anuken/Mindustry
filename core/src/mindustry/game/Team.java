@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.io.*;
 import mindustry.game.Rules.*;
 import mindustry.game.Teams.*;
 import mindustry.graphics.*;
@@ -155,6 +156,10 @@ public class Team implements Comparable<Team>, Senseable{
         }
         hasPalette = true;
     }
+
+    public void read(Reads read){}
+
+    public void write(Writes write){}
 
     @Override
     public int compareTo(Team team){

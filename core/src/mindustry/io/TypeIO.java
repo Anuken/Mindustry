@@ -359,6 +359,7 @@ public class TypeIO{
             writes.b((m.shoot ? 1 : 0) | (m.rotate ? 2 : 0));
             writes.f(m.aimX);
             writes.f(m.aimY);
+            m.write(writes);
         }
     }
 
@@ -374,6 +375,7 @@ public class TypeIO{
                 m.aimY = ay;
                 m.shoot = (state & 1) != 0;
                 m.rotate = (state & 2) != 0;
+                m.read(read);
             }
         }
 
@@ -400,7 +402,9 @@ public class TypeIO{
         for(int i = 0; i < len; i++){
             float data = read.f();
             if(abilities.length > i){
-                abilities[i].data = data;
+                Ability a = abilities[i];
+                a.data = data;
+                a.read(read);
             }
         }
         return abilities;
@@ -410,6 +414,7 @@ public class TypeIO{
         write.b(abilities.length);
         for(var a : abilities){
             write.f(a.data);
+            a.write(write);
         }
     }
 
@@ -1016,6 +1021,8 @@ public class TypeIO{
             if(entry.dragMultiplier != 1f) write.f(entry.dragMultiplier);
             if(entry.armorOverride >= 0f) write.f(entry.armorOverride);
         }
+
+        entry.write(write);
     }
 
     public static StatusEntry readStatus(Reads read){
@@ -1036,6 +1043,8 @@ public class TypeIO{
             if((flags & (1 << 5)) != 0) result.dragMultiplier = read.f();
             if((flags & (1 << 6)) != 0) result.armorOverride = read.f();
         }
+
+        result.read(read);
 
         return result;
     }
@@ -1087,11 +1096,15 @@ public class TypeIO{
     }
 
     public static void writeTeam(Writes write, Team team){
-        write.b(team == null ? 0 : team.id);
+        Team t = team == null ? Team.derelict : team;
+        write.b(t.id);
+        t.write(write);
     }
 
     public static Team readTeam(Reads read){
-        return Team.get(read.b());
+        Team t = Team.get(read.b());
+        t.read(read);
+        return t;
     }
 
     public static void writeAction(Writes write, AdminAction reason){
