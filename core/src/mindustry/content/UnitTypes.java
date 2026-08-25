@@ -394,8 +394,6 @@ public class UnitTypes{
             armor = 4f;
             riseSpeed = descentSpeed = 0.07f;
 
-            mineTier = 2;
-            mineSpeed = 3f;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
 
@@ -440,7 +438,6 @@ public class UnitTypes{
         }};
 
         quasar = new UnitType("quasar"){{
-            mineTier = 3;
             boostMultiplier = 2f;
             health = 640f;
             buildSpeed = 1.1f;
@@ -457,7 +454,6 @@ public class UnitTypes{
             speed = 0.5f;
             hitSize = 13f;
 
-            mineSpeed = 4f;
             drawShields = false;
 
             abilities.add(new ForceFieldAbility(60f, 0.4f, 500f, 60f * 6));
