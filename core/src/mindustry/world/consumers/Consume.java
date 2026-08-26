@@ -3,6 +3,7 @@ package mindustry.world.consumers;
 import arc.func.*;
 import arc.scene.ui.layout.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -12,6 +13,8 @@ public abstract class Consume{
     public boolean optional;
     /** If true, this consumer will be displayed as a boost input. */
     public boolean booster;
+    /** If true, this consumer will share the same bar/inventory with other shared booster consumers. */
+    public boolean shared;
     /** If false, this consumer will still be checked, but it will need to updated manually. */
     public boolean update = true;
     /** Optional booster multiplier used by some blocks. */
@@ -42,6 +45,11 @@ public abstract class Consume{
         return this;
     }
 
+    public Consume shared(){
+        shared = true;
+        return this;
+    }
+
     public Consume update(boolean update){
         this.update = update;
         return this;
@@ -56,6 +64,10 @@ public abstract class Consume{
 
     /** Called when a consumption is triggered manually. */
     public void trigger(Building build){}
+
+    public boolean consumes(Liquid liquid){
+        return false;
+    }
 
     public void update(Building build){}
 

@@ -90,19 +90,21 @@ public class Drill extends Block{
 
     @Override
     public void init(){
-        super.init();
         if(blockedItems == null && blockedItem != null){
             blockedItems = Seq.with(blockedItem);
         }
         if(drillEffectRnd < 0) drillEffectRnd = size;
 
         liquidBoosters.clear();
-        for(var cons : consumers){
+        for(var cons : consumeBuilder){
             if(cons instanceof ConsumeLiquidBase liq && cons.booster){
+                //update is disabled as boosters are applied manually
                 cons.update = false;
                 liquidBoosters.add(liq);
             }
         }
+
+        super.init();
     }
 
     @Override
@@ -193,45 +195,18 @@ public class Drill extends Block{
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
 
-        if(liquidBoosters.size > 0 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
+        if(liquidBoosters.size > 0){
             stats.remove(Stat.booster);
 
-            if(liquidBoosters.size == 1 && liquidBoostIntensity != 1){
+            if(liquidBoosters.size == 1){
                 var cons = liquidBoosters.first();
                 float speed = liquidSpeedMultiplier(cons);
-                stats.add(Stat.booster,
-                    StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
-                    cons.amount,
-                    speed * speed, false, cons::consumes)
-                );
+
+                if(speed != 1f){
+                    stats.add(Stat.booster, StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(), cons.amount, speed * speed, false, cons::consumes));
+                }
             }else{
-                stats.add(Stat.booster, table -> {
-                    table.row();
-                    table.table(c -> {
-                        ObjectSet<Liquid> list = new ObjectSet<>();
-                        for(var cons : liquidBoosters){
-                            for(var liquid : content.liquids()){
-                                if(!cons.consumes(liquid) || !list.add(liquid)) continue;
-
-                                float speed = Mathf.pow(liquidSpeedMultiplier(cons), 2f);
-                                if(speed == 1f || cons.amount <= 0f) continue;
-
-                                c.table(Styles.grayPanel, b -> {
-                                    b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> StatValues.withTooltip(i, liquid, false));
-                                    b.table(info -> {
-                                        info.add(liquid.localizedName).left().row();
-                                        info.add(Strings.autoFixed(cons.amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
-                                    });
-
-                                    b.table(bt -> {
-                                        bt.right().defaults().padRight(3).left();
-                                        bt.add((speed > 1f ? "[stat]" : "[negstat]") + Strings.autoFixed(speed, 2) + "[lightgray]" + StatUnit.timesSpeed.localized());
-                                    }).right().grow().pad(10f).padRight(15f);
-                                }).growX().pad(5).row();
-                            }
-                        }
-                    }).growX().colspan(table.getColumns()).row();
-                });
+                stats.add(Stat.booster, StatValues.liquidBoosters(StatUnit.timesSpeed.localized(), liquidBoosters, cons -> Mathf.pow(liquidSpeedMultiplier(cons), 2f)));
             }
         }
     }
@@ -304,28 +279,6 @@ public class Drill extends Block{
             return efficiency * (size * size) / 4f;
         }
 
-        public float liquidBoost(){
-            float result = 1f;
-            ConsumeLiquidBase best = null;
-
-            for(var cons : liquidBoosters){
-                Liquid liquid = cons instanceof ConsumeLiquid cl ? cl.liquid : cons instanceof ConsumeLiquidFilter filter ? filter.getConsumed(this) : null;
-                if(liquid == null) continue;
-
-                float boost = Mathf.lerp(1f, liquidSpeedMultiplier(cons), cons.efficiency(this));
-                if(boost > result){
-                    result = boost;
-                    best = cons;
-                }
-            }
-
-            if(best != null){
-                best.update(this);
-            }
-
-            return result;
-        }
-
         @Override
         public void drawSelect(){
             drawItemSelection(dominantItem);
@@ -390,6 +343,27 @@ public class Drill extends Block{
 
                 if(wasVisible && Mathf.chanceDelta(drillEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
             }
+        }
+
+        public float liquidBoost(){
+            float result = 1f;
+            ConsumeLiquidBase best = null;
+
+            for(var cons : liquidBoosters){
+                Liquid liquid = cons instanceof ConsumeLiquid cl ? cl.liquid : cons instanceof ConsumeLiquidFilter filter ? filter.getConsumed(this) : null;
+                if(liquid == null) continue;
+
+                float boost = Mathf.lerp(1f, liquidSpeedMultiplier(cons), cons.efficiency(this));
+                if(boost > result){
+                    result = boost;
+                    best = cons;
+                }
+            }
+
+            if(best != null){
+                best.update(this);
+            }
+            return result;
         }
 
         @Override

@@ -27,6 +27,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.consumers.*;
 
 import static mindustry.Vars.*;
 
@@ -525,6 +526,36 @@ public class StatValues{
                 }
             }).growX().colspan(table.getColumns());
             table.row();
+        };
+    }
+
+    public static StatValue liquidBoosters(String unit, Seq<ConsumeLiquidBase> consumers, Floatf<ConsumeLiquidBase> speed){
+        return table -> {
+            table.row();
+            table.table(c -> {
+                ObjectSet<Liquid> list = new ObjectSet<>();
+                for(var cons : consumers){
+                    for(var liquid : content.liquids()){
+                        if(!cons.consumes(liquid) || !list.add(liquid)) continue;
+
+                        float boost = speed.get(cons);
+                        if(boost == 1f || cons.amount <= 0f) continue;
+
+                        c.table(Styles.grayPanel, b -> {
+                            b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));
+                            b.table(info -> {
+                                info.add(liquid.localizedName).left().row();
+                                info.add(Strings.autoFixed(cons.amount * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
+                            });
+
+                            b.table(bt -> {
+                                bt.right().defaults().padRight(3).left();
+                                bt.add((boost > 1f ? "[stat]" : "[negstat]") + Strings.autoFixed(boost, 2) + "[lightgray]" + unit);
+                            }).right().grow().pad(10f).padRight(15f);
+                        }).growX().pad(5).row();
+                    }
+                }
+            }).growX().colspan(table.getColumns()).row();
         };
     }
 

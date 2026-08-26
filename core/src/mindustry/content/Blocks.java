@@ -2927,8 +2927,8 @@ public class Blocks{
             liquidBoostIntensity = 1.8f;
 
             consumePower(3f);
-            consumeLiquid(Liquids.water, 0.1f).boost();
-            consumeLiquid(Liquids.cryofluid, 0.1f).boost(2f);
+            consumeLiquid(Liquids.water, 0.1f).boost().shared();
+            consumeLiquid(Liquids.cryofluid, 0.1f).boost(2f).shared();
         }}; 
 
         waterExtractor = new SolidPump("water-extractor"){{
@@ -4470,6 +4470,7 @@ public class Blocks{
             buildTime = 60f * 9f;
 
             coolant = consume(new ConsumeLiquid(Liquids.water, 15f / 60f));
+
             limitRange(12f);
         }};
 
