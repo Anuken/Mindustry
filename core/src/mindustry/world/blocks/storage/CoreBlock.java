@@ -557,9 +557,9 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public double sense(Content content){
-            if(content instanceof UnitType type) return team.data().countType(type);
-            return super.sense(content);
+        public double sense(Object object){
+            if(object instanceof UnitType type) return team.data().countType(type);
+            return super.sense(object);
         }
 
         @Override

@@ -1675,8 +1675,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(Content content){
-        if(content instanceof Item item){
+    public double sense(Object object){
+        if(object instanceof Item item){
             if(state.rules.infiniteResources) return 0;
 
             for(ItemStack r : requirements){

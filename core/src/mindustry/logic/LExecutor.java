@@ -583,9 +583,9 @@ public class LExecutor{
                 }
 
                 if(type.isObj && p1.isobj){
-                    b.control(type, p1.obj(), p2.num(), p3.num(), p4.num());
+                    b.control(exec, type, p1.obj(), p2.num(), p3.num(), p4.num());
                 }else{
-                    b.control(type, p1.num(), p2.num(), p3.num(), p4.num());
+                    b.control(exec, type, p1.num(), p2.num(), p3.num(), p4.num());
                 }
             }
         }
@@ -690,19 +690,26 @@ public class LExecutor{
 
             //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
-                if(sense instanceof Content co){
-                    to.setnum(se.sense(co));
-                    return;
-                }else if(sense instanceof LAccess la && (exec.privileged || !la.isPrivileged())){
-                    Object objOut = se.senseObject(la);
+                if(sense instanceof LAccess la){
+                    if(exec.privileged || !la.isPrivileged()){
+                        Object objOut = se.senseObject(la);
 
-                    if(objOut == Senseable.noSensed){
-                        //numeric output
-                        to.setnum(se.sense(la));
-                    }else{
-                        //object output
-                        to.setobj(objOut);
+                        if(objOut == Senseable.noSensed){
+                            //numeric output
+                            to.setnum(se.sense(la));
+                        }else{
+                            //object output
+                            to.setobj(objOut);
+                        }
+                        return;
                     }
+                }else if(sense != null){ //sense object value
+                    to.setnum(se.sense(sense));
+                    return;
+                }else if(!type.isobj){ //sense number
+                    Object sensed = se.senseObject(type.numval);
+                    //technically there's no need for noSensed sentinel values here, but there's no harm in keeping it
+                    to.setobj(sensed == Senseable.noSensed ? null : sensed);
                     return;
                 }
             }else{

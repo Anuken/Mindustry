@@ -332,19 +332,19 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public double sense(Content content){
-        if(content == stack().item) return stack().amount;
-        if(content instanceof UnitType u){
+    public double sense(Object object){
+        if(object == stack().item) return stack().amount;
+        if(object instanceof UnitType u){
             return ((Object)this) instanceof Payloadc pay ?
                     (pay.payloads().isEmpty() ? 0 :
                     pay.payloads().count(p -> p instanceof UnitPayload up && up.unit.type == u)) : 0;
         }
-        if(content instanceof Block b){
+        if(object instanceof Block b){
             return ((Object)this) instanceof Payloadc pay ?
                     (pay.payloads().isEmpty() ? 0 :
                     pay.payloads().count(p -> p instanceof BuildPayload bp && bp.build.block == b)) : 0;
         }
-        if(content instanceof StatusEffect s){
+        if(object instanceof StatusEffect s){
             return hasEffect(s) ? getDuration(s) / 60 : 0;
         }
         return NaN;

@@ -2143,25 +2143,25 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     @Override
-    public double sense(Content content){
-        if(content instanceof Item i && items != null) return items.get(i);
-        if(content instanceof Liquid l && liquids != null) return liquids.get(l);
+    public double sense(Object object){
+        if(object instanceof Item i && items != null) return items.get(i);
+        if(object instanceof Liquid l && liquids != null) return liquids.get(l);
         if(getPayloads() != null){
-            if(content instanceof UnitType u) return getPayloads().get(u);
-            if(content instanceof Block b) return getPayloads().get(b);
+            if(object instanceof UnitType u) return getPayloads().get(u);
+            if(object instanceof Block b) return getPayloads().get(b);
         }
         return Float.NaN; //invalid sense
     }
 
     @Override
-    public void control(LAccess type, double p1, double p2, double p3, double p4){
+    public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
         if(type == LAccess.enabled){
             enabled = !Mathf.zero((float)p1);
         }
     }
 
     @Override
-    public void control(LAccess type, Object p1, double p2, double p3, double p4){
+    public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
         //don't execute configure instructions that copy logic building configures; this can cause extreme lag
         if(type == LAccess.config && block.logicConfigurable && !(p1 instanceof LogicBuild)){
             //change config only if it's new

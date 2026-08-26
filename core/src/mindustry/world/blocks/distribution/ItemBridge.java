@@ -15,6 +15,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -201,6 +202,32 @@ public class ItemBridge extends Block{
         public float time = -8f, timeSpeed;
         public boolean wasMoved, moved, hadValidLink;
         public float transportCounter;
+
+        @Override
+        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LAccess.config){
+                //if it's a building, link it, if it's null (or something else), unlink it
+                configured(null, p1 instanceof Building b ? b.pos() : -1);
+            }
+        }
+
+        @Override
+        public double sense(Object object){
+            if(object instanceof Building b){
+                //return true if linked to the building
+                return link == b.pos() && linkValid(tile, b.tile) ? 1 : 0;
+            }
+            return Double.NaN;
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config){
+                Tile other = world.tile(link);
+                return linkValid(tile, other) ? other.build : null;
+            }
+            return super.senseObject(sensor);
+        }
 
         @Override
         public void pickedUp(){

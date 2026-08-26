@@ -91,7 +91,7 @@ public class Door extends Wall{
         }
 
         @Override
-        public void control(LAccess type, double p1, double p2, double p3, double p4){
+        public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.enabled){
                 boolean shouldOpen = !Mathf.zero(p1);
 
