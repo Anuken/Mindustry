@@ -100,6 +100,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
     }
 
     public void addWeather(Sector sector, Rules rules){
+        rules.weather.clear();
 
         //apply weather based on terrain
         ObjectIntMap<Block> floorc = new ObjectIntMap<>();

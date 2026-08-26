@@ -60,7 +60,7 @@ android{
         def versionNameResult = "$versionNumber-$versionType-${getBuildVersion().replace(" ", "-")}"
 
         applicationId "io.anuke.mindustry"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 36
 
         versionName versionNameResult

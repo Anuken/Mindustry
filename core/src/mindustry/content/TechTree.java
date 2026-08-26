@@ -195,7 +195,9 @@ public class TechTree{
 
             //save finished requirements by item type
             for(ItemStack stack : finishedRequirements){
-                Core.settings.put("req-" + content.name + "-" + stack.item.name, stack.amount);
+                String key = "req-" + content.name + "-" + stack.item.name;
+                //don't write a bunch of zeroes to the settings
+                if(Core.settings.getInt(key, 0) != stack.amount) Core.settings.put(key, stack.amount);
             }
         }
     }
