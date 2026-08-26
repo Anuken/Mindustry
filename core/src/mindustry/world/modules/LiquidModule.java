@@ -53,7 +53,7 @@ public class LiquidModule extends BlockModule{
                 flow = cacheFlow;
             }
 
-            boolean updateFlow = flowTimer.get(15);
+            boolean updateFlow = flowTimer.get(flowVisualRefreshInterval);
 
             for(int i = 0; i < liquids.length; i++){
                 flow[i].add(cacheSums[i]);
@@ -63,7 +63,7 @@ public class LiquidModule extends BlockModule{
                 cacheSums[i] = 0;
 
                 if(updateFlow){
-                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / flowVisualRefreshInterval : -1;
+                    displayFlow[i] = flow[i].hasEnoughData() ? flow[i].mean() / flowPollInterval : -1;
                 }
             }
         }

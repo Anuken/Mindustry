@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
+import mindustry.game.EventType.*;
 import mindustry.mod.data.*;
 
 import java.io.*;
@@ -21,8 +22,14 @@ public class DataImagePacker{
     private static int defaultAtlasDepth = -1;
 
     public static final String regionPrefix = "dp-";
+    /** Prefix for images pushed dynamically by the server via {@link #addTexture(String, byte[])}, as opposed to map/mod data patches. */
+    public static final String serverRegionPrefix = "net-";
 
     private @Nullable Seq<AtlasRegion> addedRegions;
+    /** Textures added at runtime via addTexture(), keyed by their unprefixed name. Tracked separately from patchAtlas so they can be added/removed individually. */
+    private final ObjectMap<String, Texture> serverImages = new ObjectMap<>();
+    /** Single threaded executor so that concurrent calls always complete in FIFO order. */
+    private final ExecutorService textureExecutor = Threads.executor("Server Texture Streamer", 1);
 
     /** Packs a new set of images. If images are already packed, disposes of the old ones. */
     public void pack(Seq<ImageAsset> images){
@@ -159,6 +166,63 @@ public class DataImagePacker{
             }
             addedRegions = null;
         }
+
+        serverImages.each((name, texture) -> {
+            Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
+            Core.atlas.getDrawables().remove(serverRegionPrefix + name);
+            texture.dispose();
+        });
+        serverImages.clear();
+    }
+
+    /** Decodes PNG bytes and registers them into the atlas under "netRegionPrefix + name", replacing any existing image with the same name. Safe to call from any thread. */
+    public void addTexture(String name, byte[] pngData){
+        textureExecutor.execute(() -> {
+            Pixmap pixmap;
+            try{
+                pixmap = new Pixmap(pngData);
+            }catch(Throwable e){
+                Log.err("Invalid server-provided image data for '" + name + "'", e);
+                return;
+            }
+
+            if(pixmap.width > DataPatcher.maxImageSize || pixmap.height > DataPatcher.maxImageSize){
+                Log.err("Server-provided image '" + name + "' exceeds max size of " + DataPatcher.maxImageSize);
+                pixmap.dispose();
+                return;
+            }
+
+            Core.app.post(() -> {
+                removeTexture(name);
+
+                Texture texture = new Texture(pixmap);
+                pixmap.dispose();
+
+                var region = new TextureAtlas.AtlasRegion(texture, 0, 0, texture.width, texture.height);
+                region.name = serverRegionPrefix + name;
+
+                serverImages.put(name, texture);
+                Core.atlas.getRegionMap().put(serverRegionPrefix + name, region);
+
+                //fired with the full atlas region name
+                Events.fire(new TextureStreamEvent(serverRegionPrefix + name));
+            });
+        });
+    }
+
+    /** Removes a texture previously added with {@link #addTexture}. Must be called on the main thread. */
+    private void removeTexture(String name){
+        Texture texture = serverImages.remove(name);
+        if(texture != null){
+            Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
+            Core.atlas.getDrawables().remove(serverRegionPrefix + name);
+            texture.dispose();
+        }
+    }
+
+    /** Queues a texture for removal. Will run after any pending {@link #addTexture} calls so that races do not occur. */
+    public void removeTextureQueued(String name){
+        textureExecutor.execute(() -> Core.app.post(() -> removeTexture(name)));
     }
 
     public void printStats(PixmapPacker packer){
