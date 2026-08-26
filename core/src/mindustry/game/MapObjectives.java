@@ -563,7 +563,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                             text = "";
                         }
                     }
-                    return Core.bundle.format(text.substring(1), timeString.toString());
+                    //the 'escelating' typo was fixed in the bundle+maps, but existing saves don't have that fix, so it has to be changed here
+                    String actualText = text.equals("@objective.enemyescelating") ? "@objective.enemyescalating" : text;
+                    return Core.bundle.format(actualText.substring(1), timeString.toString());
                 }else{
                     try{
                         return Core.bundle.formatString(text, timeString.toString());
