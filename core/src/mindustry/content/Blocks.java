@@ -2921,7 +2921,7 @@ public class Blocks{
                 color = Color.valueOf("ff5512");
                 layer = Layer.block;
                 glowIntensity = 0.3f;
-                glowScale = 3f;
+                glowScale = 4f;
                 alpha = 1f;
             }}, new DrawRegion("-rotator"){{
                 spinSprite = true;
