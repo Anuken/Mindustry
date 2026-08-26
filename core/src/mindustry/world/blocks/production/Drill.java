@@ -35,6 +35,8 @@ public class Drill extends Block{
     public int tier;
     /** Base time to drill one ore, in frames. */
     public float drillTime = 300;
+    /** Interval between item consumption, if item consumption is set up. */
+    public float consumeTime = 0f;
     /** How many times faster the drill will progress when boosted by liquid. */
     public float liquidBoostIntensity = 1.6f;
     /** Speed at which the drill speeds up. */
@@ -62,7 +64,7 @@ public class Drill extends Block{
     public Effect updateEffect = Fx.pulverizeSmall;
     /** Chance the update effect will appear. */
     public float updateEffectChance = 0.02f;
-    /** Basic drawer capabilities */
+    /** Handles low this block is drawn. */
     public DrawBlock drawer = new DrawMulti(new DrawDefault(), new DrawRegion("-rotator"){{
         spinSprite = true;
         rotateSpeed = Drill.this.rotateSpeed;
@@ -78,7 +80,7 @@ public class Drill extends Block{
     public @Load(value = "@-item", fallback = "drill-item-@size") TextureRegion itemRegion;
     public Color heatColor = Color.valueOf("ff5512");
     public @Load("@-rim") TextureRegion rimRegion;
-    
+
     public Drill(String name){
         super(name);
         update = true;
@@ -299,11 +301,11 @@ public class Drill extends Block{
         @Override
         public void updateTile(){
             //does nothing for most Drills, as those do not require items.
-            if((consTimer += delta()) >= consumeTime){
+            if(consumeTime > 0f && (consTimer += delta()) >= consumeTime){
                 consume();
                 consTimer %= consumeTime;
             }
-          
+
             if(timer(timerDump, dumpTime / timeScale)){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
             }
@@ -343,7 +345,6 @@ public class Drill extends Block{
                 if(wasVisible && Mathf.chanceDelta(drillEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
             }
         }
-
 
         @Override
         public double sense(LAccess sensor){
@@ -411,9 +412,9 @@ public class Drill extends Block{
 
         @Override
         public float progress() {
-            float drillProgress = (dominantItem == null) ? 0f : Mathf.clamp(progress / getDrillTime(dominantItem));
-            return drillProgress;
+            return (dominantItem == null) ? 0f : Mathf.clamp(progress / getDrillTime(dominantItem));
         }
+
         @Override
         public float totalProgress(){
             return totalProgress;
