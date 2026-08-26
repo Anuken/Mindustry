@@ -322,7 +322,7 @@ public class Drill extends Block{
                 float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
 
                 lastDrillSpeed = (speed * dominantItems * warmup) / delay;
-                warmup = Mathf.approachDelta(warmup, speed, warmupSpeed);
+                warmup = Mathf.approachDelta(warmup, efficiency, warmupSpeed);
                 progress += delta() * dominantItems * speed * warmup;
 
                 if(Mathf.chanceDelta(updateEffectChance * warmup))
