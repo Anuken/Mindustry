@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.world.*;
 
 /**
@@ -46,8 +45,7 @@ public class ShallowLiquid extends Floor{
                     }
                 }
 
-                String baseName = this.name + (++index);
-                packer.add(PageType.environment, baseName, res);
+                packer.add(this.name + (++index), res);
 
                 res.dispose();
             }

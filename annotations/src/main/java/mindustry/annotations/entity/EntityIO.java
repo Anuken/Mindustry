@@ -40,8 +40,6 @@ public class EntityIO{
         this.serializer = serializer;
         this.name = name;
 
-        json.setIgnoreUnknownFields(true);
-
         directory.mkdirs();
 
         //load old revisions

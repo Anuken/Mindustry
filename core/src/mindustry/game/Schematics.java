@@ -5,7 +5,6 @@ import arc.assets.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -22,8 +21,8 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
 import mindustry.gen.*;
-import mindustry.input.*;
 import mindustry.input.InputHandler.*;
+import mindustry.input.*;
 import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
@@ -175,7 +174,7 @@ public class Schematics implements Loadable{
         FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
         buffer.begin();
-        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
+        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.width, buffer.height);
         file.writePng(pixmap);
         buffer.end();
     }
@@ -184,7 +183,7 @@ public class Schematics implements Loadable{
         if(errored.contains(schematic)) return errorTexture;
 
         try{
-            return getBuffer(schematic).getTexture();
+            return getBuffer(schematic).texture;
         }catch(Throwable t){
             Log.err("Failed to get preview for schematic '@' (@)", schematic.name(), schematic.file);
             Log.err(t);
@@ -220,7 +219,7 @@ public class Schematics implements Loadable{
             shadowBuffer.begin(Color.clear);
 
             Draw.trans().idt();
-            Draw.proj().setOrtho(0, 0, shadowBuffer.getWidth(), shadowBuffer.getHeight());
+            Draw.proj().setOrtho(0, 0, shadowBuffer.width, shadowBuffer.height);
 
             Draw.color();
             schematic.tiles.each(t -> {
@@ -240,11 +239,11 @@ public class Schematics implements Loadable{
 
             buffer.begin(Color.clear);
 
-            Draw.proj().setOrtho(0, buffer.getHeight(), buffer.getWidth(), -buffer.getHeight());
+            Draw.proj().setOrtho(0, buffer.height, buffer.width, -buffer.height);
 
-            Tmp.tr1.set(shadowBuffer.getTexture(), 0, 0, schematic.width + padding, schematic.height + padding);
+            Tmp.tr1.set(shadowBuffer.texture, 0, 0, schematic.width + padding, schematic.height + padding);
             Draw.color(0f, 0f, 0f, 1f);
-            Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
+            Draw.rect(Tmp.tr1, buffer.width /2f, buffer.height /2f, buffer.width, -buffer.height);
             Draw.color();
 
             Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config){

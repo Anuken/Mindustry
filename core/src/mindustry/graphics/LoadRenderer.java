@@ -5,10 +5,10 @@ import arc.func.*;
 import arc.fx.*;
 import arc.fx.filters.*;
 import arc.graphics.*;
-import arc.graphics.Pixmap.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.GLVersion.*;
+import arc.graphics.gl.*;
 import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -42,18 +42,7 @@ public class LoadRenderer implements Disposable{
     private long lastFrameTime;
 
     {
-        //some systems don't support rgba8888 w/ a stencil buffer
-        try{
-            fx = new FxProcessor(Format.rgba8888, 2, 2, false, true);
-        }catch(Exception e){
-            try{
-                fx = new FxProcessor(Format.rgb565, 2, 2, false, true);
-            }catch(Exception awful){
-                renderStencil = false;
-                fx = new FxProcessor(Format.rgba8888, 2, 2, false, false);
-            }
-        }
-
+        fx = new FxProcessor(2, 2, Format.defaultColorStencil);
         //vignetting is probably too much
         //fx.addEffect(new VignettingFilter(false));
         fx.addEffect(bloom = new BloomFilter());
@@ -90,10 +79,8 @@ public class LoadRenderer implements Disposable{
             lastFrameTime = Time.millis();
         }
 
-        if(fx.getWidth() != graphics.getWidth() || fx.getHeight() != graphics.getHeight()){
-            fx.resize(graphics.getWidth(), graphics.getHeight());
-        }
-
+        fx.resize(graphics.getWidth(), graphics.getHeight());
+        fx.clear();
         fx.begin();
 
         if(assets.getLoadedAssets() != lastLength){
@@ -136,7 +123,6 @@ public class LoadRenderer implements Disposable{
                 testprogress = 0;
             }
         }
-
 
         //square matrix
         Draw.color(Pal.accent, Color.black, 0.9f);
@@ -485,7 +471,6 @@ public class LoadRenderer implements Disposable{
         Draw.flush();
 
         fx.end();
-
         fx.applyEffects();
         fx.render();
     }

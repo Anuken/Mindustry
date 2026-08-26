@@ -10,7 +10,6 @@ import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
@@ -44,7 +43,7 @@ public class NetClient implements ApplicationListener{
         planSyncTime = Timekeeper.ofSeconds(0.5f),
         pingTime = Timekeeper.ofSeconds(1f);
     private static final Reads dataReads = new Reads(null);
-    private static final JsonValue tmpJsonMap = new JsonValue(ValueType.object);
+    private static final Jval tmpJsonMap = Jval.newObject();
 
     private long ping;
     //private Interval timer = new Interval(5);
@@ -448,8 +447,8 @@ public class NetClient implements ApplicationListener{
     public static void setRule(String rule, String jsonData){
         try{
             //readField searches for the specified value, so create a fake parent for it.
-            tmpJsonMap.child = null;
-            tmpJsonMap.addChild(rule, new JsonReader().parse(jsonData));
+            tmpJsonMap.clear().put(rule, Jval.read(jsonData));
+
             JsonIO.json.readField(state.rules, rule, tmpJsonMap);
         }catch(Throwable error){
             Log.err("Failed to read rule", error);

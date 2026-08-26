@@ -41,7 +41,7 @@ public class CustomRulesDialog extends BaseDialog{
     public Seq<String> categoryNames;
     public String currentName = "";
     public String ruleSearch = "";
-    public Seq<Runnable> additionalSetup; // for modding to easily add new rules
+    public static Seq<Runnable> additionalSetup; // for modding to easily add new rules
 
     public CustomRulesDialog(){
         this(false);
@@ -256,7 +256,7 @@ public class CustomRulesDialog extends BaseDialog{
         Boolp allowMusic = () -> !rules.disableMusic;
         Func<String, Seq<MusicContainer>> parser = str -> {
             try{
-                return Seq.map(new JsonReader().parse("[" + str + "]").asStringArray(), MusicContainer::new);
+                return Jval.read("[" + str + "]").asArray().map( j -> new MusicContainer(j.asString()));
             }catch(Throwable e){
                 return null;
             }

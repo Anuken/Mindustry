@@ -1107,22 +1107,6 @@ public class ControlPathfinder implements Runnable{
         public Vec2 dest = new Vec2();
     }
 
-    @Deprecated
-    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
-        var result = getPathPosition(unit, destination, destination);
-        out.set(result.dest);
-        if(noResultFound != null) noResultFound[0] = result.unreachable;
-        return result.move;
-    }
-
-    @Deprecated
-    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination, Vec2 out, @Nullable boolean[] noResultFound){
-        var result = getPathPosition(unit, destination, mainDestination);
-        out.set(result.dest);
-        if(noResultFound != null) noResultFound[0] = result.unreachable;
-        return result.move;
-    }
-
     public PathfindResult getPathPosition(Unit unit, Vec2 destination){
         return getPathPosition(unit, destination, destination);
     }

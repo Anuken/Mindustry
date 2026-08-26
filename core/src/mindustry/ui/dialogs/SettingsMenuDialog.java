@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
@@ -543,17 +542,11 @@ public class SettingsMenuDialog extends BaseDialog{
 
         //iOS (and possibly Android) devices do not support linear filtering well, so disable it
         graphics.checkPref("linear", !mobile, b -> {
-            for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
-                tex.setFilter(filter, filter);
-            }
+            atlas.getTexture().setFilter(b ? TextureFilter.linear : TextureFilter.nearest);
         });
 
         if(Core.settings.getBool("linear")){
-            for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = TextureFilter.linear;
-                tex.setFilter(filter, filter);
-            }
+            atlas.getTexture().setFilter(TextureFilter.linear);
         }
 
         graphics.checkPref("skipcoreanimation", false);

@@ -3,9 +3,8 @@ package mindustry.mod;
 import arc.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.PixmapPacker.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -20,11 +19,13 @@ import java.util.concurrent.atomic.*;
 
 /** Manages data patch images. */
 public class DataImagePacker{
+    private static int defaultAtlasDepth = -1;
+
     public static final String regionPrefix = "dp-";
     /** Prefix for images pushed dynamically by the server via {@link #addTexture(String, byte[])}, as opposed to map/mod data patches. */
     public static final String serverRegionPrefix = "net-";
 
-    private @Nullable TextureAtlas patchAtlas;
+    private @Nullable Seq<AtlasRegion> addedRegions;
     /** Textures added at runtime via addTexture(), keyed by their unprefixed name. Tracked separately from patchAtlas so they can be added/removed individually. */
     private final ObjectMap<String, Texture> serverImages = new ObjectMap<>();
     /** Single threaded executor so that concurrent calls always complete in FIFO order. */
@@ -32,10 +33,15 @@ public class DataImagePacker{
 
     /** Packs a new set of images. If images are already packed, disposes of the old ones. */
     public void pack(Seq<ImageAsset> images){
-        if(patchAtlas != null){
+        if(addedRegions != null){
             unload();
         }
+
         if(images.isEmpty()) return;
+
+        if(defaultAtlasDepth <= 0){
+            defaultAtlasDepth = Core.atlas.getTexture().getDepth();
+        }
 
         Time.mark();
 
@@ -67,15 +73,10 @@ public class DataImagePacker{
 
         Threads.awaitAll(sizeTasks);
 
-        int targetPower = Mathf.nextPowerOfTwo((int)(Mathf.sqrt(totalSumArea.get()) * 1.35f));
-        int targetSize = Mathf.clamp(Math.max(targetPower, maxSize.get()), 128, Math.min(4096, Vars.maxTextureSize));
+        int targetPower = Mathf.nextPowerOfTwo((int)(Mathf.sqrt(totalSumArea.get()) * 1.4f));
+        int targetSize = Mathf.clamp(Math.max(targetPower, maxSize.get()), 128, 4096);
 
         PixmapPacker packer = new PixmapPacker(targetSize, targetSize, 2, true);
-
-        //env regions are packed onto a special reserved region
-        boolean anyEnv = images.contains(p -> p.path.contains("blocks/environment/"));
-        TextureRegion envReserveRegion = Core.atlas.find("data-patch-reserved-env");
-        PixmapPacker envPacker = anyEnv ? new PixmapPacker(envReserveRegion.width, envReserveRegion.height, 2, true) : null;
 
         Seq<ImageAsset> toPack = new Seq<>(), pending = new Seq<>();
         ObjectSet<String> generatedNames = new ObjectSet<>();
@@ -96,7 +97,6 @@ public class DataImagePacker{
             }
         }
 
-        AtomicBoolean failedEnv = new AtomicBoolean();
         var tasks = new Seq<Future<?>>();
         for(var image : toPack){
             tasks.add(Vars.mainExecutor.submit(() -> {
@@ -109,41 +109,30 @@ public class DataImagePacker{
                     //don't add the double dp prefix, only add it if it's not already present
                     String name = (image.isGenerated() && image.name.contains("-dp-") ? "" : regionPrefix) + image.name;
 
-                    if(anyEnv && image.path.contains("blocks/environment/")){
-                        if(!failedEnv.get()) envPacker.pack(name, pixmap);
-                    }else{
-                        packer.pack(name, pixmap);
-                    }
+                    packer.pack(name, pixmap);
 
                     pixmap.dispose();
                 }catch(Throwable e){
-                    if(e instanceof ArcRuntimeException && e.getMessage().contains("one page")){
-                        failedEnv.set(true);
-                    }else{
-                        Log.err("Invalid patch image: " + image.path, e);
-                    }
+                    Log.err("Invalid patch image: " + image.path, e);
                 }
             }));
         }
 
         Threads.awaitAll(tasks);
 
-        if(envPacker != null && failedEnv.get()){
-            Log.warn("[Patch Atlas] Unable to fit all environment images into a " + envPacker.getPageWidth() + "x" + envPacker.getPageHeight() + " page. Reduce the size or number of images.");
-        }
+        Draw.flush();
+        var pagesToAdd = packer.getPages().select(p -> p.addedRects.size > 0);
+        addedRegions = new Seq<>();
+        Core.atlas.getTexture().resizeDepth(defaultAtlasDepth + pagesToAdd.size);
 
-        TextureFilter filter = Core.settings.getBool("linear", !Vars.mobile) ? TextureFilter.linear : TextureFilter.nearest;
-        patchAtlas = packer.generateTextureAtlas(filter, filter, false);
+        for(int i = 0; i < pagesToAdd.size; i ++){
+            var page = pagesToAdd.get(i);
+            ArraySliceTexture tex = new ArraySliceTexture(Core.atlas.getTexture(), i + defaultAtlasDepth);
+            tex.draw(page.image);
 
-        if(envPacker != null && envPacker.getPages().size > 0){
-            //directly update existing atlas page's reserved region
-            var page = envPacker.getPages().first();
-            envReserveRegion.texture.draw(page.getPixmap(), envReserveRegion.getX(), envReserveRegion.getY());
-
-            //manually add rects to the patch atlas with texture and offsets based on env atlas
             for(String name : page.addedRects){
-                PixmapPackerRect rect = page.rects.get(name);
-                TextureAtlas.AtlasRegion region = new TextureAtlas.AtlasRegion(envReserveRegion.texture, (int)rect.x + envReserveRegion.getX(), (int)rect.y + envReserveRegion.getY(), (int)rect.width, (int)rect.height);
+                var rect = page.rects.get(name);
+                var region = new AtlasRegion(tex, (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
 
                 if(rect.splits != null){
                     region.splits = rect.splits;
@@ -156,47 +145,32 @@ public class DataImagePacker{
                 region.originalWidth = rect.originalWidth;
                 region.originalHeight = rect.originalHeight;
 
-                patchAtlas.getRegions().add(region);
-                patchAtlas.getRegionMap().put(name, region);
+                Core.atlas.getRegionMap().put(name, region);
+                addedRegions.add(region);
             }
-
         }
 
-        printStats(packer, envPacker);
-
+        printStats(packer);
         packer.forceDispose();
-        //textures are never updated, so force disposal
-        if(envPacker != null) envPacker.forceDispose();
 
-        Core.atlas.getTextures().addAll(patchAtlas.getTextures());
-        Core.atlas.getRegionMap().putAll(patchAtlas.getRegionMap());
         //getRegions is intentionally not modified, it's a hassle to manage, O(n) to unapply, and not used anywhere important. there's no point.
 
         Log.debug("[Patch Atlas] Time to pack: @ms", Time.elapsed());
     }
 
     public void unload(){
-        if(patchAtlas != null){
-            for(var texture : patchAtlas.getTextures()){
-                if(texture != null) patchAtlas.getTextures().remove(texture);
+        if(addedRegions != null){
+            for(var region : addedRegions){
+                Core.atlas.getRegionMap().remove(region.name);
+                Core.atlas.getDrawables().remove(region.name);
             }
-            for(var region : patchAtlas.getRegions()){
-                if(region != null){
-                    patchAtlas.getRegionMap().remove(region.name);
-                    patchAtlas.getDrawables().remove(region.name);
-                }
-            }
-
-            patchAtlas.dispose();
-            patchAtlas = null;
+            addedRegions = null;
         }
 
         serverImages.each((name, texture) -> {
             Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
-            Core.atlas.getTextures().remove(texture);
-            texture.dispose();
             Core.atlas.getDrawables().remove(serverRegionPrefix + name);
-
+            texture.dispose();
         });
         serverImages.clear();
     }
@@ -228,7 +202,6 @@ public class DataImagePacker{
                 region.name = serverRegionPrefix + name;
 
                 serverImages.put(name, texture);
-                Core.atlas.getTextures().add(texture);
                 Core.atlas.getRegionMap().put(serverRegionPrefix + name, region);
 
                 //fired with the full atlas region name
@@ -242,9 +215,8 @@ public class DataImagePacker{
         Texture texture = serverImages.remove(name);
         if(texture != null){
             Core.atlas.getRegionMap().remove(serverRegionPrefix + name);
-            Core.atlas.getTextures().remove(texture);
-            texture.dispose();
             Core.atlas.getDrawables().remove(serverRegionPrefix + name);
+            texture.dispose();
         }
     }
 
@@ -253,24 +225,21 @@ public class DataImagePacker{
         textureExecutor.execute(() -> Core.app.post(() -> removeTexture(name)));
     }
 
-    public void printStats(PixmapPacker mainPacker, PixmapPacker envPacker){
+    public void printStats(PixmapPacker packer){
         if(Log.level != LogLevel.debug) return;
-        for(PixmapPacker packer : new PixmapPacker[]{mainPacker, envPacker}){
-            if(packer == null) continue;
 
-            int total = packer.getPages().sum(p -> p.rects.size);
-            Log.debug("[Patch Atlas] " + (packer == mainPacker ? "Main: " : "Env: ") + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&lc (" + total + " sprites)", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
-            int i = 0;
-            for(var page : packer.getPages()){
-                float totalArea = 0;
-                for(var region : page.getRects().values()){
-                    totalArea += region.area();
-                }
-
-                Log.debug("[Patch Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
-
-                i ++;
+        int total = packer.getPages().sum(p -> p.rects.size);
+        Log.debug("[Patch Atlas] " +  (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&lc (" + total + " sprites)", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
+        int i = 0;
+        for(var page : packer.getPages()){
+            float totalArea = 0;
+            for(var region : page.getRects().values()){
+                totalArea += region.area();
             }
+
+            Log.debug("[Patch Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
+
+            i ++;
         }
     }
 }

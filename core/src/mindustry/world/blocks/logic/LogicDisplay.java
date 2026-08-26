@@ -3,7 +3,6 @@ package mindustry.world.blocks.logic;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -106,7 +105,7 @@ public class LogicDisplay extends Block{
             Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(buffer != null){
-                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * scaleFactor * Draw.scl, -buffer.getHeight() * scaleFactor * Draw.scl);
+                    Draw.rect(Draw.wrap(buffer.texture), x, y, buffer.width * scaleFactor * Draw.scl, -buffer.height * scaleFactor * Draw.scl);
                 }
             });
             Draw.blend();
@@ -149,7 +148,7 @@ public class LogicDisplay extends Block{
 
         public void getBufferRegion(TextureRegion region){
             if(buffer != null){
-                region.set(buffer.getTexture(), 0, buffer.getTexture().height, buffer.getTexture().width, -buffer.getTexture().height);
+                region.set(buffer.texture, 0, buffer.texture.height, buffer.texture.width, -buffer.texture.height);
             }
         }
 
@@ -161,7 +160,7 @@ public class LogicDisplay extends Block{
 
                     Tmp.m1.set(Draw.proj());
                     Tmp.m2.set(Draw.trans());
-                    Draw.proj(0, 0, buffer.getWidth(), buffer.getHeight());
+                    Draw.proj(0, 0, buffer.width, buffer.height);
                     if(transform != null){
                         Draw.trans(transform);
                     }

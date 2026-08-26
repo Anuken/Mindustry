@@ -140,10 +140,10 @@ public class MapObjectivesDialog extends BaseDialog{
         setInterpreter(Team.class, (cont, name, type, field, remover, indexer, get, set) -> {
             name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
-                b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(get.get().color)),
+                b -> b.image(Tex.whiteui).update(i -> i.setColor(get.get().color)).grow(),
                 Styles.squarei,
                 () -> showTeamSelect(set)
-            ).fill().pad(4f)).growX().fillY();
+            ).margin(4f).pad(4f).size(50f)).growX().fillY();
         });
 
         setProvider(Color.class, (type, cons) -> cons.get(Pal.accent.cpy()));
