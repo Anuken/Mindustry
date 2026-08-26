@@ -742,14 +742,14 @@ public class Block extends UnlockableContent implements Senseable{
                     if(!sharedLiquidBar){
                         sharedLiquidBar = true;
                         addLiquidBar(build -> {
-                            Liquid last = null;
+                            Liquid first = null;
                             for(var liquid : content.liquids()){
                                 if(!consumesLiquidShared(liquid)) continue;
 
                                 if(build.liquids.get(liquid) > 0.001f) return liquid;
-                                if(last == null) last = liquid;
+                                if(first == null) first = liquid;
                             }
-                            return last;
+                            return first;
                         });
                     }
                     continue;
