@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.util.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 
 public class PlanetRenderer implements Disposable{
@@ -31,7 +32,7 @@ public class PlanetRenderer implements Disposable{
         setThreshold(0.8f);
         blurPasses = 6;
     }};
-    public final Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, false, 1.5f);
+    public final Mesh atmosphere = MeshBuilder.buildHex(Color.white, 2, 1.5f);
 
     //seed: 8kmfuix03fw
     public final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
@@ -106,6 +107,12 @@ public class PlanetRenderer implements Disposable{
         renderPlanet(solarSystem, params);
         renderTransparent(solarSystem, params);
 
+        //TODO: will draw under icons and look bad. maybe limit arcs based on facing dot product
+        if(params.renderer != null){
+            batch.proj().mul(params.planet.getTransform(mat));
+            params.renderer.renderOverProjections(params.planet);
+        }
+
         bloom.render();
 
         Events.fire(Trigger.universeDrawEnd);
@@ -176,6 +183,10 @@ public class PlanetRenderer implements Disposable{
         planet.renderSectors(batch, cam, params);
     }
 
+    public void drawArcLine(Planet planet, Vec3 a, Vec3 b){
+        drawArcLine(planet, a, b, Pal.accent, Tmp.c3.set(Pal.accent).a(0f), 1f, 80f, 25, 0.006f);
+    }
+
     public void drawArc(Planet planet, Vec3 a, Vec3 b){
         drawArc(planet, a, b, Pal.accent, Color.clear, 1f);
     }
@@ -186,6 +197,10 @@ public class PlanetRenderer implements Disposable{
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
         planet.drawArc(batch, a, b, from, to, length, timeScale, pointCount);
+    }
+
+    public void drawArcLine(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount, float stroke){
+        planet.drawArcLine(batch, a, b, from, to, length, timeScale, pointCount, stroke);
     }
 
     public void drawBorders(Sector sector, Color base, float alpha){
@@ -218,6 +233,37 @@ public class PlanetRenderer implements Disposable{
         sector.planet.drawSelection(batch, sector, color, stroke, length);
     }
 
+    /** Draws sector when selected. Supply the batch with {@link Gl#triangles triangle} vertices. */
+    public void drawSpecialSelection(Sector sector, Color color, float stroke, float length){
+        drawSelection(sector, color, stroke, length);
+
+        float arad = (outlineRad + length) * sector.planet.radius;
+        float span = 0.1f;
+
+        for(int i = 0; i < sector.tile.corners.length; i += 2){
+            Corner next = sector.tile.corners[(i + 1) % sector.tile.corners.length];
+            Corner curr = sector.tile.corners[i];
+
+            next.v.scl(arad);
+            curr.v.scl(arad);
+            sector.tile.v.scl(arad);
+
+            Tmp.v31.set(curr.v).sub(sector.tile.v).setLength(curr.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
+            Tmp.v32.set(next.v).sub(sector.tile.v).setLength(next.v.dst(sector.tile.v) - stroke).add(sector.tile.v);
+            Tmp.v33.set(Tmp.v31).lerp(Tmp.v32, span);
+            Tmp.v34.set(Tmp.v31).lerp(Tmp.v32, 1f - span);
+
+            Tmp.v31.set(Tmp.v33).sub(sector.tile.v).setLength(Tmp.v31.len() - stroke).add(sector.tile.v);
+            Tmp.v32.set(Tmp.v34).sub(sector.tile.v).setLength(Tmp.v32.len() - stroke).add(sector.tile.v);
+
+            batch.quad(Tmp.v33, Tmp.v34, Tmp.v32, Tmp.v31, color);
+
+            sector.tile.v.scl(1f / arad);
+            next.v.scl(1f / arad);
+            curr.v.scl(1f / arad);
+        }
+    }
+
     @Override
     public void dispose(){
         skybox.dispose();
@@ -230,5 +276,6 @@ public class PlanetRenderer implements Disposable{
     public interface PlanetInterfaceRenderer{
         void renderSectors(Planet planet);
         void renderProjections(Planet planet);
+        default void renderOverProjections(Planet planet){}
     }
 }

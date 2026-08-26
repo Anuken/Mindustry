@@ -18,6 +18,7 @@ public class MissileUnitType extends UnitType{
         logicControllable = false;
         isEnemy = false;
         useUnitCap = false;
+        drawCell = false;
         allowedInPayloads = false;
         controller = u -> new MissileAI();
         flying = true;
@@ -36,7 +37,7 @@ public class MissileUnitType extends UnitType{
         targetPriority = -1f;
         outlineColor = Pal.darkOutline;
         fogRadius = 2f;
-        loopSound = Sounds.missileTrail;
+        loopSound = Sounds.loopMissileTrail;
         loopSoundVolume = 0.05f;
         drawMinimap = false;
         //TODO weapon configs, etc?

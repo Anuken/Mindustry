@@ -1,5 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
+import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -8,6 +9,7 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
@@ -20,6 +22,9 @@ public class BaseTurret extends Block{
     public float placeOverlapMargin = 8 * 7f;
     public float rotateSpeed = 5;
     public float fogRadiusMultiplier = 1f;
+    public boolean disableOverlapCheck = false;
+    /** How much time to start shooting after placement. */
+    public float activationTime = 0f;
 
     /** Effect displayed when coolant is used. */
     public Effect coolEffect = Fx.fuelburn;
@@ -46,9 +51,24 @@ public class BaseTurret extends Block{
             coolant = findConsumer(c -> c instanceof ConsumeCoolant);
         }
 
-        //just makes things a little more convenient
+        checkInitCoolant();
+
+        if(!disableOverlapCheck){
+            placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
+        }
+        fogRadius = Math.max(Mathf.round(range / tilesize * fogRadiusMultiplier), fogRadius);
+        super.init();
+    }
+
+    @Override
+    public void reinitializeConsumers(){
+        checkInitCoolant();
+
+        super.reinitializeConsumers();
+    }
+
+    void checkInitCoolant(){
         if(coolant != null){
-            //TODO coolant fix
             coolant.update = false;
             coolant.booster = true;
             coolant.optional = true;
@@ -56,10 +76,6 @@ public class BaseTurret extends Block{
             //json parsing does not add to consumes
             if(!hasConsumer(coolant)) consume(coolant);
         }
-
-        placeOverlapRange = Math.max(placeOverlapRange, range + placeOverlapMargin);
-        fogRadius = Math.max(Mathf.round(range / tilesize * fogRadiusMultiplier), fogRadius);
-        super.init();
     }
 
     @Override
@@ -78,10 +94,31 @@ public class BaseTurret extends Block{
         super.setStats();
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
+        if(activationTime > 0) stats.add(Stat.activationTime, activationTime / 60f, StatUnit.seconds);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+
+        if(activationTime > 0){
+            addBar("activationtimer", (BaseTurretBuild entity) ->
+            new Bar(() ->
+            (entity.activationTimer > 0)? Core.bundle.format("bar.activationtimer", Mathf.ceil(entity.activationTimer / 60f)) : Core.bundle.get("bar.activated"),
+            () -> (entity.activationTimer > 0)?  Pal.lightOrange : Pal.techBlue,
+            () -> 1 - entity.activationTimer / activationTime));
+        }
     }
 
     public class BaseTurretBuild extends Building implements Ranged, RotBlock{
         public float rotation = 90;
+        public float activationTimer = 0;
+
+        @Override
+        public void placed(){
+            super.placed();
+            activationTimer = activationTime;
+        }
 
         @Override
         public float range(){
@@ -100,6 +137,11 @@ public class BaseTurret extends Block{
 
         public float estimateDps(){
             return 0f;
+        }
+
+        @Override
+        public BlockStatus status() {
+            return (activationTimer <= 0)? super.status() : BlockStatus.inactive;
         }
     }
 }

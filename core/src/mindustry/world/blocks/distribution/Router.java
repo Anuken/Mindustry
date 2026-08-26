@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -22,9 +23,12 @@ public class Router extends Block{
         group = BlockGroup.transportation;
         unloadable = false;
         noUpdateDisabled = true;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     public class RouterBuild extends Building implements ControlBlock{
+        protected byte[] cycles = new byte[Vars.content.items().size];
         public Item lastItem;
         public Tile lastInput;
         public float time;
@@ -83,7 +87,7 @@ public class Router extends Block{
             items.add(item, 1);
             lastItem = item;
             time = 0f;
-            lastInput = source.tile();
+            lastInput = source.tile;
         }
 
         @Override
@@ -98,14 +102,14 @@ public class Router extends Block{
         public Building getTileTarget(Item item, Tile from, boolean set){
             if(unit != null && isControlled()){
                 unit.health(health);
-                unit.ammo(unit.type().ammoCapacity * (items.total() > 0 ? 1f : 0f));
+                unit.ammo((items.total() > 0 ? 1f : 0f));
                 unit.team(team);
                 unit.set(x, y);
 
                 int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
 
                 if(unit.isShooting()){
-                    Building other = nearby(rotation = angle);
+                    Building other = nearby(angle);
                     if(other != null && other.acceptItem(this, item)){
                         return other;
                     }
@@ -114,10 +118,12 @@ public class Router extends Block{
                 return null;
             }
 
-            int counter = rotation;
+            //keep track of target offsets per-item to fix https://github.com/Anuken/Mindustry/issues/12471
+            int id = item.id;
+            int counter = cycles[id];
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
-                if(set) rotation = ((byte)((rotation + 1) % proximity.size));
+                if(set) cycles[id] = ((byte)((cycles[id] + 1) % proximity.size));
                 if(other.tile == from && from.block() == Blocks.overflowGate) continue;
                 if(other.acceptItem(this, item)){
                     return other;

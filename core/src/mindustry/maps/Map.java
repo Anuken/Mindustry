@@ -31,7 +31,7 @@ public class Map implements Comparable<Map>, Publishable{
     /** Map width/height, shorts. */
     public int width, height;
     /** Preview texture. */
-    public Texture texture;
+    public @Nullable Texture texture;
     /** Build that this map was created in. -1 = unknown or custom build. */
     public int build;
     /** All teams present on this map.*/
@@ -100,16 +100,16 @@ public class Map implements Comparable<Map>, Publishable{
 
     public Rules rules(Rules base){
         try{
-            //this replacement is a MASSIVE hack but it fixes some incorrect overwriting of team-specific rules.
-            //may need to be tweaked later
-            Rules result = JsonIO.read(Rules.class, base, tags.get("rules", "{}").replace("teams:{2:{infiniteAmmo:true}},", ""));
+            Rules result = JsonIO.read(base, tags.get("rules", "{}"));
+
             //replace the default serpulo env with erekir
             if(result.planet == Planets.serpulo && result.hasEnv(Env.scorching)){
                 result.planet = Planets.erekir;
             }
+            if(result.planet == null) result.planet = Planets.serpulo;
             if(result.spawns.isEmpty()) result.spawns = Vars.waves.get();
             return result;
-        }catch(Exception e){
+        }catch(Throwable e){
             //error reading rules. ignore?
             Log.err(e);
             return new Rules();
@@ -123,7 +123,7 @@ public class Map implements Comparable<Map>, Publishable{
         }
         return maps.readFilters(tags.get("genfilters", ""));
     }
-    
+
     public String name(){
         return tag("name");
     }
@@ -135,7 +135,7 @@ public class Map implements Comparable<Map>, Publishable{
     public String description(){
         return tag("description");
     }
-    
+
     public String plainName() {
         return Strings.stripColors(name());
     }
@@ -165,13 +165,13 @@ public class Map implements Comparable<Map>, Publishable{
     public void addSteamID(String id){
         tags.put("steamid", id);
         editor.tags.put("steamid", id);
-        
+
         try{
             ui.editor.save();
         }catch(Exception e){
             Log.err(e);
         }
-        
+
         Events.fire(new MapPublishEvent());
     }
 
@@ -179,7 +179,7 @@ public class Map implements Comparable<Map>, Publishable{
     public void removeSteamID(){
         tags.remove("steamid");
         editor.tags.remove("steamid");
-        
+
         try{
             ui.editor.save();
         }catch(Exception e){
@@ -225,7 +225,7 @@ public class Map implements Comparable<Map>, Publishable{
     public boolean prePublish(){
         tags.put("author", player.name);
         editor.tags.put("author", player.name);
-        
+
         ui.editor.save();
         return true;
     }
@@ -239,15 +239,13 @@ public class Map implements Comparable<Map>, Publishable{
         int modes = Boolean.compare(Gamemode.pvp.valid(this), Gamemode.pvp.valid(map));
         if(modes != 0) return modes;
 
-        return name().compareTo(map.name());
+        return Strings.stripColors(name()).compareTo(Strings.stripColors(map.name()));
     }
 
     @Override
     public String toString(){
         return "Map{" +
         "file='" + file + '\'' +
-        ", custom=" + custom +
-        ", tags=" + tags +
         '}';
     }
 }

@@ -36,6 +36,8 @@ public interface Payload extends Position{
     /** @return the time taken to build this payload. */
     float buildTime();
 
+    boolean contentEquals(Payload other);
+
     /** update this payload inside a container unit or building. either can be null. */
     default void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){}
 

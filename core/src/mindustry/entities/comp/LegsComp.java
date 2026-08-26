@@ -1,10 +1,10 @@
 package mindustry.entities.comp;
 
+import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -13,13 +13,14 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
+import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
 @Component
-abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
+abstract class LegsComp implements Posc, Rotc, Hitboxc, Unitc{
     private static final Vec2 straightVec = new Vec2();
 
     @Import float x, y, rotation, speedMultiplier;
@@ -37,13 +38,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
     @Replace
     @Override
     public SolidPred solidity(){
-        return type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
-    }
-
-    @Override
-    @Replace
-    public int pathType(){
-        return type.allowLegStep ? Pathfinder.costLegs : Pathfinder.costGround;
+        return ignoreSolids() ? null : type.allowLegStep ? EntityCollisions::legsSolid : EntityCollisions::solid;
     }
 
     @Override
@@ -111,6 +106,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
 
             legs[i] = l;
         }
+        totalLength = Mathf.random(100f);
     }
 
     @Override
@@ -169,8 +165,11 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
             l.moving = move;
             l.stage = moving ? stageF % 1f : Mathf.lerpDelta(l.stage, 0f, 0.1f);
 
-            Floor floor = Vars.world.floorWorld(l.base.x, l.base.y);
-            if(floor.isDeep()){
+            Tile tile = Vars.world.tileWorld(l.base.x, l.base.y);
+            Color floorColor = tile == null ? Color.clear : tile.getFloorColor();
+            Floor floor = tile == null ? Blocks.air.asFloor() : tile.floor();
+
+            if(tile != null && tile.isDeep()){
                 deeps ++;
                 lastDeepFloor = floor;
             }
@@ -180,11 +179,12 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                 //create effect when transitioning to a group it can't move in
                 if(!move && (moving || !type.legContinuousMove) && i % div == l.group){
                     if(!headless && !inFogTo(player.team())){
-                        if(floor.isLiquid){
-                            floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                        if(floor.isLiquid && tile != null && tile.block() == Blocks.air){
+                            floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floorColor);
                             floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
                         }else{
-                            Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floor.mapColor);
+                            Fx.unitLandSmall.at(l.base.x, l.base.y, type.rippleScale, floorColor);
+                            type.stepSound.at(l.base.x, l.base.y, type.stepSoundPitch + Mathf.range(type.stepSoundPitchRange), type.stepSoundVolume);
                         }
 
                         //shake when legs contact ground
@@ -196,7 +196,6 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Flyingc, Unitc{
                     if(type.legSplashDamage > 0 && !disarmed){
                         Damage.damage(team, l.base.x, l.base.y, type.legSplashRange, type.legSplashDamage * state.rules.unitDamage(team), false, true);
 
-                        var tile = Vars.world.tileWorld(l.base.x, l.base.y);
                         if(tile != null && tile.block().unitMoveBreakable){
                             ConstructBlock.deconstructFinish(tile, tile.block(), self());
                         }

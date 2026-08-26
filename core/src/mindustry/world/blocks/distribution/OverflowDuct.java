@@ -33,6 +33,8 @@ public class OverflowDuct extends Block{
         priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
         regionRotated1 = 1;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override
@@ -132,7 +134,7 @@ public class OverflowDuct extends Block{
         @Override
         public boolean acceptItem(Building source, Item item){
             return current == null && items.total() == 0 &&
-                (Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation);
+                (Edges.getFacingEdge(source.tile, tile).relativeTo(tile) == rotation);
         }
 
         @Override

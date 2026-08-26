@@ -37,9 +37,10 @@ public class ThermalGenerator extends PowerGenerator{
             outputsLiquid = true;
             hasLiquids = true;
         }
+        emitLight = true;
         super.init();
         //proper light clipping
-        clipSize = Math.max(clipSize, 45f * size * 2f * 2f);
+        lightClipSize = Math.max(lightClipSize, 45f * size * 2f * 2f);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class ThermalGenerator extends PowerGenerator{
         super.drawPlace(x, y, rotation, valid);
 
         if(displayEfficiency){
-            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(attribute, x, y) * 100, 1), x, y, valid);
+            drawPlaceText(Core.bundle.formatFloat("bar.efficiency", sumAttribute(attribute, x, y) * 100 * displayEfficiencyScale, 1), x, y, valid);
         }
     }
 

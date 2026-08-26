@@ -1,7 +1,7 @@
 package mindustry.world.blocks.distribution;
 
 import arc.*;
-import arc.graphics.*;
+import arc.func.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -15,6 +15,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -25,12 +26,11 @@ import static mindustry.Vars.*;
 public class Duct extends Block implements Autotiler{
     public float speed = 5f;
     public boolean armored = false;
-    public Color transparentColor = new Color(0.4f, 0.4f, 0.4f, 0.1f);
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
 
-    public @Nullable Block bridgeReplacement;
+    public @Nullable Block bridgeReplacement, junctionReplacement;
 
     public Duct(String name){
         super(name);
@@ -49,6 +49,9 @@ public class Duct extends Block implements Autotiler{
         isDuct = true;
         priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
+
+        drawCached = true;
+        buildingCacheLayer = BuildingCacheLayer.under;
     }
 
     @Override
@@ -63,6 +66,7 @@ public class Duct extends Block implements Autotiler{
         super.init();
 
         if(bridgeReplacement == null || !(bridgeReplacement instanceof DuctBridge || bridgeReplacement instanceof ItemBridge)) bridgeReplacement = Blocks.ductBridge;
+        //if(junctionReplacement == null) junctionReplacement = Blocks.ductJunction;
     }
 
     @Override
@@ -104,10 +108,23 @@ public class Duct extends Block implements Autotiler{
     }
 
     @Override
+    public Block getReplacement(BuildPlan req, Seq<BuildPlan> plans){
+        if(junctionReplacement == null || !junctionReplacement.unlockedNow() || junctionReplacement.isHidden()) return this;
+
+        Boolf<Point2> cont = p -> plans.contains(o -> o.x == req.x + p.x && o.y == req.y + p.y && (req.block instanceof Duct || req.block instanceof DuctJunction));
+        return cont.get(Geometry.d4(req.rotation)) &&
+            cont.get(Geometry.d4(req.rotation - 2)) &&
+            req.tile() != null &&
+            req.tile().block() instanceof Duct &&
+            Mathf.mod(req.tile().build.rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
+    }
+
+    @Override
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
-        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
-        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, false, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        boolean hasJunction = junctionReplacement != null && junctionReplacement.unlockedNow() && !junctionReplacement.isHidden();
+        if(bridgeReplacement instanceof ItemBridge bridge) Placement.calculateBridges(plans, bridge, hasJunction, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
+        if(bridgeReplacement instanceof DuctBridge bridge) Placement.calculateBridges(plans, bridge, hasJunction, b -> b instanceof Duct || b instanceof StackConveyor || b instanceof Conveyor);
     }
 
     public class DuctBuild extends Building{
@@ -120,30 +137,42 @@ public class Duct extends Block implements Autotiler{
 
         @Override
         public void draw(){
+            draw(false);
+        }
+
+        @Override
+        public void drawCached(){
+            draw(true);
+        }
+
+        public void draw(boolean under){
             float rotation = rotdeg();
             int r = this.rotation;
+
+            Draw.z(Layer.blockUnder + 0.2f);
 
             //draw extra ducts facing this one for tiling purposes
             for(int i = 0; i < 4; i++){
                 if((blending & (1 << i)) != 0){
                     int dir = r - i;
                     float rot = i == 0 ? rotation : (dir)*90;
-                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top);
+                    drawAt(x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, 0, rot, i != 0 ? SliceMode.bottom : SliceMode.top, under);
                 }
             }
 
             //draw item
-            if(current != null){
+            if(!under && current != null){
                 Draw.z(Layer.blockUnder + 0.1f);
                 Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
                 .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
-                Mathf.clamp((progress + 1f) / 2f));
+                Mathf.clamp((progress + 1f) / (2f - 1f/speed)));
 
                 Draw.rect(current.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
             }
 
             Draw.scl(xscl, yscl);
-            drawAt(x, y, blendbits, rotation, SliceMode.none);
+            Draw.z(Layer.blockUnder + 0.2f);
+            drawAt(x, y, blendbits, rotation, SliceMode.none, under);
             Draw.reset();
         }
 
@@ -152,15 +181,12 @@ public class Duct extends Block implements Autotiler{
             Draw.rect(fullIcon, x, y);
         }
 
-        protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice){
-            Draw.z(Layer.blockUnder);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
-
-            Draw.z(Layer.blockUnder + 0.2f);
-            Draw.color(transparentColor);
-            Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
-            Draw.color();
-            Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
+        protected void drawAt(float x, float y, int bits, float rotation, SliceMode slice, boolean under){
+            if(under){
+                Draw.rect(sliced(botRegions[bits], slice), x, y, rotation);
+            }else{
+                Draw.rect(sliced(topRegions[bits], slice), x, y, rotation);
+            }
         }
 
         @Override
@@ -188,7 +214,7 @@ public class Duct extends Block implements Autotiler{
                 (armored ?
                     //armored acceptance
                     ((source.block.rotate && source.front() == this && source.block.hasItems && source.block.isDuct) ||
-                    Edges.getFacingEdge(source.tile(), tile).relativeTo(tile) == rotation) :
+                    Edges.getFacingEdge(source.tile, tile).relativeTo(tile) == rotation) :
                     //standard acceptance - do not accept from front
                     !(source.block.rotate && next == source) && Edges.getFacingEdge(source.tile, tile) != null && Math.abs(Edges.getFacingEdge(source.tile, tile).relativeTo(tile.x, tile.y) - rotation) != 2
                 );
@@ -219,6 +245,7 @@ public class Duct extends Block implements Autotiler{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            recache();
 
             int[] bits = buildBlending(tile, rotation, null, true);
             blendbits = bits[0];
@@ -247,6 +274,12 @@ public class Duct extends Block implements Autotiler{
                 recDir = read.b();
             }
             current = items.first();
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.progress) return progress;
+            return super.sense(sensor);
         }
     }
 }

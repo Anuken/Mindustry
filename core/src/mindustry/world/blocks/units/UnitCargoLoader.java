@@ -36,7 +36,7 @@ public class UnitCargoLoader extends Block{
         update = true;
         hasItems = true;
         itemCapacity = 200;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
     }
 
     @Override
@@ -140,11 +140,6 @@ public class UnitCargoLoader extends Block{
         @Override
         public boolean shouldConsume(){
             return unit == null;
-        }
-
-        @Override
-        public boolean shouldActiveSound(){
-            return shouldConsume() && warmup > 0.01f;
         }
 
         @Override

@@ -32,18 +32,23 @@ public class World{
 
     public Tiles tiles = new Tiles(0, 0);
     /** The number of times tiles have changed in this session. Used for blocks that need to poll world state, but not frequently. */
-    public int tileChanges = -1;
+    public int tileChanges = 1, floorChanges = 1;
 
     private boolean generating, invalidMap;
     private ObjectMap<Map, Runnable> customMapLoaders = new ObjectMap<>();
 
     public World(){
-        Events.on(TileChangeEvent.class, e -> {
-            tileChanges ++;
-        });
+        Events.on(TileChangeEvent.class, e -> tileChanges ++);
+        Events.on(TileFloorChangeEvent.class, e -> floorChanges ++);
 
         Events.on(WorldLoadEvent.class, e -> {
             tileChanges = -1;
+            floorChanges = -1;
+
+            //make each building check if it can update in the given map area
+            for(var build : Groups.build){
+                build.checkAllowUpdate();
+            }
         });
     }
 
@@ -123,20 +128,18 @@ public class World{
         Tile tile = tiles.get(x, y);
         if(tile == null) return null;
         if(tile.build != null){
-            return tile.build.tile();
+            return tile.build.tile;
         }
         return tile;
     }
 
-    @Nullable
-    public Building build(int x, int y){
+    public @Nullable Building build(int x, int y){
         Tile tile = tile(x, y);
         if(tile == null) return null;
         return tile.build;
     }
 
-    @Nullable
-    public Building build(int pos){
+    public @Nullable Building build(int pos){
         Tile tile = tile(pos);
         if(tile == null) return null;
         return tile.build;
@@ -146,14 +149,16 @@ public class World{
         return tiles.getn(x, y);
     }
 
-    @Nullable
-    public Tile tileWorld(float x, float y){
+    public @Nullable Tile tileWorld(float x, float y){
         return tile(Math.round(x / tilesize), Math.round(y / tilesize));
     }
 
-    @Nullable
-    public Building buildWorld(float x, float y){
+    public @Nullable Building buildWorld(float x, float y){
         return build(Math.round(x / tilesize), Math.round(y / tilesize));
+    }
+
+    public @Nullable Building buildWorld(Position pos){
+        return buildWorld(pos.getX(), pos.getY());
     }
 
     /** Convert from world to logic tile coordinates. Whole numbers are at centers of tiles. */
@@ -254,19 +259,19 @@ public class World{
     }
 
     public void loadSector(Sector sector){
-        loadSector(sector, 0, true);
+        loadSector(sector, new WorldParams());
     }
 
-    public void loadSector(Sector sector, int seedOffset, boolean saveInfo){
-        setSectorRules(sector, saveInfo);
+    public void loadSector(Sector sector, WorldParams params){
+        setSectorRules(sector, params.saveInfo);
 
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> {
             if(sector.preset != null){
-                sector.preset.generator.generate(tiles);
+                sector.preset.generator.generate(tiles, params);
                 sector.preset.rules.get(state.rules); //apply extra rules
             }else if(sector.planet.generator != null){
-                sector.planet.generator.generate(tiles, sector, seedOffset);
+                sector.planet.generator.generate(tiles, sector, params);
             }else{
                 throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }
@@ -274,7 +279,7 @@ public class World{
             state.rules.sector = sector;
         });
 
-        if(saveInfo && state.rules.waves){
+        if(params.saveInfo && state.rules.waves){
             sector.info.waves = state.rules.waves;
         }
 
@@ -284,7 +289,7 @@ public class World{
         }
 
         //reset rules
-        setSectorRules(sector, saveInfo);
+        setSectorRules(sector, params.saveInfo);
 
         if(state.rules.defaultTeam.core() != null){
             sector.info.spawnPosition = state.rules.defaultTeam.core().pos();
@@ -294,7 +299,6 @@ public class World{
     private void setSectorRules(Sector sector, boolean saveInfo){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
-        state.rules.weather.clear();
 
         sector.planet.generator.addWeather(sector, state.rules);
 
@@ -304,24 +308,23 @@ public class World{
         boolean border = state.rules.limitMapArea;
         state.rules.limitMapArea = false;
 
-        //TODO duplicate code?
         for(Tile tile : tiles){
             if(getDarkness(tile.x, tile.y) >= 3){
                 continue;
             }
 
             Liquid liquid = tile.floor().liquidDrop;
-            if(tile.floor().itemDrop != null && tile.block() == Blocks.air) content.add(tile.floor().itemDrop);
-            if(tile.overlay().itemDrop != null && tile.block() == Blocks.air) content.add(tile.overlay().itemDrop);
+            if(tile.floor().itemDrop != null && !tile.block().isStatic()) content.add(tile.floor().itemDrop);
+            if(tile.overlay().itemDrop != null && !tile.block().isStatic()) content.add(tile.overlay().itemDrop);
             if(tile.wallDrop() != null) content.add(tile.wallDrop());
-            if(liquid != null) content.add(liquid);
+            if(liquid != null && !tile.block().isStatic()) content.add(liquid);
         }
         state.rules.limitMapArea = border;
 
         state.rules.cloudColor = sector.planet.landCloudColor;
         state.rules.env = sector.planet.defaultEnv;
         state.rules.planet = sector.planet;
-        sector.planet.applyRules(state.rules);
+        sector.planet.applyRules(state.rules, !saveInfo);
         sector.info.resources = content.toSeq();
         sector.info.resources.sort(Structs.comps(Structs.comparing(Content::getContentType), Structs.comparingInt(c -> c.id)));
 
@@ -458,11 +461,16 @@ public class World{
         return 0;
     }
 
-    public void checkMapArea(){
-        for(var build : Groups.build){
-            //reset map-area-based disabled blocks.
-            if(!build.enabled && build.block.autoResetEnabled){
-                build.enabled = true;
+    public void checkMapArea(int x, int y, int w, int h){
+        for(var team : state.teams.present){
+            for(var build : team.buildings){
+                //reset map-area-based disabled blocks that were not in the previous map area
+                if(!build.enabled && build.block.autoResetEnabled && !Rect.contains(x, y, w, h, build.tile.x, build.tile.y)){
+                    build.enabled = true;
+                }
+
+                //if the map area contracts, disable the block
+                build.checkAllowUpdate();
             }
         }
     }
@@ -569,9 +577,18 @@ public class World{
         }
     }
 
+    public WorldContext makeSectorContext(Sector sector){
+        return new Context(sector);
+    }
+
     private class Context implements WorldContext{
+        private Sector sector;
 
         Context(){}
+
+        Context(Sector sector){
+            this.sector = sector;
+        }
 
         @Override
         public Tile tile(int index){
@@ -603,6 +620,12 @@ public class World{
         @Override
         public void end(){
             endMapLoad();
+        }
+
+        @Nullable
+        @Override
+        public Sector getSector(){
+            return sector;
         }
     }
 

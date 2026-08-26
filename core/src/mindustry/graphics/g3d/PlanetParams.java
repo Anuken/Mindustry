@@ -18,8 +18,6 @@ public class PlanetParams{
     public Vec3 camUp = new Vec3(0f, 1f, 0f);
     /** the unit length direction vector of the camera **/
     public Vec3 camDir = new Vec3(0, 0, -1);
-    /** The sun/main planet of the solar system from which everything is rendered. Deprecated use planet.solarSystem instead */
-    public @Deprecated Planet solarSystem = Planets.sun;
     /** Planet being looked at. */
     public Planet planet = Planets.serpulo;
 

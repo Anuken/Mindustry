@@ -63,6 +63,8 @@ public class RepairTurret extends Block{
         group = BlockGroup.projectors;
 
         envEnabled |= Env.space;
+        ambientSound = Sounds.beamHeal;
+        ambientSoundVolume = 1f;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class RepairTurret extends Block{
         }
 
         consumePowerCond(powerUse, (RepairPointBuild entity) -> entity.target != null);
-        updateClipRadius(repairRadius);
+        updateClipRadius(repairRadius + tilesize);
         super.init();
     }
 
@@ -174,6 +176,11 @@ public class RepairTurret extends Block{
         @Override
         public void drawSelect(){
             Drawf.dashCircle(x, y, repairRadius, Pal.accent);
+        }
+
+        @Override
+        public boolean shouldAmbientSound(){
+            return target != null && efficiency > 0f;
         }
 
         @Override

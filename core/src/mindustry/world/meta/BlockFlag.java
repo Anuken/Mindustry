@@ -29,7 +29,10 @@ public enum BlockFlag{
     launchPad,
     unitCargoUnloadPoint,
     unitAssembler,
-    hasFogRadius;
+    hasFogRadius,
+    steamVent,
+    blockRepair,
+    synced;
 
     public final static BlockFlag[] all = values();
 

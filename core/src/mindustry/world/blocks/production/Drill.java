@@ -85,10 +85,9 @@ public class Drill extends Block{
         solid = true;
         group = BlockGroup.drills;
         hasLiquids = true;
-        liquidCapacity = 5f;
         hasItems = true;
-        ambientSound = Sounds.drill;
-        ambientSoundVolume = 0.018f;
+        ambientSound = Sounds.loopDrill;
+        ambientSoundVolume = 0.019f;
         //drills work in space I guess
         envEnabled |= Env.space;
         flags = EnumSet.of(BlockFlag.drill);
@@ -109,7 +108,7 @@ public class Drill extends Block{
     }
 
     @Override
-    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+    public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
         if(!plan.worldContext) return;
         Tile tile = plan.tile();
         if(tile == null) return;
@@ -117,7 +116,7 @@ public class Drill extends Block{
         countOre(tile);
         if(returnItem == null || !drawMineItem) return;
 
-        Draw.color(returnItem.color);
+        Draw.tint(returnItem.color);
         Draw.rect(itemRegion, plan.drawx(), plan.drawy());
         Draw.color();
     }
@@ -259,7 +258,7 @@ public class Drill extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity && enabled;
+            return items.total() < itemCapacity && enabled && dominantItem != null;
         }
 
         @Override
@@ -274,13 +273,7 @@ public class Drill extends Block{
 
         @Override
         public void drawSelect(){
-            if(dominantItem != null){
-                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f, s = iconSmall / 4f;
-                Draw.mixcol(Color.darkGray, 1f);
-                Draw.rect(dominantItem.fullIcon, dx, dy - 1, s, s);
-                Draw.reset();
-                Draw.rect(dominantItem.fullIcon, dx, dy, s, s);
-            }
+            drawItemSelection(dominantItem);
         }
 
         @Override
@@ -308,9 +301,10 @@ public class Drill extends Block{
             //does nothing for most Drills, as those do not require items.
             if((consTimer += delta()) >= consumeTime){
                 consume();
-                consTimer %= 1f;
+                consTimer %= consumeTime;
             }
-            if(timer(timerDump, dumpTime)){
+          
+            if(timer(timerDump, dumpTime / timeScale)){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
             }
 

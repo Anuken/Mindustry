@@ -16,6 +16,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.blocks.*;
 
 import java.io.*;
@@ -27,6 +28,9 @@ public class ImagePacker{
         Vars.headless = true;
         //makes PNG loading slightly faster
         ArcNativesLoader.load();
+
+        fixSubdirectory("blocks/environment/character-overlay");
+        fixSubdirectory("blocks/environment/rune-overlay");
 
         Core.settings = new MockSettings();
         Log.logger = new NoopLogHandler();
@@ -109,7 +113,7 @@ public class ImagePacker{
         map.each((key, val) -> content2id.put(val.split("\\|")[0], key));
 
         Seq<UnlockableContent> cont = Seq.withArrays(Vars.content.blocks(), Vars.content.items(), Vars.content.liquids(), Vars.content.units(), Vars.content.statusEffects());
-        cont.removeAll(u -> u instanceof ConstructBlock || u == Blocks.air);
+        cont.removeAll(u -> u instanceof ConstructBlock || u == Blocks.air || (u instanceof UnitType t && t.internal));
 
         int minid = 0xF8FF;
         for(String key : map.keys()){
@@ -199,6 +203,15 @@ public class ImagePacker{
         }
     }
 
+    static void fixSubdirectory(String dir){
+        Fi folder = Fi.get("../../../assets-raw/sprites_out/" + dir);
+        Fi parent = folder.parent();
+        folder.walk(fi -> {
+            fi.moveTo(parent.child(fi.name()));
+        });
+        folder.delete();
+    }
+
     static String texname(UnlockableContent c){
         return c.getContentType() + "-" + c.name + "-ui";
     }
@@ -250,7 +263,11 @@ public class ImagePacker{
     }
 
     static void replace(String name, Pixmap image){
-        Fi.get(name + ".png").writePng(image);
+        replace(name, name, image);
+    }
+
+    static void replace(String path, String name, Pixmap image){
+        Fi.get(path + ".png").writePng(image);
         ((GenRegion)Core.atlas.find(name)).path.delete();
     }
 

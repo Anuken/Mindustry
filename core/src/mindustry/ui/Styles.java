@@ -24,7 +24,7 @@ import static mindustry.gen.Tex.*;
 @StyleDefaults
 public class Styles{
     //TODO all these names are inconsistent and not descriptive
-    public static Drawable black, black9, black8, black6, black3, black5, grayPanel, none, flatDown, flatOver, accentDrawable;
+    public static Drawable black, black9, black8, black6, black3, black5, grayPanel, grayPanelDark, none, flatDown, flatOver, accentDrawable;
 
     public static ButtonStyle defaultb, underlineb;
 
@@ -81,6 +81,8 @@ public class Styles{
     squarei,
     /** Square border, toggleable. */
     squareTogglei,
+    /** Square border, toggleable. */
+    grayTogglei,
     /** No background unless focused, no border. */
     clearNonei,
     /** Partially transparent black background. */
@@ -92,7 +94,7 @@ public class Styles{
 
     public static ScrollPaneStyle defaultPane, horizontalPane, smallPane, noBarPane;
     public static SliderStyle defaultSlider;
-    public static LabelStyle defaultLabel, outlineLabel, techLabel;
+    public static LabelStyle defaultLabel, outlineLabel, techLabel, monoLabel;
     public static TextFieldStyle defaultField, nodeField, areaField, nodeArea;
     public static CheckBoxStyle defaultCheck;
     public static DialogStyle defaultDialog, fullDialog;
@@ -109,6 +111,7 @@ public class Styles{
         black3 = whiteui.tint(0f, 0f, 0f, 0.3f);
         none = whiteui.tint(0f, 0f, 0f, 0f);
         grayPanel = whiteui.tint(Pal.darkestGray);
+        grayPanelDark = whiteui.tint(Pal.darkestestGray);
         flatDown = createFlatDown();
         flatOver = whiteui.tint(Color.valueOf("454545"));
         accentDrawable = whiteui.tint(Pal.accent);
@@ -155,7 +158,8 @@ public class Styles{
             over = flatOver;
             font = Fonts.def;
             fontColor = Color.white;
-            disabledFontColor = Color.lightGray;
+            disabledFontColor = Color.gray;
+            disabled = grayPanelDark;
             down = flatOver;
             up = grayPanel;
         }};
@@ -274,6 +278,7 @@ public class Styles{
             imageCheckedColor = Color.white;
             imageDownColor = Color.white;
             imageUpColor = Color.gray;
+            imageDisabledColor = Color.darkGray;
         }};
         selecti = new ImageButtonStyle(){{
             checked = buttonSelect;
@@ -322,11 +327,18 @@ public class Styles{
             up = black;
             over = flatOver;
         }};
+        grayTogglei = new ImageButtonStyle(){{
+            over = flatOver;
+            disabled = grayPanelDark;
+            down = flatOver;
+            up = grayPanel;
+            checked = flatDown;
+        }};
         cleari = new ImageButtonStyle(){{
             down = flatDown;
             up = black6;
             over = flatOver;
-            disabled = black8;
+            disabled = black6;
             imageDisabledColor = Color.lightGray;
             imageUpColor = Color.white;
         }};
@@ -376,6 +388,10 @@ public class Styles{
         }};
         techLabel = new LabelStyle(){{
             font = Fonts.tech;
+            fontColor = Color.white;
+        }};
+        monoLabel = new LabelStyle(){{
+            font = Fonts.monospace;
             fontColor = Color.white;
         }};
 

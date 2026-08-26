@@ -27,7 +27,9 @@ public class LaserTurret extends PowerTurret{
         super.setStats();
 
         stats.remove(Stat.booster);
-        stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+        if(coolant != null){
+            stats.add(Stat.input, StatValues.boosters(reload, coolant.amount, coolantMultiplier, false, this::consumesLiquid));
+        }
     }
 
     @Override
@@ -50,7 +52,8 @@ public class LaserTurret extends PowerTurret{
         @Override
         public boolean shouldConsume(){
             //still consumes power when bullet is around
-            return bullets.any() || isActive() || isShooting();
+            if(bullets.any() || isActive()) return true;
+            return isShooting;
         }
 
         @Override

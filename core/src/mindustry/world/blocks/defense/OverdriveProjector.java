@@ -19,9 +19,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class OverdriveProjector extends Block{
-    @Deprecated
-    public final int timerUse = timers++;
-
     public @Load("@-top") TextureRegion topRegion;
     public float reload = 60f;
     public float range = 80f;
@@ -44,6 +41,8 @@ public class OverdriveProjector extends Block{
         emitLight = true;
         lightRadius = 50f;
         envEnabled |= Env.space;
+        ambientSound = Sounds.loopCircuit;
+        ambientSoundVolume = 0.13f;
     }
 
     @Override
@@ -74,7 +73,7 @@ public class OverdriveProjector extends Block{
             stats.add(Stat.booster, StatValues.itemBoosters("+{0}%", stats.timePeriod, speedBoostPhase * 100f, phaseRangeBoost, items.items));
         }
     }
-    
+
     @Override
     public void setBars(){
         super.setBars();
@@ -138,12 +137,14 @@ public class OverdriveProjector extends Block{
         public void draw(){
             super.draw();
 
+            if(!Lod.l2) return;
+
             float f = 1f - (Time.time / 100f) % 1f;
 
             Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f);
+            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f * Lod.alpha2);
             Draw.rect(topRegion, x, y);
-            Draw.alpha(1f);
+            Draw.alpha(Lod.alpha2);
             Lines.stroke((2f * f + 0.1f) * heat);
 
             float r = Math.max(0f, Mathf.clamp(2f - f * 2f) * size * tilesize / 2f - f - 0.2f), w = Mathf.clamp(0.5f - f) * size * tilesize;

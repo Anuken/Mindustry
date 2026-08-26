@@ -19,6 +19,7 @@ public class Team implements Comparable<Team>, Senseable{
     public final Color color = new Color();
     public final Color[] palette = {new Color(), new Color(), new Color()};
     public final int[] palettei = new int[3];
+    public boolean ignoreUnitCap = false;
     public String emoji = "";
     public boolean hasPalette;
     public String name;
@@ -50,6 +51,8 @@ public class Team implements Comparable<Team>, Senseable{
             new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.4f, 1f), 100f * Mathf.random(0.6f, 1f), 1f));
         }
         Mathf.rand.setSeed(new Rand().nextLong());
+
+        neoplastic.ignoreUnitCap = true;
     }
 
     public static Team get(int id){
@@ -95,13 +98,19 @@ public class Team implements Comparable<Team>, Senseable{
         return data().core();
     }
 
+    /** @return whether this team has any buildings on this map; in waves mode, this is always true for the enemy team. */
     public boolean active(){
         return state.teams.isActive(this);
     }
 
+    /** @return whether this team has any active cores. Not the same as active()! */
+    public boolean isAlive(){
+        return data().isAlive();
+    }
+
     /** @return whether this team is supposed to be AI-controlled. */
     public boolean isAI(){
-        return (state.rules.waves || state.rules.attackMode) && this != state.rules.defaultTeam && !state.rules.pvp;
+        return (state.rules.waves || state.rules.attackMode || state.isCampaign()) && this != state.rules.defaultTeam && !state.rules.pvp;
     }
 
     /** @return whether this team is solely comprised of AI (with no players possible). */
@@ -114,10 +123,9 @@ public class Team implements Comparable<Team>, Senseable{
         return isAI() && !rules().rtsAi;
     }
 
-    /** @deprecated There is absolutely no reason to use this. */
-    @Deprecated
-    public boolean isEnemy(Team other){
-        return this != other;
+    /** @return whether unit factories should be active, according to the game rule. */
+    public boolean activateUnitFactories(){
+        return state.tick >= state.rules.unitActivationDelay(this);
     }
 
     public Seq<CoreBuild> cores(){
@@ -160,7 +168,16 @@ public class Team implements Comparable<Team>, Senseable{
 
     @Override
     public double sense(LAccess sensor){
-        if(sensor == LAccess.id) return id;
-        return 0;
+        return switch(sensor){
+            case id -> id;
+            case color -> color.toDoubleBits();
+            default -> Double.NaN;
+        };
+    }
+
+    @Override
+    public Object senseObject(LAccess sensor){
+        if(sensor == LAccess.name) return name;
+        return Senseable.noSensed;
     }
 }

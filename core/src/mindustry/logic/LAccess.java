@@ -18,6 +18,7 @@ public enum LAccess{
     ammo,
     ammoCapacity,
     currentAmmoType,
+    memoryCapacity,
     health,
     maxHealth,
     heat,
@@ -37,19 +38,31 @@ public enum LAccess{
     cameraY,
     cameraWidth,
     cameraHeight,
+    displayWidth,
+    displayHeight,
+    bufferSize,
+    operations,
     size,
     solid,
     dead,
-    range, 
+    range,
     shooting,
     boosting,
     mineX,
     mineY,
     mining,
+    buildX,
+    buildY,
+    pingX,
+    pingY,
+    pingText,
+    building,
+    breaking,
     speed,
     team,
     type,
     flag,
+    flying,
     controlled,
     controller,
     name,
@@ -57,7 +70,12 @@ public enum LAccess{
     payloadType,
     totalPayload,
     payloadCapacity,
+    maxUnits,
     id,
+    selectedBlock,
+    selectedRotation,
+    bulletLifetime,
+    bulletTime,
 
     //values with parameters are considered controllable
     enabled("to"), //"to" is standard for single parameter access
@@ -69,11 +87,18 @@ public enum LAccess{
     public final String[] params;
     public final boolean isObj;
 
+    public static final EnumSet<LAccess> privilegedAccess = EnumSet.of(cameraX, cameraY, cameraWidth, cameraHeight);
+
     public static final LAccess[]
         all = values(),
-        senseable = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
+        senseable = Seq.select(all, t -> t.params.length <= 1 && !t.isPrivileged()).toArray(LAccess.class),
+        senseablePrivileged = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
         controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
-        settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType};
+        settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType, bulletTime, bulletLifetime};
+
+    public boolean isPrivileged(){
+        return privilegedAccess.contains(this);
+    }
 
     LAccess(String... params){
         this.params = params;

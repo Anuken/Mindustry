@@ -60,6 +60,7 @@ public class ConsumePayloadDynamic extends Consume{
         var inv = build.getPayloads();
         var pay = payloads.get(build);
 
+        table.clear();
         table.table(c -> {
             int i = 0;
             for(var stack : pay){

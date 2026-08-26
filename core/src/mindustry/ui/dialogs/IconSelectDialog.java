@@ -15,7 +15,6 @@ import static mindustry.Vars.*;
 
 public class IconSelectDialog extends Dialog{
     private Intc consumer = i -> Log.info("you have mere seconds");
-    private boolean allowLocked;
 
     public IconSelectDialog(){
         this(true);
@@ -36,7 +35,7 @@ public class IconSelectDialog extends Dialog{
                     consumer.get(0);
                 });
 
-                int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
+                int cols = Math.max((int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f)), 1);
 
                 int i = 1;
                 for(var key : accessibleIcons){

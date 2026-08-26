@@ -1,11 +1,17 @@
 package mindustry.world.meta;
 
+import arc.*;
+import arc.scene.ui.layout.*;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.mod.*;
 import mindustry.type.*;
 
+import java.util.*;
+
 /** Hold and organizes a list of block stats. */
+@NoPatch
 public class Stats{
     /** Whether to display stats with categories. If false, categories are completely ignored during display. */
     public boolean useCategories = false;
@@ -128,5 +134,14 @@ public class Stats{
             dirty = false;
         }
         return map;
+    }
+
+    public void statInfo(Cell<?> cell, Stat stat){
+        if(cell == null || stat == null) return;
+
+        String key = "stat." + stat.name.toLowerCase(Locale.ROOT);
+        if(Core.bundle.has(key + ".info")){
+            cell.tooltip("@" + key + ".info");
+        }
     }
 }

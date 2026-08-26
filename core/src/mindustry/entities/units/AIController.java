@@ -4,6 +4,9 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
+import mindustry.ai.types.*;
+import mindustry.async.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -21,11 +24,13 @@ public class AIController implements UnitController{
 
     protected Unit unit;
     protected Interval timer = new Interval(4);
-    protected AIController fallback;
+    protected @Nullable AIController fallback;
     protected float noTargetTime;
 
     /** main target that is being faced */
-    protected Teamc target;
+    protected @Nullable Teamc target;
+    protected @Nullable Teamc bomberTarget;
+    protected boolean turningAway;
 
     {
         resetTimers();
@@ -49,6 +54,16 @@ public class AIController implements UnitController{
         updateTargeting();
         updateMovement();
     }
+
+    public boolean hasStance(@Nullable UnitStance stance){
+        if(unit.controller() instanceof CommandAI ai){
+            return ai.hasStance(stance);
+        }
+        return false;
+    }
+
+    /** Called when the parent CommandAI changes its stance. */
+    public void stanceChanged(){}
 
     /**
      * @return whether controller state should not be reset after reading.
@@ -106,7 +121,7 @@ public class AIController implements UnitController{
     public void faceTarget(){
         if(unit.type.omniMovement || unit instanceof Mechc){
             if(!Units.invalidateTarget(target, unit, unit.range()) && unit.type.faceTarget && unit.type.hasWeapons()){
-                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet.speed));
+                unit.lookAt(Predict.intercept(unit, target, unit.type.weapons.first().bullet));
             }else if(unit.moving()){
                 unit.lookAt(unit.vel().angle());
             }
@@ -124,15 +139,34 @@ public class AIController implements UnitController{
     }
 
     public void pathfind(int pathTarget){
-        int costType = unit.pathType();
+        pathfind(pathTarget, true);
+    }
+
+    public void pathfind(int pathTarget, boolean stopAtTargetTile){
+        pathfind(pathTarget, stopAtTargetTile, false);
+    }
+
+    public void pathfind(int pathTarget, boolean stopAtTargetTile, boolean avoidance){
+        int costType = unit.type.flowfieldPathType;
 
         Tile tile = unit.tileOn();
         if(tile == null) return;
-        Tile targetTile = pathfinder.getTargetTile(tile, pathfinder.getField(unit.team, costType, pathTarget));
+        Tile targetTile = pathfinder.getField(unit.team, costType, pathTarget).getNextTile(tile, avoidance && unit.collisionLayer() == PhysicsProcess.layerGround ? unit.id : 0);
 
-        if(tile == targetTile || !unit.canPass(targetTile.x, targetTile.y)) return;
+        if((tile == targetTile && stopAtTargetTile) || !unit.canPass(targetTile.x, targetTile.y)) return;
 
+        //TODO: this may be buggy, figure out if it's the cause of the issue
+        //unit.movePref(alterPathfind(vec.set(targetTile.worldx(), targetTile.worldy()).sub(tile.worldx(), tile.worldy()).setLength(prefSpeed())));
         unit.movePref(vec.trns(unit.angleTo(targetTile.worldx(), targetTile.worldy()), prefSpeed()));
+    }
+
+    public Vec2 alterPathfind(Vec2 vec){
+        return vec;
+    }
+
+    public void targetInvalidated(){
+        //immediately find a new target
+        timer.reset(timerTarget, -1f);
     }
 
     public void updateWeapons(){
@@ -146,6 +180,9 @@ public class AIController implements UnitController{
         noTargetTime += Time.delta;
 
         if(invalid(target)){
+            if(target instanceof Healthc h && !h.isValid()){
+                targetInvalidated();
+            }
             target = null;
         }else{
             noTargetTime = 0f;
@@ -185,7 +222,14 @@ public class AIController implements UnitController{
             if(mount.target != null){
                 shoot = mount.target.within(mountX, mountY, wrange + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && shouldShoot();
 
-                Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet.speed);
+                if(unit.type.autoDropBombs && !shoot){
+                    if(bomberTarget == null || !bomberTarget.isAdded() || !bomberTarget.within(unit, unit.hitSize/2f + ((Sized)bomberTarget).hitSize()/2f)){
+                        bomberTarget = Units.closestTarget(unit.team, unit.x, unit.y, unit.hitSize, u -> !u.isFlying(), t -> true);
+                    }
+                    shoot = bomberTarget != null;
+                }
+
+                Vec2 to = Predict.intercept(unit, mount.target, weapon.bullet);
                 mount.aimX = to.x;
                 mount.aimY = to.y;
             }
@@ -229,6 +273,11 @@ public class AIController implements UnitController{
         return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
     }
 
+    public Teamc targetFlagActive(float x, float y, BlockFlag flag, boolean enemy){
+        if(unit.team == Team.derelict) return null;
+        return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag), t -> ((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput) && t.block.targetable);
+    }
+
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
         return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground), t -> ground && (unit.type.targetUnderBlocks || !t.block.underBullets));
     }
@@ -267,14 +316,32 @@ public class AIController implements UnitController{
     }
 
     public void circleAttack(float circleLength){
+        if(target == null) return;
+
         vec.set(target).sub(unit);
 
         float ang = unit.angleTo(target);
         float diff = Angles.angleDist(ang, unit.rotation());
 
+        if(target instanceof Unit u && u.collisionLayer() == unit.collisionLayer()){
+            float avoidDist = u.physicSize() + 30f;
+            if(turningAway){
+
+                vec.setLength(prefSpeed()).scl(-1f);
+                unit.movePref(vec);
+
+                if(!unit.within(u, unit.type.circleTargetRadius*0.5f + u.physicSize())){
+                    turningAway = false;
+                }
+                return;
+            }else if(unit.within(u, avoidDist)){
+                turningAway = true;
+            }
+        }
+
         if(diff > 70f && vec.len() < circleLength){
             vec.setAngle(unit.vel().angle());
-        }else{
+        }else if(unit.type.omniMovement){ //non-omni movement units don't need to do this as the turning is already smoothed out
             vec.setAngle(Angles.moveToward(unit.vel().angle(), vec.angle(), 6f));
         }
 
@@ -324,9 +391,15 @@ public class AIController implements UnitController{
 
         vec.setLength(speed * length);
 
-        if(arrive){
+        if(arrive && length > 0){
             Tmp.v3.set(-unit.vel.x / unit.type.accel * 2f, -unit.vel.y / unit.type.accel * 2f).add((target.getX() - unit.x), (target.getY() - unit.y));
-            vec.add(Tmp.v3).limit(speed * length);
+
+            if(unit.type.omniMovement || unit.type.rotateMoveFirst){
+                vec.add(Tmp.v3).limit(speed * length);
+            }else{
+                //directly move the unit to prevent a backwards movement vector from messing things up
+                unit.moveAt(Tmp.v3.limit(speed * length));
+            }
         }
 
         if(length < -0.5f){

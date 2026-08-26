@@ -12,6 +12,7 @@ abstract class BlockUnitComp implements Unitc{
     @Import Team team;
 
     @ReadOnly transient Building tile;
+    transient float ammo;
 
     public void tile(Building tile){
         this.tile = tile;
@@ -43,6 +44,12 @@ abstract class BlockUnitComp implements Unitc{
         return tile.block.uiIcon;
     }
 
+    @Replace
+    @Override
+    public float ammof(){
+        return ammo;
+    }
+
     @Override
     public void killed(){
         tile.kill();
@@ -60,6 +67,11 @@ abstract class BlockUnitComp implements Unitc{
 
     @Replace
     public boolean isValid(){
+        return tile != null && tile.isValid();
+    }
+
+    @Replace
+    public boolean isAdded(){
         return tile != null && tile.isValid();
     }
 

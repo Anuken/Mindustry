@@ -26,6 +26,7 @@ public class Fires{
             fire.set(tile.worldx(), tile.worldy());
             fire.add();
             set(tile, fire);
+            Events.fire(Trigger.fireCreate);
         }else{
             fire.lifetime = baseLifetime;
             fire.time = 0f;
@@ -59,7 +60,7 @@ public class Fires{
         if(tile != null){
             Fire fire = get(tile);
             if(fire != null){
-                fire.time(fire.time + intensity * Time.delta);
+                fire.time += intensity * Time.delta;
                 Fx.steam.at(fire);
                 if(fire.time >= fire.lifetime){
                     Events.fire(Trigger.fireExtinguish);

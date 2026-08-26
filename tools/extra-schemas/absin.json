@@ -1,0 +1,11 @@
+{
+  "doc": "Applies an absolute-value sine wave to progress. Applied via PartProgress's 'op'/'operation' field (e.g. `op: absin`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "scl": {
+    "type": "float",
+    "doc": "Scale (frequency) of the wave."
+  },
+  "mag": {
+    "type": "float",
+    "doc": "Magnitude (amplitude) of the wave."
+  }
+}

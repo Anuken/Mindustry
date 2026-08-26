@@ -25,8 +25,9 @@ public class DrawFlame extends DrawBlock{
 
     @Override
     public void load(Block block){
+        block.emitLight = true;
         top = Core.atlas.find(block.name + "-top");
-        block.clipSize = Math.max(block.clipSize, (lightRadius + lightSinMag) * 2f * block.size);
+        block.lightClipSize = Math.max(block.lightClipSize, (lightRadius + lightSinMag) * 2f * block.size);
     }
 
     @Override

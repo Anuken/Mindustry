@@ -3,6 +3,7 @@ package mindustry.world.blocks.campaign;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -52,6 +53,10 @@ public class LandingPad extends Block{
     public float liquidPad = 2f;
     public Color bottomColor = Pal.darkerMetal;
 
+    public float landSoundVolume = 0.75f;
+    //impact timing must be exactly equal to arrivalDuration
+    public Sound landSound = Sounds.padLand;
+
     public LandingPad(String name){
         super(name);
 
@@ -66,10 +71,11 @@ public class LandingPad extends Block{
         lightRadius = 90f;
 
         config(Item.class, (LandingPadBuild build, Item item) -> {
-            if(!build.accessible()) return;
+            if(!build.accessible() || !item.isOnPlanet(state.getPlanet()) || !item.unlockedNow()) return;
 
             build.config = item;
         });
+
         configClear((LandingPadBuild build) -> {
             if(!build.accessible()) return;
 
@@ -110,6 +116,13 @@ public class LandingPad extends Block{
     }
 
     @Override
+    public void setStats(){
+        super.setStats();
+
+        stats.add(Stat.cooldownTime, (cooldownTime+arrivalDuration)/60f, StatUnit.seconds);
+    }
+
+    @Override
     public boolean outputsItems(){
         return true;
     }
@@ -137,6 +150,7 @@ public class LandingPad extends Block{
             arriving = config;
             arrivingTimer = 0f;
             liquidRemoved = 0f;
+            landSound.at(x, y, 1f, landSoundVolume);
 
             if(state.isCampaign() && !isFake()){
                 state.rules.sector.info.importCooldownTimers.put(config, 0f);
@@ -167,6 +181,7 @@ public class LandingPad extends Block{
                 }
 
                 waiting.each((item, pads) -> {
+                    pads.removeAll(l -> l.config != item);
                     if(pads.size > 0){
                         pads.sort(p -> p.priority);
 
@@ -295,6 +310,8 @@ public class LandingPad extends Block{
 
                     items.set(arriving, itemCapacity);
                     if(!isFake()){
+                        //receiving items counts as "production" for now
+                        produced(arriving, itemCapacity);
                         state.getSector().info.handleItemImport(arriving, itemCapacity);
                     }
 
@@ -321,7 +338,7 @@ public class LandingPad extends Block{
                         Call.landingPadLanded(tile);
                     }else{
                         //queue landing for next frame
-                        waiting.get(config, Seq::new).add(this);
+                        waiting.get(config, () -> new Seq<>(false)).add(this);
                     }
                 }
             }
@@ -333,23 +350,8 @@ public class LandingPad extends Block{
         }
 
         @Override
-        public boolean canDump(Building to, Item item){
-            //hack: canDump is only ever called right before item offload, so count the item as "produced" before that.
-            produced(item);
-            return true;
-        }
-
-        @Override
         public void drawSelect(){
-            if(config != null){
-                drawItemSelection(config);
-
-                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f, s = iconSmall / 4f;
-                Draw.mixcol(Color.darkGray, 1f);
-                Draw.rect(config.fullIcon, dx, dy - 1, s, s);
-                Draw.reset();
-                Draw.rect(config.fullIcon, dx, dy, s, s);
-            }
+            drawItemSelection(config);
         }
 
         @Override
@@ -384,19 +386,22 @@ public class LandingPad extends Block{
                     t.background(Styles.black6);
 
                     t.button(Icon.downOpen, Styles.clearNonei, 40f, () -> {
-                        if(config != null && state.isCampaign()){
-                            for(Sector sector : state.getPlanet().sectors){
-                                if(sector.hasBase() && sector != state.getSector() && sector.info.destination != state.getSector() && sector.info.hasExport(config)){
-                                    sector.info.destination = state.getSector();
-                                    sector.saveInfo();
-                                }
-                            }
-                            state.getSector().info.refreshImportRates(state.getPlanet());
+                        if(config == null || !state.isCampaign()) return;
+
+                        for(Sector sector : state.getPlanet().sectors){
+                            if(!canRedirectExports(sector)) continue;
+                            sector.info.destination = state.getSector();
+                            sector.saveInfo();
                         }
-                    }).disabled(b -> config == null || !state.isCampaign() || (!state.getPlanet().sectors.contains(s -> s.hasBase() && s.info.hasExport(config) && s.info.destination != state.getSector())))
+                        state.getSector().info.refreshImportRates(state.getPlanet());
+                    }).disabled(button -> config == null || !state.isCampaign() || (!state.getPlanet().sectors.contains(this::canRedirectExports)))
                     .tooltip("@sectors.redirect").get();
                 }).fillX().left();
             }
+        }
+
+        private boolean canRedirectExports(Sector sector){
+            return sector.hasBase() && sector != state.getSector() && sector.info.hasExport(config) && sector.info.destination != state.getSector();
         }
 
         @Override
@@ -417,14 +422,13 @@ public class LandingPad extends Block{
 
                 int sources = 0;
                 float perSecond = 0f;
-                for(var s : state.getPlanet().sectors){
-                    if(s != state.getSector() && s.hasBase() && s.info.destination == state.getSector()){
-                        float amount = s.info.getExport(config);
-                        if(amount > 0){
-                            sources ++;
-                            perSecond += s.info.getExport(config);
-                        }
-                    }
+                for(var otherSector : state.getPlanet().sectors){
+                    if(otherSector == state.getSector() || !otherSector.hasBase() || otherSector.info.destination != state.getSector()) continue;
+
+                    float amount = otherSector.info.getExport(config);
+                    if(amount <= 0) continue;
+                    sources ++;
+                    perSecond += amount;
                 }
 
                 String str = Core.bundle.format("landing.sources", sources == 0 ? Core.bundle.get("none") : sources);

@@ -1,6 +1,7 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
+import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -28,12 +29,16 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class UnitFactory extends UnitBlock{
     public int[] capacities = {};
 
     public Seq<UnitPlan> plans = new Seq<>(4);
+    public Sound createSound = Sounds.unitCreate;
+    public float createSoundVolume = 1f;
 
     public UnitFactory(String name){
         super(name);
@@ -47,7 +52,8 @@ public class UnitFactory extends UnitBlock{
         rotate = true;
         regionRotated1 = 1;
         commandable = true;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
+        ambientSoundVolume = 0.09f;
 
         config(Integer.class, (UnitFactoryBuild build, Integer i) -> {
             if(!configurable) return;
@@ -55,7 +61,7 @@ public class UnitFactory extends UnitBlock{
             if(build.currentPlan == i) return;
             build.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             build.progress = 0;
-            if(build.command != null && !build.unit().commands.contains(build.command)){
+            if(build.command != null && (build.unit() == null || !build.unit().commands.contains(build.command))){
                 build.command = null;
             }
         });
@@ -80,7 +86,19 @@ public class UnitFactory extends UnitBlock{
 
     @Override
     public void init(){
+        initCapacities();
+        super.init();
+    }
+
+    @Override
+    public void afterPatch(){
+        initCapacities();
+        super.afterPatch();
+    }
+
+    public void initCapacities(){
         capacities = new int[Vars.content.items().size];
+        itemCapacity = 10; //unit factories can't control their own capacity externally, setting the value does nothing
         for(UnitPlan plan : plans){
             for(ItemStack stack : plan.requirements){
                 capacities[stack.item.id] = Math.max(capacities[stack.item.id], stack.amount * 2);
@@ -89,8 +107,12 @@ public class UnitFactory extends UnitBlock{
         }
 
         consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+    }
 
-        super.init();
+    @Override
+    public void checkContentArrayCapacity(int items, int liquids){
+        super.checkContentArrayCapacity(items, liquids);
+        if(capacities.length != items) capacities = Arrays.copyOf(capacities, items);
     }
 
     @Override
@@ -221,6 +243,14 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
+        public void drawSelect(){
+            super.drawSelect();
+            if(plans.size > 1 && currentPlan != -1 && currentPlan < plans.size){
+                drawItemSelection(plans.get(currentPlan).unit);
+            }
+        }
+
+        @Override
         public Vec2 getCommandPosition(){
             return commandPos;
         }
@@ -234,11 +264,6 @@ public class UnitFactory extends UnitBlock{
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
             return super.senseObject(sensor);
-        }
-
-        @Override
-        public boolean shouldActiveSound(){
-            return shouldConsume();
         }
 
         @Override
@@ -404,6 +429,7 @@ public class UnitFactory extends UnitBlock{
                         unit.command().command(command == null && unit.type.defaultCommand != null ? unit.type.defaultCommand : command);
                     }
 
+                    createSound.at(this, 1f + Mathf.range(0.06f), createSoundVolume);
                     payload = new UnitPayload(unit);
                     payVector.setZero();
                     consume();
@@ -419,7 +445,13 @@ public class UnitFactory extends UnitBlock{
         @Override
         public boolean shouldConsume(){
             if(currentPlan == -1) return false;
-            return enabled && payload == null;
+            return enabled && payload == null && team.activateUnitFactories();
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(!team.activateUnitFactories()) return BlockStatus.inactiveUnitFactory;
+            return super.status();
         }
 
         @Override

@@ -34,6 +34,18 @@ public class Units{
         return false;
     };
 
+    public static void notifyUnitSpawn(Unit unit){
+        if(net.server()){
+            Call.unitSpawn(new UnitSyncContainer(unit));
+        }
+    }
+
+    //syncs a unit spawn so that it appears immediately without waiting for a snapshot
+    @Remote(unreliable = true, priority = PacketPriority.low)
+    public static void unitSpawn(UnitSyncContainer container){
+        //doesn't actually do anything, reading calls add()
+    }
+
     @Remote(called = Loc.server)
     public static void unitCapDeath(Unit unit){
         if(unit != null){
@@ -88,6 +100,17 @@ public class Units{
         unit.remove();
     }
 
+    /** Removes a unit after spawning the death effects. */
+    @Remote(called = Loc.server)
+    public static void unitSafeDeath(Unit unit){
+        if(unit == null) return;
+        unit.type.deathExplosionEffect.at(unit.x, unit.y, unit.hitSize / 8f);
+        float shake = unit.type.deathShake < 0 ? unit.hitSize / 3f : unit.type.deathShake;
+        Effect.shake(shake, shake, unit);
+        unit.type.deathSound.at(unit, 1f, unit.type.deathSoundVolume);
+        unit.remove();
+    }
+
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team, UnitType type){
         return !type.useUnitCap || (team.data().countType(type) < getCap(team) && !type.isBanned());
@@ -95,7 +118,7 @@ public class Units{
 
     public static int getCap(Team team){
         //wave team has no cap
-        if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam) || state.rules.disableUnitCap){
+        if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam) || state.rules.disableUnitCap || team.ignoreUnitCap){
             return Integer.MAX_VALUE;
         }
         return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap);
@@ -197,17 +220,7 @@ public class Units{
 
     /** Returns the nearest enemy tile in a range. */
     public static Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
-        return findEnemyTile(team, x, y, range, false, pred);
-    }
-
-    /** Returns the nearest enemy tile in a range. */
-    public static Building findEnemyTile(Team team, float x, float y, float range, boolean checkUnder, Boolf<Building> pred){
         if(team == Team.derelict) return null;
-
-        if(checkUnder){
-            Building target = indexer.findEnemyTile(team, x, y, range, build -> !build.block.underBullets && pred.get(build));
-            if(target != null) return target;
-        }
 
         return indexer.findEnemyTile(team, x, y, range, pred);
     }
@@ -252,13 +265,18 @@ public class Units{
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
     public static Teamc closestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Building> tilePred){
+        return closestTarget(team, x, y, range, null, unitPred, tilePred);
+    }
+
+    /** Returns the closest target enemy. First, units are checked, then tile entities. */
+    public static Teamc closestTarget(Team team, float x, float y, float range, @Nullable Team sourceTeam, Boolf<Unit> unitPred, Boolf<Building> tilePred){
         if(team == Team.derelict) return null;
 
         Unit unit = closestEnemy(team, x, y, range, unitPred);
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, true, tilePred);
+            return indexer.findEnemyTile(team, x, y, range, UnitSorts.buildingDefault, tilePred, sourceTeam);
         }
     }
 
@@ -270,7 +288,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, true, tilePred);
+            return findEnemyTile(team, x, y, range, tilePred);
         }
     }
 
@@ -409,7 +427,7 @@ public class Units{
 
     /** @return whether any units exist in this rectangle */
     public static boolean any(float x, float y, float width, float height, Boolf<Unit> filter){
-        return count(x, y, width, height, filter) > 0;
+        return Groups.unit.intersect(x, y, width, height, filter);
     }
 
     /** Iterates over all units in a rectangle. */
@@ -493,5 +511,20 @@ public class Units{
 
     public interface Sortf{
         float cost(Unit unit, float x, float y);
+    }
+
+    public interface BuildingPriorityf{
+        float priority(Building build);
+    }
+
+    public static class UnitSyncContainer{
+        public Unit unit;
+
+        public UnitSyncContainer(){
+        }
+
+        public UnitSyncContainer(Unit unit){
+            this.unit = unit;
+        }
     }
 }

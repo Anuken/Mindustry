@@ -15,6 +15,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -29,6 +30,14 @@ public class NuclearReactor extends PowerGenerator{
     public float itemDuration = 120;
     /** heating per frame * fullness */
     public float heating = 0.01f;
+    /** max heat this block can output per side */
+    public float heatOutput = 12f;
+    /** rate at which heat progress increases */
+    public float heatWarmupRate = 1f;
+    /** rate at which fuel consumption scales with heat */
+    public float heatConsumeRate = 10f;
+    /** time taken to cool down if no fuel is inputted even if coolant is not present*/
+    public float ambientCooldownTime = 60f * 20f;
     /** threshold at which block starts smoking */
     public float smokeThreshold = 0.3f;
     /** heat threshold at which lights start flashing */
@@ -49,6 +58,7 @@ public class NuclearReactor extends PowerGenerator{
         hasItems = true;
         hasLiquids = true;
         rebuildable = false;
+        emitLight = true;
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
         schematicPriority = -5;
         envEnabled = Env.any;
@@ -60,13 +70,23 @@ public class NuclearReactor extends PowerGenerator{
         explosionDamage = 1250 * 4;
 
         explodeEffect = Fx.reactorExplosion;
-        explodeSound = Sounds.explosionbig;
+        explodeSound = Sounds.explosionReactor;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
+        stats.add(Stat.meltdownTime, table -> {
+            float avg = (itemDuration / 60f) / (1f + heatConsumeRate / 2f);
+            float val = 30f * heating * itemCapacity * avg;
+            float time = itemCapacity * avg * (1f - Mathf.sqrt(1f - 1f / val));
+            if(val > 1f){
+                table.add(Strings.autoFixed(time, 2) + " " + StatUnit.seconds.localized() + " " + Core.bundle.format("bar.whenfull"));
+            }else{
+                table.add(Core.bundle.format("bar.nevermelts"));
+            }
+        });
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
@@ -78,8 +98,10 @@ public class NuclearReactor extends PowerGenerator{
         addBar("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
     }
 
-    public class NuclearReactorBuild extends GeneratorBuild{
+    public class NuclearReactorBuild extends GeneratorBuild implements HeatBlock{
         public float heat;
+        public float heatLastFrame;
+        public float heatProgress;
         public float flash;
         public float smoothLight;
 
@@ -90,13 +112,14 @@ public class NuclearReactor extends PowerGenerator{
             productionEfficiency = fullness;
 
             if(fuel > 0 && enabled){
-                heat += fullness * heating * Math.min(delta(), 4f);
+                heat += heatLastFrame = fullness * heating * Math.min(delta(), 4f);
 
-                if(timer(timerFuel, itemDuration / timeScale)){
+                if(timer(timerFuel, itemDuration / (timeScale + (heat > heatLastFrame ? 1f * heat * heatConsumeRate : 0f)))){
                     consume();
                 }
             }else{
                 productionEfficiency = 0f;
+                heat = Math.max(0f, heat - Time.delta / ambientCooldownTime);
             }
 
             if(heat > 0){
@@ -114,11 +137,22 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
+            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * ((enabled && productionEfficiency > 0) ? 1f : 0f), heatWarmupRate * delta()) : 0f;
 
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);
                 kill();
             }
+        }
+
+        @Override
+        public float heatFrac(){
+            return heatProgress / heatOutput;
+        }
+
+        @Override
+        public float heat(){
+            return heatProgress;
         }
 
         @Override

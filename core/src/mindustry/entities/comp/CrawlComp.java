@@ -1,10 +1,8 @@
 package mindustry.entities.comp;
 
 import arc.math.*;
-import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -22,7 +20,6 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     @Import float x, y, speedMultiplier, rotation, hitSize;
     @Import UnitType type;
     @Import Team team;
-    @Import Vec2 vel;
 
     transient Floor lastDeepFloor;
     transient float lastCrawlSlowdown = 1f;
@@ -31,13 +28,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     @Replace
     @Override
     public SolidPred solidity(){
-        return EntityCollisions::legsSolid;
-    }
-
-    @Override
-    @Replace
-    public int pathType(){
-        return Pathfinder.costLegs;
+        return ignoreSolids() ? null : EntityCollisions::legsSolid;
     }
 
     @Override
@@ -45,7 +36,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
     public float floorSpeedMultiplier(){
         Floor on = isFlying() ? Blocks.air.asFloor() : floorOn();
         //TODO take into account extra blocks
-        return (on.isDeep() ? 0.45f : on.speedMultiplier) * speedMultiplier * lastCrawlSlowdown;
+        return ((float)Math.pow(on.isDeep() ? 0.45f : on.speedMultiplier, type.floorMultiplier)) * speedMultiplier * lastCrawlSlowdown;
     }
 
     @Override
@@ -92,7 +83,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
                             }
 
                             if(Mathf.chanceDelta(0.025)){
-                                Fx.crawlDust.at(t.worldx(), t.worldy(), t.floor().mapColor);
+                                Fx.crawlDust.at(t.worldx(), t.worldy(), t.getFloorColor());
                             }
                         }else{
                             solids ++;
@@ -110,6 +101,6 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
         }
         segmentRot = Angles.clampRange(segmentRot, rotation, type.segmentMaxRot);
 
-        crawlTime += vel.len() * Time.delta;
+        crawlTime += deltaLen();
     }
 }

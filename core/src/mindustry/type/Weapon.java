@@ -10,6 +10,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
@@ -34,8 +35,6 @@ public class Weapon implements Cloneable{
     public Effect ejectEffect = Fx.none;
     /** whether weapon should appear in the stats of a unit with this weapon */
     public boolean display = true;
-    /** whether to consume ammo when ammo is enabled in rules */
-    public boolean useAmmo = true;
     /** whether to create a flipped copy of this weapon upon initialization. default: true */
     public boolean mirror = true;
     /** whether to flip the weapon's sprite when rendering. internal use only - do not set! */
@@ -46,7 +45,7 @@ public class Weapon implements Cloneable{
     public boolean rotate = false;
     /** Whether to show the sprite of the weapon in the database. */
     public boolean showStatSprite = true;
-    /** rotation at which this weapon starts at. TODO buggy!*/
+    /** rotation at which this weapon starts at. */
     public float baseRotation = 0f;
     /** whether to draw the outline on top. */
     public boolean top = true;
@@ -92,14 +91,16 @@ public class Weapon implements Cloneable{
     public float shootX = 0f, shootY = 3f;
     /** offsets of weapon position on unit */
     public float x = 5f, y = 0f;
-    /** Random spread on the X axis. */
-    public float xRand = 0f;
+    /** Random spread on the X/Y axis. */
+    public float xRand = 0f, yRand = 0f;
     /** pattern used for bullets */
     public ShootPattern shoot = new ShootPattern();
     /** radius of shadow drawn under the weapon; <0 to disable */
     public float shadow = -1f;
     /** fraction of velocity that is random */
     public float velocityRnd = 0f;
+    /** extra velocity that is added as a fraction */
+    public float extraVelocity = 0f;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
     /** Cone in which the weapon can rotate relative to its mount. */
@@ -124,12 +125,18 @@ public class Weapon implements Cloneable{
     public int otherSide = -1;
     /** draw Z offset relative to the default value */
     public float layerOffset = 0f;
+    /** sound looped when shooting */
+    public Sound activeSound = Sounds.none;
+    /** volume of active sound */
+    public float activeSoundVolume = 1f;
     /** sound used for shooting */
-    public Sound shootSound = Sounds.pew;
+    public Sound shootSound = Sounds.shoot;
+    /** volume of the shoot sound */
+    public float shootSoundVolume = 1f;
+    /** sound used when this weapon first fires; for continuous weapons only */
+    public Sound initialShootSound = Sounds.none;
     /** sound used for weapons that have a delay */
     public Sound chargeSound = Sounds.none;
-    /** sound played when there is nothing to shoot */
-    public Sound noAmmoSound = Sounds.noammo;
     /** displayed region (autoloaded) */
     public TextureRegion region;
     /** heat region, must be same size as region (optional) */
@@ -148,6 +155,8 @@ public class Weapon implements Cloneable{
     public float shootStatusDuration = 60f * 5f;
     /** whether this weapon should fire when its owner dies */
     public boolean shootOnDeath = false;
+    /** If not null and shootOnDeath == true, overrides the weapon's shoot effect only when its owner dies. */
+    public @Nullable Effect shootOnDeathEffect = null;
     /** extra animated parts */
     public Seq<DrawPart> parts = new Seq<>(DrawPart.class);
 
@@ -234,7 +243,9 @@ public class Weapon implements Cloneable{
             }
         }
 
-        Draw.xscl = -Mathf.sign(flipSprite);
+        float prev = Draw.xscl;
+
+        Draw.xscl *= -Mathf.sign(flipSprite);
 
         //fix color
         unit.type.applyColor(unit);
@@ -255,7 +266,7 @@ public class Weapon implements Cloneable{
             Draw.color();
         }
 
-        Draw.xscl = 1f;
+        Draw.xscl = prev;
 
         if(parts.size > 0){
             //TODO does it need an outline?
@@ -320,7 +331,7 @@ public class Weapon implements Cloneable{
                 shoot = mount.target.within(mountX, mountY, bullet.range + Math.abs(shootY) + (mount.target instanceof Sized s ? s.hitSize()/2f : 0f)) && can;
 
                 if(predictTarget){
-                    Vec2 to = Predict.intercept(unit, mount.target, bullet.speed);
+                    Vec2 to = Predict.intercept(unit, mount.target, bullet);
                     mount.aimX = to.x;
                     mount.aimY = to.y;
                 }else{
@@ -406,30 +417,30 @@ public class Weapon implements Cloneable{
 
         //flip weapon shoot side for alternating weapons
         boolean wasFlipped = mount.side;
-        if(otherSide != -1 && alternate && mount.side == flipSprite && mount.reload <= reload / 2f && lastReload > reload / 2f){
+        if(otherSide >= 0 && alternate && mount.side == flipSprite && otherSide < unit.mounts.length && mount.reload <= reload / 2f && lastReload > reload / 2f){
             unit.mounts[otherSide].side = !unit.mounts[otherSide].side;
             mount.side = !mount.side;
         }
+
+        if(!headless && activeSound != Sounds.none && mount.shoot && can && mount.warmup >= minWarmup){
+            Vars.control.sound.loop(activeSound, unit, activeSoundVolume);
+        }
+
+        float velLen = unit.isRemote() ? unit.vel.len() : unit.deltaLen() / Time.delta;
 
         //shoot if applicable
         if(mount.shoot && //must be shooting
         can && //must be able to shoot
         !(bullet.killShooter && mount.totalShots > 0) && //if the bullet kills the shooter, you should only ever be able to shoot once
-        (!useAmmo || unit.ammo > 0 || !state.rules.unitAmmo || unit.team.rules().infiniteAmmo) && //check ammo
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
-        unit.vel.len() >= minShootVelocity && //check velocity requirements
+        velLen >= minShootVelocity && //check velocity requirements
         (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
         (alwaysShooting || Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone)) //has to be within the cone
         ){
             shoot(unit, mount, bulletX, bulletY, shootAngle);
 
             mount.reload = reload;
-
-            if(useAmmo){
-                unit.ammo--;
-                if(unit.ammo < 0) unit.ammo = 0;
-            }
         }
     }
 
@@ -479,26 +490,31 @@ public class Weapon implements Cloneable{
         mount.charging = false;
         float
         xSpread = Mathf.range(xRand),
+        ySpread = Mathf.range(yRand),
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation),
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
         mountY = unit.y + Angles.trnsy(unit.rotation - 90, x, y),
-        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
-        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset),
+        bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset + ySpread),
+        bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset + ySpread),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
         lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
         angle = shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
         Entityc shooter = unit.controller() instanceof MissileAI ai ? ai.shooter : unit; //Pass the missile's shooter down to its bullets
-        mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, mount.aimX, mount.aimY, mount.target);
+        mount.bullet = bullet.create(unit, shooter, unit.team, bulletX, bulletY, angle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd) + extraVelocity, lifeScl, null, mover, mount.aimX, mount.aimY, mount.target);
         handleBullet(unit, mount, mount.bullet);
 
         if(!continuous){
-            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
+            shootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
+        }else{
+            initialShootSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax), shootSoundVolume);
         }
 
-        ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
-        bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
-        bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+        if(mount.allowShootEffects){
+            ejectEffect.at(mountX, mountY, angle * Mathf.sign(this.x));
+            bullet.shootEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+            bullet.smokeEffect.at(bulletX, bulletY, angle, bullet.hitColor, unit);
+        }
 
         unit.vel.add(Tmp.v1.trns(shootAngle + 180f, bullet.recoil));
         Effect.shake(shake, shake, bulletX, bulletY);

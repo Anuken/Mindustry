@@ -30,8 +30,6 @@ public class MinimapRenderer{
     private Rect rect = new Rect();
     private float zoom = 4;
 
-    private float lastX, lastY, lastW, lastH, lastScl;
-    private boolean worldSpace;
     private IntSet updates = new IntSet();
     private float updateCounter = 0f;
 
@@ -62,7 +60,7 @@ public class MinimapRenderer{
             if(e.tile.block().solid && e.tile.y > 0){
                 Tile tile = world.tile(e.tile.x, e.tile.y - 1);
                 if(tile.block() == Blocks.air){
-                    Core.app.post(() -> update(tile));
+                    Time.run(0f, () -> update(tile));
                 }
             }
         });
@@ -123,13 +121,7 @@ public class MinimapRenderer{
         region = new TextureRegion(texture);
     }
 
-    public void drawEntities(float x, float y, float w, float h, float scaling, boolean fullView){
-        lastX = x;
-        lastY = y;
-        lastW = w;
-        lastH = h;
-        lastScl = scaling;
-        worldSpace = fullView;
+    public void drawEntities(float x, float y, float w, float h, boolean fullView){
 
         if(!fullView){
             updateUnitArray();
@@ -150,12 +142,12 @@ public class MinimapRenderer{
 
         float scaleFactor;
         var trans = Tmp.m1.idt();
-        trans.translate(lastX, lastY);
-        if(!worldSpace){
-            trans.scl(Tmp.v1.set(scaleFactor = lastW / rect.width, lastH / rect.height));
+        trans.translate(x, y);
+        if(!fullView){
+            trans.scl(Tmp.v1.set(scaleFactor = w / rect.width, h / rect.height));
             trans.translate(-rect.x, -rect.y);
         }else{
-            trans.scl(Tmp.v1.set(scaleFactor = lastW / world.unitWidth(), lastH / world.unitHeight()));
+            trans.scl(Tmp.v1.set(scaleFactor = w / world.unitWidth(), h / world.unitHeight()));
         }
         trans.translate(tilesize / 2f, tilesize / 2f);
         Draw.trans(trans);
@@ -173,10 +165,35 @@ public class MinimapRenderer{
             Draw.reset();
         }
 
-        if(fullView && net.active()){
+        if(fullView){
             for(Player player : Groups.player){
-                if(!player.dead()){
-                    drawLabel(player.x, player.y, player.name, player.color);
+                if(!player.dead() && net.active()){
+                    drawLabel(player.x, player.y, player.name, player.color, scaleFactor);
+                }
+                if(player.pingTime > 0f && renderer.showPings){
+
+                    float rad = 12f;
+
+                    Draw.color(Tmp.c1.set(player.color).mul(Color.darkGray));
+                    Lines.stroke(Scl.scl(scaleFactor * 9f));
+                    Lines.poly(player.pingX, player.pingY, 4, scaleFactor * rad, 0f);
+
+                    Fill.poly(player.pingX, player.pingY + scaleFactor * 30f, 3, scaleFactor * 16f, -90f);
+
+                    Draw.color(player.color);
+                    Lines.stroke(Scl.scl(scaleFactor * 3f));
+                    Lines.poly(player.pingX, player.pingY, 4, scaleFactor * rad, 0f);
+
+                    Fill.poly(player.pingX, player.pingY + scaleFactor * 30f, 3, scaleFactor * 10f, -90f);
+
+                    if(player.pingText != null){
+                        drawLabel(player.pingX, player.pingY + scaleFactor * 65f, player.name, player.color, scaleFactor * 0.7f, false);
+                        drawLabel(player.pingX, player.pingY + scaleFactor * 50f, player.pingText, Color.white, scaleFactor, false);
+                    }else{
+                        drawLabel(player.pingX, player.pingY + scaleFactor * 50f, player.name, player.color, scaleFactor, false);
+                    }
+
+                    Draw.color();
                 }
             }
         }
@@ -203,7 +220,7 @@ public class MinimapRenderer{
             float wf = world.width() * tilesize;
             float hf = world.height() * tilesize;
 
-            Draw.color(state.rules.dynamicColor, 0.5f);
+            Draw.color(state.rules.dynamicColor, Float.isNaN(state.rules.dynamicColor.a) ? 0.5f : Math.max(0.5f, state.rules.dynamicColor.a));
             Draw.rect(Tmp.tr1, wf / 2, hf / 2, wf, hf);
 
             if(state.rules.staticFog){
@@ -278,7 +295,7 @@ public class MinimapRenderer{
     }
 
     public void drawSpawns(){
-        if(!state.rules.showSpawns || !state.hasSpawns() || !state.rules.waves) return;
+        if(state.rules.hideSpawns || !state.hasSpawns() || !state.rules.waves) return;
 
         TextureRegion icon = Icon.units.getRegion();
 
@@ -317,6 +334,7 @@ public class MinimapRenderer{
     }
 
     public void updateAll(){
+        if(pixmap.isDisposed() || texture.isDisposed()) return;
         for(Tile tile : world.tiles){
             pixmap.set(tile.x, pixmap.height - 1 - tile.y, colorFor(tile));
         }
@@ -344,7 +362,7 @@ public class MinimapRenderer{
         updatePixel(tile);
     }
 
-    void updatePixel(Tile tile){
+    public void updatePixel(Tile tile){
         updates.add(tile.pos());
     }
 
@@ -368,6 +386,7 @@ public class MinimapRenderer{
         if(tile == null) return 0;
         Block real = realBlock(tile);
         int bc = real.minimapColor(tile);
+        if(bc == 0 && tile.block() == Blocks.air && tile.overlay() == Blocks.air) bc = tile.floor().minimapColor(tile);
 
         Color color = Tmp.c1.set(bc == 0 ? MapIO.colorFor(real, tile.floor(), tile.overlay(), tile.team()) : bc);
         color.mul(1f - Mathf.clamp(world.getDarkness(tile.x, tile.y) / 4f));
@@ -381,22 +400,28 @@ public class MinimapRenderer{
         return color.rgba();
     }
 
-    public void drawLabel(float x, float y, String text, Color color){
+    public void drawLabel(float x, float y, String text, Color color, float scaleFactor){
+        drawLabel(x, y, text, color ,scaleFactor, true);
+    }
+
+    public void drawLabel(float x, float y, String text, Color color, float scaleFactor, boolean bg){
         Font font = Fonts.outline;
         GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
         boolean ints = font.usesIntegerPositions();
-        font.getData().setScale(1 / 1.5f / Scl.scl(1f));
+        font.getData().setScale(1 / 1.25f / Scl.scl(1f) * scaleFactor * 1f);
         font.setUseIntegerPositions(false);
 
-        l.setText(font, text, color, 90f, Align.left, true);
-        float yOffset = 20f;
-        float margin = 3f;
+        l.setText(font, text, color, 90f * scaleFactor, Align.left, false);
 
-        Draw.color(0f, 0f, 0f, 0.2f);
-        Fill.rect(x, y + yOffset - l.height/2f, l.width + margin, l.height + margin);
-        Draw.color();
+        if(bg){
+            float margin = 3f * scaleFactor;
+            Draw.color(0f, 0f, 0f, 0.2f);
+            Fill.rect(x, y + l.height/2f - l.height/2f, l.width + margin, l.height + margin);
+            Draw.color();
+        }
+
         font.setColor(color);
-        font.draw(text, x - l.width/2f, y + yOffset, 90f, Align.left, true);
+        font.draw(text, x - l.width/2f, y + l.height/2f, 90f * scaleFactor, Align.left, false);
         font.setUseIntegerPositions(ints);
 
         font.getData().setScale(1f);

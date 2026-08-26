@@ -53,7 +53,7 @@ public class Puddles{
             return;
         }
 
-        if(tile.floor().isLiquid && !canStayOn(liquid, tile.floor().liquidDrop)){
+        if(tile.floor().isLiquid && tile.floor().liquidDrop != null && !canStayOn(liquid, tile.floor().liquidDrop)){
             reactPuddle(tile.floor().liquidDrop, liquid, amount, tile, ax, ay);
 
             Puddle p = get(tile);
@@ -97,6 +97,12 @@ public class Puddles{
         }
     }
 
+    public static boolean hasLiquid(Tile tile, Liquid liquid){
+        if(tile == null) return false;
+        var p = get(tile);
+        return p != null && p.liquid == liquid && p.amount >= 0.5f;
+    }
+
     public static void remove(Tile tile){
         if(tile == null) return;
 
@@ -104,7 +110,7 @@ public class Puddles{
     }
 
     public static void register(Puddle puddle){
-        world.tiles.setPuddle(puddle.tile().array(), puddle);
+        world.tiles.setPuddle(puddle.tile.array(), puddle);
     }
 
     /** Reacts two liquids together at a location. */
@@ -126,7 +132,7 @@ public class Puddles{
             if(Mathf.chance(0.8f * amount)){
                 Fx.steam.at(x, y);
             }
-            return -0.4f * amount;
+            return -0.7f * amount;
         }
         return dest.react(liquid, amount, tile, x, y);
     }

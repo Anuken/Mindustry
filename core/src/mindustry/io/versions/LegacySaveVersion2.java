@@ -1,7 +1,6 @@
 package mindustry.io.versions;
 
 import arc.func.*;
-import arc.util.io.*;
 import mindustry.gen.*;
 
 import java.io.*;
@@ -14,21 +13,19 @@ public class LegacySaveVersion2 extends LegacyRegionSaveVersion{
     }
 
     @Override
-    public void readWorldEntities(DataInput stream) throws IOException{
-        //entityMapping is null in older save versions, so use the default
-        Prov[] mapping = this.entityMapping == null ? EntityMapping.idMap : this.entityMapping;
+    public void readWorldEntities(DataInput stream, Prov[] mapping) throws IOException{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
-            readChunk(stream, true, in -> {
-                int typeid = in.readUnsignedByte();
+            readLegacyShortChunk(stream, (in, len) -> {
+                int typeid = in.ub();
                 if(mapping[typeid] == null){
-                    in.skipBytes(lastRegionLength - 1);
+                    in.skip(len - 1);
                     return;
                 }
 
                 Entityc entity = (Entityc)mapping[typeid].get();
-                entity.read(Reads.get(in));
+                entity.read(in);
                 entity.add();
             });
         }

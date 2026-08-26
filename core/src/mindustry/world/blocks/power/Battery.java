@@ -5,7 +5,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.draw.*;
@@ -16,9 +15,6 @@ public class Battery extends PowerDistributor{
 
     public Color emptyLightColor = Color.valueOf("f8c266");
     public Color fullLightColor = Color.valueOf("fb9567");
-
-    @Deprecated
-    public @Load("@-top") TextureRegion topRegion;
 
     public Battery(String name){
         super(name);

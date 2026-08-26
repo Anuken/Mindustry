@@ -3,6 +3,7 @@ package mindustry.entities;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 
 /**
@@ -55,13 +56,21 @@ public class Predict{
         return intercept(src, dst, 0, 0, v);
     }
 
+    public static Vec2 intercept(Position src, Position dst, BulletType bullet){
+        return intercept(src, dst, 0f, 0f, bullet.keepVelocity, bullet.speed);
+    }
+
     public static Vec2 intercept(Position src, Position dst, float offsetx, float offsety, float v){
+        return intercept(src, dst, offsetx, offsety, true, v);
+    }
+
+    public static Vec2 intercept(Position src, Position dst, float offsetx, float offsety, boolean useSrcVelocity, float v){
         float ddx = 0, ddy = 0;
         if(dst instanceof Hitboxc h){
             ddx += h.deltaX();
             ddy += h.deltaY();
         }
-        if(src instanceof Hitboxc h){
+        if(src instanceof Hitboxc h && useSrcVelocity){
             ddx -= h.deltaX();
             ddy -= h.deltaY();
         }

@@ -40,12 +40,26 @@ public class ContentLoader{
         }
     }
 
+    public ContentLoader copy(){
+        var result = new ContentLoader();
+        result.initialization.addAll(initialization);
+        result.lastAdded = lastAdded;
+        result.currentMod = currentMod;
+        result.temporaryMapper = temporaryMapper;
+        result.nameMap.putAll(nameMap);
+        for(int i = 0; i < contentMap.length; i++){
+            result.contentMap[i].addAll(contentMap[i]);
+            result.contentNameMap[i].putAll(contentNameMap[i]);
+        }
+        return result;
+    }
+
     /** Creates all base types. */
     public void createBaseContent(){
         UnitCommand.loadAll();
-        UnitStance.loadAll();
         TeamEntries.load();
         Items.load();
+        UnitStance.loadAll(); //needs to access items
         StatusEffects.load();
         Liquids.load();
         Bullets.load();
@@ -180,7 +194,7 @@ public class ContentLoader{
             if(list.size > 0 && list.peek() == content){
                 list.pop();
             }
-            throw new IllegalArgumentException("Two content objects cannot have the same name! (issue: '" + content.name + "')");
+            throw new IllegalArgumentException("Two content objects defined with the same name: '" + content.name + "'");
         }
         if(currentMod != null){
             content.minfo.mod = currentMod;
@@ -212,6 +226,7 @@ public class ContentLoader{
     }
 
     public <T extends MappableContent> T getByName(ContentType type, String name){
+        if(name == null) return null;
         var map = contentNameMap[type.ordinal()];
 
         if(map == null) return null;
@@ -245,6 +260,23 @@ public class ContentLoader{
 
     public <T extends Content> Seq<T> getBy(ContentType type){
         return (Seq<T>)contentMap[type.ordinal()];
+    }
+
+    public <T extends Content> ObjectMap<String, T> getNamesBy(ContentType type){
+        return (ObjectMap<String, T>)contentNameMap[type.ordinal()];
+    }
+
+    /** Only use this for modded/data patcher content. */
+    public void remove(@Nullable Content content){
+        if(content == null) return;
+        var type = content.getContentType();
+        getBy(type).remove(content);
+        if(content instanceof MappableContent m){
+            getNamesBy(type).remove(m.name);
+            if(nameMap.get(m.name) == m) nameMap.remove(m.name);
+        }
+
+        content.removeContent();
     }
 
     //utility methods, just makes things a bit shorter

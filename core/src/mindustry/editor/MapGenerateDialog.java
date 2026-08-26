@@ -3,8 +3,10 @@ package mindustry.editor;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.input.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
@@ -36,9 +38,15 @@ public class MapGenerateDialog extends BaseDialog{
     Seq<GenerateFilter> filters = new Seq<>();
     int scaling = mobile ? 3 : 1;
     Table filterTable;
+    BorderImage preview;
 
     Future<?> result;
     boolean generating;
+    boolean updateQueued;
+    MirrorFilter dragging;
+    Rect dragRect = new Rect();
+    Vec2 dragAxis = new Vec2();
+    long lastDrag;
 
     long[] buffer1, buffer2;
     Cons<Seq<GenerateFilter>> applier;
@@ -91,12 +99,12 @@ public class MapGenerateDialog extends BaseDialog{
                 p.table(Tex.button, in -> {
                     in.defaults().size(280f, 60f).left();
 
-                    in.button("@waves.copy", Icon.copy, style, () -> {
+                    in.button("@copy.clipboard", Icon.copy, style, () -> {
                         dialog.hide();
 
                         Core.app.setClipboardText(JsonIO.write(filters));
                     }).marginLeft(12f).row();
-                    in.button("@waves.load", Icon.download, style, () -> {
+                    in.button("@load.clipboard", Icon.download, style, () -> {
                         dialog.hide();
                         try{
                             filters.set(JsonIO.read(Seq.class, Core.app.getClipboardText()));
@@ -151,6 +159,7 @@ public class MapGenerateDialog extends BaseDialog{
     public void applyToEditor(Seq<GenerateFilter> filters){
         //writeback buffer
         long[] writeTiles = new long[editor.width() * editor.height()];
+        long[] writeData = new long[writeTiles.length];
 
         for(GenerateFilter filter : filters){
             input.begin(editor.width(), editor.height(), editor::tile);
@@ -158,10 +167,10 @@ public class MapGenerateDialog extends BaseDialog{
             //write to buffer
             for(int x = 0; x < editor.width(); x++){
                 for(int y = 0; y < editor.height(); y++){
-                    Tile tile = editor.tile(x, y);
-                    input.set(x, y, tile.block(), tile.floor(), tile.overlay());
+                    input.set(editor.tile(x, y));
                     filter.apply(input);
                     writeTiles[x + y*world.width()] = PackTile.get(input.block.id, input.floor.id, input.overlay.id);
+                    writeData[x + y*world.width()] = input.packedData;
                 }
             }
 
@@ -178,6 +187,8 @@ public class MapGenerateDialog extends BaseDialog{
                         tile.setBlock(block);
                     }
 
+                    tile.setPackedData(writeData[i]);
+
                     tile.setFloor((Floor)floor);
                     tile.setOverlay(overlay);
                 }
@@ -185,8 +196,59 @@ public class MapGenerateDialog extends BaseDialog{
         }
 
         //reset undo stack as generation... messes things up
-        editor.renderer.updateAll();
+        editor.renderer.recache();
         editor.clearOp();
+    }
+
+    MirrorFilter hit(float x, float y){
+        if(preview == null) return null;
+
+        MirrorFilter.getDrawRect(preview, dragRect);
+        if(dragRect.width <= 0f || dragRect.height <= 0f) return null;
+
+        MirrorFilter out = null;
+        float dst = Float.MAX_VALUE;
+        float pad = Scl.scl(16f);
+        int amount = 0;
+
+        //pick the closest mirror line to the cursor
+        for(var filter : filters){
+            if(filter instanceof MirrorFilter){
+                MirrorFilter mirror = (MirrorFilter)filter;
+                float px = dragRect.x + Mathf.clamp(mirror.axisX, 0f, 1f) * dragRect.width;
+                float py = dragRect.y + Mathf.clamp(mirror.axisY, 0f, 1f) * dragRect.height;
+
+                dragAxis.trnsExact(mirror.angle - 90f, 1f);
+                float ndst = Math.abs((x - px) * dragAxis.y - (y - py) * dragAxis.x);
+                if(ndst < dst){
+                    dst = ndst;
+                    out = mirror;
+                }
+                amount++;
+            }
+        }
+
+        if(out != null && dst <= pad) return out;
+        if(amount == 1 && out != null && x >= dragRect.x - pad && y >= dragRect.y - pad && x <= dragRect.x + dragRect.width + pad && y <= dragRect.y + dragRect.height + pad) return out;
+        return null;
+    }
+
+    void drag(float x, float y){
+        if(preview == null || dragging == null) return;
+
+        MirrorFilter.getDrawRect(preview, dragRect);
+        if(dragRect.width <= 0f || dragRect.height <= 0f) return;
+
+        //convert preview coordinates back into normalized axis coordinates
+        dragging.axisX = Mathf.clamp((x - dragRect.x) / dragRect.width, 0f, 1f);
+        dragging.axisY = Mathf.clamp((y - dragRect.y) / dragRect.height, 0f, 1f);
+    }
+
+    void dragUpdate(boolean force){
+        long now = Time.millis();
+        if(!force && now - lastDrag < 33L) return;
+        lastDrag = now;
+        update();
     }
 
     void setup(){
@@ -203,7 +265,7 @@ public class MapGenerateDialog extends BaseDialog{
         cont.clear();
         cont.table(t -> {
             t.margin(8f);
-            t.stack(new BorderImage(texture){
+            preview = new BorderImage(texture){
                 {
                     setScaling(Scaling.fit);
                 }
@@ -215,10 +277,39 @@ public class MapGenerateDialog extends BaseDialog{
                         filter.draw(this);
                     }
                 }
-            }, new Stack(){{
+            };
+            preview.addListener(new InputListener(){
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                    if(button != KeyCode.mouseLeft) return false;
+
+                    dragging = hit(x, y);
+                    if(dragging == null) return false;
+
+                    drag(x, y);
+                    dragUpdate(true);
+                    return true;
+                }
+
+                @Override
+                public void touchDragged(InputEvent event, float x, float y, int pointer){
+                    if(dragging == null) return;
+                    drag(x, y);
+                    dragUpdate(false);
+                }
+
+                @Override
+                public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                    if(dragging == null) return;
+                    drag(x, y);
+                    dragUpdate(true);
+                    dragging = null;
+                }
+            });
+            t.stack(preview, new Stack(){{
                 add(new Image(Styles.black8));
                 add(new Image(Icon.refresh, Scaling.none));
-                visible(() -> generating && !updateEditorOnChange);
+                visible(() -> generating && !updateEditorOnChange && dragging == null);
             }}).uniformX().grow().padRight(10);
             t.pane(p -> filterTable = p.marginRight(6)).update(pane -> {
                 if(Core.scene.getKeyboardFocus() instanceof Dialog && Core.scene.getKeyboardFocus() != this){
@@ -391,6 +482,8 @@ public class MapGenerateDialog extends BaseDialog{
         buffer1 = null;
         buffer2 = null;
         generating = false;
+        preview = null;
+        dragging = null;
         if(pixmap != null){
             pixmap.dispose();
             texture.dispose();
@@ -404,18 +497,25 @@ public class MapGenerateDialog extends BaseDialog{
     void update(){
 
         if(generating){
+            updateQueued = true;
             return;
         }
 
-        var copy = filters.copy();
+        Seq<GenerateFilter> copy = new Seq<>(filters.size);
+        //copy filters so preview generation doesn't race with UI edits
+        for(var filter : filters){
+            copy.add(filter.copy());
+        }
+
+        generating = true;
+        updateQueued = false;
 
         result = mainExecutor.submit(() -> {
             try{
                 int w = pixmap.width;
                 world.setGenerating(true);
-                generating = true;
 
-                if(!filters.isEmpty()){
+                if(!copy.isEmpty()){
                     //write to buffer1 for reading
                     for(int px = 0; px < pixmap.width; px++){
                         for(int py = 0; py < pixmap.height; py++){
@@ -431,7 +531,7 @@ public class MapGenerateDialog extends BaseDialog{
                     pixmap.each((px, py) -> {
                         int x = px * scaling, y = py * scaling;
                         long tile = buffer1[px + py * w];
-                        input.set(x, y, content.block(PackTile.block(tile)), content.block(PackTile.floor(tile)), content.block(PackTile.overlay(tile)));
+                        input.set(x, y, content.block(PackTile.block(tile)), content.block(PackTile.floor(tile)), content.block(PackTile.overlay(tile)), 0);
                         filter.apply(input);
                         buffer2[px + py * w] = PackTile.get(input.block.id, input.floor.id, input.overlay.id);
                     });
@@ -443,7 +543,7 @@ public class MapGenerateDialog extends BaseDialog{
                     for(int py = 0; py < pixmap.height; py++){
                         int color;
                         //get result from buffer1 if there's filters left, otherwise get from editor directly
-                        if(filters.isEmpty()){
+                        if(copy.isEmpty()){
                             Tile tile = editor.tile(px * scaling, py * scaling);
                             color = MapIO.colorFor(tile.block(), tile.floor(), tile.overlay(), Team.derelict);
                         }else{
@@ -456,14 +556,24 @@ public class MapGenerateDialog extends BaseDialog{
 
                 Core.app.post(() -> {
                     if(pixmap == null || texture == null){
+                        generating = false;
                         return;
                     }
                     texture.draw(pixmap);
                     generating = false;
+                    if(updateQueued){
+                        //run one more pass if changes came in while generating
+                        update();
+                    }
                 });
             }catch(Exception e){
                 generating = false;
                 Log.err(e);
+                Core.app.post(() -> {
+                    if(updateQueued){
+                        update();
+                    }
+                });
             }
             world.setGenerating(false);
         });

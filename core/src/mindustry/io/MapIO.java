@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.maps.*;
 import mindustry.world.*;
@@ -39,15 +40,24 @@ public class MapIO{
             SaveIO.readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = SaveIO.getSaveWriter(version);
+            if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
             StringMap tags = new StringMap();
-            ver.region("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
+            ver.readRegion("meta", stream, counter, in -> tags.putAll(ver.readStringMap(in)));
             return new Map(file, tags.getInt("width"), tags.getInt("height"), tags, custom, version, Version.build);
         }
     }
 
     public static void writeMap(Fi file, Map map) throws IOException{
+        writeMap(file, map, true);
+    }
+
+    /** @param embed if true, assets will be embedded in the map - this is needed for external export. */
+    public static void writeMap(Fi file, Map map, boolean embed) throws IOException{
         try{
-            SaveIO.write(file, map.tags);
+            SaveIO.write(file, new SaveOptions(){{
+                extraTags = map.tags;
+                embedAssets = embed;
+            }});
         }catch(Exception e){
             throw new IOException(e);
         }
@@ -69,18 +79,26 @@ public class MapIO{
             SaveIO.readHeader(stream);
             int version = stream.readInt();
             SaveVersion ver = SaveIO.getSaveWriter(version);
-            ver.region("meta", stream, counter, ver::readStringMap);
+            if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
+            ver.readRegion("meta", stream, counter, ver::readStringMap);
 
             Pixmap floors = new Pixmap(map.width, map.height);
             Pixmap walls = new Pixmap(map.width, map.height);
             int black = 255;
             int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
+
+            int width = map.width, height = map.height;
+            int len = width*height;
+            short[] floorIds = new short[len];
+            boolean[] overlays = new boolean[len];
+
             CachedTile tile = new CachedTile(){
                 @Override
                 public void setBlock(Block type){
-                    super.setBlock(type);
-
-                    int c = colorFor(block(), Blocks.air, Blocks.air, team());
+                    //do not super.setBlock as that affects the current world
+                    this.block = type;
+                    this.build = type.newBuilding().init(this, this.team(), false, 0);
+                    int c = colorFor(type, Blocks.air, Blocks.air, team());
                     if(c != black){
                         walls.setRaw(x, floors.height - 1 - y, c);
                         floors.set(x, floors.height - 1 - y + 1, shade);
@@ -88,8 +106,10 @@ public class MapIO{
                 }
             };
 
-            ver.region("content", stream, counter, ver::readContentHeader);
-            ver.region("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
+            if(ver.version >= 12) ver.skipChunk(stream);
+            ver.readRegion("content", stream, counter, MapIO::readPreviewContentHeader);
+            if(ver.version == 11) ver.skipChunk(stream);
+            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
                 @Override public void begin(){
@@ -137,7 +157,27 @@ public class MapIO{
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;
                     }
+                    floorIds[x + y * width] = (short)floorID;
+                    overlays[x + y * width] = overlayID != 0;
                     return tile;
+                }
+
+                @Override
+                public void onReadTileData(){
+                    Block block = tile.block();
+                    Block floor = content.block(floorIds[tile.x + tile.y*width]);
+
+                    if(!block.synthetic() && block != Blocks.air){
+                        int color = block.minimapColor(tile);
+                        if(color != 0){
+                            walls.set(tile.x, walls.height - 1 - tile.y, color);
+                        }
+                    }else if(!overlays[tile.array()] && block == Blocks.air){
+                        int color = floor.minimapColor(tile);
+                        if(color != 0){
+                            floors.set(tile.x, floors.height - 1 - tile.y, color);
+                        }
+                    }
                 }
             }));
 
@@ -149,12 +189,40 @@ public class MapIO{
         }
     }
 
+    private static void readPreviewContentHeader(DataInput stream) throws IOException{
+        //reads content header while refusing to fire patch loaded event
+        int mapped = stream.readUnsignedByte();
+
+        MappableContent[][] map = new MappableContent[ContentType.all.length][0];
+
+        for(int i = 0; i < mapped; i++){
+            ContentType type = ContentType.all[stream.readByte()];
+            short total = stream.readShort();
+            map[type.ordinal()] = new MappableContent[total];
+
+            for(int j = 0; j < total; j++){
+                String name = stream.readUTF();
+                //fallback only for blocks
+                map[type.ordinal()][j] = content.getByName(type, type == ContentType.block ? SaveFileReader.fallback.get(name, name) : name);
+            }
+        }
+
+        content.setTemporaryMapper(map);
+    }
+
     public static Pixmap generatePreview(Tiles tiles){
         Pixmap pixmap = new Pixmap(tiles.width, tiles.height);
         for(int x = 0; x < pixmap.width; x++){
             for(int y = 0; y < pixmap.height; y++){
                 Tile tile = tiles.getn(x, y);
-                pixmap.set(x, pixmap.height - 1 - y, colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team()));
+                int color = 0;
+                if(!tile.block().synthetic() && tile.block() != Blocks.air){
+                    color = tile.block().minimapColor(tile);
+                }else if(tile.overlay() == Blocks.air && tile.block() == Blocks.air){
+                    color = tile.floor().minimapColor(tile);
+                }
+                if(color == 0) color = colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team());
+                pixmap.set(x, pixmap.height - 1 - y, color);
             }
         }
         return pixmap;
@@ -172,7 +240,7 @@ public class MapIO{
         for(Tile tile : tiles){
             //while synthetic blocks are possible, most of their data is lost, so in order to avoid questions like
             //"why is there air under my drill" and "why are all my conveyors facing right", they are disabled
-            int color = tile.block().hasColor && !tile.block().synthetic() ? tile.block().mapColor.rgba() : tile.floor().mapColor.rgba();
+            int color = tile.block().hasColor && !tile.block().hasBuilding() ? tile.block().mapColor.rgba() : tile.floor().mapColor.rgba();
             pix.set(tile.x, tiles.height - 1 - tile.y, color);
         }
         return pix;
@@ -182,6 +250,9 @@ public class MapIO{
         for(Tile tile : tiles){
             int color = pixmap.get(tile.x, pixmap.height - 1 - tile.y);
             Block block = ColorMapper.get(color);
+
+            //ignore buildings; reading images is only intended for environment tiles
+            if(block.hasBuilding()) continue;
 
             if(block.isOverlay()){
                 tile.setOverlay(block.asFloor());
@@ -194,11 +265,10 @@ public class MapIO{
             }
         }
 
-        //guess at floors by grabbing a random adjacent floor
         for(Tile tile : tiles){
             //default to stone floor
             if(tile.floor() == Blocks.air){
-                tile.setFloorUnder((Floor)Blocks.stone);
+                tile.setFloor((Floor)Blocks.stone);
             }
         }
     }

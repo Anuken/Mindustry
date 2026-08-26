@@ -1,62 +1,62 @@
-Mindustry is a factory-building game with tower defense and RTS elements. Create elaborate supply chains to feed ammo into your turrets, produce materials to use for building, and construct units. Command units to capture enemy bases, and expand your production. Defend your core from waves of enemies.
+Mindustry adalah sebuah game manajemen pembangunan industri dengan elemen RTS dan menara pertahanan. Buat rantai pasokan yang rumit untuk memasukkan amunisi ke menara Anda, menghasilkan material yang digunakan untuk membangun, dan membuat unit. Perintahkan unit untuk merebut markas musuh, dan perluas produksi Anda. Pertahankan inti Anda dari gelombang musuh.
 
-Play through the campaign alone or with with your friends in cross-platform multiplayer co-op and challenge them in team-based PvP matches.
+Mainkan kampanye sendirian atau bersama teman-teman Anda dalam lintas platfrom multi pemain co-op dan tantang mereka dalam pertandingan PvP berbasis tim.
 
 [img]{STEAM_APP_IMAGE}/extras/factory.gif[/img]
 
-[h2]Factory Building[/h2]
+[h2]Bangunan Pabrik[/h2]
 
 [list]
-[*] Create elaborate supply chains of conveyor belts to feed ammo into your turrets and produce materials to use for building
-[*] Use production blocks to create a wide variety of advanced materials
-[*] Distribute liquids and fight constant challenges, like outbreaks of fire or enemy flier raids
-[*] Get the most out of your production by supplying optional coolant and lubricant
-[*] Produce a wide variety of units for automatic management of your base or assault on enemy bases
+[*] Buat rantai pasokan yang rumit untuk memasukkan amunisi ke menara Anda dan menghasilkan bahan yang digunakan untuk membangun
+[*] Gunakan blok produksi untuk membuat berbagai macam material canggih
+[*] Mendistribusikan cairan dan melawan tantangan konstan, seperti bencana kebakaran atau serangan udara musuh
+[*] Dapatkan hasil maksimal dari produksi Anda dengan menyediakan cairan pendingin opsional dan pelumas
+[*] Hasilkan berbagai macam unit untuk otomatis memanajemen markas Anda atau penyerangan ke markas musuh
 [/list]
 
-[h2]Tower Defense[/h2]
+[h2]Menara Pertahanan[/h2]
 
 [list]
-[*] Defend your structures from waves of enemies
-[*] Strategically place your turrets to destroy them before they reach your core
-[*] Supply your turrets with ammo, coolant, and power
-[*] Bolster your defenses with powered shields, regeneration projectors and other support buildings
+[*] Pertahankan struktur Anda dari gelombang musuh
+[*] Tempatkan menara Anda secara strategis untuk menghancurkan unit musuh sebelum mencapai inti Anda
+[*] Lengkapi menara Anda dengan amunisi, pendingin, dan tenaga
+[*] Perkuat pertahanan Anda dengan proyektor perisai ,proyektor mender, dan bangunan pendukung lainnya
 [/list]
 
 [img]{STEAM_APP_IMAGE}/extras/rts3.png[/img]
 
-[h2]Real Time Strategy[/h2]
+[h2]Strategi Waktu Nyata[/h2]
 
 [list]
-[*] Set up assembly lines to construct armies of mechanized units
-[*] Use your units to square up against fully functional enemy bases
-[*] Capture more territory to place down more cores and get access to additional resources for expansion
+[*] Siapkan jalur perakitan untuk membangun pasukan unit mekanis
+[*] Gunakan unit Anda untuk melawan markas musuh yang berfungsi penuh
+[*] Rebut lebih banyak wilayah untuk menempatkan lebih banyak inti dan dapatkan akses ke sumber daya tambahan untuk ekspansi
 [/list]
 
-[h2]Campaign[/h2]
+[h2]Kampanye[/h2]
 
 [list]
-[*] Play through two separate planetary campaigns
-[*] Conquer the planet Serpulo and Erekir as you advance through 35 hand-made maps and 250+ procedurally generated sectors
-[*] Capture territory and set up factories to produce resources while you play other sectors
-[*] Defend your sectors from periodic invasions
-[*] Coordinate resource distribution between sectors via launch pads
-[*] Research new blocks to fuel progress
-[*] Invite your friends to complete missions together
-[*] 250+ technology blocks to master
-[*] 50+ different types of drones, mechs and ships
-[*] 80+ achievements to complete
+[*] Mainkan dua kampanye planet yang terpisah
+[*] Taklukkan planet Serpulo dan Erekir saat Anda maju melalui 35 peta buatan tangan dan 250+ sektor yang dihasilkan secara prosedural
+[*] Rebut wilayah dan dirikan pabrik untuk menghasilkan sumber daya selagi Anda bermain di sektor lain
+[*] Pertahankan sektor Anda dari invasi berkala
+[*] Koordinasikan distribusi sumber daya antar sektor melalui alas peluncur
+[*] Riset blok baru untuk mendorong kemajuan
+[*] Undang teman Anda untuk menyelesaikan misi bersama
+[*] 250+ blok teknologi untuk dikuasai
+[*] 50+ jenis drone, mech, dan kapal yang berbeda
+[*] 80+ prestasi untuk diselesaikan
 [/list]
 
-[h2]Community and Modding[/h2]
+[h2]Komunitas dan Modding[/h2]
 
 [list]
-[*] Use the steam workshop to browse community-made maps and schematics
-[*] Join public community servers to play with others across platforms
-[*] Play co-op, PvP or sandbox
-[*] Community servers support plugins for custom maps and gamemodes
-[*] Create your public dedicated server, or invite friends to your own private session
-[*] Customizable game rules: Change block costs, enemy stats, starting items, wave timing and more
-[*] Built-in map editor lets you make your own maps to play and share with the community
-[*] Browse community-made mods to add or remix even more content
+[*] Gunakan Steam Workshop untuk menelusuri peta dan skematik buatan komunitas
+[*] Bergabunglah dengan server komunitas publik untuk bermain dengan orang lain di berbagai platform
+[*] Mainkan co-op, PvP (Satu lawan Satu) ataupun sandbox
+[*] Server komunitas mendukung plugin untuk peta kostum dan mode permainan khusus
+[*] Buat server khusus publik Anda, atau undang teman ke sesi pribadi Anda sendiri
+[*] Aturan permainan yang dapat disesuaikan: Ubah biaya blok, statistik musuh, muatan sumber daya, waktu gelombang, dan banyak lagi
+[*] Editor peta bawaan memungkinkan Anda membuat peta sendiri untuk dimainkan dan dibagikan dengan komunitas
+[*] Telusuri mod buatan komunitas untuk menambahkan atau mencampur lebih banyak konten
 [/list]

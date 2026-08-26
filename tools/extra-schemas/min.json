@@ -1,0 +1,7 @@
+{
+  "doc": "Takes the minimum of this progress and another PartProgress. Applied via PartProgress's 'op'/'operation' field (e.g. `op: min`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "other": {
+    "type": "mindustry.entities.part.DrawPart$PartProgress",
+    "doc": "Progress function to compare against."
+  }
+}

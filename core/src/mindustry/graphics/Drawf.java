@@ -5,10 +5,12 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 
 import java.util.*;
@@ -19,11 +21,48 @@ public class Drawf{
     private static final Vec2[] vecs = new Vec2[]{new Vec2(), new Vec2(), new Vec2(), new Vec2()};
     private static final FloatSeq points = new FloatSeq();
 
+    public static void text(String text, float x, float y, Color color){
+        text(text, x, y, 0f, color, 1f, Align.center);
+    }
+
+    public static void text(String text, float x, float y, Color color, float scale){
+        text(text, x, y, 0f, color, scale, Align.center);
+    }
+
+    public static void text(String text, float x, float y, Color color, float scale, int align){
+        text(text, x, y, 0f, color, scale, align);
+    }
+
+    public static void text(String text, float x, float y, float rotation, Color color, float scale, int align){
+        Font font = Fonts.outline;
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(0.25f / Scl.scl(1f) * scale);
+        font.setColor(color);
+        font.getCache().clear();
+        GlyphLayout layout = font.getCache().addText(text, x, y, 0f, align, false);
+        if(rotation != 0){
+            float verticalFraction = (align & Align.bottom) != 0 ? 1f : (align & Align.top) != 0 ? 0f: 0.5f;
+            font.getCache().setRotation(rotation, x, y - layout.height * verticalFraction);
+        }
+        if(color.a < 1f){
+            font.getCache().setAlphas(color.a);
+        }
+        font.getCache().draw();
+        font.getData().setScale(1f);
+        font.setColor(Color.white);
+        font.setUseIntegerPositions(ints);
+    }
+
     /** Bleeds a mod pixmap if linear filtering is enabled. */
     public static void checkBleed(Pixmap pixmap){
         if(Core.settings.getBool("linear", true)){
             Pixmaps.bleed(pixmap);
         }
+    }
+
+    public static void underwater(Runnable run){
+        renderer.blocks.floor.drawUnderwater(run);
     }
 
     //TODO offset unused
@@ -130,12 +169,34 @@ public class Drawf{
         additive(region, color, 1f, x, y, rotation, layer);
     }
 
+    public static void additive(TextureRegion region, Color color, float alpha, float x, float y, float width, float height, float layer){
+        float pz = Draw.z();
+        Draw.z(layer);
+        Draw.color(color, alpha * color.a);
+        Draw.blend(Blending.additive);
+        Draw.rect(region, x, y, width, height, 0f);
+        Draw.blend();
+        Draw.color();
+        Draw.z(pz);
+    }
+
     public static void additive(TextureRegion region, Color color, float alpha, float x, float y, float rotation, float layer){
         float pz = Draw.z();
         Draw.z(layer);
         Draw.color(color, alpha * color.a);
         Draw.blend(Blending.additive);
         Draw.rect(region, x, y, rotation);
+        Draw.blend();
+        Draw.color();
+        Draw.z(pz);
+    }
+
+    public static void additive(TextureRegion region, Color color, float alpha, float x, float y, float rotation, float layer, float originX, float originY){
+        float pz = Draw.z(), w = region.width * region.scl() * Draw.xscl, h = region.height * region.scl() * Draw.yscl;
+        Draw.z(layer);
+        Draw.color(color, alpha * color.a);
+        Draw.blend(Blending.additive);
+        Draw.rect(region, x, y, w, h, w / 2f + originX * region.scl() * Draw.xscl, h / 2f + originY * region.scl() * Draw.yscl, rotation);
         Draw.blend();
         Draw.color();
         Draw.z(pz);
@@ -267,7 +328,7 @@ public class Drawf{
     }
 
     public static void selected(Building tile, Color color){
-        selected(tile.tile(), color);
+        selected(tile.tile, color);
     }
 
     public static void selected(Tile tile, Color color){
@@ -321,12 +382,14 @@ public class Drawf{
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color, float rotation){
+        if(alpha < 1f/255f) return;
         Draw.color(color, alpha * color.a);
         Draw.rect(region, x, y, rotation);
         Draw.color();
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color){
+        if(alpha < 1f/255f) return;
         Draw.color(color, alpha * color.a);
         Draw.rect(region, x, y);
         Draw.color();
@@ -361,10 +424,28 @@ public class Drawf{
     }
 
     public static void square(float x, float y, float radius, float rotation, Color color){
+        square(x, y, radius, rotation, color, Pal.gray.write(Tmp.c3).a(color.a));
+    }
+
+    public static void square(float x, float y, float radius, float rotation, Color color, Color bgColor){
+        square(x, y, radius, rotation, color, bgColor, 1f);
+    }
+
+    public static void square(float x, float y, float radius, float rotation, Color color, Color bgColor, float scaling){
+        Lines.stroke(3f * scaling, bgColor);
+        Lines.square(x, y, radius + 1f * scaling, rotation);
+        Lines.stroke(1f * scaling, color);
+        Lines.square(x, y, radius + 1f * scaling, rotation);
+        Draw.reset();
+    }
+
+    public static void cross(float x, float y, float radius, Color color){
         Lines.stroke(3f, Pal.gray.write(Tmp.c3).a(color.a));
-        Lines.square(x, y, radius + 1f, rotation);
+        Lines.lineAngleCenter(x, y, 45f, radius + 1f);
+        Lines.lineAngleCenter(x, y, 135f, radius + 1f);
         Lines.stroke(1f, color);
-        Lines.square(x, y, radius + 1f, rotation);
+        Lines.lineAngleCenter(x, y, 45f, radius + 1f);
+        Lines.lineAngleCenter(x, y, 135f, radius + 1f);
         Draw.reset();
     }
 
@@ -373,6 +454,18 @@ public class Drawf{
         Lines.poly(x, y, sides, radius + 1f, rotation);
         Lines.stroke(1f, color);
         Lines.poly(x, y, sides, radius + 1f, rotation);
+        Draw.reset();
+    }
+
+    public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color){
+        fillPoly(x, y, sides, radius, rotation, color, Pal.gray, 1f);
+    }
+
+    public static void fillPoly(float x, float y, int sides, float radius, float rotation, Color color, Color bgColor, float scl){
+        Draw.color(bgColor, color.a);
+        Fill.poly(x, y, sides, radius + 2f*scl, rotation);
+        Draw.color(color);
+        Fill.poly(x, y, sides, radius, rotation);
         Draw.reset();
     }
 
@@ -418,17 +511,33 @@ public class Drawf{
     }
 
     public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
+        laser(line, start, end, x, y, x2, y2, scale, true);
+    }
+
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale, boolean light){
+        laser(line, start, end, x, y, x2, y2, scale, light, true);
+    }
+
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale, boolean light, boolean useLod){
         float scl = 8f * scale * Draw.scl, rot = Mathf.angle(x2 - x, y2 - y);
         float vx = Mathf.cosDeg(rot) * scl, vy = Mathf.sinDeg(rot) * scl;
+        float lod = useLod ? (start.width * scale * start.scl() < 10f ? Lod.alpha1 : Lod.alpha2) : 1f;
+        float a = Draw.getColorAlpha();
 
-        Draw.rect(start, x, y, start.width * scale * start.scl(), start.height * scale * start.scl(), rot + 180);
-        Draw.rect(end, x2, y2, end.width * scale * end.scl(), end.height * scale * end.scl(), rot);
+        if(a >= 1f/255f){
+            if(lod > 0.0001f){
+                Draw.alpha(lod * a);
+                Draw.rect(start, x, y, start.width * scale * start.scl(), start.height * scale * start.scl(), rot + 180);
+                Draw.rect(end, x2, y2, end.width * scale * end.scl(), end.height * scale * end.scl(), rot);
+                Draw.alpha(a);
+            }
 
-        Lines.stroke(12f * scale);
-        Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
-        Lines.stroke(1f);
+            Lines.stroke(12f * scale);
+            Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
+            Lines.stroke(1f);
+        }
 
-        light(x, y, x2, y2);
+        if(light) light(x, y, x2, y2);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){

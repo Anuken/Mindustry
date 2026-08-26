@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -18,7 +17,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
+abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Unitc{
     @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
 
@@ -39,19 +38,6 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     }
 
     @Override
-    @Replace
-    public int pathType(){
-        return Pathfinder.costNaval;
-    }
-
-    //don't want obnoxious splashing
-    @Override
-    @Replace
-    public boolean emitWalkSound(){
-        return false;
-    }
-
-    @Override
     public void add(){
         tleft.clear();
         tright.clear();
@@ -59,6 +45,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
 
     @Override
     public void draw(){
+        //TODO: move to UnitType
         float z = Draw.z();
 
         Draw.z(Layer.debris);
@@ -76,7 +63,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Flyingc, Unitc{
     @Replace
     @Override
     public SolidPred solidity(){
-        return isFlying() ? null : EntityCollisions::waterSolid;
+        return isFlying() || ignoreSolids() ? null : EntityCollisions::waterSolid;
     }
 
     @Replace

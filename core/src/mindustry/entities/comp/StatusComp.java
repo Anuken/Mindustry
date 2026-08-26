@@ -15,7 +15,7 @@ import mindustry.world.blocks.environment.*;
 import static mindustry.Vars.*;
 
 @Component
-abstract class StatusComp implements Posc, Flyingc{
+abstract class StatusComp implements Posc{
     private Seq<StatusEntry> statuses = new Seq<>(4);
     private transient Bits applied = new Bits(content.getBy(ContentType.status).size);
 
@@ -28,13 +28,31 @@ abstract class StatusComp implements Posc, Flyingc{
     @Import float maxHealth;
 
     /** Apply a status effect for 1 tick (for permanent effects) **/
-    void apply(StatusEffect effect){
+    public void apply(StatusEffect effect){
         apply(effect, 1);
     }
 
     /** Adds a status effect to this unit. */
-    void apply(StatusEffect effect, float duration){
+    public void apply(StatusEffect effect, float duration){
+        applyStatus(effect, duration, false);
+    }
+
+    public float getDuration(StatusEffect effect){
+        var entry = statuses.find(e -> e.effect == effect);
+        return entry == null ? 0 : entry.time;
+    }
+
+    public void setDuration(StatusEffect effect, float duration){
+        applyStatus(effect, duration, true);
+    }
+
+    private void applyStatus(StatusEffect effect, float duration, boolean shorten){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
+
+        if(shorten && duration == 0){
+            if(hasEffect(effect)) unapply(effect);
+            return;
+        }
 
         //unlock status effects regardless of whether they were applied to friendly units
         if(state.isCampaign()){
@@ -45,9 +63,9 @@ abstract class StatusComp implements Posc, Flyingc{
             //check for opposite effects
             for(int i = 0; i < statuses.size; i ++){
                 StatusEntry entry = statuses.get(i);
-                //extend effect
+                //extend or shorten effect
                 if(entry.effect == effect){
-                    entry.time = Math.max(entry.time, duration);
+                    entry.time = shorten ? duration : Math.max(entry.time, duration);
                     effect.applied(self(), entry.time, true);
                     return;
                 }else if(entry.effect.applyTransition(self(), effect, entry, duration)){ //find reaction
@@ -61,24 +79,21 @@ abstract class StatusComp implements Posc, Flyingc{
         if(!effect.reactive){
             //otherwise, no opposites found, add direct effect
             StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
+            entry.damageTime = 0f;
             entry.set(effect, duration);
+            applied.set(effect.id);
             statuses.add(entry);
             effect.applied(self(), duration, false);
         }
     }
 
-    float getDuration(StatusEffect effect){
-        var entry = statuses.find(e -> e.effect == effect);
-        return entry == null ? 0 : entry.time;
-    }
-
-    void clearStatuses(){
+    public void clearStatuses(){
         statuses.each(e -> e.effect.onRemoved(self()));
         statuses.clear();
     }
 
     /** Removes a status effect. */
-    void unapply(StatusEffect effect){
+    public void unapply(StatusEffect effect){
         statuses.remove(e -> {
             if(e.effect == effect){
                 e.effect.onRemoved(self());
@@ -89,13 +104,15 @@ abstract class StatusComp implements Posc, Flyingc{
         });
     }
 
-    boolean isBoss(){
+    public boolean isBoss(){
         return hasEffect(StatusEffects.boss);
     }
 
-    abstract boolean isImmune(StatusEffect effect);
+    public boolean isImmune(StatusEffect effect){
+        return type.immunities.contains(effect);
+    }
 
-    Color statusColor(){
+    public Color statusColor(){
         if(statuses.size == 0){
             return Tmp.c1.set(Color.white);
         }
@@ -125,6 +142,7 @@ abstract class StatusComp implements Posc, Flyingc{
         StatusEntry entry = Pools.obtain(StatusEntry.class, StatusEntry::new);
         entry.set(StatusEffects.dynamic, Float.POSITIVE_INFINITY);
         statuses.add(entry);
+        applied.set(StatusEffects.dynamic.id);
         entry.effect.applied(self(), entry.time, false);
         return entry;
     }
@@ -167,6 +185,8 @@ abstract class StatusComp implements Posc, Flyingc{
     public void statusArmor(float armor){
         applyDynamicStatus().armorOverride = armor;
     }
+
+    public abstract boolean isGrounded();
 
     @Override
     public void update(){
@@ -222,7 +242,7 @@ abstract class StatusComp implements Posc, Flyingc{
 
                 disarmed |= entry.effect.disarm;
 
-                entry.effect.update(self(), entry.time);
+                entry.effect.update(self(), entry);
             }
         }
     }
@@ -237,7 +257,7 @@ abstract class StatusComp implements Posc, Flyingc{
         }
     }
 
-    boolean hasEffect(StatusEffect effect){
+    public boolean hasEffect(StatusEffect effect){
         return applied.get(effect.id);
     }
 }

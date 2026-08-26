@@ -94,7 +94,7 @@ public class PayloadLoader extends PayloadBlock{
                 //item container
                 (build.build.block.hasItems && build.block().unloadable && build.block().itemCapacity >= 10 && build.block().size <= maxBlockSize) ||
                 //liquid container
-                (build.build.block().hasLiquids && build.block().liquidCapacity >= 10f) ||
+                (build.build.block.hasLiquids && build.block().liquidCapacity >= 10f) ||
                 //battery
                 (build.build.block.consPower != null && build.build.block.consPower.buffered)
             );
@@ -228,7 +228,7 @@ public class PayloadLoader extends PayloadBlock{
             return payload != null && (
                 exporting ||
                 (payload.block().hasLiquids && liquids.currentAmount() >= 0.1f && payload.build.liquids.currentAmount() >= payload.block().liquidCapacity - 0.001f) ||
-                (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)) ||
+                (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> (payload.build.items.get(i) >= payload.block().itemCapacity) && items.has(i))) ||
                 (hasBattery() && payload.build.power.status >= 0.999999999f));
         }
 

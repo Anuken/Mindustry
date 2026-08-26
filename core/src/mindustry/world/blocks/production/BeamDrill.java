@@ -69,8 +69,9 @@ public class BeamDrill extends Block{
         solid = true;
         drawArrow = false;
         regionRotated1 = 1;
+        ignoreLineRotation = true;
         ambientSoundVolume = 0.05f;
-        ambientSound = Sounds.minebeam;
+        ambientSound = Sounds.loopMineBeam;
 
         envEnabled |= Env.space;
         flags = EnumSet.of(BlockFlag.drill);
@@ -126,11 +127,9 @@ public class BeamDrill extends Block{
         stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
 
         if(optionalBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
-            stats.remove(Stat.booster);
-            stats.add(Stat.booster,
+            stats.replace(Stat.booster,
                 StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
-                consBase.amount, optionalBoostIntensity, false,
-                l -> (consumesLiquid(l) && (findConsumer(f -> f instanceof ConsumeLiquid).booster || ((ConsumeLiquid)findConsumer(f -> f instanceof ConsumeLiquid)).liquid != l)))
+                consBase.amount, optionalBoostIntensity, false, consBase::consumes)
             );
         }
     }
@@ -231,13 +230,7 @@ public class BeamDrill extends Block{
         @Override
         public void drawSelect(){
 
-            if(lastItem != null){
-                float dx = x - size * tilesize/2f, dy = y + size * tilesize/2f, s = iconSmall / 4f;
-                Draw.mixcol(Color.darkGray, 1f);
-                Draw.rect(lastItem.fullIcon, dx, dy - 1, s, s);
-                Draw.reset();
-                Draw.rect(lastItem.fullIcon, dx, dy, s, s);
-            }
+            drawItemSelection(lastItem);
         }
 
         @Override
@@ -247,13 +240,13 @@ public class BeamDrill extends Block{
             if(lasers[0] == null) updateLasers();
 
             warmup = Mathf.approachDelta(warmup, Mathf.num(efficiency > 0), 1f / 60f);
-            
+
             updateFacing();
 
             float multiplier = Mathf.lerp(1f, optionalBoostIntensity, optionalEfficiency);
             float drillTime = getDrillTime(lastItem);
             boostWarmup = Mathf.lerpDelta(boostWarmup, optionalEfficiency, 0.1f);
-            lastDrillSpeed = (facingAmount * multiplier * timeScale) / drillTime;
+            lastDrillSpeed = (facingAmount * multiplier * timeScale) / drillTime * efficiency;
 
             time += edelta() * multiplier;
 
@@ -268,7 +261,7 @@ public class BeamDrill extends Block{
                 time %= drillTime;
             }
 
-            if(timer(timerDump, dumpTime)){
+            if(timer(timerDump, dumpTime / timeScale)){
                 dump();
             }
         }
@@ -291,6 +284,9 @@ public class BeamDrill extends Block{
             for(int i = 0; i < size; i++){
                 Tile face = facing[i];
                 if(face != null){
+                    Item drop = face.wallDrop();
+
+                    if(drop == null) continue;
                     Point2 p = lasers[i];
                     float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
 
@@ -328,21 +324,24 @@ public class BeamDrill extends Block{
                     Draw.color();
                     Draw.mixcol();
 
-                    Draw.z(Layer.effect);
-                    Lines.stroke(warmup);
-                    rand.setState(i, id);
-                    Color col = face.wallDrop().color;
-                    Color spark = Tmp.c3.set(sparkColor).lerp(boostHeatColor, boostWarmup);
-                    for(int j = 0; j < sparks; j++){
-                        float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;
-                        float or = rand.range(2f);
-                        Tmp.v1.set(sparkRange * fin, 0).rotate(rotdeg() + rand.range(sparkSpread));
+                    if(Lod.l2){
+                        Draw.z(Layer.effect);
+                        Lines.stroke(warmup);
+                        rand.setState(i, id);
+                        Color col = drop.color;
+                        Color spark = Tmp.c3.set(sparkColor).lerp(boostHeatColor, boostWarmup);
+                        for(int j = 0; j < sparks; j++){
+                            float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;
+                            float or = rand.range(2f);
+                            Tmp.v1.set(sparkRange * fin, 0).rotate(rotdeg() + rand.range(sparkSpread));
 
-                        Draw.color(spark, col, fin);
-                        float px = Tmp.v1.x, py = Tmp.v1.y;
-                        if(fin <= 1f) Lines.lineAngle(lx + px + or * ddx, ly + py + or * ddy, Angles.angle(px, py), Mathf.slope(fin) * sparkSize);
+                            Color result = Tmp.c1.set(spark).lerp(col, fin);
+                            Draw.color(result.r, result.g, result.b, result.a * Lod.alpha2);
+                            float px = Tmp.v1.x, py = Tmp.v1.y;
+                            if(fin <= 1f) Lines.lineAngle(lx + px + or * ddx, ly + py + or * ddy, Angles.angle(px, py), Mathf.slope(fin) * sparkSize);
+                        }
+                        Draw.reset();
                     }
-                    Draw.reset();
                 }
             }
 
