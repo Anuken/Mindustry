@@ -2920,7 +2920,7 @@ public class Blocks{
                 blending = Blending.additive;
                 color = Color.valueOf("ff5512");
                 layer = Layer.block;
-                glowIntensity = 0.3f;
+                glowIntensity = 0.35f;
                 glowScale = 4f;
                 alpha = 1f;
             }}, new DrawRegion("-rotator"){{

@@ -94,7 +94,7 @@ public class BurstDrill extends Drill{
 
                 float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
 
-                timeDrilled += speedCurve.apply(progress / drillTime) * speed;
+                totalProgress += speedCurve.apply(progress / drillTime) * speed;
 
                 lastDrillSpeed = 1f / drillTime * speed * dominantItems;
                 progress += delta() * speed;

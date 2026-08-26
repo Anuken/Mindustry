@@ -252,7 +252,6 @@ public class Drill extends Block{
         public float totalProgress;
         public float consTimer;
         public float warmup;
-        public float timeDrilled;
         public float lastDrillSpeed;
 
         public int dominantItems;
@@ -314,7 +313,7 @@ public class Drill extends Block{
                 return;
             }
 
-            timeDrilled += warmup * delta();
+            totalProgress += warmup * delta();
 
             float delay = getDrillTime(dominantItem);
 
@@ -332,7 +331,6 @@ public class Drill extends Block{
                 warmup = Mathf.approachDelta(warmup, 0f, warmupSpeed);
                 return;
             }
-            totalProgress += warmup * Time.delta;
 
             if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
                 int amount = (int)(progress / delay);
@@ -412,7 +410,7 @@ public class Drill extends Block{
 
         @Override
         public float progress() {
-            return (dominantItem == null) ? 0f : Mathf.clamp(progress / getDrillTime(dominantItem));
+            return dominantItem == null ? 0f : Mathf.clamp(progress / getDrillTime(dominantItem));
         }
 
         @Override
