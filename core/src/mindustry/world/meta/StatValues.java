@@ -559,6 +559,7 @@ public class StatValues{
         return table -> {
             table.row();
             for(int i = 0; i < weapons.size; i++){
+                int index = i;
                 Weapon weapon = weapons.get(i);
 
                 if(weapon.flipSprite || !weapon.hasStats(unit)){
@@ -572,6 +573,7 @@ public class StatValues{
                     w.left().top().defaults().padRight(3).left();
                     if(region != null && region.found() && weapon.showStatSprite) w.image(region).size(60).scaling(Scaling.bounded).left().top();
                     w.row();
+                    tableInfo(w, "unit." + unit.name + ".weapon." + index + ".info");
 
                     weapon.addStats(unit, w);
                 }).growX().pad(5).margin(10);
@@ -655,17 +657,7 @@ public class StatValues{
 
                     if(blockName != null && t instanceof UnlockableContent){
                         UnlockableContent content = (UnlockableContent) t;
-                        String key = "block." + blockName + "." + content.name + ".info";
-                        if(Core.bundle.has(key) && !Vars.headless){
-                            bt.table(desc -> {
-                                desc.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
-                                desc.add("[lightgray]" + Core.bundle.get(key));
-                            });
-                            
-                            bt.row();
-                            bt.add().height(10f);
-                            bt.row();
-                        }
+                        tableInfo(bt, "block." + blockName + "." + content.name + ".info");
                     }
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
@@ -862,19 +854,30 @@ public class StatValues{
         };
     }
 
-    //for AmmoListValue
-    private static Cell<?> sep(Table table, String text){
-        table.row();
-        return table.add(text);
+    /** Adds an info table with an icon and description key from the bundle */
+    private static Cell<?> tableInfo(Table table, String key){
+        return table.table(t -> {
+            if(Core.bundle.has(key) && !Vars.headless){
+                t.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
+                t.add("[lightgray]" + Core.bundle.get(key));
+                t.row().add().height(10f).row();
+            }
+        });
     }
 
-    //add a note under a value
+    /** Adds a note under a value */
     private static Cell<?> note(Table table, String text){
         table.row();
         return table.table(t -> {
             if(!Vars.headless) t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
             t.add(text);
         });
+    }
+
+    //for AmmoListValue
+    private static Cell<?> sep(Table table, String text){
+        table.row();
+        return table.add(text);
     }
 
     //for AmmoListValue

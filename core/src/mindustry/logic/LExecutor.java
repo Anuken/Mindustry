@@ -31,7 +31,6 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
@@ -694,7 +693,7 @@ public class LExecutor{
                 if(sense instanceof Content co){
                     to.setnum(se.sense(co));
                     return;
-                }else if(sense instanceof LAccess la){
+                }else if(sense instanceof LAccess la && (exec.privileged || !la.isPrivileged())){
                     Object objOut = se.senseObject(la);
 
                     if(objOut == Senseable.noSensed){

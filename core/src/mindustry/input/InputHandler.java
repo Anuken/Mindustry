@@ -594,6 +594,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)){
                     pay.pickup(build);
                 }else{
+                    Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
                     Fx.unitPickup.at(build);
                     build.tile.remove();
                 }
@@ -602,6 +603,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(current != null && pay.canPickupPayload(current)){
                     Payload taken = build.takePayload();
                     if(taken != null){
+                        Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
                         pay.addPayload(taken);
                         Fx.unitPickup.at(build);
                     }
@@ -609,6 +611,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
         }else if(build != null && onGround){
+            Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
             Fx.unitPickup.at(build);
             build.tile.remove();
         }

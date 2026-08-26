@@ -327,6 +327,9 @@ public class DataPatcher{
         for(var block : Vars.content.blocks()){
             //don't waste time resizing arrays for blocks that can't use them
             if(!block.synthetic()) continue;
+            if(block.lastConfig instanceof Content c && c.removed){
+                block.lastConfig = null;
+            }
 
             block.checkContentArrayCapacity(items, liquids);
         }
