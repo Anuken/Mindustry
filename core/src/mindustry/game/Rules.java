@@ -171,12 +171,18 @@ public class Rules{
     public @Nullable Seq<MusicContainer> darkMusic;
     /** If true, this overrides the game setting to always play ambient music. */
     public boolean alwaysPlayMusic = false;
+    /** If true, automatic music is disabled. */
+    public boolean disableMusic = false;
+    /** Multiplier for music volume (max value is 1). */
+    public float musicVolume = 1f;
     /** Spawn layout. */
     public Seq<SpawnGroup> spawns = new Seq<>();
     /** Starting items put in cores. */
     public Seq<ItemStack> loadout = ItemStack.list(Items.copper, 100);
     /** Weather events that occur here. */
     public Seq<WeatherEntry> weather = new Seq<>(1);
+    /** Block placement limits by type. */
+    public ObjectIntMap<Block> blockLimits = new ObjectIntMap<>();
     /** Blocks that cannot be placed. */
     public ObjectSet<Block> bannedBlocks = new ObjectSet<>();
     /** Units that cannot be built. */

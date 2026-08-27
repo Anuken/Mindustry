@@ -1,0 +1,7 @@
+{
+  "doc": "Shortens the progress range by a fixed amount. Applied via PartProgress's 'op'/'operation' field (e.g. `op: shorten`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "amount": {
+    "type": "float",
+    "doc": "Amount to shorten progress by."
+  }
+}

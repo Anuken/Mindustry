@@ -20,6 +20,7 @@ public enum LogicRule{
     ban,
     unban,
     pauseDisabled,
+    musicVolume,
 
     //team specific
     buildSpeed,

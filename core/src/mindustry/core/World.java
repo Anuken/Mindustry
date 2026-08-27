@@ -308,17 +308,16 @@ public class World{
         boolean border = state.rules.limitMapArea;
         state.rules.limitMapArea = false;
 
-        //TODO duplicate code?
         for(Tile tile : tiles){
             if(getDarkness(tile.x, tile.y) >= 3){
                 continue;
             }
 
             Liquid liquid = tile.floor().liquidDrop;
-            if(tile.floor().itemDrop != null && tile.block().isStatic()) content.add(tile.floor().itemDrop);
-            if(tile.overlay().itemDrop != null && tile.block().isStatic()) content.add(tile.overlay().itemDrop);
+            if(tile.floor().itemDrop != null && !tile.block().isStatic()) content.add(tile.floor().itemDrop);
+            if(tile.overlay().itemDrop != null && !tile.block().isStatic()) content.add(tile.overlay().itemDrop);
             if(tile.wallDrop() != null) content.add(tile.wallDrop());
-            if(liquid != null && tile.block().isStatic()) content.add(liquid);
+            if(liquid != null && !tile.block().isStatic()) content.add(liquid);
         }
         state.rules.limitMapArea = border;
 

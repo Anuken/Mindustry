@@ -414,7 +414,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 t.left();
                 t.margin(10f);
 
-                if(name.length() > 0) t.add(name + ":").color(Pal.accent);
+                if(name.length() > 0) t.add(name).color(Pal.accent);
                 t.add().growX();
 
                 Cell<ImageButton> remove = null;
@@ -494,13 +494,13 @@ public class MapObjectivesDialog extends BaseDialog{
                         var style = Styles.cleart;
                         t.defaults().size(280f, 64f).pad(2f);
 
-                        t.button("@waves.copy", Icon.copy, style, () -> {
+                        t.button("@copy.clipboard", Icon.copy, style, () -> {
                             ui.showInfoFade("@copied");
                             Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
                             dialog.hide();
                         }).disabled(b -> canvas.objectives.isEmpty()).marginLeft(12f).row();
 
-                        t.button("@waves.load", Icon.download, style, () -> {
+                        t.button("@load.clipboard", Icon.download, style, () -> {
                             try{
                                 rebuildObjectives(new Seq<>(JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all));
                             }catch(Exception e){

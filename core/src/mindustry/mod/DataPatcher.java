@@ -8,6 +8,7 @@ import arc.util.serialization.Json.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.part.*;
@@ -22,6 +23,7 @@ import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
+import mindustry.world.modules.*;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -43,7 +45,6 @@ public class DataPatcher{
     private static final ObjectMap<String, ContentType> nameToType = new ObjectMap<>();
     private static DataPatcher currentDataPatcher;
     private static ContentParser parser = createParser();
-
 
     private boolean applied;
     private ContentLoader contentLoader;
@@ -92,7 +93,7 @@ public class DataPatcher{
     public void apply(Seq<PatchAsset> patches, Seq<ContentAsset> content, boolean reloadContentWorld){
         //if you're un-applying data patches, and it throws an error, just crash. this is not recoverable.
         if(applied){
-            unapply();
+            unapply(reloadContentWorld);
             applied = false;
         }
 
@@ -108,49 +109,6 @@ public class DataPatcher{
             Attribute.all = oldAttributes;
             Attribute.map = oldAttributeMap;
         });
-
-        //patches are read first.
-        for(var set : patches){
-            set.warnings.clear();
-            set.error = false;
-
-            try{
-                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
-                if(!(someValue instanceof JsonValue value)) throw new SerializationException("Patch must be a JSON object.");
-
-                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
-                    JsonValue req = value.get("requiredPlanets");
-                    value.remove("requiredPlanets");
-
-                    //this should be ignored unless this instance is a dedicated server
-                    if(Vars.headless){
-                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
-                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
-                            continue;
-                        }
-                    }
-                }
-
-                set.json = value;
-                currentlyApplyingPatch = set;
-                visitStack.clear();
-
-                set.name = value.getString("name", "");
-                value.remove("name"); //patchsets can have a name, ignore it if present
-                for(var child : value){
-                    assign(root, child.name, child, null, null, null);
-                }
-                currentlyApplyingPatch = null;
-
-            }catch(Exception e){
-                set.error = true;
-                set.name = "";
-                set.warnings.add(Strings.getSimpleMessage(e));
-                currentlyApplyingPatch = null;
-
-                Log.err("Failed to apply patch: " + set.patch, e);
-            }
-        }
 
         if(!content.isEmpty()){
             content.sort();
@@ -173,7 +131,8 @@ public class DataPatcher{
                 Fi file = new Fi(asset.path);
 
                 //this is very important for resizing various arrays used in the game
-                if((asset.type == ContentType.item || asset.type == ContentType.liquid)){
+                //checking for blocks is also important, as those can be added/removed, and corresponding blocks need to be updated
+                if(asset.type == ContentType.item || asset.type == ContentType.liquid || asset.type == ContentType.block){
                     needsArrayFix = true;
                 }
 
@@ -262,6 +221,52 @@ public class DataPatcher{
             if(reloadContentWorld) fixContentArrays();
         }
 
+        var patchIt = patches.iterator();
+        while(patchIt.hasNext()){
+            PatchAsset set = patchIt.next();
+
+            set.warnings.clear();
+            set.error = false;
+
+            try{
+                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                if(!(someValue instanceof JsonValue value)) throw new SerializationException("Patch must be a JSON object.");
+
+                if(Vars.state.rules.planet != null && value.has("requiredPlanets")){
+                    JsonValue req = value.get("requiredPlanets");
+                    value.remove("requiredPlanets");
+
+                    //this should be ignored unless this instance is a dedicated server
+                    if(Vars.headless){
+                        String[] planets = req.isArray() ? req.asStringArray() : new String[]{req.asString()};
+                        if(!Structs.contains(planets, Vars.state.rules.planet.name)){
+                            patchIt.remove();
+                            continue;
+                        }
+                    }
+                }
+
+                set.json = value;
+                currentlyApplyingPatch = set;
+                visitStack.clear();
+
+                set.name = value.getString("name", "");
+                value.remove("name"); //patchsets can have a name, ignore it if present
+                for(var child : value){
+                    assign(root, child.name, child, null, null, null);
+                }
+                currentlyApplyingPatch = null;
+
+            }catch(Exception e){
+                set.error = true;
+                set.name = "";
+                set.warnings.add(Strings.getSimpleMessage(e));
+                currentlyApplyingPatch = null;
+
+                Log.err("Failed to apply patch: " + set.patch, e);
+            }
+        }
+
         afterCallbacks.each(Runnable::run);
     }
 
@@ -316,11 +321,15 @@ public class DataPatcher{
     public static void fixContentArrays(){
         if(!needsArrayFix) return;
         int items = Vars.content.items().size, liquids = Vars.content.liquids().size;
+        ItemModule.empty.checkArrayCapacity(items);
 
         //block item/liquid filter
         for(var block : Vars.content.blocks()){
             //don't waste time resizing arrays for blocks that can't use them
             if(!block.synthetic()) continue;
+            if(block.lastConfig instanceof Content c && c.removed){
+                block.lastConfig = null;
+            }
 
             block.checkContentArrayCapacity(items, liquids);
         }
@@ -329,15 +338,44 @@ public class DataPatcher{
         if(!Vars.headless && Vars.ui != null && Vars.ui.editor != null && Vars.ui.editor.isShown()){
             int wh = Vars.world.width() * Vars.world.height();
             for(int i = 0; i < wh; i++){
-                var b = Vars.world.tiles.geti(i).build;
-                if(b != null && b.items != null) b.items.checkArrayCapacity(items);
-                if(b != null && b.liquids != null) b.liquids.checkArrayCapacity(items);
+                Tile tile = Vars.world.tiles.geti(i);
+
+                //stale checks for floor/overlay
+                if(tile.floor().removed) tile.setFloor(getReplacementBlock(tile.floor()).asFloor());
+                if(tile.overlay().removed) tile.setOverlay(getReplacementBlock(tile.overlay()).asFloor());
+
+                if(tile.block().removed){
+                    Block mapped = getReplacementBlock(tile.block());
+                    //tile refers to stale content; get rid of it.
+                    if(mapped == Blocks.air){
+                        tile.remove();
+                    }else{
+                        //update internal reference of block to point to the new one with correct ID
+                        tile.updateBlockReference(mapped);
+                    }
+                }
+
+                var b = tile.build;
+                if(b == null || !tile.isCenter()) continue;
+                if(b.items != null) b.items.checkArrayCapacity(items);
+                if(b.liquids != null) b.liquids.checkArrayCapacity(items);
             }
         }
 
         //TODO: this doesn't do anything about extensive ItemSeq usage across the codebase, which is limited to the campaign
         //TODO: this also doesn't change sectors
         needsArrayFix = false;
+    }
+
+    private static Block getReplacementBlock(Block existing){
+        Block other = Vars.content.block(existing.name);
+        if(other == null) return Blocks.air;
+        //make sure they are type compatible
+        if(other.getClass() == existing.getClass()){
+            return other;
+        }
+        //could not find an equivalent, clear it
+        return Blocks.air;
     }
 
     void visit(Object object){
@@ -603,6 +641,7 @@ public class DataPatcher{
                     Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, bl, "consumeBuilder").copy();
                     boolean hadItems = bl.hasItems, hadLiquids = bl.hasLiquids, hadPower = bl.hasPower, acceptedItems = bl.acceptsItems;
                     Runnable resetCons = () -> {
+                        if(bl.isPatchContent()) return; //useless
                         Reflect.set(Block.class, bl, "consumeBuilder", prevBuilder);
                         bl.reinitializeConsumers();
                         bl.hasItems = hadItems;
@@ -657,6 +696,7 @@ public class DataPatcher{
                 }else{
                     //assign each field manually
                     var childFields = parser.getJson().getFields(prevValue.getClass().isAnonymousClass() ? prevValue.getClass().getSuperclass() : prevValue.getClass());
+                    visit(prevValue);
 
                     for(var child : jsv){
                         if(child.name != null){

@@ -7,11 +7,8 @@ import arc.files.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Saves.*;
-import mindustry.io.*;
 import mindustry.net.*;
 import mindustry.ui.FileChooser.*;
 import mindustry.ui.*;
@@ -21,9 +18,7 @@ import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
 import rhino.*;
 
-import java.io.*;
 import java.util.*;
-import java.util.zip.*;
 
 import static mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.*;
@@ -198,17 +193,13 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options){
-        openURL(url);
+        handleAppURL(url);
         return false;
     }
 
     @Override
     public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions options){
         boolean b = super.didFinishLaunching(application, options);
-
-        if(options != null && options.has(UIApplicationLaunchOptions.Keys.URL())){
-            openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
-        }
 
         Events.on(ClientLoadEvent.class, e -> Core.app.post(() -> Core.app.post(() -> Core.scene.table(Styles.black9, t -> {
             t.visible(() -> {
@@ -223,36 +214,16 @@ public class IOSLauncher extends IOSApplication.Delegate{
         return b;
     }
 
-    void openURL(NSURL url){
+    void handleAppURL(NSURL url){
+        if(url == null) return;
+        try{
+            Fi file = new Fi(getDocumentsDirectory()).child(url.getLastPathComponent());
+            new Fi(url.getPath()).copyTo(file);
 
-        Core.app.post(() -> Core.app.post(() -> {
-            Fi file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
-            Core.files.absolute(url.getPath()).copyTo(file);
-
-            if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
-
-                try{
-                    if(SaveIO.isSaveValid(file)){
-                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
-                        if(meta.tags.containsKey("name")){
-                            //is map
-                            if(!ui.editor.isShown()){
-                                ui.editor.show();
-                            }
-
-                            ui.editor.beginEditMap(file);
-                        }else{
-                            SaveSlot slot = control.saves.importSave(file);
-                            ui.load.runLoadSave(slot);
-                        }
-                    }else{
-                        ui.showErrorMessage("@save.import.invalid");
-                    }
-                }catch(Throwable e){
-                    ui.showException("@save.import.fail", e);
-                }
-            }
-        }));
+            ClientLauncher.runOnClientLoad(() -> ClientLauncher.handleFileImport(file));
+        }catch(Exception e){
+            Log.err(e);
+        }
     }
 
     public static void main(String[] argv){

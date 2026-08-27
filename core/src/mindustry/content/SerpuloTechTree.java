@@ -499,30 +499,19 @@ public class SerpuloTechTree{
                                             new Research(thoriumReactor),
                                             new Research(coreNucleus)
                                             ), () -> {
-                                                node(littoralShipyard, Seq.with(
+                                                node(planetaryTerminal, Seq.with(
                                                 new SectorComplete(desolateRift),
-                                                new SectorComplete(navalFortress),
-                                                new Research(risso),
-                                                new Research(minke),
-                                                new Research(bryde),
-                                                new Research(sei),
-                                                new Research(spectre),
-                                                new Research(additiveReconstructor),
-                                                new Research(exponentialReconstructor)
+                                                new SectorComplete(nuclearComplex),
+                                                new SectorComplete(extractionOutpost),
+                                                new SectorComplete(mycelialBastion),
+                                                new SectorComplete(littoralShipyard),
+                                                new Research(omura),
+                                                new Research(advancedLaunchPad),
+                                                new Research(massDriver),
+                                                new Research(impactReactor),
+                                                new Research(tetrativeReconstructor)
                                                 ), () -> {
-                                                    node(planetaryTerminal, Seq.with(
-                                                    new SectorComplete(nuclearComplex),
-                                                    new SectorComplete(extractionOutpost),
-                                                    new SectorComplete(mycelialBastion),
-                                                    new SectorComplete(littoralShipyard),
-                                                    new Research(omura),
-                                                    new Research(advancedLaunchPad),
-                                                    new Research(massDriver),
-                                                    new Research(impactReactor),
-                                                    new Research(tetrativeReconstructor)
-                                                    ), () -> {
 
-                                                    });
                                                 });
                                             });
                                         });
@@ -692,7 +681,20 @@ public class SerpuloTechTree{
                                         new Research(multiplicativeReconstructor),
                                         new Research(exponentialReconstructor)
                                         ), () -> {
+                                            node(littoralShipyard, Seq.with(
+                                            new SectorComplete(desolateRift),
+                                            new SectorComplete(navalFortress),
+                                            new SectorComplete(mycelialBastion),
+                                            new Research(risso),
+                                            new Research(minke),
+                                            new Research(bryde),
+                                            new Research(sei),
+                                            new Research(spectre),
+                                            new Research(additiveReconstructor),
+                                            new Research(exponentialReconstructor)
+                                            ), () -> {
 
+                                            });
                                         });
                                     });
                                 });
