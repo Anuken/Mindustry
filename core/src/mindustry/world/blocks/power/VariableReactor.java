@@ -184,7 +184,7 @@ public class VariableReactor extends PowerGenerator{
             heat = read.f();
             instability = read.f();
             warmup = read.f();
-            if(revision >= 1){
+            if(revision >= 2){
                 requiredHeat = read.f();
             }
         }
