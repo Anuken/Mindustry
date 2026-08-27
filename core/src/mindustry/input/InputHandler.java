@@ -652,6 +652,9 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void unitEnteredPayload(Unit unit, Building build){
         if(unit == null || build == null || unit.team != build.team) return;
 
+        UnitPayload unitPay = new UnitPayload(unit);
+        if(!build.acceptPayload(build, unitPay)) return;
+
         unit.remove();
 
         //reset the enter command
@@ -665,12 +668,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Vars.netClient.clearRemovedEntity(unit.id);
         }
 
-        UnitPayload unitPay = new UnitPayload(unit);
-
-        if(build.acceptPayload(build, unitPay)){
-            Fx.unitDrop.at(build);
-            build.handlePayload(build, unitPay);
-        }
+        Fx.unitDrop.at(build);
+        build.handlePayload(build, unitPay);
     }
 
     @Remote(targets = Loc.client, called = Loc.server)

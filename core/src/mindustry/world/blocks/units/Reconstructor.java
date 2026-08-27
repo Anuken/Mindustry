@@ -181,7 +181,11 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean acceptUnitPayload(Unit unit){
-            return hasUpgrade(unit.type) && !upgrade(unit.type).isBanned();
+            var upgrade = upgrade(unit.type);
+            return hasUpgrade(unit.type) &&
+                upgrade != null &&
+                !upgrade.isBanned() &&
+                Units.canCreate(unit.team, upgrade);
         }
 
         public boolean canSetCommand(){
@@ -253,7 +257,8 @@ public class Reconstructor extends UnitBlock{
                 }
             }
 
-            return upgrade != null && (team.isAI() || upgrade.unlockedNowHost()) && !upgrade.isBanned();
+            return upgrade != null && (team.isAI() || upgrade.unlockedNowHost()) &&
+                !upgrade.isBanned() && Units.canCreate(pay.unit.team(), upgrade);
         }
 
         @Override
@@ -331,8 +336,10 @@ public class Reconstructor extends UnitBlock{
                         }
 
                         //upgrade the unit
-                        if(progress >= constructTime){
-                            payload.unit = upgrade(payload.unit.type).create(payload.unit.team());
+                        var target = upgrade(payload.unit.type);
+                        if(progress >= constructTime && target != null && !target.isBanned() &&
+                            Units.canCreate(payload.unit.team(), target)){
+                            payload.unit = target.create(payload.unit.team());
 
                             if(payload.unit.isCommandable()){
                                 if(commandPos != null){
@@ -366,7 +373,11 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            return constructing && enabled && team.activateUnitFactories();
+            if(payload == null) return false;
+
+            var target = upgrade(payload.unit.type);
+            return target != null && hasUpgrade(payload.unit.type) && enabled && team.activateUnitFactories() &&
+                !target.isBanned() && Units.canCreate(payload.unit.team(), target);
         }
 
         @Override
