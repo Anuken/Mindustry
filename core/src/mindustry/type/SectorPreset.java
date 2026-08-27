@@ -2,11 +2,14 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
+import mindustry.graphics.MultiPacker.*;
 import mindustry.maps.generators.*;
 import mindustry.mod.Mods.*;
 
@@ -41,6 +44,10 @@ public class SectorPreset extends UnlockableContent{
     public int originalPosition;
     /** Sectors that prevent this sector from being landed on until they are completed. */
     public Seq<Sector> shieldSectors = new Seq<>();
+    /** Set to false to disable outline generation. */
+    public boolean outline = true;
+    public int outlineRadius = 5;
+    public Color outlineColor = Pal.gray;
 
     private @Nullable String fileName;
 
@@ -68,15 +75,21 @@ public class SectorPreset extends UnlockableContent{
     }
 
     public void initialize(Planet planet, int sector){
+        initialize(planet, sector, false);
+    }
+
+    public void initialize(Planet planet, int sector, boolean override){
         this.planet = planet;
         if(generator == null){
             this.generator = new FileMapGenerator(fileName == null ? this.name : fileName, this);
         }
         this.originalPosition = sector;
-        //auto remap based on data
-        var data = planet.getData();
-        if(data != null){
-            sector = data.presets.get(name, sector);
+        if(!override){
+            //auto remap based on data
+            var data = planet.getData();
+            if(data != null){
+                sector = data.presets.get(name, sector);
+            }
         }
         sector %= planet.sectors.size;
         this.sector = planet.sectors.get(sector == -1 ? 0 : sector);
@@ -89,12 +102,29 @@ public class SectorPreset extends UnlockableContent{
     }
 
     @Override
+    public void removeContent(){
+        super.removeContent();
+        if(sector != null && sector.preset == this){
+            sector.preset = null;
+        }
+    }
+
+    @Override
     public void init(){
         super.init();
 
         //note that sectors can only have one visual shield target
         for(var other : shieldSectors){
             other.shieldTarget = sector;
+        }
+    }
+
+    @Override
+    public void createIcons(MultiPacker packer){
+        super.createIcons(packer);
+
+        if(outline && Core.atlas.has("sector-" + name)){
+            makeOutline(PageType.ui, packer, Core.atlas.find("sector-" + name), false, outlineColor, outlineRadius, outlineRadius);
         }
     }
 

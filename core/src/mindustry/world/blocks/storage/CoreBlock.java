@@ -81,6 +81,8 @@ public class CoreBlock extends StorageBlock{
         canOverdrive = false;
         commandable = true;
         envEnabled |= Env.space;
+        drawCached = false;
+        drawDynamic = true;
 
         //support everything
         replaceable = false;
@@ -844,7 +846,8 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void damage(float amount){
-            if(player != null && team == player.team()){
+            if(player != null && team == player.team() && control != null){
+                Vars.control.lastDamagedCore = this;
                 Events.fire(Trigger.teamCoreDamage);
             }
             super.damage(amount);

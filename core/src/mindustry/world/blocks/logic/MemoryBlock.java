@@ -33,6 +33,14 @@ public class MemoryBlock extends Block{
     }
 
     @Override
+    public double sense(LAccess sensor){
+        return switch(sensor){
+            case memoryCapacity -> memoryCapacity;
+            default -> super.sense(sensor);
+        };
+    }
+
+    @Override
     public boolean canBreak(Tile tile){
         return accessible();
     }
