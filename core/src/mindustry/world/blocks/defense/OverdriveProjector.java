@@ -25,6 +25,7 @@ public class OverdriveProjector extends Block{
     public float speedBoost = 1.5f;
     public float speedBoostPhase = 0.75f;
     public float useTime = 400f;
+    public float extraDuration = 10f;
     public float phaseRangeBoost = 20f;
     public boolean hasBoost = true;
     public Color baseColor = Color.valueOf("feb380");
@@ -81,7 +82,7 @@ public class OverdriveProjector extends Block{
     }
 
     public class OverdriveBuild extends Building implements Ranged{
-        public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency, useProgress;
+        public float heat, charge = Mathf.random(reload), durationTime, phaseHeat, smoothEfficiency, useProgress;
 
         @Override
         public float range(){
@@ -102,12 +103,13 @@ public class OverdriveProjector extends Block{
             if(hasBoost){
                 phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
             }
-
-            if(charge >= reload){
+            // prevents disable cheese
+            if(charge >= reload && durationTime < Time.time){
                 float realRange = range + phaseHeat * phaseRangeBoost;
 
                 charge = 0f;
-                indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 10f));
+                indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + extraDuration));
+                durationTime = Time.time + extraDuration;
             }
 
             if(efficiency > 0){
