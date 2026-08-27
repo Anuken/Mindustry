@@ -83,6 +83,7 @@ public class ControlPathfinder implements Runnable{
     private static final int updateStepInterval = 200;
     private static final int updateFPS = 30;
     private static final int updateInterval = 1000 / updateFPS, invalidateCheckInterval = 1000;
+    private static final PathfindResult pathResult = new PathfindResult();
 
     static final int clusterSize = 12;
 
@@ -316,6 +317,9 @@ public class ControlPathfinder implements Runnable{
 
                     for(var fields : controlPath.fieldList){
                         try{
+                            int mx = World.toTile(Core.input.mouseWorldX());
+                            int my = World.toTile(Core.input.mouseWorldY());
+                            int hoverValue = -100;
                             for(var entry : fields.fields){
                                 int cx = entry.key % controlPath.cwidth, cy = entry.key / controlPath.cwidth;
                                 for(int y = 0; y < clusterSize; y++){
@@ -325,8 +329,14 @@ public class ControlPathfinder implements Runnable{
                                         Lines.stroke(0.8f, Tmp.c1.fromHsv(value * 3f, 1f, 1f));
                                         Draw.alpha(0.5f);
                                         Fill.square((x + cx * clusterSize) * tilesize, (y + cy * clusterSize) * tilesize, tilesize / 2f);
+                                        if(mx == (x + cx * clusterSize) && my == (y + cy * clusterSize)){
+                                            hoverValue = value;
+                                        }
                                     }
                                 }
+                            }
+                            if(hoverValue > -100){
+                                Drawf.text(hoverValue + " / " + fields.cost.getCost(Team.sharded.id, pathfinder.get(mx, my)), Core.input.mouseWorldX(), Core.input.mouseWorldY(), Color.white);
                             }
                         }catch(Exception ignored){} //probably has some concurrency issues when iterating but I don't care, this is for debugging
                     }
@@ -1086,14 +1096,42 @@ public class ControlPathfinder implements Runnable{
         return raycast(unit.team().id, unit.type.pathCost, x1, y1, x2, y2);
     }
 
-    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
-        return getPathPosition(unit, destination, destination, out, noResultFound);
+    public static class PathfindResult{
+        /** If true, the request cannot be satisfied. */
+        public boolean unreachable;
+        /** If true, the request is ready to execute. */
+        public boolean move;
+        /** If move is true, this is the next tile to move on. Don't use this unless you know what you are doing. */
+        public @Nullable Tile next;
+        /** Destination vector. Only valid if move is true. */
+        public Vec2 dest = new Vec2();
     }
 
+    @Deprecated
+    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
+        var result = getPathPosition(unit, destination, destination);
+        out.set(result.dest);
+        if(noResultFound != null) noResultFound[0] = result.unreachable;
+        return result.move;
+    }
+
+    @Deprecated
     public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination, Vec2 out, @Nullable boolean[] noResultFound){
-        if(noResultFound != null){
-            noResultFound[0] = false;
-        }
+        var result = getPathPosition(unit, destination, mainDestination);
+        out.set(result.dest);
+        if(noResultFound != null) noResultFound[0] = result.unreachable;
+        return result.move;
+    }
+
+    public PathfindResult getPathPosition(Unit unit, Vec2 destination){
+        return getPathPosition(unit, destination, destination);
+    }
+
+    public PathfindResult getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination){
+        pathResult.unreachable = false;
+        pathResult.move = false;
+        pathResult.next = null;
+        pathResult.dest.setZero();
 
         int costId = unit.type.pathCostId;
         PathCost cost = idToCost(costId);
@@ -1137,8 +1175,9 @@ public class ControlPathfinder implements Runnable{
 
         //if the destination can be trivially reached in a straight line, do that.
         if(raycastResult){
-            out.set(destination);
-            return true;
+            pathResult.dest.set(destination);
+            pathResult.move = true;
+            return pathResult;
         }
 
         boolean any = false;
@@ -1154,7 +1193,7 @@ public class ControlPathfinder implements Runnable{
             FieldCache fieldCache = null;
             try{
                 fieldCache = fields.get(fieldKey);
-            }catch(ArrayIndexOutOfBoundsException ignored){ //TODO fix this, rare crash due to remove() elsewhere
+            }catch(Exception ignored){ //TODO fix this, rare crash due to remove() elsewhere
             }
             if(fieldCache == null) fieldCache = request.oldCache;
 
@@ -1221,6 +1260,7 @@ public class ControlPathfinder implements Runnable{
                                     recalc = true;
                                     any = true;
                                 }
+                                pathResult.next = current;
 
                                 break;
                             }else{
@@ -1250,9 +1290,10 @@ public class ControlPathfinder implements Runnable{
                     if(showDebug && Core.graphics.getFrameId() % 30 == 0){
                         Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
                     }
-                    out.set(request.lastTargetTile.worldx(), request.lastTargetTile.worldy());
+                    pathResult.dest.set(request.lastTargetTile.worldx(), request.lastTargetTile.worldy());
+                    pathResult.move = true;
                     request.lastTile = recalc ? -1 : initialTileOn.pos();
-                    return true;
+                    return pathResult;
                 }
             }
         }else{
@@ -1272,16 +1313,16 @@ public class ControlPathfinder implements Runnable{
                 recalculatePath(f);
             });
 
-            return false;
+            pathResult.move = false;
+            return pathResult;
         }
 
-        if(noResultFound != null){
-            noResultFound[0] = request.notFound;
-        }
-        return false;
+        pathResult.move = false;
+        pathResult.unreachable = request.notFound;
+        return pathResult;
     }
 
-    private void recalculatePath(PathRequest request){
+    private void recalculatePath(ControlPathfinder.PathRequest request){
         initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % wwidth, request.destination / wwidth);
     }
 
@@ -1326,30 +1367,6 @@ public class ControlPathfinder implements Runnable{
         }
 
         return true;
-    }
-
-    /** @return 0 if nothing was hit, otherwise the packed coordinates. This is an internal function and will likely be moved - do not use!*/
-    public static int raycastFast(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = world.width(), wh = world.height();
-        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
-        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
-        int err = dx - dy;
-
-        while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(solid(team, type, x + y * wwidth, true)) return Point2.pack(x, y);
-            if(x == x2 && y == y2) return 0;
-
-            //no diagonals
-            if(2 * err + dy > dx - 2 * err){
-                err -= dy;
-                x += sx;
-            }else{
-                err += dx;
-                y += sy;
-            }
-        }
-
-        return 0;
     }
 
     /** @return 0 if nothing was hit, otherwise the packed coordinates. This is an internal function and will likely be moved - do not use!*/

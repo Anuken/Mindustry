@@ -10,7 +10,7 @@ public class SectorPresets{
     groundZero,
     crateredBattleground, biomassFacility, taintedWoods, frozenForest, ruinousShores, facility32m, windsweptIslands, stainedMountains, tarFields,
     frontier, fungalPass, infestedCanyons, atolls, sunkenPier, mycelialBastion, extractionOutpost, saltFlats, testingGrounds, overgrowth,
-    impact0078, desolateRift, fallenVessel, nuclearComplex, planetaryTerminal,
+    impact0078, desolateRift, nuclearComplex, planetaryTerminal,
     coastline, navalFortress, weatheredChannels, perilousHarbor, littoralShipyard,
 
     onset, aegis, lake, intersect, basin, atlas, split, marsh, peaks, ravine, caldera,
@@ -144,11 +144,6 @@ public class SectorPresets{
             difficulty = 8;
         }};
 
-        fallenVessel = new SectorPreset("fallenVessel", serpulo, -1){{
-            captureWave = 70;
-            difficulty = 9;
-        }};
-
         nuclearComplex = new SectorPreset("nuclearComplex", serpulo, 130){{
             captureWave = 50;
             difficulty = 7;
@@ -161,18 +156,6 @@ public class SectorPresets{
         planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
             difficulty = 10;
             isLastSector = true;
-        }};
-
-        new SectorPreset("geothermalStronghold", serpulo, 264){{
-            requireUnlock = false;
-            difficulty = 10;
-            showHidden = true;
-        }};
-
-        new SectorPreset("cruxscape", serpulo, 54){{
-            requireUnlock = false;
-            difficulty = 10;
-            showHidden = true;
         }};
 
         SectorSubmissions.registerSectors();

@@ -2,6 +2,7 @@ package mindustry.logic;
 
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 
@@ -75,6 +76,11 @@ public class LParser{
             //legacy name change
             tokens[1] = opNameChanges.get(tokens[1], tokens[1]);
         }
+        if(tokens[0].equals("status")){
+            if(Vars.content.statusEffect(tokens[1]) != null){
+                tokens[1] = "@status-" + tokens[1];
+            }
+        }
     }
 
     /** Reads the next statement until EOL/EOF. */
@@ -118,7 +124,11 @@ public class LParser{
                 if(jumpLocations.size >= maxJumps){
                     error("Too many jump locations. Max jumps: " + maxJumps);
                 }
-                jumpLocations.put(tokens[0].substring(0, tokens[0].length() - 1), line);
+                String label = tokens[0].substring(0, tokens[0].length() - 1);
+                if(jumpLocations.containsKey(label)){
+                    error("Jump label already defined: \"" + label + "\".");
+                }
+                jumpLocations.put(label, line);
             }else{
                 boolean wasJump;
                 String jumpLoc = null;

@@ -1,7 +1,6 @@
 package mindustry.input;
 
 import arc.*;
-import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -78,6 +77,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** If true, there is a cutscene currently occurring in logic. */
     public boolean logicCutscene;
+    public boolean logicHideHud;
     public Vec2 logicCamPan = new Vec2();
     public float logicCamSpeed = 0.1f;
     public float logicCutsceneZoom = -1f;
@@ -144,15 +144,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         });
 
-        Events.on(WorldLoadEvent.class, e -> {
-            playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
-            selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
-            createPlanLists();
-        });
+        Events.on(WorldLoadEvent.class, e -> initQuadtrees());
 
-        Events.on(ResetEvent.class, e -> {
-            reset();
-        });
+        Events.on(ResetEvent.class, e -> reset());
+    }
+
+    protected void initQuadtrees(){
+        playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+        selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+        createPlanLists();
     }
 
     //methods to override
@@ -284,15 +284,13 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void pingLocation(Player player, float x, float y, @Nullable String text){
-        if(player != null && Vars.player != null && player.team() == Vars.player.team()){
-            if(net.server() && !netServer.admins.allowAction(player, ActionType.pingLocation, event -> {
-                event.pingX = x;
-                event.pingY = y;
-                event.pingText = text;
-            })){
-                throw new ValidateException(player, "Player was not allowed to ping a location.");
-            }
+        if(net.server() && !netServer.admins.allowAction(player, ActionType.pingLocation, event -> {
+            event.pingX = x;
+            event.pingY = y;
+            event.pingText = text;
+        })) throw new ValidateException(player, "Player was not allowed to ping a location.");
 
+        if(player != null && Vars.player != null && player.team() == Vars.player.team()){
             player.pingX = x;
             player.pingY = y;
             player.pingTime = 1f;
@@ -322,6 +320,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Vec2 targetAsVec = new Vec2().set(teamTarget != null ? teamTarget : posTarget);
         Seq<Unit> toAdd = queuedCommands.get(targetAsVec, Seq::new);
         boolean anyCommandedTarget = false;
+
+        if(unitTarget != null || buildTarget != null){
+            Events.fire(Trigger.unitCommandAttack);
+        }else{
+            Events.fire(Trigger.unitCommandPosition);
+        }
 
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
@@ -409,6 +413,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(net.server() && !netServer.admins.allowAction(player, ActionType.commandUnits, event -> {
             event.unitIDs = unitIds;
+            event.unitCommand = command;
         })){
             throw new ValidateException(player, "Player cannot command units.");
         }
@@ -589,6 +594,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)){
                     pay.pickup(build);
                 }else{
+                    Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
                     Fx.unitPickup.at(build);
                     build.tile.remove();
                 }
@@ -597,6 +603,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(current != null && pay.canPickupPayload(current)){
                     Payload taken = build.takePayload();
                     if(taken != null){
+                        Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
                         pay.addPayload(taken);
                         Fx.unitPickup.at(build);
                     }
@@ -604,6 +611,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
         }else if(build != null && onGround){
+            Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
             Fx.unitPickup.at(build);
             build.tile.remove();
         }
@@ -733,19 +741,19 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Events.fire(new TapEvent(player, tile));
     }
 
-    @Remote(targets = Loc.both, called = Loc.server, forward = true)
+    @Remote(targets = Loc.both, called = Loc.server)
     public static void buildingControlSelect(Player player, Building build){
         if(player == null || build == null || player.dead()) return;
 
         //make sure player is allowed to control the building
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.buildSelect, action -> action.tile = build.tile)){
+        if(net.server() && (!state.rules.possessionAllowed && player.bestCore() != build  || !netServer.admins.allowAction(player, ActionType.buildSelect, action -> action.tile = build.tile))){
             throw new ValidateException(player, "Player cannot control a building.");
         }
 
         if(player.team() == build.team && build.canControlSelect(player.unit())){
             var before = player.unit();
 
-            build.onControlSelect(player.unit());
+            Call.unitBuildingControlSelect(player.unit(), build);
 
             if(!before.dead && before.spawnedByCore && !before.isPlayer()){
                 Call.unitDespawn(before);
@@ -883,10 +891,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void updateSelectQuadtree(){
-        selectPlanTree.clear();
-        for(var plan : selectPlans){
-            selectPlanTree.insert(plan);
-        }
+        selectPlanTree.fill(selectPlans);
     }
 
     /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
@@ -914,6 +919,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void reset(){
         logicCutscene = false;
+        logicHideHud = false;
         commandBuildings.clear();
         selectedUnits.clear();
         itemDepositCooldown = 0f;
@@ -921,6 +927,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lastUnit = null;
         lastPlans.clear();
         player.shooting = false;
+        player.pingTime = 0f;
     }
 
     public void getSyncedPlans(Seq<BuildPlan> out){
@@ -1038,8 +1045,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             Call.requestUnitPayload(player, target);
         }else{
             Building build = world.buildWorld(pay.x(), pay.y());
+            if(build == null) return;
+            Payload current = build.getPayload();
 
-            if(build != null && state.teams.canInteract(unit.team, build.team)){
+            if(state.teams.canInteract(unit.team, build.team) &&
+                ((current != null && pay.canPickupPayload(current)) || (build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)))){
                 Call.requestBuildPayload(player, build);
             }
         }
@@ -1047,7 +1057,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void tryDropPayload(){
         Unit unit = player.unit();
-        if(!(unit instanceof Payloadc)) return;
+        if(!(unit instanceof Payloadc pay) || !pay.canDropPayload()) return;
 
         Call.requestDropPayload(player, player.x, player.y);
     }
@@ -1170,12 +1180,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int[] ids = new int[selectedUnits.size];
                 for(int i = 0; i < ids.length; i++){
                     ids[i] = selectedUnits.get(i).id;
-                }
-
-                if(attack != null){
-                    Events.fire(Trigger.unitCommandAttack);
-                }else{
-                    Events.fire(Trigger.unitCommandPosition);
                 }
 
                 int maxChunkSize = 200;
@@ -1405,10 +1409,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         plan.animScale = prev.animScale;
                     }
                 }
-                player.previewPlanTree.clear();
-                for(BuildPlan plan : plans){
-                    player.previewPlanTree.insert(plan);
-                }
+                player.previewPlanTree.fill(plans);
             }
 
             BuildPlan current = player.isBuilder() ? player.unit().buildPlan() : null;
@@ -1422,7 +1423,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     overlappingPlayer= player;
                 }
 
-                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f * Time.delta);
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f);
                 plan.block.drawOtherPlayerPlan(plan, player.planEachable, overlappingPlan == plan ? 0.7f : 0.25f);
             });
         });
@@ -1988,10 +1989,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (config.isShown() && config.getSelected().onConfigureBuildTapped(build) && build.shouldShowConfigure(player))){
-                AudioBus oldBus = build.block.configureSound.bus;
-                build.block.configureSound.bus = control.sound.uiBus;
-                build.block.configureSound.at(build);
-                build.block.configureSound.bus = oldBus;
+                build.block.configureSound.at(build.x, build.y, 1f, 1f, control.sound.uiBus);
                 config.showConfig(build);
             }
             //otherwise...
@@ -2070,9 +2068,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     boolean tryRepairDerelict(Tile selected){
-        if(!player.dead() && selected != null && !state.rules.editor && player.team() != Team.derelict && selected.build != null && selected.build.block.unlockedNow() && selected.build.team == Team.derelict &&
-            Build.validPlace(selected.block(), player.team(), selected.build.tileX(), selected.build.tileY(), selected.build.rotation)){
-
+        if(canRepairDerelict(selected)){
             player.unit().addBuild(new BuildPlan(selected.build.tileX(), selected.build.tileY(), selected.build.rotation, selected.block(), selected.build.config()));
             return true;
         }
@@ -2266,6 +2262,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             config.build(group);
             planConfig.build(group);
         }
+
+        initQuadtrees();
     }
 
     public boolean canShoot(){

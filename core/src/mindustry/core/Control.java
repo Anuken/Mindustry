@@ -52,6 +52,7 @@ public class Control implements ApplicationListener, Loadable{
     public SoundControl sound;
     public InputHandler input;
     public AttackIndicators indicators;
+    public @Nullable CoreBuild lastDamagedCore; //TODO not sure where else to put this
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
@@ -146,7 +147,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
-            if(state.rules.pvp && !net.active() && !state.rules.pauseDisabled){
+            if(state.rules.pvp && !net.active() && !state.rules.pauseDisabled && !state.isEditor() && !ui.editor.isShown()){
                 try{
                     net.host(port);
                     player.admin = true;
@@ -400,10 +401,13 @@ public class Control implements ApplicationListener, Loadable{
         ui.loadAnd(() -> {
             logic.reset();
             world.loadMap(map, rules);
+            var oldRules = state.rules;
+            rules.retainContentFields(oldRules);
             state.rules = rules;
             if(playtest) state.playtestingMap = map;
             state.rules.sector = null;
             state.rules.editor = false;
+            Events.fire(new RulesLoadEvent(state.rules));
             logic.play();
             if(settings.getBool("savecreate") && !world.isInvalidMap() && !playtest){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
@@ -543,6 +547,7 @@ public class Control implements ApplicationListener, Loadable{
                             });
                         }
                     }else{
+                        Events.fire(new RulesLoadEvent(state.rules, true));
                         state.set(State.playing);
                         reloader.end();
                     }
@@ -577,6 +582,7 @@ public class Control implements ApplicationListener, Loadable{
             beforePlay.run();
         }
 
+        Events.fire(new RulesLoadEvent(state.rules));
         logic.play();
         control.saves.saveSector(sector);
         Events.fire(new SectorLaunchEvent(sector));
@@ -683,11 +689,7 @@ public class Control implements ApplicationListener, Loadable{
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");
-            if(full){
-                graphics.setWindowedMode(graphics.getWidth(), graphics.getHeight());
-            }else{
-                graphics.setFullscreen();
-            }
+            graphics.setFullscreen(!full);
             settings.put("fullscreen", !full);
         }
 
@@ -697,6 +699,10 @@ public class Control implements ApplicationListener, Loadable{
         }
         if(Float.isNaN(camera.position.x)) camera.position.x = world.unitWidth()/2f;
         if(Float.isNaN(camera.position.y)) camera.position.y = world.unitHeight()/2f;
+
+        if(!scene.hasKeyboard()){
+            if(Core.input.keyTap(Binding.performanceMetrics)) Core.settings.toggle("showperformance");
+        }
 
         if(state.isGame()){
             input.update();
@@ -737,7 +743,7 @@ public class Control implements ApplicationListener, Loadable{
                 state.set(State.paused);
             }
 
-            if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown() && !ui.minimapfrag.shown()){
+            if((input instanceof DesktopInput ? Core.input.keyTap(Binding.menu) : Core.input.keyTap(KeyCode.back)) && !ui.restart.isShown() && !ui.minimapfrag.shown()){
                 if(ui.chatfrag.shown()){
                     ui.chatfrag.hide();
                 }else if(!ui.paused.isShown() && !scene.hasDialog()){

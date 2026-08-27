@@ -52,6 +52,7 @@ public class LogicDisplay extends Block{
 
     public int displaySize = 64;
     public float scaleFactor = 1f;
+    public Color backgroundColor = Pal.darkerMetal;
 
     static{
         Events.on(ResetEvent.class, e -> displays.clear());
@@ -81,7 +82,7 @@ public class LogicDisplay extends Block{
         clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
     }
 
-    public class LogicDisplayBuild extends Building{
+    public class LogicDisplayBuild extends Building implements LDrawable{
         //The root display (bottom left corner of display for tileable displays)
         public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
@@ -121,7 +122,13 @@ public class LogicDisplay extends Block{
             };
         }
 
-        public void flushCommands(LongSeq graphicsBuffer){
+        @Override
+        public boolean drawable(LExecutor exec){
+            return isValid() && (exec.privileged || (team == exec.team && !privileged));
+        }
+
+        @Override
+        public void draw(LongSeq graphicsBuffer){
             int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
 
             for(int i = 0; i < added; i++){
@@ -135,7 +142,7 @@ public class LogicDisplay extends Block{
             if(buffer == null){
                 buffer = new FrameBuffer(displaySize, displaySize);
                 //clear the buffer - some OSs leave garbage in it
-                buffer.begin(Pal.darkerMetal);
+                buffer.begin(backgroundColor);
                 buffer.end();
             }
         }

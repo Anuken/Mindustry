@@ -18,6 +18,7 @@ import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.power.*;
 
 import static mindustry.Vars.*;
 
@@ -26,7 +27,9 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     private static final TilePreChangeEvent preChange = new TilePreChangeEvent();
     private static final TileFloorChangeEvent floorChange = new TileFloorChangeEvent();
     private static final TileOverlayChangeEvent overlayChange = new TileOverlayChangeEvent();;
+
     private static final ObjectSet<Building> tileSet = new ObjectSet<>();
+    private static final IntSet staleGraphs = new IntSet();
 
     /**
      * Extra data for specific blocks. Only saved if Block#saveData is true.
@@ -156,6 +159,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return 0;
     }
 
+    public boolean inMapArea(){
+        return !state.rules.limitMapArea || Rect.contains(state.rules.limitX , state.rules.limitY , state.rules.limitWidth, state.rules.limitHeight, x, y);
+    }
+
     public float worldx(){
         return x * tilesize;
     }
@@ -187,6 +194,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public Floor overlay(){
         return overlay;
+    }
+
+    /** Internal method for data patches - do not use!! */
+    public void updateBlockReference(Block block){
+        this.block = block;
     }
 
     @SuppressWarnings("unchecked")
@@ -460,6 +472,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         return !block.solid && (floor.isDeep() || floor.damages());
     }
 
+    public boolean isDeep(){
+        return block == Blocks.air && floor.isDeep();
+    }
+
     /**
      * Iterates through the list of all tiles linked to this multiblock, or just itself if it's not a multiblock.
      * The result contains all linked tiles, including this tile itself.
@@ -717,6 +733,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     @Override
+    public boolean displayable(){
+        return (drop() != null && block == Blocks.air) || wallDrop() != null || (floor().liquidDrop != null && block == Blocks.air);
+    }
+
+    @Override
     public float getX(){
         return drawx();
     }
@@ -769,6 +790,44 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
     }
 
+    /** Fills an area. x2/y2 are inclusive.*/
+    @Remote(called = Loc.server)
+    public static void fillTileBlocks(int x, int y, int x2, int y2, Block block, Team team){
+        for(int tx = x; tx <= x2; tx++){
+            for(int ty = y; ty <= y2; ty++){
+                Tile tile = world.tile(tx, ty);
+                if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
+                tile.setBlock(block, team, 0);
+            }
+        }
+    }
+
+    /** Fills an area. x2/y2 are inclusive.*/
+    @Remote(called = Loc.server)
+    public static void fillTileFloors(int x, int y, int x2, int y2, Block block){
+        if(!(block instanceof Floor floor)) return;
+        for(int tx = x; tx <= x2; tx++){
+            for(int ty = y; ty <= y2; ty++){
+                Tile tile = world.tile(tx, ty);
+                if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
+                tile.setFloor(floor);
+            }
+        }
+    }
+
+    /** Fills an area. x2/y2 are inclusive.*/
+    @Remote(called = Loc.server)
+    public static void fillTileOverlays(int x, int y, int x2, int y2, Block block){
+        if(!(block instanceof OverlayFloor floor)) return;
+        for(int tx = x; tx <= x2; tx++){
+            for(int ty = y; ty <= y2; ty++){
+                Tile tile = world.tile(tx, ty);
+                if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
+                tile.setOverlay(floor);
+            }
+        }
+    }
+
     @Remote(called = Loc.server)
     public static void setFloor(Tile tile, Block floor, Block overlay){
         tile.setFloor(floor.asFloor());
@@ -801,11 +860,58 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     @Remote(called = Loc.server)
     public static void setTeams(int[] positions, Team team){
         if(positions == null) return;
+
+        staleGraphs.clear();
+        tileSet.clear();
+
         for(int pos : positions){
-            Tile tile = world.tile(pos);
-            if(tile != null && tile.build != null){
-                tile.build.changeTeam(team);
+            var build = world.build(pos);
+            if(build != null){
+                var power = build.power;
+                if(build.power != null){
+                    staleGraphs.add(build.power.graph.getID());
+
+                    for(int i = 0; i < power.links.size; i++){
+                        var other = world.build(power.links.items[i]);
+                        if(other != null && other.power != null){
+                            tileSet.add(other);
+                            staleGraphs.add(other.power.graph.getID());
+                        }
+                    }
+                }
+                build.changeTeam(team, false);
             }
+        }
+
+        for(var external : tileSet){
+            reflowPower(team, external);
+        }
+
+        //update power graphs in a second pass
+        for(int pos : positions){
+            var build = world.build(pos);
+            reflowPower(team, build);
+        }
+    }
+
+    private static void reflowPower(Team team, Building build){
+        if(build != null && build.power != null && staleGraphs.contains(build.power.graph.getID())){
+            for(int i = 0; i < build.power.links.size; i++){
+                var other = world.build(build.power.links.items[i]);
+
+                //only reflow links that were connected to the old power graph; ones that have a new one were already covered.
+                if(other != null && other.team != team && other.power != null && staleGraphs.contains(other.power.graph.getID())){
+                    build.power.links.removeIndex(i);
+                    other.power.links.removeValue(build.pos());
+
+                    new PowerGraph().reflow(other);
+
+                    i --;
+                }
+            }
+            new PowerGraph().reflow(build);
+
+            build.updatePowerGraph();
         }
     }
 

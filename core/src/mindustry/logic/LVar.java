@@ -1,6 +1,7 @@
 package mindustry.logic;
 
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
@@ -65,6 +66,11 @@ public class LVar{
         return isobj ? objval != null ? 1 : 0 : invalid(numval) ? 0 : (float)numval;
     }
 
+    /** @return float number converted from tile (logic) to world coordinates */
+    public float numfWorld(){
+        return World.unconv(numf());
+    }
+
     /** Get float value from variable, convert null to NaN to handle it differently in some instructions */
     public float numfOrNan(){
         return isobj ? objval != null ? 1 : Float.NaN : invalid(numval) ? 0 : (float)numval;
@@ -99,6 +105,17 @@ public class LVar{
     public void setconst(Object value){
         objval = value;
         isobj = true;
+    }
+
+    public void setlink(Object value){
+        isobj = true;
+        if(value == null){
+            objval = null;
+            constant = false;   //convert a former linked block into a regular variable
+        }else{
+            objval = value;
+            constant = true;    //make this variable a linked block
+        }
     }
 
     public void set(LVar other){

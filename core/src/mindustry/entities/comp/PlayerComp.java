@@ -142,7 +142,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
     }
 
     public boolean displayAmmo(){
-        return unit instanceof BlockUnitc || state.rules.unitAmmo;
+        return unit instanceof BlockUnitc;
     }
 
     public void reset(){
@@ -304,6 +304,11 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             unit.team(team);
             unit.controller(this);
 
+            //this player just became remote, snap the interpolation so it doesn't go wild
+            if(unit.isRemote() && !net.client()){
+                unit.snapInterpolation();
+            }
+
             //reset selected block when switching units
             if(!headless && isLocal()){
                 control.input.block = null;
@@ -351,8 +356,12 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         drawName();
     }
 
+    public boolean isPinging(){
+        return pingTime > 0f;
+    }
+
     void drawPing(){
-        if(pingTime <= 0f || !renderer.showPings || name == null || team != Vars.player.team()) return;
+        if(pingTime <= 0f || !renderer.showPings || name == null || (!state.rules.showOtherTeamPings && team != Vars.player.team())) return;
 
         float alpha = Math.min(Interp.pow5Out.apply(Mathf.clamp(Mathf.map(pingTime, 1f / 20f, 0f, 1f, 0f))), Interp.pow5Out.apply(Mathf.map(pingTime, 1f, 0.98f, 0f, 1f)));
 

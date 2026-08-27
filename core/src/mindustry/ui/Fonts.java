@@ -153,8 +153,8 @@ public class Fonts{
         glyph.v = region.v2;
         glyph.u2 = region.u2;
         glyph.v2 = region.v;
-        glyph.xoffset = 0;
-        glyph.yoffset = -size;
+        glyph.xoffset = (size - glyph.width) / 2;
+        glyph.yoffset = (size - glyph.height) / 2 - size;
         glyph.xadvance = size;
         glyph.kerning = null;
         glyph.fixedWidth = true;

@@ -94,7 +94,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             t.button("@editor.import", Icon.download, () -> createDialog("@editor.import",
                 "@editor.importmap", "@editor.importmap.description", Icon.download, (Runnable)loadDialog::show,
                 "@editor.importfile", "@editor.importfile.description", Icon.file, (Runnable)() ->
-                platform.showFileChooser(true, mapExtension, file -> ui.loadAnd(() -> {
+                FileChooser.open(mapExtension).submit(file -> ui.loadAnd(() -> {
                     maps.tryCatchMapError(() -> {
                         if(MapIO.isImage(file)){
                             ui.showInfo("@editor.errorimage");
@@ -105,7 +105,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 })),
 
                 "@editor.importimage", "@editor.importimage.description", Icon.fileImage, (Runnable)() ->
-                platform.showFileChooser(true, "png", file ->
+                FileChooser.open("png").submit(file ->
                 ui.loadAnd(() -> {
                     try{
                         Pixmap pixmap = new Pixmap(file);
@@ -124,9 +124,9 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             t.button("@editor.export", Icon.upload, () -> createDialog("@editor.export",
             "@editor.exportfile", "@editor.exportfile.description", Icon.file,
-                (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
+                (Runnable)() -> FileChooser.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
             "@editor.exportimage", "@editor.exportimage.description", Icon.fileImage,
-                (Runnable)() -> platform.export(editor.tags.get("name", "unknown"), "png", file -> {
+                (Runnable)() -> FileChooser.export(editor.tags.get("name", "unknown"), "png", file -> {
                     Pixmap out = MapIO.writeImage(editor.tiles());
                     file.writePng(out);
                     out.dispose();
@@ -350,7 +350,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }
 
-            Groups.build.clear();
             Groups.weather.clear();
             logic.play();
 
@@ -429,7 +428,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                     editor.tags.put("steamid", map.tags.get("steamid"));
                     workshop = true;
                 }
-                returned = maps.saveMap(editor.tags);
+                returned = maps.saveMap(editor.tags, false);
                 if(workshop){
                     returned.workshop = workshop;
                 }
@@ -788,7 +787,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
     }
 
     private void tryExit(){
-        ui.showConfirm("@confirm", "@editor.unsaved", this::hide);
+        ui.showConfirm("@confirm", "@editor.unsaved", () -> {
+            //clears data patches
+            logic.reset();
+            hide();
+        });
     }
 
     private void addBlockSelection(Table cont){
@@ -831,6 +834,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
         rebuildBlockSelection("");
     }
 
+    public void rebuildBlockSelection(){
+        rebuildBlockSelection("");
+    }
+
     private void rebuildBlockSelection(String searchText){
         blockSelection.clear();
 
@@ -847,13 +854,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         int i = 0;
+        String search = searchText.trim().replaceAll(" +", " ").toLowerCase();
 
         for(Block block : blocksOut){
             TextureRegion region = block.uiIcon;
 
             if(!Core.atlas.isFound(region) || !block.inEditor
                     || block.buildVisibility == BuildVisibility.debugOnly
-                    || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
+                    || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(search))
             ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
@@ -862,8 +870,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(editor.drawBlock == block));
             blockSelection.add(button).size(50f).tooltip(block.localizedName);
-
-            if(i == 0) editor.drawBlock = block;
 
             int cols = mobile ? 4 : 6;
 

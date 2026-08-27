@@ -182,7 +182,7 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Item itemDrop = null;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    /** Array of affinities to certain things. */
+    /** Affinities for floors. */
     public Attributes attributes = new Attributes();
     /** Health per square tile that this block occupies; essentially, this is multiplied by size * size. Overridden if health is > 0. If <0, the default is 40. */
     public float scaledHealth = -1;
@@ -229,8 +229,14 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean crushFragile = false;
     /** Max of timers used. */
     public int timers = 0;
-    /** Cache layer. Only used for 'cached' rendering. */
+    /** Cache layer. Only used for 'cached' rendering of blocks (not buildings). */
     public CacheLayer cacheLayer = CacheLayer.normal;
+    /** If true, draw() will be called on the building. */
+    public boolean drawDynamic = true;
+    /** If enabled, drawCached() will be called on the building. */
+    public boolean drawCached = false;
+    /** */
+    public BuildingCacheLayer buildingCacheLayer = BuildingCacheLayer.normal;
     /** Special flag; if false, floor will be drawn under this block even if it is cached. */
     public boolean fillsTile = true;
     /** If true, this block can be covered by darkness / fog even if synthetic. */
@@ -438,13 +444,25 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public void drawBase(Tile tile){
-        //delegates to entity unless it is null
+        //delegates to building unless it is null
         if(tile.build != null){
             tile.build.draw();
         }else{
             Draw.rect(
                 variants == 0 ? region :
                 variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))],
+            tile.drawx(), tile.drawy());
+        }
+    }
+
+    public void drawBaseCached(Tile tile){
+        //delegates to building unless it is null
+        if(tile.build != null){
+            tile.build.drawCached();
+        }else{
+            Draw.rect(
+            variants == 0 ? region :
+            variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))],
             tile.drawx(), tile.drawy());
         }
     }
@@ -743,6 +761,9 @@ public class Block extends UnlockableContent implements Senseable{
         offset = ((size + 1) % 2) * tilesize / 2f;
         sizeOffset = -((size - 1) / 2);
 
+        itemFilter = new boolean[content.items().size];
+        liquidFilter = new boolean[content.liquids().size];
+
         if(consumeBuilder.size != 0){
             for(var consume : consumeBuilder){
                 consume.apply(this);
@@ -838,7 +859,7 @@ public class Block extends UnlockableContent implements Senseable{
         Draw.rect(reg, plan.drawx(), plan.drawy(), !rotate || !rotateDraw ? 0 : plan.rotation * 90);
 
         if(plan.worldContext && player != null && teamRegion != null && teamRegion.found()){
-            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color);
+            if(teamRegions[player.team().id] == teamRegion) Draw.color(player.team().color, a);
             Draw.rect(teamRegions[player.team().id], plan.drawx(), plan.drawy());
             Draw.color(1f, 1f, 1f, a);
         }
@@ -1005,6 +1026,14 @@ public class Block extends UnlockableContent implements Senseable{
     @Override
     public boolean isBanned(){
         return state.rules.isBanned(this);
+    }
+
+    public boolean isOverPlacementLimit(Team team){
+        if(!state.rules.editor && !team.isAI()){
+            int limit = state.rules.blockLimits.get(this, 0);
+            return limit > 0 && team.data().getBuildings(this).size >= limit;
+        }
+        return false;
     }
 
     /** @return whether this block supports a specific environment. */
@@ -1473,6 +1502,11 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
+    public void checkContentArrayCapacity(int items, int liquids){
+        if(liquidFilter.length != liquids) liquidFilter = Arrays.copyOf(liquidFilter, liquids);
+        if(itemFilter.length != items) itemFilter = Arrays.copyOf(itemFilter, items);
+    }
+
     @Override
     public void load(){
         super.load();
@@ -1514,7 +1548,7 @@ public class Block extends UnlockableContent implements Senseable{
         super.createIcons(packer);
 
         if(!synthetic()){
-            PixmapRegion image = Core.atlas.getPixmap(fullIcon);
+            PixmapRegion image = packer.get(fullIcon);
             mapColor.set(image.get(image.width/2, image.height/2));
         }
 
@@ -1525,7 +1559,7 @@ public class Block extends UnlockableContent implements Senseable{
             for(Team team : Team.all){
                 //if there's an override, don't generate anything
                 if(team.hasPalette && !Core.atlas.has(name + "-team-" + team.name)){
-                    var base = Core.atlas.getPixmap(teamRegion);
+                    var base = packer.get(teamRegion);
                     Pixmap out = new Pixmap(base.width, base.height);
 
                     for(int x = 0; x < base.width; x++){
@@ -1560,20 +1594,22 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(outlineIcon){
             AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1];
-            PixmapRegion region = Core.atlas.getPixmap(atlasRegion);
-            Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
-            Drawf.checkBleed(out);
-            packer.add(PageType.main, atlasRegion.name, out);
-            toDispose.add(out);
+            if(atlasRegion.found()){
+                PixmapRegion region = packer.get(atlasRegion);
+                Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
+                Drawf.checkBleed(out);
+                packer.add(PageType.main, atlasRegion.name, out);
+                toDispose.add(out);
+            }
         }
 
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
         for(var region : toOutline){
-            if(region instanceof AtlasRegion atlas){
+            if(region instanceof AtlasRegion atlas && atlas.found()){
                 String regionName = atlas.name;
-                Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
+                Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
                 Drawf.checkBleed(outlined);
 
@@ -1582,20 +1618,22 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        if(gen.length > 1){
-            Pixmap base = Core.atlas.getPixmap(gen[0]).crop();
-            for(int i = 1; i < gen.length; i++){
-                if(i == gen.length - 1 && last != null){
-                    base.draw(last, 0, 0, true);
-                }else{
-                    base.draw(Core.atlas.getPixmap(gen[i]), true);
+        if(gen.length > 0 && gen[0] != null && gen[0].found()){
+            if(gen.length > 1){
+                Pixmap base = packer.get(gen[0]).crop();
+                for(int i = 1; i < gen.length; i++){
+                    if(i == gen.length - 1 && last != null){
+                        base.draw(last, 0, 0, true);
+                    }else{
+                        base.draw(packer.get(gen[i]), true);
+                    }
                 }
-            }
-            packer.add(PageType.main, "block-" + name + "-full", base);
+                packer.add(PageType.main, "block-" + name + "-full", base);
 
-            toDispose.add(base);
-        }else{
-            if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", Core.atlas.getPixmap(gen[0]));
+                toDispose.add(base);
+            }else{
+                if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", packer.get(gen[0]));
+            }
         }
 
         toDispose.each(Pixmap::dispose);
@@ -1626,6 +1664,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case armor -> armor;
             case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;

@@ -216,6 +216,19 @@ public class CanvasBlock extends Block{
         }
 
         @Override
+        public void afterPickedUp(){
+            super.afterPickedUp();
+            blending = 0;
+        }
+
+        @Override
+        public void dropped(){
+            super.dropped();
+
+            onProximityUpdate();
+        }
+
+        @Override
         public boolean readable(LExecutor exec){
             return isValid() && (exec.privileged || this.team == exec.team);
         }

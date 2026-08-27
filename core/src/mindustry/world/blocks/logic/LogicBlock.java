@@ -1,5 +1,6 @@
 package mindustry.world.blocks.logic;
 
+import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.func.*;
@@ -33,6 +34,7 @@ import static mindustry.Vars.*;
 
 public class LogicBlock extends Block{
     private static final int maxByteLen = 1024 * 100;
+    private static final int maxCompressedLen = 16_000;
     private static final int maxLinks = 6000;
     public static final int maxNameLength = 32;
 
@@ -54,6 +56,8 @@ public class LogicBlock extends Block{
         group = BlockGroup.logic;
         schematicPriority = 5;
         ignoreResizeConfig = true;
+        drawCached = true;
+        drawDynamic = false;
 
         //universal, no real requirements
         envEnabled = Env.any;
@@ -85,21 +89,26 @@ public class LogicBlock extends Block{
             if(!entity.validLink(world.build(pos))) return;
             var lbuild = world.build(pos);
             int x = lbuild.tileX(), y = lbuild.tileY();
+            int oldSize = entity.links.size;
 
-            LogicLink link = entity.links.find(l -> l.x == x && l.y == y);
+            entity.links.removeAll(l -> {
+                boolean remove = world.build(l.x, l.y) == lbuild;
+                if(remove) l.trySet(entity.executor, null);
+                return remove;
+            });
 
-            if(link != null){
-                entity.links.remove(link);
-                //disable when unlinking
+            if(oldSize > entity.links.size){ //check whether any were removed
+                //re-enable the target when unlinking
                 if(lbuild.block.autoResetEnabled && lbuild.lastDisabler == entity){
                     lbuild.enabled = true;
                 }
             }else{
-                entity.links.remove(l -> world.build(l.x, l.y) == lbuild);
-                entity.links.add(new LogicLink(x, y, entity.findLinkName(lbuild.block), true));
+                LogicLink link = new LogicLink(x, y, entity.findLinkName(lbuild.block), true);
+                link.trySet(entity.executor, lbuild);
+                entity.links.add(link);
             }
 
-            entity.updateCode(entity.code, true, null);
+            entity.updateLinks();
         });
     }
 
@@ -119,7 +128,7 @@ public class LogicBlock extends Block{
 
     public static String getLinkName(Block block){
         String name = block.name;
-        if(name.contains("-")){
+        if(name.indexOf('-') != -1){
             String[] split = name.split("-");
             //filter out 'large' at the end of block names
             if(split.length >= 2 && (split[split.length - 1].equals("large") || Strings.canParseFloat(split[split.length - 1]))){
@@ -181,7 +190,7 @@ public class LogicBlock extends Block{
 
     @Override
     public Object pointConfig(Object config, Cons<Point2> transformer){
-        if(config instanceof byte[] data){
+        if(config instanceof byte[] data && data.length <= maxCompressedLen){
 
             try(DataInputStream stream = new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)))){
                 //discard version for now
@@ -207,8 +216,8 @@ public class LogicBlock extends Block{
                 }
 
                 return compress(bytes, links);
-            }catch(IOException e){
-                Log.err(e);
+            }catch(IOException ignored){
+                //error should not be logged
             }
         }
         return config;
@@ -219,12 +228,22 @@ public class LogicBlock extends Block{
         public int x, y;
         public String name;
         public Building lastBuild;
+        public @Nullable LVar logicVar;
 
         public LogicLink(int x, int y, String name, boolean valid){
             this.x = x;
             this.y = y;
             this.name = name;
             this.valid = valid;
+        }
+
+        public void trySet(LExecutor exec, Object value){
+            if(logicVar != null){
+                logicVar.setlink(value);
+            }else{
+                logicVar = exec.optionalVar(name);
+                if(logicVar != null) logicVar.setlink(value);
+            }
         }
 
         public LogicLink copy(){
@@ -238,12 +257,14 @@ public class LogicBlock extends Block{
         public LExecutor executor = new LExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
+        public @Nullable ObjectIntMap<String> linkMap;
         public boolean checkedDuplicates = false;
-        //dynamic only for privileged processors
+
         public int ipt = instructionsPerTick;
         /** Display name, for convenience. This is currently only available for world processors. */
         public @Nullable String tag;
         public char iconTag;
+        public @Nullable LVar linksVar;
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
@@ -341,6 +362,7 @@ public class LogicBlock extends Block{
         }
 
         public void updateCode(String str, boolean keep, Cons<LAssembler> assemble){
+            linkMap = null;
             if(str != null){
                 code = str;
 
@@ -352,7 +374,7 @@ public class LogicBlock extends Block{
                     for(LogicLink link : links){
                         link.valid = validLink(world.build(link.x, link.y));
                         if(link.valid){
-                            asm.putConst(link.name, world.build(link.x, link.y));
+                            link.logicVar = asm.putConst(link.name, world.build(link.x, link.y));
                         }
                     }
 
@@ -369,7 +391,7 @@ public class LogicBlock extends Block{
                         }
                     }
 
-                    asm.putConst("@links", executor.links.length);
+                    linksVar = asm.putConst("@links", executor.links.length);
                     asm.putConst("@ipt", instructionsPerTick);
 
                     Object oldUnit = null;
@@ -413,7 +435,7 @@ public class LogicBlock extends Block{
         //editor-only processors cannot be damaged or destroyed
         @Override
         public boolean collide(Bullet other){
-            return !privileged;
+            return !privileged || destructible;
         }
 
         @Override
@@ -423,7 +445,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void damage(float damage){
-            if(!privileged){
+            if(!privileged || destructible){
                 super.damage(damage);
             }
         }
@@ -457,11 +479,7 @@ public class LogicBlock extends Block{
 
         @Override
         public void updateTile(){
-            //load up code from read()
-            if(loadBlock != null){
-                loadBlock.run();
-                loadBlock = null;
-            }
+            checkReadCode();
 
             executor.team = team;
 
@@ -492,20 +510,34 @@ public class LogicBlock extends Block{
                     var cur = world.build(l.x, l.y);
 
                     boolean valid = validLink(cur);
+                    Block lastBlock = (l.lastBuild == null ? null : l.lastBuild.block);
                     if(l.lastBuild == null) l.lastBuild = cur;
                     if(valid != l.valid || l.lastBuild != cur){
                         l.lastBuild = cur;
                         changed = true;
                         l.valid = valid;
+
+                        l.trySet(executor, null); //always clear old variable, it may get a new name
+
                         if(valid){
 
-                            //this prevents conflicts
-                            l.name = "";
-                            //finds a new matching name after toggling
-                            l.name = findLinkName(cur.block);
+                            if((lastBlock != null && cur.block != lastBlock) ||
+                                //links don't store the type of block they used to be in saves, so when a link becomes valid, the only way to make sure the name is correct is an expensive string startsWith check
+                                (lastBlock == null && !l.name.startsWith(getLinkName(cur.block)))){
+                                l.logicVar = null; //name was reassigned because block type changed, the old cached logic var is no longer relevant
+                                l.name = "";
+                                l.name = findLinkName(cur.block);
+                            }
 
                             //remove redundant links
-                            links.removeAll(o -> world.build(o.x, o.y) == cur && o != l);
+                            links.removeAll(o -> {
+                                boolean remove = world.build(o.x, o.y) == cur && o != l;
+                                if(remove) o.trySet(executor, null); //clear value when removing the link
+                                return remove;
+                            });
+
+                            //set the newly assigned building value
+                            l.trySet(executor, cur);
 
                             //break to prevent concurrent modification
                             updates = true;
@@ -516,11 +548,7 @@ public class LogicBlock extends Block{
             }
 
             if(changed){
-                updateCode(code, true, null);
-            }
-
-            if(!privileged){
-                ipt = instructionsPerTick;
+                updateLinks();
             }
 
             if(state.rules.disableWorldProcessors && privileged) return;
@@ -543,6 +571,25 @@ public class LogicBlock extends Block{
             }
         }
 
+        public void updateLinks(){
+            if(linksVar == null) return;
+
+            int valids = links.count(l -> l.valid);
+            executor.links = new Building[valids];
+            executor.linkIds.clear();
+
+            int index = 0;
+            for(LogicLink link : links){
+                if(link.valid){
+                    Building build = world.build(link.x, link.y);
+                    executor.links[index ++] = build;
+                    if(build != null) executor.linkIds.add(build.id);
+                }
+            }
+
+            linksVar.numval = valids;
+        }
+
         @Override
         public boolean readable(LExecutor exec){
             return isValid() && (exec.privileged || (this.team == exec.team && !this.block.privileged));
@@ -553,12 +600,31 @@ public class LogicBlock extends Block{
             if(position.isobj && position.objval instanceof String varName){
                 LVar ret = executor.optionalVar(varName);
                 if(ret == null){
-                    output.setnum(Double.NaN);
+                    output.setobj(optionalLink(varName));
                     return;
                 }
                 if(output.constant) return;
                 output.set(ret);
+            }else{
+                int index = position.numi();
+                output.setobj(index >= 0 && index < executor.links.length ? executor.links[index] : null);
             }
+        }
+
+        public @Nullable Building optionalLink(String name){
+            if(name == null || name.isEmpty()) return null;
+            // Quick check the name can even be a link to avoid building/using the map needlessly
+            char ch = name.charAt(name.length() - 1);
+            if(ch < '0' || ch > '9') return null;
+
+            if(linkMap == null){
+                linkMap = new ObjectIntMap<>();
+                for(int i = 0; i < links.size; i++){
+                    linkMap.put(links.get(i).name, i);
+                }
+            }
+            int index = linkMap.get(name, -1);
+            return index >= 0 && index < links.size && links.get(index).valid ? links.get(index).lastBuild : null;
         }
 
         @Override
@@ -659,7 +725,7 @@ public class LogicBlock extends Block{
         }
 
         public boolean validLink(Building other){
-            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(other instanceof ConstructBuild);
+            return other != null && other.isValid() && (privileged || (!other.block.privileged && other.team == team && other.within(this, range + other.block.size*tilesize/2f))) && !(privileged && !state.rules.worldProcessorPlayerLink && other.team == state.rules.defaultTeam) && !(other instanceof ConstructBuild);
         }
 
         @Override
@@ -681,8 +747,13 @@ public class LogicBlock extends Block{
                 boolean prev = state.rules.editor;
                 //this is a hack to allow configuration to work correctly in the editor for privileged processors
                 if(forceEditor) state.rules.editor = true;
-                configure(compress(code, relativeConnections()));
-                state.rules.editor = prev;
+                byte[] bytes = compress(code, relativeConnections());
+                if(bytes.length > maxCompressedLen){
+                    ui.showErrorMessage(Core.bundle.format("logic.error.toolong", maxCompressedLen, bytes.length));
+                }else{
+                    configure(bytes);
+                    state.rules.editor = prev;
+                }
             });
         }
 
@@ -703,7 +774,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 4;
+            return 5;
         }
 
         @Override
@@ -745,6 +816,8 @@ public class LogicBlock extends Block{
 
             if(privileged){
                 write.s(Mathf.clamp(ipt, 1, maxInstructionsPerTick));
+            }else{
+                write.s(ipt == instructionsPerTick ? 0 : Mathf.clamp(ipt, 1, instructionsPerTick));
             }
 
             TypeIO.writeString(write, tag);
@@ -766,6 +839,18 @@ public class LogicBlock extends Block{
             }
 
             write.f(accumulator);
+        }
+
+        public void checkReadCode(){
+            if(loadBlock != null){
+                loadBlock.run();
+                loadBlock = null;
+            }
+        }
+
+        @Override
+        public void afterReadAll(){
+            checkReadCode();
         }
 
         @Override
@@ -806,6 +891,13 @@ public class LogicBlock extends Block{
 
             if(privileged && revision >= 2){
                 ipt = Mathf.clamp(read.s(), 1, maxInstructionsPerTick);
+            }
+
+            if(!privileged && revision >= 5){
+                short iptR = read.s();
+                if(iptR != 0){
+                    ipt = Mathf.clamp(iptR, 1, instructionsPerTick);
+                }
             }
 
             if(revision >= 3){

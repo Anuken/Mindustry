@@ -24,6 +24,8 @@ import mindustry.logic.*;
 import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
+import mindustry.ui.builder.*;
+import mindustry.ui.builder.UiBuilder.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.payloads.*;
@@ -37,7 +39,7 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unused")
 @TypeIOHandler
 public class TypeIO{
-    private static final int maxArraySize = 1000, maxByteArraySize = 40_000;
+    private static final int maxArraySize = 1000, maxByteArraySize = 40_000, maxSyncedPlans = 20;
 
     public static void writeObject(Writes write, Object object){
         if(object == null){
@@ -147,6 +149,8 @@ public class TypeIO{
         }else if(object instanceof UnitCommand command){
             write.b(23);
             write.s(command.id);
+        }else if(object instanceof Bullet b || object instanceof Seq<?> s){ //write bullets as null
+            write.b((byte)0);
         }else{
             throw new IllegalArgumentException("Unknown object type: " + object.getClass());
         }
@@ -186,8 +190,8 @@ public class TypeIO{
             case 4 -> {
                 byte exists = read.b();
                 if(exists != 0){
-                    //in a safe context, strings can only be 1000 chars
-                    yield read.str(safe ? 1000 : 0);
+                    //in a safe context, strings can only be 1200 chars
+                    yield read.str(safe ? 1200 : 0);
                 }else{
                     yield null;
                 }
@@ -266,6 +270,81 @@ public class TypeIO{
         };
     }
 
+    public static void writeUiBuilder(Writes writes, NodeBuilder<?> node){
+        node.write(writes);
+    }
+
+    public static NodeBuilder<?> readUiBuilder(Reads reads){
+        return NodeBuilder.read(reads);
+    }
+
+    public static void writeMenuResult(Writes writes, MenuResult result){
+        writes.l(result.token);
+
+        writeString(writes, result.result);
+
+        writes.s(Math.min(MenuResult.maxTotalValues, result.values.size));
+        int i = 0;
+        for(var entry : result.values){
+            if(++i > MenuResult.maxTotalValues){
+                break;
+            }
+
+            writes.str(entry.key);
+            if(entry.value instanceof Float f){
+                writes.b(0);
+                writes.f(f);
+            }else if(entry.value instanceof Boolean b){
+                writes.b(1);
+                writes.bool(b);
+            }else if(entry.value instanceof String s){
+                writes.b(2);
+                writes.str(s);
+            }else{
+                throw new ArcRuntimeException("Unknown object type: " + entry.value);
+            }
+        }
+    }
+
+    public static MenuResult readMenuResult(Reads read){
+        MenuResult result = new MenuResult();
+
+        result.token = read.l();
+
+        //would be nice to count bytes but sadly that's not really viable here
+        int remainingChars = MenuResult.maxTotalStringLen;
+
+        byte exists = read.b();
+        if(exists != 0){
+            result.result = read.str(MenuResult.maxResultLen);
+            remainingChars -= result.result.length();
+        } //else, no result, remains null
+
+        int entries = read.us();
+        if(entries > MenuResult.maxTotalValues) throw new ArcRuntimeException("UI result entry count exceeds max entries: " + entries);
+
+        for(int i = 0; i < entries; i++){
+            if(remainingChars <= 0) throw new ArcRuntimeException("Too many long strings in MenuResult, reduce your amount of elements/IDs.");
+            String key = read.str(Math.min(remainingChars, MenuResult.maxValueLen));
+            remainingChars -= key.length();
+
+            byte type = read.b();
+
+            switch(type){
+                case 0 -> result.values.put(key, read.f());
+                case 1 ->  result.values.put(key, read.bool());
+                case 2 -> {
+                    if(remainingChars <= 0) throw new ArcRuntimeException("Too many long strings in MenuResult, reduce your amount of elements/IDs.");
+                    String value = read.str(Math.min(remainingChars, MenuResult.maxValueLen));
+                    remainingChars -= value.length();
+                    result.values.put(key, value);
+                }
+                default -> throw new ArcRuntimeException("Unknown UI entry type: " + type);
+            }
+        }
+        return result;
+    }
+
     public static void writePayload(Writes writes, Payload payload){
         Payload.write(payload, writes);
     }
@@ -312,6 +391,12 @@ public class TypeIO{
 
     public static Ability[] readAbilities(Reads read, Ability[] abilities){
         byte len = read.b();
+
+        if(len != abilities.length){
+            abilities = new Ability[len];
+            for(int i = 0; i < len; i++) abilities[i] = new EmptyDataAbility();
+        }
+
         for(int i = 0; i < len; i++){
             float data = read.f();
             if(abilities.length > i){
@@ -421,6 +506,14 @@ public class TypeIO{
         return val == 255 || val >= content.unitStances().size ? UnitStance.stop : content.unitStance(val);
     }
 
+    public static void writePosEntity(Writes write, Posc entity){
+        write.i(entity == null ? -1 : entity.id());
+    }
+
+    public static Posc readPosEntity(Reads read){
+        return (Posc)Groups.sync.getByID(read.i());
+    }
+
     public static void writeEntity(Writes write, Entityc entity){
         write.i(entity == null ? -1 : entity.id());
     }
@@ -457,7 +550,7 @@ public class TypeIO{
     /** @return the maximum acceptable amount of plans to send over the network */
     public static int getMaxPlans(Queue<BuildPlan> plans){
         //limit to prevent buffer overflows
-        int used = Math.min(plans.size, 20);
+        int used = Math.min(plans.size, maxSyncedPlans);
         int totalLength = 0;
 
         //prevent buffer overflow by checking config length
@@ -495,10 +588,21 @@ public class TypeIO{
         }
     }
 
+    public static Queue<BuildPlan> readPlansQueueNet(Reads read){
+        int used = read.i();
+        if(used == -1) return null;
+        if(used > maxSyncedPlans) throw new RuntimeException("Queue too long: " + used);
+        var out = new Queue<BuildPlan>();
+        for(int i = 0; i < used; i++){
+            out.add(readPlan(read));
+        }
+        return out;
+    }
+
     public static Queue<BuildPlan> readPlansQueue(Reads read){
         int used = read.i();
         if(used == -1) return null;
-        if(used >= maxArraySize) throw new RuntimeException("Queue too long: "+ used);
+        //this is ONLY used in saves, so don't enforce a max size, it can be anything.
         var out = new Queue<BuildPlan>();
         for(int i = 0; i < used; i++){
             out.add(readPlan(read));
@@ -603,6 +707,7 @@ public class TypeIO{
             int x = read.us();
             int y = read.us();
             Block block = Vars.content.block(read.us());
+            if(block == null) throw new ArcRuntimeException("Invalid block ID in block plans! Client is likely using an incorrectly configured mod.");
             int rotation = (block.rotate ? read.b() : 0);
             Object config = readClientPlanConfig(read);
             BuildPlan plan = new BuildPlan(x, y, rotation, block, config);
@@ -820,7 +925,7 @@ public class TypeIO{
     public static Rules readRules(Reads read){
         int length = read.i();
         //this is only called clientside, but the byte limit is reasonable either way...
-        if(length > maxByteArraySize) throw new ArcRuntimeException("Rules too long");
+        if(length > 100_000) throw new ArcRuntimeException("Rules too long");
         String string = new String(read.b(new byte[length]), charset);
         return JsonIO.read(Rules.class, string);
     }
@@ -1157,6 +1262,22 @@ public class TypeIO{
         int[] out = new int[length];
         for(int i = 0; i < length; i++){
             out[i] = read.i();
+        }
+        return out;
+    }
+
+    public static void writeShorts(Writes write, short[] ints){
+        write.s((short)ints.length);
+        for(short i : ints){
+            write.s(i);
+        }
+    }
+
+    public static short[] readShorts(Reads read){
+        short length = read.s();
+        short[] out = new short[length];
+        for(int i = 0; i < length; i++){
+            out[i] = read.s();
         }
         return out;
     }

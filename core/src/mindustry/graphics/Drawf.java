@@ -22,21 +22,29 @@ public class Drawf{
     private static final FloatSeq points = new FloatSeq();
 
     public static void text(String text, float x, float y, Color color){
-        text(text, x, y, color, 1f, Align.center);
+        text(text, x, y, 0f, color, 1f, Align.center);
     }
 
     public static void text(String text, float x, float y, Color color, float scale){
-        text(text, x, y, color, scale, Align.center);
+        text(text, x, y, 0f, color, scale, Align.center);
     }
 
     public static void text(String text, float x, float y, Color color, float scale, int align){
+        text(text, x, y, 0f, color, scale, align);
+    }
+
+    public static void text(String text, float x, float y, float rotation, Color color, float scale, int align){
         Font font = Fonts.outline;
         boolean ints = font.usesIntegerPositions();
         font.setUseIntegerPositions(false);
         font.getData().setScale(0.25f / Scl.scl(1f) * scale);
         font.setColor(color);
         font.getCache().clear();
-        font.getCache().addText(text, x, y, 0f, align, false);
+        GlyphLayout layout = font.getCache().addText(text, x, y, 0f, align, false);
+        if(rotation != 0){
+            float verticalFraction = (align & Align.bottom) != 0 ? 1f : (align & Align.top) != 0 ? 0f: 0.5f;
+            font.getCache().setRotation(rotation, x, y - layout.height * verticalFraction);
+        }
         if(color.a < 1f){
             font.getCache().setAlphas(color.a);
         }
@@ -374,12 +382,14 @@ public class Drawf{
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color, float rotation){
+        if(alpha < 1f/255f) return;
         Draw.color(color, alpha * color.a);
         Draw.rect(region, x, y, rotation);
         Draw.color();
     }
 
     public static void liquid(TextureRegion region, float x, float y, float alpha, Color color){
+        if(alpha < 1f/255f) return;
         Draw.color(color, alpha * color.a);
         Draw.rect(region, x, y);
         Draw.color();
@@ -501,17 +511,33 @@ public class Drawf{
     }
 
     public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale){
+        laser(line, start, end, x, y, x2, y2, scale, true);
+    }
+
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale, boolean light){
+        laser(line, start, end, x, y, x2, y2, scale, light, true);
+    }
+
+    public static void laser(TextureRegion line, TextureRegion start, TextureRegion end, float x, float y, float x2, float y2, float scale, boolean light, boolean useLod){
         float scl = 8f * scale * Draw.scl, rot = Mathf.angle(x2 - x, y2 - y);
         float vx = Mathf.cosDeg(rot) * scl, vy = Mathf.sinDeg(rot) * scl;
+        float lod = useLod ? (start.width * scale * start.scl() < 10f ? Lod.alpha1 : Lod.alpha2) : 1f;
+        float a = Draw.getColorAlpha();
 
-        Draw.rect(start, x, y, start.width * scale * start.scl(), start.height * scale * start.scl(), rot + 180);
-        Draw.rect(end, x2, y2, end.width * scale * end.scl(), end.height * scale * end.scl(), rot);
+        if(a >= 1f/255f){
+            if(lod > 0.0001f){
+                Draw.alpha(lod * a);
+                Draw.rect(start, x, y, start.width * scale * start.scl(), start.height * scale * start.scl(), rot + 180);
+                Draw.rect(end, x2, y2, end.width * scale * end.scl(), end.height * scale * end.scl(), rot);
+                Draw.alpha(a);
+            }
 
-        Lines.stroke(12f * scale);
-        Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
-        Lines.stroke(1f);
+            Lines.stroke(12f * scale);
+            Lines.line(line, x + vx, y + vy, x2 - vx, y2 - vy, false);
+            Lines.stroke(1f);
+        }
 
-        light(x, y, x2, y2);
+        if(light) light(x, y, x2, y2);
     }
 
     public static void tri(float x, float y, float width, float length, float rotation){

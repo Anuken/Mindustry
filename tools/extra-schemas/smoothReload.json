@@ -1,0 +1,4 @@
+{
+  "doc": "Reload, but smoothed out, so there is no sudden jump between 0-1. A sensor value for PartProgress.type - not an operation (see PartProgress and the 'op' field for those).",
+  "superclass": "mindustry.entities.part.DrawPart$PartProgress"
+}
