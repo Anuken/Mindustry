@@ -38,7 +38,6 @@ import static mindustry.Vars.*;
 public class CoreBlock extends StorageBlock{
     public static final float cloudScaling = 1700f, cfinScl = -2f, cfinOffset = 0.3f, calphaFinOffset = 0.25f, cloudAlpha = 0.81f;
     public static final float[] cloudAlphas = {0, 0.5f, 1f, 0.1f, 0, 0f};
-    public static final Team[] teamChangerTeams = {Team.derelict, Team.sharded, Team.crux, Team.green, Team.blue};
 
     //hacky way to pass item modules between methods
     private static ItemModule nextItems;
@@ -293,7 +292,7 @@ public class CoreBlock extends StorageBlock{
             cont.defaults().size(32f);
 
             int i = 0;
-            for(Team team : teamChangerTeams){
+            for(Team team : Team.baseTeams){
                 ImageButton button = cont.button(Tex.whiteui, Styles.clearTogglei, 24f, () -> {
                 }).group(group).get();
                 button.changed(() -> {
