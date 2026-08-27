@@ -855,12 +855,10 @@ public class StatValues{
 
     /** Adds an info table with an icon and description key from the bundle */
     private static Cell<?> tableInfo(Table table, String key){
+        if(!Core.bundle.has(key)) return null;
         return table.table(t -> {
-            if(Core.bundle.has(key) && !Vars.headless){
-                t.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
-                t.add("[lightgray]" + Core.bundle.get(key));
-                t.row().add().height(10f).row();
-            }
+            if(!Vars.headless) t.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
+            t.add("[lightgray]" + Core.bundle.get(key)).padBottom(10f);
         });
     }
 
