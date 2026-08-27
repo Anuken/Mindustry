@@ -1114,7 +1114,7 @@ public class LStatements{
     @RegisterStatement("ucontrol")
     public static class UnitControlStatement extends LStatement{
         public LUnitControl type = LUnitControl.move;
-        public String p1 = "0", p2 = "0", p3 = "0", p4 = "0", p5 = "0";
+        public String p1 = "0", p2 = "0", p3 = "0", p4 = "0", p5 = "null";
 
         @Override
         public void build(Table table){

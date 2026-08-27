@@ -456,8 +456,11 @@ public class LExecutor{
                             }
 
                             var conf = p5.obj();
+                            if(!p5.isobj){
+                                conf = p5.numi();
+                            }
                             ai.plan.set(x, y, rot, block);
-                            ai.plan.config = conf instanceof Content c ? c : conf instanceof Building b ? b : null;
+                            ai.plan.config = conf instanceof Content c ? c : conf instanceof Building b ? b : conf instanceof Integer i ? i : null;
 
                             unit.clearBuilding();
                             Tile tile = ai.plan.tile();
