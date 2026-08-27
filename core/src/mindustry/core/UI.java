@@ -34,7 +34,6 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
-
     private static final StringBuilder buffer = new StringBuilder();
     public static String billions, millions, thousands;
 
@@ -80,8 +79,6 @@ public class UI implements ApplicationListener, Loadable{
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
     public CampaignRulesDialog campaignRules;
-
-    public IntMap<Dialog> followUpMenus;
 
     public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
 
@@ -229,7 +226,6 @@ public class UI implements ApplicationListener, Loadable{
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
         campaignRules = new CampaignRulesDialog();
-        followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
 
@@ -326,9 +322,11 @@ public class UI implements ApplicationListener, Loadable{
             }});
         }else{
             new Dialog(titleText){{
-                cont.margin(30).add(text).padRight(6f);
+                cont.image().width(400f).pad(2).height(4f).color(Pal.accent);
+                cont.row();
+                cont.add(text).row();
                 TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
-                TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
+                TextField field = cont.field(def, t -> {}).size(400f, 50f).get();
                 field.setMaxLength(textLength);
                 field.setFilter(filter);
                 buttons.defaults().size(120, 54).pad(4);
@@ -662,81 +660,6 @@ public class UI implements ApplicationListener, Loadable{
             confirmed.run();
         });
         dialog.show();
-    }
-
-    // TODO REPLACE INTEGER WITH arc.fun.IntCons(int, T) or something like that.
-    public Dialog newMenuDialog(String title, String message, String[][] options, Cons2<Integer, Dialog> buttonListener){
-        return new Dialog(title){{
-            setFillParent(true);
-            removeChild(titleTable);
-            cont.add(titleTable).width(400f);
-
-            cont.row();
-            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
-            cont.row();
-            cont.pane(table -> {
-                table.add(message).width(400f).wrap().get().setAlignment(Align.center);
-                table.row();
-
-                int option = 0;
-                for(var optionsRow : options){
-                    if(optionsRow.length == 0) continue;
-                    Table buttonRow = table.row().table().get().row();
-                    int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
-                    int width = fullWidth / optionsRow.length;
-                    int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
-
-                    for(int i = 0; i < optionsRow.length; i++){
-                        if(optionsRow[i] == null) continue;
-
-                        String optionName = optionsRow[i];
-                        int finalOption = option;
-                        buttonRow.button(optionName, () -> buttonListener.get(finalOption, this))
-                                .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
-                        option++;
-                    }
-                }
-            }).growX();
-        }};
-    }
-
-    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
-    public void showMenu(String title, String message, String[][] options, Intc callback){
-        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
-            callback.get(option);
-            myself.hide();
-        });
-        dialog.closeOnBack(() -> callback.get(-1));
-        dialog.show();
-    }
-
-    /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
-     * @see UI#showMenu(String, String, String[][], Intc) */
-    public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
-        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
-            callback.get(option);
-            if(!state.isGame()){
-                myself.hide();
-            }
-        });
-        dialog.closeOnBack(() -> {
-            followUpMenus.remove(menuId);
-            callback.get(-1);
-        });
-
-        Dialog oldDialog = followUpMenus.remove(menuId);
-        if(oldDialog != null){
-            dialog.show(Core.scene, null);
-            oldDialog.hide(null);
-        }else{
-            dialog.show();
-        }
-        followUpMenus.put(menuId, dialog);
-    }
-
-    public void hideFollowUpMenu(int menuId) {
-        if(!followUpMenus.containsKey(menuId)) return;
-        followUpMenus.remove(menuId).hide();
     }
 
     /**

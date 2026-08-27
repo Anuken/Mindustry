@@ -206,14 +206,22 @@ public class ModsDialog extends BaseDialog{
                             t.table(title1 -> {
                                 title1.left();
 
-                                title1.add(new BorderImage(){{
+                                title1.add(new BorderImage()).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f).with(b -> {
                                     if(mod.iconTexture != null){
-                                        setDrawable(new TextureRegion(mod.iconTexture));
+                                        b.setDrawable(new TextureRegion(mod.iconTexture));
                                     }else{
-                                        setDrawable(Tex.nomap);
+                                        b.setDrawable(Tex.nomap);
+                                        //if the texture gets loaded with a delay, update it
+                                        b.update(() -> {
+                                            if(mod.iconTexture != null){
+                                                b.setDrawable(new TextureRegion(mod.iconTexture));
+                                                //stop updating
+                                                b.update(null);
+                                            }
+                                        });
                                     }
-                                    border(Pal.accent);
-                                }}).size(h - 8f).padTop(-8f).padLeft(-8f).padRight(8f);
+                                    b.border(Pal.accent);
+                                });
 
                                 title1.table(text -> {
                                     boolean hideDisabled = !mod.isSupported() || mod.hasUnmetDependencies() || mod.hasContentErrors();

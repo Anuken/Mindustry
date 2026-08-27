@@ -11,6 +11,7 @@ import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
+import mindustry.ui.builder.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -21,6 +22,7 @@ public class EventType{
     public enum Trigger{
         shock,
         cannotUpgrade,
+        fireCreate,
         openConsole,
         blastFreeze,
         impactPower,
@@ -117,6 +119,15 @@ public class EventType{
         }
     }
 
+    /** Called when a new texture is received from the server via {@link mindustry.core.NetServer#sendTexture}. */
+    public static class TextureStreamEvent {
+        public final String name;
+
+        public TextureStreamEvent(String name){
+            this.name = name;
+        }
+    }
+
     public static class SaveLoadEvent{
         public final boolean isMap;
 
@@ -205,6 +216,19 @@ public class EventType{
             this.player = player;
             this.menuId = menuId;
             this.option = option;
+        }
+    }
+
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuBuilderOptionChooseEvent{
+        public final Player player;
+        public final int menuId;
+        public final MenuResult result;
+
+        public MenuBuilderOptionChooseEvent(Player player, int menuId, MenuResult result){
+            this.player = player;
+            this.menuId = menuId;
+            this.result = result;
         }
     }
 
@@ -492,6 +516,22 @@ public class EventType{
 
         public ResearchEvent(UnlockableContent content){
             this.content = content;
+        }
+    }
+
+    /** Called when all rules of the current map are loaded. */
+    public static class RulesLoadEvent{
+        public final Rules rules;
+        public final boolean fromSave;
+
+        public RulesLoadEvent(Rules rules){
+            this.rules = rules;
+            this.fromSave = false;
+        }
+
+        public RulesLoadEvent(Rules rules, boolean fromSave){
+            this.rules = rules;
+            this.fromSave = fromSave;
         }
     }
 
