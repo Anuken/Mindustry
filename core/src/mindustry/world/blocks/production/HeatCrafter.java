@@ -104,8 +104,8 @@ public class HeatCrafter extends GenericCrafter{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            heat = read.f();
             if(revision >= 1){
+                heat = read.f();
                 requiredHeat = read.f();
             }
         }
