@@ -93,8 +93,8 @@ public class ModBrowserDialog extends BaseDialog{
             String strResult = response.getResultAsString();
 
             try{
-                Seq<ModListing> mods = json.fromJson(Seq.class, ModListing.class, strResult);
-                if(mods == null) mods = new Seq<>();
+                Seq<ModListing> parsed = json.fromJson(Seq.class, ModListing.class, strResult);
+                Seq<ModListing> mods = parsed == null ? new Seq<>() : parsed;
 
                 var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 Func<String, Date> parser = text -> {
