@@ -858,14 +858,14 @@ public class Turret extends ReloadTurret{
                 reloadCounter = read.f();
                 rotation = read.f();
             }
-            if(revision >= 2){
+            if(revision >= 4){
                 requiredHeat = read.f();
             }
         }
 
         @Override
         public byte version(){
-            return 2;
+            return 4;
         }
 
         @Override
