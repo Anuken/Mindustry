@@ -119,6 +119,15 @@ public class EventType{
         }
     }
 
+    /** Called when a new texture is received from the server via {@link mindustry.core.NetServer#sendTexture}. */
+    public static class TextureStreamEvent {
+        public final String name;
+
+        public TextureStreamEvent(String name){
+            this.name = name;
+        }
+    }
+
     public static class SaveLoadEvent{
         public final boolean isMap;
 
@@ -507,6 +516,22 @@ public class EventType{
 
         public ResearchEvent(UnlockableContent content){
             this.content = content;
+        }
+    }
+
+    /** Called when all rules of the current map are loaded. */
+    public static class RulesLoadEvent{
+        public final Rules rules;
+        public final boolean fromSave;
+
+        public RulesLoadEvent(Rules rules){
+            this.rules = rules;
+            this.fromSave = false;
+        }
+
+        public RulesLoadEvent(Rules rules, boolean fromSave){
+            this.rules = rules;
+            this.fromSave = fromSave;
         }
     }
 

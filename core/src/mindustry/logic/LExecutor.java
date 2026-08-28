@@ -31,7 +31,6 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
-import mindustry.world.blocks.logic.MessageBlock.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.meta.*;
 
@@ -694,7 +693,7 @@ public class LExecutor{
                 if(sense instanceof Content co){
                     to.setnum(se.sense(co));
                     return;
-                }else if(sense instanceof LAccess la){
+                }else if(sense instanceof LAccess la && (exec.privileged || !la.isPrivileged())){
                     Object objOut = se.senseObject(la);
 
                     if(objOut == Senseable.noSensed){
@@ -1040,8 +1039,8 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            if(target.building() instanceof LogicDisplayBuild d && d.isValid() && (d.team == exec.team || exec.privileged)){
-                d.flushCommands(exec.graphicsBuffer);
+            if(target.building() instanceof LDrawable d && d.drawable(exec)){
+                d.draw(exec.graphicsBuffer);
             }
             exec.graphicsBuffer.clear();
         }
@@ -1176,9 +1175,8 @@ public class LExecutor{
         @Override
         public void run(LExecutor exec){
 
-            if(target.building() instanceof MessageBuild d && d.isValid() && (exec.privileged || (d.team == exec.team && !d.block.privileged))){
-                d.message.setLength(0);
-                d.message.append(exec.textBuffer, 0, Math.min(exec.textBuffer.length(), ((MessageBlock)d.block).maxTextLength));
+            if(target.building() instanceof LPrintable d && d.printable(exec)){
+                d.print(exec.textBuffer);
             }
             exec.textBuffer.setLength(0);
 

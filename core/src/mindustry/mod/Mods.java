@@ -875,15 +875,20 @@ public class Mods implements Loadable{
                 Fi contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
                     String lower = type.name().toLowerCase(Locale.ROOT);
-                    Fi folder = contentRoot.child(lower + (lower.endsWith("s") ? "" : "s"));
-                    if(folder.exists()){
-                        for(Fi file : folder.findAll(f -> f.extension().equals("json") || f.extension().equals("hjson"))){
+                    //search both the proper folder name (e.g. "weather", "statuses") and the old nonsensical folder names ("weathers", "status")
+                    String oldName = lower + (lower.endsWith("s") ? "" : "s");
+                    Fi[] folders = {oldName.equals(type.folderName) ? null : contentRoot.child(oldName), contentRoot.child(type.folderName)};
 
-                            //if this is part of the ordered content, put it aside to be dealt with later
-                            if(orderSet != null && orderSet.contains(file.nameWithoutExtension())){
-                                orderedContent.put(file.nameWithoutExtension(), new LoadRun(type, file, mod));
-                            }else{
-                                unorderedContent.add(new LoadRun(type, file, mod));
+                    for(Fi folder : folders){
+                        if(folder != null && folder.exists()){
+                            for(Fi file : folder.findAll(f -> f.extEquals("json") || f.extEquals("hjson"))){
+
+                                //if this is part of the ordered content, put it aside to be dealt with later
+                                if(orderSet != null && orderSet.contains(file.nameWithoutExtension())){
+                                    orderedContent.put(file.nameWithoutExtension(), new LoadRun(type, file, mod));
+                                }else{
+                                    unorderedContent.add(new LoadRun(type, file, mod));
+                                }
                             }
                         }
                     }

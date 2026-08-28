@@ -253,6 +253,7 @@ public class UiBuilder{
         ImageBuilder(){ super(UiKey.image); }
 
         public ImageBuilder region(String region){ return prop(UiKey.region, region); }
+        public ImageBuilder placeholder(String placeholder){ return prop(UiKey.placeholder, placeholder); }
         public ImageBuilder scaling(Scaling scaling){ return prop(UiKey.scaling, scaling.name()); }
     }
 
@@ -261,6 +262,7 @@ public class UiBuilder{
 
         public ButtonBuilder text(String text){ return prop(UiKey.text, text); }
         public ButtonBuilder icon(String icon){ return prop(UiKey.icon, icon); }
+        public ButtonBuilder placeholder(String placeholder){ return prop(UiKey.placeholder, placeholder); }
         public ButtonBuilder style(String style){ return prop(UiKey.style, style); }
         public ButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
@@ -272,6 +274,7 @@ public class UiBuilder{
         ImageButtonBuilder(){ super(UiKey.imageButton); }
 
         public ImageButtonBuilder icon(String icon){ return prop(UiKey.icon, icon); }
+        public ImageButtonBuilder placeholder(String placeholder){ return prop(UiKey.placeholder, placeholder); }
         public ImageButtonBuilder style(String style){ return prop(UiKey.style, style); }
         public ImageButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ImageButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
