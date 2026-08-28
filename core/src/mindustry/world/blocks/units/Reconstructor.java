@@ -39,8 +39,6 @@ public class Reconstructor extends UnitBlock{
 
     public Sound createSound = Sounds.unitCreate;
     public float createSoundVolume = 1f;
-    //adds moveCommand and enterPayloadCommand
-    public static Seq<UnitCommand> list = new Seq<UnitCommand>().with(Vars.content.unitCommand(0),Vars.content.unitCommand(6));
 
     public Reconstructor(String name){
         super(name);
@@ -169,7 +167,6 @@ public class Reconstructor extends UnitBlock{
     public class ReconstructorBuild extends UnitBuild{
         public @Nullable Vec2 commandPos;
         public @Nullable UnitCommand command;
-        public @Nullable Seq<UnitCommand> lastList = list;
 
         boolean constructing;
 
@@ -223,11 +220,9 @@ public class Reconstructor extends UnitBlock{
 
             table.background(Styles.black6);
 
-            if(unit != null){
-                lastList = unit().commands;
-            }
-            for(var item : lastList){
-                ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> {
+            var list = unit == null ? Vars.content.unitCommands().copy() : unit().commands;
+            for(var item : list){
+                ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 44f, () -> {
                     configure(item);
                     deselect();
                 }).tooltip(item.localized()).group(group).get();
