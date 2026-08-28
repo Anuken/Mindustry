@@ -94,6 +94,7 @@ public class ModBrowserDialog extends BaseDialog{
 
             try{
                 Seq<ModListing> mods = json.fromJson(Seq.class, ModListing.class, strResult);
+                if(mods == null) mods = new Seq<>();
 
                 var d = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 Func<String, Date> parser = text -> {
