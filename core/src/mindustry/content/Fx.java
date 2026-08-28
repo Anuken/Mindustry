@@ -13,6 +13,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.units.UnitAssembler.*;
 
 import static arc.graphics.g2d.Draw.rect;
@@ -1933,7 +1934,7 @@ public class Fx{
             float angle = rand.random(360f);
             float lenRand = rand.random(0.5f, 1.2f);
             Tmp.v1.trns(angle, circleRad);
- 
+
             for(int s : Mathf.signs){
                 Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fout() * 10f, e.fout() * 10f * lenRand + 8f, angle + 90f + s * 90f);
             }
@@ -2807,12 +2808,10 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
-        if(e.data instanceof ForceFieldAbility ab){
-            Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
-            return;
-        }
+        int sides = e.data instanceof ForceProjector f ? f.sides : e.data instanceof ForceFieldAbility a ? a.sides : 6;
+        float rotation = e.data instanceof ForceProjector f ? f.shieldRotation : e.data instanceof ForceFieldAbility a ? a.rotation : 6;
 
-        Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
+        Lines.poly(e.x, e.y, sides, e.rotation + e.fin(), rotation);
     }).followParent(true),
 
     arcShieldBreak = new Effect(40, e -> {

@@ -43,7 +43,7 @@ allprojects{
         if(!project.hasProperty("versionType")) versionType = 'official'
         appName = 'Mindustry'
         steamworksVersion = 'da41c05b7a2a44c8625ca0ba7d6ca1a2e73f621a'
-        rhinoVersion = 'e74ac129d2bff72c1deb536d7d99a0dbb7046d2e'
+        rhinoVersion = '32395f942976a6d1d21ec9877664554cd5762306'
 
         loadVersionProps = {
             return new Properties().with{p -> p.load(file('../core/assets/version.properties').newReader()); return p }
@@ -532,5 +532,11 @@ task resolveDependencies{
             Set<Configuration> configurations = project.buildscript.configurations + project.configurations
             configurations.findAll{c -> c.canBeResolved}.forEach{c -> c.resolve()}
         }
+    }
+}
+
+if(System.getProperty("compileMethodParams") != null){
+    project(":core").tasks.withType(JavaCompile).configureEach{
+        options.compilerArgs << '-parameters'
     }
 }

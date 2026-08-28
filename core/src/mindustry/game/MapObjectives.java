@@ -309,7 +309,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.research", content.emoji(), content.localizedName);
+            return Core.bundle.format("objective.research", content.emoji() + " ", content.localizedName);
         }
 
         @Override
@@ -340,7 +340,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.produce", content.emoji(), content.localizedName);
+            return Core.bundle.format("objective.produce", content.emoji() + " ", content.localizedName);
         }
 
         @Override
@@ -373,7 +373,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
+            return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji()  + " ", item.localizedName);
         }
 
         @Override
@@ -406,7 +406,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji(), item.localizedName);
+            return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji() + " ", item.localizedName);
         }
 
         @Override
@@ -439,7 +439,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji() + " ", block.localizedName);
         }
 
         @Override
@@ -472,7 +472,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji(), unit.localizedName);
+            return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji() + " ", unit.localizedName);
         }
 
         @Override
@@ -563,7 +563,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                             text = "";
                         }
                     }
-                    return Core.bundle.format(text.substring(1), timeString.toString());
+                    //the 'escelating' typo was fixed in the bundle+maps, but existing saves don't have that fix, so it has to be changed here
+                    String actualText = text.equals("@objective.enemyescelating") ? "@objective.enemyescalating" : text;
+                    return Core.bundle.format(actualText.substring(1), timeString.toString());
                 }else{
                     try{
                         return Core.bundle.formatString(text, timeString.toString());
@@ -605,7 +607,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyblock", block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.destroyblock", block.emoji() + " ", block.localizedName);
         }
 
         @Override
@@ -650,7 +652,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji() + " ", block.localizedName);
         }
 
         @Override
@@ -1413,10 +1415,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     private static void prepareTexture(ObjectiveMarker marker, Object texture){
         if(texture instanceof LogicDisplayBuild d && d.isAdded()){
-            if(d.buffer == null || d.buffer.isDisposed()){
+            if(d.rootDisplay.buffer == null || d.rootDisplay.buffer.isDisposed()){
                 marker.setTexture("error");
             }else{
-                d.processCommands();
+                d.rootDisplay.processCommands();
             }
         }else if(texture instanceof CanvasBuild c && c.isAdded()){
             if(c.texture == null || c.texture.isDisposed()){

@@ -45,7 +45,20 @@ public class UiHotReload{
             });
         }catch(Exception e){
             dialog.cont.clearChildren();
-            dialog.cont.add("[scarlet]Error reading file: \n" + Strings.getStackTrace(e)).center().labelAlign(Align.center);
+            if(e.getMessage() != null && e.getMessage().contains("line ")){
+                try{
+                    String text = file.readString();
+                    int actualLine = Strings.parseInt(e.getMessage().substring(e.getMessage().indexOf("line ") + 5));
+                    if(actualLine > 0){
+                        String[] lines = text.split("\n");
+                        if(actualLine < lines.length){
+                            dialog.cont.add("[red]Error:[] " + e.getMessage() + "\n\nLine: [red]" + lines[actualLine - 1].trim());
+                        }
+                    }
+                }catch(Exception ignored){
+                }
+            }
+            if(dialog.cont.getChildren().isEmpty()) dialog.cont.add("[red]Error reading file![] \n" + Strings.getStackTrace(e)).center().labelAlign(Align.center);
         }
     }
 }

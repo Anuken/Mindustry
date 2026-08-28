@@ -20,20 +20,21 @@ import arc.scene.utils.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
+import mindustry.mod.*;
 import mindustry.ui.*;
 import mindustry.ui.builder.UiBuilder.*;
 
 /** Builds a UI into an existing Table from a NodeBuilder tree. */
 public class UiTreeBuilder{
 
-    public static ObjectMap<String, Element> build(Table root, NodeBuilder<?> builder){
+    public static BuildResult build(Table root, NodeBuilder<?> builder){
         return build(root, builder, null);
     }
 
-    public static ObjectMap<String, Element> build(Table root, NodeBuilder<?> builder, @Nullable Cons<MenuResult> resultListener){
+    public static BuildResult build(Table root, NodeBuilder<?> builder, @Nullable Cons<MenuResult> resultListener){
         BuildContext ctx = new BuildContext(resultListener);
         buildInto(root, builder.entries, ctx);
-        return ctx.idElements;
+        return new BuildResult(ctx.idElements, ctx.images);
     }
 
     private static void buildInto(Table table, Seq<Entry> entries, BuildContext ctx){
@@ -53,7 +54,7 @@ public class UiTreeBuilder{
                 String cond = node.str(UiKey.condition);
                 if(cond != null && !evalCondition(cond)) continue; // condition false - node is not added at all
 
-                Cell<?> cell = addNode(table, entry.key, node, ctx);
+                Cell<?> cell = entry.key == UiKey.space ? table.add() : table.add(addNode(entry.key, node, ctx));
                 if(cell == null) continue; // unknown/unsupported node - skip for forward compat
 
                 for(Entry d : defaults) applyCellProp(cell, d.key, d.value);
@@ -64,8 +65,7 @@ public class UiTreeBuilder{
                 String id = node.str(UiKey.id);
                 if(id != null){
                     cell.name(id); // assigns element.name via Cell.name()
-                    Object element = cell.get();
-                    if(element instanceof Element el) ctx.idElements.put(id, el);
+                    ctx.idElements.put(id, cell.get());
                 }
 
             }else{
@@ -75,7 +75,7 @@ public class UiTreeBuilder{
     }
 
     /** Constructs the element for one node, adds it to the parent table, and returns its cell. */
-    private static Cell<?> addNode(Table table, UiKey type, NodeBuilder<?> node, BuildContext ctx){
+    private static Element addNode(UiKey type, NodeBuilder<?> node, BuildContext ctx){
         return switch(type){
             case table -> {
                 String bg = node.str(UiKey.background);
@@ -84,16 +84,41 @@ public class UiTreeBuilder{
                 Float margin = node.num(UiKey.margin);
                 if(margin != null) t.margin(margin);
 
-                Cell<Table> cell = table.add(t);
                 buildInto(t, node.entries, ctx); // recurse with a fresh defaults scope
-                yield cell;
+                yield t;
+            }
+            case stack -> {
+                Stack stack = new Stack();
+                stack.touchable = Touchable.childrenOnly;
+
+                //simplified creation compared to table; no cells are involved
+                for(Entry entry : node.entries){
+                    if(entry.value instanceof NodeBuilder<?> child){
+                        String cond = child.str(UiKey.condition);
+                        if(cond != null && !evalCondition(cond)) continue;
+
+                        var element = addNode(entry.key, child, ctx);
+                        if(element == null) continue; // unknown/unsupported node - skip for forward compat
+                        String id = child.str(UiKey.id);
+
+                        if(id != null){
+                            element.name = id;
+                            ctx.idElements.put(id, element);
+                        }
+                        String colorStr = child.str(UiKey.color); // Apply color if provided
+                        if(colorStr != null) element.setColor(Strings.parseColor(colorStr, Color.white));
+
+                        stack.add(element);
+                    }
+                }
+                yield stack;
             }
             case pane -> {
                 Table inner = new Table();
                 buildInto(inner, node.entries, ctx);
                 ScrollPane pane = new ScrollPane(inner);
                 applyStyle(node, ScrollPaneStyle.class, pane::setStyle);
-                yield table.add(pane);
+                yield pane;
             }
             case label -> {
                 Label label = new Label(node.str(UiKey.text, ""));
@@ -101,10 +126,13 @@ public class UiTreeBuilder{
                 String labelAlign = node.str(UiKey.labelAlign);
                 if(labelAlign != null) label.setAlignment(parseAlign(labelAlign));
                 applyStyle(node, LabelStyle.class, label::setStyle);
-                yield table.add(label);
+                yield label;
             }
             case image -> {
-                Image image = new Image(findDrawable(node.str(UiKey.region, node.str(UiKey.icon, "error"))));
+                String region = node.str(UiKey.region, node.str(UiKey.icon, "error"));
+                Image image = new Image(findDrawable(region, node.str(UiKey.placeholder)));
+                // track server-streamed images so that they can be reloaded when streaming finishes
+                if(region.startsWith(DataImagePacker.serverRegionPrefix)) ctx.images.get(region, Seq::new).add(image);
                 String scl = node.str(UiKey.scaling);
                 if(scl != null){
                     try{
@@ -112,7 +140,7 @@ public class UiTreeBuilder{
                         image.setScaling(scaling);
                     }catch(Exception ignored){}
                 }
-                yield table.add(image);
+                yield image;
             }
             case button -> {
                 TextButton btn = new TextButton(node.str(UiKey.text, ""));
@@ -120,18 +148,23 @@ public class UiTreeBuilder{
 
                 String icon = node.str(UiKey.icon);
                 if(icon != null){
-                    btn.add(new Image(findDrawable(icon)).setScaling(Scaling.fit)).size(32f);
+                    Image iconImage = new Image(findDrawable(icon, node.str(UiKey.placeholder))).setScaling(Scaling.fit);
+                    // track server-streamed images so that they can be reloaded when streaming finishes
+                    if(icon.startsWith(DataImagePacker.serverRegionPrefix)) ctx.images.get(icon, Seq::new).add(iconImage);
+                    btn.add(iconImage).size(32f);
                     btn.getCells().reverse();
                 }
                 wireButton(btn, node, ctx);
-                yield table.add(btn);
+                yield btn;
             }
             case imageButton -> {
                 String icon = node.str(UiKey.icon);
-                ImageButton btn = new ImageButton(icon != null ? findDrawable(icon) : null);
+                ImageButton btn = new ImageButton(icon != null ? findDrawable(icon, node.str(UiKey.placeholder)) : null);
+                // track server-streamed images so that they can be reloaded when streaming finishes
+                if(icon != null && icon.startsWith(DataImagePacker.serverRegionPrefix)) ctx.images.get(icon, Seq::new).add(btn.getImage());
                 applyStyle(node, ImageButtonStyle.class, btn::setStyle);
                 wireButton(btn, node, ctx);
-                yield table.add(btn);
+                yield btn;
             }
             case field -> {
                 TextField field = new TextField(node.str(UiKey.text, ""));
@@ -142,7 +175,7 @@ public class UiTreeBuilder{
                 String enter = node.str(UiKey.enter);
                 if(enter != null) field.keyDown(KeyCode.enter, () -> fireResult(ctx, enter));
                 applyStyle(node, TextFieldStyle.class, field::setStyle);
-                yield table.add(field);
+                yield field;
             }
             case check -> {
                 CheckBox box = new CheckBox(node.str(UiKey.text, ""));
@@ -150,7 +183,7 @@ public class UiTreeBuilder{
                 String group = node.str(UiKey.group);
                 if(group != null) ctx.group(group).add(box);
                 applyStyle(node, CheckBoxStyle.class, box::setStyle);
-                yield table.add(box);
+                yield box;
             }
             case slider -> {
                 Slider slider = new Slider(node.num(UiKey.min, 0f), node.num(UiKey.max, 1f), node.num(UiKey.step, 0.1f), false);
@@ -175,19 +208,17 @@ public class UiTreeBuilder{
                 label.setAlignment(Align.center);
                 label.touchable = Touchable.disabled;
                 label.setStyle(Styles.outlineLabel);
-                yield table.add(new Stack(slider, label));
+                yield new Stack(slider, label);
             }
-            case space -> table.add();
             case buttonTable -> {
                 Button btn = new Button();
                 //can use any button style
                 if(!applyStyle(node, TextButtonStyle.class, btn::setStyle)) applyStyle(node, ImageButtonStyle.class, btn::setStyle);
                 Float margin = node.num(UiKey.margin);
                 if(margin != null) btn.margin(margin);
-                Cell<Button> cell = table.add(btn);
                 buildInto(btn, node.entries, ctx); // build the button's own contents into it, like table/pane
                 wireButton(btn, node, ctx);
-                yield cell;
+                yield btn;
             }
             default -> null;
         };
@@ -226,7 +257,7 @@ public class UiTreeBuilder{
         for(var entry : ctx.idElements){
             Element el = entry.value;
             if(el instanceof Slider s) res.values.put(entry.key, s.getValue());
-            else if(el instanceof Stack stack && stack.getChildren().contains(e -> e instanceof Slider)) res.values.put(entry.key, ((Slider)stack.getChildren().find(e -> e instanceof Slider)).getValue());
+            else if(el instanceof Stack stack && stack.getChildren().size > 0 && stack.getChildren().get(0) instanceof Slider slider) res.values.put(entry.key, slider.getValue());
             else if(el instanceof TextField f) res.values.put(entry.key, f.getText());
             else if(el instanceof CheckBox c) res.values.put(entry.key, c.isChecked());
             //the only thing distinguishing buttons that can be checked is that they have a style for it; it's just not visible otherwise.
@@ -289,13 +320,20 @@ public class UiTreeBuilder{
     }
 
     private static Drawable findDrawable(String name){
+        return findDrawable(name, "error");
+    }
+
+    /** @param placeholder shown instead of the error sprite if {@code name} isn't streamed from the server yet */
+    private static Drawable findDrawable(String name, @Nullable String placeholder){
         if(Core.atlas.has(name)){
             return Core.atlas.drawable(name);
         }
         //icons are a fallback (TODO: bad idea?)
         var result = Icon.icons.get(name);
-        if(result == null) return Core.atlas.drawable("error");
-        return result;
+        if(result != null) return result;
+
+        if(placeholder != null) return findDrawable(placeholder, null);
+        return Core.atlas.drawable("nomap"); // no placeholder provided, use the default of the map preview texture
     }
 
     /** Evaluates a condition string: "portrait", "landscape", or "width|height >=|>|<|<= number". */
@@ -344,6 +382,7 @@ public class UiTreeBuilder{
         final @Nullable Cons<MenuResult> resultListener;
         final ObjectMap<String, Element> idElements = new ObjectMap<>();
         final ObjectMap<String, ButtonGroup<Button>> buttonGroups = new ObjectMap<>();
+        final ObjectMap<String, Seq<Image>> images = new ObjectMap<>();
 
         BuildContext(@Nullable Cons<MenuResult> resultListener){
             this.resultListener = resultListener;
@@ -351,6 +390,17 @@ public class UiTreeBuilder{
 
         ButtonGroup<Button> group(String name){
             return buttonGroups.get(name, ButtonGroup::new);
+        }
+    }
+
+    /** Result of building a NodeBuilder: named elements (those with an explicit id), plus any server-streamed images, keyed by region name */
+    public static class BuildResult{
+        public final ObjectMap<String, Element> idElements;
+        public final ObjectMap<String, Seq<Image>> images;
+
+        BuildResult(ObjectMap<String, Element> idElements, ObjectMap<String, Seq<Image>> images){
+            this.idElements = idElements;
+            this.images = images;
         }
     }
 }

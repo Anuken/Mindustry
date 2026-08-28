@@ -10,6 +10,7 @@ public class UiBuilder{
 
     public static TableBuilder parse(String source){ return UiDslParser.parse(source); }
     public static TableBuilder table(){ return new TableBuilder(); }
+    public static StackBuilder stack(){ return new StackBuilder(); }
     public static PaneBuilder pane(){ return new PaneBuilder(); }
     public static LabelBuilder label(String text){ return new LabelBuilder().text(text); }
     public static ImageBuilder image(){ return new ImageBuilder(); }
@@ -98,6 +99,7 @@ public class UiBuilder{
             return switch(type){
                 case table -> new TableBuilder();
                 case pane -> new PaneBuilder();
+                case stack -> new StackBuilder();
                 case label -> new LabelBuilder();
                 case image -> new ImageBuilder();
                 case button -> new ButtonBuilder();
@@ -172,6 +174,11 @@ public class UiBuilder{
             for(Entry e : entries) if(e.key == key && e.value instanceof Boolean b) return b;
             return def;
         }
+
+        @Override
+        public String toString(){
+            return UiDslWriter.write(this);
+        }
     }
 
     static class Entry{
@@ -215,6 +222,10 @@ public class UiBuilder{
         }
     }
 
+    public static class StackBuilder extends ContainerBuilder<StackBuilder>{
+        StackBuilder(){ super(UiKey.stack); }
+    }
+
     public static class TableBuilder extends ContainerBuilder<TableBuilder>{
         TableBuilder(){ super(UiKey.table); }
 
@@ -242,6 +253,7 @@ public class UiBuilder{
         ImageBuilder(){ super(UiKey.image); }
 
         public ImageBuilder region(String region){ return prop(UiKey.region, region); }
+        public ImageBuilder placeholder(String placeholder){ return prop(UiKey.placeholder, placeholder); }
         public ImageBuilder scaling(Scaling scaling){ return prop(UiKey.scaling, scaling.name()); }
     }
 
@@ -250,18 +262,24 @@ public class UiBuilder{
 
         public ButtonBuilder text(String text){ return prop(UiKey.text, text); }
         public ButtonBuilder icon(String icon){ return prop(UiKey.icon, icon); }
+        public ButtonBuilder placeholder(String placeholder){ return prop(UiKey.placeholder, placeholder); }
         public ButtonBuilder style(String style){ return prop(UiKey.style, style); }
         public ButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
+        public ButtonBuilder group(String group){ return prop(UiKey.group, group); }
+        public ButtonBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 
     public static class ImageButtonBuilder extends NodeBuilder<ImageButtonBuilder>{
         ImageButtonBuilder(){ super(UiKey.imageButton); }
 
         public ImageButtonBuilder icon(String icon){ return prop(UiKey.icon, icon); }
+        public ImageButtonBuilder placeholder(String placeholder){ return prop(UiKey.placeholder, placeholder); }
         public ImageButtonBuilder style(String style){ return prop(UiKey.style, style); }
         public ImageButtonBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ImageButtonBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
+        public ImageButtonBuilder group(String group){ return prop(UiKey.group, group); }
+        public ImageButtonBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 
     public static class FieldBuilder extends NodeBuilder<FieldBuilder>{
@@ -282,6 +300,7 @@ public class UiBuilder{
         public CheckBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
         public CheckBuilder style(String style){ return prop(UiKey.style, style); }
         public CheckBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
+        public CheckBuilder group(String group){ return prop(UiKey.group, group); }
     }
 
     public static class SliderBuilder extends NodeBuilder<SliderBuilder>{
@@ -310,5 +329,7 @@ public class UiBuilder{
         public ButtonTableBuilder clicked(String result){ return prop(UiKey.clicked, result); }
         public ButtonTableBuilder margin(float m){ return prop(UiKey.margin, m); }
         public ButtonTableBuilder disabled(boolean disabled){ return prop(UiKey.disabled, disabled); }
+        public ButtonTableBuilder group(String group){ return prop(UiKey.group, group); }
+        public ButtonTableBuilder checked(boolean checked){ return prop(UiKey.checked, checked); }
     }
 }
