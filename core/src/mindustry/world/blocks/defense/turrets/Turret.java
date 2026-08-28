@@ -547,7 +547,7 @@ public class Turret extends ReloadTurret{
             }
 
             if(heatRequirement > 0){
-                requiredHeat = Mathf.approachDelta(requiredHeat, heatRequirement * (scaleHeat ? timeScale : 1f), warmupHeatRate * delta());
+                requiredHeat = heatRequirement * (scaleHeat ? timeScale : 1f);
                 heatReq = calculateHeat(sideHeat);
             }
 
