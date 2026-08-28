@@ -174,7 +174,7 @@ public class ContinuousTurret extends Turret{
 
         @Override
         public byte version(){
-            return 3;
+            return (byte)(super.version() + 1);
         }
 
         @Override

@@ -164,7 +164,7 @@ public class VariableReactor extends PowerGenerator{
 
         @Override
         public byte version(){
-            return 2;
+            return (byte)(super.version() + 1);
         }
 
         @Override
