@@ -268,11 +268,11 @@ public class TileableLogicDisplay extends LogicDisplay{
 
         @Override
         public void ensureBuffer() {
-            if(buffer == null){
-                buffer = new FrameBuffer(32 * tilesWidth - 2 * frameSize, 32 * tilesHeight - 2 * frameSize);
+            if(rootDisplay.buffer == null){
+                rootDisplay.buffer = new FrameBuffer(32 * tilesWidth - 2 * frameSize, 32 * tilesHeight - 2 * frameSize);
                 //clear the buffer - some OSs leave garbage in it
-                buffer.begin(backgroundColor);
-                buffer.end();
+                rootDisplay.buffer.begin(backgroundColor);
+                rootDisplay.buffer.end();
             }
         }
 

@@ -173,6 +173,7 @@ const BuildSelectEvent = Packages.mindustry.game.EventType.BuildSelectEvent
 const BuildRotateEvent = Packages.mindustry.game.EventType.BuildRotateEvent
 const BlockBuildEndEvent = Packages.mindustry.game.EventType.BlockBuildEndEvent
 const BlockBuildBeginEvent = Packages.mindustry.game.EventType.BlockBuildBeginEvent
+const RulesLoadEvent = Packages.mindustry.game.EventType.RulesLoadEvent
 const ResearchEvent = Packages.mindustry.game.EventType.ResearchEvent
 const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent

@@ -636,6 +636,8 @@ public class Block extends UnlockableContent implements Senseable{
     public void setStats(){
         super.setStats();
 
+        stats.useCategories = true;
+
         stats.add(Stat.size, "@x@", size, size);
 
         if(synthetic()){
@@ -1462,8 +1464,6 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         setBars();
-
-        stats.useCategories = true;
 
         //TODO check for double power consumption
 
