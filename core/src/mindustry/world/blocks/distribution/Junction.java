@@ -1,5 +1,6 @@
 package mindustry.world.blocks.distribution;
 
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
@@ -30,11 +31,9 @@ public class Junction extends Block{
     public void setStats(){
         super.setStats();
 
-        //(60f / speed * capacity) returns 13.84 which is not the actual value (non linear, depends on fps)
+        //(60f / speed * capacity) returns 13.84 which is not the actual value (non-linear, depends on fps)
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
-        stats.add(Stat.itemCapacity, table -> {
-            table.add(Strings.autoFixed(capacity, 2) + " " + StatUnit.items.localized() + " " + StatUnit.perSide.localized());
-        });
+        stats.add(Stat.itemCapacity, table -> table.add(Strings.autoFixed(capacity, 2) + " " + StatUnit.items.localized() + " " + StatUnit.perSide.localized()));
     }
 
     @Override
@@ -44,6 +43,17 @@ public class Junction extends Block{
 
     public class JunctionBuild extends Building{
         public DirectionalItemBuffer buffer = new DirectionalItemBuffer(capacity);
+        public boolean[] acceptSide = new boolean[4];
+
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            for(int i = 0; i < 4; i++){
+                Building to = nearby(i);
+                acceptSide[i] = to != null && to.team == team && (to instanceof JunctionBuild || to.block.hasItems);
+            }
+        }
 
         @Override
         public int acceptStack(Item item, int amount, Teamc source){
@@ -88,9 +98,7 @@ public class Junction extends Block{
             int relative = source.relativeTo(tile);
 
             if(relative == -1 || !buffer.accepts(relative)) return false;
-            Building to = nearby(relative);
-            //allow accepting if the target can accept items, is another junction, or produces items (hasItems) like a crafter
-            return to != null && to.team == team && (to.acceptItem(this, item) || to instanceof JunctionBuild || to.block.hasItems);
+            return acceptSide[relative];
         }
 
         @Override
