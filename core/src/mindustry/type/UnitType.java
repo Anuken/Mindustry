@@ -375,9 +375,6 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** amount of items this unit can carry; <0 to determine based on hitSize. */
     public int itemCapacity = -1;
-    /** @deprecated only kept for compatibility with some turrets that query this field! Remove this from your code immediately! */
-    @Deprecated
-    public int ammoCapacity = 1;
 
     /** max hardness of ore that this unit can mine (<0 to disable) */
     public int mineTier = -1;

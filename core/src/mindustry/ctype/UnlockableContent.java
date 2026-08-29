@@ -140,12 +140,6 @@ public abstract class UnlockableContent extends MappableContent{
         return minfo.mod == null || isPatchContent() ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
     }
 
-    /** @deprecated just call computeStats() every time, there's no reason to cache it. This will be removed in v9. */
-    @Deprecated
-    public void checkStats(){
-        computeStats();
-    }
-
     /** Initializes stats on demand. Called every time the block stats are shown. */
     public void setStats(){
     }
