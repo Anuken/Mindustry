@@ -1,0 +1,1 @@
+Un gioco di gestione industriale a mondo aperto con elementi RTS e tower defense.
