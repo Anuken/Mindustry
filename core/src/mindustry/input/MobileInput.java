@@ -1046,7 +1046,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             attractDst = 0f;
 
             if(unit.within(payloadTarget, 3f * Time.delta)){
-                if(payloadTarget instanceof Vec2 && pay.hasPayload()){
+                if(pay.hasPayload() && (payloadTarget instanceof Vec2 || (payloadTarget instanceof Building b && b.team == player.team() && b.acceptPayload(b, pay.payloads().peek())))){
                     //vec -> dropping something
                     tryDropPayload();
                 }else if(payloadTarget instanceof Building build && build.team == unit.team){

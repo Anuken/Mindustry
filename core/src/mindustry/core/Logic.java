@@ -476,7 +476,7 @@ public class Logic implements ApplicationListener{
 
         PerfCounter.unitUpdate.begin();
         if(editor){
-            Groups.unit.update(Unitc::isPlayer);
+            Groups.unit.update(u -> u.isPlayer() || u.spawnedByCore);
         }else{
             Groups.unit.update();
         }

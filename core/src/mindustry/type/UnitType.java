@@ -740,11 +740,11 @@ public class UnitType extends UnlockableContent implements Senseable{
             table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
             if(net.active() && ai.controller != null && ai.controller.lastAccessed != null){
                 table.row();
-                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).growX().wrap().left();
+                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).width(260f).wrap().left();
             }
         }else if(net.active() && unit.lastCommanded != null){
             table.row();
-            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).growX().wrap().left();
+            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).width(260f).wrap().left();
         }
 
         table.row();
