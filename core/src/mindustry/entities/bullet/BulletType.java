@@ -777,6 +777,7 @@ public class BulletType extends Content implements Cloneable{
             float angle = b.angleTo(u.aimX, u.aimY);
             b.vel.setAngle(Angles.moveToward(b.vel.angle(), angle, followAimSpeed * Time.delta));
         }
+    }
 
     public void updateRicochet(Bullet b){
         float angle = b.rotation();
