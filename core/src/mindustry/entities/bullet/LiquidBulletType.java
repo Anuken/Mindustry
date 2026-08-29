@@ -96,7 +96,7 @@ public class LiquidBulletType extends BulletType{
         Puddles.deposit(world.tileWorld(hitx, hity), liquid, puddleSize);
 
         if(liquid.temperature <= 0.5f && liquid.flammability < 0.3f){
-            float intensity = 400f * puddleSize/6f;
+            float intensity = 400f * (liquid.heatCapacity / 0.4f) * (puddleSize / 6f);
             Fires.extinguish(world.tileWorld(hitx, hity), intensity);
             for(Point2 p : Geometry.d4){
                 Fires.extinguish(world.tileWorld(hitx + p.x * tilesize, hity + p.y * tilesize), intensity);

@@ -7,7 +7,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
 import arc.scene.event.*;
-import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
@@ -655,13 +654,13 @@ public class StatValues{
                         bt.row();
                     }
 
-                    if(blockName != null && t instanceof UnlockableContent){
-                        UnlockableContent content = (UnlockableContent) t;
-                        tableInfo(bt, "block." + blockName + "." + content.name + ".info");
+                    if(blockName != null && t != null){
+                        tableInfo(bt, "block." + blockName + "." + t.name + ".info");
+                        bt.row();
                     }
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
-                        bt.add(Core.bundle.format("bullet.damage", type.damage) + (type.continuousDamage() > 0 ? 
+                        bt.add(Core.bundle.format("bullet.damage", type.damage) + (type.continuousDamage() > 0 ?
                         "[lightgray] ~ [stat]" + Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized() : ""));
                     }
 
@@ -732,7 +731,7 @@ public class StatValues{
                             Strings.autoFixed(b.timeDuration / 60f, 1)) + " " + StatUnit.seconds.localized());
                         }
                         if(b.timeDuration > 0f && b.powerSclDecrease < 1f){
-                            sep(bt, Core.bundle.format("bullet.empslowdown", 
+                            sep(bt, Core.bundle.format("bullet.empslowdown",
                             (b.powerSclDecrease < 1f ? "[negstat]" : "") + Strings.autoFixed((b.powerSclDecrease - 1f) * 100f, 2),
                             Strings.autoFixed(b.timeDuration / 60f, 1)) + " " + StatUnit.seconds.localized());
                         }
@@ -856,12 +855,10 @@ public class StatValues{
 
     /** Adds an info table with an icon and description key from the bundle */
     private static Cell<?> tableInfo(Table table, String key){
+        if(!Core.bundle.has(key)) return null;
         return table.table(t -> {
-            if(Core.bundle.has(key) && !Vars.headless){
-                t.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
-                t.add("[lightgray]" + Core.bundle.get(key));
-                t.row().add().height(10f).row();
-            }
+            if(!Vars.headless) t.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
+            t.add("[lightgray]" + Core.bundle.get(key)).padBottom(10f);
         });
     }
 

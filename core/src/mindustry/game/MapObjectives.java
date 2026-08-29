@@ -1415,10 +1415,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     private static void prepareTexture(ObjectiveMarker marker, Object texture){
         if(texture instanceof LogicDisplayBuild d && d.isAdded()){
-            if(d.buffer == null || d.buffer.isDisposed()){
+            if(d.rootDisplay.buffer == null || d.rootDisplay.buffer.isDisposed()){
                 marker.setTexture("error");
             }else{
-                d.processCommands();
+                d.rootDisplay.processCommands();
             }
         }else if(texture instanceof CanvasBuild c && c.isAdded()){
             if(c.texture == null || c.texture.isDisposed()){
