@@ -75,6 +75,7 @@ public class NuclearReactor extends PowerGenerator{
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemDuration;
         super.setStats();
 
         stats.add(Stat.meltdownTime, table -> {
