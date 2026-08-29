@@ -26,10 +26,8 @@ public class PowerTurret extends Turret{
     public class PowerTurretBuild extends TurretBuild{
 
         @Override
-        public void updateTile(){
-            unit.ammo(power == null ? 0f : power.status * unit.type().ammoCapacity);
-
-            super.updateTile();
+        public float getAmmoFraction(){
+            return power == null ? 0f : power.status;
         }
 
         @Override
@@ -37,6 +35,7 @@ public class PowerTurret extends Turret{
             return switch(sensor){
                 case ammo -> power == null ? 0f : power.status;
                 case ammoCapacity -> 1;
+                case heat -> heatRequirement > 0 ? heatReq : Float.NaN;
                 default -> super.sense(sensor);
             };
         }

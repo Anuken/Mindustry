@@ -35,7 +35,7 @@ public class IconSelectDialog extends Dialog{
                     consumer.get(0);
                 });
 
-                int cols = (int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f));
+                int cols = Math.max((int)Math.min(20, Core.graphics.getWidth() / Scl.scl(52f)), 1);
 
                 int i = 1;
                 for(var key : accessibleIcons){

@@ -52,6 +52,7 @@ public class LogicDisplay extends Block{
 
     public int displaySize = 64;
     public float scaleFactor = 1f;
+    public Color backgroundColor = Pal.darkerMetal;
 
     static{
         Events.on(ResetEvent.class, e -> displays.clear());
@@ -81,7 +82,7 @@ public class LogicDisplay extends Block{
         clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
     }
 
-    public class LogicDisplayBuild extends Building{
+    public class LogicDisplayBuild extends Building implements LDrawable{
         //The root display (bottom left corner of display for tileable displays)
         public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
@@ -121,7 +122,13 @@ public class LogicDisplay extends Block{
             };
         }
 
-        public void flushCommands(LongSeq graphicsBuffer){
+        @Override
+        public boolean drawable(LExecutor exec){
+            return isValid() && (exec.privileged || (team == exec.team && !privileged));
+        }
+
+        @Override
+        public void draw(LongSeq graphicsBuffer){
             int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
 
             for(int i = 0; i < added; i++){
@@ -135,14 +142,15 @@ public class LogicDisplay extends Block{
             if(buffer == null){
                 buffer = new FrameBuffer(displaySize, displaySize);
                 //clear the buffer - some OSs leave garbage in it
-                buffer.begin(Pal.darkerMetal);
+                buffer.begin(backgroundColor);
                 buffer.end();
             }
         }
 
         public void getBufferRegion(TextureRegion region){
-            if(buffer != null){
-                region.set(buffer.getTexture(), 0, buffer.getTexture().height, buffer.getTexture().width, -buffer.getTexture().height);
+            if(rootDisplay.buffer != null){
+                region.set(rootDisplay.buffer.getTexture(), 0, rootDisplay.buffer.getTexture().height,
+                rootDisplay.buffer.getTexture().width, -rootDisplay.buffer.getTexture().height);
             }
         }
 
@@ -188,7 +196,7 @@ public class LogicDisplay extends Block{
                                 int id = packed >> 5;
                                 if(ctype == displayDrawType){
                                     if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
-                                        displays.get(id).getBufferRegion(Tmp.tr1);
+                                        displays.get(id).rootDisplay.getBufferRegion(Tmp.tr1);
                                         Draw.rect(Tmp.tr1, x, y, p2, p2 / Tmp.tr1.ratio(), p3);
                                     }
                                 }else if(ctype < ContentType.all.length && Vars.content.getByID(ContentType.all[ctype], id) instanceof UnlockableContent u){
@@ -268,8 +276,10 @@ public class LogicDisplay extends Block{
             super.remove();
 
             if(index != -1){
-                displays.get(displays.size - 1).index = index;
-                displays.remove(index);
+                LogicDisplayBuild last = displays.get(displays.size - 1);
+                last.index = index;
+                displays.set(index, last);
+                displays.remove(displays.size - 1);
                 index = -1;
             }
 

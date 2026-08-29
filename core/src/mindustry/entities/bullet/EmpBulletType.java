@@ -14,8 +14,8 @@ public class EmpBulletType extends BasicBulletType{
     public float unitDamageScl = 0.7f;
 
     @Override
-    public void hit(Bullet b, float x, float y){
-        super.hit(b, x, y);
+    public void hit(Bullet b, float x, float y, boolean createFrags){
+        super.hit(b, x, y, createFrags);
 
         if(!b.absorbed){
             Vars.indexer.allBuildings(x, y, radius, other -> {

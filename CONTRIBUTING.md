@@ -20,6 +20,12 @@ Yes, there are occurrences of trailing spaces, extra newlines, empty indents, an
 
 I **especially** do not want to see PRs that apply any kind of automated analysis to the source code to "optimize" anything - my IDE can do that already. If the PR doesn't actually change anything useful, I'm not going to review or merge it.
 
+### Do not make AI "contributions".
+
+If I see a PR with significant amounts of code that's obviously written by AI, I will reject your PR, and you will be blocked. Don't waste my time with slop.
+
+Asking AI questions, and using that information to help you write code? Fine. Using it to actually write code? No.
+
 ## Style Guidelines
 
 ### Follow the formatting guidelines.
@@ -28,7 +34,7 @@ This means:
 - Same-line braces.
 - 4 spaces indentation
 - `camelCase`, **even for constants or enums**. Why? Because `SCREAMING_CASE` is ugly, annoying to type and does not achieve anything useful. Constants are *less* dangerous than variables, not more. Any reasonable IDE should highlight them for you anyway.
-- No underscores for anything. (Yes, I know `Bindings` violates this principle, but that's for legacy reasons and really should be cleaned up some day)
+- No underscores for anything.
 - Do not use braceless `if/else` statements. `if(x) statement else statement2` should **never** be done. In very specific situations, having braceless if-statements on one line is allowed: `if(cond) return;` would be valid.
 - Prefer single-line javadoc `/** @return for example */` instead of multiline javadoc whenever possible
 - Short method/variable names (multipleLongWords should be avoided if it's possible to do so reasonably, especially for variables)

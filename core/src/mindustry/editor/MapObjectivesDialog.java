@@ -3,6 +3,8 @@ package mindustry.editor;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.input.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -47,6 +49,10 @@ public class MapObjectivesDialog extends BaseDialog{
 
             if(field != null && field.isAnnotationPresent(Multiline.class)){
                 cont.area(get.get(), set).height(100f).growX();
+            }else if(field != null && field.isAnnotationPresent(LogicCode.class)){
+                cont.button(b -> b.image(Icon.pencil).size(iconSmall), () -> {
+                    ui.logic.show(get.get(), null, true, set::get);
+                }).pad(4f);
             }else{
                 cont.field(get.get(), set).growX();
             }
@@ -410,7 +416,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 t.left();
                 t.margin(10f);
 
-                if(name.length() > 0) t.add(name + ":").color(Pal.accent);
+                if(name.length() > 0) t.add(name).color(Pal.accent);
                 t.add().growX();
 
                 Cell<ImageButton> remove = null;
@@ -482,21 +488,21 @@ public class MapObjectivesDialog extends BaseDialog{
                 buttons.defaults().size(160f, 64f).pad(2f);
                 buttons.button("@back", Icon.left, MapObjectivesDialog.this::hide);
                 buttons.button("@add", Icon.add, () -> getProvider(MapObjective.class).get(new TypeInfo(MapObjective.class), canvas::query));
-                buttons.button("@waves.edit", Icon.edit, () -> {
-                    BaseDialog dialog = new BaseDialog("@waves.edit");
+                buttons.button("@edit.menu", Icon.edit, () -> {
+                    BaseDialog dialog = new BaseDialog("@edit.menu");
                     dialog.addCloseButton();
                     dialog.setFillParent(false);
                     dialog.cont.table(Tex.button, t -> {
                         var style = Styles.cleart;
                         t.defaults().size(280f, 64f).pad(2f);
 
-                        t.button("@waves.copy", Icon.copy, style, () -> {
+                        t.button("@copy.clipboard", Icon.copy, style, () -> {
                             ui.showInfoFade("@copied");
                             Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
                             dialog.hide();
                         }).disabled(b -> canvas.objectives.isEmpty()).marginLeft(12f).row();
 
-                        t.button("@waves.load", Icon.download, style, () -> {
+                        t.button("@load.clipboard", Icon.download, style, () -> {
                             try{
                                 rebuildObjectives(new Seq<>(JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all));
                             }catch(Exception e){
@@ -534,6 +540,46 @@ public class MapObjectivesDialog extends BaseDialog{
             out.get(canvas.objectives);
             out = arr -> {};
         });
+
+        update(() -> {
+            if(hasKeyboard()){
+                doInput();
+            }
+        });
+    }
+
+    private void doInput(){
+        if(Core.input.ctrl() && Core.input.keyTap(KeyCode.c)){
+            Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
+            int pasteX = Mathf.round((pos.x - objWidth * canvas.unitSize / 2f) / canvas.unitSize);
+            int pasteY = Mathf.floor((pos.y - canvas.unitSize) / canvas.unitSize);
+            Tmp.r1.set(pasteX, pasteY, 1, 1).grow(-0.001f);
+            for(var obj : canvas.objectives){
+                if(Tmp.r2.set(obj.editorX - 2, obj.editorY - 1, objWidth, objHeight).overlaps(Tmp.r1)){
+                    Core.app.setClipboardText(JsonIO.json.toJson(obj, Object.class));
+                    break;
+                }
+            }
+        }
+
+        if(Core.input.ctrl() && Core.input.keyTap(KeyCode.v)){
+            String text = Core.app.getClipboardText();
+            if(text == null) return;
+
+            try{
+                MapObjective obj = JsonIO.read(MapObjective.class, text);
+                Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
+                int tx = Mathf.round((pos.x - objWidth * canvas.unitSize / 2f) / canvas.unitSize);
+                int ty = Mathf.floor((pos.y - canvas.unitSize) / canvas.unitSize);
+                if(obj != null && canvas.tilemap.validPlace(tx, ty, null)){
+                    obj.editorX = tx;
+                    obj.editorY = ty;
+                    canvas.tilemap.createTile(tx, ty, obj, true);
+                    canvas.objectives.add(obj);
+                }
+            }catch(Exception e){ //in case serialization fails
+            }
+        }
     }
 
     public void show(Seq<MapObjective> objectives, Cons<Seq<MapObjective>> out){
