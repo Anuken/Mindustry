@@ -830,7 +830,7 @@ public class Fx{
         float fadeIn = Mathf.clamp(e.fin() / 0.1f), fadeOut = Mathf.clamp(e.fout() / 0.12f);
         float a = fadeIn * fadeOut, radius = 90f;
 
-        if(noiseAlphaCircle == null) noiseAlphaCircle = Core.assets.get("sprites/noiseAlphaCircle.png", Texture.class);
+        if(noiseAlphaCircle == null) noiseAlphaCircle = Core.assets.getOrNull("sprites/noiseAlphaCircle.png", Texture.class);
         if(noiseAlphaCircle == null) return;
 
         int layers = 3;
