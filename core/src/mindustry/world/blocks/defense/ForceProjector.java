@@ -48,6 +48,7 @@ public class ForceProjector extends Block{
     public float hitSoundVolume = 0.12f;
     public Effect absorbEffect = Fx.absorb;
     public Effect shieldBreakEffect = Fx.shieldBreak;
+    public Effect forceShrinkEffect = Fx.forceShrink;
     public @Load("@-top") TextureRegion topRegion;
 
     //TODO json support
@@ -110,6 +111,7 @@ public class ForceProjector extends Block{
         if(consItems) stats.timePeriod = phaseUseTime;
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
+        stats.add(Stat.range, radius / tilesize, StatUnit.blocks);
         stats.add(Stat.regenerationRate, cooldownNormal * 60f, StatUnit.perSecond);
         stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBrokenBase / 60f), StatUnit.seconds);
 
@@ -186,7 +188,7 @@ public class ForceProjector extends Block{
         @Override
         public void onRemoved(){
             float radius = realRadius();
-            if(!broken && radius > 1f) Fx.forceShrink.at(x, y, radius, team.color);
+            if(!broken && radius > 1f) forceShrinkEffect.at(x, y, radius, team.color);
             super.onRemoved();
         }
 
@@ -207,7 +209,7 @@ public class ForceProjector extends Block{
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
-            if(phaseValid && !broken && timer(timerUse, phaseUseTime) && efficiency > 0){
+            if(phaseValid && !broken && timer(timerUse, phaseUseTime / timeScale) && efficiency > 0){
                 consume();
             }
 
@@ -240,7 +242,7 @@ public class ForceProjector extends Block{
             if(buildup >= shieldHealth + phaseShieldBoost * phaseHeat && !broken){
                 broken = true;
                 buildup = shieldHealth;
-                shieldBreakEffect.at(x, y, realRadius(), team.color);
+                shieldBreakEffect.at(x, y, realRadius(), team.color, block);
                 breakSound.at(x, y);
                 if(team != state.rules.defaultTeam){
                     Events.fire(Trigger.forceProjectorBreak);

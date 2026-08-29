@@ -15,7 +15,7 @@ public class DrawCultivator extends DrawBlock{
 
     public int bubbles = 12, sides = 8;
     public float strokeMin = 0.2f, spread = 3f, timeScl = 70f;
-    public float recurrence = 6f, radius = 3f;
+    public float recurrence = 6f, radius = 3f, x, y;
 
     public TextureRegion middle;
 
@@ -27,12 +27,12 @@ public class DrawCultivator extends DrawBlock{
 
         rand.setSeed(build.pos());
         for(int i = 0; i < bubbles; i++){
-            float x = rand.range(spread), y = rand.range(spread);
+            float rx = rand.range(spread), ry = rand.range(spread);
             float life = 1f - ((Time.time / timeScl + rand.random(recurrence)) % recurrence);
 
             if(life > 0){
                 Lines.stroke(build.warmup() * (life + strokeMin));
-                Lines.poly(build.x + x, build.y + y, sides, (1f - life) * radius);
+                Lines.poly(build.x + rx + x, build.y + ry + y, sides, (1f - life) * radius);
             }
         }
 

@@ -5,6 +5,7 @@ import mindustry.content.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.production.*;
@@ -18,6 +19,18 @@ import org.junit.jupiter.params.provider.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PatcherTests{
+
+    static void apply(String... patches){
+        Vars.state.data.load(Seq.with(patches).map(PatchAsset::new));
+    }
+
+    static Seq<PatchAsset> getPatches(){
+        return Vars.state.data.getPatches();
+    }
+
+    static void assertNoWarnings(){
+        assertEquals(new Seq<>(), getPatches().first().warnings);
+    }
 
     @BeforeAll
     static void init(){
@@ -55,7 +68,7 @@ public class PatcherTests{
     """
     })
     void unitFactoryPlans(String value) throws Exception{
-        Vars.state.patcher.apply(Seq.with(value));
+        apply(value);
 
         var plan = ((UnitFactory)Blocks.groundFactory).plans.find(u -> u.unit == UnitTypes.flare);
         assertNotNull(plan, "A plan for flares must have been added.");
@@ -76,7 +89,7 @@ public class PatcherTests{
         var prev = reconstructor.upgrades.copy();
         var prevConsumes = reconstructor.<ConsumeItems>findConsumer(c -> c instanceof ConsumeItems).items;
 
-        Vars.state.patcher.apply(Seq.with(
+        apply(
         """
         block.additive-reconstructor.upgrades: [[dagger, flare]]
         block.additive-reconstructor.consumes: {
@@ -84,7 +97,7 @@ public class PatcherTests{
             items: [surge-alloy/10, copper/20]
         }
         """
-        ));
+        );
 
         assertNoWarnings();
         var plan = reconstructor.upgrades.get(0);
@@ -103,11 +116,11 @@ public class PatcherTests{
         var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
         var prev = reconstructor.upgrades.copy();
 
-        Vars.state.patcher.apply(Seq.with(
+        apply(
         """
         block.additive-reconstructor.upgrades.1: [dagger, flare]
         """
-        ));
+        );
 
         assertNoWarnings();
         var plan = reconstructor.upgrades.get(1);
@@ -123,11 +136,11 @@ public class PatcherTests{
         var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
         var prev = reconstructor.upgrades.copy();
 
-        Vars.state.patcher.apply(Seq.with(
+        apply(
         """
         block.additive-reconstructor.upgrades.+: [[dagger, flare]]
         """
-        ));
+        );
 
         assertNoWarnings();
         var plan = reconstructor.upgrades.peek();
@@ -140,11 +153,11 @@ public class PatcherTests{
 
     @Test
     void consumeApply() throws Exception{
-        Vars.state.patcher.apply(Seq.with(
+        apply(
         """
         block.conveyor.consumes: {power: 1}
         """
-        ));
+        );
 
         assertNoWarnings();
         assertTrue(Blocks.conveyor.hasPower);
@@ -160,11 +173,10 @@ public class PatcherTests{
 
     @Test
     void unitWeapons() throws Exception{
-        UnitTypes.dagger.checkStats();
         UnitTypes.dagger.stats.add(Stat.charge, 999);
         assertNotNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
 
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.weapons.+: {
             name: navanax-weapon
             bullet: {
@@ -172,7 +184,7 @@ public class PatcherTests{
                 lightningLength: 999
             }
         }
-        """));
+        """);
 
         assertNoWarnings();
         assertEquals(3, UnitTypes.dagger.weapons.size);
@@ -182,13 +194,13 @@ public class PatcherTests{
 
         Vars.logic.reset();
 
-        UnitTypes.dagger.checkStats();
+        UnitTypes.dagger.computeStats();
         assertNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
     }
 
     @Test
     void uUnitWeaponReassign() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.weapons: [
             {
                 name: megapoop
@@ -198,7 +210,7 @@ public class PatcherTests{
                 }
             }
         ]
-        """));
+        """);
 
         assertEquals(1, UnitTypes.dagger.weapons.size);
         assertEquals("megapoop", UnitTypes.dagger.weapons.get(0).name);
@@ -213,12 +225,12 @@ public class PatcherTests{
 
     @Test
     void unitAbilities() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.abilities.+: {
             type: ShieldArcAbility
             max: 1000
         }
-        """));
+        """);
 
         assertEquals(1, UnitTypes.dagger.abilities.size);
         assertEquals(ShieldArcAbility.class, UnitTypes.dagger.abilities.get(0).getClass());
@@ -231,7 +243,7 @@ public class PatcherTests{
 
     @Test
     void unitAbilitiesArray() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.abilities.+: [
             {
                 type: ShieldArcAbility
@@ -242,7 +254,7 @@ public class PatcherTests{
                 amount: 10
             }
         ]
-        """));
+        """);
 
         assertEquals(2, UnitTypes.dagger.abilities.size);
         assertEquals(ShieldArcAbility.class, UnitTypes.dagger.abilities.get(0).getClass());
@@ -258,14 +270,14 @@ public class PatcherTests{
 
     @Test
     void unitTypeObject() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         {
             "name": "object syntax",
             "unit.dagger": {
                 "type": "legs"
             }
         }
-        """));
+        """);
 
         assertNoWarnings();
     }
@@ -274,11 +286,11 @@ public class PatcherTests{
     void unitFlagsArray() throws Exception{
         int oldLength = UnitTypes.dagger.targetFlags.length;
 
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.targetFlags.+: [
             shield, drill
         ]
-        """));
+        """);
 
         assertEquals(oldLength + 2, UnitTypes.dagger.targetFlags.length);
         assertEquals(BlockFlag.shield, UnitTypes.dagger.targetFlags[UnitTypes.dagger.targetFlags.length - 2]);
@@ -293,9 +305,9 @@ public class PatcherTests{
     void unitFlags() throws Exception{
         int oldLength = UnitTypes.dagger.targetFlags.length;
 
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.targetFlags.+: shield
-        """));
+        """);
 
         assertEquals(oldLength + 1, UnitTypes.dagger.targetFlags.length);
         assertEquals(BlockFlag.shield, UnitTypes.dagger.targetFlags[UnitTypes.dagger.targetFlags.length - 1]);
@@ -307,11 +319,11 @@ public class PatcherTests{
 
     @Test
     void unitType() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.type: legs
-        """));
+        """);
 
-        assertEquals(0, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(0, getPatches().first().warnings.size);
         assertEquals(LegsUnit.class, UnitTypes.dagger.constructor.get().getClass());
 
         Vars.logic.reset();
@@ -321,51 +333,61 @@ public class PatcherTests{
 
     @Test
     void cannotPatch() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block.conveyor.size: 2
-        """));
+        """);
 
-        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(1, getPatches().first().warnings.size);
         assertEquals(1, Blocks.conveyor.size);
     }
 
     @Test
+    void assignStringToObject() throws Exception{
+        apply("""
+        unit.dagger.weapons: ["frog"]
+        """);
+
+        assertEquals(1, getPatches().first().warnings.size);
+        assertEquals(2, UnitTypes.dagger.weapons.size);
+    }
+
+    @Test
     void gibberish() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         }[35209509()jfkjhadsf,
         ,,,,,[]
         ]{
-        """));
+        """);
 
-        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(1, getPatches().first().warnings.size);
     }
 
     @Test
     void noIdAssign() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block.router.id: 9231
-        """));
+        """);
 
-        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(1, getPatches().first().warnings.size);
     }
 
     @Test
     void unknownFieldWarn() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.weapons.+: {
             bullet: {
                 frogs: 99
             }
         }
         unit.dagger.frogs: 10
-        """));
+        """);
 
-        assertEquals(2, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(2, getPatches().first().warnings.size);
     }
 
     @Test
     void objectFloatMap() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block.mechanical-drill.drillMultipliers: {
             titanium: 2.0
         }
@@ -376,7 +398,7 @@ public class PatcherTests{
             }
         }
         block.mechanical-drill.drillMultipliers.surge-alloy: 10
-        """));
+        """);
 
         assertNoWarnings();
         assertEquals(2f, ((Drill)Blocks.mechanicalDrill).drillMultipliers.get(Items.titanium, 0f));
@@ -392,12 +414,12 @@ public class PatcherTests{
     @Test
     void specificArrayRequirements() throws Exception{
         ItemStack[] reqs = Blocks.scatter.requirements.clone();
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block.scatter.requirements: {
             0: surge-alloy/10
         }
         block.duo.requirements: [titanium/5, surge-alloy/20]
-        """));
+        """);
 
         assertNoWarnings();
         assertEquals(Blocks.scatter.requirements[0], new ItemStack(Items.surgeAlloy, 10));
@@ -411,12 +433,12 @@ public class PatcherTests{
 
     @Test
     void attributes() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block.grass.attributes: {
             oil: 99
         }
         block.grass.attributes.heat: 77
-        """));
+        """);
 
         assertNoWarnings();
         assertEquals(99, Blocks.grass.attributes.get(Attribute.oil));
@@ -430,11 +452,11 @@ public class PatcherTests{
 
     @Test
     void singleValue() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block: {
          graphite-press.craftTime: 1
         }
-        """));
+        """);
 
         assertNoWarnings();
         assertEquals(1f, ((GenericCrafter)Blocks.graphitePress).craftTime);
@@ -442,13 +464,13 @@ public class PatcherTests{
 
     @Test
     void singleValue2() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block: {
          graphite-press: {
             craftTime: 1
          }
         }
-        """));
+        """);
 
         assertNoWarnings();
         assertEquals(1f, ((GenericCrafter)Blocks.graphitePress).craftTime);
@@ -458,20 +480,20 @@ public class PatcherTests{
     void noResolution() throws Exception{
         String name = Pathfinder.class.getCanonicalName();
 
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block.conveyor.lastConfig: {
             class: %theClass%
         }
-        """.replace("%theClass%", name)));
+        """.replace("%theClass%", name));
 
-        assertEquals(1, Vars.state.patcher.patches.first().warnings.size);
+        assertEquals(1, getPatches().first().warnings.size);
     }
 
     @Test
     void setMultiAdd() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.immunities.+: [slow, fast]
-        """));
+        """);
 
         assertNoWarnings();
         assertTrue(UnitTypes.dagger.immunities.contains(StatusEffects.slow));
@@ -485,7 +507,7 @@ public class PatcherTests{
 
     @Test
     void ammoReassign() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         block.fuse.ammoTypes: {
           titanium: "-"
           surge-alloy: {
@@ -496,7 +518,7 @@ public class PatcherTests{
             colors: ["000000", "ff0000", "ffffff"]
           }
         }
-        """));
+        """);
 
         assertNoWarnings();
         assertTrue(((ItemTurret)Blocks.fuse).ammoTypes.containsKey(Items.surgeAlloy));
@@ -512,9 +534,9 @@ public class PatcherTests{
     @Test
     void indexAccess() throws Exception{
         float oldDamage = UnitTypes.dagger.weapons.first().bullet.damage;
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.dagger.weapons.0.bullet.damage: 100
-        """));
+        """);
 
         assertNoWarnings();
         assertEquals(100, UnitTypes.dagger.weapons.first().bullet.damage);
@@ -525,9 +547,88 @@ public class PatcherTests{
     }
 
     @Test
+    void nestedArrays() throws Exception{
+
+        apply("""
+        {
+            "block.ship-refabricator.upgrades.0": {
+                "0": "dagger",
+                "1": "mace"
+            }
+        }
+        """);
+        assertNoWarnings();
+
+        assertEquals(UnitTypes.dagger, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.mace, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.elude, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.avert, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+    }
+
+    @Test
+    void nestedArrays2() throws Exception{
+
+        apply("""
+        {
+            "block.ship-refabricator": {
+                "upgrades.0.0": "dagger",
+                "upgrades.0.1": "mace"
+            }
+        }
+        """);
+        assertNoWarnings();
+
+        assertEquals(UnitTypes.dagger, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.mace, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.elude, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[0]);
+        assertEquals(UnitTypes.avert, ((Reconstructor)Blocks.shipRefabricator).upgrades.get(0)[1]);
+    }
+
+    @Test
+    void arrayMulti() throws Exception{
+        int size = UnitTypes.emanate.weapons.size;
+
+        apply("""
+        {"name":"Patch0","unit":{"emanate":{"weapons":{"0":{"type":"Weapon","name":"toxopid-cannon"}},"weapons.+":[{"name":"sei-launcher"}]}}}
+        """);
+
+        assertEquals(UnitTypes.emanate.weapons.size, size + 1);
+
+        resetAfter();
+
+        assertEquals(UnitTypes.emanate.weapons.size, size);
+    }
+
+    @Test
+    void customAttribute() throws Exception{
+        int amount = Attribute.all.length;
+
+        apply("""
+        block.grass.attributes: {
+          frogs: 10
+        }
+        """);
+
+        assertTrue(Attribute.exists("frogs"));
+        assertEquals(amount + 1, Attribute.all.length);
+        assertEquals(10f, Blocks.grass.asFloor().attributes.get(Attribute.get("frogs")), 0.0001f);
+
+        Vars.logic.reset();
+
+        assertFalse(Attribute.exists("frogs"));
+        assertEquals(amount, Attribute.all.length);
+    }
+
+    @Test
     void addWeapon() throws Exception{
         int oldSize = UnitTypes.flare.weapons.size;
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         unit.flare.weapons.+: {
           x: 0
           y: 0
@@ -537,7 +638,7 @@ public class PatcherTests{
             damage: 100
           }
         }
-        """));
+        """);
 
         assertNoWarnings();
         assertEquals(oldSize + 1, UnitTypes.flare.weapons.size);
@@ -546,7 +647,7 @@ public class PatcherTests{
 
     @Test
     void bigPatch() throws Exception{
-        Vars.state.patcher.apply(Seq.with("""
+        apply("""
         item: {
         	fissile-matter: {
         	    localizedName: Duo
@@ -601,12 +702,8 @@ public class PatcherTests{
         		]
         	}
         }
-        """));
+        """);
 
         assertNoWarnings();
-    }
-
-    static void assertNoWarnings(){
-        assertEquals(new Seq<>(), Vars.state.patcher.patches.first().warnings);
     }
 }

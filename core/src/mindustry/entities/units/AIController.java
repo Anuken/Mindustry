@@ -4,6 +4,8 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
+import mindustry.ai.types.*;
 import mindustry.async.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -51,6 +53,13 @@ public class AIController implements UnitController{
         updateVisuals();
         updateTargeting();
         updateMovement();
+    }
+
+    public boolean hasStance(@Nullable UnitStance stance){
+        if(unit.controller() instanceof CommandAI ai){
+            return ai.hasStance(stance);
+        }
+        return false;
     }
 
     /** Called when the parent CommandAI changes its stance. */
@@ -262,6 +271,11 @@ public class AIController implements UnitController{
     public Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
         if(unit.team == Team.derelict) return null;
         return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
+    }
+
+    public Teamc targetFlagActive(float x, float y, BlockFlag flag, boolean enemy){
+        if(unit.team == Team.derelict) return null;
+        return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag), t -> ((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput) && t.block.targetable);
     }
 
     public Teamc target(float x, float y, float range, boolean air, boolean ground){

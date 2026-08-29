@@ -62,7 +62,7 @@ public class MenuFragment{
 
         parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
             up = discordBanner;
-        }}, ui.discord::show).marginTop(9f).marginLeft(10f).tooltip("@discord").size(84, 45).name("discord"));
+        }}, ui.discord::show).visible(() -> !ui.consolefrag.shown()).marginTop(9f).marginLeft(10f).tooltip("@discord").size(84, 45).name("discord"));
 
         //info icon
         if(mobile){
@@ -85,11 +85,16 @@ public class MenuFragment{
                 }
             });
 
-            parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
-                font = Fonts.def;
-                fontColor = Color.white;
-                up = infoBanner;
-            }}, ui.about::show).size(84, 45).name("info"));
+            parent.fill(c -> {
+                c.bottom().left();
+                c.button(Icon.terminal, () -> ui.consolefrag.toggleMobile()).visible(() -> !ui.consolefrag.shown() && Core.settings.getBool("console")).pad(4f).size(60f).left().row();
+
+                c.button("", new TextButtonStyle(){{
+                    font = Fonts.def;
+                    fontColor = Color.white;
+                    up = infoBanner;
+                }}, ui.about::show).size(84, 45).visible(() -> !ui.consolefrag.shown()).name("info");
+            });
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {
                 ui.loadfrag.show();

@@ -3,6 +3,7 @@ package mindustry.mod;
 import arc.files.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.graphics.*;
 
 public abstract class Mod{
 
@@ -23,6 +24,11 @@ public abstract class Mod{
 
     /** Called on clientside mods. Load content here. */
     public void loadContent(){
+
+    }
+
+    /** Called during sprite packing to allow adding custom textures */
+    public void packSprites(MultiPacker packer){
 
     }
 

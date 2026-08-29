@@ -17,14 +17,14 @@ public class ModTestAllure extends GenericModTest{
 
     @Test
     public void begin(){
-        grabMod("https://github.com/LixieWulf/Allure/archive/7dff39df9b07719315a8379a88542fa0fe80fd30.zip");
+        grabMod("https://github.com/LixieWulf/Allure/archive/c94e83e07ab918c0402b8f3897bba832e42432f0.zip");
         checkExistence("allure");
 
         UnitType type = Vars.content.unit("allure-0b11-exodus");
         assertNotNull(type, "A mod unit must be loaded.");
         assertTrue(type.weapons.size > 0, "A mod unit must have a weapon.");
 
-        Vars.world.loadMap(maps.loadInternalMap("groundZero"));
+        Vars.world.loadMap(maps.loadInternalMap("serpulo/groundZero"));
 
         Unit unit = type.spawn(0, 0);
 
