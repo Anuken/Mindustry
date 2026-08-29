@@ -4376,8 +4376,8 @@ public class Blocks{
             }},
             Items.tungsten, new BasicBulletType(8f, 95){{
                 width = 13f;
-                height = 19f;
-                hitSize = 7f;
+                height = 22f;
+                hitSize = 12f;
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 2;
@@ -4385,6 +4385,8 @@ public class Blocks{
                 pierceCap = 4;
                 pierce = true;
                 pierceBuilding = true;
+                ricochetAngle = 20f;
+                ricochetSpeed = 2f;
                 hitColor = backColor = trailColor = Pal.tungstenShot;
                 frontColor = Color.white;
                 trailWidth = 2.2f;

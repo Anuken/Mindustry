@@ -718,8 +718,16 @@ public class StatValues{
                         sep(bt, "@bullet.incendiary");
                     }
 
-                    if(type.homingPower > 0.01f){
-                        sep(bt, "@bullet.homing");
+                    if(type.homingPower > 0.0001f){
+                        if(type.homingPower < 0.05f) sep(bt, Core.bundle.format("bullet.weakhoming"));
+                        else if(type.homingPower < 0.15f) sep(bt, Core.bundle.format("bullet.mediumhoming"));
+                        else sep(bt, Core.bundle.format("bullet.stronghoming"));
+                    }
+
+                    if(type.ricochetAngle > 0f){
+                        if(type.ricochetAngle < 30f) sep(bt, Core.bundle.format("bullet.weakricochet"));
+                        else if(type.ricochetAngle < 90f) sep(bt, Core.bundle.format("bullet.mediumricochet"));
+                        else sep(bt, Core.bundle.format("bullet.strongricochet"));
                     }
 
                     if(type.lightning > 0){

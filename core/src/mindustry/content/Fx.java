@@ -2584,6 +2584,37 @@ public class Fx{
         }
     }),
 
+    ricochetSpark = new Effect(15, e -> {
+        float dst = 1.4f; //multiplier
+
+        rand.setSeed(e.id);
+        e.scaled(5, i -> {
+            Draw.color(e.color, Color.white, i.fout());
+            Fill.circle(e.x, e.y, 3.5f * i.fout());
+        });
+
+        e.scaled(7, i -> {
+            Draw.color(e.color, Color.white, i.fout());
+            Lines.stroke(1.4f * i.fout());
+            Lines.circle(e.x, e.y, 6f * i.fin());
+        });
+
+        Mathf.rand.setSeed(e.id);
+        Lines.stroke(1.2f * e.fout());
+        Draw.color(e.color, Color.white, e.fout() * 0.4f);
+
+        for(int i = 0; i < 6; i++){
+            float angle = e.rotation + 180f + Mathf.rand.range(60f);
+            float len = (5f + rand.random(1f) * 13f) * e.fout() * dst;
+            Lines.lineAngle(e.x, e.y, angle, len);
+        }
+
+        Angles.randLenVectors(e.id, 5, 3f + 10f * e.fin(), e.rotation + 180f, 75f * dst, (dx, dy) -> {
+            Draw.color(e.color, Color.white, e.fout());
+            Fill.circle(e.x + dx, e.y + dy, 1.3f * e.fout());
+        });
+    }),
+
     shootPayloadDriver = new Effect(30f, e -> {
         color(Pal.accent);
         Lines.stroke(0.5f + 0.5f*e.fout());
