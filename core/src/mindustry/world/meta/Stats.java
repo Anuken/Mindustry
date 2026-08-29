@@ -2,7 +2,6 @@ package mindustry.world.meta;
 
 import arc.*;
 import arc.scene.ui.layout.*;
-import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
@@ -125,7 +124,7 @@ public class Stats{
         //sort stats by index if they've been modified
         if(dirty){
             map.orderedKeys().sort();
-            for(Entry<StatCat, OrderedMap<Stat, Seq<StatValue>>> entry : map.entries()){
+            for(var entry : map.entries()){
                 entry.value.orderedKeys().sort();
             }
 
