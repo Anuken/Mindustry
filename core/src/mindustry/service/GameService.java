@@ -461,7 +461,8 @@ public class GameService{
             if(campaign()){
                 SStat.maxWavesSurvived.max(Vars.state.wave);
 
-                if(state.stats.buildingsBuilt == 0 && state.wave >= 10){
+                //TODO: remove (263 is uniquely broken)
+                if(state.stats.buildingsBuilt == 0 && state.wave >= 10 && !(Vars.state.getSector() != null && Vars.state.getPlanet() == Planets.serpulo && Vars.state.getSector().id == 263)){
                     survive10WavesNoBlocks.complete();
                 }
             }

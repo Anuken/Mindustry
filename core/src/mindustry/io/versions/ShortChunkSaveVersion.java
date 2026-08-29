@@ -41,6 +41,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
 
         Groups.all.each(Entityc::afterReadAll);
         Groups.unit.each(Entityc::afterReadAll);
+        Groups.build.each(Entityc::afterReadAll);
     }
 
     @Override

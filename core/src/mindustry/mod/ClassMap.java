@@ -68,10 +68,12 @@ public class ClassMap{
         classes.put("SpaceLiquidBulletType", mindustry.entities.bullet.SpaceLiquidBulletType.class);
         classes.put("ExplosionEffect", mindustry.entities.effect.ExplosionEffect.class);
         classes.put("MultiEffect", mindustry.entities.effect.MultiEffect.class);
+        classes.put("NoiseEffect", mindustry.entities.effect.NoiseEffect.class);
         classes.put("ParticleEffect", mindustry.entities.effect.ParticleEffect.class);
         classes.put("RadialEffect", mindustry.entities.effect.RadialEffect.class);
         classes.put("SeqEffect", mindustry.entities.effect.SeqEffect.class);
         classes.put("SoundEffect", mindustry.entities.effect.SoundEffect.class);
+        classes.put("TriangleEffect", mindustry.entities.effect.TriangleEffect.class);
         classes.put("WaveEffect", mindustry.entities.effect.WaveEffect.class);
         classes.put("WrapEffect", mindustry.entities.effect.WrapEffect.class);
         classes.put("DrawPart", mindustry.entities.part.DrawPart.class);
@@ -117,6 +119,7 @@ public class ClassMap{
         classes.put("Publishable", mindustry.type.Publishable.class);
         classes.put("Sector", mindustry.type.Sector.class);
         classes.put("SectorRect", mindustry.type.Sector.SectorRect.class);
+        classes.put("SectorDifficulty", mindustry.type.SectorDifficulty.class);
         classes.put("SectorPreset", mindustry.type.SectorPreset.class);
         classes.put("StatusEffect", mindustry.type.StatusEffect.class);
         classes.put("TransitionHandler", mindustry.type.StatusEffect.TransitionHandler.class);

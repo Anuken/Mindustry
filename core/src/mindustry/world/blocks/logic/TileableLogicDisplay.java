@@ -187,7 +187,7 @@ public class TileableLogicDisplay extends LogicDisplay{
                         Draw.proj(0, 0, root.buffer.getWidth(), root.buffer.getHeight());
 
                         //clear the buffer - some OSs leave garbage in it
-                        root.buffer.begin(Pal.darkerMetal);
+                        root.buffer.begin(backgroundColor);
                         if(root.prevBuffers != null){
                             for(var other : root.prevBuffers){
                                 Draw.rect(Draw.wrap(other.buffer.getTexture()), (other.x - originX) * 32 + other.buffer.getWidth() / 2f, (other.y - originY) * 32 + other.buffer.getHeight() / 2f, other.buffer.getWidth(), -other.buffer.getHeight());
@@ -259,11 +259,21 @@ public class TileableLogicDisplay extends LogicDisplay{
         }
 
         @Override
-        public void flushCommands(LongSeq graphicsBuffer){
+        public void draw(LongSeq graphicsBuffer){
             if(isRoot()){
-                super.flushCommands(graphicsBuffer);
+                super.draw(graphicsBuffer);
             }else{
-                rootDisplay.flushCommands(graphicsBuffer);
+                rootDisplay.draw(graphicsBuffer);
+            }
+        }
+
+        @Override
+        public void ensureBuffer() {
+            if(rootDisplay.buffer == null){
+                rootDisplay.buffer = new FrameBuffer(32 * tilesWidth - 2 * frameSize, 32 * tilesHeight - 2 * frameSize);
+                //clear the buffer - some OSs leave garbage in it
+                rootDisplay.buffer.begin(backgroundColor);
+                rootDisplay.buffer.end();
             }
         }
 

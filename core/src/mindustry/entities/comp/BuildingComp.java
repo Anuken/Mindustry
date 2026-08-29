@@ -1650,7 +1650,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
             if(net.active() && lastAccessed != null){
                 table.row();
-                table.add(Core.bundle.format("lastaccessed", lastAccessed)).growX().wrap().left();
+                table.add(Core.bundle.format("lastaccessed", lastAccessed)).width(260f).wrap().left();
             }
 
             table.marginBottom(-5);
@@ -1682,7 +1682,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Update table alignment after configuring.*/
     public void updateTableAlign(Table table){
         Vec2 pos = Core.input.mouseScreen(x, y - block.size * tilesize / 2f - 1);
-        table.setPosition(pos.x, pos.y, Align.top);
+        table.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.top);
     }
 
     /** Returns whether a hand cursor should be shown over this block. */
@@ -1836,6 +1836,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(was){
             indexer.addIndex(tile);
             Events.fire(teamChangeEvent.set(last, self()));
+            pathfinder.updateTile(tile);
+            updateProximity();
         }
 
         checkAllowUpdate();
@@ -2121,6 +2123,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
+            case armor -> block.armor;
             case enabled -> enabled ? 1 : 0;
             case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalVars.ctrlPlayer : 0;
             case payloadCount -> (getPayloads() != null ? getPayloads().total() : 0) + (getPayload() != null ? 1 : 0);
@@ -2173,8 +2176,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         switch(prop){
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
-                if(health <= 0f && !dead()){
-                    Call.buildDestroyed(self());
+                if(health <= 0f){
+                    if(!dead) Call.buildDestroyed(self());
                 }else{
                     healthChanged();
                 }
@@ -2286,6 +2289,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             wasVisible = true;
             renderer.blocks.updateShadow(self());
             renderer.minimap.update(tile);
+            if(block.drawCached) recache();
         }
     }
 

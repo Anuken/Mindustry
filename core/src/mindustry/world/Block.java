@@ -182,7 +182,7 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Item itemDrop = null;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    /** Array of affinities to certain things. */
+    /** Affinities for floors. */
     public Attributes attributes = new Attributes();
     /** Health per square tile that this block occupies; essentially, this is multiplied by size * size. Overridden if health is > 0. If <0, the default is 40. */
     public float scaledHealth = -1;
@@ -386,6 +386,8 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Team forceTeam;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
+    /** Maximum number of instantTransfer consecutive blocks. */
+    public int maxConsecutive = 2;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
     /** If true, this derelict block can be repair by clicking it. */
@@ -637,6 +639,8 @@ public class Block extends UnlockableContent implements Senseable{
     public void setStats(){
         super.setStats();
 
+        stats.useCategories = true;
+
         stats.add(Stat.size, "@x@", size, size);
 
         if(synthetic()){
@@ -652,7 +656,8 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         if(instantTransfer){
-            stats.add(Stat.maxConsecutive, 2, StatUnit.none);
+            stats.add(Stat.itemsMoved, StatUnit.instant.localized());
+            stats.add(Stat.maxConsecutive, maxConsecutive, StatUnit.none);
         }
 
         for(var c : consumers){
@@ -661,7 +666,10 @@ public class Block extends UnlockableContent implements Senseable{
 
         //Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
-        if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+        if(hasItems){
+            if(itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+            else if (instantTransfer || itemCapacity == 0) stats.add(Stat.itemCapacity, Core.bundle.format("none") + ". " + Core.bundle.format("unabletoclog"));
+        }
     }
 
     public <T extends Building> void addBar(String name, Func<T, Bar> sup){
@@ -1026,6 +1034,14 @@ public class Block extends UnlockableContent implements Senseable{
     @Override
     public boolean isBanned(){
         return state.rules.isBanned(this);
+    }
+
+    public boolean isOverPlacementLimit(Team team){
+        if(!state.rules.editor && !team.isAI()){
+            int limit = state.rules.blockLimits.get(this, 0);
+            return limit > 0 && team.data().getBuildings(this).size >= limit;
+        }
+        return false;
     }
 
     /** @return whether this block supports a specific environment. */
@@ -1456,8 +1472,6 @@ public class Block extends UnlockableContent implements Senseable{
 
         setBars();
 
-        stats.useCategories = true;
-
         //TODO check for double power consumption
 
         if(!logicConfigurable){
@@ -1586,18 +1600,20 @@ public class Block extends UnlockableContent implements Senseable{
 
         if(outlineIcon){
             AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1];
-            PixmapRegion region = packer.get(atlasRegion);
-            Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
-            Drawf.checkBleed(out);
-            packer.add(PageType.main, atlasRegion.name, out);
-            toDispose.add(out);
+            if(atlasRegion.found()){
+                PixmapRegion region = packer.get(atlasRegion);
+                Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
+                Drawf.checkBleed(out);
+                packer.add(PageType.main, atlasRegion.name, out);
+                toDispose.add(out);
+            }
         }
 
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
         for(var region : toOutline){
-            if(region instanceof AtlasRegion atlas){
+            if(region instanceof AtlasRegion atlas && atlas.found()){
                 String regionName = atlas.name;
                 Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
@@ -1608,20 +1624,22 @@ public class Block extends UnlockableContent implements Senseable{
             }
         }
 
-        if(gen.length > 1){
-            Pixmap base = packer.get(gen[0]).crop();
-            for(int i = 1; i < gen.length; i++){
-                if(i == gen.length - 1 && last != null){
-                    base.draw(last, 0, 0, true);
-                }else{
-                    base.draw(packer.get(gen[i]), true);
+        if(gen.length > 0 && gen[0] != null && gen[0].found()){
+            if(gen.length > 1){
+                Pixmap base = packer.get(gen[0]).crop();
+                for(int i = 1; i < gen.length; i++){
+                    if(i == gen.length - 1 && last != null){
+                        base.draw(last, 0, 0, true);
+                    }else{
+                        base.draw(packer.get(gen[i]), true);
+                    }
                 }
-            }
-            packer.add(PageType.main, "block-" + name + "-full", base);
+                packer.add(PageType.main, "block-" + name + "-full", base);
 
-            toDispose.add(base);
-        }else{
-            if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", packer.get(gen[0]));
+                toDispose.add(base);
+            }else{
+                if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", packer.get(gen[0]));
+            }
         }
 
         toDispose.each(Pixmap::dispose);
@@ -1652,6 +1670,7 @@ public class Block extends UnlockableContent implements Senseable{
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case armor -> armor;
             case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;

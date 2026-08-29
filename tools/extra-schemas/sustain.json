@@ -1,0 +1,17 @@
+{
+  "doc": "Rises to and sustains progress at a plateau. Applied via PartProgress's 'op'/'operation' field (e.g. `op: sustain`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "offset": {
+    "type": "float",
+    "doc": "Progress offset before rising.",
+    "default": "0"
+  },
+  "grow": {
+    "type": "float",
+    "doc": "Duration of the rise to the plateau.",
+    "default": "0"
+  },
+  "sustain": {
+    "type": "float",
+    "doc": "Length of the sustained plateau."
+  }
+}

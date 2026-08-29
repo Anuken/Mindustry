@@ -82,6 +82,12 @@ public class ForceFieldAbility extends Ability{
         this.rotation = rotation;
     }
 
+    ForceFieldAbility(){}
+
+    public float scaledMax(Unit unit){
+        return max * Vars.state.rules.unitHealth(unit.team);
+    }
+
     @Override
     public void addStats(Table t){
         super.addStats(t);
@@ -112,7 +118,7 @@ public class ForceFieldAbility extends Ability{
             }
         }
 
-        if(unit.shield < max){
+        if(unit.shield < scaledMax(unit)){
             unit.shield += Time.delta * regen;
         }
 
@@ -135,7 +141,7 @@ public class ForceFieldAbility extends Ability{
 
         //self-destructing units can have a shield on death
         if(unit.shield > 0f && !wasBroken){
-            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), sides);
             breakSound.at(unit.x, unit.y);
         }
     }
@@ -163,12 +169,12 @@ public class ForceFieldAbility extends Ability{
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / max)).row();
+        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / scaledMax(unit))).row();
     }
 
     @Override
     public void created(Unit unit){
-        unit.shield = max;
+        unit.shield = scaledMax(unit);
     }
 
     public void checkRadius(Unit unit){

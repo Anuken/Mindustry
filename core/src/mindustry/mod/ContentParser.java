@@ -224,7 +224,6 @@ public class ContentParser{
             readFields(result, data);
             return result;
         });
-        //TODO this is untested
         put(PartProgress.class, (type, data) -> {
             //simple case: it's a string or number constant
             if(data.isString()) return field(PartProgress.class, data.asString());
@@ -1129,14 +1128,13 @@ public class ContentParser{
         String tname = Strings.capitalize(data.getString("type", "NoiseMesh"));
 
         return switch(tname){
-            //TODO NoiseMesh is bad
             case "NoiseMesh" -> new NoiseMesh(planet,
-            data.getInt("seed", 0), data.getInt("divisions", 1), data.getFloat("radius", 1f),
-            data.getInt("octaves", 1), data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("mag", 0.5f),
-            Color.valueOf(data.getString("color1", data.getString("color", "ffffff"))),
-            Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
-            data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
-            data.getFloat("colorThreshold", 0.5f));
+                data.getInt("seed", 0), data.getInt("divisions", 1), data.getFloat("radius", 1f),
+                data.getInt("octaves", 1), data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("mag", 0.5f),
+                Color.valueOf(data.getString("color1", data.getString("color", "ffffff"))),
+                Color.valueOf(data.getString("color2", data.getString("color", "ffffff"))),
+                data.getInt("colorOct", 1), data.getFloat("colorPersistence", 0.5f), data.getFloat("colorScale", 1f),
+                data.getFloat("colorThreshold", 0.5f));
             case "SunMesh" -> {
                 var cvals = data.get("colors").asStringArray();
                 var colors = new Color[cvals.length];
@@ -1149,9 +1147,9 @@ public class ContentParser{
                 data.getFloat("colorScale", 1f), colors);
             }
             case "HexSkyMesh" -> new HexSkyMesh(planet,
-            data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
-            data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
-            data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("thresh", 0.5f));
+                data.getInt("seed", 0), data.getFloat("speed", 0), data.getFloat("radius", 1f),
+                data.getInt("divisions", 3), Color.valueOf(data.getString("color", "ffffff")), data.getInt("octaves", 1),
+                data.getFloat("persistence", 0.5f), data.getFloat("scale", 1f), data.getFloat("thresh", 0.5f));
             case "MultiMesh" -> new MultiMesh(parseMeshes(planet, data.get("meshes")));
             case "MatMesh" -> new MatMesh(parseMesh(planet, data.get("mesh")), parser.readValue(Mat3D.class, data.get("mat")));
             default -> throw new RuntimeException("Unknown mesh type: " + tname);

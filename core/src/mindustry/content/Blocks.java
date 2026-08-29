@@ -2068,9 +2068,8 @@ public class Blocks{
         conveyor = new Conveyor("conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1));
             health = 45;
-            speed = 0.03f;
-            displayedSpeed = 4.2f;
-            buildCostMultiplier = 2f;
+            speed = 0.046f;
+            displayedSpeed = 6.5f;
             researchCost = with(Items.copper, 5);
         }};
 
@@ -2092,7 +2091,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 280;
             speed = 0.08f;
-            displayedSpeed = 11f;
+            displayedSpeed = 10f;
         }};
 
         junction = new Junction("junction"){{
@@ -2100,7 +2099,7 @@ public class Blocks{
             speed = 26;
             capacity = 6;
             health = 30;
-            buildCostMultiplier = 6f;
+            buildCostMultiplier = 3f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -2380,6 +2379,7 @@ public class Blocks{
             hasPower = false;
             liquidCapacity = 100f;
             explosivenessScale = flammabilityScale = 20f/100f;
+            noAcceptDisabled = true;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
@@ -2393,6 +2393,7 @@ public class Blocks{
             pulse = true;
             explosivenessScale = flammabilityScale = 20f/100f;
             liquidCapacity = 100f;
+            noAcceptDisabled = true;
             consumePower(0.30f);
         }};
 
@@ -2439,6 +2440,7 @@ public class Blocks{
             underBullets = true;
             health = 250;
             explosivenessScale = flammabilityScale = 20f/120f;
+            floating = true;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
@@ -2621,10 +2623,11 @@ public class Blocks{
             ambientSound = Sounds.loopThoriumReactor;
             ambientSoundVolume = 0.11f;
             size = 3;
-            health = 700;
+            health = 1400;
             itemDuration = 360f;
             powerProduction = 15f;
-            heating = 0.02f;
+            heating = 0.005f;
+            coolantPower = 0.125f;
 
             consumeItem(Items.thorium);
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);

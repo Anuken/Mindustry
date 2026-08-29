@@ -15,7 +15,8 @@ import java.util.*;
 public class Stats{
     /** Whether to display stats with categories. If false, categories are completely ignored during display. */
     public boolean useCategories = false;
-    /** Whether these stats are initialized yet. */
+    /** @deprecated does nothing, will be removed in v9 */
+    @Deprecated
     public boolean intialized = false;
     /** Production time period in ticks. Used for crafters. **/
     public float timePeriod = -1;

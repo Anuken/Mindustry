@@ -59,6 +59,12 @@ public class Turret extends ReloadTurret{
     public float inaccuracy = 0f;
     /** Fraction of bullet velocity that is random. */
     public float velocityRnd = 0f;
+    /** extra velocity that is added as a fraction */
+    public float extraVelocity = 0f;
+    /** fraction of lifetime that is random */
+    public float lifeRnd = 0f;
+    /** extra lifetime that is added as a fraction */
+    public float extraLife = 0f;
     /** Fraction of lifetime that is added to bullets with lifeScale. */
     public float scaleLifetimeOffset = 0f;
     /** Maximum angle difference in degrees at which turret will still try to shoot. */
@@ -545,11 +551,7 @@ public class Turret extends ReloadTurret{
                 ((Building)this).rotation = Mathf.mod(Mathf.round(rotation / 90f), 4);
             }
 
-            //turret always reloads regardless of whether it's targeting something
-            if(reloadWhileCharging || !charging()){
-                updateReload();
-                updateCooling();
-            }
+            handleReload();
 
             if(state.rules.fog){
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
@@ -717,11 +719,17 @@ public class Turret extends ReloadTurret{
             return queuedBullets > 0 && shoot.firstShotDelay > 0;
         }
 
+        protected void handleReload(){
+            //turret always reloads regardless of whether it's targeting something
+            if((reloadWhileCharging || !charging()) && reloadCounter < reload){
+                //update the two reload related methods
+                updateReload();
+                updateCooling();
+            }
+        }
+
         protected void updateReload(){
             reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
-
-            //cap reload for visual reasons
-            reloadCounter = Math.min(reloadCounter, reload);
         }
 
         @Override
@@ -784,11 +792,12 @@ public class Turret extends ReloadTurret{
             bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy + type.inaccuracy);
-
-            float lifeScl = type.scaleLife ? Mathf.clamp((1 + scaleLifetimeOffset) * Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange() / type.range, range() / type.range) : 1f;
+            
+            float baseLife = (1f - lifeRnd) + Mathf.random(lifeRnd) + extraLife,
+                  lifeScl = type.scaleLife ? Mathf.clamp((baseLife + scaleLifetimeOffset) * Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange() / type.range, range() / type.range) : baseLife;
 
             //TODO aimX / aimY for multi shot turrets?
-            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, shootAngle - rotation);
+            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd) + extraVelocity, lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, shootAngle - rotation);
 
             (shootEffect == null ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             (smokeEffect == null ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);

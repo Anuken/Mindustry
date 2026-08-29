@@ -60,6 +60,7 @@ public class BuildPayload implements Payload{
     public void destroyed(){
         build.dead = true;
         build.onDestroyed();
+        build.afterDestroyed();
     }
 
     @Override

@@ -45,8 +45,14 @@ public class DirectionalUnloader extends Block{
         drawCached = true;
         drawDynamic = false;
 
-        config(Item.class, (DirectionalUnloaderBuild tile, Item item) -> tile.unloadItem = item);
-        configClear((DirectionalUnloaderBuild tile) -> tile.unloadItem = null);
+        config(Item.class, (DirectionalUnloaderBuild tile, Item item) -> {
+            tile.unloadItem = item;
+            tile.recache();
+        });
+        configClear((DirectionalUnloaderBuild tile) -> {
+            tile.unloadItem = null;
+            tile.recache();
+        });
     }
 
     @Override

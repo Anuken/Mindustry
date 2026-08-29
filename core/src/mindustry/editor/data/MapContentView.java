@@ -22,7 +22,7 @@ import java.util.regex.*;
 import static mindustry.Vars.*;
 
 public class MapContentView implements AssetView{
-    private static final Pattern unsafeNamePattern = Pattern.compile("[\\[\\]{}`!@#$%^&8*();:,]");
+    private static final Pattern unsafeNamePattern = Pattern.compile("[\\[\\]{}`!@#$%^&*();:,]");
 
     static ObjectMap<ContentType, TextureRegionDrawable> contentIcons = ObjectMap.of(
     ContentType.item, Icon.box,
@@ -116,7 +116,7 @@ public class MapContentView implements AssetView{
                         TextButtonStyle style = Styles.flatt;
                         t.defaults().size(280f, 60f).left();
                         t.row();
-                        t.button("@import.clipboard", Icon.copy, style, () -> {
+                        t.button("@load.clipboard", Icon.copy, style, () -> {
                             dialog.hide();
                             handler.get(Core.app.getClipboardText());
                         }).marginLeft(12f).disabled(b -> Core.app.getClipboardText() == null);
@@ -162,6 +162,7 @@ public class MapContentView implements AssetView{
                 ui.showConfirm("@asset.delete.confirm",  () -> {
                     contents.remove(content);
                     Vars.content.remove(content.content);
+                    state.data.reloadContent(false);
                     diag.rebuild();
                 });
             }).size(h);
@@ -170,7 +171,7 @@ public class MapContentView implements AssetView{
         }
 
         if(list.getChildren().isEmpty()){
-            list.add("@patch.none");
+            list.add("@none.found");
         }
     }
 
