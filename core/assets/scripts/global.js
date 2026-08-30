@@ -182,6 +182,7 @@ const TileOverlayChangeEvent = Packages.mindustry.game.EventType.TileOverlayChan
 const TileFloorChangeEvent = Packages.mindustry.game.EventType.TileFloorChangeEvent
 const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const TilePreChangeEvent = Packages.mindustry.game.EventType.TilePreChangeEvent
+const BulletCreateEvent = Packages.mindustry.game.EventType.BulletCreateEvent
 const BuildDamageEvent = Packages.mindustry.game.EventType.BuildDamageEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
 const BuildingCommandEvent = Packages.mindustry.game.EventType.BuildingCommandEvent
