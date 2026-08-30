@@ -46,8 +46,8 @@ public class OreBlock extends OverlayFloor{
         for(int i = 0; i < variants; i++){
             //use name (e.g. "ore-copper1"), fallback to "copper1" as per the old naming system
             PixmapRegion shadow = Core.atlas.has(name + (i + 1)) ?
-                Core.atlas.getPixmap(name + (i + 1)) :
-                Core.atlas.getPixmap(itemDrop.name + (i + 1));
+                packer.get(name + (i + 1)) :
+                packer.get(itemDrop.name + (i + 1));
 
             Pixmap image = shadow.crop();
 
@@ -63,10 +63,8 @@ public class OreBlock extends OverlayFloor{
             }
 
             packer.add(PageType.environment, name + (i + 1), image);
-            packer.add(PageType.editor, "editor-" + name + (i + 1), image);
 
             if(i == 0){
-                packer.add(PageType.editor, "editor-block-" + name + "-full", image);
                 packer.add(PageType.main, "block-" + name + "-full", image);
             }
 

@@ -1,6 +1,7 @@
 package mindustry.world.meta;
 
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
 
 public class Attribute{
@@ -45,6 +46,11 @@ public class Attribute{
     /** Never returns null, may throw an exception if not found. */
     public static Attribute get(String name){
         return map.getThrow(name, () -> new IllegalArgumentException("Unknown Attribute type: " + name));
+    }
+
+    /** May return null. */
+    public static @Nullable Attribute getOrNull(String name){
+        return map.get(name);
     }
 
     /** @return Whether an attribute exists. */

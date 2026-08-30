@@ -75,18 +75,14 @@ public class CargoAI extends AIController{
                     //deposit items when it's possible
                     if(max > 0){
                         Call.transferItemTo(unit, unit.item(), max, unit.x, unit.y, unloadTarget);
-
-                        //reset wait timer if we can't fill the unload point.
-                        if(!unit.hasItem()){
-                            noDestTimer = 0f;
-                        }
                     }
+
                     //keep the target for at most emptyWaitTime, then we try change if other need.
-                    if((noDestTimer += dropSpacing) >= emptyWaitTime){
+                    if(!unit.hasItem() || (noDestTimer += dropSpacing) >= emptyWaitTime){
                         //oh no, it's out of space - wait for a while, and if nothing changes, try the next destination
 
                         //next targeting attempt will try the next destination point
-                        targetIndex = findDropTarget(unit.item(), targetIndex, unloadTarget) + 1;
+                        targetIndex = findDropTarget(unit.item(), targetIndex, unloadTarget);
                         noDestTimer = 0f;
 
                         //nothing found at all, clear item
@@ -110,34 +106,22 @@ public class CargoAI extends AIController{
 
         if(targets.isEmpty()) return 0;
 
-        UnitCargoUnloadPointBuild lastStale = null;
+        //Search from offset + 1
+        for(int i = 0; i < targets.size; i++){
+            int index = (i + offset + 1) % targets.size;
+            var target = targets.get(index);
 
-        offset %= targets.size;
-
-        int i = 0;
-
-        for(var target : targets){
-            if(i >= offset && target != ignore){
-                if(target.stale){
-                    lastStale = target;
-                }else{
-                    unloadTarget = target;
-                    targets.clear();
-                    return i;
-                }
+            if(!target.stale){
+                unloadTarget = target;
+                targets.clear();
+                return index;
             }
-            i ++;
         }
 
-        //it's still possible that the ignored target may become available at some point, try that, so it doesn't waste items
-        if(ignore != null){
-            unloadTarget = ignore;
-        }else if(lastStale != null){ //a stale target is better than nothing
-            unloadTarget = lastStale;
-        }
-
+        //a stale target is better than nothing
+        unloadTarget = targets.get(0);
         targets.clear();
-        return -1;
+        return 0;
     }
 
     public void findAnyTarget(Building build){

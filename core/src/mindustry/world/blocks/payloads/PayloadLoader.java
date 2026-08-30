@@ -228,7 +228,7 @@ public class PayloadLoader extends PayloadBlock{
             return payload != null && (
                 exporting ||
                 (payload.block().hasLiquids && liquids.currentAmount() >= 0.1f && payload.build.liquids.currentAmount() >= payload.block().liquidCapacity - 0.001f) ||
-                (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> payload.build.items.get(i) >= payload.block().itemCapacity)) ||
+                (payload.block().hasItems && items.any() && payload.block().separateItemCapacity && content.items().contains(i -> (payload.build.items.get(i) >= payload.block().itemCapacity) && items.has(i))) ||
                 (hasBattery() && payload.build.power.status >= 0.999999999f));
         }
 

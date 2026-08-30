@@ -9,6 +9,7 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Tooltip.*;
+import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -28,6 +29,8 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.meta.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -123,44 +126,48 @@ public class PlacementFragment{
         toggler.remove();
         build(group);
         toggler.setZIndex(index);
+        lastDisplayState = null;
     }
 
     boolean updatePick(InputHandler input){
-        if(Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
-            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Tile tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+        if(tile != null && Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
+            var build = tile.build;
 
             //can't middle click buildings in fog
             if(build != null && build.inFogTo(player.team())){
                 build = null;
             }
 
-            Block tryRecipe = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
+            Block tryBlock = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
             Object tryConfig = build == null || !build.block.copyConfig ? null : build.config();
 
             for(BuildPlan req : player.unit().plans()){
                 if(!req.breaking && req.block.bounds(req.x, req.y, Tmp.r1).contains(Core.input.mouseWorld())){
-                    tryRecipe = req.block;
+                    tryBlock = req.block;
                     tryConfig = req.config;
                     break;
                 }
             }
 
-            if(tryRecipe == null && state.rules.editor){
-                var tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
-                if(tile != null){
-                    tryRecipe =
+            if(tryBlock == null && state.rules.editor){
+                tryBlock =
                     tile.block() != Blocks.air ? tile.block() :
                     tile.overlay() != Blocks.air ? tile.overlay() :
                     tile.floor() != Blocks.air ? tile.floor() : null;
-                }
             }
 
-            if(tryRecipe != null && ((tryRecipe.isVisible() && unlocked(tryRecipe)) || state.rules.editor)){
-                input.block = tryRecipe;
-                tryRecipe.lastConfig = tryConfig;
-                if(tryRecipe.isVisible()){
+            if(tryBlock != null && build == null && tryConfig == null){
+                tryConfig = tryBlock.getConfig(tile);
+            }
+
+            if(tryBlock != null && ((tryBlock.isVisible() && unlocked(tryBlock)) || state.rules.editor)){
+                input.block = tryBlock;
+                tryBlock.lastConfig = tryConfig;
+                if(tryBlock.isVisible()){
                     currentCategory = input.block.category;
                 }
+                tryBlock.onPicked(tile);
                 return true;
             }
         }
@@ -251,12 +258,16 @@ public class PlacementFragment{
         }
 
         if(Core.input.keyTap(Binding.blockInfo)){
-            var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-            Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
-            Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
-            if(displayBlock != null && displayBlock.unlockedNow()){
-                ui.content.show(displayBlock);
-                Events.fire(new BlockInfoEvent());
+            if(hovered() instanceof Unit unit && unit.type.unlockedNow()){
+                ui.content.show(unit.type());
+            }else{
+                var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+                Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
+                Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
+                if(displayBlock != null && displayBlock.unlockedNow()){
+                    ui.content.show(displayBlock);
+                    Events.fire(new BlockInfoEvent());
+                }
             }
         }
 
@@ -266,7 +277,7 @@ public class PlacementFragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> ui.hudfrag.shown);
+            full.bottom().right().visible(() -> ui.hudfrag.shown());
 
             full.table(frame -> {
 
@@ -370,9 +381,9 @@ public class PlacementFragment{
                                         }
                                     }
                                 }
-                                final String keyComboFinal = keyCombo;
+                                String keyComboFinal = keyCombo;
                                 header.left();
-                                header.add(new Image(displayBlock.uiIcon)).size(8 * 4);
+                                header.add(new Image(displayBlock.uiIcon)).scaling(Scaling.fit).size(8 * 4);
                                 header.labelWrap(() -> !unlocked(displayBlock) ? Core.bundle.get("block.unknown") : displayBlock.localizedName + keyComboFinal)
                                 .left().width(190f).padLeft(5);
                                 header.add().growX();
@@ -408,14 +419,16 @@ public class PlacementFragment{
                                 }
                             }).growX().left().margin(3);
 
-                            if((!displayBlock.isPlaceable() || !player.isBuilder()) && !state.rules.editor){
-                                topTable.row();
-                                topTable.table(b -> {
-                                    b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : !displayBlock.supportsEnv(state.rules.env) ? "@unsupported.environment" : "@banned").width(190f).wrap();
-                                    b.left();
-                                }).padTop(2).left();
-                            }
+                            topTable.row();
+                            topTable.collapser(b -> {
+                                b.left();
+                                b.marginTop(2f);
+                                b.image(Icon.cancel).padRight(2).color(Color.scarlet);
+                                b.label(() -> {
+                                    var reason = getUnplaceableReason(displayBlock);
+                                    return reason == null ? "" : reason;
+                                }).width(190f).wrap();
+                            }, () -> getUnplaceableReason(displayBlock) != null).left();
 
                         }else if(hovered != null){
                             //show hovered item, whatever that may be
@@ -467,9 +480,9 @@ public class PlacementFragment{
 
                         Bits availableCommands = new Bits(content.unitCommands().size);
                         Bits availableStances = new Bits(content.unitStances().size);
+                        Bits activeTypes = new Bits(content.units().size), prevActiveTypes = new Bits(content.units().size);
 
                         u.left();
-                        int[] curCount = {0};
                         Bits usedCommands = new Bits(content.unitCommands().size);
                         var commands = new Seq<UnitCommand>();
 
@@ -477,7 +490,12 @@ public class PlacementFragment{
                         var stances = new Seq<UnitStance>();
                         var stancesOut = new Seq<UnitStance>();
 
+                        int[][] countBox = new int[1][0];
+
                         rebuildCommand = () -> {
+                            if(countBox[0].length != content.units().size) countBox[0] = new int[content.units().size];
+                            int[] counts = countBox[0];
+
                             u.clearChildren();
                             var units = control.input.selectedUnits;
                             if(units.size > 0){
@@ -485,8 +503,7 @@ public class PlacementFragment{
                                 usedStances.clear();
                                 commands.clear();
                                 stances.clear();
-
-                                int[] counts = new int[content.units().size];
+                                Arrays.fill(counts, 0);
 
                                 for(var unit : units){
                                     counts[unit.type.id] ++;
@@ -507,11 +524,17 @@ public class PlacementFragment{
 
                                 int col = 0;
                                 for(int i = 0; i < counts.length; i++){
+                                    int fi = i;
                                     if(counts[i] > 0){
                                         var type = content.unit(i);
                                         unitlist.add(StatValues.stack(type, counts[i])).pad(4).with(b -> {
                                             b.clearListeners();
                                             b.addListener(Tooltips.getInstance().create(type.localizedName, false));
+
+                                            Label amountLabel = b.find("stack amount");
+                                            if(amountLabel != null){
+                                                amountLabel.setText(() -> counts[fi] + "");
+                                            }
 
                                             var listener = new ClickListener();
 
@@ -577,7 +600,7 @@ public class PlacementFragment{
                                         for(var stance : stances){
 
                                             coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
                                             }).checked(i -> activeStances.get(stance.id)).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
@@ -591,17 +614,26 @@ public class PlacementFragment{
 
                         u.update(() -> {
                             {
+                                if(countBox[0].length != content.units().size) countBox[0] = new int[content.units().size];
+                                int[] counts = countBox[0];
                                 activeCommands.clear();
                                 activeStances.clear();
                                 availableCommands.clear();
                                 availableStances.clear();
+                                activeTypes.clear();
+
+                                Arrays.fill(counts, 0);
 
                                 //find the command that all units have, or null if they do not share one
                                 for(var unit : control.input.selectedUnits){
                                     if(unit.controller() instanceof CommandAI cmd){
                                         activeCommands.set(cmd.command.id);
-                                        activeStances.set(cmd.stance.id);
+                                        activeStances.set(cmd.stances);
                                     }
+
+                                    counts[unit.type.id] ++;
+
+                                    activeTypes.set(unit.type.id);
 
                                     stancesOut.clear();
                                     unit.type.getUnitStances(unit, stancesOut);
@@ -615,19 +647,16 @@ public class PlacementFragment{
                                     }
                                 }
 
-                                int size = control.input.selectedUnits.size;
-                                if(curCount[0] != size || !usedCommands.equals(availableCommands) || !usedStances.equals(availableStances)){
-                                    if(!(curCount[0] + size == 0)){
-                                        rebuildCommand.run();
-                                    }
-                                    curCount[0] = size;
+                                if(!usedCommands.equals(availableCommands) || !usedStances.equals(availableStances) || !prevActiveTypes.equals(activeTypes)){
+                                    rebuildCommand.run();
+                                    prevActiveTypes.set(activeTypes);
                                 }
 
                                 //not a huge fan of running input logic here, but it's convenient as the stance arrays are all here...
                                 for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
                                     if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance);
+                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
                                     }
                                 }
 
@@ -662,7 +691,7 @@ public class PlacementFragment{
                             t.row();
                             control.input.buildPlacementUI(t);
                         }).name("inputTable").growX();
-                    }).fillY().bottom().touchable(Touchable.enabled);
+                    }).growX().fillY().bottom().touchable(Touchable.enabled);
                     blockCatTable.table(categories -> {
                         categories.bottom();
                         categories.add(new Image(Styles.black6){
@@ -721,6 +750,16 @@ public class PlacementFragment{
         });
     }
 
+    @Nullable String getUnplaceableReason(Block block){
+        if(block == null) return null;
+        if(!player.isBuilder()) return "@unit.nobuild";
+        if(state.isEditor()) return null; //always placeable in editor as long as there's a builder
+        if(!block.supportsEnv(state.rules.env)) return "@unsupported.environment";
+        if(block.isBanned()) return "@banned";
+        if(block.isOverPlacementLimit(player.team())) return Core.bundle.format("block.limit", state.rules.blockLimits.get(block));
+        return null;
+    }
+
     Seq<Category> getCategories(){
         return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
     }
@@ -761,14 +800,14 @@ public class PlacementFragment{
 
         //check tile being hovered over
         Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
-        if(hoverTile != null){
+        if(hoverTile != null && hoverTile.inMapArea()){
             //if the tile has a building, display it
-            if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team())){
+            if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team()) && hoverTile.build.inMapArea()){
                 return nextFlowBuild = hoverTile.build;
             }
 
             //if the tile has a drop, display the drop
-            if((hoverTile.drop() != null && hoverTile.block() == Blocks.air) || hoverTile.wallDrop() != null || hoverTile.floor().liquidDrop != null){
+            if(hoverTile.displayable()){
                 return hoverTile;
             }
         }

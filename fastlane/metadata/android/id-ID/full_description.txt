@@ -1,0 +1,34 @@
+Mindustry adalah sebuah game manajemen pembangunan industri dengan elemen RTS dan menara pertahanan. Buat rantai pasokan yang rumit untuk memasukkan amunisi ke menara Anda, menghasilkan material yang digunakan untuk membangun, dan membuat unit. Perintahkan unit untuk merebut markas musuh, dan perluas produksi Anda. Pertahankan inti Anda dari gelombang musuh.
+
+<h2>Fitur Permainan</h2>
+ 
+- Gunakan blok produksi untuk membuat berbagai macam material canggih
+- Pertahankan struktur Anda dari gelombang musuh
+- Bermain dengan teman-teman Anda dalam sesi multipemain antar platform, atau tantang mereka dalam pertandingan PvP satu lawan satu berbasis tim
+- Mendistribusikan cairan dan melawan tantangan konstan, seperti bencana kebakaran atau serangan udara musuh
+- Dapatkan hasil maksimal dari produksi Anda dengan menyediakan cairan pendingin opsional dan pelumas
+- Hasilkan berbagai macam unit untuk otomatis memanajemen markas Anda atau penyerangan ke markas musuh
+- Siapkan jalur perakitan untuk membangun pasukan unit mekanis
+- Gunakan unit Anda untuk melawan markas musuh yang berfungsi penuh
+
+
+<h2>Kampanye</h2>
+
+- Taklukkan planet Serpulo dan Erekir saat Anda maju melalui 35 peta buatan tangan dan 250+ sektor yang dihasilkan secara prosedural
+- Rebut wilayah dan dirikan pabrik untuk menghasilkan sumber daya selagi Anda bermain di sektor lain
+- Pertahankan sektor Anda dari invasi berkala
+- Koordinasikan distribusi sumber daya antar sektor melalui alas peluncur
+- Riset blok baru untuk mendorong kemajuan
+- Undang teman Anda untuk menyelesaikan misi bersama
+- 250+ blok teknologi untuk dikuasai
+- 50+ jenis drone, mech, dan kapal yang berbeda
+
+
+<h2>Permainan Kustom & Multipemain Antar Platform</h2>
+
+- 16+ peta telah tersedia untuk permainan kustom dan dua kampanye khusus
+- Mainkan co-op, PvP ataupun sandbox
+- Bermainlah dalam server khusus publik, atau undang teman ke sesi pribadi Anda sendiri
+- Aturan permainan yang dapat disesuaikan: Ubah biaya blok, statistik musuh, muatan sumber daya, waktu gelombang, dan banyak lagi
+- Penyunting peta bawaan yang handal dengan dukungan skrip
+- Peramban mod bawaan & dukungan mod

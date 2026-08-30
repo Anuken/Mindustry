@@ -23,11 +23,10 @@ public class IconConverter{
         Time.mark();
         Fi.get("fontgen/icons").deleteDirectory();
         Fi.get("fontgen/icon_parts").deleteDirectory();
-        Fi[] list = new Fi("icons").list();
 
         Seq<Fi> files = new Seq<>();
 
-        for(Fi img : list){
+        for(Fi img :  new Fi("icons").list()){
             if(img.extension().equals("png")){
                 Fi dst = new Fi("fontgen/icons").child(img.nameWithoutExtension().replace("icon-", "") + ".svg");
                 new IconConverter().convert(new Pixmap(img), dst);
@@ -223,7 +222,7 @@ public class IconConverter{
 
         output.writeString(out.toString());
     }
-    
+
     void square(float x, float y, float size){
         rect(x - size/2f, y - size/2f, size, size);
     }

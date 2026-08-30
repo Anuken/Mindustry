@@ -5,20 +5,21 @@ import android.app.*;
 import android.content.*;
 import android.content.pm.*;
 import android.net.*;
-import android.os.Build.*;
 import android.os.*;
+import android.os.Build.*;
 import android.telephony.*;
 import arc.*;
 import arc.backend.android.*;
 import arc.files.*;
-import arc.func.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import dalvik.system.*;
 import mindustry.*;
-import mindustry.game.Saves.*;
-import mindustry.io.*;
+import mindustry.game.EventType.*;
 import mindustry.net.*;
+import mindustry.ui.*;
+import mindustry.ui.FileChooser.*;
 import mindustry.ui.dialogs.*;
 
 import java.io.*;
@@ -30,7 +31,7 @@ import static mindustry.Vars.*;
 public class AndroidLauncher extends AndroidApplication{
     public static final int PERMISSION_REQUEST_CODE = 1;
     boolean doubleScaleTablets = true;
-    FileChooser chooser;
+    FileChooserDialog chooser;
     Runnable permCallback;
 
     @Override
@@ -73,52 +74,87 @@ public class AndroidLauncher extends AndroidApplication{
             @Override
             public ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
                 //Required to load jar files in Android 14: https://developer.android.com/about/versions/14/behavior-changes-14#safer-dynamic-code-loading
-                jar.file().setReadOnly();
-                return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, parent){
-                    @Override
-                    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
-                        //check for loaded state
-                        Class<?> loadedClass = findLoadedClass(name);
-                        if(loadedClass == null){
-                            try{
-                                //try to load own class first
-                                loadedClass = findClass(name);
-                            }catch(ClassNotFoundException | NoClassDefFoundError e){
-                                //use parent if not found
-                                return parent.loadClass(name);
+                try{
+                    jar.file().setReadOnly();
+                    return new DexClassLoader(jar.file().getPath(), getFilesDir().getPath(), null, parent){
+                        @Override
+                        protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
+                            //check for loaded state
+                            Class<?> loadedClass = findLoadedClass(name);
+                            if(loadedClass == null){
+                                try{
+                                    //try to load own class first
+                                    loadedClass = findClass(name);
+                                }catch(ClassNotFoundException | NoClassDefFoundError e){
+                                    //use parent if not found
+                                    return parent.loadClass(name);
+                                }
                             }
-                        }
 
-                        if(resolve){
-                            resolveClass(loadedClass);
+                            if(resolve){
+                                resolveClass(loadedClass);
+                            }
+                            return loadedClass;
                         }
-                        return loadedClass;
+                    };
+                }catch(SecurityException e){
+                    //`setReadOnly` to jar file in `/sdcard/Android/data/...` does not work on some Android 14 devices, but in `/data/...`, it does
+
+                    if(Build.VERSION.SDK_INT < VERSION_CODES.O_MR1){
+                        throw e;
                     }
-                };
+
+                    Fi cacheDir = new Fi(getCacheDir()).child("mods");
+                    cacheDir.mkdirs();
+
+                    //long file name support
+                    Fi modCacheDir = cacheDir.child(jar.nameWithoutExtension());
+                    Fi modCache = modCacheDir.child(Long.toHexString(jar.lastModified()) + ".zip");
+
+                    if(modCacheDir.equals(jar.parent())){
+                        //should not reach here, just in case
+                        throw e;
+                    }
+
+                    //Cache will be deleted when mod is removed
+                    if(!modCache.exists() || jar.length() != modCache.length()){
+                        modCacheDir.mkdirs();
+                        jar.copyTo(modCache);
+                    }
+                    modCache.file().setReadOnly();
+                    return loadJar(modCache, parent);
+                }
             }
 
             @Override
-            public void showFileChooser(boolean open, String title, String extension, Cons<Fi> cons){
-                showFileChooser(open, title, cons, extension);
-            }
-
-            void showFileChooser(boolean open, String title, Cons<Fi> cons, String... extensions){
+            public void showFileChooser(FileChooserParams params){
                 try{
-                    String extension = extensions[0];
+                    String extension = params.extensions[0];
 
                     if(VERSION.SDK_INT >= VERSION_CODES.Q){
-                        Intent intent = new Intent(open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
+                        Intent intent = new Intent(params.open ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
-                        intent.setType(extension.equals("zip") && !open && extensions.length == 1 ? "application/zip" : "*/*");
-                        intent.putExtra(Intent.EXTRA_TITLE, "export." + extension);
+                        intent.setType(extension.equals("zip") && !params.open && params.extensions.length == 1 ? "application/zip" : "*/*");
+                        intent.putExtra(Intent.EXTRA_TITLE, params.fileName);
+                        if(params.allowMultiple){
+                            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                        }
 
                         addResultListener(i -> startActivityForResult(intent, i), (code, in) -> {
                             if(code == Activity.RESULT_OK && in != null && in.getData() != null){
-                                Uri uri = in.getData();
+                                Uri[] uris;
+                                if(in.getClipData() != null){
+                                    uris = new Uri[in.getClipData().getItemCount()];
+                                    for(int i = 0; i < uris.length; i++){
+                                        uris[i] = in.getClipData().getItemAt(i).getUri();
+                                    }
+                                }else{
+                                    uris = new Uri[]{in.getData()};
+                                }
 
-                                if(uri.getPath().contains("(invalid)")) return;
+                                if(uris.length == 0 || uris[0].getPath().contains("(invalid)")) return;
 
-                                Core.app.post(() -> Core.app.post(() -> cons.get(new Fi(uri.getPath()){
+                                Fi[] files = Seq.with(uris).map(uri -> new Fi(uri.getPath()){
                                     @Override
                                     public InputStream read(){
                                         try{
@@ -131,23 +167,28 @@ public class AndroidLauncher extends AndroidApplication{
                                     @Override
                                     public OutputStream write(boolean append){
                                         try{
-                                            return getContentResolver().openOutputStream(uri);
+                                            return getContentResolver().openOutputStream(uri, "rwt");
                                         }catch(IOException e){
                                             throw new ArcRuntimeException(e);
                                         }
                                     }
-                                })));
+
+                                    @Override
+                                    public Writer writer(boolean append, String charset){
+                                        try{
+                                            return new OutputStreamWriter(write(append), charset);
+                                        }catch(IOException ex){
+                                            throw new ArcRuntimeException(ex);
+                                        }
+                                    }
+                                }).toArray(Fi.class);
+
+                                Core.app.post(() -> Core.app.post(() -> params.handleChooseResult(files)));
                             }
                         });
                     }else if(VERSION.SDK_INT >= VERSION_CODES.M && !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                     checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
-                        chooser = new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), open, file -> {
-                            if(!open){
-                                cons.get(file.parent().child(file.nameWithoutExtension() + "." + extension));
-                            }else{
-                                cons.get(file);
-                            }
-                        });
+                        chooser = FileChooser.createFallbackFileChooser(params);
 
                         ArrayList<String> perms = new ArrayList<>();
                         if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
@@ -158,20 +199,11 @@ public class AndroidLauncher extends AndroidApplication{
                         }
                         requestPermissions(perms.toArray(new String[0]), PERMISSION_REQUEST_CODE);
                     }else{
-                        if(open){
-                            new FileChooser(title, file -> Structs.contains(extensions, file.extension().toLowerCase()), true, cons).show();
-                        }else{
-                            super.showFileChooser(open, "@open", extension, cons);
-                        }
+                        FileChooser.showFallbackFileChooser(params);
                     }
                 }catch(Throwable error){
                     Core.app.post(() -> Vars.ui.showException(error));
                 }
-            }
-
-            @Override
-            public void showMultiFileChooser(Cons<Fi> cons, String... extensions){
-                showFileChooser(true, "@open", cons, extensions);
             }
 
             @Override
@@ -189,7 +221,9 @@ public class AndroidLauncher extends AndroidApplication{
             hideStatusBar = true;
             useGL30 = true;
         }});
-        checkFiles(getIntent());
+
+        var intent = getIntent();
+        Events.on(ClientLoadEvent.class, u -> handleIntent(intent));
 
         try{
             //new external folder
@@ -205,7 +239,6 @@ public class AndroidLauncher extends AndroidApplication{
             }catch(Throwable t){
                 Log.err("Failed to delete cached folder", t);
             }
-
 
             //move to internal storage if there's no file indicating that it moved
             if(!Core.files.local("files_moved").exists()){
@@ -248,54 +281,45 @@ public class AndroidLauncher extends AndroidApplication{
         }
     }
 
-    private void checkFiles(Intent intent){
+    @Override
+    protected void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
+
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent){
+        if(intent == null) return;
+
         try{
             Uri uri = intent.getData();
             if(uri != null){
-                File myFile = null;
                 String scheme = uri.getScheme();
-                if(scheme.equals("file")){
-                    String fileName = uri.getEncodedPath();
-                    myFile = new File(fileName);
-                }else if(!scheme.equals("content")){
-                    //error
-                    return;
-                }
-                boolean save = uri.getPath().endsWith(saveExtension);
-                boolean map = uri.getPath().endsWith(mapExtension);
-                InputStream inStream;
-                if(myFile != null) inStream = new FileInputStream(myFile);
-                else inStream = getContentResolver().openInputStream(uri);
-                Core.app.post(() -> Core.app.post(() -> {
-                    if(save){ //open save
-                        System.out.println("Opening save.");
-                        Fi file = Core.files.local("temp-save." + saveExtension);
-                        file.write(inStream, false);
-                        if(SaveIO.isSaveValid(file)){
-                            try{
-                                SaveSlot slot = control.saves.importSave(file);
-                                ui.load.runLoadSave(slot);
-                            }catch(IOException e){
-                                ui.showException("@save.import.fail", e);
-                            }
-                        }else{
-                            ui.showErrorMessage("@save.import.invalid");
-                        }
-                    }else if(map){ //open map
-                        Fi file = Core.files.local("temp-map." + mapExtension);
-                        file.write(inStream, false);
+
+                //clear data (not sure if necessary?)
+                intent.setAction(Intent.ACTION_MAIN);
+                intent.setData(null);
+                setIntent(intent);
+
+                if("mindustry".equalsIgnoreCase(scheme)){ //open a server URL
+
+                    String host = uri.getHost();
+                    int port = uri.getPort();
+
+                    if(host != null && !host.isEmpty()){
                         Core.app.post(() -> {
-                            System.out.println("Opening map.");
-                            if(!ui.editor.isShown()){
-                                ui.editor.show();
-                            }
-                            ui.editor.beginEditMap(file);
+                            ui.showConfirm(Core.bundle.format("servers.connect.confirm", host), () -> ui.join.connect(host, port != -1 ? port : 6567));
                         });
                     }
-                }));
+                }else{ //open a save file
+                    Fi file = Core.files.cache("imported");
+                    file.write(getContentResolver().openInputStream(uri), false);
+
+                    ClientLauncher.handleFileImport(file);
+                }
             }
-        }catch(IOException e){
-            e.printStackTrace();
+        }catch(Throwable e){
+            Log.err(e);
         }
     }
 
