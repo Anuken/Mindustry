@@ -5,6 +5,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.Units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 public class UnitSorts{
@@ -21,12 +22,12 @@ public class UnitSorts{
     mostShield = (u, x, y) -> -u.shield + Mathf.dst2(u.x, u.y, x, y) / 6400f,
     leastShield = (u, x, y) -> u.shield + Mathf.dst2(u.x, u.y, x, y) / 6400f;
 
-    /**
-     * @param distanceWeight higher values make distance less important. Set to <= 0 to ignore distance.
-     */
     public static Sortf grouped(float radius){
         return grouped(radius, -1f);
     }
+    /**
+     * @param distanceWeight higher values make distance less important. Set to <= 0 to ignore distance.
+     */
     public static Sortf grouped(float radius, float distanceWeight){
         return (u, x, y) -> {
             if((timer += Time.delta) > 10f || clusterCount.size < 0){
