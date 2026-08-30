@@ -32,7 +32,7 @@ public class MapEditor{
     public int rotation;
     public Block drawBlock = Blocks.stone;
     public Team drawTeam = Team.sharded;
-    public boolean showTerrain = true, showFloor = true, showBuildings = true;
+    public boolean showTerrain = true, showFloor = true, showBuildings = true, xrayMode = false;
 
     public boolean isLoading(){
         return loading;
