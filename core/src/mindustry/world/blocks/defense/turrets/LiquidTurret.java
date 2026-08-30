@@ -3,6 +3,7 @@ package mindustry.world.blocks.defense.turrets;
 import arc.struct.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -21,7 +22,7 @@ public class LiquidTurret extends Turret{
     public LiquidTurret(String name){
         super(name);
         hasLiquids = true;
-        loopSound = Sounds.spray;
+        loopSound = Sounds.loopSpray;
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
@@ -36,7 +37,7 @@ public class LiquidTurret extends Turret{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
     }
 
     @Override
@@ -54,7 +55,9 @@ public class LiquidTurret extends Turret{
             }
         });
 
-        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        if(targetGround){
+            ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        }
 
         super.init();
     }
@@ -67,10 +70,13 @@ public class LiquidTurret extends Turret{
         }
 
         @Override
-        public void updateTile(){
-            unit.ammo(unit.type().ammoCapacity * liquids.currentAmount() / liquidCapacity);
+        public UnlockableContent getAmmoContent(){
+            return liquids != null && liquids.currentAmount() > 0f ? liquids.current() : null;
+        }
 
-            super.updateTile();
+        @Override
+        public float getAmmoFraction(){
+            return liquids.currentAmount() / liquidCapacity;
         }
 
         @Override

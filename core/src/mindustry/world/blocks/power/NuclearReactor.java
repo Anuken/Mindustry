@@ -30,10 +30,14 @@ public class NuclearReactor extends PowerGenerator{
     public float itemDuration = 120;
     /** heating per frame * fullness */
     public float heating = 0.01f;
-    /** max heat this block can output */
-    public float heatOutput = 15f;
+    /** max heat this block can output per side */
+    public float heatOutput = 12f;
     /** rate at which heat progress increases */
     public float heatWarmupRate = 1f;
+    /** rate at which fuel consumption scales with heat */
+    public float heatConsumeRate = 10f;
+    /** time taken to cool down if no fuel is inputted even if coolant is not present*/
+    public float ambientCooldownTime = 60f * 20f;
     /** threshold at which block starts smoking */
     public float smokeThreshold = 0.3f;
     /** heat threshold at which lights start flashing */
@@ -66,15 +70,34 @@ public class NuclearReactor extends PowerGenerator{
         explosionDamage = 1250 * 4;
 
         explodeEffect = Fx.reactorExplosion;
-        explodeSound = Sounds.explosionbig;
+        explodeSound = Sounds.explosionReactor;
     }
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemDuration;
         super.setStats();
 
+        stats.add(Stat.meltdownTime, table -> {
+            float avg = (itemDuration / 60f) / (1f + heatConsumeRate / 2f);
+            float val = 30f * heating * itemCapacity * avg;
+            float time = itemCapacity * avg * (1f - Mathf.sqrt(1f - 1f / val));
+            if(val > 1f){
+                table.add(Strings.autoFixed(time, 2) + " " + StatUnit.seconds.localized() + " " + Core.bundle.format("bar.whenfull"));
+            }else{
+                table.add(Core.bundle.format("bar.nevermelts"));
+            }
+        });
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
+        }
+        if(heatOutput > 0f && (ui.planet.isShown() ? ui.planet.state.planet : state.isGame() ? state.getPlanet() : null) == Planets.erekir){
+            stats.add(Stat.output, table -> {
+                //using StatUnit.localized() strips the icon
+                String unit = "[red]" + Iconc.waves + "[] " + Strings.fixed(heatOutput, 0) + " " + Core.bundle.get("unit.heatunitsperside");
+
+                table.add(Core.bundle.format("bar.upto", unit));
+            });
         }
     }
 
@@ -86,6 +109,7 @@ public class NuclearReactor extends PowerGenerator{
 
     public class NuclearReactorBuild extends GeneratorBuild implements HeatBlock{
         public float heat;
+        public float heatLastFrame;
         public float heatProgress;
         public float flash;
         public float smoothLight;
@@ -97,13 +121,14 @@ public class NuclearReactor extends PowerGenerator{
             productionEfficiency = fullness;
 
             if(fuel > 0 && enabled){
-                heat += fullness * heating * Math.min(delta(), 4f);
+                heat += heatLastFrame = fullness * heating * Math.min(delta(), 4f);
 
-                if(timer(timerFuel, itemDuration / timeScale)){
+                if(timer(timerFuel, itemDuration / (timeScale + (heat > heatLastFrame ? 1f * heat * heatConsumeRate : 0f)))){
                     consume();
                 }
             }else{
                 productionEfficiency = 0f;
+                heat = Math.max(0f, heat - Time.delta / ambientCooldownTime);
             }
 
             if(heat > 0){
@@ -121,7 +146,7 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
-            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * (enabled ? 1f : 0f), heatWarmupRate * delta()) : 0f;
+            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * ((enabled && productionEfficiency > 0) ? 1f : 0f), heatWarmupRate * delta()) : 0f;
 
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);

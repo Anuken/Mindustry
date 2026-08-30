@@ -64,8 +64,15 @@ public class DesktopInput extends InputHandler{
     private boolean changedCursor, pressedCommandRect;
 
     boolean showHint(){
-        return ui.hudfrag.shown && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
+        return ui.hudfrag.shown() && Core.settings.getBool("hints") && selectPlans.isEmpty() && !player.dead() &&
             (!isBuilding && !Core.settings.getBool("buildautopause") || player.unit().isBuilding() || !player.dead() && !player.unit().spawnedByCore());
+    }
+
+    @Override
+    public void reset(){
+        super.reset();
+        shouldShoot = false;
+        deleting = false;
     }
 
     @Override
@@ -98,7 +105,7 @@ public class DesktopInput extends InputHandler{
 
         //schematic controls
         group.fill(t -> {
-            t.visible(() -> ui.hudfrag.shown && lastSchematic != null && !selectPlans.isEmpty());
+            t.visible(() -> ui.hudfrag.shown() && lastSchematic != null && !selectPlans.isEmpty());
             t.bottom();
             t.table(Styles.black6, b -> {
                 b.defaults().left();
@@ -152,7 +159,7 @@ public class DesktopInput extends InputHandler{
                 drawArrow(splan.block, splan.x, splan.y, splan.rotation, valid);
             }
 
-            splan.block.drawPlan(splan, allPlans(), valid);
+            splan.block.drawPlan(splan, allPlans, valid);
 
             drawSelected(splan.x, splan.y, splan.block, getPlan(splan.x, splan.y, splan.block.size, splan) != null ? Pal.remove : Pal.accent);
         }
@@ -207,7 +214,7 @@ public class DesktopInput extends InputHandler{
                     Draw.mixcol(!valid ? Pal.breakInvalid : Color.white, (!valid ? 0.4f : 0.24f) + Mathf.absin(Time.globalTime, 6f, 0.28f));
                     bplan.set(cursorX, cursorY, rot, block);
                     bplan.config = block.lastConfig;
-                    block.drawPlanConfig(bplan, allPlans());
+                    block.drawPlanConfig(bplan, allPlans);
                     bplan.config = null;
                     Draw.reset();
                 }
@@ -233,8 +240,14 @@ public class DesktopInput extends InputHandler{
         boolean detached = settings.getBool("detach-camera", false);
 
         if(!scene.hasField() && !scene.hasDialog()){
-            if(input.keyTap(Binding.debugHitboxes)){
-                drawDebugHitboxes = !drawDebugHitboxes;
+            if(input.keyTap(Binding.debugHitboxes)) Core.settings.toggle("drawhitboxes");
+
+            if(input.keyTap(Binding.teleportCursor) && (state.rules.editor || state.rules.infiniteResources) && !net.client()){
+                if(player.dead()){
+                    camera.position.set(input.mouseWorld());
+                }else{
+                    player.unit().set(input.mouseWorld());
+                }
             }
 
             if(input.keyTap(Binding.detachCamera)){
@@ -428,6 +441,7 @@ public class DesktopInput extends InputHandler{
             if(Core.input.keyTap(Binding.respawn)){
                 controlledType = null;
                 recentRespawnTimer = 1f;
+                droppingItem = false;
                 Call.unitClear(player);
             }
         }
@@ -452,7 +466,13 @@ public class DesktopInput extends InputHandler{
             }
         }
 
-        if(state.isMenu() || Core.scene.hasDialog()) return;
+        if(state.isMenu() || Core.scene.hasDialog()){
+            if(!Core.input.keyDown(Binding.select)) player.shooting = false;
+            if(mode == breaking && !Core.input.keyDown(Binding.breakBlock)) mode = none;
+            if(mode == placing && !Core.input.keyDown(Binding.select)) mode = none;
+
+            return;
+        }
 
         //zoom camera
         if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonalPlacement)) && !ui.chatfrag.shown() && !ui.consolefrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
@@ -465,6 +485,14 @@ public class DesktopInput extends InputHandler{
             Tile selected = world.tileWorld(input.mouseWorldX(), input.mouseWorldY());
             if(selected != null){
                 Call.tileTap(player, selected);
+            }
+        }
+
+        if(input.keyTap(Binding.ping) && !Core.scene.hasMouse() && !scene.hasKeyboard()){
+            if(input.ctrl()){
+                ui.showTextInput("", "@ping.text", Vars.maxPingTextLength, "", result -> Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), UI.formatIcons(result)));
+            }else{
+                Call.pingLocation(Vars.player, input.mouseWorldX(), input.mouseWorldY(), null);
             }
         }
 
@@ -975,7 +1003,7 @@ public class DesktopInput extends InputHandler{
 
         unit.movePref(movement);
 
-        unit.aim(Core.input.mouseWorld());
+        unit.aim(input.mouseWorldX(), input.mouseWorldY(), true);
         unit.controlWeapons(true, player.shooting && !boosted);
 
         player.boosting = Core.input.keyDown(Binding.boost);

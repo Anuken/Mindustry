@@ -57,7 +57,7 @@ public class WallCrafter extends Block{
         rotate = true;
         update = true;
         solid = true;
-        ignoreLineRotation = true;
+       ignoreLineRotation = true;
         regionRotated1 = 1;
 
         envEnabled |= Env.space;
@@ -204,7 +204,7 @@ public class WallCrafter extends Block{
                 }
             }, null) * Mathf.lerp(1f, liquidBoostIntensity, hasLiquidBooster ? optionalEfficiency : 0f) * (itemValid ? itemBoostIntensity : 1f);
 
-            if(itemValid && eff * efficiency > 0 && timer(timerUse, boostItemUseTime)){
+            if(itemValid && eff * efficiency > 0 && timer(timerUse, boostItemUseTime / timeScale)){
                 consume();
             }
 

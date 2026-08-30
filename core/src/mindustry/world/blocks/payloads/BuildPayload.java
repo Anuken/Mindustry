@@ -60,6 +60,7 @@ public class BuildPayload implements Payload{
     public void destroyed(){
         build.dead = true;
         build.onDestroyed();
+        build.afterDestroyed();
     }
 
     @Override
@@ -103,7 +104,6 @@ public class BuildPayload implements Payload{
     @Override
     public void set(float x, float y, float rotation){
         build.set(x, y);
-        build.payloadRotation = rotation;
     }
 
     @Override

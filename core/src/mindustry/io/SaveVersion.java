@@ -11,11 +11,13 @@ import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.maps.Map;
+import mindustry.mod.*;
+import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -58,18 +60,13 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     @Override
-    public final void write(DataOutputStream stream) throws IOException{
-        write(stream, new StringMap());
-    }
-
-    @Override
-    public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
-        readRegion("meta", stream, counter, in -> readMeta(in, context));
-        readRegion("content", stream, counter, this::readContentHeader);
+    public void read(DataInputStream stream, CounterInputStream counter, SaveReadState saveState) throws IOException{
+        readRegion("meta", stream, counter, in -> readMeta(in, saveState));
+        if(version >= 12) readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
 
         try{
-            if(version >= 11) readRegion("patches", stream, counter, this::readContentPatches);
-            readRegion("map", stream, counter, in -> readMap(in, context));
+            readRegion("content", stream, counter, this::readContentHeader);
+            readRegion("map", stream, counter, in -> readMap(in, saveState.context));
             readRegion("entities", stream, counter, this::readEntities);
             if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
             readRegion("custom", stream, counter, this::readCustomChunks);
@@ -78,10 +75,11 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void write(DataOutputStream stream, StringMap extraTags) throws IOException{
-        writeRegion("meta", stream, out -> writeMeta(out, extraTags));
+    @Override
+    public void write(DataOutputStream stream, SaveOptions options) throws IOException{
+        writeRegion("meta", stream, out -> writeMeta(out, options.extraTags));
+        writeRegion("patches", stream, out -> writeDataPatches(out, options.embedAssets));
         writeRegion("content", stream, this::writeContentHeader);
-        writeRegion("patches", stream, this::writeContentPatches);
         writeRegion("map", stream, this::writeMap);
         writeRegion("entities", stream, this::writeEntities);
         writeRegion("markers", stream, this::writeMarkers);
@@ -125,7 +123,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         StringMap result = new StringMap();
-        result.putAll(tags);
+        if(tags != null) result.putAll(tags);
 
         writeStringMap(stream, result.merge(StringMap.of(
             "saved", Time.millis(),
@@ -146,31 +144,25 @@ public abstract class SaveVersion extends SaveFileReader{
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
-            "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id
+            "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id,
+            "hasExternalAssets", state.data.getAllExternalAssets().size > 0
         )));
     }
 
-    public void readMeta(DataInput stream, WorldContext context) throws IOException{
+    public void readMeta(DataInput stream, SaveReadState saveState) throws IOException{
         StringMap map = readStringMap(stream);
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.tick = map.getFloat("tick");
         state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
-        state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         state.mapLocales = JsonIO.read(MapLocales.class, map.get("locales", "{}"));
-        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
 
-        if(context.getSector() != null){
-            state.rules.sector = context.getSector();
-            if(state.rules.sector != null){
-                state.rules.sector.planet.applyRules(state.rules);
-            }
-        }
+        saveState.ruleString = map.get("rules", "{}");
 
-        //replace the default serpulo env with erekir
-        if(state.rules.planet == Planets.serpulo && state.rules.hasEnv(Env.scorching)){
-            state.rules.planet = Planets.erekir;
+        //for versions >= 13, rules are parsed after data patches are loaded
+        if(version < 13){
+            readRules(saveState);
         }
 
         if(!headless){
@@ -196,6 +188,25 @@ public abstract class SaveVersion extends SaveFileReader{
             "width", 1,
             "height", 1
         )) : worldmap;
+    }
+
+    public void readRules(SaveReadState saveState){
+        if(saveState.ruleString == null) return; //in NetworkIO, rules are null, not read here
+        state.rules = JsonIO.read(Rules.class, saveState.ruleString);
+
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
+
+        if(saveState.context.getSector() != null){
+            state.rules.sector = saveState.context.getSector();
+            if(state.rules.sector != null){
+                state.rules.sector.planet.applyRules(state.rules);
+            }
+        }
+
+        //replace the default serpulo env with erekir
+        if(state.rules.planet == Planets.serpulo && state.rules.hasEnv(Env.scorching)){
+            state.rules.planet = Planets.erekir;
+        }
     }
 
     public void writeMap(DataOutput stream) throws IOException{
@@ -334,6 +345,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 //set block only if this is the center; otherwise, it's handled elsewhere
                 if(isCenter){
                     tile.setBlock(block);
+                    if(tile.build != null) tile.build.enabled = true;
                 }
 
                 //must be assigned after setBlock, because that can reset data
@@ -400,17 +412,27 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeWorldEntities(DataOutput stream) throws IOException{
-        stream.writeInt(Groups.all.count(Entityc::serialize));
+        //units are not included in Groups.all
+        stream.writeInt(Groups.all.count(Entityc::serialize) + Groups.unit.size());
+
         for(Entityc entity : Groups.all){
             if(!entity.serialize()) continue;
 
-            writeChunk(stream, out -> {
-                out.b(entity.classId());
-                out.i(entity.id());
-                entity.beforeWrite();
-                entity.write(out);
-            });
+            writeEntity(entity, stream);
         }
+
+        for(Entityc entity : Groups.unit){
+            writeEntity(entity, stream);
+        }
+    }
+
+    private void writeEntity(Entityc entity, DataOutput stream) throws IOException{
+        writeChunk(stream, out -> {
+            out.b(entity.classId());
+            out.i(entity.id());
+            entity.beforeWrite();
+            entity.write(out);
+        });
     }
 
     public void writeEntityMapping(DataOutput stream) throws IOException{
@@ -460,6 +482,8 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readWorldEntities(DataInput stream, Prov[] mapping) throws IOException{
+        IntSet used = new IntSet();
+        Seq<Entityc> reassign = new Seq<>();
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
@@ -476,11 +500,23 @@ public abstract class SaveVersion extends SaveFileReader{
                 EntityGroup.checkNextId(id);
                 entity.id(id);
                 entity.read(in);
-                entity.add();
+                if(used.add(id)){
+                    entity.add();
+                }else{
+                    Log.warn("Duplicate entity ID in save: @ (@)", id, entity);
+                    reassign.add(entity);
+                }
             });
         }
 
+        for(var ent : reassign){
+            ent.id(EntityGroup.nextId());
+            ent.add();
+        }
+
         Groups.all.each(Entityc::afterReadAll);
+        Groups.unit.each(Entityc::afterReadAll);
+        Groups.build.each(Entityc::afterReadAll);
     }
 
     public Prov[] readEntityMapping(DataInput stream) throws IOException{
@@ -505,49 +541,67 @@ public abstract class SaveVersion extends SaveFileReader{
         readWorldEntities(stream, mapping);
     }
 
-    public void skipContentPatches(DataInput stream) throws IOException{
-        int amount = stream.readUnsignedByte();
-        for(int i = 0; i < amount; i++){
-            int len = stream.readInt();
-            stream.skipBytes(len);
+    public void readDataPatches(DataInput stream, SaveReadState saveState) throws IOException{
+        stream.readInt(); //version - ignored for now
+
+        int total = stream.readInt();
+        Seq<DataAsset> assets = new Seq<>(total);
+
+        for(int i = 0; i < total; i++){
+            byte typeId = stream.readByte();
+            if(typeId < 0 || typeId >= DataAssetType.all.length) throw new IOException("Invalid asset type ID: " + typeId + ". You are likely loading trying to load a save from a newer version of the game, possibly a beta.");
+
+            String path = stream.readUTF();
+            boolean embedded = stream.readBoolean();
+            var type = DataAssetType.all[typeId];
+            var asset = type.create();
+
+            asset.setPath(path);
+
+            if(embedded){
+                asset.read(stream);
+            }else{
+                byte[] hash = new byte[32];
+                stream.readFully(hash);
+                asset.setHash(hash);
+
+                if(!asset.isCached()){
+                    //TODO: log this when loading a save
+                    Log.warn("Asset @: cache file not found.", asset.path);
+                }
+            }
+
+            assets.add(asset);
         }
+
+        Events.fire(new DataPatchLoadEvent(assets));
+
+        state.data.load(assets);
+
+        //now that patches are loaded, the rules can actually be read
+        readRules(saveState);
     }
 
-    public void readContentPatches(DataInput stream) throws IOException{
-        Seq<String> patches = new Seq<>();
+    public void writeDataPatches(DataOutput stream, boolean forceEmbed) throws IOException{
+        stream.writeInt(DataPatcher.patchFormatVersion);
 
-        int amount = stream.readUnsignedByte();
-        if(amount > 0){
-            for(int i = 0; i < amount; i++){
-                int len = stream.readInt();
-                byte[] bytes = new byte[len];
-                stream.readFully(bytes);
-                patches.add(new String(bytes, Strings.utf8));
+        var assets = state.data.getAllAssets();
+        stream.writeInt(assets.size);
+
+        for(var asset : assets){
+            boolean embed = forceEmbed || asset.isAlwaysEmbedded() || asset.byteHash == null;
+
+            stream.writeByte(asset.getType().ordinal());
+            stream.writeUTF(asset.path);
+            stream.writeBoolean(embed);
+
+            if(embed){
+                //most embedded assets (images, audio) write byte[] values directly from their cache file. game patches and content write raw string data.
+                asset.write(stream);
+            }else{
+                //if it's cached successfully, just write the 32-byte SHA256
+                stream.write(asset.byteHash);
             }
-        }
-
-        Events.fire(new ContentPatchLoadEvent(patches));
-
-        if(patches.size > 0){
-            try{
-                state.patcher.apply(patches);
-            }catch(Throwable e){
-                Log.err("Failed to apply patches: " + patches, e);
-            }
-        }
-    }
-
-    public void writeContentPatches(DataOutput stream) throws IOException{
-        if(state.patcher.patches.size > 0){
-            var patches = state.patcher.patches;
-            stream.writeByte(patches.size);
-            for(var patchset : patches){
-                byte[] bytes = patchset.patch.getBytes(Strings.utf8);
-                stream.writeInt(bytes.length);
-                stream.write(bytes);
-            }
-        }else{
-            stream.writeByte(0);
         }
     }
 
@@ -573,16 +627,10 @@ public abstract class SaveVersion extends SaveFileReader{
         //HACK: versions below 11 don't read the patch chunk, which means the event for reading patches is never triggered.
         //manually fire the event here for older versions.
         if(version < 11){
-            Seq<String> patches = new Seq<>();
-            Events.fire(new ContentPatchLoadEvent(patches));
+            Seq<DataAsset> assets = new Seq<>();
+            Events.fire(new DataPatchLoadEvent(assets));
 
-            if(patches.size > 0){
-                try{
-                    state.patcher.apply(patches);
-                }catch(Throwable e){
-                    Log.err("Failed to apply patches: " + patches, e);
-                }
-            }
+            state.data.load(assets);
         }
     }
 

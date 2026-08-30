@@ -68,6 +68,8 @@ public class Floor extends Block{
     public Block decoration = Blocks.air;
     /** Whether units can draw shadows over this. */
     public boolean canShadow = true;
+    /** If true, this floor ignores the obstructsLight flag of overlays. */
+    public boolean forceDrawLight = false;
     /** Whether this overlay needs a surface to be on. False for floating blocks, like spawns. */
     public boolean needsSurface = true;
     /** If true, cores can be placed on this floor. */
@@ -93,7 +95,7 @@ public class Floor extends Block{
     protected TextureRegion[] autotileRegions, autotileMidRegions;
     protected TextureRegion[][] autotileVariantRegions;
     protected int tilingSize;
-    protected TextureRegion[][] edges;
+    protected @Nullable TextureRegion[][] edges;
     protected Seq<Floor> blenders = new Seq<>();
     protected Bits blended = new Bits(256);
     protected int[] dirs = new int[8];
@@ -110,6 +112,7 @@ public class Floor extends Block{
         allowRectanglePlacement = true;
         instantBuild = true;
         ignoreBuildDarkness = true;
+        obstructsLight = false;
         placeEffect = Fx.rotateBlock;
     }
 
@@ -164,6 +167,15 @@ public class Floor extends Block{
 
         if(Core.atlas.has(name + "-edge")){
             edges = Core.atlas.find(name + "-edge").split(tsize, tsize);
+            if(edges.length != 3 || edges[0].length != 3){
+                //edges must be 3x3
+                var error = Core.atlas.find("error");
+                edges = new TextureRegion[][]{
+                    new TextureRegion[]{error, error, error},
+                    new TextureRegion[]{error, error, error},
+                    new TextureRegion[]{error, error, error},
+                };
+            }
         }
         region = variantRegions[0];
         edgeRegion = Core.atlas.find("edge");
@@ -193,7 +205,7 @@ public class Floor extends Block{
         }
 
         if(isLiquid && walkSound == Sounds.none){
-            walkSound = Sounds.splash;
+            walkSound = Sounds.stepWater;
         }
     }
 
@@ -217,8 +229,8 @@ public class Floor extends Block{
 
         if(Core.atlas.has(name + "-edge")) return;
 
-        var image = Core.atlas.getPixmap(icons()[0]);
-        var edge = Core.atlas.getPixmap(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
+        var image = packer.get(icons()[0]);
+        var edge = packer.get(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
         Pixmap result = new Pixmap(edge.width, edge.height);
 
         for(int x = 0; x < edge.width; x++){
