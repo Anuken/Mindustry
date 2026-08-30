@@ -798,6 +798,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             updateField(jsonData.get("minimap"));
             updateField(jsonData.get("light"));
             json.readFields(this, jsonData);
+            if(jsonData.has("textureName")) setTexture(jsonData.getString("textureName"));
         }
 
         public static String fetchText(String text){
@@ -824,17 +825,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }else{
                 return UI.formatIcons(text);
             }
-        }
-
-        @Override
-        public void write(Json json){
-            json.writeFields(this);
-        }
-
-        @Override
-        public void read(Json json, JsonValue jsonData){
-            json.readFields(this, jsonData);
-            if(jsonData.has("textureName")) setTexture(jsonData.getString("textureName"));
         }
     }
 
@@ -1463,7 +1453,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
         }
     }
-  
+
     private static void lookupRegion(Object texture, TextureRegion out){
         if(texture instanceof String name){
             TextureRegion region = Core.atlas.find(name);
