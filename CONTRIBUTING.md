@@ -34,7 +34,7 @@ This means:
 - Same-line braces.
 - 4 spaces indentation
 - `camelCase`, **even for constants or enums**. Why? Because `SCREAMING_CASE` is ugly, annoying to type and does not achieve anything useful. Constants are *less* dangerous than variables, not more. Any reasonable IDE should highlight them for you anyway.
-- No underscores for anything. (Yes, I know `Bindings` violates this principle, but that's for legacy reasons and really should be cleaned up some day)
+- No underscores for anything.
 - Do not use braceless `if/else` statements. `if(x) statement else statement2` should **never** be done. In very specific situations, having braceless if-statements on one line is allowed: `if(cond) return;` would be valid.
 - Prefer single-line javadoc `/** @return for example */` instead of multiline javadoc whenever possible
 - Short method/variable names (multipleLongWords should be avoided if it's possible to do so reasonably, especially for variables)

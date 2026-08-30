@@ -1,7 +1,6 @@
 package mindustry.input;
 
 import arc.*;
-import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -78,6 +77,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** If true, there is a cutscene currently occurring in logic. */
     public boolean logicCutscene;
+    public boolean logicHideHud;
     public Vec2 logicCamPan = new Vec2();
     public float logicCamSpeed = 0.1f;
     public float logicCutsceneZoom = -1f;
@@ -144,15 +144,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         });
 
-        Events.on(WorldLoadEvent.class, e -> {
-            playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
-            selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
-            createPlanLists();
-        });
+        Events.on(WorldLoadEvent.class, e -> initQuadtrees());
 
-        Events.on(ResetEvent.class, e -> {
-            reset();
-        });
+        Events.on(ResetEvent.class, e -> reset());
+    }
+
+    protected void initQuadtrees(){
+        playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+        selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+        createPlanLists();
     }
 
     //methods to override
@@ -320,6 +320,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         Vec2 targetAsVec = new Vec2().set(teamTarget != null ? teamTarget : posTarget);
         Seq<Unit> toAdd = queuedCommands.get(targetAsVec, Seq::new);
         boolean anyCommandedTarget = false;
+
+        if(unitTarget != null || buildTarget != null){
+            Events.fire(Trigger.unitCommandAttack);
+        }else{
+            Events.fire(Trigger.unitCommandPosition);
+        }
 
         for(int id : unitIds){
             Unit unit = Groups.unit.getByID(id);
@@ -588,6 +594,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)){
                     pay.pickup(build);
                 }else{
+                    Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
                     Fx.unitPickup.at(build);
                     build.tile.remove();
                 }
@@ -596,6 +603,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(current != null && pay.canPickupPayload(current)){
                     Payload taken = build.takePayload();
                     if(taken != null){
+                        Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
                         pay.addPayload(taken);
                         Fx.unitPickup.at(build);
                     }
@@ -603,6 +611,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
         }else if(build != null && onGround){
+            Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
             Fx.unitPickup.at(build);
             build.tile.remove();
         }
@@ -737,7 +746,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(player == null || build == null || player.dead()) return;
 
         //make sure player is allowed to control the building
-        if(net.server() && !netServer.admins.allowAction(player, ActionType.buildSelect, action -> action.tile = build.tile)){
+        if(net.server() && (!state.rules.possessionAllowed && player.bestCore() != build  || !netServer.admins.allowAction(player, ActionType.buildSelect, action -> action.tile = build.tile))){
             throw new ValidateException(player, "Player cannot control a building.");
         }
 
@@ -882,10 +891,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void updateSelectQuadtree(){
-        selectPlanTree.clear();
-        for(var plan : selectPlans){
-            selectPlanTree.insert(plan);
-        }
+        selectPlanTree.fill(selectPlans);
     }
 
     /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
@@ -913,6 +919,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void reset(){
         logicCutscene = false;
+        logicHideHud = false;
         commandBuildings.clear();
         selectedUnits.clear();
         itemDepositCooldown = 0f;
@@ -920,6 +927,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lastUnit = null;
         lastPlans.clear();
         player.shooting = false;
+        player.pingTime = 0f;
     }
 
     public void getSyncedPlans(Seq<BuildPlan> out){
@@ -1174,12 +1182,6 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     ids[i] = selectedUnits.get(i).id;
                 }
 
-                if(attack != null){
-                    Events.fire(Trigger.unitCommandAttack);
-                }else{
-                    Events.fire(Trigger.unitCommandPosition);
-                }
-
                 int maxChunkSize = 200;
 
                 if(ids.length > maxChunkSize){
@@ -1407,10 +1409,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         plan.animScale = prev.animScale;
                     }
                 }
-                player.previewPlanTree.clear();
-                for(BuildPlan plan : plans){
-                    player.previewPlanTree.insert(plan);
-                }
+                player.previewPlanTree.fill(plans);
             }
 
             BuildPlan current = player.isBuilder() ? player.unit().buildPlan() : null;
@@ -1424,7 +1423,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     overlappingPlayer= player;
                 }
 
-                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f * Time.delta);
+                plan.animScale = Mathf.lerpDelta(plan.animScale, 1f, 0.2f);
                 plan.block.drawOtherPlayerPlan(plan, player.planEachable, overlappingPlan == plan ? 0.7f : 0.25f);
             });
         });
@@ -1990,10 +1989,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (config.isShown() && config.getSelected().onConfigureBuildTapped(build) && build.shouldShowConfigure(player))){
-                AudioBus oldBus = build.block.configureSound.bus;
-                build.block.configureSound.bus = control.sound.uiBus;
-                build.block.configureSound.at(build);
-                build.block.configureSound.bus = oldBus;
+                build.block.configureSound.at(build.x, build.y, 1f, 1f, control.sound.uiBus);
                 config.showConfig(build);
             }
             //otherwise...
@@ -2266,6 +2262,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             config.build(group);
             planConfig.build(group);
         }
+
+        initQuadtrees();
     }
 
     public boolean canShoot(){

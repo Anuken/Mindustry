@@ -247,7 +247,15 @@ public class Schematics implements Loadable{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
+            Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config){
+                @Override
+                public Tile tile(){
+                    //fake tile to return for previews to work properly
+                    emptyTile.x = (short)x;
+                    emptyTile.y = (short)y;
+                    return emptyTile;
+                }
+            });
 
             Draw.flush();
             //scale each plan to fit schematic
@@ -263,6 +271,10 @@ public class Schematics implements Loadable{
             });
 
             plans.each(req -> req.block.drawPlanConfigTop(req, eachPlans));
+
+            //reset state
+            emptyTile.x = 0;
+            emptyTile.y = 0;
 
             Draw.flush();
             Draw.trans().idt();
@@ -521,6 +533,21 @@ public class Schematics implements Loadable{
     }
 
     //region IO methods
+
+    public static boolean isSchematic(Fi file){
+        try{
+            try(InputStream input = file.read()){
+                for(byte b : header){
+                    if(input.read() != b){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }catch(Throwable t){
+            return false;
+        }
+    }
 
     /** Loads a schematic from base64. May throw an exception. */
     public static Schematic readBase64(String schematic){

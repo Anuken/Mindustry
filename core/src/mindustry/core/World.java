@@ -299,7 +299,6 @@ public class World{
     private void setSectorRules(Sector sector, boolean saveInfo){
         state.map = new Map(StringMap.of("name", sector.preset == null ? sector.planet.localizedName + "; Sector " + sector.id : sector.preset.localizedName));
         state.rules.sector = sector;
-        state.rules.weather.clear();
 
         sector.planet.generator.addWeather(sector, state.rules);
 
@@ -309,17 +308,16 @@ public class World{
         boolean border = state.rules.limitMapArea;
         state.rules.limitMapArea = false;
 
-        //TODO duplicate code?
         for(Tile tile : tiles){
             if(getDarkness(tile.x, tile.y) >= 3){
                 continue;
             }
 
             Liquid liquid = tile.floor().liquidDrop;
-            if(tile.floor().itemDrop != null && tile.block() == Blocks.air) content.add(tile.floor().itemDrop);
-            if(tile.overlay().itemDrop != null && tile.block() == Blocks.air) content.add(tile.overlay().itemDrop);
+            if(tile.floor().itemDrop != null && !tile.block().isStatic()) content.add(tile.floor().itemDrop);
+            if(tile.overlay().itemDrop != null && !tile.block().isStatic()) content.add(tile.overlay().itemDrop);
             if(tile.wallDrop() != null) content.add(tile.wallDrop());
-            if(liquid != null && tile.block() == Blocks.air) content.add(liquid);
+            if(liquid != null && !tile.block().isStatic()) content.add(liquid);
         }
         state.rules.limitMapArea = border;
 
@@ -557,6 +555,30 @@ public class World{
         }
     }
 
+    public static void raycastEachNoDiagonalWorld(float x0, float y0, float x1, float y1, Raycaster cons){
+        raycastEachNoDiagonal(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
+    }
+
+    public static void raycastEachNoDiagonal(int startX, int startY, int endX, int endY, Raycaster cons){
+        int xDist = Math.abs(endX - startX);
+        int yDist = -Math.abs(endY - startY);
+        int xStep = (startX < endX ? +1 : -1);
+        int yStep = (startY < endY ? +1 : -1);
+        int error = xDist + yDist;
+
+        while(true){
+            if(cons.accept(startX, startY) || (startX == endX && startY == endY)) break;
+
+            if(2 * error - yDist > xDist - 2 * error){
+                error += yDist;
+                startX += xStep;
+            }else{
+                error += xDist;
+                startY += yStep;
+            }
+        }
+    }
+
     public static boolean raycast(int x1, int y1, int x2, int y2, Raycaster cons){
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
@@ -644,6 +666,11 @@ public class World{
             applyFilters();
 
             super.end();
+        }
+
+        @Override
+        public boolean isMap(){
+            return true;
         }
 
         public void applyFilters(){

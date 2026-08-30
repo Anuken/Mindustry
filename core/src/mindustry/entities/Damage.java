@@ -107,9 +107,9 @@ public class Damage{
             float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
-                var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                 int f = i;
                 Time.run(i * 2f, () -> {
+                    var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                     if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
                         damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
                     }
@@ -263,7 +263,7 @@ public class Damage{
         if(hitter.type.collidesGround && hitter.type.collidesTiles){
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
-            World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
+            World.raycastEachNoDiagonalWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 boolean collide = tile != null && tile.collide(hitter) && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
                     && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());

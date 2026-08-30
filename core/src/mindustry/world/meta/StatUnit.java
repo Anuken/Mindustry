@@ -36,7 +36,8 @@ public class StatUnit{
     percent = new StatUnit("percent", false),
     shieldHealth = new StatUnit("shieldHealth"),
     none = new StatUnit("none"),
-    items = new StatUnit("items");
+    items = new StatUnit("items"),
+    instant = new StatUnit("instant");
 
     public final boolean space;
     public final String name;

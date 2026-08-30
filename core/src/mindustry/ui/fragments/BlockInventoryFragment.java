@@ -233,7 +233,7 @@ public class BlockInventoryFragment{
     private void updateTablePosition(){
         Vec2 v = Core.input.mouseScreen(build.x + build.block.size * tilesize / 2f, build.y + build.block.size * tilesize / 2f);
         table.pack();
-        table.setPosition(v.x, v.y, Align.topLeft);
+        table.setPosition(v.x - Core.scene.marginLeft, v.y - Core.scene.marginBottom, Align.topLeft);
     }
 
     private Element itemImage(TextureRegion region, Prov<CharSequence> text){
