@@ -1389,6 +1389,14 @@ public class ContentParser{
 
                 if(research.has("planet")){
                     node.planet = find(ContentType.planet, research.getString("planet"));
+                    node.planets.addUnique(node.planet);
+                }
+
+                if(research.has("planets")){
+                    for(var name: research.get("planets").asStringArray()){
+                        node.planets.addUnique(find(ContentType.planet, name));
+                    }
+
                 }
 
                 if(research.getBoolean("root", false)){
@@ -1410,6 +1418,7 @@ public class ContentParser{
                             //reparent the node
                             node.parent = parent;
                             node.planet = parent.planet;
+                            node.planets = parent.planets;
                         }
                     }else{
                         warn(unlock.name + " is not a root node, and does not have a `parent: ` property. Ignoring.");

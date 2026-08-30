@@ -450,12 +450,14 @@ public class Planet extends UnlockableContent{
         loadStats();
 
         if(techTree == null){
-            techTree = TechTree.roots.find(n -> n.planet == this);
+            techTree = TechTree.roots.find(n -> n.planets.contains(this));
         }
 
-        if(techTree != null && autoAssignPlanet){
-            techTree.addDatabaseTab(this);
-            techTree.addPlanet(this);
+        if(autoAssignPlanet){
+            for(var tech : TechTree.roots.select(n -> n.planets.contains(this))){
+                tech.addDatabaseTab(this);
+                tech.addPlanet(this);
+            }
         }
 
         for(Sector sector : sectors){

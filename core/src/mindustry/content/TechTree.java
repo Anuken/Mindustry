@@ -98,14 +98,17 @@ public class TechTree{
         public Seq<Objective> objectives = new Seq<>();
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
-        /** Planet associated with this tech node. Null to auto-detect, or use Serpulo if no associated planet is found. */
+        /** The main planet associated with this tech node. Null to auto-detect, or use Serpulo if no associated planet is found. */
         public @Nullable Planet planet;
+        /** Secondary planets associated with this tech node. */
+        public @Nullable Seq<Planet> planets = new Seq<>();
 
         public TechNode(@Nullable TechNode parent, UnlockableContent content, ItemStack[] requirements){
             if(parent != null){
                 parent.children.add(this);
                 rootNode = parent.rootNode == null ? parent : parent.rootNode;
                 planet = parent.planet;
+                planets = parent.planets;
                 researchCostMultipliers = parent.researchCostMultipliers;
             }else if(researchCostMultipliers == null){
                 researchCostMultipliers = new ObjectFloatMap<>();

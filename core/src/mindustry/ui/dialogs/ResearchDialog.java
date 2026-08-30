@@ -218,7 +218,7 @@ public class ResearchDialog extends BaseDialog{
                 //first, find a planets associated with the current tech tree
                 rootPlanets.clear();
                 for(var planet : content.planets()){
-                    if(planet.techTree == lastNode || lastNode.planet == planet){
+                    if(planet.techTree == lastNode || lastNode.planet == planet || lastNode.planets.contains(planet)){
                         rootPlanets.add(planet);
                     }
                 }
