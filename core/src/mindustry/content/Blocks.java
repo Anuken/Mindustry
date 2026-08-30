@@ -3671,7 +3671,7 @@ public class Blocks{
         swarmer = new ItemTurret("swarmer"){{
             requirements(Category.turret, with(Items.graphite, 35, Items.titanium, 35, Items.plastanium, 45, Items.silicon, 30));
             ammo(
-                Items.blastCompound, new MissileBulletType(3.7f, 14){{
+                Items.blastCompound, new MissileBulletType(3.7f, 10){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
@@ -3687,7 +3687,7 @@ public class Blocks{
                     hitColor = backColor = trailColor = Pal.blastAmmoBack;
                     frontColor = Pal.blastAmmoFront;
                 }},
-                Items.pyratite, new MissileBulletType(3.7f, 16){{
+                Items.pyratite, new MissileBulletType(3.7f, 12){{
                     frontColor = Pal.lightishOrange;
                     backColor = Pal.lightOrange;
                     width = 7f;
@@ -3702,7 +3702,7 @@ public class Blocks{
                     hitEffect = Fx.blastExplosion;
                     status = StatusEffects.burning;
                 }},
-                Items.surgeAlloy, new MissileBulletType(3.7f, 22){{
+                Items.surgeAlloy, new MissileBulletType(3.7f, 18){{
                     width = 8f;
                     height = 8f;
                     shrinkY = 0f;
