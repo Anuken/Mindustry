@@ -236,6 +236,11 @@ public class CustomRulesDialog extends BaseDialog{
 
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
+        if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
+            current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
+        }
+
+        category("light");
         if(Core.bundle.get("rules.ambientlight").toLowerCase().contains(ruleSearch)){
             current.button(b -> {
                 b.left();
@@ -247,6 +252,7 @@ public class CustomRulesDialog extends BaseDialog{
                 b.add("@rules.ambientlight");
             }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
         }
+        check("@rules.lighting.unitlight", b -> rules.unitLight = b, () -> rules.unitLight);
 
         if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
             current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
