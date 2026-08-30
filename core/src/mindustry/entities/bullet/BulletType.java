@@ -29,6 +29,7 @@ import static mindustry.Vars.*;
 
 public class BulletType extends Content implements Cloneable{
     static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
+    static final BulletCreateEvent bulletCreateEvent = new BulletCreateEvent();
 
     /** Lifetime in ticks. */
     public float lifetime = 40f;
@@ -138,6 +139,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean collideTerrain = false;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
+    /** If keepVelocity = true, whether to reduce lifetime proportionally to the added speed, making range consistent. */
+    public boolean scaleKeepVelocity = false;
     /** Whether to scale lifetime (not actually velocity!) to disappear at the target position. Used for artillery. */
     public boolean scaleLife;
     /** Whether this bullet can be hit by point defense. */
@@ -186,8 +189,10 @@ public class BulletType extends Content implements Cloneable{
     public boolean fragOnAbsorb = true;
     /** If true, unit armor is ignored in damage calculations. */
     public boolean pierceArmor = false;
-    /** Multiplies the unit armor used in damage calculations. Used for armor weakness, armor piercing, and anti-armor. */
+    /** Multiplies the unit/building armor used in damage calculations. Used for armor weakness, armor piercing, and anti-armor. */
     public float armorMultiplier = 1f;
+    /** Multiplies only the building armor used in damage calculations. */
+    public float blockArmorMultiplier = 1f;
     /** If true, the bullet will "stick" to enemies and get deactivated on collision. */
     public boolean sticky = false;
     /** Extra time added to bullet when it sticks to something. */
@@ -591,7 +596,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void createSplashDamage(Bullet b, float x, float y){
         if(splashDamageRadius > 0 && !b.absorbed){
-            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b, armorMultiplier);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
@@ -672,7 +677,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void drawTrail(Bullet b){
         if(trailLength > 0 && b.trail != null){
-            //draw below bullets? TODO
+            //draw below bullets
             float z = Draw.z();
             Draw.z(z - 0.0001f);
             b.trail.draw(trailColor, trailWidth);
@@ -738,10 +743,9 @@ public class BulletType extends Content implements Cloneable{
             Teamc target;
             //home in on allies if possible
             if(heals()){
-                target = Units.closestTarget(null, realAimX, realAimY, homingRange,
-                e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
-                t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
-                );
+                target = Units.closestTarget(null, realAimX, realAimY, homingRange, b.team,
+                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
+                    t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id));
             }else{
                 if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
                     target = b.aimTile.build;
@@ -836,6 +840,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(fragBullet != null){
             fragBullet.keepVelocity = false;
+            fragBullet.scaleKeepVelocity = false;
         }
 
         if(lightningType == null){
@@ -976,7 +981,16 @@ public class BulletType extends Content implements Cloneable{
         }
         bullet.add();
 
-        if(keepVelocity && owner instanceof Velc v) bullet.vel.add(v.vel());
+        if(keepVelocity && owner instanceof Velc v){
+            float len = bullet.vel.len();
+            bullet.vel.add(v.vel());
+
+            if(scaleKeepVelocity){
+                float newLen = bullet.vel.len();
+                //only reduce lifetime, never add
+                if(newLen > 0f) bullet.lifetime *= Math.min(1f, len / newLen);
+            }
+        }
         return bullet;
     }
 
@@ -987,6 +1001,7 @@ public class BulletType extends Content implements Cloneable{
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
         if(type == null) return;
-        type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
+        var bullet = type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
+        Events.fire(bulletCreateEvent.set(bullet));
     }
 }

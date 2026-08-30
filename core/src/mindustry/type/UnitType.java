@@ -29,7 +29,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
-import mindustry.type.ammo.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
@@ -244,7 +243,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     bounded = true,
     /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
     naval = false,
-    /** if false, RTS AI controlled units do not automatically attack things while moving. This is automatically assigned. */
+    /** if false, RTS AI controlled units do not automatically attack things while moving. */
     autoFindTarget = true,
     /** If false, 'under' blocks like conveyors are not targeted. */
     targetUnderBlocks = true,
@@ -377,10 +376,9 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** amount of items this unit can carry; <0 to determine based on hitSize. */
     public int itemCapacity = -1;
-    /** amount of ammo this unit can hold (if the rule is enabled); <0 to determine based on weapon fire rate. */
-    public int ammoCapacity = -1;
-    /** ammo this unit uses, if that system is enabled. */
-    public AmmoType ammoType = new ItemAmmoType(Items.copper);
+    /** @deprecated only kept for compatibility with some turrets that query this field! Remove this from your code immediately! */
+    @Deprecated
+    public int ammoCapacity = 1;
 
     /** max hardness of ore that this unit can mine (<0 to disable) */
     public int mineTier = -1;
@@ -530,6 +528,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         // Try to immediately resolve the Unit constructor based on EntityMapping entry, if it is set.
         // This is the default Vanilla behavior - it won't work properly for mods (see comment in `init()`)!
         constructor = EntityMapping.map(this.name);
+        if(constructor == null) constructor = UnitEntity::create;
         selectionSize = 30f;
     }
 
@@ -562,7 +561,6 @@ public class UnitType extends UnlockableContent implements Senseable{
         for(var ability : unit.abilities){
             ability.created(unit);
         }
-        unit.ammo = ammoCapacity; //fill up on ammo upon creation
         unit.elevation = flying ? 1f : 0;
         unit.heal();
         if(unit instanceof TimedKillc u){
@@ -648,8 +646,12 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** Adds all available unit stances based on the unit's current state. This can change based on the command of the unit. */
     public void getUnitStances(Unit unit, Seq<UnitStance> out){
+        if(!(unit.controller() instanceof CommandAI ai)) return;
+
+        var current = ai.currentCommand();
+
         //return mining stances based on present items
-        if(unit.controller() instanceof CommandAI ai && ai.currentCommand() == UnitCommand.mineCommand){
+        if(current == UnitCommand.mineCommand){
             out.add(UnitStance.mineAuto);
             for(Item item : indexer.getAllPresentOres()){
                 if(unit.canMine(item) && ((mineFloor && indexer.hasOre(item)) || (mineWalls && indexer.hasWallOre(item)))){
@@ -660,8 +662,15 @@ public class UnitType extends UnlockableContent implements Senseable{
                 }
             }
         }else{
-            out.addAll(stances);
+            for(var stance : stances){
+                if(stance.isCompatible(current)){
+                    out.add(stance);
+                }
+            }
         }
+
+        //there might be duplicates, but that shouldn't cause issues
+        out.addAll(current.extraStances);
     }
 
     public boolean allowStance(Unit unit, UnitStance stance){
@@ -702,11 +711,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             bars.add(new Bar("stat.health", Pal.health, unit::healthf).blink(Color.white));
             bars.row();
 
-            if(state.rules.unitAmmo){
-                bars.add(new Bar(ammoType.icon() + " " + Core.bundle.get("stat.ammo"), ammoType.barColor(), () -> unit.ammo / ammoCapacity));
-                bars.row();
-            }
-
             for(Ability ability : unit.abilities){
                 ability.displayBars(unit, bars);
             }
@@ -736,11 +740,11 @@ public class UnitType extends UnlockableContent implements Senseable{
             table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
             if(net.active() && ai.controller != null && ai.controller.lastAccessed != null){
                 table.row();
-                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).growX().wrap().left();
+                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).width(260f).wrap().left();
             }
         }else if(net.active() && unit.lastCommanded != null){
             table.row();
-            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).growX().wrap().left();
+            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).width(260f).wrap().left();
         }
 
         table.row();
@@ -795,7 +799,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
         if(legSplashDamage > 0 && legSplashRange > 0){
             stats.add(Stat.legSplashDamage, table -> {
-                table.add((String)(Core.bundle.format("bullet.splashdamage", Strings.autoFixed(legSplashDamage, 2),
+                table.add((Core.bundle.format("bullet.splashdamage", Strings.autoFixed(legSplashDamage, 2),
                     Strings.autoFixed(legSplashRange / tilesize, 2))).replace("[stat]", "[white]") + " " + StatUnit.perLeg.localized());
             });
         }
@@ -803,7 +807,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
 
-        if(abilities.any()){
+        if(abilities.contains(a -> a.display)){
             stats.add(Stat.abilities, StatValues.abilities(abilities));
         }
 
@@ -948,11 +952,6 @@ public class UnitType extends UnlockableContent implements Senseable{
             lightRadius = Math.max(60f, hitSize * 2.3f);
         }
 
-        //if a status effects slows a unit when firing, don't shoot while moving.
-        if(autoFindTarget){
-            autoFindTarget = !weapons.contains(w -> w.shootStatus.speedMultiplier < 0.99f) || alwaysShootWhenMoving;
-        }
-
         if(flyingLayer < 0) flyingLayer = lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit;
         clipSize = Math.max(clipSize, lightRadius * 1.1f);
         singleTarget |= weapons.size <= 1 && !forceMultiTarget;
@@ -1066,10 +1065,13 @@ public class UnitType extends UnlockableContent implements Senseable{
         //assign default commands.
         if(commands.size == 0){
 
-            commands.add(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand);
+            commands.add(UnitCommand.moveCommand);
+
+            if(allowedInPayloads){
+                commands.add(UnitCommand.enterPayloadCommand);
+            }
 
             if(canBoost){
-                commands.add(UnitCommand.boostCommand);
 
                 if(buildSpeed > 0f){
                     commands.add(UnitCommand.rebuildCommand, UnitCommand.assistCommand);
@@ -1108,18 +1110,12 @@ public class UnitType extends UnlockableContent implements Senseable{
                 if(!flying){
                     stances.add(UnitStance.ram);
                 }
+                if(canBoost){
+                    stances.add(UnitStance.boost);
+                }
             }else{
                 stances.addAll(UnitStance.stop, UnitStance.patrol);
             }
-        }
-
-        //dynamically create ammo capacity based on firing rate
-        if(ammoCapacity < 0){
-            float shotsPerSecond = weapons.sumf(w -> w.useAmmo ? 60f / w.reload : 0f);
-            //duration of continuous fire without reload
-            float targetSeconds = 35;
-
-            ammoCapacity = Math.max(1, (int)(shotsPerSecond * targetSeconds));
         }
 
         estimateDps();
@@ -1231,7 +1227,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         for(var region : toOutline){
             if(region instanceof AtlasRegion atlas && !Core.atlas.has(atlas.name + "-outline")){
                 String regionName = atlas.name;
-                Pixmap outlined = Pixmaps.outline(Core.atlas.getPixmap(region), outlineColor, outlineRadius);
+                Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
                 Drawf.checkBleed(outlined);
 
@@ -1267,7 +1263,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         if(sample instanceof Tankc){
-            PixmapRegion pix = Core.atlas.getPixmap(treadRegion);
+            PixmapRegion pix = packer.get(treadRegion);
 
             for(int r = 0; r < treadRects.length; r++){
                 Rect treadRect = treadRects[r];
@@ -1432,7 +1428,10 @@ public class UnitType extends UnlockableContent implements Senseable{
     public double sense(LAccess sensor){
         return switch(sensor){
             case health, maxHealth -> health;
+            case armor -> armor;
+            case range -> World.conv(maxRange);
             case size -> hitSize / tilesize;
+            case flying -> flying ? 1f : 0f;
             case itemCapacity -> itemCapacity;
             case speed -> speed * 60f / tilesize;
             case payloadCapacity -> sample instanceof Payloadc ? payloadCapacity / tilePayload : 0f;
@@ -1471,15 +1470,15 @@ public class UnitType extends UnlockableContent implements Senseable{
         float scl = xscl;
         if(unit.inFogTo(Vars.player.team())) return;
 
-        if(buildSpeed > 0f){
+        boolean isPayload = !unit.isAdded();
+
+        if(buildSpeed > 0f && !isPayload){
             unit.drawBuilding();
         }
 
-        if(unit.mining()){
+        if(unit.mining() && !isPayload){
             drawMining(unit);
         }
-
-        boolean isPayload = !unit.isAdded();
 
         Mechc mech = unit instanceof Mechc m ? m : null;
         Segmentc seg = unit instanceof Segmentc c ? c : null;
@@ -1797,7 +1796,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     public void drawLight(Unit unit){
-        if(lightRadius > 0){
+        if(lightRadius > 0 && state.rules.unitLight){
             Drawf.light(unit.x, unit.y, lightRadius, lightColor, lightOpacity);
         }
     }
@@ -2002,6 +2001,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     public static class UnitEngine implements Cloneable{
         public float x, y, radius, rotation;
+        public @Nullable Color color;
 
         public UnitEngine(float x, float y, float radius, float rotation){
             this.x = x;
@@ -2020,7 +2020,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             if(scale <= 0.0001f) return;
 
             float rot = unit.rotation - 90;
-            Color color = type.engineColor == null ? unit.team.color : type.engineColor;
+            Color color = this.color != null ? this.color : type.engineColor == null ? unit.team.color : type.engineColor;
 
             Tmp.v1.set(x, y).rotate(rot);
             float ex = Tmp.v1.x, ey = Tmp.v1.y;

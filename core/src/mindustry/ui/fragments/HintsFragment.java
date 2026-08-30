@@ -42,7 +42,7 @@ public class HintsFragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
+        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown();
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -82,6 +82,7 @@ public class HintsFragment{
         });
 
         Events.run(Trigger.cannotUpgrade, () -> events.add("cannotupgrade"));
+        Events.run(Trigger.fireCreate, () -> events.add("fire"));
 
         Events.on(ResetEvent.class, e -> {
             placedBlocks.clear();
@@ -248,13 +249,8 @@ public class HintsFragment{
         ),
 
         waveFire(
-            () -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(),
+            () -> ui.hints.events.contains("fire") && Blocks.wave.unlockedNow(),
             () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
-        ),
-
-        generator(
-            () -> control.input.block == Blocks.combustionGenerator,
-            () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)
         ),
 
         rebuildSelect(
@@ -263,7 +259,7 @@ public class HintsFragment{
         ),
 
         guardian(
-            () -> state.boss() != null && isSerpulo() && state.boss().armor >= 4,
+            () -> state.boss() != null && isSerpulo() && state.boss().armor >= 4 && Blocks.salvo.unlocked() && !state.boss().isFlying(),
             () -> state.boss() == null
         ),
 

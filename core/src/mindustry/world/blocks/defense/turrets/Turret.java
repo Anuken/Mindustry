@@ -13,6 +13,7 @@ import arc.util.io.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.bullet.*;
@@ -57,6 +58,12 @@ public class Turret extends ReloadTurret{
     public float inaccuracy = 0f;
     /** Fraction of bullet velocity that is random. */
     public float velocityRnd = 0f;
+    /** extra velocity that is added as a fraction */
+    public float extraVelocity = 0f;
+    /** fraction of lifetime that is random */
+    public float lifeRnd = 0f;
+    /** extra lifetime that is added as a fraction */
+    public float extraLife = 0f;
     /** Fraction of lifetime that is added to bullets with lifeScale. */
     public float scaleLifetimeOffset = 0f;
     /** Maximum angle difference in degrees at which turret will still try to shoot. */
@@ -288,7 +295,7 @@ public class Turret extends ReloadTurret{
         public @Nullable Posc target;
         public Vec2 targetPos = new Vec2();
         public BlockUnitc unit = (BlockUnitc)UnitTypes.block.create(team);
-        public boolean wasShooting;
+        public boolean wasShooting, isShooting;
         public int queuedBullets = 0;
 
         public float heatReq;
@@ -312,6 +319,16 @@ public class Turret extends ReloadTurret{
             if(soundLoop != null){
                 soundLoop.stop();
             }
+        }
+
+        @Nullable
+        public UnlockableContent getAmmoContent(){
+            return null;
+        }
+
+        /** @return ammo as a fraction of capacity; used for direct turret control HUD */
+        public float getAmmoFraction(){
+            return 1f;
         }
 
         @Override
@@ -351,9 +368,7 @@ public class Turret extends ReloadTurret{
 
         @Override
         public boolean shouldConsume(){
-            //when the block is first placed, it shouldn't consume power/liquid just to "cool down" from the initial reload
-            //thus, it should only consume once it has actually shot at something
-            return isShooting() || (reloadCounter < reload && totalShots > 0);
+            return isShooting || reloadCounter < reload;
         }
 
         @Override
@@ -401,7 +416,7 @@ public class Turret extends ReloadTurret{
                 case rotation -> rotation;
                 case shootX -> World.conv(targetPos.x);
                 case shootY -> World.conv(targetPos.y);
-                case shooting -> isShooting() ? 1 : 0;
+                case shooting -> isShooting ? 1 : 0;
                 case progress -> progress();
                 default -> super.sense(sensor);
             };
@@ -418,7 +433,7 @@ public class Turret extends ReloadTurret{
         }
 
         public boolean isShooting(){
-            return alwaysShooting || (isControlled() ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+            return isShooting;
         }
 
         @Override
@@ -427,6 +442,10 @@ public class Turret extends ReloadTurret{
             unit.tile(this);
             unit.team(team);
             return (Unit)unit;
+        }
+
+        public boolean controlled(){
+            return unit.isPlayer();
         }
 
         public boolean logicControlled(){
@@ -476,13 +495,18 @@ public class Turret extends ReloadTurret{
         @Override
         public void updateTile(){
             if(!validateTarget()) target = null;
+            isShooting = alwaysShooting || (unit.controller() instanceof Player ? unit.isShooting() : logicControlled() ? logicShooting : target != null);
+
+            if(unit.isPlayer()){ //there's no reason to update this when a player isn't controlling it
+                unit.ammo(getAmmoFraction());
+            }
 
             if(soundLoop != null){
                 soundLoop.update(x, y, shouldActiveSound(), activeSoundVolume());
             }
 
-            float warmupTarget = (isShooting() && canConsume()) || charging() ? 1f : 0f;
-            if(warmupTarget > 0 && !isControlled()){
+            float warmupTarget = (isShooting && canConsume()) || charging() ? 1f : 0f;
+            if(warmupTarget > 0 && !controlled()){
                 warmupHold = 1f;
             }
             if(warmupHold > 0f){
@@ -526,11 +550,7 @@ public class Turret extends ReloadTurret{
                 ((Building)this).rotation = Mathf.mod(Mathf.round(rotation / 90f), 4);
             }
 
-            //turret always reloads regardless of whether it's targeting something
-            if(reloadWhileCharging || !charging()){
-                updateReload();
-                updateCooling();
-            }
+            handleReload();
 
             if(state.rules.fog){
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
@@ -555,7 +575,7 @@ public class Turret extends ReloadTurret{
                 if(validateTarget()){
                     boolean canShoot;
 
-                    if(isControlled()){ //player behavior
+                    if(controlled()){ //player behavior
                         targetPos.set(unit.aimX(), unit.aimY());
                         canShoot = unit.isShooting();
                     }else if(logicControlled()){ //logic behavior
@@ -567,7 +587,7 @@ public class Turret extends ReloadTurret{
                         canShoot = within(target, range() + (target instanceof Sized hb ? hb.hitSize()/1.9f : 0f));
                     }
 
-                    if(!isControlled()){
+                    if(!controlled()){
                         unit.aimX(targetPos.x);
                         unit.aimY(targetPos.y);
                     }
@@ -611,7 +631,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || isControlled() || logicControlled();
+            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || controlled() || logicControlled();
         }
 
         protected boolean canHeal(){
@@ -699,11 +719,17 @@ public class Turret extends ReloadTurret{
             return queuedBullets > 0 && shoot.firstShotDelay > 0;
         }
 
+        protected void handleReload(){
+            //turret always reloads regardless of whether it's targeting something
+            if((reloadWhileCharging || !charging()) && reloadCounter < reload){
+                //update the two reload related methods
+                updateReload();
+                updateCooling();
+            }
+        }
+
         protected void updateReload(){
             reloadCounter += delta() * ammoReloadMultiplier() * baseReloadSpeed();
-
-            //cap reload for visual reasons
-            reloadCounter = Math.min(reloadCounter, reload);
         }
 
         @Override
@@ -766,11 +792,12 @@ public class Turret extends ReloadTurret{
             bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy + type.inaccuracy);
-
-            float lifeScl = type.scaleLife ? Mathf.clamp((1 + scaleLifetimeOffset) * Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange() / type.range, range() / type.range) : 1f;
+            
+            float baseLife = (1f - lifeRnd) + Mathf.random(lifeRnd) + extraLife,
+                  lifeScl = type.scaleLife ? Mathf.clamp((baseLife + scaleLifetimeOffset) * Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange() / type.range, range() / type.range) : baseLife;
 
             //TODO aimX / aimY for multi shot turrets?
-            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd), lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, shootAngle - rotation);
+            handleBullet(type.create(this, team, bulletX, bulletY, shootAngle, -1f, (1f - velocityRnd) + Mathf.random(velocityRnd) + extraVelocity, lifeScl, null, mover, targetPos.x, targetPos.y), xOffset, yOffset, shootAngle - rotation);
 
             (shootEffect == null ? type.shootEffect : shootEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
             (smokeEffect == null ? type.smokeEffect : smokeEffect).at(bulletX, bulletY, rotation + angleOffset, type.hitColor);
