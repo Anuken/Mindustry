@@ -25,25 +25,22 @@ public class UnitSorts{
     }
     public static Sortf grouped(float radius, float distanceWeight){
         return (u, x, y) -> {
-            updateClusters(radius);
-            int key = (Mathf.floor(u.x / radius) << 16) | Mathf.floor(u.y / radius);
-            return -clusterCount.get(key, 0) + (distanceWeight > 0 ? Mathf.dst2(u.x, u.y, x, y) / distanceWeight : 0f);
+            if((timer += Time.delta) > 10f || clusterCount.size < 0){
+                timer = 0f;
+                clusterCount.clear();
+                Groups.unit.each(uc -> clusterCount.increment(clusterKey(uc.team, uc.x, uc.y, radius)));
+            }
+            return -clusterCount.get(clusterKey(u.team, u.x, u.y, radius), 0) + (distanceWeight > 0 ? Mathf.dst2(u.x, u.y, x, y) / distanceWeight : 0f);
         };
+    }
+
+    //8 bits for team. Does not support negative coords
+    private static int clusterKey(Team team, float x, float y, float radius){
+        return (team.id << 24) | ((Mathf.floor(x / radius) & 0xFFF) << 12) | (Mathf.floor(y / radius) & 0xFFF);
     }
 
     public static BuildingPriorityf
 
     buildingDefault = b -> b.block.priority,
     buildingWater = b -> b.block.priority + (b.liquids != null && b.liquids.get(Liquids.water) > 5f ? 10f : 0f);
-
-    public static void updateClusters(float radius){
-        if((timer += Time.delta) < 10f && clusterCount.size > 0) return;
-        timer = 0f;
-        clusterCount.clear();
-
-        Groups.unit.each(u -> {
-            if(!u.isEnemy()) return;
-            clusterCount.increment((Mathf.floor(u.x / radius) << 16) | Mathf.floor(u.y / radius));
-        });
-    }
 }
