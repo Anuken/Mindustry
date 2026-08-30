@@ -72,14 +72,9 @@ public class EditorRenderer implements Disposable{
             varying lowp vec4 v_color;
             varying vec2 v_texCoords;
             uniform sampler2D u_texture;
-            uniform bool u_xray;
         
             void main(){
-              vec4 color = v_color * texture2D(u_texture, v_texCoords); 
-              if(u_xray){
-                  color.a *= 0.4;
-              }
-              gl_FragColor = color;
+              gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
             }
             """
             );
@@ -116,11 +111,9 @@ public class EditorRenderer implements Disposable{
 
         Draw.proj(Core.camera.mat);
 
-        if(!editor.xrayMode){
-            Draw.shader(Shaders.darkness);
-            Draw.rect(Draw.wrap(renderer.blocks.getShadowBuffer().getTexture()), world.width() * tilesize/2f - tilesize/2f, world.height() * tilesize/2f - tilesize/2f, world.width() * tilesize, -world.height() * tilesize);
-            Draw.shader();
-        }
+        Draw.shader(Shaders.darkness);
+        Draw.rect(Draw.wrap(renderer.blocks.getShadowBuffer().getTexture()), world.width() * tilesize/2f - tilesize/2f, world.height() * tilesize/2f - tilesize/2f, world.width() * tilesize, -world.height() * tilesize);
+        Draw.shader();
 
         Draw.proj(Tmp.m2);
 
@@ -140,7 +133,6 @@ public class EditorRenderer implements Disposable{
         if(editor.showBuildings){
             shader.bind();
             shader.setUniformMatrix4("u_projTrans", Tmp.m1.set(Core.camera.mat).translate(-packPad, -packPad).scale(packWidth, packHeight));
-            shader.setUniformi("u_xray", editor.xrayMode ? 1 : 0);
 
             for(int x = 0; x < chunks.length; x++){
                 for(int y = 0; y < chunks[0].length; y++){
