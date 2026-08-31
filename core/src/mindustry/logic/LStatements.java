@@ -1934,7 +1934,7 @@ public class LStatements{
 
             switch(action){
                 case active, getHud -> {
-                    table.add(" result ");
+                    table.add(token("result"));
                     fields(table, p1, str -> p1 = str);
                 }
                 case pan -> {
@@ -1953,13 +1953,13 @@ public class LStatements{
                     fields(table, p1, str -> p1 = str);
                 }
                 case shake -> {
-                    table.add(" amount ");
+                    table.add(token("amount"));
                     fields(table, p1, str -> p1 = str);
-                    table.add(" duration ");
+                    table.add(token("duration"));
                     fields(table, p2, str -> p2 = str);
                 }
                 case setHud -> {
-                    table.add(" shown ");
+                    table.add(token("shown"));
                     fields(table, p1, str -> p1 = str);
                 }
             }
@@ -2342,7 +2342,7 @@ public class LStatements{
                         i.left();
                         for(StatusEffect status : Vars.content.statusEffects()){
                             if(!status.unlockedNow() || !status.show || status == StatusEffects.none) continue;
-                            i.button(status.name, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
+                            i.button(status.localizedName, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
                                 stype("@status-" + status.name);
                                 hide.run();
                             }).size(240f, 40f).marginLeft(5f).row();
