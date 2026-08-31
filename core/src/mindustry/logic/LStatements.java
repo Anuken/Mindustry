@@ -631,7 +631,8 @@ public class LStatements{
                         }),
                         //sensors
                         new Table(i -> {
-                            for(LAccess sensor : LAccess.senseable){
+                            boolean currentPrivileged = ui.logic.isShown() && ui.logic.privileged;
+                            for(LAccess sensor : (currentPrivileged ? LAccess.senseablePrivileged : LAccess.senseable)){
                                 i.button(enumText(sensor), Styles.flatt, () -> {
                                     stype("@" + sensor.name());
                                     hide.run();

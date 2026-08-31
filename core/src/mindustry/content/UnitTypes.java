@@ -1361,7 +1361,7 @@ public class UnitTypes{
             accel = 0.1f;
             range = 130f;
             health = 400;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.4f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
@@ -2355,7 +2355,7 @@ public class UnitTypes{
                     timeIncrease = 3f;
                     timeDuration = 60f * 20f;
                     powerDamageScl = 3f;
-                    damage = 60;
+                    damage = 110;
                     hitColor = lightColor = Pal.heal;
                     lightRadius = 70f;
                     clipSize = 250f;
@@ -2372,7 +2372,7 @@ public class UnitTypes{
                     trailWidth = 6f;
                     trailColor = Pal.heal;
                     trailInterval = 3f;
-                    splashDamage = 70f;
+                    splashDamage = 110f;
                     splashDamageRadius = rad;
                     hitShake = 4f;
                     trailRotation = true;

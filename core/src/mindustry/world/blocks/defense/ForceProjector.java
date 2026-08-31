@@ -242,7 +242,7 @@ public class ForceProjector extends Block{
             if(buildup >= shieldHealth + phaseShieldBoost * phaseHeat && !broken){
                 broken = true;
                 buildup = shieldHealth;
-                shieldBreakEffect.at(x, y, realRadius(), team.color, sides);
+                shieldBreakEffect.at(x, y, realRadius(), team.color, block);
                 breakSound.at(x, y);
                 if(team != state.rules.defaultTeam){
                     Events.fire(Trigger.forceProjectorBreak);
