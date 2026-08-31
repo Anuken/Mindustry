@@ -148,6 +148,7 @@ public class KeybindDialog extends Dialog{
             rebindAxis = false;
         }
     }
+    
     private void openDialog( KeyBind name){
         rebindDialog = new Dialog(rebindAxis ? bundle.get("keybind.press.axis") : bundle.get("keybind.press"));
 
