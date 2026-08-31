@@ -68,19 +68,18 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         if(gl30 == null && !isIntel) Log.warn("[GL] Your device or video drivers do not support OpenGL 3. This will cause performance issues.");
 
-        if(NvGpuInfo.hasMemoryInfo()) Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
+        if(NvGpuInfo.hasMemoryInfo()) Log.info("[GL] Total available VRAM: @", Strings.formatByteCount(NvGpuInfo.getMaxMemoryKB() * 1000L));
 
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
 
         Log.info("[JAVA] Version: @", OS.javaVersion);
-        if(Core.app.isAndroid()){
-            Log.info("[ANDROID] API level: @", Core.app.getVersion());
-        }
+
+        if(Core.app.isAndroid()) Log.info("[ANDROID] API level: @", Core.app.getVersion());
+        if(Core.app.isIOS()) Log.info("[iOS] OS version: @", Core.app.getVersion());
+
         long ram = Runtime.getRuntime().maxMemory();
-        boolean gb = ram >= 1024 * 1024 * 1024;
-        if(!OS.isIos){
-            Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
-        }
+
+        if(!OS.isIos) Log.info("[RAM] Available: @", Strings.formatByteCount(ram));
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;

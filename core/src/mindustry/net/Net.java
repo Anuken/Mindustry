@@ -22,7 +22,7 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
 public class Net{
-    public static final int packetIdAssetStream, packetIdWorldStream;
+    public static final int packetIdAssetStream, packetIdWorldStream, packetIdTextureStream;
 
     private static Seq<Prov<? extends Packet>> packetProvs = new Seq<>();
     private static Seq<Class<? extends Packet>> packetClasses = new Seq<>();
@@ -50,6 +50,7 @@ public class Net{
         registerPacket(ConnectPacket::new);
         registerPacket(AssetRequirementStream::new);
         packetIdAssetStream = registerPacket(AssetStream::new);
+        packetIdTextureStream = registerPacket(TextureStream::new);
 
         //register generated packet classes
         Call.registerPackets();
