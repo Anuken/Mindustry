@@ -170,7 +170,7 @@ public class TargetDummy extends Block{
             super.draw();
 
             if(tether.found() && unit != null){
-                float z = unit.elevation > 0.5f ? (unitType.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) : unitType.groundLayer + Mathf.clamp(unitType.hitSize / 4000f, 0, 0.01f);
+                float z = unit.elevation > 0.5f ? unit.type.flyingLayer - 0.01f : unitType.groundLayer + Mathf.clamp(unitType.hitSize / 4000f, 0, 0.01f);
                 Draw.z(z - 0.01f);
                 Draw.color(team.color);
                 Drawf.laser(tether, tetherEnd, x, y, unit.x, unit.y);

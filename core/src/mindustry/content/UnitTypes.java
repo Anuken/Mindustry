@@ -4633,6 +4633,17 @@ public class UnitTypes{
             canBoost = true;
             useUnitCap = false;
             killable = false;
+            physics = false;
+
+            flyingLayer = Layer.flyingUnit - 1f;
+            drag = 0.33f;
+            hitSize = 12f;
+            hideDetails = false;
+            engineOffset = 7f;
+            engineSize = 2f;
+            for(int i = 0; i < 3; i++){
+                engines.add(new UnitEngine(Geometry.d4x(i) * engineOffset, Geometry.d4y(i) * engineOffset, engineSize, i * 90));
+            }
         }
 
         @Override
