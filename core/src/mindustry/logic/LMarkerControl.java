@@ -4,7 +4,7 @@ public enum LMarkerControl{
     remove,
     world("truefalse"),
     minimap("truefalse"),
-    light("truefalse")
+    light("truefalse"),
     autoscale("truefalse"),
     pos("x", "y"),
     endPos("x", "y"),
