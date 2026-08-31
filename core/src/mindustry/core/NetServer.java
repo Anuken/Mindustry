@@ -129,9 +129,10 @@ public class NetServer implements ApplicationListener{
     private ObjectMap<String, Seq<Cons2<Player, byte[]>>> customBinaryPacketHandlers = new ObjectMap<>();
     /** Packet handlers for logic client data */
     private ObjectMap<String, Seq<Cons2<Player, Object>>> logicClientDataHandlers = new ObjectMap<>();
-    /** Reused Seq<Player> for writing entity snapshots per team. */
-    private Seq<Player> playersToSend = new Seq<>(false);
+    /** Reused Seq<NetConnection> for writing entity snapshots per team. */
     private Seq<NetConnection> tempConnections = new Seq<>(false);
+    /** Reused Seq<NetConnection> for writing snapshots for players who have loaded the world. */
+    private Seq<NetConnection> tempLoadedConnections = new Seq<>(false);
     /** Used for entity snapshot timing. */
     public long snapshotSyncTime;
 
@@ -1077,7 +1078,7 @@ public class NetServer implements ApplicationListener{
 
                 if(syncStream.size() > maxSnapshotSize){
                     dataStream.close();
-                    Call.blockSnapshot(sent, syncStream.toByteArray());
+                    for(NetConnection con : tempLoadedConnections)Call.blockSnapshot(con, sent, syncStream.toByteArray());
                     sent = 0;
                     syncStream.reset();
                 }
@@ -1086,7 +1087,7 @@ public class NetServer implements ApplicationListener{
 
         if(sent > 0){
             dataStream.close();
-            Call.blockSnapshot(sent, syncStream.toByteArray());
+            for(NetConnection con : tempLoadedConnections)Call.blockSnapshot(con, sent, syncStream.toByteArray());
         }
     }
 
@@ -1108,8 +1109,19 @@ public class NetServer implements ApplicationListener{
 
         dataStream.close();
 
-        Call.stateSnapshot(state.wavetime, state.wave, state.enemies, state.isPaused(), state.gameOver,
-        universe.seconds(), tps, GlobalVars.rand.seed0, GlobalVars.rand.seed1, syncStream.toByteArray());
+
+        StateSnapshotCallPacket packet = new StateSnapshotCallPacket();
+        packet.waveTime = state.wavetime;
+        packet.wave = state.wave;
+        packet.enemies = state.enemies;
+        packet.paused = state.isPaused();
+        packet.gameOver = state.gameOver;
+        packet.timeData = universe.seconds();
+        packet.tps = tps;
+        packet.rand0 = GlobalVars.rand.seed0;
+        packet.rand1 = GlobalVars.rand.seed1;
+        packet.coreData = syncStream.toByteArray();
+        for(NetConnection con : tempLoadedConnections)con.send(packet, false);
     }
 
     /** Does not check isSyncHidden. Call this if no entities are hidden. */
@@ -1125,7 +1137,7 @@ public class NetServer implements ApplicationListener{
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
-                Call.entitySnapshot((short)sent, syncStream.toByteArray());
+                for(NetConnection con : tempLoadedConnections)Call.entitySnapshot(con, (short)sent, syncStream.toByteArray());
                 sent = 0;
                 syncStream.reset();
             }
@@ -1134,22 +1146,16 @@ public class NetServer implements ApplicationListener{
         if(sent > 0){
             dataStream.close();
 
-            Call.entitySnapshot((short)sent, syncStream.toByteArray());
+            for(NetConnection con : tempLoadedConnections)Call.entitySnapshot(con, (short)sent, syncStream.toByteArray());
         }
     }
 
     /** Checks isSyncHidden for only one player per team. Called if FoW is enabled. */
-    public void writeEntitySnapshotsTeam(Team team, Seq<Player> players) throws IOException{
+    public void writeEntitySnapshotsTeam(Team team) throws IOException{
         syncStream.reset();
 
         hiddenIds.clear();
         int sent = 0;
-        tempConnections.clear();
-
-        for(Player player : players){
-            //player.con must not be null here (the players seq must ONLY contain non-local connected clients)
-            tempConnections.add(player.con);
-        }
 
         for(Syncc entity : Groups.sync){
             if(entity.isSyncHidden(team)){
@@ -1279,18 +1285,29 @@ public class NetServer implements ApplicationListener{
                 }
             });
 
+            tempLoadedConnections.clear();
+            for(Player player : Groups.player){
+                if(!player.isLocal() && player.con != null && player.con.hasConnected){
+                    tempLoadedConnections.add(player.con);
+                }
+            }
             if(Time.timeSinceMillis(snapshotSyncTime) >= interval){
                 snapshotSyncTime = Time.millis();
-
                 writeStateSnapshot();
 
                 if(Vars.state.rules.fog){
                     //Serialize by teams
                     for(Team team : Team.all){ //Not Teams.active, because players can be on inactive teams
                         var tdata = team.data();
-                        playersToSend.selectFrom(tdata.players, p -> !p.isLocal() && p.con.hasConnected);
-                        if(!playersToSend.isEmpty()){
-                            writeEntitySnapshotsTeam(team, playersToSend);
+                        tempConnections.clear();
+                        for(Player player : tdata.players){
+                            if(!player.isLocal() && player.con.hasConnected){
+                                //player.con must not be null here (the players seq must ONLY contain non-local connected clients)
+                                tempConnections.add(player.con);
+                            }
+                        }
+                        if(!tempConnections.isEmpty()){
+                            writeEntitySnapshotsTeam(team);
                         }
                     }
                 }else{
