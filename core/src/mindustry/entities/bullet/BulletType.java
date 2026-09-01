@@ -514,8 +514,9 @@ public class BulletType extends Content implements Cloneable{
             if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
             // Use statusChance from data if present (lightning bullets pass it), otherwise use type default
-            float sc = b.data instanceof Float f ? f : statusChance;
-            unit.apply(status, statusDuration, false, sc);
+            if(Mathf.chance(getStatusChance(b))){
+                unit.apply(status, statusDuration);
+            }
 
             Events.fire(bulletDamageEvent.set(unit, b));
         }
@@ -602,7 +603,7 @@ public class BulletType extends Content implements Cloneable{
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b, armorMultiplier);
 
             if(status != StatusEffects.none){
-                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround, statusChance);
+                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround, getStatusChance(b));
             }
 
             if(heals()){
@@ -638,6 +639,16 @@ public class BulletType extends Content implements Cloneable{
                 Units.notifyUnitSpawn(u);
             }
         }
+    }
+
+    /** Gets the status chance from lighting bullets */
+    public float getStatusChance(Bullet b){
+        if(b.data instanceof Bullet parent &&
+        (parent.type.lightningType == b.type || parent.type.lightningType == null && b.type == Bullets.damageLightning)){
+            return parent.type.lightningStatusChance < 0f ? parent.type.statusChance : parent.type.lightningStatusChance;
+        }
+
+        return statusChance;
     }
 
     /** Called when the bullet reaches the end of its lifetime or is destroyed by something external. */
