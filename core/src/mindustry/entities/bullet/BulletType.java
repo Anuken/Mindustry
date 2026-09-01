@@ -64,6 +64,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean removeAfterPierce = true;
     /** For piercing lasers, setting this to true makes it get absorbed by plastanium walls. */
     public boolean laserAbsorb = true;
+    /** Wether this bullet is considered a laser bullet and thus absorbed by plastanium walls. */
+    public boolean laserBullet = false;
     /** Life fraction at which this bullet has the best range/damage/etc. Used for lasers and continuous turrets. */
     public float optimalLifeFract = 0f;
     /** Z layer to drawn on. */
