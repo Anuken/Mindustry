@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
@@ -37,26 +38,21 @@ public class TargetDummy extends Block{
         super(name);
 
         update = alwaysUpdateInUnits = true;
-        configurable = logicConfigurable = saveConfig = true;
+        configurable = logicConfigurable = true;
         underBullets = true;
         targetable = false;
 
-        config(Boolean.class, (TargetDummyBuild tile, Boolean b) -> tile.boosting = b);
-        config(Integer.class, (TargetDummyBuild tile, Integer i) -> tile.unitTeam = Team.get(i));
-        config(Vec2.class, (TargetDummyBuild tile, Vec2 v) -> {
-            tile.unitArmor = v.x;
-            tile.resetTime = v.y;
-        });
-        config(Float.class, (TargetDummyBuild tile, Float f) -> tile.dummySize = f);
-        config(int[].class, (TargetDummyBuild tile, int[] config) -> {
-            if(config.length > 0){
+        saveConfig = true;
+
+        config(FloatSeq.class, (TargetDummyBuild tile, FloatSeq config) -> {
+            if(config.size > 0){
                 tile.unitTeam = tile.team;
-                if(config[0] == 1) tile.unitTeam = Team.get(tile.dummyTeam());
+                if(config.get(0) == 1) tile.unitTeam = Team.get(tile.dummyTeam());
             }
-            if(config.length > 1) tile.boosting = config[1] == 1;
-            if(config.length > 2) tile.unitArmor = Float.intBitsToFloat(config[2]);
-            if(config.length > 3) tile.resetTime = Float.intBitsToFloat(config[3]);
-            if(config.length > 4) tile.dummySize = Float.intBitsToFloat(config[4]);
+            if(config.size > 1) tile.boosting = config.get(1) == 1;
+            if(config.size > 2) tile.unitArmor = config.get(2);
+            if(config.size > 3) tile.resetTime = config.get(3);
+            if(config.size > 4) tile.dummySize = config.get(4);
         });
     }
 
@@ -153,10 +149,7 @@ public class TargetDummy extends Block{
             }
 
             if(reset >= resetTime){
-                total = 0f;
-                time = 0f;
-                DPS = 0f;
-                hits = 0;
+                total = time = DPS = hits = 0;
             }
         }
 
@@ -240,17 +233,24 @@ public class TargetDummy extends Block{
                 t.background(Styles.black6);
                 t.defaults().left();
 
-                t.check(Core.bundle.get("rules.enemyteam"), unitTeam != team, b -> configure(dummyTeam())).colspan(3).row();
-                t.check(Core.bundle.get("stat.flying"), boosting, this::configure).colspan(3).row();
+                t.check(Core.bundle.get("rules.enemyteam"), unitTeam != team, b -> configureFloat(0, Mathf.num(b))).colspan(3).row();
+                t.check(Core.bundle.get("stat.flying"), boosting, b -> configureFloat(1, Mathf.num(b))).colspan(3).row();
                 t.add(Core.bundle.get("stat.armor"));
-                t.field("" + unitArmor, TextFieldFilter.floatsOnly, s -> configure(Tmp.v1.set(Strings.parseFloat(s), resetTime))).width(200f).padLeft(8f).colspan(2).row();
+                t.field("" + unitArmor, TextFieldFilter.floatsOnly, s -> configureFloat(2, Strings.parseFloat(s))).width(200f).padLeft(8f).colspan(2).row();
                 t.add(Core.bundle.get("stat.resettime"));
-                t.field(Strings.autoFixed(resetTime / 60f, 2), TextFieldFilter.floatsOnly, s -> configure(Tmp.v1.set(unitArmor, Strings.parseFloat(s) * 60f))).padLeft(8f).growX();
+                t.field(Strings.autoFixed(resetTime / 60f, 2), TextFieldFilter.floatsOnly, s -> configureFloat(3, Strings.parseFloat(s) * 60f)).padLeft(8f).growX();
                 t.add(StatUnit.seconds.localized()).padLeft(8).row();
                 t.add(Core.bundle.get("stat.hitsize"));
-                t.field("" + dummySize, TextFieldFilter.floatsOnly, s -> configure(Strings.parseFloat(s))).padLeft(8f).growX();
-                t.add(StatUnit.worldUnits.localized()).padLeft(8);
+                t.field("" + dummySize, TextFieldFilter.floatsOnly, s -> configureFloat(4, Strings.parseFloat(s))).padLeft(8f).growX();
+                t.add(StatUnit.worldUnits.localized()).padLeft(8f);
             }).top().grow().margin(8f);
+        }
+
+        //helper to send the rest of values, since config does not support arrays
+        public void configureFloat(int index, float value){
+            FloatSeq seq = FloatSeq.with(Mathf.num(unitTeam != team), Mathf.num(boosting), unitArmor, resetTime, dummySize);
+            seq.set(index, value);
+            configure(seq);
         }
 
         public int dummyTeam(){
@@ -260,11 +260,7 @@ public class TargetDummy extends Block{
 
         @Override
         public Object config(){
-            return new int[]{Mathf.num(unitTeam != team), Mathf.num(boosting),
-                Float.floatToIntBits(unitArmor),
-                Float.floatToIntBits(resetTime),
-                Float.floatToIntBits(dummySize)
-            };
+            return FloatSeq.with(Mathf.num(unitTeam != team), Mathf.num(boosting), unitArmor, resetTime, dummySize);
         }
 
         @Override
