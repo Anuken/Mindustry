@@ -3622,7 +3622,6 @@ public class Blocks{
                 //for visual stats only.
                 buildingDamageMultiplier = 0.4f;
                 pierceCap = 5;
-                pierceBuilding = true;
 
                 lightningType = new BulletType(0.0001f, 0f){{
                     lifetime = Fx.lightning.lifetime;
