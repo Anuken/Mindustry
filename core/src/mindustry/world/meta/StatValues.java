@@ -225,6 +225,16 @@ public class StatValues{
         return withTooltip(element, content, false);
     }
 
+    /** Displays the chance for status effects */
+    public static String statusText(StatusEffect status, float duration, float chance){
+        return (chance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(chance * 100f, 4)) : "") +
+        (status.hasEmoji() ? status.emoji() + " " : "") +
+        "[stat]" + status.localizedName +
+        (status.reactive ? "" :
+        "[lightgray] ~ [stat]" + Strings.autoFixed(duration / 60f, 1) +
+        "[lightgray] " + Core.bundle.get("unit.seconds"));
+    }
+
     /** Displays an item with a specified amount. */
     private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content, boolean tooltip){
         Stack stack = new Stack();
@@ -883,15 +893,6 @@ public class StatValues{
             if(!Vars.headless) t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
             t.add(text);
         });
-    }
-
-    private static String statusText(StatusEffect status, float duration, float chance){
-        return (chance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(chance * 100f, 4)) : "") +
-        (status.hasEmoji() ? status.emoji() + " " : "") +
-        "[stat]" + status.localizedName +
-        (status.reactive ? "" :
-        "[lightgray] ~ [stat]" + Strings.autoFixed(duration / 60f, 1) +
-        "[lightgray] " + Core.bundle.get("unit.seconds"));
     }
 
     //for AmmoListValue
