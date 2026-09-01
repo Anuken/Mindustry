@@ -208,7 +208,7 @@ public class PayloadDeconstructor extends PayloadBlock{
 
                 //transfer items from accumulation buffer into block inventory when they reach integers
                 for(int i = 0; i < reqs.length; i++){
-                    int taken = Math.min((int)accum[i], itemCapacity);
+                    int taken = Math.min((int)accum[i], itemCapacity - items.get(reqs[i].item));
                     if(taken > 0){
                         items.add(reqs[i].item, taken);
                         accum[i] -= taken;
