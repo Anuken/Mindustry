@@ -18,6 +18,7 @@ public enum LUnitControl{
     mine("x", "y"),
     flag("value"),
     build("x", "y", "block", "rotation", "config"),
+    configPos("x", "y", "tx", "ty"),
     deconstruct("x", "y"),
     getBlock("x", "y", "type", "building", "floor"),
     within("x", "y", "radius", "result"),

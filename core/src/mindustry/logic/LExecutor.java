@@ -467,6 +467,22 @@ public class LExecutor{
                             }
                         }
                     }
+                    case configPos -> {
+                        float range = Math.max(unit.range(), unit.type.buildRange);
+
+                        if(!p3.isobj && !p4.isobj && unit.within(x1, y1, range)){
+                            float x2 = World.unconv(p3.numf()), y2 = World.unconv(p4.numf());
+                            Building source = world.buildWorld(x1, y1);
+                            Tile target = world.tileWorld(x2, y2);
+
+                            if(source != null && target != null && source.team == unit.team && source.block.configurations.containsKey(Point2.class)){
+                                source.configured(unit, Tmp.p1.set(
+                                        target.x - source.tileX(),
+                                        target.y - source.tileY()
+                                ));
+                            }
+                        }
+                    }
                     case deconstruct -> {
                         if((state.rules.logicUnitDeconstruct || exec.privileged) && unit.canBuild()){
                             //reset state of last request when necessary
