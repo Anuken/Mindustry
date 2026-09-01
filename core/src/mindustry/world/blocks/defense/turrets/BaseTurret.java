@@ -1,7 +1,6 @@
 package mindustry.world.blocks.defense.turrets;
 
 import arc.*;
-import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;

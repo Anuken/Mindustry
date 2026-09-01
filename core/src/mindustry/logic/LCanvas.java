@@ -212,7 +212,7 @@ public class LCanvas extends Table{
             seq.clear();
 
             float totalHeight = getChildren().sumf(e -> e.getPrefHeight() + space);
-            if(height != totalHeight || width != Scl.scl(targetWidth)){
+            if(!Mathf.equal(height, totalHeight, 1f) || !Mathf.equal(width, Scl.scl(targetWidth), 1f)){
                 height = prefHeight = totalHeight;
                 width = prefWidth = Scl.scl(targetWidth);
                 invalidateHierarchy();
@@ -431,7 +431,7 @@ public class LCanvas extends Table{
                 t.margin(6f);
                 t.touchable = Touchable.enabled;
 
-                t.add(st.name()).style(Styles.outlineLabel).name("statement-name").color(color).padRight(8);
+                t.add(st.localizedName()).style(Styles.outlineLabel).name("statement-name").color(color).padRight(8);
                 t.add().growX();
 
                 addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();

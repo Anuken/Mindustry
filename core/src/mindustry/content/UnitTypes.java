@@ -191,7 +191,7 @@ public class UnitTypes{
             hitSize = 22f;
             rotateSpeed = 2.1f;
             health = 9000;
-            armor = 10f;
+            armor = 20f;
             mechFrontSway = 1f;
 
             mechStepParticles = true;
@@ -292,7 +292,7 @@ public class UnitTypes{
             hitSize = 30f;
             rotateSpeed = 1.65f;
             health = 24000;
-            armor = 18f;
+            armor = 30f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 1.6f;
@@ -506,7 +506,7 @@ public class UnitTypes{
             riseSpeed = descentSpeed = 0.02f;
 
             health = 8200f;
-            armor = 9f;
+            armor = 16f;
             canBoost = true;
             mechLandShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
@@ -577,7 +577,7 @@ public class UnitTypes{
         corvus = new UnitType("corvus"){{
             hitSize = 29f;
             health = 18000f;
-            armor = 9f;
+            armor = 14f;
             stepShake = 1.5f;
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 1.6f;
@@ -745,7 +745,7 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
-            armor = 5f;
+            armor = 9f;
 
             shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
@@ -766,7 +766,7 @@ public class UnitTypes{
                 y = -1.5f;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.5f;
+                    sapStrength = 0.4f;
                     length = 75f;
                     damage = 23;
                     shootEffect = Fx.shootSmall;
@@ -786,7 +786,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootSap;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.8f;
+                    sapStrength = 0.7f;
                     length = 40f;
                     damage = 18;
                     shootEffect = Fx.shootSmall;
@@ -804,7 +804,7 @@ public class UnitTypes{
             speed = 0.62f;
             hitSize = 23f;
             health = 8000;
-            armor = 6f;
+            armor = 14f;
 
             rotateSpeed = 2.7f;
 
@@ -908,7 +908,7 @@ public class UnitTypes{
             speed = 0.5f;
             hitSize = 26f;
             health = 22000;
-            armor = 13f;
+            armor = 22f;
             lightRadius = 140f;
             stepSound = Sounds.walkerStep;
             stepSoundVolume = 1.1f;
@@ -1186,7 +1186,7 @@ public class UnitTypes{
             flying = true;
             lowAltitude = true;
             health = 7200;
-            armor = 9f;
+            armor = 17f;
             engineOffset = 21;
             engineSize = 5.3f;
             hitSize = 46f;
@@ -1266,7 +1266,7 @@ public class UnitTypes{
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            armor = 13f;
+            armor = 22f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
 
             loopSound = Sounds.loopHover;
@@ -1366,7 +1366,7 @@ public class UnitTypes{
             rotateSpeed = 15f;
             accel = 0.1f;
             range = 130f;
-            health = 200;
+            health = 400;
             buildSpeed = 0.5f;
             engineOffset = 6.5f;
             hitSize = 9f;
@@ -1463,7 +1463,7 @@ public class UnitTypes{
         }};
 
         quad = new UnitType("quad"){{
-            armor = 8f;
+            armor = 10f;
             health = 6000;
             speed = 1.2f;
             rotateSpeed = 2f;
@@ -1540,7 +1540,7 @@ public class UnitTypes{
         oct = new UnitType("oct"){{
             aiController = DefenderAI::new;
 
-            armor = 16f;
+            armor = 20f;
             health = 24000;
             speed = 0.8f;
             rotateSpeed = 1f;
@@ -2327,7 +2327,7 @@ public class UnitTypes{
             speed = 0.65f;
             drag = 0.17f;
             hitSize = 58f;
-            armor = 16f;
+            armor = 20f;
             accel = 0.2f;
             rotateSpeed = 1.1f;
             faceTarget = false;
@@ -2369,7 +2369,7 @@ public class UnitTypes{
                     timeIncrease = 3f;
                     timeDuration = 60f * 20f;
                     powerDamageScl = 3f;
-                    damage = 60;
+                    damage = 110;
                     hitColor = lightColor = Pal.heal;
                     lightRadius = 70f;
                     clipSize = 250f;
@@ -2386,7 +2386,7 @@ public class UnitTypes{
                     trailWidth = 6f;
                     trailColor = Pal.heal;
                     trailInterval = 3f;
-                    splashDamage = 70f;
+                    splashDamage = 110f;
                     splashDamageRadius = rad;
                     scaledSplashDamage = true;
                     hitShake = 4f;

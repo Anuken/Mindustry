@@ -279,23 +279,21 @@ public class MinimapRenderer{
         //TODO autoscale markers
         state.rules.objectives.eachRunning(obj -> {
             for(var marker : obj.markers){
-                if(marker.minimap){
+                if(marker.minimap != -1){
                     marker.draw(1);
                 }
             }
         });
-
-        for(var marker : state.markers){
-            if(marker.minimap){
-                marker.draw(1);
-            }
+        for(var marker : state.markers.mapMarkers){
+            marker.draw(1);
         }
+        Draw.reset();
 
         Draw.trans(Tmp.m2);
     }
 
     public void drawSpawns(){
-        if(!state.rules.showSpawns || !state.hasSpawns() || !state.rules.waves) return;
+        if(state.rules.hideSpawns || !state.hasSpawns() || !state.rules.waves) return;
 
         TextureRegion icon = Icon.units.getRegion();
 

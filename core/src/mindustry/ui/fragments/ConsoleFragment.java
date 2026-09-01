@@ -40,12 +40,13 @@ public class ConsoleFragment extends Table{
         font = Fonts.def;
 
         visible(() -> {
-            if(input.keyTap(Binding.console) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null) && !ui.chatfrag.shown()){
+            if(input.keyTap(Binding.console) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || !(scene.getKeyboardFocus() instanceof TextField)) && !ui.chatfrag.shown()){
                 shown = !shown;
                 if(shown && !open && settings.getBool("console")){
                     toggle();
                 }
                 if(shown){
+                    toFront();
                     chatfield.requestKeyboard();
                 }else if(scene.getKeyboardFocus() == chatfield){
                     scene.setKeyboardFocus(null);
@@ -60,7 +61,7 @@ public class ConsoleFragment extends Table{
         });
 
         update(() -> {
-            if(input.keyTap(Binding.chat) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
+            if(input.keyTap(Binding.chat) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || !(scene.getKeyboardFocus() instanceof TextField))){
                 toggle();
             }
 
@@ -122,7 +123,7 @@ public class ConsoleFragment extends Table{
 
             button(Icon.downOpen, Styles.cleari, () -> scrollPos = Mathf.clamp(scrollPos - 1, 0, Math.max(0, messages.size))).disabled(b -> scrollPos <= 0).size(s).padLeft(4f);
 
-            button(Icon.fileText, Styles.cleari, () -> platform.showFileChooser(true, "js", file -> {
+            button(Icon.fileText, Styles.cleari, () -> FileChooser.open("js").submit(file -> {
                 try{
                     mods.getScripts().runConsole(file.readString());
                 }catch(Exception e){

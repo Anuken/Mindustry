@@ -19,6 +19,7 @@ const floatp = method => new Floatp(){get: method}
 const cons = method => new Cons(){get: method}
 const prov = method => new Prov(){get: method}
 const func = method => new Func(){get: method}
+const getRealClass = value => Vars.mods.getScripts().getClass(value);
 
 const newEffect = (lifetime, renderer) => new Effect.Effect(lifetime, new Effect.EffectRenderer({render: renderer}))
 Call = Packages.mindustry.gen.Call
@@ -41,17 +42,34 @@ function extend(/*Base, ..., def*/){
     return instance
 }
 
+importPackage(Packages.java.lang)
+const Arrays = Packages.java.util.Arrays
+//commonly used inner classes that are moved out so JS mods can be more compatible with v8 and v9
+const TextureFilter = Packages.arc.graphics.Texture.TextureFilter
+const TextureWrap = Packages.arc.graphics.Texture.TextureWrap
 importPackage(Packages.arc)
+importPackage(Packages.arc.assets)
+importPackage(Packages.arc.assets.loaders)
 importPackage(Packages.arc.audio)
+importPackage(Packages.arc.backend.headless)
 importPackage(Packages.arc.files)
 importPackage(Packages.arc.flabel)
+importPackage(Packages.arc.freetype)
 importPackage(Packages.arc.func)
+importPackage(Packages.arc.fx)
+importPackage(Packages.arc.fx.filters)
+importPackage(Packages.arc.fx.util)
 importPackage(Packages.arc.graphics)
 importPackage(Packages.arc.graphics.g2d)
+importPackage(Packages.arc.graphics.g3d)
 importPackage(Packages.arc.graphics.gl)
 importPackage(Packages.arc.input)
 importPackage(Packages.arc.math)
 importPackage(Packages.arc.math.geom)
+importPackage(Packages.arc.mock)
+importPackage(Packages.arc.net)
+importPackage(Packages.arc.net.dns)
+importPackage(Packages.arc.packer)
 importPackage(Packages.arc.scene)
 importPackage(Packages.arc.scene.actions)
 importPackage(Packages.arc.scene.event)
@@ -75,6 +93,7 @@ importPackage(Packages.mindustry.content)
 importPackage(Packages.mindustry.core)
 importPackage(Packages.mindustry.ctype)
 importPackage(Packages.mindustry.editor)
+importPackage(Packages.mindustry.editor.data)
 importPackage(Packages.mindustry.entities)
 importPackage(Packages.mindustry.entities.abilities)
 importPackage(Packages.mindustry.entities.bullet)
@@ -95,6 +114,7 @@ importPackage(Packages.mindustry.maps.filters)
 importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
 importPackage(Packages.mindustry.mod)
+importPackage(Packages.mindustry.mod.data)
 importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.service)
 importPackage(Packages.mindustry.type)
@@ -102,6 +122,7 @@ importPackage(Packages.mindustry.type.unit)
 importPackage(Packages.mindustry.type.weapons)
 importPackage(Packages.mindustry.type.weather)
 importPackage(Packages.mindustry.ui)
+importPackage(Packages.mindustry.ui.builder)
 importPackage(Packages.mindustry.ui.dialogs)
 importPackage(Packages.mindustry.ui.fragments)
 importPackage(Packages.mindustry.ui.layout)
@@ -113,7 +134,6 @@ importPackage(Packages.mindustry.world.blocks.defense.turrets)
 importPackage(Packages.mindustry.world.blocks.distribution)
 importPackage(Packages.mindustry.world.blocks.environment)
 importPackage(Packages.mindustry.world.blocks.heat)
-importPackage(Packages.mindustry.world.blocks.legacy)
 importPackage(Packages.mindustry.world.blocks.liquid)
 importPackage(Packages.mindustry.world.blocks.logic)
 importPackage(Packages.mindustry.world.blocks.payloads)
@@ -152,6 +172,7 @@ const BuildSelectEvent = Packages.mindustry.game.EventType.BuildSelectEvent
 const BuildRotateEvent = Packages.mindustry.game.EventType.BuildRotateEvent
 const BlockBuildEndEvent = Packages.mindustry.game.EventType.BlockBuildEndEvent
 const BlockBuildBeginEvent = Packages.mindustry.game.EventType.BlockBuildBeginEvent
+const RulesLoadEvent = Packages.mindustry.game.EventType.RulesLoadEvent
 const ResearchEvent = Packages.mindustry.game.EventType.ResearchEvent
 const UnlockEvent = Packages.mindustry.game.EventType.UnlockEvent
 const StateChangeEvent = Packages.mindustry.game.EventType.StateChangeEvent
@@ -161,6 +182,7 @@ const TileOverlayChangeEvent = Packages.mindustry.game.EventType.TileOverlayChan
 const TileFloorChangeEvent = Packages.mindustry.game.EventType.TileFloorChangeEvent
 const TileChangeEvent = Packages.mindustry.game.EventType.TileChangeEvent
 const TilePreChangeEvent = Packages.mindustry.game.EventType.TilePreChangeEvent
+const BulletCreateEvent = Packages.mindustry.game.EventType.BulletCreateEvent
 const BuildDamageEvent = Packages.mindustry.game.EventType.BuildDamageEvent
 const GameOverEvent = Packages.mindustry.game.EventType.GameOverEvent
 const BuildingCommandEvent = Packages.mindustry.game.EventType.BuildingCommandEvent
@@ -175,6 +197,7 @@ const SectorCaptureEvent = Packages.mindustry.game.EventType.SectorCaptureEvent
 const ClientChatEvent = Packages.mindustry.game.EventType.ClientChatEvent
 const PlayerChatEvent = Packages.mindustry.game.EventType.PlayerChatEvent
 const TextInputEvent = Packages.mindustry.game.EventType.TextInputEvent
+const MenuBuilderOptionChooseEvent = Packages.mindustry.game.EventType.MenuBuilderOptionChooseEvent
 const MenuOptionChooseEvent = Packages.mindustry.game.EventType.MenuOptionChooseEvent
 const ClientServerConnectEvent = Packages.mindustry.game.EventType.ClientServerConnectEvent
 const ClientPreConnectEvent = Packages.mindustry.game.EventType.ClientPreConnectEvent
@@ -185,7 +208,8 @@ const LaunchItemEvent = Packages.mindustry.game.EventType.LaunchItemEvent
 const SectorInvasionEvent = Packages.mindustry.game.EventType.SectorInvasionEvent
 const SectorLoseEvent = Packages.mindustry.game.EventType.SectorLoseEvent
 const SaveLoadEvent = Packages.mindustry.game.EventType.SaveLoadEvent
-const ContentPatchLoadEvent = Packages.mindustry.game.EventType.ContentPatchLoadEvent
+const TextureStreamEvent = Packages.mindustry.game.EventType.TextureStreamEvent
+const DataPatchLoadEvent = Packages.mindustry.game.EventType.DataPatchLoadEvent
 const WorldLoadEndEvent = Packages.mindustry.game.EventType.WorldLoadEndEvent
 const WorldLoadBeginEvent = Packages.mindustry.game.EventType.WorldLoadBeginEvent
 const WorldLoadEvent = Packages.mindustry.game.EventType.WorldLoadEvent

@@ -7,9 +7,11 @@ import mindustry.core.GameState.*;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.MultiPacker;
+import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
+import mindustry.ui.builder.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -20,6 +22,7 @@ public class EventType{
     public enum Trigger{
         shock,
         cannotUpgrade,
+        fireCreate,
         openConsole,
         blastFreeze,
         impactPower,
@@ -107,12 +110,21 @@ public class EventType{
     /** Called when a game begins and the world tiles are initiated. About to updates tile proximity and sets up physics for the world(Before WorldLoadEvent) */
     public static class WorldLoadEndEvent{}
 
-    /** Called when a save loads custom patches. {@link #patches} can be modified in the event handler. */
-    public static class ContentPatchLoadEvent{
-        public final Seq<String> patches;
+    /** Called when a save loads custom data patches. {@link #assets} can be modified in the event handler. The array may be empty. */
+    public static class DataPatchLoadEvent{
+        public final Seq<DataAsset> assets;
 
-        public ContentPatchLoadEvent(Seq<String> patches){
-            this.patches = patches;
+        public DataPatchLoadEvent(Seq<DataAsset> assets){
+            this.assets = assets;
+        }
+    }
+
+    /** Called when a new texture is received from the server via {@link mindustry.core.NetServer#sendTexture}. */
+    public static class TextureStreamEvent {
+        public final String name;
+
+        public TextureStreamEvent(String name){
+            this.name = name;
         }
     }
 
@@ -204,6 +216,19 @@ public class EventType{
             this.player = player;
             this.menuId = menuId;
             this.option = option;
+        }
+    }
+
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuBuilderOptionChooseEvent{
+        public final Player player;
+        public final int menuId;
+        public final MenuResult result;
+
+        public MenuBuilderOptionChooseEvent(Player player, int menuId, MenuResult result){
+            this.player = player;
+            this.menuId = menuId;
+            this.result = result;
         }
     }
 
@@ -386,6 +411,20 @@ public class EventType{
     }
 
     /**
+     * Called when a bullet has been created.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class BulletCreateEvent{
+        public Bullet bullet;
+
+        public BulletCreateEvent set(Bullet bullet){
+            this.bullet = bullet;
+            return this;
+        }
+    }
+
+    /**
      * Called *before* a tile has changed.
      * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
      * Do not modify any tiles inside listeners that use this tile.
@@ -491,6 +530,22 @@ public class EventType{
 
         public ResearchEvent(UnlockableContent content){
             this.content = content;
+        }
+    }
+
+    /** Called when all rules of the current map are loaded. */
+    public static class RulesLoadEvent{
+        public final Rules rules;
+        public final boolean fromSave;
+
+        public RulesLoadEvent(Rules rules){
+            this.rules = rules;
+            this.fromSave = false;
+        }
+
+        public RulesLoadEvent(Rules rules, boolean fromSave){
+            this.rules = rules;
+            this.fromSave = fromSave;
         }
     }
 

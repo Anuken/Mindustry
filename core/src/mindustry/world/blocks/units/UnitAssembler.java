@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
+import arc.struct.EnumSet;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -32,6 +33,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.units.UnitAssemblerModule.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -96,11 +99,11 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
-        //overlapping construction areas not allowed; grow by a tiny amount so edges can't overlap either.
+        //overlapping construction areas not allowed unless it s being replaced; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
         return
-            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
-            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> ((ConstructBuild)b).current instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
+            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b != tile.build && b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> b != tile.build && ((ConstructBuild)b).current instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
     @Override
@@ -122,7 +125,11 @@ public class UnitAssembler extends PayloadBlock{
             removeBar("liquid");
         }
 
-        addBar("progress", (UnitAssemblerBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
+        addBar("progress", (UnitAssemblerBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.progress", Strings.autoFixed(e.progress * 100f, 0)),
+            () -> Pal.ammo,
+            () -> e.progress
+        ));
 
         addBar("units", (UnitAssemblerBuild e) ->
             new Bar(() ->
@@ -163,8 +170,9 @@ public class UnitAssembler extends PayloadBlock{
 
     @Override
     public void afterPatch(){
-        initCapacities();
         super.afterPatch();
+
+        initCapacities();
     }
 
     public void initCapacities(){
@@ -182,10 +190,16 @@ public class UnitAssembler extends PayloadBlock{
 
             if(plan.liquidReq != null){
                 for(LiquidStack stack : plan.liquidReq){
-                    liquidFilter[stack.liquid.id] = true;
+                    if(stack.liquid.id < liquidFilter.length) liquidFilter[stack.liquid.id] = true;
                 }
             }
         }
+    }
+
+    @Override
+    public void checkContentArrayCapacity(int items, int liquids){
+        super.checkContentArrayCapacity(items, liquids);
+        if(capacities.length != items) capacities = Arrays.copyOf(capacities, items);
     }
 
     @Override
@@ -383,6 +397,7 @@ public class UnitAssembler extends PayloadBlock{
 
         @Override
         public void drawSelect(){
+            super.drawSelect();
             for(var module : modules){
                 Drawf.selected(module, Pal.accent);
             }
@@ -685,7 +700,7 @@ public class UnitAssembler extends PayloadBlock{
 
         @Override
         public BlockStatus status(){
-            if(!team.activateUnitFactories()) return BlockStatus.inactive;
+            if(!team.activateUnitFactories()) return BlockStatus.inactiveUnitFactory;
             return super.status();
         }
 
@@ -693,6 +708,13 @@ public class UnitAssembler extends PayloadBlock{
         public double sense(LAccess sensor){
             if(sensor == LAccess.progress) return progress;
             return super.sense(sensor);
+        }
+
+        @Override
+        public boolean acceptUnitPayload(Unit unit){
+            var plan = plan();
+            return plan.requirements.contains(b -> b.item == unit.type() &&
+                blocks.get(unit.type()) < Mathf.round(b.amount * state.rules.unitCost(team)));
         }
 
         @Override

@@ -28,6 +28,7 @@ import static mindustry.Vars.*;
 
 public class BulletType extends Content implements Cloneable{
     static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
+    static final BulletCreateEvent bulletCreateEvent = new BulletCreateEvent();
 
     /** Lifetime in ticks. */
     public float lifetime = 40f;
@@ -592,7 +593,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void createSplashDamage(Bullet b, float x, float y){
         if(splashDamageRadius > 0 && !b.absorbed){
-            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b);
+            Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b, armorMultiplier);
 
             if(status != StatusEffects.none){
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
@@ -673,7 +674,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void drawTrail(Bullet b){
         if(trailLength > 0 && b.trail != null){
-            //draw below bullets? TODO
+            //draw below bullets
             float z = Draw.z();
             Draw.z(z - 0.0001f);
             b.trail.draw(trailColor, trailWidth);
@@ -739,10 +740,9 @@ public class BulletType extends Content implements Cloneable{
             Teamc target;
             //home in on allies if possible
             if(heals()){
-                target = Units.closestTarget(null, realAimX, realAimY, homingRange,
-                e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
-                t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id)
-                );
+                target = Units.closestTarget(null, realAimX, realAimY, homingRange, b.team,
+                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
+                    t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id));
             }else{
                 if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
                     target = b.aimTile.build;
@@ -998,6 +998,7 @@ public class BulletType extends Content implements Cloneable{
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
         if(type == null) return;
-        type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
+        var bullet = type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
+        Events.fire(bulletCreateEvent.set(bullet));
     }
 }

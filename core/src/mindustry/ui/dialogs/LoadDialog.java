@@ -1,6 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
+import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.style.*;
@@ -91,7 +92,7 @@ public class LoadDialog extends BaseDialog{
         Seq<SaveSlot> array = control.saves.getSaveSlots();
         array.sort((slot, other) -> -Long.compare(slot.getTimestamp(), other.getTimestamp()));
 
-        int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(470)), 1);
+        int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(470)), 1);
         int i = 0;
         boolean any = false;
 
@@ -135,7 +136,13 @@ public class LoadDialog extends BaseDialog{
                         });
                     }).right();
 
-                    t.button(Icon.export, Styles.emptyi, () -> platform.export("save-" + slot.getName(), saveExtension, slot::exportFile)).right();
+                    t.button(Icon.export, Styles.emptyi, () -> {
+                        if(slot.hasExternalAssets() && !slot.isBeingPlayed()){
+                            ui.showInfo("@save.export.needsload");
+                        }else{
+                            FileChooser.export(slot.getName(), saveExtension, slot::exportFile);
+                        }
+                    }).right();
 
                 }).padRight(-10).growX();
             }).growX().colspan(2);
@@ -159,7 +166,7 @@ public class LoadDialog extends BaseDialog{
 
             button.table(meta -> {
                 meta.left().top();
-                meta.defaults().padBottom(-2).left().width(290f);
+                meta.defaults().padBottom(-2).left().width(280f);
                 meta.row();
                 meta.labelWrap(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().name())));
                 meta.row();
@@ -171,13 +178,12 @@ public class LoadDialog extends BaseDialog{
                 meta.row();
                 meta.labelWrap(color + slot.getDate());
                 meta.row();
-            }).left().growX().width(250f);
+            }).left().growX().width(260f);
 
             modifyButton(button, slot);
-
             slots.add(button).uniformX().fillX().pad(4).padRight(8f).margin(10f);
 
-            if(++i % maxwidth == 0){
+            if(++i % cols == 0){
                 slots.row();
             }
         }
@@ -190,24 +196,27 @@ public class LoadDialog extends BaseDialog{
     public void addSetup(){
 
         buttons.button("@save.import", Icon.add, () -> {
-            platform.showFileChooser(true, saveExtension, file -> {
-                if(SaveIO.isSaveValid(file)){
-                    var meta = SaveIO.getMeta(file);
+            FileChooser.open("msav").submitMulti(files -> {
+                for(Fi file : files){
+                    if(SaveIO.isSaveValid(file)){
+                        var meta = SaveIO.getMeta(file);
 
-                    if(meta.rules.sector != null){
-                        ui.showErrorMessage("@save.nocampaign");
-                    }else{
-                        try{
-                            control.saves.importSave(file);
-                            rebuild();
-                        }catch(IOException e){
-                            e.printStackTrace();
-                            ui.showException("@save.import.fail", e);
+                        if(meta.rules.sector != null){
+                            ui.showErrorMessage("@save.nocampaign");
+                        }else{
+                            try{
+                                control.saves.importSave(file);
+                            }catch(Exception e){
+                                Log.err(e);
+                                ui.showException("@save.import.fail", e);
+                            }
                         }
+                    }else{
+                        ui.showErrorMessage("@save.import.invalid");
                     }
-                }else{
-                    ui.showErrorMessage("@save.import.invalid");
                 }
+
+                rebuild();
             });
         }).fillX().margin(10f);
     }
@@ -223,6 +232,27 @@ public class LoadDialog extends BaseDialog{
                     state.rules.editor = false;
                     state.rules.sector = null;
                     state.set(State.playing);
+
+                    var missing = state.data.getMissingAssets();
+                    if(missing.size > 0){
+                        BaseDialog d = new BaseDialog("@save.assets.missing");
+                        d.cont.add("@save.assets.missing.info").labelAlign(Align.center).expandX().wrap().colspan(2);
+                        d.cont.row();
+
+                        Collapser col = new Collapser(base -> base.pane(t -> {
+                            t.margin(14f);
+                            for(var asset : missing){
+                                t.add("[accent]" + asset.getType() + ": [lightgray]" + asset.path).left().row();
+                            }
+                        }), true);
+
+                        d.cont.button("@save.assets.missing.list", Styles.togglet, col::toggle).size(180f, 50f).checked(b -> !col.isCollapsed()).fillX().right();
+                        d.cont.button("@ok", d::hide).size(110, 50).fillX().left();
+                        d.cont.row();
+                        d.cont.add(col).colspan(2).pad(2);
+
+                        d.show();
+                    }
                 }catch(SaveException e){
                     Log.err(e);
                     logic.reset();
