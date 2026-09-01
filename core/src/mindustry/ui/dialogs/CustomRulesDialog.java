@@ -146,6 +146,7 @@ public class CustomRulesDialog extends BaseDialog{
         main.clear();
         main.left().defaults().fillX().left();
         main.row();
+        main.marginRight(25f);
 
         category("waves");
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
@@ -163,6 +164,7 @@ public class CustomRulesDialog extends BaseDialog{
         category("resourcesbuilding");
         check("@rules.alloweditworldprocessors", b -> rules.allowEditWorldProcessors = b, () -> rules.allowEditWorldProcessors);
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
+        check("@rules.corebuildandconfig", b -> rules.coreBuildAndConfig = b, () -> rules.coreBuildAndConfig);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.coreunloaders", b -> rules.allowCoreUnloaders = b, () -> rules.allowCoreUnloaders);
         check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);
@@ -234,6 +236,11 @@ public class CustomRulesDialog extends BaseDialog{
 
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
+        if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
+            current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
+        }
+
+        category("light");
         if(Core.bundle.get("rules.ambientlight").toLowerCase().contains(ruleSearch)){
             current.button(b -> {
                 b.left();
@@ -245,6 +252,7 @@ public class CustomRulesDialog extends BaseDialog{
                 b.add("@rules.ambientlight");
             }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
         }
+        check("@rules.lighting.unitlight", b -> rules.unitLight = b, () -> rules.unitLight);
 
         if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
             current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
@@ -252,7 +260,7 @@ public class CustomRulesDialog extends BaseDialog{
 
         category("music");
 
-        Boolp allowMusic = () -> !state.rules.disableMusic;
+        Boolp allowMusic = () -> !rules.disableMusic;
         Func<String, Seq<MusicContainer>> parser = str -> {
             try{
                 return Seq.map(new JsonReader().parse("[" + str + "]").asStringArray(), MusicContainer::new);
@@ -265,13 +273,13 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.nomusic", b -> rules.disableMusic = b, () -> rules.disableMusic);
 
         text("@rules.ambientmusic",
-            s -> state.rules.ambientMusic = s.trim().isEmpty() ? null : parser.get(s),
+            s -> rules.ambientMusic = s.trim().isEmpty() ? null : parser.get(s),
             () -> rules.ambientMusic == null ? "" : rules.ambientMusic.toString(", "),
             text -> parser.get(text) != null,
         allowMusic);
 
         text("@rules.darkmusic",
-            s -> state.rules.darkMusic = s.trim().isEmpty() ? null : parser.get(s),
+            s -> rules.darkMusic = s.trim().isEmpty() ? null : parser.get(s),
             () -> rules.darkMusic == null ? "" : rules.darkMusic.toString(", "),
             text -> parser.get(text) != null,
         allowMusic);

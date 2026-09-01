@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -327,7 +328,7 @@ public class LStatements{
                         }
                     });
                 }));
-            }, Styles.logict, () -> {}).size(40f).padLeft(-2).color(table.color);
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2f).color(table.color);
         }
 
         @Override
@@ -628,7 +629,8 @@ public class LStatements{
                         }),
                         //sensors
                         new Table(i -> {
-                            for(LAccess sensor : LAccess.senseable){
+                            boolean currentPrivileged = ui.logic.isShown() && ui.logic.privileged;
+                            for(LAccess sensor : (currentPrivileged ? LAccess.senseablePrivileged : LAccess.senseable)){
                                 i.button(sensor.name(), Styles.flatt, () -> {
                                     stype("@" + sensor.name());
                                     hide.run();
@@ -1567,9 +1569,7 @@ public class LStatements{
     @RegisterStatement("status")
     public static class ApplyStatusStatement extends LStatement{
         public boolean clear;
-        public String effect = "wet", unit = "unit", duration = "10";
-
-        private static @Nullable String[] statusNames;
+        public String effect = "@status-wet", unit = "unit", duration = "10";
 
         @Override
         public void build(Table table){
@@ -1580,32 +1580,48 @@ public class LStatements{
                 build(table);
             }).size(80f, 40f).pad(4f).color(table.color);
 
-            if(statusNames == null){
-                statusNames = content.statusEffects().map(s -> s.name).toArray(String.class);
-            }
-
+            TextField field = field(table, effect, str -> {
+                effect = str;
+                build(table);
+            }).width(240f).wrap().get();
             table.button(b -> {
-                b.label(() -> effect).grow().wrap().labelAlign(Align.center).center();
-                b.clicked(() -> showSelect(b, statusNames, effect, o -> {
-                    effect = o;
-                    build(table);
-                }, 2, c -> c.size(120f, 38f)));
-            }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
-
-            table.add(clear ? " from " : " to ");
+                b.image(Icon.pencilSmall);
+                b.clicked(() -> showSelectTable(b, (t, hide) -> {
+                    t.left();
+                    for(StatusEffect status : content.statusEffects()){
+                        if(status == StatusEffects.none) continue;
+                        t.button(status.name, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
+                            effect = "@status-" + status.name;
+                            build(table);
+                            field.setText(effect);
+                            hide.run();
+                        }).size(240f, 40f).marginLeft(5f).padLeft(-1f).row();
+                    }
+                }));
+            }, Styles.logict, () -> {}).size(40f).padLeft(-2f).color(table.color);
 
             row(table);
 
-            fields(table, unit, str -> unit = str);
+            table.add(clear ? " from " : " to ").left();
 
-            if(!clear && !(content.statusEffect(effect) != null && content.statusEffect(effect).permanent)){
+            fields(table, unit, str -> unit = str).left();
 
-                table.add(" for ");
+            if(!clear && !isPermanent()){
+                row(table);
 
-                fields(table, duration, str -> duration = str);
+                table.add(" for ").left();
 
-                table.add(" sec");
+                fields(table, duration, str -> duration = str).left();
+
+                table.add(" sec").left();
             }
+        }
+
+        private boolean isPermanent(){
+            if(!effect.startsWith("@status-")) return false;
+            StatusEffect status = content.statusEffect(effect.substring(8));
+            if(status == null) return false;
+            return status.permanent;
         }
 
         @Override
@@ -1615,7 +1631,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new ApplyEffectI(clear, effect, builder.var(unit), builder.var(duration));
+            return new ApplyEffectI(clear, builder.var(effect), builder.var(unit), builder.var(duration));
         }
 
         @Override
@@ -1905,10 +1921,14 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, CutsceneAction.all, action, o -> {
                     action = o;
                     rebuild(table);
-                }));
-            }, Styles.logict, () -> {}).size(90f, 40f).padLeft(2).color(table.color);
+                }, 3, cell -> cell.size(120f, 40f)));
+            }, Styles.logict, () -> {}).size(120f, 40f).padLeft(2).color(table.color);
 
             switch(action){
+                case active, getHud -> {
+                    table.add(" result ");
+                    fields(table, p1, str -> p1 = str);
+                }
                 case pan -> {
                     table.add(" x ");
                     fields(table, p1, str -> p1 = str);
@@ -1922,6 +1942,16 @@ public class LStatements{
                 }
                 case zoom -> {
                     table.add(" level ");
+                    fields(table, p1, str -> p1 = str);
+                }
+                case shake -> {
+                    table.add(" amount ");
+                    fields(table, p1, str -> p1 = str);
+                    table.add(" duration ");
+                    fields(table, p2, str -> p2 = str);
+                }
+                case setHud -> {
+                    table.add(" shown ");
                     fields(table, p1, str -> p1 = str);
                 }
             }
@@ -2052,18 +2082,13 @@ public class LStatements{
         }
 
         @Override
-        public boolean privileged(){
-            return true;
-        }
-
-        @Override
         public LInstruction build(LAssembler builder){
             return new SetRateI(builder.var(amount));
         }
 
         @Override
         public LCategory category(){
-            return LCategory.world;
+            return LCategory.control;
         }
     }
 
@@ -2303,6 +2328,17 @@ public class LStatements{
                             if(++c % 6 == 0) i.row();
                         }
                     }),
+                    //status effects
+                    new Table(i -> {
+                        i.left();
+                        for(StatusEffect status : Vars.content.statusEffects()){
+                            if(!status.unlockedNow() || !status.show || status == StatusEffects.none) continue;
+                            i.button(status.name, status.uiIcon != Core.atlas.find("error") ? new TextureRegionDrawable(status.uiIcon) : Icon.effect, Styles.flatt, iconSmall, () -> {
+                                stype("@status-" + status.name);
+                                hide.run();
+                            }).size(240f, 40f).marginLeft(5f).row();
+                        }
+                    }),
                     //sensors
                     new Table(i -> {
                         for(LAccess property : LAccess.settable){
@@ -2314,7 +2350,7 @@ public class LStatements{
                     })
                     };
 
-                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.tree};
+                    Drawable[] icons = {Icon.box, Icon.liquid, Icon.effect, Icon.tree};
                     Stack stack = new Stack(tables[selected]);
                     ButtonGroup<Button> group = new ButtonGroup<>();
 
@@ -2332,7 +2368,7 @@ public class LStatements{
                         }).height(50f).growX().checked(selected == fi).group(group);
                     }
                     t.row();
-                    t.add(stack).colspan(3).width(240f).left();
+                    t.add(stack).colspan(icons.length).width(240f).left();
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
@@ -2390,21 +2426,7 @@ public class LStatements{
 
             table.button(b -> {
                 b.image(Icon.pencilSmall);
-
-                Seq<String> soundNames = new Seq<>();
-
-                for(var entry : Core.assets.getAllEntries(Sound.class, new Seq<>())){
-                    if(entry.value != Sounds.none && entry.value.file != null){
-                        soundNames.add(Strings.getFileNameWithoutExtension(entry.key));
-                    }
-                }
-                soundNames.sort();
-
-                String soundName = id.startsWith("@sfx-") ? id.substring(5) : id;
-                b.clicked(() -> showSelect(b, soundNames.toArray(String.class), soundName, t -> {
-                    id = "@sfx-" + t;
-                    build(table);
-                }, 3, cell -> cell.size(170, 50)));
+                b.clicked(() -> showSoundSelect(b, table));
             }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
 
             row(table);
@@ -2440,6 +2462,157 @@ public class LStatements{
         @Override
         public LCategory category(){
             return LCategory.world;
+        }
+
+        private static @Nullable Sound lastPreview;
+
+        private static class SoundChoice{
+            final String category;
+            final String name;
+            final Sound sound;
+
+            SoundChoice(String category, String name, Sound sound){
+                this.category = category;
+                this.name = name;
+                this.sound = sound;
+            }
+        }
+
+        protected void showSoundSelect(Button button, Table table){
+            Seq<SoundChoice> choices = new Seq<>();
+            ObjectMap<String, Seq<SoundChoice>> categories = new ObjectMap<>();
+
+            for(var entry : Core.assets.getAllEntries(Sound.class, new Seq<>())){
+                Sound sound = entry.value;
+                if(sound == Sounds.none || sound == null || sound.file == null) continue;
+
+                String name = Strings.getFileNameWithoutExtension(entry.key);
+                String category = soundCategory(entry.key);
+
+                SoundChoice choice = new SoundChoice(category, name, sound);
+                choices.add(choice);
+                categories.get(category, Seq::new).add(choice);
+            }
+
+            if(choices.isEmpty()) return;
+
+            choices.sort((a, b) -> {
+                int cmp = a.category.compareTo(b.category);
+                return cmp == 0 ? a.name.compareTo(b.name) : cmp;
+            });
+
+            Seq<String> categoryNames = categories.keys().toSeq().sort();
+            categoryNames.insert(0, "all");
+
+            for(var seq : categories.values()){
+                seq.sortComparing(a -> a.name);
+            }
+
+            String current = id.startsWith("@sfx-") ? id.substring(5) : id;
+            String currentCategory = "all";
+            for(var choice : choices){
+                if(choice.name.equals(current)){
+                    currentCategory = choice.category;
+                    break;
+                }
+            }
+
+            final String selectedCurrentCategory = currentCategory;
+
+            showSelectTable(button, (root, hide) -> {
+                root.left().top();
+
+                String[] selectedCategory = {categories.containsKey(selectedCurrentCategory) ? selectedCurrentCategory : "all"};
+                Table soundList = new Table();
+                ButtonGroup<Button> tabGroup = new ButtonGroup<>();
+
+                Runnable rebuild = () -> {
+                    soundList.clearChildren();
+                    soundList.defaults().left().pad(2f);
+                    soundList.top();
+
+                    Seq<SoundChoice> visible = new Seq<>();
+                    if("all".equals(selectedCategory[0])){
+                        visible.addAll(choices);
+                    }else{
+                        visible.addAll(categories.get(selectedCategory[0], Seq::new));
+                    }
+
+                    if(visible.isEmpty()){
+                        soundList.add("@none.found").pad(8f);
+                        return;
+                    }
+
+                    for(var choice : visible){
+                        soundList.table(row -> {
+                            row.left().top();
+                            row.defaults().left();
+
+                            row.button(Icon.play, Styles.cleari, 28f, () -> previewSound(choice.sound))
+                            .update(b -> b.getStyle().imageUp = choice.sound != null && choice.sound == lastPreview && choice.sound.countPlaying() > 0 ? Icon.pause : Icon.play)
+                            .size(40f).padRight(6f);
+
+                            String label = "all".equals(selectedCategory[0]) ? choice.category + "/" + choice.name : choice.name;
+                            row.button(label, Styles.logicTogglet, () -> {
+                                id = "@sfx-" + choice.name;
+                                build(table);
+                                hide.run();
+                            }).growX().height(40f).left().checked(choice.name.equals(current)).with(t -> {
+                                t.getLabelCell().growX().left().labelAlign(Align.left).padLeft(10f);
+                            }).padRight(4f);
+                        }).growX().height(40f).padBottom(3f).row();
+                    }
+                };
+
+                root.table(tabs -> {
+                    tabs.left().top();
+                    tabs.defaults().size(140f, 34f).left();
+
+                    for(String category : categoryNames){
+                        tabs.button(Strings.capitalize(category), Styles.logicTogglet, () -> {
+                            selectedCategory[0] = category;
+                            rebuild.run();
+                            //fixes flickering
+                            var parent = (Table)root.parent.parent;
+                            parent.pack();
+                            parent.act(0f);
+                        }).checked(selectedCategory[0].equals(category)).group(tabGroup).growX().row();
+                    }
+                }).top().left().width(160f);
+
+                root.add(soundList).top().width(Math.min(Core.graphics.getWidth() / Scl.scl(1f) * 0.9f, 450f));
+
+                rebuild.run();
+            }, () -> {
+                if(lastPreview != null){
+                    lastPreview.stop();
+                }
+            });
+        }
+
+        private static String soundCategory(String entryName){
+            String normalized = entryName.replace('\\', '/');
+            int end = normalized.lastIndexOf('/');
+            if(end < 0) return "Data Patch";
+
+            int start = normalized.lastIndexOf('/', end - 1);
+            return normalized.substring(start + 1, end);
+        }
+
+        private static void previewSound(Sound sound){
+            if(sound == null || sound == Sounds.none) return;
+
+            if(lastPreview != null && lastPreview.countPlaying() > 0 && lastPreview != Sounds.uiButton){
+                lastPreview.stop();
+                if(lastPreview == sound) return; //double tap = stop
+            }
+
+            lastPreview = sound;
+            //don't play the button sound every time
+            if(sound != Sounds.uiButton) Sounds.uiButton.stop();
+
+            //play sound on the UI bus as the main one is paused
+            sound.play(1, 1, 0, false, true, control.sound.uiBus);
         }
     }
 

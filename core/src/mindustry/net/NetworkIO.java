@@ -163,6 +163,15 @@ public class NetworkIO{
         }
     }
 
+    public static void packTexture(OutputStream os, String name, byte[] pngData){
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeUTF(name);
+            stream.write(pngData);
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
     public static ByteBuffer writeServerData(){
         String name = (headless ? Config.serverName.string() : player.name);
         String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";

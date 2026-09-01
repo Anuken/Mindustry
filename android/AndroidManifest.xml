@@ -25,7 +25,8 @@
                 android:label="@string/app_name"
                 android:screenOrientation="user"
                 android:exported="true"
-                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout">
+                android:launchMode="singleTask"
+                android:configChanges="uiMode|keyboard|keyboardHidden|orientation|screenSize|screenLayout">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -37,6 +38,25 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="mindustry"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/x-msav" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.msav" />
             </intent-filter>
 
         </activity>

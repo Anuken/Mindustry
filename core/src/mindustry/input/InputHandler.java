@@ -1,7 +1,6 @@
 package mindustry.input;
 
 import arc.*;
-import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -78,6 +77,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** If true, there is a cutscene currently occurring in logic. */
     public boolean logicCutscene;
+    public boolean logicHideHud;
     public Vec2 logicCamPan = new Vec2();
     public float logicCamSpeed = 0.1f;
     public float logicCutsceneZoom = -1f;
@@ -144,15 +144,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         });
 
-        Events.on(WorldLoadEvent.class, e -> {
-            playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
-            selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
-            createPlanLists();
-        });
+        Events.on(WorldLoadEvent.class, e -> initQuadtrees());
 
-        Events.on(ResetEvent.class, e -> {
-            reset();
-        });
+        Events.on(ResetEvent.class, e -> reset());
+    }
+
+    protected void initQuadtrees(){
+        playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+        selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+        createPlanLists();
     }
 
     //methods to override
@@ -594,6 +594,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(build.block.buildVisibility != BuildVisibility.hidden && build.canPickup() && pay.canPickup(build)){
                     pay.pickup(build);
                 }else{
+                    Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
                     Fx.unitPickup.at(build);
                     build.tile.remove();
                 }
@@ -602,6 +603,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 if(current != null && pay.canPickupPayload(current)){
                     Payload taken = build.takePayload();
                     if(taken != null){
+                        Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
                         pay.addPayload(taken);
                         Fx.unitPickup.at(build);
                     }
@@ -609,6 +611,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
 
         }else if(build != null && onGround){
+            Sounds.payloadPickup.at(unit, Mathf.random(0.9f, 1.1f));
             Fx.unitPickup.at(build);
             build.tile.remove();
         }
@@ -666,7 +669,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         if(build.acceptPayload(build, unitPay)){
             Fx.unitDrop.at(build);
-            build.handlePayload(build, unitPay);
+            build.handlePayload(build, unitPay, unit);
         }
     }
 
@@ -888,10 +891,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void updateSelectQuadtree(){
-        selectPlanTree.clear();
-        for(var plan : selectPlans){
-            selectPlanTree.insert(plan);
-        }
+        selectPlanTree.fill(selectPlans);
     }
 
     /** Adds an input lock; if this function returns true, input is locked. Used for mod 'cutscenes' or custom camera panning. */
@@ -919,6 +919,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void reset(){
         logicCutscene = false;
+        logicHideHud = false;
         commandBuildings.clear();
         selectedUnits.clear();
         itemDepositCooldown = 0f;
@@ -926,6 +927,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         lastUnit = null;
         lastPlans.clear();
         player.shooting = false;
+        player.pingTime = 0f;
     }
 
     public void getSyncedPlans(Seq<BuildPlan> out){
@@ -1407,10 +1409,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                         plan.animScale = prev.animScale;
                     }
                 }
-                player.previewPlanTree.clear();
-                for(BuildPlan plan : plans){
-                    player.previewPlanTree.insert(plan);
-                }
+                player.previewPlanTree.fill(plans);
             }
 
             BuildPlan current = player.isBuilder() ? player.unit().buildPlan() : null;
@@ -1990,10 +1989,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             if((!config.isShown() && build.shouldShowConfigure(player)) //if the config fragment is hidden, show
             //alternatively, the current selected block can 'agree' to switch config tiles
             || (config.isShown() && config.getSelected().onConfigureBuildTapped(build) && build.shouldShowConfigure(player))){
-                AudioBus oldBus = build.block.configureSound.bus;
-                build.block.configureSound.bus = control.sound.uiBus;
-                build.block.configureSound.at(build);
-                build.block.configureSound.bus = oldBus;
+                build.block.configureSound.at(build.x, build.y, 1f, 1f, control.sound.uiBus);
                 config.showConfig(build);
             }
             //otherwise...
@@ -2019,6 +2015,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             consumed = true;
         }else if(build.interactable(player.team()) && build.block.synthetic() && (!consumed || build.block.allowConfigInventory)){
             if(build.block.hasItems && build.items.total() > 0){
+                inv.swap = build.block.swapConfigInventory;
                 inv.showFor(build);
                 consumed = true;
                 showedInventory = true;
@@ -2266,6 +2263,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             config.build(group);
             planConfig.build(group);
         }
+
+        initQuadtrees();
     }
 
     public boolean canShoot(){

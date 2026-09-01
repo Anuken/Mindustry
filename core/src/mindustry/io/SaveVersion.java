@@ -516,6 +516,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         Groups.all.each(Entityc::afterReadAll);
         Groups.unit.each(Entityc::afterReadAll);
+        Groups.build.each(Entityc::afterReadAll);
     }
 
     public Prov[] readEntityMapping(DataInput stream) throws IOException{

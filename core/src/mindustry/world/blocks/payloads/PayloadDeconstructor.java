@@ -1,6 +1,7 @@
 package mindustry.world.blocks.payloads;
 
 import arc.graphics.*;
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -48,7 +49,11 @@ public class PayloadDeconstructor extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        addBar("progress", (PayloadDeconstructorBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
+        addBar("progress", (PayloadDeconstructorBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.progress", Strings.autoFixed(e.progress * 100f, 0)),
+            () -> Pal.ammo,
+            () -> e.progress
+        ));
     }
 
     public class PayloadDeconstructorBuild extends PayloadBlockBuild<Payload>{
