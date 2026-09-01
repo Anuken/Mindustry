@@ -23,7 +23,7 @@ public class CommandAI extends AIController{
 
     public Seq<Position> commandQueue = new Seq<>(5);
     public @Nullable Vec2 targetPos;
-    public @Nullable Building targetBuild; 
+    public @Nullable Building targetBuild;
     public @Nullable Teamc attackTarget;
     /** Group of units that were all commanded to reach the same point. */
     public @Nullable UnitGroup group;
@@ -343,8 +343,7 @@ public class CommandAI extends AIController{
                 }else{
                     var result = controlPath.getPathPosition(unit, movePos, isSolidPayload ? movePos : targetPos);
 
-                    if(!isSolidPayload)
-                        unreachable = result.unreachable;
+                    unreachable = result.unreachable;
                     move &= result.move && (!blockingUnit || timeSpentBlocked > maxBlockTime);
                     if(result.move) vecOut.set(result.dest);
 
@@ -530,7 +529,7 @@ public class CommandAI extends AIController{
 
     @Override
     public void hit(Bullet bullet){
-        if(unit.team.isAI() && 
+        if(unit.team.isAI() &&
            //excluding bullets
            (!(bullet.owner instanceof Bullet) && bullet.owner instanceof Teamc teamc) && teamc.team() != unit.team && attackTarget == null &&
             //can only counter-attack every few seconds to prevent rapidly changing targets

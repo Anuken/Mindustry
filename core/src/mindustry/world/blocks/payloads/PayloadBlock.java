@@ -101,8 +101,10 @@ public class PayloadBlock extends Block{
 
         @Override
         public boolean canControlSelect(Unit unit){
-            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && 
-            (unit.isGrounded() && !unit.type.allowLegStep && solid) ? unit.within(this, size * tilesize * 0.7f + unit.hitSize / 2f) : unit.tileOn() != null && unit.tileOn().build == this;
+            if(unit.spawnedByCore || !unit.type.allowedInPayloads || this.payload != null || !acceptUnitPayload(unit)) return false;
+
+            //ground units can be accepted when they are near solid blocks
+            return (unit.isGrounded() && !unit.type.allowLegStep && solid) ? unit.within(this, size * tilesize * 0.7f + unit.hitSize / 2f) : unit.tileOn() != null && unit.tileOn().build == this;
         }
 
         @Override
@@ -118,6 +120,7 @@ public class PayloadBlock extends Block{
             return this.payload == null;
         }
 
+        @Override
         public void handlePayload(Building source, Payload payload, @Nullable Unit unit){
             if(unit != null){
                 float clampPos = size * tilesize * 0.7f + unit.hitSize / 2f;
