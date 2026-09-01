@@ -533,9 +533,9 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, RadarSort.all, sort, t -> {
                     sort = t;
                 }, 2, cell -> cell.size(100, 50)));
-            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {}).size(130, 40).color(table.color).left().padLeft(2);
 
-            table.add(bundle("output")).self(this::param);
+            table.add(bundle("output")).self(this::param).padLeft(2);
 
             fields(table, output, v -> output = v);
         }
