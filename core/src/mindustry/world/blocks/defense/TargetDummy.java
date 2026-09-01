@@ -49,12 +49,14 @@ public class TargetDummy extends Block{
         });
         config(Float.class, (TargetDummyBuild tile, Float f) -> tile.dummySize = f);
         config(int[].class, (TargetDummyBuild tile, int[] config) -> {
-            tile.unitTeam = tile.team;
-            if(config[0] == 1) tile.unitTeam = Team.get(tile.dummyTeam());
-            tile.boosting = config[1] == 1;
-            tile.unitArmor = Float.intBitsToFloat(config[2]);
-            tile.resetTime = Float.intBitsToFloat(config[3]);
-            tile.dummySize = Float.intBitsToFloat(config[4]);
+            if(config.length > 0){
+                tile.unitTeam = tile.team;
+                if(config[0] == 1) tile.unitTeam = Team.get(tile.dummyTeam());
+            }
+            if(config.length > 1) tile.boosting = config[1] == 1;
+            if(config.length > 2) tile.unitArmor = Float.intBitsToFloat(config[2]);
+            if(config.length > 3) tile.resetTime = Float.intBitsToFloat(config[3]);
+            if(config.length > 4) tile.dummySize = Float.intBitsToFloat(config[4]);
         });
     }
 
@@ -233,11 +235,6 @@ public class TargetDummy extends Block{
         }
 
         @Override
-        public void kill(){
-            //just in case
-        }
-
-        @Override
         public void buildConfiguration(Table table){
             table.table(t -> {
                 t.background(Styles.black6);
@@ -258,11 +255,7 @@ public class TargetDummy extends Block{
 
         public int dummyTeam(){
             if(unitTeam != team) return team.id; //Return to own team
-
-            if(team == state.rules.defaultTeam) return state.rules.waveTeam.id; //Set to wave team if player team
-            if(team == state.rules.waveTeam) return state.rules.defaultTeam.id; //Set to player team if wave team
-            if(team != Team.crux) return Team.crux.id; //Set to crux if not crux
-            return Team.sharded.id; //Set to sharded if crux
+            return (team == state.rules.defaultTeam ? state.rules.waveTeam : state.rules.defaultTeam).id;
         }
 
         @Override
