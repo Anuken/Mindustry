@@ -555,6 +555,30 @@ public class World{
         }
     }
 
+    public static void raycastEachNoDiagonalWorld(float x0, float y0, float x1, float y1, Raycaster cons){
+        raycastEachNoDiagonal(toTile(x0), toTile(y0), toTile(x1), toTile(y1), cons);
+    }
+
+    public static void raycastEachNoDiagonal(int startX, int startY, int endX, int endY, Raycaster cons){
+        int xDist = Math.abs(endX - startX);
+        int yDist = -Math.abs(endY - startY);
+        int xStep = (startX < endX ? +1 : -1);
+        int yStep = (startY < endY ? +1 : -1);
+        int error = xDist + yDist;
+
+        while(true){
+            if(cons.accept(startX, startY) || (startX == endX && startY == endY)) break;
+
+            if(2 * error - yDist > xDist - 2 * error){
+                error += yDist;
+                startX += xStep;
+            }else{
+                error += xDist;
+                startY += yStep;
+            }
+        }
+    }
+
     public static boolean raycast(int x1, int y1, int x2, int y2, Raycaster cons){
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
@@ -642,6 +666,11 @@ public class World{
             applyFilters();
 
             super.end();
+        }
+
+        @Override
+        public boolean isMap(){
+            return true;
         }
 
         public void applyFilters(){

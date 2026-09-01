@@ -16,6 +16,8 @@ import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
 
@@ -120,6 +122,37 @@ public abstract class LStatement{
         return value;
     }
 
+    protected static boolean logicLocalization(){
+        return Core.settings.getBool("logiclocalization", true);
+    }
+
+    public static String bundle(String key){
+        if(!logicLocalization()) return key;
+        return Core.bundle.get("name.token." + key, key);
+    }
+
+    protected static String bundle(Enum<?> value){
+        if(value instanceof LogicOp op){
+            return selectTranslate(op.symbol);
+        }else if(value instanceof ConditionOp op){
+            return selectTranslate(op.symbol);
+        }
+        String name = value.name().toLowerCase(Locale.ROOT);
+        String labelKey = value.getClass().getSimpleName().toLowerCase(Locale.ROOT) + ".label." + name;
+        if(logicLocalization() && Core.bundle.has(labelKey)){
+            return Core.bundle.get(labelKey);
+        }
+        return value.name();
+    }
+
+    protected static String selectTranslate(String text){
+        if(text == null || text.isEmpty() || !logicLocalization()) return text;
+        return switch(text){
+            case "not", "and", "or", "b-and", "xor", "flip", "always" -> bundle(text);
+            default -> text;
+        };
+    }
+
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, s -> setter.get(sanitize(s)))
             .size(144f, 40f).pad(2f).color(table.color);
@@ -176,7 +209,8 @@ public abstract class LStatement{
             t.defaults().size(60f, 38f);
 
             for(T p : values){
-                sizer.get(t.button(p.toString(), Styles.logicTogglet, () -> {
+                String btnText = (p instanceof Enum e) ? bundle(e) : bundle(p.toString());
+                sizer.get(t.button(btnText, Styles.logicTogglet, () -> {
                     getter.get(p);
                     hide.run();
                 }).self(c -> {
@@ -213,7 +247,7 @@ public abstract class LStatement{
                 int val = nameToAlign.get(align);
                 if(!hor && !Align.isCenterHorizontal(val)) continue;
                 if(!ver && !Align.isCenterVertical(val)) continue;
-                t.button(align, Styles.logicTogglet, () -> {
+                t.button(bundle(align), Styles.logicTogglet, () -> {
                     setter.get(val);
                     hide.run();
                 }).checked(current == nameToAlign.get(align)).grow();
@@ -300,6 +334,15 @@ public abstract class LStatement{
 
     public String typeName(){
         return getClass().getSimpleName().replace("Statement", "");
+    }
+
+    public String statementKey(){
+        return typeName().toLowerCase(Locale.ROOT);
+    }
+
+    public String localizedName(){
+        if(logicLocalization()) return Core.bundle.get("instruction." + statementKey(), name());
+        return statementKey();
     }
 
     public String name(){

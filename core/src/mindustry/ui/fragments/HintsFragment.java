@@ -82,6 +82,7 @@ public class HintsFragment{
         });
 
         Events.run(Trigger.cannotUpgrade, () -> events.add("cannotupgrade"));
+        Events.run(Trigger.fireCreate, () -> events.add("fire"));
 
         Events.on(ResetEvent.class, e -> {
             placedBlocks.clear();
@@ -248,7 +249,7 @@ public class HintsFragment{
         ),
 
         waveFire(
-            () -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(),
+            () -> ui.hints.events.contains("fire") && Blocks.wave.unlockedNow(),
             () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
         ),
 

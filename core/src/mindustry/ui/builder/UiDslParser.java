@@ -20,7 +20,7 @@ public class UiDslParser{
         UiDslParser p = new UiDslParser(source);
         p.parseStatementsInto(root);
         p.skipWs();
-        if(!p.atEnd()) throw new SerializationException("Unexpected character '" + p.peek() + "' at index " + p.pos);
+        if(!p.atEnd()) throw new SerializationException("Unexpected character '" + p.peek() + "' at line " + p.line(p.pos));
         return root;
     }
 
@@ -34,17 +34,21 @@ public class UiDslParser{
 
     private void parseStatement(NodeBuilder<?> node){
         skipWs();
-        if(atEnd() || peek() == '"') throw new SerializationException("Expected identifier at index " + pos);
+        if(atEnd() || peek() == '"') throw new SerializationException("Expected identifier at line " + line(pos));
         String ident = readBareToken();
-        if(ident.isEmpty()) throw new SerializationException("Unexpected character '" + peek() + "' at index " + pos);
+        if(ident.isEmpty()) throw new SerializationException("Unexpected character '" + peek() + "' at line " + line(pos));
 
         if(ident.equals("row")){
             node.entries.add(new Entry(UiKey.row, true));
             return;
         }
 
-        //TODO: throws on the client upon invalid value, that's probably fine?
-        UiKey key = UiKey.valueOf(ident);
+        UiKey key;
+        try{
+            key = UiKey.valueOf(ident);
+        }catch(IllegalArgumentException e){
+            throw new SerializationException("Unknown property: \"" + ident + "\" at line " + line(pos));
+        }
 
         //TODO hack: everything before the row ordinal is a node type
         boolean isNodeType = key.ordinal() < UiKey.row.ordinal();
@@ -74,7 +78,7 @@ public class UiDslParser{
         // "ident { ... }" - a node with a block
         if(!atEnd() && peek() == '{'){
             pos++;
-            if(!isNodeType) throw new SerializationException("Unknown node type '" + ident + "' at index " + pos);
+            if(!isNodeType) throw new SerializationException("Unknown node type '" + ident + "' at line " + line(pos));
             NodeBuilder<?> child = NodeBuilder.create(key);
             parseStatementsInto(child);
             expect('}');
@@ -83,7 +87,7 @@ public class UiDslParser{
         }
 
         // bare "ident" - childless node (e.g. "space")
-        if(!isNodeType) throw new SerializationException("Unknown node type '" + ident + "' at index " + pos);
+        if(!isNodeType) throw new SerializationException("Unknown node type '" + ident + "' at line " + line(pos));
         node.entries.add(new Entry(key, NodeBuilder.create(key)));
     }
 
@@ -117,7 +121,7 @@ public class UiDslParser{
         }
         lastQuoted = false;
         String tok = readBareToken();
-        if(tok.isEmpty()) throw new SerializationException("Expected value at index " + pos);
+        if(tok.isEmpty()) throw new SerializationException("Expected value at line " + line(pos));
         return tok;
     }
 
@@ -135,7 +139,7 @@ public class UiDslParser{
             sb.append(c);
             pos++;
         }
-        if(atEnd()) throw new SerializationException("Unterminated string");
+        if(atEnd()) throw new SerializationException("Unterminated string starting at line " + line(pos));
         pos++; // closing quote
         return sb.toString();
     }
@@ -164,7 +168,7 @@ public class UiDslParser{
     }
 
     private void expect(char c){
-        if(atEnd() || peek() != c) throw new SerializationException("Expected '" + c + "', found '" + (atEnd() ? "<eof>" : peek()) + "'");
+        if(atEnd() || peek() != c) throw new SerializationException("Expected '" + c + "', found '" + (atEnd() ? "<eof>" : peek()) + "' at line " + line(pos));
         pos++;
     }
 
@@ -174,5 +178,15 @@ public class UiDslParser{
 
     private char peek(){
         return src.charAt(pos);
+    }
+
+    // counts newlines up to (not including) the given index to determine the 1-based line number
+    private int line(int index){
+        int line = 1;
+        int end = Math.min(index, src.length());
+        for(int i = 0; i < end; i++){
+            if(src.charAt(i) == '\n') line++;
+        }
+        return line;
     }
 }

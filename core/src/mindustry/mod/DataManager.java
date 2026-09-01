@@ -10,6 +10,7 @@ import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.mod.data.*;
+import mindustry.net.*;
 
 public class DataManager{
     private DataPatcher patcher = new DataPatcher();
@@ -27,7 +28,6 @@ public class DataManager{
 
     public void reloadContent(boolean reloadArrays){
 
-        patcher.unapply(reloadArrays);
         patcher.apply(getPatches(), getContent(), reloadArrays);
 
         rebuildOrderedAssets();
@@ -186,6 +186,18 @@ public class DataManager{
         if(images != getImages()) getImages().set(images);
 
         reloadImages();
+    }
+
+    /** Adds/replaces a single image pushed by the server at runtime, independent of map/mod data patches.
+     * Use {@link mindustry.core.NetServer#sendTexture(NetConnection, String, byte[])} to send a texture to connected clients. */
+    public void addTexture(String name, byte[] pngData){
+        if(!Vars.headless) packer.addTexture(name, pngData);
+    }
+
+    /** Removes a texture previously added with {@link #addTexture}.
+     * Use {@link mindustry.core.NetServer#removeTexture(NetConnection, String)} to remove a texture from connected clients. */
+    public void removeTexture(String name){
+        if(!Vars.headless) packer.removeTextureQueued(name);
     }
 
     public void reloadAudio(){

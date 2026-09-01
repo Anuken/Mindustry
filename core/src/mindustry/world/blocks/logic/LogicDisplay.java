@@ -82,7 +82,7 @@ public class LogicDisplay extends Block{
         clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
     }
 
-    public class LogicDisplayBuild extends Building{
+    public class LogicDisplayBuild extends Building implements LDrawable{
         //The root display (bottom left corner of display for tileable displays)
         public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
@@ -92,6 +92,7 @@ public class LogicDisplay extends Block{
         public @Nullable Mat transform;
         public long operations;
         public int index = -1;
+        public boolean processing = false;
 
         @Override
         public void draw(){
@@ -122,7 +123,13 @@ public class LogicDisplay extends Block{
             };
         }
 
-        public void flushCommands(LongSeq graphicsBuffer){
+        @Override
+        public boolean drawable(LExecutor exec){
+            return isValid() && (exec.privileged || (team == exec.team && !privileged));
+        }
+
+        @Override
+        public void draw(LongSeq graphicsBuffer){
             int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
 
             for(int i = 0; i < added; i++){
@@ -142,14 +149,34 @@ public class LogicDisplay extends Block{
         }
 
         public void getBufferRegion(TextureRegion region){
-            if(buffer != null){
-                region.set(buffer.getTexture(), 0, buffer.getTexture().height, buffer.getTexture().width, -buffer.getTexture().height);
+            if(rootDisplay.buffer != null){
+                region.set(rootDisplay.buffer.getTexture(), 0, rootDisplay.buffer.getTexture().height,
+                rootDisplay.buffer.getTexture().width, -rootDisplay.buffer.getTexture().height);
             }
         }
 
         public void processCommands(){
             //don't bother processing commands if displays are off
             if(!commands.isEmpty() && buffer != null){
+                processing = true;
+
+                //force update of off-screen displays used as a source in commandImage
+                for (int i = 0; i < commands.size; i++){
+                    long c = commands.get(i);
+                    if(DisplayCmd.type(c) != commandImage) continue;
+                    int packed = (DisplayCmd.p4(c) << 10) | DisplayCmd.p1(c);
+                    int ctype = packed & 0x1F;
+                    if(ctype != displayDrawType) continue;
+
+                    int id = packed >> 5;
+                    if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
+                        LogicDisplayBuild source = displays.get(id).rootDisplay;
+                        if(source.isAdded() && !source.processing){
+                            source.rootDisplay.processCommands();
+                        }
+                    }
+                }
+
                 Draw.draw(Draw.z(), () -> {
                     if(buffer == null || commands.isEmpty()) return;
 
@@ -189,7 +216,7 @@ public class LogicDisplay extends Block{
                                 int id = packed >> 5;
                                 if(ctype == displayDrawType){
                                     if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
-                                        displays.get(id).getBufferRegion(Tmp.tr1);
+                                        displays.get(id).rootDisplay.getBufferRegion(Tmp.tr1);
                                         Draw.rect(Tmp.tr1, x, y, p2, p2 / Tmp.tr1.ratio(), p3);
                                     }
                                 }else if(ctype < ContentType.all.length && Vars.content.getByID(ContentType.all[ctype], id) instanceof UnlockableContent u){
@@ -218,6 +245,8 @@ public class LogicDisplay extends Block{
                     Draw.trans(Tmp.m2);
                     Draw.reset();
                 });
+
+                processing = false;
             }
         }
 

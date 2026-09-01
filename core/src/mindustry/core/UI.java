@@ -322,9 +322,11 @@ public class UI implements ApplicationListener, Loadable{
             }});
         }else{
             new Dialog(titleText){{
-                cont.margin(30).add(text).padRight(6f);
+                cont.image().width(400f).pad(2).height(4f).color(Pal.accent);
+                cont.row();
+                cont.add(text).row();
                 TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
-                TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
+                TextField field = cont.field(def, t -> {}).size(400f, 50f).get();
                 field.setMaxLength(textLength);
                 field.setFilter(filter);
                 buttons.defaults().size(120, 54).pad(4);

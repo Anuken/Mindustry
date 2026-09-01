@@ -33,7 +33,7 @@ jobs:
     - name: Update bundles
       if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
-        ./gradlew updateBundles
+        ./gradlew -DcompileMethodParams updateBundles
 
         if [ -n "$(git status --porcelain)" ]; then
           git config --global user.name "Github Actions"
@@ -45,7 +45,7 @@ jobs:
     - name: Update scripts, class mappings and map names
       if: ${{ github.repository == 'Anuken/Mindustry' }}
       run: |
-        ./gradlew updateScripts fixMaps
+        ./gradlew -DcompileMethodParams updateScripts fixMaps
 
         if [ -n "$(git status --porcelain)" ]; then
           git config --global user.name "Github Actions"

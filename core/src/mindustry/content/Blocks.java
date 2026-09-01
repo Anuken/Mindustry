@@ -2379,6 +2379,7 @@ public class Blocks{
             hasPower = false;
             liquidCapacity = 100f;
             explosivenessScale = flammabilityScale = 20f/100f;
+            noAcceptDisabled = true;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
@@ -2392,6 +2393,7 @@ public class Blocks{
             pulse = true;
             explosivenessScale = flammabilityScale = 20f/100f;
             liquidCapacity = 100f;
+            noAcceptDisabled = true;
             consumePower(0.30f);
         }};
 
@@ -2525,6 +2527,10 @@ public class Blocks{
             ambientSoundVolume = 0.03f;
             generateEffect = Fx.generatespark;
 
+            explosionShake = 1f;
+            explosionScorchSize = 1;
+            explosionFireballs = 3;
+
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
             itemDurationMultipliers.put(Items.pyratite, 3f);
@@ -2554,6 +2560,10 @@ public class Blocks{
 
             ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.06f;
+
+            explosionShake = 1f;
+            explosionScorchSize = 2;
+            explosionFireballs = 6;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
@@ -2625,6 +2635,11 @@ public class Blocks{
             powerProduction = 15f;
             heating = 0.005f;
             coolantPower = 0.125f;
+
+            explosionShake = 4f;
+            explosionScorchSize = 8;
+            explosionIgnitionChance = 0.5f;
+            explosionFireballs = 11;
 
             consumeItem(Items.thorium);
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
@@ -6620,8 +6635,8 @@ public class Blocks{
             requirements(Category.units, with(Items.tungsten, 40, Items.silicon, 50, Items.graphite, 20));
             regionSuffix = "-dark";
             size = 3;
-            reload = 130f;
-            chargeTime = 90f;
+            reload = 45f;
+            chargeTime = 70f;
             range = 700f;
             maxPayloadSize = 2.5f;
             fogRadius = 5;
@@ -6629,7 +6644,7 @@ public class Blocks{
         }};
 
         largePayloadMassDriver = new PayloadMassDriver("large-payload-mass-driver"){{
-            requirements(Category.units, with(Items.phaseFabric, 20, Items.tungsten, 200, Items.silicon, 200, Items.graphite, 100, Items.oxide, 30));
+            requirements(Category.units, with(Items.phaseFabric, 10, Items.tungsten, 120, Items.silicon, 150, Items.graphite, 60, Items.oxide, 30));
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
@@ -6640,21 +6655,28 @@ public class Blocks{
         }};
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 40, Items.graphite, 80));
+            requirements(Category.units, with(Items.beryllium, 70, Items.silicon, 70, Items.oxide, 25, Items.graphite, 50));
             regionSuffix = "-dark";
             itemCapacity = 100;
+            itemBuffer = itemCapacity - 20;
             consumePower(1f);
             size = 3;
             deconstructSpeed = 3f;
+            separateItemCapacity = true;
+
+            //it just looks weird for anything larger
+            maxPayloadSize = 3;
         }};
 
         deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 50));
             regionSuffix = "-dark";
-            itemCapacity = 250;
+            itemCapacity = 320;
+            itemBuffer = itemCapacity - 20;
             consumePower(3f);
             size = 5;
             deconstructSpeed = 6f;
+            separateItemCapacity = true;
         }};
 
         constructor = new Constructor("constructor"){{
@@ -6673,12 +6695,12 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 100, Items.tungsten, 200, Items.thorium, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.75f;
+            buildSpeed = 5f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
 
-            consumePower(3f);
+            consumePower(5f);
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
