@@ -86,8 +86,9 @@ public enum LAccess{
 
     public final String[] params;
     public final boolean isObj;
+    public boolean privileged;
 
-    public static final EnumSet<LAccess> privilegedAccess = EnumSet.of(cameraX, cameraY, cameraWidth, cameraHeight);
+    private static final ObjectSet<LAccess> privilegedAccess = ObjectSet.with(cameraX, cameraY, cameraWidth, cameraHeight);
 
     public static final LAccess[]
         all = values(),
@@ -96,8 +97,12 @@ public enum LAccess{
         controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
         settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType, bulletTime, bulletLifetime};
 
-    public boolean isPrivileged(){
-        return privilegedAccess.contains(this);
+    static{
+        privilegedAccess.each(l -> l.privileged = privilegedAccess.contains(l));
+    }
+
+    private boolean isPrivileged(){
+        return privileged = privilegedAccess.contains(this);
     }
 
     LAccess(String... params){
