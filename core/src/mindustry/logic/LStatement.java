@@ -20,7 +20,6 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
-import java.util.Locale;
 
 /**
  * A statement is an intermediate representation of an instruction, to be used mostly in UI.
@@ -123,7 +122,9 @@ public abstract class LStatement{
         return value;
     }
 
-    protected static boolean logicLocalization(){ return Core.settings.getBool("logiclocalization", true);}
+    protected static boolean logicLocalization(){
+        return Core.settings.getBool("logiclocalization", true);
+    }
 
     public static String bundle(String key){
         if(!logicLocalization()) return key;
