@@ -225,6 +225,10 @@ public class StatValues{
         return withTooltip(element, content, false);
     }
 
+    private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content, boolean tooltip){
+        return stack(region, amount, content, tooltip);
+    }
+
     /** Displays an item with a specified amount. */
     private static Stack stack(TextureRegion region, float amount, @Nullable UnlockableContent content, boolean tooltip){
         Stack stack = new Stack();
@@ -237,7 +241,7 @@ public class StatValues{
         if(amount != 0){
             stack.add(new Table(t -> {
                 t.left().bottom();
-                t.add(amount >= 1000 ? UI.formatAmount((int)amount) : amount + "").name("stack amount").style(Styles.outlineLabel);
+                t.add(amount >= 1000 || amount == (int)amount ? UI.formatAmount((int)amount) : amount + "").name("stack amount").style(Styles.outlineLabel);
                 t.pack();
             }));
         }
@@ -258,6 +262,10 @@ public class StatValues{
 
     public static Stack stack(UnlockableContent item, int amount){
         return stack(item.uiIcon, amount, item);
+    }
+
+    public static Stack stack(UnlockableContent item, int amount, boolean tooltip){
+        return stack(item.uiIcon, amount, item, tooltip);
     }
 
     public static Stack stack(UnlockableContent item, float amount, boolean tooltip){
