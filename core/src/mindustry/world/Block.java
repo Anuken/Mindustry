@@ -59,7 +59,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
-    /** If true, this block can input payloads; affects unit payload enter behavior. */
+    /** If true, this block can input payloads. Affects unit payload enter and pathfinding behaviors. */
     public boolean acceptsUnitPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
