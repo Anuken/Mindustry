@@ -255,7 +255,14 @@ public class TargetDummy extends Block{
 
         public int dummyTeam(){
             if(unitTeam != team) return team.id; //Return to own team
-            return (team == state.rules.defaultTeam ? state.rules.waveTeam : state.rules.defaultTeam).id;
+
+            if(state.rules.defaultTeam != state.rules.waveTeam){
+                if(team == state.rules.defaultTeam) return state.rules.waveTeam.id;
+                if(team == state.rules.waveTeam) return state.rules.defaultTeam.id;
+            }
+
+            //waveTeam is the same as player team
+            return (team == Team.crux ? Team.sharded : Team.crux).id;
         }
 
         @Override
