@@ -513,7 +513,7 @@ public class BulletType extends Content implements Cloneable{
             Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
             if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
             unit.impulse(Tmp.v3);
-            // Use statusChance from data if present (lightning bullets pass it), otherwise use type default
+
             if(Mathf.chance(getStatusChance(b))){
                 unit.apply(status, statusDuration);
             }
@@ -641,11 +641,16 @@ public class BulletType extends Content implements Cloneable{
         }
     }
 
-    /** Gets the status chance from lighting bullets */
+    // used for lightning bullets only
+    public float getLightningStatusChance(){
+        return lightningStatusChance < 0f ? statusChance : lightningStatusChance;
+    }
+
+    /** Gets the status chance from lightning bullets */
     public float getStatusChance(Bullet b){
         if(b.data instanceof Bullet parent &&
         (parent.type.lightningType == b.type || parent.type.lightningType == null && b.type == Bullets.damageLightning)){
-            return parent.type.lightningStatusChance < 0f ? parent.type.statusChance : parent.type.lightningStatusChance;
+            return parent.type.getLightningStatusChance();
         }
 
         return statusChance;

@@ -713,14 +713,20 @@ public class StatValues{
                         sep(bt, "@bullet.homing");
                     }
 
+                    // Showing the correct value for lightning damage is annoyinh
                     if(type.lightning > 0){
-                        sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
-                        if(type.status != StatusEffects.none && type.lightningStatusChance > 0f){
-                            sep(bt,
-                            (type.lightningStatusChance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(type.lightningStatusChance * 100f, 4)) : "") +
-                            (type.status.hasEmoji() ? type.status.emoji() + " " : "") + "[stat]" + type.status.localizedName +
-                            (type.status.reactive ? "" : "[lightgray] ~ [stat]" + Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))
-                            ).with(c -> withTooltip(c, type.status));
+                        sep(bt, Core.bundle.format(
+                        "bullet.lightning",
+                        type.lightning,
+                        type.lightningDamage < 0 ? type.damage : type.lightningDamage
+                        ));
+
+                        BulletType lightningType = type.lightningType == null ? Bullets.damageLightning : type.lightningType;
+                        float chance = type.getLightningStatusChance();
+
+                        if(lightningType.status != StatusEffects.none && chance > 0f){
+                            sep(bt, statusText(lightningType.status, lightningType.statusDuration, chance))
+                            .with(c -> withTooltip(c, lightningType.status));
                         }
                     }
 
@@ -787,11 +793,8 @@ public class StatValues{
 
                     // It is redundant to show the status effect if it can't be applied
                     if(type.status != StatusEffects.none && type.statusChance > 0f){
-                        sep(bt,
-                                (type.statusChance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(type.statusChance * 100f, 4)) : "") +
-                                        (type.status.hasEmoji() ? type.status.emoji() + " " : "") + "[stat]" + type.status.localizedName +
-                                        (type.status.reactive ? "" : "[lightgray] ~ [stat]" + Strings.autoFixed(type.statusDuration / 60f, 1) + "[lightgray] " + Core.bundle.get("unit.seconds"))
-                        ).with(c -> withTooltip(c, type.status));
+                        sep(bt, statusText(type.status, type.statusDuration, type.statusChance))
+                        .with(c -> withTooltip(c, type.status));
                     }
 
                     if(!type.targetMissiles){
@@ -880,6 +883,15 @@ public class StatValues{
             if(!Vars.headless) t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
             t.add(text);
         });
+    }
+
+    private static String statusText(StatusEffect status, float duration, float chance){
+        return (chance < 1f ? Core.bundle.format("stat.chance", Strings.autoFixed(chance * 100f, 4)) : "") +
+        (status.hasEmoji() ? status.emoji() + " " : "") +
+        "[stat]" + status.localizedName +
+        (status.reactive ? "" :
+        "[lightgray] ~ [stat]" + Strings.autoFixed(duration / 60f, 1) +
+        "[lightgray] " + Core.bundle.get("unit.seconds"));
     }
 
     //for AmmoListValue
