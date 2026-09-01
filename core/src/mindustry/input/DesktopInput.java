@@ -630,13 +630,17 @@ public class DesktopInput extends InputHandler{
                 if(selectPlans.isEmpty()){
                     lastSchematic = null;
                 }
-                schemX = -1;
-                schemY = -1;
+                if(!input.keyDown(Binding.rebuildSelect)){
+                    schemX = -1;
+                    schemY = -1;
+                }
             }else if(input.keyRelease(Binding.rebuildSelect)){
 
                 rebuildArea(schemX, schemY, rawCursorX, rawCursorY);
-                schemX = -1;
-                schemY = -1;
+                if(!input.keyDown(Binding.schematicSelect)){
+                    schemX = -1;
+                    schemY = -1;
+                }
             }
         }
 
