@@ -340,7 +340,7 @@ public abstract class LStatement{
     }
 
     public String localizedName(){
-        return Core.bundle.get("instruction." + statementKey(), name());
+        if (logicLocalization()) { Core.bundle.get("instruction." + statementKey(), name());}
     }
 
     public String name(){
