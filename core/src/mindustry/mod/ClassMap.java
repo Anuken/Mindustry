@@ -20,10 +20,10 @@ public class ClassMap{
         classes.put("LogicAI", mindustry.ai.types.LogicAI.class);
         classes.put("MinerAI", mindustry.ai.types.MinerAI.class);
         classes.put("MissileAI", mindustry.ai.types.MissileAI.class);
+        classes.put("NoAI", mindustry.ai.types.NoAI.class);
         classes.put("PrebuildAI", mindustry.ai.types.PrebuildAI.class);
         classes.put("RepairAI", mindustry.ai.types.RepairAI.class);
         classes.put("SuicideAI", mindustry.ai.types.SuicideAI.class);
-        classes.put("NoAI", mindustry.ai.types.NoAI.class);
         classes.put("Ability", mindustry.entities.abilities.Ability.class);
         classes.put("ArmorPlateAbility", mindustry.entities.abilities.ArmorPlateAbility.class);
         classes.put("EmptyDataAbility", mindustry.entities.abilities.EmptyDataAbility.class);
@@ -187,12 +187,12 @@ public class ClassMap{
         classes.put("ShockMineBuild", mindustry.world.blocks.defense.ShockMine.ShockMineBuild.class);
         classes.put("ShockwaveTower", mindustry.world.blocks.defense.ShockwaveTower.class);
         classes.put("ShockwaveTowerBuild", mindustry.world.blocks.defense.ShockwaveTower.ShockwaveTowerBuild.class);
+        classes.put("TargetDummy", mindustry.world.blocks.defense.TargetDummy.class);
+        classes.put("TargetDummyBuild", mindustry.world.blocks.defense.TargetDummy.TargetDummyBuild.class);
         classes.put("Thruster", mindustry.world.blocks.defense.Thruster.class);
         classes.put("ThrusterBuild", mindustry.world.blocks.defense.Thruster.ThrusterBuild.class);
         classes.put("Wall", mindustry.world.blocks.defense.Wall.class);
         classes.put("WallBuild", mindustry.world.blocks.defense.Wall.WallBuild.class);
-        classes.put("TargetDummy", mindustry.world.blocks.defense.TargetDummy.class);
-        classes.put("TargetDummyBuild", mindustry.world.blocks.defense.TargetDummy.TargetDummyBuild.class);
         classes.put("BaseTurret", mindustry.world.blocks.defense.turrets.BaseTurret.class);
         classes.put("BaseTurretBuild", mindustry.world.blocks.defense.turrets.BaseTurret.BaseTurretBuild.class);
         classes.put("ContinuousLiquidTurret", mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret.class);
