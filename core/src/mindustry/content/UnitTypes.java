@@ -1115,13 +1115,12 @@ public class UnitTypes{
                 ignoreRotation = true;
                 shootSound = Sounds.shootHorizon;
                 soundPitchMax = 1.2f;
-                bullet = new BombBulletType(24f, 25f){{
+                bullet = new BombBulletType(27f, 25f){{
                     width = 10f;
                     height = 14f;
                     hitEffect = Fx.flakExplosion;
                     shootEffect = Fx.none;
                     smokeEffect = Fx.none;
-                    scaledSplashDamage = true;
                     status = StatusEffects.blasted;
                     statusDuration = 60f;
                     damage = splashDamage * 0.5f;
@@ -1274,7 +1273,7 @@ public class UnitTypes{
             BulletType fragBullet = new FlakBulletType(4f, 15){{
                 shootEffect = Fx.shootBig;
                 ammoMultiplier = 4f;
-                splashDamage = 65f;
+                splashDamage = 45f;
                 splashDamageRadius = 25f;
                 scaledSplashDamage = true;
                 collidesGround = true;
@@ -1532,7 +1531,6 @@ public class UnitTypes{
                     splashDamage = 220f;
                     splashDamageRadius = 80f;
                     damage = splashDamage * 0.7f;
-                    scaledSplashDamage = true;
                 }};
             }});
         }};
@@ -1846,7 +1844,7 @@ public class UnitTypes{
                     homingRange = 80f;
                     keepVelocity = false;
                     splashDamageRadius = 35f;
-                    splashDamage = 45f;
+                    splashDamage = 35f;
                     scaledSplashDamage = true;
                     lifetime = 62f;
                     trailColor = Pal.bulletYellowBack;
@@ -2039,7 +2037,7 @@ public class UnitTypes{
                     trailWidth = 3f;
                     trailLength = 8;
 
-                    splashDamage = 40f;
+                    splashDamage = 35f;
                     splashDamageRadius = 32f;
                     scaledSplashDamage = true;
                 }};
