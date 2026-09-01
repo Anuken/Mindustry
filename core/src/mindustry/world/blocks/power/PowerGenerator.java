@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -49,7 +50,9 @@ public class PowerGenerator extends PowerDistributor{
     /** If true, the ignition chance decreases with distance. */
     public boolean explosionScaleIgnitionChance = true;
     /** The speed at which ignition spreads. */
-    public float explosionSpeed = 0.5f;
+    public float explosionSpeed = 0.4f;
+    /** Extra number of fireballs spawned from explosions. */
+    public int explosionFireballs = 0;
 
     public PowerGenerator(String name){
         super(name);
@@ -161,6 +164,13 @@ public class PowerGenerator extends PowerDistributor{
                         ConstructBlock.deconstructFinish(t, t.block(), null);
                     }
                 });
+            }
+
+            if(explosionFireballs > 0){
+                int amount = Mathf.random(1, explosionFireballs);
+                for(int i = 0; i < amount; i++){
+                    Bullets.fireball.createNet(Team.derelict, x, y, Mathf.random(360f), -1f, Mathf.random(0.5f, 1f), 1);
+                }
             }
 
             explodeEffect.at(this);

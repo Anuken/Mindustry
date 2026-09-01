@@ -2529,7 +2529,7 @@ public class Blocks{
 
             explosionShake = 1f;
             explosionScorchSize = 1;
-            explosionIgnitionChance = 0.2f;
+            explosionFireballs = 3;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
@@ -2563,7 +2563,7 @@ public class Blocks{
 
             explosionShake = 1f;
             explosionScorchSize = 2;
-            explosionIgnitionChance = 0.2f;
+            explosionFireballs = 6;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
@@ -2639,6 +2639,7 @@ public class Blocks{
             explosionShake = 4f;
             explosionScorchSize = 8;
             explosionIgnitionChance = 0.5f;
+            explosionFireballs = 11;
 
             consumeItem(Items.thorium);
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
