@@ -123,6 +123,8 @@ public class Planet extends UnlockableContent{
     public boolean clearSectorOnLose = false;
     /** Multiplier for enemy rebuild speeds; only applied in campaign (not standard rules) */
     public float enemyBuildSpeedMultiplier = 1f;
+    /** Default activation delay for enemy factories, if not set in the campaign. */
+    public float enemyFactoryActivationDelay = 0;
     /** If true, the enemy team always has infinite items. */
     public boolean enemyInfiniteItems = true;
     /** If true, enemy cores are replaced with spawnpoints on this planet (for invasions) */
@@ -139,6 +141,12 @@ public class Planet extends UnlockableContent{
     public String icon = "planet";
     /** Plays in the planet dialog when this planet is selected. */
     public Music launchMusic = Musics.launch;
+    /** Overrides random ambient music to be played. */
+    public @Nullable Seq<Music> ambientMusic;
+    /** Overrides music that is played in certain situations, like during boss waves or low core health. */
+    public @Nullable Seq<Music> darkMusic;
+    /** If true, this overrides the game setting to always play ambient music. */
+    public boolean alwaysPlayMusic = false;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */
@@ -171,8 +179,10 @@ public class Planet extends UnlockableContent{
     public CampaignRules campaignRules = new CampaignRules();
     /** Defaults applied to the rules. */
     public CampaignRules campaignRuleDefaults = new CampaignRules();
-    /** Sets up rules on game load for any sector on this planet. */
+    /** Sets up rules on game load for any sector on this planet. In JSON mods, this field is called "rules", and expects an object. */
     public Cons<Rules> ruleSetter = r -> {};
+    /** Replaces specific blocks on the map upon sector capture. Used for metal floor tiles on Serpulo. Unstable API, may be removed! */
+    public ObjectMap<Block, Block> sectorCaptureReplacements = new ObjectMap<>();
     /** If true, RTS AI can be customized. */
     public boolean showRtsAIRule = false;
 
@@ -184,7 +194,7 @@ public class Planet extends UnlockableContent{
     /** Statistics of this planet campaign. If statParent is not null, this planet shares the same stats as the parent. */
     private CampaignStats campaignStats = new CampaignStats();
 
-    public Planet(String name, Planet parent, float radius){
+    public Planet(String name, @Nullable Planet parent, float radius){
         super(name);
 
         this.radius = radius;
@@ -223,6 +233,18 @@ public class Planet extends UnlockableContent{
             }
 
             sectorApproxRadius = sectors.first().tile.v.dst(sectors.first().tile.corners[0].v);
+        }
+    }
+
+    @Override
+    public void removeContent(){
+        super.removeContent();
+
+        if(parent != null){
+            parent.children.remove(this);
+            parent.updateTotalRadius();
+            if(mesh != null) mesh.dispose();
+            if(cloudMesh != null) cloudMesh.dispose();
         }
     }
 

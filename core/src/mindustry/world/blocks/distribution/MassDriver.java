@@ -59,11 +59,22 @@ public class MassDriver extends Block{
     }
 
     @Override
+    public void load(){
+        super.load();
+
+        bullet.load(); //double loading is fine
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
-        stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);
+        stats.add(Stat.reload, table -> {
+            table.add((String)(Strings.autoFixed(60f / reload, 2) + StatUnit.perSecond.localized() + " ~ " +
+                Strings.autoFixed(itemCapacity * (60f / reload), 2) + " " + StatUnit.itemsSecond.localized()));
+        });
+        stats.add(Stat.receiveRate, 60f, StatUnit.itemsSecond);
     }
 
     @Override
@@ -201,7 +212,7 @@ public class MassDriver extends Block{
                         Angles.near(rotation, targetRotation, 2f) && Angles.near(other.rotation, targetRotation + 180f, 2f)){
                             //actually fire
                             fire(other);
-                            float timeToArrive = Math.min(bulletLifetime, dst(other) / bulletSpeed);
+                            float timeToArrive = Math.min(bulletLifetime / timeScale, dst(other) / (bulletSpeed * timeScale));
                             Time.run(timeToArrive, () -> {
                                 //remove waiting shooters, it's done firing
                                 other.waitingShooters.remove(this);
@@ -301,7 +312,7 @@ public class MassDriver extends Block{
 
             bullet.create(this, team,
                 x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation),
-                angle, totalUsed/2f, bulletSpeed, bulletLifetime, data);
+                angle, totalUsed/2f, bulletSpeed * timeScale, bulletLifetime / timeScale, data);
 
             shootEffect.at(x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation), angle);
             smokeEffect.at(x + Angles.trnsx(angle, translation), y + Angles.trnsy(angle, translation), angle);

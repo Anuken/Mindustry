@@ -12,7 +12,7 @@ import mindustry.world.blocks.production.*;
 
 /** An implementation of custom rendering behavior for a crafter block.
  * This is used mostly for mods. */
-public abstract class DrawBlock{
+public class DrawBlock{
     protected static final Rand rand = new Rand();
 
     /** If set, the icon is overridden to be these strings, in order. Each string is a suffix. */

@@ -5,8 +5,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
-import mindustry.gen.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 
@@ -17,7 +15,8 @@ import java.util.*;
 public class Stats{
     /** Whether to display stats with categories. If false, categories are completely ignored during display. */
     public boolean useCategories = false;
-    /** Whether these stats are initialized yet. */
+    /** @deprecated does nothing, will be removed in v9 */
+    @Deprecated
     public boolean intialized = false;
     /** Production time period in ticks. Used for crafters. **/
     public float timePeriod = -1;
@@ -147,15 +146,7 @@ public class Stats{
 
         String key = "stat." + stat.name.toLowerCase(Locale.ROOT);
         if(Core.bundle.has(key + ".info")){
-            if(Vars.mobile && !Core.graphics.isPortrait()){ //disabled in portrait - broken and goes offscreen
-                Table table = new Table();
-                table.add(cell.get()).left().expandX().fillX();
-                cell.clearElement();
-                table.button(Icon.infoSmall, () -> Vars.ui.showInfo("@" + key + ".info")).size(32f).right();
-                cell.setElement(table).left().expandX().fillX();
-            }else{
-                cell.tooltip("@" + key + ".info");
-            }
+            cell.tooltip("@" + key + ".info");
         }
     }
 }

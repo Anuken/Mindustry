@@ -110,7 +110,7 @@ public class Blocks{
     //defense - erekir
     radar,
     buildTower,
-    regenProjector, barrierProjector, shockwaveTower,
+    regenProjector, shockwaveTower,
     //campaign only
     shieldProjector,
     largeShieldProjector,
@@ -719,52 +719,52 @@ public class Blocks{
             sclMax = 100f;
         }};
 
-        boulder = new Prop("boulder"){{
+        boulder = new StaticProp("boulder"){{
             variants = 2;
             stone.asFloor().decoration = craters.asFloor().decoration = charr.asFloor().decoration = this;
         }};
 
-        snowBoulder = new Prop("snow-boulder"){{
+        snowBoulder = new StaticProp("snow-boulder"){{
             variants = 2;
             snow.asFloor().decoration = ice.asFloor().decoration = iceSnow.asFloor().decoration = salt.asFloor().decoration = this;
         }};
 
-        shaleBoulder = new Prop("shale-boulder"){{
+        shaleBoulder = new StaticProp("shale-boulder"){{
             variants = 2;
             shale.asFloor().decoration = this;
         }};
 
-        sandBoulder = new Prop("sand-boulder"){{
+        sandBoulder = new StaticProp("sand-boulder"){{
             variants = 2;
             sand.asFloor().decoration = this;
         }};
 
-        daciteBoulder = new Prop("dacite-boulder"){{
+        daciteBoulder = new StaticProp("dacite-boulder"){{
             variants = 2;
             dacite.asFloor().decoration = this;
         }};
 
-        basaltBoulder = new Prop("basalt-boulder"){{
+        basaltBoulder = new StaticProp("basalt-boulder"){{
             variants = 2;
             basalt.asFloor().decoration = hotrock.asFloor().decoration = darksand.asFloor().decoration = magmarock.asFloor().decoration = this;
         }};
 
-        carbonBoulder = new Prop("carbon-boulder"){{
+        carbonBoulder = new StaticProp("carbon-boulder"){{
             variants = 2;
             carbonStone.asFloor().decoration = this;
         }};
 
-        ferricBoulder = new Prop("ferric-boulder"){{
+        ferricBoulder = new StaticProp("ferric-boulder"){{
             variants = 2;
             ferricStone.asFloor().decoration = ferricCraters.asFloor().decoration = this;
         }};
 
-        beryllicBoulder = new Prop("beryllic-boulder"){{
+        beryllicBoulder = new StaticProp("beryllic-boulder"){{
             variants = 2;
             beryllicStone.asFloor().decoration = this;
         }};
 
-        yellowStoneBoulder = new Prop("yellow-stone-boulder"){{
+        yellowStoneBoulder = new StaticProp("yellow-stone-boulder"){{
             variants = 2;
             yellowStone.asFloor().decoration = regolith.asFloor().decoration = yellowStonePlates.asFloor().decoration = this;
         }};
@@ -801,22 +801,22 @@ public class Blocks{
             shadowOffset = -2.5f;
         }};
 
-        crystallineBoulder = new Prop("crystalline-boulder"){{
+        crystallineBoulder = new StaticProp("crystalline-boulder"){{
             variants = 2;
             crystallineStone.asFloor().decoration = this;
         }};
 
-        redIceBoulder = new Prop("red-ice-boulder"){{
+        redIceBoulder = new StaticProp("red-ice-boulder"){{
             variants = 3;
             redIce.asFloor().decoration = this;
         }};
 
-        rhyoliteBoulder = new Prop("rhyolite-boulder"){{
+        rhyoliteBoulder = new StaticProp("rhyolite-boulder"){{
             variants = 3;
             rhyolite.asFloor().decoration = roughRhyolite.asFloor().decoration = this;
         }};
 
-        redStoneBoulder = new Prop("red-stone-boulder"){{
+        redStoneBoulder = new StaticProp("red-stone-boulder"){{
             variants = 4;
             denseRedStone.asFloor().decoration = redStone.asFloor().decoration = this;
         }};
@@ -1504,7 +1504,7 @@ public class Blocks{
         }};
 
         smallHeatRedirector = new HeatConductor("small-heat-redirector"){{
-            requirements(Category.crafting, with(Items.surgeAlloy, 8, Items.graphite, 8));
+            requirements(Category.crafting, with(Items.surgeAlloy, 3, Items.graphite, 8));
 
             researchCostMultiplier = 2f;
             researchCostMultipliers.put(Items.graphite, 7f);
@@ -2035,19 +2035,6 @@ public class Blocks{
             }});
         }};
 
-        //TODO implement
-        if(false)
-        barrierProjector = new DirectionalForceProjector("barrier-projector"){{
-            requirements(Category.effect, with(Items.surgeAlloy, 100, Items.silicon, 125));
-            size = 3;
-            width = 50f;
-            length = 36;
-            shieldHealth = 2000f;
-            cooldownNormal = 3f;
-            cooldownBrokenBase = 0.35f;
-
-            consumePower(4f);
-        }};
 
         shockwaveTower = new ShockwaveTower("shockwave-tower"){{
             requirements(Category.effect, with(Items.surgeAlloy, 50, Items.silicon, 150, Items.oxide, 30, Items.tungsten, 100));
@@ -2082,17 +2069,16 @@ public class Blocks{
         conveyor = new Conveyor("conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1));
             health = 45;
-            speed = 0.03f;
-            displayedSpeed = 4.2f;
-            buildCostMultiplier = 2f;
+            speed = 0.046f;
+            displayedSpeed = 6.5f;
             researchCost = with(Items.copper, 5);
         }};
 
         titaniumConveyor = new Conveyor("titanium-conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1, Items.lead, 1, Items.titanium, 1));
             health = 65;
-            speed = 0.08f;
-            displayedSpeed = 11f;
+            speed = 0.0801f;
+            displayedSpeed = 10f;
         }};
 
         plastaniumConveyor = new StackConveyor("plastanium-conveyor"){{
@@ -2106,7 +2092,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
             health = 280;
             speed = 0.08f;
-            displayedSpeed = 11f;
+            displayedSpeed = 10f;
         }};
 
         junction = new Junction("junction"){{
@@ -2114,7 +2100,7 @@ public class Blocks{
             speed = 26;
             capacity = 6;
             health = 30;
-            buildCostMultiplier = 6f;
+            buildCostMultiplier = 3f;
         }};
 
         itemBridge = new BufferedItemBridge("bridge-conveyor"){{
@@ -2394,6 +2380,7 @@ public class Blocks{
             hasPower = false;
             liquidCapacity = 100f;
             explosivenessScale = flammabilityScale = 20f/100f;
+            noAcceptDisabled = true;
         }};
 
         phaseConduit = new LiquidBridge("phase-conduit"){{
@@ -2407,6 +2394,7 @@ public class Blocks{
             pulse = true;
             explosivenessScale = flammabilityScale = 20f/100f;
             liquidCapacity = 100f;
+            noAcceptDisabled = true;
             consumePower(0.30f);
         }};
 
@@ -2452,6 +2440,7 @@ public class Blocks{
             underBullets = true;
             health = 250;
             explosivenessScale = flammabilityScale = 20f/120f;
+            floating = true;
 
             ((Conduit)reinforcedConduit).rotBridgeReplacement = this;
         }};
@@ -2539,6 +2528,10 @@ public class Blocks{
             ambientSoundVolume = 0.03f;
             generateEffect = Fx.generatespark;
 
+            explosionShake = 1f;
+            explosionScorchSize = 1;
+            explosionFireballs = 3;
+
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
             itemDurationMultipliers.put(Items.pyratite, 3f);
@@ -2568,6 +2561,10 @@ public class Blocks{
 
             ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.06f;
+
+            explosionShake = 1f;
+            explosionScorchSize = 2;
+            explosionFireballs = 6;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
@@ -2634,10 +2631,16 @@ public class Blocks{
             ambientSound = Sounds.loopThoriumReactor;
             ambientSoundVolume = 0.11f;
             size = 3;
-            health = 700;
+            health = 1400;
             itemDuration = 360f;
             powerProduction = 15f;
-            heating = 0.02f;
+            heating = 0.005f;
+            coolantPower = 0.125f;
+
+            explosionShake = 4f;
+            explosionScorchSize = 8;
+            explosionIgnitionChance = 0.5f;
+            explosionFireballs = 11;
 
             consumeItem(Items.thorium);
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
@@ -2694,6 +2697,7 @@ public class Blocks{
             laserColor2 = Color.valueOf("ffd9c2");
             laserScale = 0.8f;
             scaledHealth = 130;
+            useLod = false;
         }};
 
         turbineCondenser = new ThermalGenerator("turbine-condenser"){{
@@ -3443,7 +3447,6 @@ public class Blocks{
                     hitEffect = Fx.hitFlameSmall;
                     despawnEffect = Fx.none;
                     status = StatusEffects.burning;
-                    keepVelocity = false;
                     hittable = false;
                 }},
                 Items.pyratite, new BulletType(4f, 30f){{
@@ -3636,6 +3639,7 @@ public class Blocks{
                     shieldDamageMultiplier = 0.2f;
                 }};
             }};
+            researchCostMultiplier = 1/3f;
             reload = 35f;
             shootCone = 40f;
             rotateSpeed = 8f;
@@ -4851,7 +4855,7 @@ public class Blocks{
         }};
 
         disperse = new ItemTurret("disperse"){{
-            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 150, Items.silicon, 200, Items.beryllium, 350));
+            requirements(Category.turret, with(Items.thorium, 50, Items.oxide, 50, Items.silicon, 200, Items.beryllium, 350));
 
             ammo(
             Items.tungsten, new BasicBulletType(){{
@@ -5068,7 +5072,7 @@ public class Blocks{
                 despawnEffect = hitEffect = new ExplosionEffect(){{
                     waveColor = Pal.surge;
                     smokeColor = Color.gray;
-                    sparkColor = Pal.sap;
+                    sparkColor = Pal.surge;
                     waveStroke = 4f;
                     waveRad = 40f;
                 }};
@@ -5593,6 +5597,47 @@ public class Blocks{
 
                     moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
                 }});
+                setAmmoParts(
+                    Items.carbide, Seq.with(new RegionPart("-missile"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }}),
+                    Items.phaseFabric, Seq.with(new RegionPart("-missile-phase"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }}),
+                    Items.surgeAlloy, Seq.with(new RegionPart("-missile-surge"){{
+                        progress = PartProgress.reload.curve(Interp.pow2In);
+
+                        colorTo = new Color(1f, 1f, 1f, 0f);
+                        color = Color.white;
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1f, 1f, 1f, 0f);
+                        outline = false;
+                        under = true;
+                        layerOffset = -0.01f;
+
+                        moves.add(new PartMove(PartProgress.warmup.inv(), 0f, -4f, 0f));
+                    }})
+                );
             }};
 
             recoil = 0.5f;
@@ -6591,8 +6636,8 @@ public class Blocks{
             requirements(Category.units, with(Items.tungsten, 40, Items.silicon, 50, Items.graphite, 20));
             regionSuffix = "-dark";
             size = 3;
-            reload = 130f;
-            chargeTime = 90f;
+            reload = 45f;
+            chargeTime = 70f;
             range = 700f;
             maxPayloadSize = 2.5f;
             fogRadius = 5;
@@ -6600,7 +6645,7 @@ public class Blocks{
         }};
 
         largePayloadMassDriver = new PayloadMassDriver("large-payload-mass-driver"){{
-            requirements(Category.units, with(Items.phaseFabric, 20, Items.tungsten, 200, Items.silicon, 200, Items.graphite, 100, Items.oxide, 30));
+            requirements(Category.units, with(Items.phaseFabric, 10, Items.tungsten, 120, Items.silicon, 150, Items.graphite, 60, Items.oxide, 30));
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
@@ -6611,21 +6656,28 @@ public class Blocks{
         }};
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 40, Items.graphite, 80));
+            requirements(Category.units, with(Items.beryllium, 70, Items.silicon, 70, Items.oxide, 25, Items.graphite, 50));
             regionSuffix = "-dark";
             itemCapacity = 100;
+            itemBuffer = itemCapacity - 20;
             consumePower(1f);
             size = 3;
             deconstructSpeed = 3f;
+            separateItemCapacity = true;
+
+            //it just looks weird for anything larger
+            maxPayloadSize = 3;
         }};
 
         deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 50));
             regionSuffix = "-dark";
-            itemCapacity = 250;
+            itemCapacity = 320;
+            itemBuffer = itemCapacity - 20;
             consumePower(3f);
             size = 5;
             deconstructSpeed = 6f;
+            separateItemCapacity = true;
         }};
 
         constructor = new Constructor("constructor"){{
@@ -6644,12 +6696,12 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 100, Items.tungsten, 200, Items.thorium, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.75f;
+            buildSpeed = 5f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
 
-            consumePower(3f);
+            consumePower(5f);
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
@@ -6915,6 +6967,7 @@ public class Blocks{
         reinforcedMessage = new MessageBlock("reinforced-message"){{
             requirements(Category.logic, with(Items.graphite, 10, Items.beryllium, 5));
             health = 100;
+            crushFragile = true;
         }};
 
         worldProcessor = new LogicBlock("world-processor"){{

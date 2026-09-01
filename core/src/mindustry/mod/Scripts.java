@@ -55,6 +55,7 @@ public class Scripts implements Disposable{
             else if(o instanceof long[] arr) o = Arrays.toString(arr);
             else if(o instanceof char[] arr) o = Arrays.toString(arr);
             else if(o instanceof boolean[] arr) o = Arrays.toString(arr);
+            else if(o instanceof NativeArray arr) o = Arrays.toString(arr.toArray());
 
             var out = o.toString();
             return out == null ? "null" : out;
@@ -80,6 +81,10 @@ public class Scripts implements Disposable{
         return new float[capacity];
     }
 
+    public Class<?> getClass(Object object){
+        return object == null ? null : object.getClass();
+    }
+
     public void run(LoadedMod mod, Fi file){
         currentMod = mod;
         run(file.readString(), mod.name + "/" + file.name(), true);
@@ -88,7 +93,7 @@ public class Scripts implements Disposable{
 
     private boolean run(String script, String file, boolean wrap){
         try{
-            if(currentMod != null){
+            if(currentMod != null && wrap){
                 //inject script info into file
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1);
             }

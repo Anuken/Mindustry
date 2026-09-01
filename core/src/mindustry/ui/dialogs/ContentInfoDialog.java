@@ -7,6 +7,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.core.UI;
 import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -37,8 +38,9 @@ public class ContentInfoDialog extends BaseDialog{
         Table table = new Table();
         table.margin(10);
 
-        //initialize stats if they haven't been yet
-        content.checkStats();
+        //compute stats every time
+        var stats = content.computeStats();
+        var statMap = stats.toMap();
 
         table.table(title1 -> {
             title1.image(content.uiIcon).size(iconXLarge).scaling(Scaling.fit);
@@ -47,7 +49,7 @@ public class ContentInfoDialog extends BaseDialog{
 
         table.row();
 
-        if(state.isGame() && state.patcher.isPatched(content)){
+        if(state.isGame() && state.data.isPatched(content)){
             table.table(t -> {
                 t.image(Icon.info).color(Pal.lightishGray);
                 t.add("@database.patched").color(Pal.lightishGray).padLeft(4f);
@@ -57,26 +59,24 @@ public class ContentInfoDialog extends BaseDialog{
         }
 
         if(content.description != null){
-            var any = content.stats.toMap().size > 0;
+            var any = statMap.size > 0;
 
             if(any){
                 table.add("@category.purpose").color(Pal.accent).fillX().padTop(10);
                 table.row();
             }
 
-            table.add("[lightgray]" + content.displayDescription()).wrap().fillX().padLeft(any ? 10 : 0).width(500f).padTop(any ? 0 : 10).left();
+            table.add("[lightgray]" + UI.formatIcons(content.displayDescription())).wrap().fillX().padLeft(any ? 10 : 0).width(500f).padTop(any ? 0 : 10).left();
             table.row();
 
-            if(!content.stats.useCategories && any){
+            if(!stats.useCategories && any){
                 table.add("@category.general").fillX().color(Pal.accent);
                 table.row();
             }
         }
 
-        Stats stats = content.stats;
-
-        for(StatCat cat : stats.toMap().keys()){
-            OrderedMap<Stat, Seq<StatValue>> map = stats.toMap().get(cat);
+        for(StatCat cat : statMap.keys()){
+            var map = statMap.get(cat);
 
             if(map.size == 0) continue;
 
@@ -100,14 +100,14 @@ public class ContentInfoDialog extends BaseDialog{
         }
 
         if(content.details != null){
-            table.add("[gray]" + (content.unlocked() || !content.hideDetails ? content.details : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
+            table.add("[gray]" + (content.unlocked() || !content.hideDetails ? UI.formatIcons(content.details) : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
         }
 
         //TODO: move this into a final end-game credit sequence. this is temporary and thus not localized
         if(content.credit != null){
             table.row();
-            table.add("Created by: " + content.credit).color(Color.gray).padTop(40f).row();
+            table.add(Core.bundle.format("content.createdby", content.credit)).color(Color.gray).padTop(40f).row();
         }
 
         if(settings.getBool("console")){

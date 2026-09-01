@@ -52,6 +52,7 @@ public class Control implements ApplicationListener, Loadable{
     public SoundControl sound;
     public InputHandler input;
     public AttackIndicators indicators;
+    public @Nullable CoreBuild lastDamagedCore; //TODO not sure where else to put this
 
     private Interval timer = new Interval(2);
     private boolean hiscore = false;
@@ -146,7 +147,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //autohost for pvp maps
         Events.on(WorldLoadEvent.class, event -> app.post(() -> {
-            if(state.rules.pvp && !net.active()){
+            if(state.rules.pvp && !net.active() && !state.rules.pauseDisabled && !state.isEditor() && !ui.editor.isShown()){
                 try{
                     net.host(port);
                     player.admin = true;
@@ -249,7 +250,7 @@ public class Control implements ApplicationListener, Loadable{
                             if(ccore != null){
                                 anyBuilds = true;
 
-                                if(!net.active()){
+                                if(!net.active() && !state.rules.pauseDisabled){
                                     build.pickedUp();
                                     build.tile.remove();
 
@@ -400,10 +401,13 @@ public class Control implements ApplicationListener, Loadable{
         ui.loadAnd(() -> {
             logic.reset();
             world.loadMap(map, rules);
+            var oldRules = state.rules;
+            rules.retainContentFields(oldRules);
             state.rules = rules;
             if(playtest) state.playtestingMap = map;
             state.rules.sector = null;
             state.rules.editor = false;
+            Events.fire(new RulesLoadEvent(state.rules));
             logic.play();
             if(settings.getBool("savecreate") && !world.isInvalidMap() && !playtest){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
@@ -543,6 +547,7 @@ public class Control implements ApplicationListener, Loadable{
                             });
                         }
                     }else{
+                        Events.fire(new RulesLoadEvent(state.rules, true));
                         state.set(State.playing);
                         reloader.end();
                     }
@@ -577,6 +582,7 @@ public class Control implements ApplicationListener, Loadable{
             beforePlay.run();
         }
 
+        Events.fire(new RulesLoadEvent(state.rules));
         logic.play();
         control.saves.saveSector(sector);
         Events.fire(new SectorLaunchEvent(sector));
@@ -611,7 +617,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void pause(){
-        if(settings.getBool("backgroundpause", true) && !net.active()){
+        if(settings.getBool("backgroundpause", true) && !net.active() && !state.rules.pauseDisabled){
             backgroundPaused = true;
             wasPaused = state.is(State.paused);
             if(state.is(State.playing)) state.set(State.paused);
@@ -620,7 +626,7 @@ public class Control implements ApplicationListener, Loadable{
 
     @Override
     public void resume(){
-        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active()){
+        if(state.is(State.paused) && !wasPaused && settings.getBool("backgroundpause", true) && !net.active() && !state.rules.pauseDisabled){
             state.set(State.playing);
         }
         backgroundPaused = false;
@@ -683,11 +689,7 @@ public class Control implements ApplicationListener, Loadable{
 
         if(Core.input.keyTap(Binding.fullscreen)){
             boolean full = settings.getBool("fullscreen");
-            if(full){
-                graphics.setWindowedMode(graphics.getWidth(), graphics.getHeight());
-            }else{
-                graphics.setFullscreen();
-            }
+            graphics.setFullscreen(!full);
             settings.put("fullscreen", !full);
         }
 
@@ -697,6 +699,10 @@ public class Control implements ApplicationListener, Loadable{
         }
         if(Float.isNaN(camera.position.x)) camera.position.x = world.unitWidth()/2f;
         if(Float.isNaN(camera.position.y)) camera.position.y = world.unitHeight()/2f;
+
+        if(!scene.hasKeyboard()){
+            if(Core.input.keyTap(Binding.performanceMetrics)) Core.settings.toggle("showperformance");
+        }
 
         if(state.isGame()){
             input.update();
@@ -716,7 +722,7 @@ public class Control implements ApplicationListener, Loadable{
                 core.items.each((i, a) -> i.unlock());
             }
 
-            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active()){
+            if(backgroundPaused && settings.getBool("backgroundpause") && !net.active() && !state.rules.pauseDisabled){
                 state.set(State.paused);
             }
 
@@ -726,19 +732,23 @@ public class Control implements ApplicationListener, Loadable{
             }
 
             if(!net.client() && Core.input.keyTap(Binding.pause) && !(state.isCampaign() && state.afterGameOver) && !renderer.isCutscene() && !scene.hasDialog() && !scene.hasKeyboard() && !ui.restart.isShown() && (state.is(State.paused) || state.is(State.playing))){
-                state.set(state.isPaused() ? State.playing : State.paused);
+                if(state.rules.pauseDisabled){
+                    ui.hudfrag.showPauseDisabled();
+                }else{
+                    state.set(state.isPaused() ? State.playing : State.paused);
+                }
             }
 
             if(state.isCampaign() && state.afterGameOver){
                 state.set(State.paused);
             }
 
-            if(Core.input.keyTap(Binding.menu) && !ui.restart.isShown() && !ui.minimapfrag.shown()){
+            if((input instanceof DesktopInput ? Core.input.keyTap(Binding.menu) : Core.input.keyTap(KeyCode.back)) && !ui.restart.isShown() && !ui.minimapfrag.shown()){
                 if(ui.chatfrag.shown()){
                     ui.chatfrag.hide();
                 }else if(!ui.paused.isShown() && !scene.hasDialog()){
                     ui.paused.show();
-                    if(!net.active()){
+                    if(!net.active() && !state.rules.pauseDisabled){
                         state.set(State.paused);
                     }
                 }

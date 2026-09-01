@@ -147,6 +147,11 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return unit != null && unit.hitSize <= maxPayloadSize * tilesize;
+        }
+
+        @Override
         public float buildRotation(){
             return rotation;
         }
@@ -378,7 +383,6 @@ public class PayloadMassDriver extends PayloadBlock{
             Draw.rect(topRegion, x, y);
 
             Draw.z(Layer.turret);
-            //TODO
             Drawf.shadow(region, tx - (size / 2f), ty - (size / 2f), r);
 
             Tmp.v1.trns(turretRotation, 0, -(curSize/2f - grabWidth));

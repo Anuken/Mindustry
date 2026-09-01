@@ -248,19 +248,24 @@ public class ResearchDialog extends BaseDialog{
             public void add(Item item, int amount){
                 //only have custom removal logic for when the sequence gets items taken out of it (e.g. research)
                 if(amount < 0){
+                    Sector curSector = state.isCampaign() ? state.rules.sector : null;
                     //remove items from each sector's storage, one by one
 
                     //negate amount since it's being *removed* - this makes it positive
                     amount = -amount;
 
-                    //% that gets removed from each sector
-                    double percentage = (double)amount / get(item);
+                    //% that gets removed from each sector except the current one
+                    double percentage = (double)amount / Math.max(get(item) - (curSector != null && cache.get(curSector) != null ? cache.get(curSector).get(item) : 0), 1);
                     int[] counter = {amount};
+
                     cache.each((sector, seq) -> {
-                        if(counter[0] == 0) return;
+                        if(counter[0] == 0 || sector == curSector) return;
+
+                        int available = seq.get(item);
+                        if(available <= 0) return;
 
                         //amount that will be removed
-                        int toRemove = Math.min((int)Math.ceil(percentage * seq.get(item)), counter[0]);
+                        int toRemove = Math.min(counter[0], Math.min((int)Math.ceil(percentage * available), available));
 
                         //actually remove it from the sector
                         sector.removeItem(item, toRemove);
@@ -268,6 +273,19 @@ public class ResearchDialog extends BaseDialog{
 
                         counter[0] -= toRemove;
                     });
+
+                    //only consume from the active sector last
+                    if(counter[0] > 0 && curSector != null){
+                        var seq = cache.get(curSector);
+                        if(seq != null){
+                            int toRemove = Math.min(seq.get(item), counter[0]);
+
+                            curSector.removeItem(item, toRemove);
+                            seq.remove(item, toRemove);
+
+                            counter[0] -= toRemove;
+                        }
+                    }
 
                     //negate again to display correct number
                     amount = -amount;
@@ -643,6 +661,7 @@ public class ResearchDialog extends BaseDialog{
             boolean selectable = selectable(node);
 
             infoTable.table(b -> {
+                b.left();
                 b.margin(0).left().defaults().left();
 
                 if(selectable){
@@ -734,7 +753,7 @@ public class ResearchDialog extends BaseDialog{
                     }else{
                         desc.add("@completed");
                     }
-                }).pad(9);
+                }).pad(9).left().growX();
 
                 if(mobile && locked(node) && !net.client()){
                     b.row();
@@ -747,11 +766,12 @@ public class ResearchDialog extends BaseDialog{
                         over = buttonDown;
                     }}, () -> spend(node)).disabled(i -> !canSpend(node)).growX().height(44f).colspan(3);
                 }
-            });
+            }).growX().left();
 
             infoTable.row();
             if(node.content.description != null && node.content.inlineDescription && selectable){
-                infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray).growX()).fillX();
+                infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray)
+                .maxWidth(node.content.displayDescription().length() > 20 ? 270f : 0f).growX()).fillX();
             }
 
             addChild(infoTable);
