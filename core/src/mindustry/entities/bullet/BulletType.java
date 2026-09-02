@@ -64,6 +64,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean removeAfterPierce = true;
     /** For piercing lasers, setting this to true makes it get absorbed by plastanium walls. */
     public boolean laserAbsorb = true;
+    /** Whether this bullet is considered a laser bullet and thus absorbed by plastanium walls. */
+    public boolean laserBullet = false;
     /** Life fraction at which this bullet has the best range/damage/etc. Used for lasers and continuous turrets. */
     public float optimalLifeFract = 0f;
     /** Z layer to drawn on. */
@@ -506,9 +508,11 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(entity instanceof Unit unit){
-            Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
-            if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
-            unit.impulse(Tmp.v3);
+            if(unit.type.knockbackMultiplier > 0f){
+                Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f * unit.type.knockbackMultiplier);
+                if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
+                unit.impulse(Tmp.v3);
+            }
             unit.apply(status, statusDuration);
 
             Events.fire(bulletDamageEvent.set(unit, b));
