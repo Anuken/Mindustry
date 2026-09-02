@@ -51,7 +51,7 @@ public class MemoryBlock extends Block{
     }
 
     public class MemoryBuild extends Building implements LReadable, LWritable{
-        /** Marks a memory slot as being stored in {@code numberMemory} (insted of {@code objectMemory}) */
+        /** Marks a memory slot as being stored in {@code numberMemory} (instead of {@code objectMemory}) */
         private static final Object sentinel = new Object();
 
         /** Objects stored in this memory building */
