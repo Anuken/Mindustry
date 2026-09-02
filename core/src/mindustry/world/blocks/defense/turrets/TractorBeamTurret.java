@@ -60,7 +60,7 @@ public class TractorBeamTurret extends BaseTurret{
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
-        if(status != StatusEffects.none && Mathf.chance(statusChance)){
+        if(status != StatusEffects.none && statusChance > 0f){
             stats.add(Stat.status, StatValues.statusText(status, statusDuration, statusChance));
         }
     }
