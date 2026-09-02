@@ -3666,6 +3666,9 @@ public class Blocks{
             scaledHealth = 160;
             rotateSpeed = 12;
 
+            status = StatusEffects.invincible;
+            statusChance = 0.01f;
+
             consumePower(3.3f);
         }};
 
@@ -3683,6 +3686,7 @@ public class Blocks{
                     despawnEffect = Fx.blastExplosion;
 
                     status = StatusEffects.blasted;
+                    statusChance = 0.000001f;
 
                     hitColor = backColor = trailColor = Pal.blastAmmoBack;
                     frontColor = Pal.blastAmmoFront;
@@ -3700,6 +3704,7 @@ public class Blocks{
                     ammoMultiplier = 5f;
                     hitEffect = Fx.blastExplosion;
                     status = StatusEffects.burning;
+                    statusChance = 0.234f;
                 }},
                 Items.surgeAlloy, new MissileBulletType(3.7f, 18){{
                     width = 8f;
@@ -3713,6 +3718,9 @@ public class Blocks{
                     lightningDamage = 10;
                     lightning = 2;
                     lightningLength = 10;
+                    status = StatusEffects.freezing;
+                    lightningStatusChance = 0.2f;
+                    statusChance = 0.8f;
 
                     hitColor = backColor = trailColor = Pal.surgeAmmoBack;
                     frontColor = Pal.surgeAmmoFront;

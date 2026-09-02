@@ -76,6 +76,7 @@ public class Stat implements Comparable<Stat>{
 
     weapons = new Stat("weapons", StatCat.function),
     bullet = new Stat("bullet", StatCat.function),
+    status = new Stat("status", StatCat.function),
 
     speedIncrease = new Stat("speedIncrease", StatCat.function),
     repairTime = new Stat("repairTime", StatCat.function),
