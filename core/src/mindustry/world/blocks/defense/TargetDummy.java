@@ -88,7 +88,12 @@ public class TargetDummy extends Block{
         public int hitsDisplay;
         public boolean boosting;
         public float unitArmor;
-        public Team unitTeam;
+        public Team unitTeam = Team.derelict;
+
+        @Override
+        public void created(){
+            if(unitTeam == Team.derelict) unitTeam = team;
+        }
 
         @Override
         public void updateTile(){
@@ -104,7 +109,7 @@ public class TargetDummy extends Block{
                 }
             }
 
-            if(unitTeam == null) unitTeam = team;
+            if(unitTeam == Team.derelict) unitTeam = team;
 
             if(unit == null){
                 if(!net.client()){
