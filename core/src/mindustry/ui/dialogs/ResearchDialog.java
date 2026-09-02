@@ -257,7 +257,7 @@ public class ResearchDialog extends BaseDialog{
                     //% that gets removed from each sector except the current one
                     double percentage = (double)amount / Math.max(get(item) - (curSector != null && cache.get(curSector) != null ? cache.get(curSector).get(item) : 0), 1);
                     int[] counter = {amount};
-                    
+
                     cache.each((sector, seq) -> {
                         if(counter[0] == 0 || sector == curSector) return;
 
@@ -771,7 +771,7 @@ public class ResearchDialog extends BaseDialog{
             infoTable.row();
             if(node.content.description != null && node.content.inlineDescription && selectable){
                 infoTable.table(t -> t.margin(3f).left().labelWrap(node.content.displayDescription()).color(Color.lightGray)
-                .minWidth(node.content.displayDescription().length() > 20 ? 270f : 0f).growX()).fillX();
+                .maxWidth(node.content.displayDescription().length() > 20 ? 270f : 0f).growX()).fillX();
             }
 
             addChild(infoTable);
