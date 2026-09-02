@@ -58,7 +58,7 @@ public class EmpBulletType extends BasicBulletType{
                         hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
                         chainEffect.at(x, y, 0, hitColor, other);
                         other.damage(damage * unitDamageScl);
-                        if(Mathf.chance(getStatusChance(b))){
+                        if(Mathf.chance(statusChance)){
                             other.apply(status, statusDuration);
                         }
                     }

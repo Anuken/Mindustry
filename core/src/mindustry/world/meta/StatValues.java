@@ -730,14 +730,6 @@ public class StatValues{
                         type.lightning,
                         type.lightningDamage < 0 ? type.damage : type.lightningDamage
                         ));
-
-                        BulletType lightningType = type.lightningType == null ? Bullets.damageLightning : type.lightningType;
-                        float chance = type.getLightningStatusChance();
-
-                        if(lightningType.status != StatusEffects.none && chance > 0f){
-                            sep(bt, statusText(lightningType.status, lightningType.statusDuration, chance))
-                            .with(c -> withTooltip(c, lightningType.status));
-                        }
                     }
 
                     if(type instanceof LaserBulletType b && b.lightningSpacing > 0){

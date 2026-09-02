@@ -47,7 +47,7 @@ public class Lightning{
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){
-            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
+            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, null);
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             if(lines.size > 1){
