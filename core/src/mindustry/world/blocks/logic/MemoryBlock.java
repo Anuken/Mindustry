@@ -113,7 +113,7 @@ public class MemoryBlock extends Block{
             int address = position.numi();
             if(address < 0 || address >= objectMemory.length) return;
 
-            if(value.isobj) {
+            if(value.isobj){
                 objectMemory[address] = value.objval;
             }else{
                 objectMemory[address] = sentinel;
