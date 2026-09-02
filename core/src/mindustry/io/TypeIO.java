@@ -265,7 +265,7 @@ public class TypeIO{
                 yield bytes;
             }
             //unit command
-            case leagacyType -> {
+            case legacyType -> {
                 read.b();
                 yield null;
             }
