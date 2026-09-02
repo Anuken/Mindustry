@@ -7,6 +7,7 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.Stack;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -178,21 +179,22 @@ public class DatabaseDialog extends BaseDialog{
                         for(var unlock : array){
                             Image image = unlocked(unlock) ? new Image(new TextureRegionDrawable(unlock.uiIcon), mobile ? Color.white : Color.lightGray).setScaling(Scaling.fit) : new Image(Icon.lock, Pal.gray);
 
-                            //banned cross
-                            if(state.isGame() && unlock.isBanned()){
-                                list.stack(image, new Image(Icon.cancel){{
-                                    setColor(Color.scarlet);
-                                    touchable = Touchable.disabled;
-                                }}).size(8 * 4).pad(3);
-                            }else if(state.isGame() && state.data.isPatched(unlock)){
-                                list.stack(image, new Table(){{
-                                    right().bottom().touchable = Touchable.disabled;
-                                    // Interpolated color (lerp lightishGray and white) for better contrast
-                                    image(Icon.fileSmall).size(12f).color(Tmp.c1.set(Color.white).a(0.5f));
-                                }}).size(8 * 4).pad(3);
-                            }else{
-                                list.add(image).size(8 * 4).pad(3);
-                            }
+                            //banned cross and patched icon
+                            list.stack(image, new Stack(){{
+                                if(state.isGame()){
+                                    if(state.data.isPatched(unlock)){
+                                        add(new Table(){{
+                                            right().bottom().touchable = Touchable.disabled;
+                                            image(Icon.fileSmall).size(12f).color(Tmp.c1.set(Color.white).a(0.5f));
+                                        }});
+                                    }
+                                    if(unlock.isBanned()){
+                                        add(new Image(Icon.cancel, Tmp.c1.set(Color.scarlet).a(0.6f)){{
+                                            touchable = Touchable.disabled;
+                                        }});
+                                    }
+                                }
+                            }}).size(iconMed).pad(3);
 
                             ClickListener listener = new ClickListener();
                             image.addListener(listener);
@@ -221,7 +223,7 @@ public class DatabaseDialog extends BaseDialog{
                         for(int k = 0; k < cols - count; k++){
                             Image image = new Image();
                             image.setColor(Color.clear);
-                            list.add(image).size(8 * 4).pad(3);
+                            list.add(image).size(iconMed).pad(3);
                         }
                     });
                     sub.row();

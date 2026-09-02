@@ -350,7 +350,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 }
             }
 
-            Groups.build.clear();
             Groups.weather.clear();
             logic.play();
 
@@ -855,13 +854,14 @@ public class MapEditorDialog extends Dialog implements Disposable{
         });
 
         int i = 0;
+        String search = searchText.trim().replaceAll(" +", " ").toLowerCase();
 
         for(Block block : blocksOut){
             TextureRegion region = block.uiIcon;
 
             if(!Core.atlas.isFound(region) || !block.inEditor
                     || block.buildVisibility == BuildVisibility.debugOnly
-                    || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(searchText.trim().replaceAll(" +", " ").toLowerCase()))
+                    || (!searchText.isEmpty() && !block.localizedName.toLowerCase().contains(search))
             ) continue;
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
@@ -870,8 +870,6 @@ public class MapEditorDialog extends Dialog implements Disposable{
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(editor.drawBlock == block));
             blockSelection.add(button).size(50f).tooltip(block.localizedName);
-
-            if(i == 0) editor.drawBlock = block;
 
             int cols = mobile ? 4 : 6;
 

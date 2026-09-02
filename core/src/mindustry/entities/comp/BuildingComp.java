@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -16,6 +17,7 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
@@ -49,7 +51,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, excludeGroups = {"all"}, isFinal = false, genio = false, serialize = false)
 @Component(base = true, genInterface = false)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable, AmbientSource{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -125,6 +127,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         if(shouldAdd){
             add();
+
+            if(block.ambientSound != Sounds.none && !headless){
+                control.sound.addAmbientSource(this);
+            }
         }
 
         checkAllowUpdate();
@@ -809,7 +815,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void handlePayload(Building source, Payload payload){
 
     }
-
 
     /**
      * Tries moving a payload forwards.
@@ -1644,7 +1649,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
             if(net.active() && lastAccessed != null){
                 table.row();
-                table.add(Core.bundle.format("lastaccessed", lastAccessed)).growX().wrap().left();
+                table.add(Core.bundle.format("lastaccessed", lastAccessed)).width(260f).wrap().left();
             }
 
             table.marginBottom(-5);
@@ -1676,7 +1681,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     /** Update table alignment after configuring.*/
     public void updateTableAlign(Table table){
         Vec2 pos = Core.input.mouseScreen(x, y - block.size * tilesize / 2f - 1);
-        table.setPosition(pos.x, pos.y, Align.top);
+        table.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.top);
     }
 
     /** Returns whether a hand cursor should be shown over this block. */
@@ -1830,6 +1835,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(was){
             indexer.addIndex(tile);
             Events.fire(teamChangeEvent.set(last, self()));
+            pathfinder.updateTile(tile);
+            updateProximity();
         }
 
         checkAllowUpdate();
@@ -2115,6 +2122,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             case powerNetOut -> power == null ? 0 : power.graph.getLastScaledPowerOut() * 60;
             case powerNetStored -> power == null ? 0 : power.graph.getLastPowerStored();
             case powerNetCapacity -> power == null ? 0 : power.graph.getLastCapacity();
+            case armor -> block.armor;
             case enabled -> enabled ? 1 : 0;
             case controlled -> this instanceof ControlBlock c && c.isControlled() ? GlobalVars.ctrlPlayer : 0;
             case payloadCount -> (getPayloads() != null ? getPayloads().total() : 0) + (getPayload() != null ? 1 : 0);
@@ -2167,8 +2175,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         switch(prop){
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
-                if(health <= 0f && !dead()){
-                    Call.buildDestroyed(self());
+                if(health <= 0f){
+                    if(!dead) Call.buildDestroyed(self());
                 }else{
                     healthChanged();
                 }
@@ -2266,11 +2274,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScale = 1f;
         }
 
-        //TODO separate multithreaded system for sound? AudioSource, etc
-        if(!headless && block.ambientSound != Sounds.none && shouldAmbientSound()){
-            control.sound.loop(block.ambientSound, self(), block.ambientSoundVolume * ambientVolume());
-        }
-
         updateConsumption();
 
         if(enabled || !block.noUpdateDisabled){
@@ -2285,7 +2288,18 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             wasVisible = true;
             renderer.blocks.updateShadow(self());
             renderer.minimap.update(tile);
+            if(block.drawCached) recache();
         }
+    }
+
+    @Override
+    public float getAmbientVolume(){
+        return block.ambientSoundVolume * ambientVolume();
+    }
+
+    @Override
+    public Sound getAmbientSound(){
+        return block.ambientSound;
     }
 
     @Override

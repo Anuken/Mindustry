@@ -169,8 +169,13 @@ public class SaveIO{
 
             if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
 
-            ver.read(stream, counter, context);
+            ver.read(stream, counter, new SaveReadState(context));
             Events.fire(new SaveLoadEvent(context.isMap()));
+
+            //this gets handled elsewhere when starting a new game or loading a sector
+            if(!context.isMap() && !state.isCampaign()){
+                Events.fire(new RulesLoadEvent(state.rules, true));
+            }
         }catch(Throwable e){
             throw new SaveException(e);
         }finally{

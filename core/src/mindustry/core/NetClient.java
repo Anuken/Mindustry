@@ -165,6 +165,20 @@ public class NetClient implements ApplicationListener{
             Call.requestAssets(missing.toArray());
         });
 
+        net.handleClient(TextureStream.class, data -> {
+            try(DataInputStream in = new DataInputStream(data.stream)){
+                String name = in.readUTF();
+                byte[] pngData = in.readAllBytes();
+                if(!headless){
+                    //empty image data means we're removing the texture instead. see NetServer.removeTexture()
+                    if(pngData.length == 0) state.data.removeTexture(name);
+                    else state.data.addTexture(name, pngData);
+                }
+            }catch(IOException e){
+                Log.err("Failed to read server texture stream", e);
+            }
+        });
+
         net.handleClient(StreamBegin.class, data -> {
             boolean isWorld = data.type == Net.packetIdWorldStream, isAssets = data.type == Net.packetIdAssetStream;
 
@@ -319,7 +333,7 @@ public class NetClient implements ApplicationListener{
         //detect and kick for foul play
         if(player != null && player.con != null && !player.con.chatRate.allow(2000, Config.chatSpamLimit.num())){
             player.con.kick(KickReason.kick);
-            netServer.admins.blacklistDos(player.con.address);
+            player.con.blacklist();
             return;
         }
 
@@ -371,7 +385,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(called = Loc.client, variants = Variant.one)
+    @Remote(called = Loc.client, variants = Variant.one, priority = PacketPriority.high)
     public static void connect(String ip, int port){
         if(!steam && (ip.startsWith("steam:") || ip.startsWith("steamserver:"))) return;
         netClient.disconnectQuietly();
@@ -537,7 +551,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
+    @Remote(variants = Variant.both, priority = PacketPriority.low, unreliable = true)
     public static void entitySnapshot(short amount, byte[] data){
         try{
             netClient.lastSnapshotTimestamp = Time.millis();
@@ -591,7 +605,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
+    @Remote(priority = PacketPriority.low, unreliable = true)
     public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, byte tps, long rand0, long rand1, byte[] coreData){
         try{
             if(wave > state.wave){

@@ -31,8 +31,6 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
 
     private double fixedCounter, timeCounter;
     private long lastTimeAccess = -1;
-    private long totalUpdates = 0, updateId;
-    private float lastRenderInterpolation = 1f;
     private Seq<DelayRun> timeRuns = new Seq<>();
 
     public static int nextId(){
@@ -93,9 +91,16 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
-    /** Calls {@link #fixedUpdate(int, int)} with a minimum FPS of 10. */
+    public void update(Boolf<T> filter){
+        for(index = 0; index < array.size; index++){
+            var item = array.items[index];
+            if(filter.get(item)) array.items[index].update();
+        }
+    }
+
+    /** Calls {@link #fixedUpdate(int, int)} with a maximum of 10 updates per frame. */
     public void fixedUpdate(int targetFps){
-        fixedUpdate(targetFps, Math.max(2, targetFps / 10));
+        fixedUpdate(targetFps, 10);
     }
 
     /**
@@ -106,12 +111,9 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     public void fixedUpdate(int targetUps, int maxUpdatesPerFrame){
         //if fixedUpdate isn't called, e.g. when the game is paused or map is reloaded, the time counter needs to 'sync' with the actual proper time
         if(lastTimeAccess != Core.graphics.getFrameId()){
-            totalUpdates = 0;
-            updateId = state.updateId;
             timeCounter = Time.getInternalTime();
         }
 
-        long prevUpdateId = state.updateId;
         double targetDelta = 1.0 / targetUps;
         float timeDelta = (float)targetDelta * 60f;
         float prevDelta = Time.delta;
@@ -124,19 +126,13 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         Time.setRuns(timeRuns);
         int updates = 0;
 
-        float delta = Core.graphics.getDeltaTime();
-
-        //the first two updates are usually bogus
-        if(totalUpdates++ < 2) delta = Math.min(delta, 1f / 60f);
-
-        fixedCounter += delta;
+        fixedCounter += Core.graphics.getDeltaTime();
 
         while(fixedCounter >= targetDelta && updates++ < maxUpdatesPerFrame){
             //this executes any pending tasks (manually reassigned), and increments internal time, which is local to this group
             Time.update();
             update();
             fixedCounter -= targetDelta;
-            state.updateId = updateId ++;
         }
 
         timeCounter = Time.getInternalTime();
@@ -144,18 +140,8 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         Time.delta = prevDelta;
         Time.setInternalTime(prevTime);
         Time.setRuns(oldRuns);
-        state.updateId = prevUpdateId;
 
         lastTimeAccess = Core.graphics.getFrameId();
-        lastRenderInterpolation = (float)(fixedCounter / targetDelta);
-    }
-
-    public long getFixedUpdateId(){
-        return updateId;
-    }
-
-    public float getRenderInterpolation(){
-        return lastRenderInterpolation;
     }
 
     public Seq<T> copy(){
@@ -236,6 +222,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     public QuadTree tree(){
         if(tree == null) throw new RuntimeException("This group does not support quadtrees! Enable quadtrees when creating it.");
         return tree;
+    }
+
+    public Seq<T> rawSeq(){
+        return array;
     }
 
     /** Resizes the internal quadtree, if it is enabled.*/
@@ -346,11 +336,6 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         timeRuns.clear();
 
         clearing = false;
-        totalUpdates = 0;
-
-        lastRenderInterpolation = 0f;
-        lastTimeAccess = -1;
-        updateId = 0;
     }
 
     @Nullable
@@ -366,5 +351,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     @Override
     public Iterator<T> iterator(){
         return array.iterator();
+    }
+
+    @Override
+    public String toString(){
+        return array.toString();
     }
 }

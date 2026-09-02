@@ -2,6 +2,7 @@ package mindustry.logic;
 
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 
@@ -74,6 +75,11 @@ public class LParser{
         if(tokens[0].equals("op")){
             //legacy name change
             tokens[1] = opNameChanges.get(tokens[1], tokens[1]);
+        }
+        if(tokens[0].equals("status")){
+            if(Vars.content.statusEffect(tokens[1]) != null){
+                tokens[1] = "@status-" + tokens[1];
+            }
         }
     }
 

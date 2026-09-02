@@ -28,6 +28,7 @@ import static mindustry.Vars.*;
 
 public class BulletType extends Content implements Cloneable{
     static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
+    static final BulletCreateEvent bulletCreateEvent = new BulletCreateEvent();
 
     /** Lifetime in ticks. */
     public float lifetime = 40f;
@@ -63,6 +64,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean removeAfterPierce = true;
     /** For piercing lasers, setting this to true makes it get absorbed by plastanium walls. */
     public boolean laserAbsorb = true;
+    /** Whether this bullet is considered a laser bullet and thus absorbed by plastanium walls. */
+    public boolean laserBullet = false;
     /** Life fraction at which this bullet has the best range/damage/etc. Used for lasers and continuous turrets. */
     public float optimalLifeFract = 0f;
     /** Z layer to drawn on. */
@@ -505,9 +508,11 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(entity instanceof Unit unit){
-            Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f);
-            if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
-            unit.impulse(Tmp.v3);
+            if(unit.type.knockbackMultiplier > 0f){
+                Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f * unit.type.knockbackMultiplier);
+                if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
+                unit.impulse(Tmp.v3);
+            }
             unit.apply(status, statusDuration);
 
             Events.fire(bulletDamageEvent.set(unit, b));
@@ -997,6 +1002,7 @@ public class BulletType extends Content implements Cloneable{
     @Remote(called = Loc.server, unreliable = true)
     public static void createBullet(BulletType type, Team team, float x, float y, float angle, float damage, float velocityScl, float lifetimeScl){
         if(type == null) return;
-        type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
+        var bullet = type.create(null, team, x, y, angle, damage, velocityScl, lifetimeScl, null);
+        Events.fire(bulletCreateEvent.set(bullet));
     }
 }

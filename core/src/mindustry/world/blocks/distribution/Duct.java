@@ -10,7 +10,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -30,6 +29,7 @@ public class Duct extends Block implements Autotiler{
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
+    public @Load("@-cap") TextureRegion capRegion;
 
     public @Nullable Block bridgeReplacement, junctionReplacement;
 
@@ -133,11 +133,9 @@ public class Duct extends Block implements Autotiler{
         public @Nullable Item current;
         public int recDir = 0;
         public int blendbits, xscl, yscl, blending;
-        public @Nullable Building next;
+        public @Nullable Building next, prev;
         public @Nullable DuctBuild nextc;
-
-        float lastFrom, lastTo;
-        Item lastItem;
+        public boolean capped, backCapped = false;
 
         @Override
         public void draw(){
@@ -164,32 +162,25 @@ public class Duct extends Block implements Autotiler{
                 }
             }
 
-            if(Renderer.blockTimestep){
-                //draw item
-                if(!under && lastItem != null){
-                    Draw.z(Layer.blockUnder + 0.1f);
-                    Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
-                    .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
-                    Mathf.clamp((Mathf.lerp(lastFrom, lastTo, Renderer.blockInterp) + 1f) / (2f - 1f/speed)));
+            //draw item
+            if(!under && current != null){
+                Draw.z(Layer.blockUnder + 0.1f);
+                Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
+                .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
+                Mathf.clamp((progress + 1f) / (2f - 1f/speed)));
 
-                    Draw.rect(lastItem.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
-                }
-            }else{
-                //draw item
-                if(!under && current != null){
-                    Draw.z(Layer.blockUnder + 0.1f);
-                    Tmp.v1.set(Geometry.d4x(recDir) * tilesize / 2f, Geometry.d4y(recDir) * tilesize / 2f)
-                    .lerp(Geometry.d4x(r) * tilesize / 2f, Geometry.d4y(r) * tilesize / 2f,
-                    Mathf.clamp((progress + 1f) / (2f - 1f/speed)));
-
-                    Draw.rect(current.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
-                }
+                Draw.rect(current.fullIcon, x + Tmp.v1.x, y + Tmp.v1.y, itemSize, itemSize);
             }
 
             Draw.scl(xscl, yscl);
             Draw.z(Layer.blockUnder + 0.2f);
             drawAt(x, y, blendbits, rotation, SliceMode.none, under);
             Draw.reset();
+
+            if(!under) return;
+
+            if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
+            if(backCapped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg() + 180);
         }
 
         @Override
@@ -207,10 +198,7 @@ public class Duct extends Block implements Autotiler{
 
         @Override
         public void updateTile(){
-            lastItem = current;
-            lastFrom = progress;
             progress += edelta() / speed * 2f;
-            lastTo = progress;
 
             if(current != null && next != null){
                 if(progress >= (1f - 1f/speed) && moveForward(current)){
@@ -273,6 +261,10 @@ public class Duct extends Block implements Autotiler{
             blending = bits[4];
             next = front();
             nextc = next instanceof DuctBuild d ? d : null;
+
+            prev = back();
+            capped = next == null || next.team != team || !next.block.hasItems;
+            backCapped = blendbits == 0 && (prev == null || prev.team != team || !prev.block.hasItems);
         }
 
         @Override

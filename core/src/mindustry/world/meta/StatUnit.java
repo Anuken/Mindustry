@@ -14,6 +14,7 @@ public class StatUnit{
 
     blocks = new StatUnit("blocks"),
     blocksSquared = new StatUnit("blocksSquared"),
+    worldUnits = new StatUnit("worldUnits"),
     tilesSecond = new StatUnit("tilesSecond"),
     powerSecond = new StatUnit("powerSecond", "[accent]" + Iconc.power + "[]"),
     liquidSecond = new StatUnit("liquidSecond", "[sky]" + Iconc.liquid + "[]"),
@@ -36,7 +37,8 @@ public class StatUnit{
     percent = new StatUnit("percent", false),
     shieldHealth = new StatUnit("shieldHealth"),
     none = new StatUnit("none"),
-    items = new StatUnit("items");
+    items = new StatUnit("items"),
+    instant = new StatUnit("instant");
 
     public final boolean space;
     public final String name;

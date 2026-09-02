@@ -33,9 +33,12 @@ public class ItemBridge extends Block{
     public boolean fadeIn = true;
     public boolean moveArrows = true;
     public boolean pulse = false;
+    /** If true, only allows this bridge to link with the same block type. Otherwise this can link with any ItemBridge. */
+    public boolean linkSameType = true;
     public float arrowSpacing = 4f, arrowOffset = 2f, arrowPeriod = 0.4f;
     public float arrowTimeScl = 6.2f;
     public float bridgeWidth = 6.5f;
+    public boolean noAcceptDisabled = false;
 
     //for autolink
     public @Nullable ItemBridgeBuild lastBuild;
@@ -54,9 +57,8 @@ public class ItemBridge extends Block{
         noUpdateDisabled = true;
         allowDiagonal = false;
         copyConfig = false;
-        //disabled as to not be annoying
-        allowConfigInventory = false;
         ignoreResizeConfig = true;
+        diagonalConfigInventory = true;
         priority = TargetPriority.transport;
         delayLandingConfig = true;
 
@@ -147,18 +149,28 @@ public class ItemBridge extends Block{
     }
 
     public boolean linkValid(Tile tile, Tile other, boolean checkDouble){
-        if(other == null || tile == null || !positionsValid(tile.x, tile.y, other.x, other.y)) return false;
+        if(other == null || tile == null || !positionsValid(tile.x, tile.y, other.x, other.y, linkSameType ? range
+            : Math.max(tile.block() instanceof ItemBridge bt ? bt.range : range, other.block() instanceof ItemBridge bo ? bo.range : range))) return false;
+        if(!linkSameType){
+            //false if at least 1 module isn't  shared
+            if(!(tile.block().hasItems && other.block().hasItems) && !(tile.block().hasLiquids && other.block().hasLiquids)) return false;
+        }
 
-        return ((other.block() == tile.block() && tile.block() == this) || (!(tile.block() instanceof ItemBridge) && other.block() == this))
+        return ((linkSameType ? other.block() == tile.block() && tile.block() == this : (other.block() instanceof ItemBridge && tile.block() instanceof ItemBridge))
+            || (!(tile.block() instanceof ItemBridge) && other.block() == this))
             && (other.team() == tile.team() || tile.block() != this)
             && (!checkDouble || ((ItemBridgeBuild)other.build).link != tile.pos());
     }
 
     public boolean positionsValid(int x1, int y1, int x2, int y2){
+        return positionsValid(x1, y1, x2, y2, range);
+    }
+
+    public boolean positionsValid(int x1, int y1, int x2, int y2, int baseRange){
         if(x1 == x2){
-            return Math.abs(y1 - y2) <= range;
+            return Math.abs(y1 - y2) <= baseRange;
         }else if(y1 == y2){
-            return Math.abs(x1 - x2) <= range;
+            return Math.abs(x1 - x2) <= baseRange;
         }else{
             return false;
         }
@@ -433,7 +445,7 @@ public class ItemBridge extends Block{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             return
-                hasLiquids && team == source.team &&
+                hasLiquids && team == source.team && (!noAcceptDisabled || enabled) &&
                 (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f) &&
                 checkAccept(source, world.tile(link));
         }

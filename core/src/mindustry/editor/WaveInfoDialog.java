@@ -57,13 +57,13 @@ public class WaveInfoDialog extends BaseDialog{
                 var style = Styles.cleart;
                 t.defaults().size(280f, 64f).pad(2f);
 
-                t.button("@waves.copy", Icon.copy, style, () -> {
+                t.button("@copy.clipboard", Icon.copy, style, () -> {
                     ui.showInfoFade("@waves.copied");
                     Core.app.setClipboardText(maps.writeWaves(groups));
                     dialog.hide();
                 }).disabled(b -> groups == null || groups.isEmpty()).marginLeft(12f).row();
 
-                t.button("@waves.load", Icon.download, style, () -> {
+                t.button("@load.clipboard", Icon.download, style, () -> {
                     try{
                         groups = maps.readWaves(Core.app.getClipboardText());
                         buildGroups();

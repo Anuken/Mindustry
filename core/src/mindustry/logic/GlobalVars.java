@@ -30,15 +30,13 @@ public class GlobalVars{
     //non-constants that depend on state
     private static LVar
         varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer,
-        varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile, varClientMusicPlaying;
+        varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile, varClientMusicPlaying, varClientCurrentMusic;
 
     private ObjectMap<String, LVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
     private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
-
-    public static final Seq<String> soundNames = new Seq<>();
 
     public void init(){
         putEntryOnly("sectionProcessor");
@@ -90,6 +88,7 @@ public class GlobalVars{
         varClientTeam = putEntry("@clientTeam", 0, true);
         varClientMobile = putEntry("@clientMobile", 0, true);
         varClientMusicPlaying = putEntry("@clientMusicPlaying", 0, true);
+        varClientCurrentMusic = putEntry("@clientCurrentMusic", null, true);
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
@@ -101,7 +100,6 @@ public class GlobalVars{
             for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
                 if(sound != Sounds.none && sound.file != null){
                     String name = sound.file.nameWithoutExtension();
-                    soundNames.add(name);
                     put("@sfx-" + name, Sounds.getSoundId(sound));
                 }
             }
@@ -136,6 +134,10 @@ public class GlobalVars{
 
         for(Weather weather : Vars.content.weathers()){
             put("@" + weather.name, weather);
+        }
+
+        for(StatusEffect effect : Vars.content.statusEffects()){
+            put("@status-" + effect.name, effect);
         }
 
         for(var entry : Colors.getColors().entries()){
@@ -216,6 +218,10 @@ public class GlobalVars{
             varClientTeam.numval = player.team().id;
             varClientMobile.numval = mobile ? 1 : 0;
             varClientMusicPlaying.numval = control.sound.isPlaying() ? 1 : 0;
+
+            var music = control.sound.getCurrent();
+            String dpName = music == null || music.file == null ? null : state.data.getAudioName(music.file);
+            varClientCurrentMusic.objval = music == null || music.file == null ? null : (dpName == null ? music.file.nameWithoutExtension() : dpName);
         }
     }
 
@@ -301,6 +307,10 @@ public class GlobalVars{
         if(match == lvar){
             vars.remove(lvar.name);
         }
+    }
+
+    public void remove(String name){
+        vars.remove(name);
     }
 
     public LVar put(String name, Object value){

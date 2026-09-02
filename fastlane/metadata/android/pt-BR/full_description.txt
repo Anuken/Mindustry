@@ -1,0 +1,34 @@
+Mindustry é um jogo de construção de fábricas com elementos de defesa de torres e estratégia em tempo real. Crie cadeias de suprimento elaboradas para alimentar suas torres com munição, produza materiais para construir e fabricar unidades. Comande tropas para capturar bases inimigas e expanda sua produção. Defenda seu núcleo contra hordas de inimigos.
+
+<h2>Recursos de Jogabilidade</h2>
+ 
+- Use blocos de produção para criar uma grande variedade de materiais avançados
+- Defenda suas estruturas contra hordas de inimigos
+- Jogue com seus amigos em partidas cooperativas multijogador entre plataformas ou desafie-os em confrontos PvP por equipes
+- Distribua líquidos e enfrente desafios constantes, como incêndios ou ataques de unidades aéreas inimigas
+- Tire o máximo da sua produção fornecendo refrigeramento e lubrificante opcionais
+- Produza uma ampla variedade de unidades para gerenciar automaticamente sua base ou atacar bases inimigas
+- Configure linhas de montagem para construir exércitos de unidades mecanizadas
+- Use suas tropas para enfrentar bases inimigas totalmente funcionais
+
+
+<h2>Campanha</h2>
+
+- Conquiste os planetas Serpulo e Erekir avançando por 35 mapas feitos à mão e mais de 250 setores gerados proceduralmente
+- Capture território e instale fábricas para produzir recursos enquanto joga em outros setores
+- Defenda seus setores contra invasões periódicas
+- Coordene a distribuição de recursos entre setores por meio de plataformas de lançamento
+- Pesquise novos blocos para impulsionar o progresso
+- Convide seus amigos para completar missões juntos
+- Mais de 250 blocos tecnológicos para dominar
+- Mais de 50 tipos diferentes de drones, mechs e naves
+
+
+<h2>Jogos Personalizados e Multijogador Entre Plataformas</h2>
+
+- Mais de 16 mapas integrados para jogos personalizados, além de duas campanhas completas
+- Jogue em modo cooperativo, PvP ou sandbox
+- Entre em um servidor dedicado público ou convide amigos para sua própria sessão privada
+- Regras de jogo personalizáveis: altere custos de blocos, estatísticas de inimigos, itens iniciais, tempo das hordas e muito mais
+- Editor de mapas totalmente funcional com suporte a scripts
+- Navegador de mods integrado e suporte completo a modificações

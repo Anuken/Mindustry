@@ -7,7 +7,6 @@ import arc.util.io.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
 import mindustry.mod.data.*;
-import mindustry.world.*;
 
 import java.io.*;
 
@@ -23,14 +22,14 @@ public class Save11 extends SaveVersion{
     }
 
     @Override
-    public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
-        readRegion("meta", stream, counter, in -> readMeta(in, context));
+    public void read(DataInputStream stream, CounterInputStream counter, SaveReadState saveState) throws IOException{
+        readRegion("meta", stream, counter, in -> readMeta(in, saveState));
         readRegion("content", stream, counter, this::readContentHeader);
 
         try{
-            readRegion("patches", stream, counter, this::readDataPatches);
-            readRegion("map", stream, counter, in -> readMap(in, context));
-            readRegion("entities", stream, counter, this::readEntities);
+            readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
+            readRegion("map", stream, counter, in -> readMap(in, saveState));
+            readRegion("entities", stream, counter, in -> readEntities(in, saveState));
             readRegion("markers", stream, counter, this::readMarkers);
             readRegion("custom", stream, counter, this::readCustomChunks);
         }finally{
@@ -40,7 +39,7 @@ public class Save11 extends SaveVersion{
 
     //old, simplified string-only data patches
     @Override
-    public void readDataPatches(DataInput stream) throws IOException{
+    public void readDataPatches(DataInput stream, SaveReadState saveState) throws IOException{
         Seq<DataAsset> assets = new Seq<>();
 
         int amount = stream.readUnsignedByte();

@@ -107,6 +107,17 @@ public class LVar{
         isobj = true;
     }
 
+    public void setlink(Object value){
+        isobj = true;
+        if(value == null){
+            objval = null;
+            constant = false;   //convert a former linked block into a regular variable
+        }else{
+            objval = value;
+            constant = true;    //make this variable a linked block
+        }
+    }
+
     public void set(LVar other){
         isobj = other.isobj;
         // Setting a non-numeric value to @counter must preserve its numeric field
