@@ -3650,7 +3650,7 @@ public class Blocks{
             
             consumePower(3.3f);
             coolant = consumeCoolant(0.1f);
-            coolantMultiplier = 20f;
+            coolantMultiplier = 30f;
         }};
 
         parallax = new TractorBeamTurret("parallax"){{
