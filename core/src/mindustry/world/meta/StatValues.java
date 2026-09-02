@@ -385,72 +385,72 @@ public class StatValues{
         });
     }
 
-    public static StatValue blocks(Attribute attr, boolean floating, float scaleEff, float scaleAmount, @Nullable Seq<ItemStack> outputs, float timePeriod, boolean startZero, boolean checkFloors) {
-    return table -> {
-        if(table.getCells().size > 0) table.getCells().peek().growX();
-        table.row();
-
-        table.table(c -> {
-            Runnable[] rebuild = {null};
-            Map[] lastMap = {null};
-
-            rebuild[0] = () -> {
-                c.clearChildren();
-                c.left();
-
-                if(state.isGame()){
-                    var blocks = Vars.content.blocks()
-                    .select(block -> (!checkFloors || block instanceof Floor) && indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
-                    .with(s -> s.sort(f -> f.attributes.get(attr)));
-
-                    if(blocks.any()){
-                        for(var block : blocks){
-                            c.table(Styles.grayPanel, b -> {
-                                float effiency = 1f + block.attributes.get(attr) * scaleEff;
-
-                                b.image(block.uiIcon).size(40f).pad(10f).left().scaling(Scaling.fit);
-                                b.table(center -> {
-                                    center.left();
-
-                                    if(outputs != null && outputs.any()){
-                                        for(ItemStack output : outputs){
-                                            float scaled = output.amount * (1f + block.attributes.get(attr) * scaleAmount);
-
-                                            center.table(it -> {
-                                            it.left();
-                                            it.add(displayItem(output.item, scaled, timePeriod / effiency , true)).left().padLeft(6f);
-                                            }).padRight(8f);
+    public static StatValue blocks(Attribute attr, boolean floating, float scaleEff, float scaleAmount, @Nullable Seq<ItemStack> outputs, float timePeriod, boolean startZero, boolean checkFloors){
+        return table -> {
+            if(table.getCells().size > 0) table.getCells().peek().growX();
+            table.row();
+    
+            table.table(c -> {
+                Runnable[] rebuild = {null};
+                Map[] lastMap = {null};
+    
+                rebuild[0] = () -> {
+                    c.clearChildren();
+                    c.left();
+    
+                    if(state.isGame()){
+                        var blocks = Vars.content.blocks()
+                        .select(block -> (!checkFloors || block instanceof Floor) && indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
+                        .with(s -> s.sort(f -> f.attributes.get(attr)));
+    
+                        if(blocks.any()){
+                            for(var block : blocks){
+                                c.table(Styles.grayPanel, b -> {
+                                    float effiency = 1f + block.attributes.get(attr) * scaleEff;
+    
+                                    b.image(block.uiIcon).size(40f).pad(10f).left().scaling(Scaling.fit);
+                                    b.table(center -> {
+                                        center.left();
+    
+                                        if(outputs != null && outputs.any()){
+                                            for(ItemStack output : outputs){
+                                                float scaled = output.amount * (1f + block.attributes.get(attr) * scaleAmount);
+    
+                                                center.table(it -> {
+                                                it.left();
+                                                it.add(displayItem(output.item, scaled, timePeriod / effiency , true)).left().padLeft(6f);
+                                                }).padRight(8f);
+                                            }
+                                        }else{
+                                            center.add("@none");
                                         }
-                                    }else{
-                                        center.add("@none");
-                                    }
-                                }).left().grow();
-                                b.add((effiency < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("stat.efficiency", fixValue(effiency * 100f))).right().pad(10f).padRight(15f);
-
-                            }).growX().pad(5).row();
+                                    }).left().grow();
+                                    b.add((effiency < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("stat.efficiency", fixValue(effiency * 100f))).right().pad(10f).padRight(15f);
+    
+                                }).growX().pad(5).row();
+                            }
+                        }else{
+                            c.add("@none.inmap");
                         }
                     }else{
-                        c.add("@none.inmap");
+                        c.add("@stat.showinmap");
                     }
-                }else{
-                    c.add("@stat.showinmap");
-                }
-            };
-
-            rebuild[0].run();
-
-            //rebuild when map changes.
-            c.update(() -> {
-                Map current = state.isGame() ? state.map : null;
-
-                if(current != lastMap[0]){
-                    rebuild[0].run();
-                    lastMap[0] = current;
-                }
-            });
-        }).growX().colspan(table.getColumns()).row();
-    };
-}
+                };
+    
+                rebuild[0].run();
+    
+                //rebuild when map changes.
+                c.update(() -> {
+                    Map current = state.isGame() ? state.map : null;
+    
+                    if(current != lastMap[0]){
+                        rebuild[0].run();
+                        lastMap[0] = current;
+                    }
+                });
+            }).growX().colspan(table.getColumns()).row();
+        };
+    }
 
     public static StatValue content(Seq<UnlockableContent> list){
         return content(list, i -> true);
