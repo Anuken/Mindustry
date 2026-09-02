@@ -31,7 +31,7 @@ public class NuclearReactor extends PowerGenerator{
     /** heating per frame * fullness */
     public float heating = 0.01f;
     /** max heat this block can output per side */
-    public float heatOutput = 12f;
+    public float heatOutput = 8f;
     /** rate at which heat progress increases */
     public float heatWarmupRate = 1f;
     /** rate at which fuel consumption scales with heat */

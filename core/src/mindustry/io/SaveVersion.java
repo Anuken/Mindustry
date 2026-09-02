@@ -525,7 +525,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public Prov[] readEntityMapping(DataInput stream) throws IOException{
         //copy entityMapping for further mutation; will be used in readWorldEntities
-        Prov[] entityMapping = Arrays.copyOf(EntityMapping.idMap, EntityMapping.idMap.length);
+        var entityMapping = Arrays.copyOf(EntityMapping.idMap, EntityMapping.idMap.length);
 
         short amount = stream.readShort();
         for(int i = 0; i < amount; i++){

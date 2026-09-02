@@ -340,6 +340,7 @@ public class Blocks{
             variants = 0;
             canShadow = false;
             drawEdgeOut = false;
+            supportsBeingOverlaid = false;
         }};
 
         empty = new EmptyFloor("empty");
