@@ -903,7 +903,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
             other = other.getLiquidDestination(self(), liquid);
 
-            if(other != null && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null){
+            if(other != null && other.block.hasLiquids && canDumpLiquid(other, liquid) && other.liquids != null && other.acceptLiquid(self(), liquid)){
                 float ofract = other.liquids.get(liquid) / other.block.liquidCapacity;
                 float fract = liquids.get(liquid) / block.liquidCapacity;
 
@@ -919,10 +919,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void transferLiquid(Building next, float amount, Liquid liquid){
         float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
 
-        if(next.acceptLiquid(self(), liquid)){
-            next.handleLiquid(self(), liquid, flow);
-            liquids.remove(liquid, flow);
-        }
+        next.handleLiquid(self(), liquid, flow);
+        liquids.remove(liquid, flow);
     }
 
     public float moveLiquidForward(boolean leaks, Liquid liquid){
