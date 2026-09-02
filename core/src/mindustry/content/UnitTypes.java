@@ -78,6 +78,7 @@ public class UnitTypes{
 
     //special building tethered (has payload capability, because it's necessary sometimes)
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
+    public static @EntityDef({TargetDummyc.class, Unitc.class}) UnitType dummy;
 
     //tank
     public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, locus, precept, vanquish, conquer;
@@ -4629,6 +4630,40 @@ public class UnitTypes{
             createWreck = false;
             envEnabled = Env.any;
             envDisabled = Env.none;
+        }};
+
+        dummy = new UnitType("dummy"){{
+            controller = u -> new NoAI();
+
+            envEnabled = Env.any;
+            envDisabled = 0;
+            isEnemy = false;
+            allowedInPayloads = false;
+            logicControllable = false;
+            playerControllable = false;
+            hidden = true;
+            hoverable = false;
+            canBoost = true;
+            useUnitCap = false;
+            killable = false;
+            physics = false;
+
+            flyingLayer = Layer.flyingUnit - 1f;
+            drag = 0.33f;
+            hitSize = 12f;
+            hideDetails = false;
+            engineOffset = 7f;
+            engineSize = 2f;
+            for(int i = 0; i < 3; i++){
+                engines.add(new UnitEngine(Geometry.d4x(i) * engineOffset, Geometry.d4y(i) * engineOffset, engineSize, i * 90));
+            }
+        }
+
+        @Override
+        public void drawBody(Unit unit) {
+            applyColor(unit);
+            Drawf.spinSprite(region, unit.x, unit.y, unit.rotation - 90);
+            Draw.reset();
         }};
 
         //endregion

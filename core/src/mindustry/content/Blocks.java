@@ -105,7 +105,7 @@ public class Blocks{
     shieldedWall,
 
     //defense
-    mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
+    mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine, targetDummy,
 
     //defense - erekir
     radar,
@@ -6781,6 +6781,12 @@ public class Blocks{
             alwaysUnlocked = true;
             ambientSound = Sounds.none;
             allDatabaseTabs = true;
+        }};
+
+        targetDummy = new TargetDummy("target-dummy"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            size = 2;
+            alwaysUnlocked = true;
         }};
 
         //TODO move
