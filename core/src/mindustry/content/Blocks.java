@@ -3739,6 +3739,7 @@ public class Blocks{
             scaledHealth = 300;
             shootSound = Sounds.shootMissile;
             envEnabled |= Env.space;
+            rotateSpeed = 4f;
 
             limitRange(5f);
             coolant = consumeCoolant(0.3f);
@@ -4206,7 +4207,7 @@ public class Blocks{
             size = 3;
             recoil = 1.5f;
             recoilTime = 10;
-            rotateSpeed = 10f;
+            rotateSpeed = 7f;
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootCyclone;
@@ -4241,7 +4242,7 @@ public class Blocks{
 
             maxAmmo = 40;
             ammoPerShot = 5;
-            rotateSpeed = 2f;
+            rotateSpeed = 1.5f;
             reload = 200f;
             ammoUseEffect = Fx.casing3Double;
             recoil = 5f;
@@ -4324,6 +4325,7 @@ public class Blocks{
 
             scaledHealth = 160;
             coolant = consumeCoolant(1f);
+            rotateSpeed = 4f;
 
             depositCooldown = 2.0f;
             limitRange();
@@ -4344,6 +4346,7 @@ public class Blocks{
             loopSound = Sounds.beamMeltdown;
             loopSoundVolume = 2f;
             envEnabled |= Env.space;
+            rotateSpeed = 1.5f;
 
             shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
