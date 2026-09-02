@@ -1,0 +1,152 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    # 每6小时检查一次上游更新
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync even if no new changes'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  UPSTREAM_REPO: Anuken/Mindustry
+  UPSTREAM_BRANCH: master
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    outputs:
+      synced: ${{ steps.do_sync.outputs.synced }}
+      tag_version: ${{ steps.do_sync.outputs.tag_version }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+        # 使用 PAT token（如果已配置）以推送tag能够触发其他工作流
+        token: ${{ secrets.SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Add upstream remote
+      run: |
+        git remote add upstream https://github.com/${{ env.UPSTREAM_REPO }}.git
+        git fetch upstream --tags
+        git fetch origin --tags
+
+    - name: Check for new tags and sync
+      id: do_sync
+      run: |
+        # 获取上游最新的release tag (v* 格式)
+        UPSTREAM_LATEST_TAG=$(git -c 'versionsort.suffix=-' ls-remote --tags --sort='v:refname' upstream 'v*' | tail -n1 | awk -F'/' '{print $3}')
+        
+        # 获取本地最新的release tag
+        LOCAL_LATEST_TAG=$(git -c 'versionsort.suffix=-' tag --list 'v*' --sort='v:refname' | tail -n1)
+        
+        echo "Upstream latest tag: $UPSTREAM_LATEST_TAG"
+        echo "Local latest tag: $LOCAL_LATEST_TAG"
+        
+        NEW_TAG_EXISTS="false"
+        NEW_TAG=""
+        TAG_VERSION=""
+        
+        if [ -z "$UPSTREAM_LATEST_TAG" ]; then
+          echo "No upstream tags found"
+        elif [ "$UPSTREAM_LATEST_TAG" != "$LOCAL_LATEST_TAG" ] || [ "${{ github.event.inputs.force_sync }}" = "true" ]; then
+          NEW_TAG_EXISTS="true"
+          NEW_TAG="$UPSTREAM_LATEST_TAG"
+          TAG_VERSION="${NEW_TAG#v}"
+          echo "New tag detected: $NEW_TAG (version: $TAG_VERSION)"
+        fi
+        
+        if [ "$NEW_TAG_EXISTS" = "false" ]; then
+          echo "No new upstream version found. Nothing to sync."
+          echo "synced=false" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
+        # === 执行同步 ===
+        echo "Syncing upstream commits and tag: $NEW_TAG"
+        
+        # 保留我们的自定义工作流
+        git checkout origin/master -- .github/workflows/sync-upstream.yml 2>/dev/null || true
+        git checkout origin/master -- .github/workflows/ios-release.yml 2>/dev/null || true
+        mkdir -p .github/workflows
+        ls -la .github/workflows/
+        
+        # 暂存自定义工作流
+        cp -r .github /tmp/our_github_backup
+        
+        # 检出上游master
+        git checkout -B upstream-sync upstream/$UPSTREAM_BRANCH
+        
+        # 恢复我们的自定义工作流
+        rm -rf .github/workflows
+        cp -r /tmp/our_github_backup/* .github/
+        
+        # 提交同步
+        git add -A
+        if [ -n "$(git status --porcelain)" ]; then
+          git commit -m "chore: sync upstream $NEW_TAG"
+        else
+          # 即使没有变更也创建一个空提交以便后续同步工作流
+          git commit --allow-empty -m "chore: sync upstream $NEW_TAG"
+        fi
+        
+        # 推送到 master（使用 PAT 或 GITHUB_TOKEN）
+        SYNC_TOKEN="${{ secrets.SYNC_TOKEN || secrets.GITHUB_TOKEN }}"
+        if [ -n "$SYNC_TOKEN" ]; then
+          git remote set-url origin "https://x-access-token:${SYNC_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+        fi
+        git push origin upstream-sync:master --force
+        
+        # 创建并推送tag
+        if git rev-parse "$NEW_TAG" >/dev/null 2>&1; then
+          git tag -d "$NEW_TAG" 2>/dev/null || true
+          git push origin ":refs/tags/$NEW_TAG" 2>/dev/null || true
+        fi
+        git tag -a "$NEW_TAG" -m "Release $NEW_TAG (sync from upstream $UPSTREAM_REPO)"
+        git push origin "$NEW_TAG" --force
+        
+        echo "=== Sync completed ==="
+        echo "synced=true" >> $GITHUB_OUTPUT
+        echo "tag_version=$TAG_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Trigger iOS build workflow (fallback for GITHUB_TOKEN push)
+      if: steps.do_sync.outputs.synced == 'true'
+      continue-on-error: true
+      run: |
+        TAG_VERSION="${{ steps.do_sync.outputs.tag_version }}"
+        echo "Triggering iOS build for version: $TAG_VERSION"
+        
+        # 调用 workflow_dispatch API 触发 iOS 构建
+        API_URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/ios-release.yml/dispatches"
+        SYNC_TOKEN="${{ secrets.SYNC_TOKEN || secrets.GITHUB_TOKEN }}"
+        
+        HTTP_CODE=$(curl -s -o /tmp/curl_resp.txt -w "%{http_code}" \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${SYNC_TOKEN}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          "$API_URL" \
+          -d "{\"ref\":\"v${TAG_VERSION}\",\"inputs\":{\"build_version\":\"${TAG_VERSION}\"}}")
+        
+        echo "HTTP response code: $HTTP_CODE"
+        cat /tmp/curl_resp.txt 2>/dev/null || true
+        
+        if [ "$HTTP_CODE" = "204" ]; then
+          echo "iOS build workflow triggered successfully via API"
+        else
+          echo "WARNING: iOS build trigger failed (code: $HTTP_CODE). The tag push should still trigger it if PAT is used."
+        fi

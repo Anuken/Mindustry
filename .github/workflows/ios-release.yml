@@ -1,0 +1,298 @@
+name: iOS Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_run:
+    workflows: ["Sync Upstream"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      build_version:
+        description: 'Build version number (e.g. 146 or 146.1)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  build-ios:
+    name: Build iOS IPA
+    # workflow_run成功时也运行，但要排除sync没有新版本的情况（实际没推送代码所以构建会以相同tag运行）
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: macos-15
+    timeout-minutes: 180
+
+    env:
+      APP_NAME: Mindustry
+      ARC_REPO: Anuken/Arc
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+
+    - name: Determine build version
+      id: version
+      run: |
+        BUILD_VERSION=""
+        
+        # 优先级 1: 手动指定
+        if [ -n "${{ github.event.inputs.build_version }}" ]; then
+          BUILD_VERSION="${{ github.event.inputs.build_version }}"
+          echo "Using manual build_version input: $BUILD_VERSION"
+        
+        # 优先级 2: tag触发
+        elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+          TAG="${GITHUB_REF#refs/tags/}"
+          BUILD_VERSION="${TAG#v}"
+          echo "Using tag-based version: $BUILD_VERSION"
+        
+        # 优先级 3: 从 workflow_run 触发的上游工作流中获取（没有简单的输入传递方式，fallback 到最新tag）
+        else
+          # 获取最新的 v* tag
+          TAG=$(git -c 'versionsort.suffix=-' tag --list 'v*' --sort='v:refname' | tail -n1)
+          if [ -n "$TAG" ]; then
+            BUILD_VERSION="${TAG#v}"
+            echo "Using latest detected tag: $TAG -> $BUILD_VERSION"
+          else
+            echo "ERROR: Cannot determine build version. Please trigger via tag or provide build_version."
+            exit 1
+          fi
+        fi
+        
+        # 纯数字和点号的格式校验
+        if echo "$BUILD_VERSION" | grep -qE '^[0-9]+(\.[0-9]+)?$'; then
+          echo "Version format valid: $BUILD_VERSION"
+        else
+          echo "WARNING: Build version $BUILD_VERSION doesn't match expected numeric format, continuing anyway"
+        fi
+        
+        echo "build_version=$BUILD_VERSION" >> $GITHUB_OUTPUT
+        
+        # 拆分 build 和 revision
+        if echo "$BUILD_VERSION" | grep -q '\.'; then
+          MAJOR_BUILD=$(echo "$BUILD_VERSION" | cut -d. -f1)
+          REVISION=$(echo "$BUILD_VERSION" | cut -d. -f2)
+        else
+          MAJOR_BUILD="$BUILD_VERSION"
+          REVISION="0"
+        fi
+        
+        echo "major_build=$MAJOR_BUILD" >> $GITHUB_OUTPUT
+        echo "revision=$REVISION" >> $GITHUB_OUTPUT
+        
+        # 从 build.gradle 中解析版本前缀 (versionNumber = '8')
+        VERSION_PREFIX=$(grep -oP "versionNumber\s*=\s*'\K[0-9]+" build.gradle | head -1)
+        if [ -z "$VERSION_PREFIX" ]; then
+          VERSION_PREFIX="8"  # 默认回退
+        fi
+        echo "version_prefix=$VERSION_PREFIX" >> $GITHUB_OUTPUT
+        
+        # === iOS 版本号，严格与上游同步 ===
+        # 上游 ios/build.gradle 版本写入规则：
+        #   props['app.version'] = versionNumber + "." + bversion + (bversion.contains(".") ? "" : ".0")
+        # Info.plist.xml:
+        #   CFBundleShortVersionString = ${app.version}
+        #   CFBundleVersion = ${app.build}
+        
+        if echo "$BUILD_VERSION" | grep -q '\.'; then
+          IOS_APP_VERSION="${VERSION_PREFIX}.${BUILD_VERSION}"
+        else
+          IOS_APP_VERSION="${VERSION_PREFIX}.${BUILD_VERSION}.0"
+        fi
+        echo "ios_app_version=$IOS_APP_VERSION" >> $GITHUB_OUTPUT
+        
+        # CFBundleVersion 使用 build 号（单调递增的整数）
+        # 与上游 incrementConfig 保持一致: 取 MAJOR_BUILD 作为 build
+        IOS_BUILD_NUMBER="$MAJOR_BUILD"
+        echo "ios_build_number=$IOS_BUILD_NUMBER" >> $GITHUB_OUTPUT
+        
+        echo ""
+        echo "====== VERSION SUMMARY ======"
+        echo "Input/Build version : $BUILD_VERSION"
+        echo "Version prefix      : $VERSION_PREFIX"
+        echo "Major build num     : $MAJOR_BUILD"
+        echo "Revision            : $REVISION"
+        echo "CFBundleShortVer    : $IOS_APP_VERSION  (displayed in App Store)"
+        echo "CFBundleVersion     : $IOS_BUILD_NUMBER  (internal build number)"
+        echo "============================="
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v5
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        architecture: 'x64'
+
+    - name: Set up Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+
+    - name: Verify build environment
+      run: |
+        echo "Java:"
+        java -version
+        echo ""
+        echo "Xcode:"
+        xcodebuild -version
+        echo ""
+        echo "Clang:"
+        clang --version
+        echo ""
+        echo "Disk space:"
+        df -h
+
+    - name: Clone Arc repository (sibling)
+      run: |
+        cd "$GITHUB_WORKSPACE/.."
+        if [ -d Arc ]; then
+          echo "Arc already exists, removing..."
+          rm -rf Arc
+        fi
+        git clone --depth=1 --branch=master https://github.com/${ARC_REPO}.git Arc
+        echo "Arc cloned to $(cd Arc && pwd)"
+        ls -la Arc/ | head -20
+
+    - name: Setup Gradle wrapper
+      uses: gradle/actions/setup-gradle@v6
+      with:
+        cache-read-only: false
+        cache-write-only: false
+        gradle-home-cache-cleanup: true
+
+    - name: Pre-write iOS robovm.properties with correct versions
+      run: |
+        # 提前写入 robovm.properties 以确保版本号与上游一致
+        cat > ios/robovm.properties << 'PROPS_EOF'
+        app.id=io.anuke.mindustry
+        app.mainclass=mindustry.ios.IOSLauncher
+        app.executable=IOSLauncher
+        app.name=${{ env.APP_NAME }}
+        app.version=${{ steps.version.outputs.ios_app_version }}
+        app.build=${{ steps.version.outputs.ios_build_number }}
+        PROPS_EOF
+        
+        echo "Created ios/robovm.properties:"
+        cat ios/robovm.properties
+
+    - name: Copy iOS native libraries
+      run: |
+        ./gradlew :ios:copyNatives --no-daemon --console=plain \
+          -Pbuildversion=${{ steps.version.outputs.build_version }} \
+          2>&1 | tail -50
+
+    - name: Build iOS IPA
+      id: build_ipa
+      run: |
+        BUILD_VERSION="${{ steps.version.outputs.build_version }}"
+        echo "=== Starting iOS IPA build for v$BUILD_VERSION ==="
+        
+        # RoboVM createIPA
+        # 注: iosSkipSigning=true 跳过签名 -> 生成的是 unsigned/development IPA
+        # 若要上传 App Store 需要配置签名证书（secrets）
+        ./gradlew :ios:createIPA \
+          --no-daemon \
+          --stacktrace \
+          --console=plain \
+          -Pbuildversion="$BUILD_VERSION" \
+          -PpresetIOSVersion=true \
+          -Probovm.iosSkipSigning=true \
+          2>&1 | tee /tmp/ios_build.log | tail -200
+        
+        BUILD_EXIT=${PIPESTATUS[0]}
+        echo "Gradle exit code: $BUILD_EXIT"
+        
+        if [ "$BUILD_EXIT" != "0" ]; then
+          echo ""
+          echo "=== Build failed. Last 300 lines of log: ==="
+          tail -300 /tmp/ios_build.log
+          exit "$BUILD_EXIT"
+        fi
+        
+        # 查找 IPA
+        IPA_FILE=$(find ios/build -name "*.ipa" -type f 2>/dev/null | head -1)
+        
+        if [ -z "$IPA_FILE" ]; then
+          echo "ERROR: IPA not produced! Directory listing of ios/build:"
+          ls -laR ios/build 2>/dev/null || true
+          exit 1
+        fi
+        
+        echo "Found IPA at: $IPA_FILE"
+        ls -lh "$IPA_FILE"
+        
+        # 重命名为带版本的文件名
+        IOS_APP_VERSION="${{ steps.version.outputs.ios_app_version }}"
+        OUTPUT_NAME="${APP_NAME}-iOS-${IOS_APP_VERSION}.ipa"
+        OUTPUT_PATH="$(dirname "$IPA_FILE")/${OUTPUT_NAME}"
+        mv "$IPA_FILE" "$OUTPUT_PATH"
+        echo "ipa_path=$OUTPUT_PATH" >> $GITHUB_OUTPUT
+        echo "ipa_name=$OUTPUT_NAME" >> $GITHUB_OUTPUT
+        
+        echo "Final IPA: $OUTPUT_PATH"
+        ls -lh "$OUTPUT_PATH"
+
+    - name: Write release notes
+      id: release_notes
+      run: |
+        IOS_APP_VERSION="${{ steps.version.outputs.ios_app_version }}"
+        BUILD_VERSION="${{ steps.version.outputs.build_version }}"
+        IOS_BUILD="${{ steps.version.outputs.ios_build_number }}"
+        BUILD_DATE_UTC=$(date -u '+%Y-%m-%d %H:%M UTC')
+        
+        cat > release_notes.md << EOF
+        ## iOS Build v${IOS_APP_VERSION}
+        
+        | Property | Value |
+        |----------|-------|
+        | Mindustry Build Version | v${BUILD_VERSION} |
+        | CFBundleShortVersionString (Display) | ${IOS_APP_VERSION} |
+        | CFBundleVersion (Internal Build) | ${IOS_BUILD} |
+        | Build Date | ${BUILD_DATE_UTC} |
+        
+        ### Notes
+        This iOS IPA package was automatically built and released after syncing
+        the upstream repository **Anuken/Mindustry** v${BUILD_VERSION}.
+        
+        The version numbers match upstream's iOS release convention:
+        - \`CFBundleShortVersionString = versionNumber.buildVersion[.0]\`
+        - \`CFBundleVersion = major build number\`
+        
+        ### How to install
+        - Requires iOS 15.0 or later.
+        - Use **AltStore**, **Sideloadly**, or a developer certificate to re-sign and install.
+        EOF
+        
+        cat release_notes.md
+
+    - name: Upload IPA to Release
+      if: success()
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ steps.version.outputs.build_version }}
+        name: Release v${{ steps.version.outputs.build_version }}
+        body_path: release_notes.md
+        append_body: true
+        fail_on_unmatched_files: true
+        files: |
+          ${{ steps.build_ipa.outputs.ipa_path }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload build artifact (even if release step failed)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-ipa-${{ steps.version.outputs.build_version }}
+        path: ${{ steps.build_ipa.outputs.ipa_path || 'ios/build/**/*.ipa' }}
+        if-no-files-found: ignore
+        retention-days: 30

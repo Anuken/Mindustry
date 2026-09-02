@@ -25,8 +25,12 @@ task incrementConfig{
         props['app.name'] = 'Mindustry'
     }
 
-    props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
-    if(bversion != "custom build"){
+    // 如果已通过 CI/预设值方式写入了 app.version 和 app.build，则保持不变（不覆盖CI预设的版本号）
+    boolean presetVersion = project.hasProperty("presetIOSVersion")
+    if(!presetVersion){
+        props['app.build'] = (!props.containsKey("app.build") ? 40 : props['app.build'].toInteger() + 1) + ""
+    }
+    if(bversion != "custom build" && !presetVersion){
         props['app.version'] = versionNumber + "." + bversion + (bversion.contains(".") ? "" : ".0")
     }
     props.store(vfile.newWriter(), null)
@@ -76,5 +80,7 @@ robovm{
 
     iosSignIdentity = project.properties["signIdentity"]
     iosProvisioningProfile = project.properties["provisioningProfile"]
-    iosSkipSigning = false
+    // 允许通过 -Probovm.iosSkipSigning=true 属性覆盖（例如CI中无证书环境）
+    iosSkipSigning = project.hasProperty("robovm.iosSkipSigning") ?
+        project.property("robovm.iosSkipSigning").toBoolean() : false
 }
