@@ -77,7 +77,7 @@ public class ModsDialog extends BaseDialog{
 
         browser.onResize(this::rebuildBrowser);
 
-        if(!mods.list().allMatch(m -> !m.failed())){
+        if(mods.list().contains(m -> m.failed())){
             buttons.button("@mods.restore", Icon.power, () -> {
                 Seq<LoadedMod> skipped = new Seq<>();
                 skipped.selectFrom(mods.list(), LoadedMod::failed);
