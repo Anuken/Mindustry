@@ -693,7 +693,7 @@ public class LExecutor{
                 if(sense instanceof Content co){
                     to.setnum(se.sense(co));
                     return;
-                }else if(sense instanceof LAccess la && (exec.privileged || !la.isPrivileged())){
+                }else if(sense instanceof LAccess la && (exec.privileged || !la.privileged)){
                     Object objOut = se.senseObject(la);
 
                     if(objOut == Senseable.noSensed){

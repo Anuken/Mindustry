@@ -122,7 +122,12 @@ public abstract class LStatement{
         return value;
     }
 
+    protected static boolean logicLocalization(){
+        return Core.settings.getBool("logiclocalization", true);
+    }
+
     public static String bundle(String key){
+        if(!logicLocalization()) return key;
         return Core.bundle.get("name.token." + key, key);
     }
 
@@ -132,17 +137,16 @@ public abstract class LStatement{
         }else if(value instanceof ConditionOp op){
             return selectTranslate(op.symbol);
         }
-
         String name = value.name().toLowerCase(Locale.ROOT);
         String labelKey = value.getClass().getSimpleName().toLowerCase(Locale.ROOT) + ".label." + name;
-        if(Core.bundle.has(labelKey)){
+        if(logicLocalization() && Core.bundle.has(labelKey)){
             return Core.bundle.get(labelKey);
         }
         return value.name();
     }
 
     protected static String selectTranslate(String text){
-        if(text == null || text.isEmpty()) return text;
+        if(text == null || text.isEmpty() || !logicLocalization()) return text;
         return switch(text){
             case "not", "and", "or", "b-and", "xor", "flip", "always" -> bundle(text);
             default -> text;
@@ -337,7 +341,8 @@ public abstract class LStatement{
     }
 
     public String localizedName(){
-        return Core.bundle.get("instruction." + statementKey(), name());
+        if(logicLocalization()) return Core.bundle.get("instruction." + statementKey(), name());
+        return statementKey();
     }
 
     public String name(){
