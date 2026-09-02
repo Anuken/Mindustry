@@ -92,17 +92,13 @@ public enum LAccess{
 
     public static final LAccess[]
         all = values(),
-        senseable = Seq.select(all, t -> t.params.length <= 1 && !t.isPrivileged()).toArray(LAccess.class),
+        senseable = Seq.select(all, t -> t.params.length <= 1 && !privilegedAccess.contains(t)).toArray(LAccess.class),
         senseablePrivileged = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
         controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
         settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType, bulletTime, bulletLifetime};
 
     static{
         privilegedAccess.each(l -> l.privileged = privilegedAccess.contains(l));
-    }
-
-    private boolean isPrivileged(){
-        return privileged = privilegedAccess.contains(this);
     }
 
     LAccess(String... params){
