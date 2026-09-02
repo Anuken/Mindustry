@@ -20,8 +20,8 @@ public class LegacyRegionSaveVersion extends ShortChunkSaveVersion{
         readRegion("content", stream, counter, this::readContentHeader);
 
         try{
-            readRegion("map", stream, counter, in -> readMap(in, saveState.context));
-            readRegion("entities", stream, counter, this::readEntities);
+            readRegion("map", stream, counter, in -> readMap(in, saveState));
+            readRegion("entities", stream, counter, in -> readEntities(in, saveState));
         }finally{
             content.setTemporaryMapper(null);
 

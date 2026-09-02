@@ -109,7 +109,7 @@ public class MapIO{
             if(ver.version >= 12) ver.skipChunk(stream);
             ver.readRegion("content", stream, counter, MapIO::readPreviewContentHeader);
             if(ver.version == 11) ver.skipChunk(stream);
-            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
+            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new SaveReadState(new WorldContext(){
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
                 @Override public void begin(){
@@ -179,7 +179,9 @@ public class MapIO{
                         }
                     }
                 }
-            }));
+            }){{
+                preview = true;
+            }}));
 
             floors.draw(walls, true);
             walls.dispose();

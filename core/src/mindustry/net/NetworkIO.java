@@ -60,6 +60,7 @@ public class NetworkIO{
 
             SaveIO.getSaveWriter().writeContentHeader(stream);
             SaveIO.getSaveWriter().writeMap(stream);
+            SaveIO.getSaveWriter().writeEntities(stream);
             SaveIO.getSaveWriter().writeTeamBlocks(stream);
             SaveIO.getSaveWriter().writeMarkers(stream);
             SaveIO.getSaveWriter().writeCustomChunks(stream, true);
@@ -93,8 +94,11 @@ public class NetworkIO{
             player.id = id;
             player.add();
 
+            var state = new SaveReadState(world.context);
+
             SaveIO.getSaveWriter().readContentHeader(stream);
-            SaveIO.getSaveWriter().readMap(stream, world.context);
+            SaveIO.getSaveWriter().readMap(stream, state);
+            SaveIO.getSaveWriter().readEntities(stream, state);
             SaveIO.getSaveWriter().readTeamBlocks(stream);
             SaveIO.getSaveWriter().readMarkers(stream);
             SaveIO.getSaveWriter().readCustomChunks(stream);
