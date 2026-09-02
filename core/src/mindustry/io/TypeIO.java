@@ -40,30 +40,31 @@ import static mindustry.Vars.*;
 @TypeIOHandler
 public class TypeIO{
     /** Possible Types of written objects. */
-    public static final byte nullType = 0;
-    public static final byte integerType = 1;
-    public static final byte longType = 2;
-    public static final byte floatType = 3;
-    public static final byte stringType = 4;
-    public static final byte contentType = 5;
-    public static final byte intSeqType = 6;
-    public static final byte point2Type = 7;
-    public static final byte point2ArrayType = 8;
-    public static final byte techNodeType = 9;
-    public static final byte booleanType = 10;
-    public static final byte doubleType = 11;
-    public static final byte buildingType = 12;
-    public static final byte lAccessType = 13;
-    public static final byte byteArrayType = 14;
-    public static final byte leagacyType = 15;
-    public static final byte booleanArrayType = 16;
-    public static final byte unitType = 17;
-    public static final byte vec2ArrayType = 18;
-    public static final byte vec2Type = 19;
-    public static final byte teamType = 20;
-    public static final byte intArrayType = 21;
-    public static final byte objectArrayType = 22;
-    public static final byte unitCommandType = 23;
+    public static final byte
+        nullType = 0,
+        integerType = 1,
+        longType = 2,
+        floatType = 3,
+        stringType = 4,
+        contentType = 5,
+        intSeqType = 6,
+        point2Type = 7,
+        point2ArrayType = 8,
+        techNodeType = 9,
+        booleanType = 10,
+        doubleType = 11,
+        buildingType = 12,
+        lAccessType = 13,
+        byteArrayType = 14,
+        legacyType = 15,
+        booleanArrayType = 16,
+        unitType = 17,
+        vec2ArrayType = 18,
+        vec2Type = 19,
+        teamType = 20,
+        intArrayType = 21,
+        objectArrayType = 22,
+        unitCommandType = 23;
 
     private static final int maxArraySize = 1000, maxByteArraySize = 40_000, maxSyncedPlans = 20;
 
