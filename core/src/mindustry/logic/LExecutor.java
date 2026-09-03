@@ -645,12 +645,13 @@ public class LExecutor{
     }
 
     public static class WriteI implements LInstruction{
-        public LVar target, position, value;
+        public LVar target, position, value, length;
 
-        public WriteI(LVar target, LVar position, LVar value){
+        public WriteI(LVar target, LVar position, LVar value, LVar length){
             this.target = target;
             this.position = position;
             this.value = value;
+            this.length = length;
         }
 
         public WriteI(){
@@ -661,7 +662,7 @@ public class LExecutor{
             Object targetObj = target.obj();
             if(targetObj instanceof LWritable write){
                 if(!write.writable(exec)) return;
-                write.write(position, value);
+                write.write(position, value, length);
             }
         }
     }

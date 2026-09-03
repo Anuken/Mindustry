@@ -109,15 +109,17 @@ public class MemoryBlock extends Block{
         }
 
         @Override
-        public void write(LVar position, LVar value){
+        public void write(LVar position, LVar value, LVar length){
             int address = position.numi();
-            if(address < 0 || address >= objectMemory.length) return;
+            int len = length.numi();
+            if(address < 0 || address >= objectMemory.length || len <= 0) return;
+            int end = Math.min(objectMemory.length, address + len);
 
             if(value.isobj){
-                objectMemory[address] = value.objval;
+                Arrays.fill(objectMemory, address, end, value.objval);
             }else{
-                objectMemory[address] = sentinel;
-                numberMemory[address] = value.numval;
+                Arrays.fill(objectMemory, address, end, sentinel);
+                Arrays.fill(numberMemory, address, end, value.numval);
             }
         }
 

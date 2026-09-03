@@ -633,7 +633,7 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public void write(LVar position, LVar value){
+        public void write(LVar position, LVar value, LVar length){
             if(position.isobj && position.objval instanceof String varName){
                 LVar at = executor.optionalVar(varName);
                 if(at == null || at.constant) return;

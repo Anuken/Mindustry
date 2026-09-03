@@ -154,9 +154,12 @@ public class CanvasBlock extends Block{
         public int blending;
         protected boolean invalidated = false;
 
-        public void setPixel(int pos, int index){
+        public void setPixel(int pos, int length, int index){
             if(pos < canvasSize * canvasSize && pos >= 0 && index >= 0 && index < palette.length){
-                setByte(data, pos * bitsPerPixel, index);
+                int repeat = Math.min(length, canvasSize * canvasSize - pos);
+                while (repeat-- > 0) {
+                    setByte(data, pos++ * bitsPerPixel, index);
+                }
                 invalidated = true;
             }
         }
@@ -244,8 +247,8 @@ public class CanvasBlock extends Block{
         }
 
         @Override
-        public void write(LVar position, LVar value){
-            setPixel(position.numi(), value.numi());
+        public void write(LVar position, LVar value, LVar length){
+            setPixel(position.numi(), length.numi(), value.numi());
         }
 
         boolean blends(Tile other){

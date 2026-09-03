@@ -93,7 +93,7 @@ public class LStatements{
 
     @RegisterStatement("write")
     public static class WriteStatement extends LStatement{
-        public String input = "result", target = "cell1", address = "0";
+        public String input = "result", target = "cell1", address = "0", length = "1";
 
         @Override
         public void build(Table table){
@@ -110,11 +110,15 @@ public class LStatements{
             table.add(bundle("at"));
 
             field(table, address, str -> address = str);
+
+            table.add(bundle("length"));
+
+            field(table, length, str -> length = str);
         }
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new WriteI(builder.var(target), builder.var(address), builder.var(input));
+            return new WriteI(builder.var(target), builder.var(address), builder.var(input), builder.var(length));
         }
 
         @Override
