@@ -2,15 +2,12 @@ package mindustry.entities;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.Units.*;
-import mindustry.game.*;
 import mindustry.gen.*;
 
 public class UnitSorts{
-    public static final IntIntMap clusterCount = new IntIntMap();
-    public static float timer;
+    private static final Seq<UnitCluster> clusters = new Seq<>();
     public static Sortf
 
     closest = Unit::dst2,
@@ -22,26 +19,19 @@ public class UnitSorts{
     mostShield = (u, x, y) -> -u.shield + Mathf.dst2(u.x, u.y, x, y) / 6400f,
     leastShield = (u, x, y) -> u.shield + Mathf.dst2(u.x, u.y, x, y) / 6400f;
 
-    public static Sortf grouped(float radius){
+    public static UnitCluster grouped(float radius){
         return grouped(radius, -1f);
     }
-    /**
-     * @param distanceWeight higher values make distance less important. Set to <= 0 to ignore distance.
-     */
-    public static Sortf grouped(float radius, float distanceWeight){
-        return (u, x, y) -> {
-            if((timer += Time.delta) > 10f || clusterCount.size < 0){
-                timer = 0f;
-                clusterCount.clear();
-                Groups.unit.each(uc -> clusterCount.increment(clusterKey(uc.team, uc.x, uc.y, radius)));
-            }
-            return -clusterCount.get(clusterKey(u.team, u.x, u.y, radius), 0) + (distanceWeight > 0 ? Mathf.dst2(u.x, u.y, x, y) / distanceWeight : 0f);
-        };
-    }
 
-    //8 bits for team. Does not support negative coords
-    private static int clusterKey(Team team, float x, float y, float radius){
-        return (team.id << 24) | ((Mathf.floor(x / radius) & 0xFFF) << 12) | (Mathf.floor(y / radius) & 0xFFF);
+    /** @param distanceWeight higher values make distance less important. Set to <= 0 to ignore distance. */
+    public static UnitCluster grouped(float radius, float distanceWeight){
+        for(UnitCluster c : clusters){
+            if(c.radius == radius && c.dstWeight == distanceWeight) return c;
+        }
+        //only allocate if no same cluster (radius, distance) is found
+        UnitCluster c = new UnitCluster(radius, distanceWeight);
+        clusters.add(c);
+        return c;
     }
 
     public static BuildingPriorityf
