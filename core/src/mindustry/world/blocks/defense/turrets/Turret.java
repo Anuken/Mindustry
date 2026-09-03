@@ -301,7 +301,6 @@ public class Turret extends ReloadTurret{
         public float heatReq;
         public float[] sideHeat = new float[4];
 
-        public @Nullable UnitCluster unitCluster;
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
 
         float lastRangeChange;
