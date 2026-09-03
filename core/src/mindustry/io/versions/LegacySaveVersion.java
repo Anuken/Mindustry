@@ -3,6 +3,7 @@ package mindustry.io.versions;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
+import mindustry.io.*;
 import mindustry.world.*;
 
 import java.io.*;
@@ -16,7 +17,8 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
     }
 
     @Override
-    public void readMap(DataInput stream, WorldContext context) throws IOException{
+    public void readMap(DataInput stream, SaveReadState state) throws IOException{
+        var context = state.context;
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
@@ -56,7 +58,10 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
                 //do not override occupied cells
                 if(!occupied){
                     tile.setBlock(block);
-                    if(tile.build != null) tile.build.enabled = true;
+                    if(tile.build != null){
+                        if(!state.preview) state.allBuildings.add(tile.build);
+                        tile.build.enabled = true;
+                    }
                 }
 
                 if(block.hasBuilding()){
