@@ -2111,6 +2111,7 @@ public class Blocks{
             arrowSpacing = 6f;
             bufferCapacity = 14;
             crushFragile = true;
+            noAcceptDisabled = true;
         }};
 
         phaseConveyor = new ItemBridge("phase-conveyor"){{
@@ -2121,6 +2122,7 @@ public class Blocks{
             arrowTimeScl = 2.75f;
             hasPower = true;
             pulse = true;
+            noAcceptDisabled = true;
             envEnabled |= Env.space;
             consumePower(0.30f);
         }};
