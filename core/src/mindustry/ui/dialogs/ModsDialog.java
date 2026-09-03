@@ -44,7 +44,14 @@ public class ModsDialog extends BaseDialog{
         super("@mods");
         addCloseButton();
 
-        buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
+        if(mods.list().contains(LoadedMod::failed)){
+            buttons.button("@mods.restore", Icon.power, () -> {
+                mods.list().each(LoadedMod::failed, m -> mods.setEnabled(m, true));
+                setup();
+            });
+        }else{ //no room for both buttons on mobile
+            buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
+        }
 
         if(!mobile){
             buttons.button("@mods.openfolder", Icon.link, () -> Core.app.openFolder(modDirectory.absolutePath()));

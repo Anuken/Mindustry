@@ -120,6 +120,8 @@ public class BulletType extends Content implements Cloneable{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 8f;
+    /** Chance for this bullet to apply a status effect */
+    public float statusChance = 1f;
     /** Turret only. If false, blocks will not be targeted. */
     public boolean targetBlocks = true;
     /** Turret only. If false, missiles will not be targeted. */
@@ -513,7 +515,10 @@ public class BulletType extends Content implements Cloneable{
                 if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
                 unit.impulse(Tmp.v3);
             }
-            unit.apply(status, statusDuration);
+
+            if(Mathf.chance(statusChance)){
+                unit.apply(status, statusDuration);
+            }
 
             Events.fire(bulletDamageEvent.set(unit, b));
         }
@@ -600,7 +605,7 @@ public class BulletType extends Content implements Cloneable{
             Damage.damage(b.team, x, y, splashDamageRadius, splashDamage * b.damageMultiplier(), splashDamagePierce, collidesAir, collidesGround, scaledSplashDamage, b, armorMultiplier);
 
             if(status != StatusEffects.none){
-                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround);
+                Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround, statusChance);
             }
 
             if(heals()){

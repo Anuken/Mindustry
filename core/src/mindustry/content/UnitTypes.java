@@ -2536,7 +2536,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.02f;
                 }};
             }});
@@ -2587,7 +2587,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.03f;
                 }};
             }});
@@ -2642,7 +2642,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 70f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.04f;
                 }};
             }});
