@@ -63,7 +63,7 @@ public class Map implements Comparable<Map>, Publishable{
         this(Vars.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
     }
 
-    public int getHightScore(){
+    public int getHighScore(){
         return Core.settings.getInt("hiscore" + file.nameWithoutExtension() + tags.get("steamid", ""), 0);
     }
 

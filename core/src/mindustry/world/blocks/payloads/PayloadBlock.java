@@ -121,8 +121,9 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public void handlePayload(Building source, Payload payload, @Nullable Unit unit){
-            if(unit != null){
+        public void handlePayload(Building source, Payload payload){
+            if(payload instanceof UnitPayload up){
+                var unit = up.unit;
                 float clampPos = size * tilesize * 0.7f + unit.hitSize / 2f;
                 this.payVector.set(unit.x, unit.y).sub(this).clamp(-clampPos, -clampPos, clampPos, clampPos);
             }else{

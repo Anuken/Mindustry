@@ -78,6 +78,7 @@ public class UnitTypes{
 
     //special building tethered (has payload capability, because it's necessary sometimes)
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
+    public static @EntityDef({TargetDummyc.class, Unitc.class}) UnitType dummy;
 
     //tank
     public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, locus, precept, vanquish, conquer;
@@ -355,19 +356,25 @@ public class UnitTypes{
 
         nova = new UnitType("nova"){{
             canBoost = true;
-            boostMultiplier = 1.5f;
+            boostMultiplier = 2f;
             speed = 0.55f;
             hitSize = 8f;
-            health = 120f;
+            health = 200f;
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
+            abilities.add(new RepairFieldAbility(20f, 60f * 2, 100f){{
+                sameTypeHealMult = 0.15f;
+                maxTargets = 6;
+
+                smartHeal = true;
+                smartDowntime = 60 * 4f;
+            }});
 
             weapons.add(new Weapon("heal-weapon"){{
                 top = false;
                 shootY = 2f;
-                reload = 24f;
+                reload = 30f;
                 x = 4.5f;
                 alternate = false;
                 ejectEffect = Fx.none;
@@ -377,6 +384,9 @@ public class UnitTypes{
                 bullet = new LaserBoltBulletType(5.2f, 13){{
                     lifetime = 30f;
                     healPercent = 5f;
+                    pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -1370,7 +1380,11 @@ public class UnitTypes{
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
 
-            abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
+            abilities.add(new RepairFieldAbility(){{
+                amount = 5f;
+                reload = 60f * 8f;
+                range = 50f;
+            }});
 
             weapons.add(new Weapon("poly-weapon"){{
                 top = false;
@@ -2522,7 +2536,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.02f;
                 }};
             }});
@@ -2573,7 +2587,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.03f;
                 }};
             }});
@@ -2628,7 +2642,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 70f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.04f;
                 }};
             }});
@@ -4616,6 +4630,40 @@ public class UnitTypes{
             createWreck = false;
             envEnabled = Env.any;
             envDisabled = Env.none;
+        }};
+
+        dummy = new UnitType("dummy"){{
+            controller = u -> new NoAI();
+
+            envEnabled = Env.any;
+            envDisabled = 0;
+            isEnemy = false;
+            allowedInPayloads = false;
+            logicControllable = false;
+            playerControllable = false;
+            hidden = true;
+            hoverable = false;
+            canBoost = true;
+            useUnitCap = false;
+            killable = false;
+            physics = false;
+
+            flyingLayer = Layer.flyingUnit - 1f;
+            drag = 0.33f;
+            hitSize = 12f;
+            hideDetails = false;
+            engineOffset = 7f;
+            engineSize = 2f;
+            for(int i = 0; i < 3; i++){
+                engines.add(new UnitEngine(Geometry.d4x(i) * engineOffset, Geometry.d4y(i) * engineOffset, engineSize, i * 90));
+            }
+        }
+
+        @Override
+        public void drawBody(Unit unit) {
+            applyColor(unit);
+            Drawf.spinSprite(region, unit.x, unit.y, unit.rotation - 90);
+            Draw.reset();
         }};
 
         //endregion
