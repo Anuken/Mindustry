@@ -57,9 +57,8 @@ public class ItemBridge extends Block{
         noUpdateDisabled = true;
         allowDiagonal = false;
         copyConfig = false;
-        //disabled as to not be annoying
-        allowConfigInventory = false;
         ignoreResizeConfig = true;
+        diagonalConfigInventory = true;
         priority = TargetPriority.transport;
         delayLandingConfig = true;
 
@@ -157,7 +156,7 @@ public class ItemBridge extends Block{
             if(!(tile.block().hasItems && other.block().hasItems) && !(tile.block().hasLiquids && other.block().hasLiquids)) return false;
         }
 
-        return ((linkSameType ? other.block() == tile.block() && tile.block() == this : (other.block() instanceof ItemBridge && tile.block() instanceof ItemBridge)) 
+        return ((linkSameType ? other.block() == tile.block() && tile.block() == this : (other.block() instanceof ItemBridge && tile.block() instanceof ItemBridge))
             || (!(tile.block() instanceof ItemBridge) && other.block() == this))
             && (other.team() == tile.team() || tile.block() != this)
             && (!checkDouble || ((ItemBridgeBuild)other.build).link != tile.pos());

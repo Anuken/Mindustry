@@ -18,7 +18,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
     }
 
     @Override
-    public void readWorldEntities(DataInput stream, Prov[] mapping) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveReadState state) throws IOException{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
@@ -45,7 +45,8 @@ public class ShortChunkSaveVersion extends SaveVersion{
     }
 
     @Override
-    public void readMap(DataInput stream, WorldContext context) throws IOException{
+    public void readMap(DataInput stream, SaveReadState state) throws IOException{
+        var context = state.context;
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
@@ -103,7 +104,10 @@ public class ShortChunkSaveVersion extends SaveVersion{
                 //set block only if this is the center; otherwise, it's handled elsewhere
                 if(isCenter){
                     tile.setBlock(block);
-                    if(tile.build != null) tile.build.enabled = true;
+                    if(tile.build != null){
+                        if(!state.preview) state.allBuildings.add(tile.build);
+                        tile.build.enabled = true;
+                    }
                 }
 
                 //must be assigned after setBlock, because that can reset data

@@ -816,7 +816,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     }
 
-
     /**
      * Tries moving a payload forwards.
      * @param todump payload to dump.

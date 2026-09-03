@@ -266,7 +266,7 @@ public class Damage{
             World.raycastEachNoDiagonalWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 boolean collide = tile != null && tile.collide(hitter) && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
-                    && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
+                && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
                 if(collide){
                     collided.add(collidePool.obtain().set(cx * tilesize, cy * tilesize, tile));
 
@@ -468,14 +468,19 @@ public class Damage{
         damage(team, x, y, radius, damage, false, air, ground);
     }
 
-    /** Applies a status effect to all enemy units in a range. */
     public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
+        status(team, x, y, radius, effect, duration, air, ground, 1f);
+    }
+
+    public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground, float chance){
         Cons<Unit> cons = entity -> {
             if(entity.team == team || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius)){
                 return;
             }
 
-            entity.apply(effect, duration);
+            if(Mathf.chance(chance)){
+                entity.apply(effect, duration);
+            }
         };
 
         rect.setSize(radius * 2).setCenter(x, y);
@@ -485,7 +490,6 @@ public class Damage{
             Units.nearby(rect, cons);
         }
     }
-
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
         damage(team, x, y, radius, damage, complete, true, true);
