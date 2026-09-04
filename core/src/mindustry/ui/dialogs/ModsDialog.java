@@ -547,7 +547,6 @@ public class ModsDialog extends BaseDialog{
                         ui.showInfo("@mods.browser.noreleases");
                     }
                 }else{
-                    //sel.hide();
                     downloads = new BaseDialog("@mods.browser.releases");
                     downloads.cont.pane(p -> {
                         if(reinstall && !isJava){
@@ -577,7 +576,7 @@ public class ModsDialog extends BaseDialog{
                                     b.button("@mods.github.open-release", Icon.link, () -> Core.app.openURI(release.getString("html_url")));
                                     b.button("@mods.browser.add", Icon.download, () -> {
                                         String releaseUrl = release.getString("url");
-                                        ui.mods.githubImportMod(repo, isJava, releaseUrl.substring(releaseUrl.lastIndexOf("/") + 1), true);
+                                        githubImportMod(repo, isJava, releaseUrl.substring(releaseUrl.lastIndexOf("/") + 1), true);
                                     });
                                 }).right();
                             }).margin(5f).growX().pad(5f);
@@ -588,16 +587,14 @@ public class ModsDialog extends BaseDialog{
                     downloads.buttons.button("@back", Icon.left, () -> {
                         downloads.clear();
                         downloads.hide();
-                        //sel.show();
                     }).size(150f, 54f).pad(2f);
                     downloads.keyDown(KeyCode.escape, downloads::hide);
                     downloads.keyDown(KeyCode.back, downloads::hide);
-                    //downloads.hidden(sel::show);
                     downloads.show();
                 }
             });
         }, t -> Core.app.post(() -> {
-            ui.mods.showModError(t);
+            showModError(t);
             load.hide();
         }));
     }
