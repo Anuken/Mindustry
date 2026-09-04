@@ -25,6 +25,7 @@ public class GenericCrafter extends Block{
     public @Nullable ItemStack outputItem;
     /** Overwrites outputItem if not null. */
     public @Nullable ItemStack[] outputItems;
+    public @Nullable float[] outputAccumulator;
 
     /** Written to outputLiquids as a single-element array if outputLiquids is null. */
     public @Nullable LiquidStack outputLiquid;
@@ -119,6 +120,7 @@ public class GenericCrafter extends Block{
     public void init(){
         if(outputItems == null && outputItem != null){
             outputItems = new ItemStack[]{outputItem};
+            outputAccumulator = new float[outputItems.length];
         }
         if(outputLiquids == null && outputLiquid != null){
             outputLiquids = new LiquidStack[]{outputLiquid};
@@ -203,7 +205,7 @@ public class GenericCrafter extends Block{
         public boolean shouldConsume(){
             if(outputItems != null){
                 for(var output : outputItems){
-                    if(items.get(output.item) + scaleOutput(output.amount, true, false) > itemCapacity){
+                    if(items.get(output.item) + scaleOutput(output.amount) > itemCapacity){
                         return false;
                     }
                 }
@@ -299,20 +301,21 @@ public class GenericCrafter extends Block{
         }
 
         public float scaleOutput(float amount){
-            return scaleOutput(amount, false, false);
-        }
-
-        public float scaleOutput(float amount, boolean item, boolean accumulate){
             return amount;
         }
 
         public void craft(){
             consume();
 
-            if(outputItems != null){
-                for(var output : outputItems){
-                    float maxOutput = scaleOutput(output.amount, true, true);
-                    for(int i = 0; i < maxOutput; i++){
+            if(outputItems != null && outputAccumulator != null){
+                for(int i = 0; i < outputItems.length; i++){
+                    ItemStack output = outputItems[i];
+
+                    outputAccumulator[i] += scaleOutput(output.amount);
+                    int floored = Mathf.floor(outputAccumulator[i]);
+                    outputAccumulator[i] -= floored;
+
+                    for(int j = 0; j < floored; j++){
                         offload(output.item);
                     }
                 }

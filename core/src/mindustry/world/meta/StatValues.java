@@ -237,7 +237,7 @@ public class StatValues{
 
     /** Displays an item with a specified amount. */
     private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content, boolean tooltip){
-        return stack(region, amount, content, tooltip);
+        return stack(region, (float)amount, content, tooltip);
     }
 
     /** Displays an item with a specified amount. */
