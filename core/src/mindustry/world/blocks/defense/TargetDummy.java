@@ -131,7 +131,7 @@ public class TargetDummy extends Block{
                 unit.hitSize = dummySize;
 
                 //similar to impulseNet but does not factor in mass
-                Tmp.v1.set(this).sub(unit).limit(dst(unit) * pullScale * Time.delta);
+                Tmp.v1.set(this).sub(unit).limit(dst(unit) * pullScale);
                 unit.vel.add(Tmp.v1);
 
                 //manually move units to simulate velocity for remote players
