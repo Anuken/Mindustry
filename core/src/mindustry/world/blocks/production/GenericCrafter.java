@@ -118,10 +118,8 @@ public class GenericCrafter extends Block{
 
     @Override
     public void init(){
-        if(outputItems == null && outputItem != null){
-            outputItems = new ItemStack[]{outputItem};
-            outputAccumulator = new float[outputItems.length];
-        }
+        initializeOutputItems();
+
         if(outputLiquids == null && outputLiquid != null){
             outputLiquids = new LiquidStack[]{outputLiquid};
         }
@@ -131,7 +129,6 @@ public class GenericCrafter extends Block{
         }
         outputsLiquid = outputLiquids != null;
 
-        if(outputItems != null) hasItems = true;
         if(outputLiquids != null) hasLiquids = true;
 
         super.init();
@@ -141,10 +138,21 @@ public class GenericCrafter extends Block{
     public void afterPatch(){
         super.afterPatch();
 
+        initializeOutputItems();
         outputsLiquid = outputLiquids != null;
-
-        if(outputItems != null) hasItems = true;
         if(outputLiquids != null) hasLiquids = true;
+    }
+
+    private void initializeOutputItems(){
+        if(outputItems == null && outputItem != null){
+            outputItems = new ItemStack[]{outputItem};
+        }
+        if(outputItems != null){
+            hasItems = true;
+            if(outputAccumulator == null || outputAccumulator.length != outputItems.length){
+                outputAccumulator = new float[outputItems.length];
+            }
+        }
     }
 
     @Override
@@ -300,6 +308,7 @@ public class GenericCrafter extends Block{
             return totalProgress;
         }
 
+        /** Allows scaling the crafter's output dynamically. */
         public float scaleOutput(float amount){
             return amount;
         }
