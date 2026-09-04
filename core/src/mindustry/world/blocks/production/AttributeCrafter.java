@@ -84,7 +84,6 @@ public class AttributeCrafter extends GenericCrafter{
 
     public class AttributeCrafterBuild extends GenericCrafterBuild{
         public float attrsum;
-        public float scaledOutput;
 
         @Override
         public float getProgressIncrease(float base){
@@ -106,8 +105,7 @@ public class AttributeCrafter extends GenericCrafter{
 
         @Override
         public float scaleOutput(float amount){
-            scaledOutput = amount * outputMultiplier();
-            return outputScale > 0f ? scaledOutput : amount;
+            return outputScale > 0f ? amount * outputMultiplier() : amount;
         }
 
         @Override
