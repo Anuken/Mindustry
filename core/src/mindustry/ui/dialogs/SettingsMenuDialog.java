@@ -21,7 +21,6 @@ import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -528,10 +527,6 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("indicators", true);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
-
-        if(Shaders.shield != null){
-            graphics.checkPref("animatedshields", true);
-        }
 
         graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
 

@@ -149,24 +149,43 @@ public class KeybindDialog extends Dialog{
         }
     }
 
-    private void openDialog( KeyBind name){
-        rebindDialog = new Dialog(rebindAxis ? bundle.get("keybind.press.axis") : bundle.get("keybind.press"));
+    private void openDialog(KeyBind keyBind){
+        InputListener blocker = new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                event.cancel();
+                return true;
+            }
+        };
 
-        rebindKey = name;
+        float bw = 210f, bh = 64f;
+        rebindDialog = new Dialog(bundle.get("keybind." + keyBind.name + ".name", Strings.capitalize(keyBind.name))){{
+            title.setAlignment(Align.center);
+            cont.add(rebindAxis ? bundle.get("keybind.press.axis") : bundle.get("keybind.press")).pad(40f);
+
+            buttons.button("@settings.unbindKey", Icon.cancel, () -> {
+                keyBind.unset();
+                hide();
+            }).size(bw, bh).get().addListener(blocker);
+
+            buttons.button("@back", Icon.left, this::hide).size(bw, bh).get().addListener(blocker);
+        }};
+
+        rebindKey = keyBind;
 
         rebindDialog.titleTable.getCells().first().pad(4);
         rebindDialog.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
                 if(Core.app.isAndroid()) return false;
-                rebind(name, button);
+                rebind(keyBind, button);
                 return false;
             }
 
             @Override
             public boolean keyDown(InputEvent event, KeyCode keycode){
                 rebindDialog.hide();
-                rebind(name, keycode);
+                rebind(keyBind, keycode);
                 return false;
             }
 
@@ -174,7 +193,7 @@ public class KeybindDialog extends Dialog{
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 if(!rebindAxis) return false;
                 rebindDialog.hide();
-                rebind(name, KeyCode.scroll);
+                rebind(keyBind, KeyCode.scroll);
                 return false;
             }
         });
