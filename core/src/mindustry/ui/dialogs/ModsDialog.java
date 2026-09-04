@@ -407,7 +407,7 @@ public class ModsDialog extends BaseDialog{
             boolean showImport = !mod.hasSteamID();
             modDetails.buttons.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + mod.getRepo()));
             if(mobile && showImport) modDetails.buttons.row();
-            if(showImport) modDetails.buttons.button("@mods.browser.reinstall", Icon.download, () -> viewReleases(mod.getRepo(), mod.isJava()));
+            if(showImport) modDetails.buttons.button("@mods.browser.reinstall", Icon.download, () -> viewReleases(mod.getRepo(), mod.isJava(), true));
         }
 
         modDetails.cont.pane(desc -> {
@@ -529,7 +529,7 @@ public class ModsDialog extends BaseDialog{
         }
     }
 
-    public void viewReleases(String repo, boolean isJava) {
+    public void viewReleases(String repo, boolean isJava, boolean reinstall) {
         BaseDialog load = new BaseDialog("");
         load.cont.add("[accent]" + Core.bundle.get("mods.browser.fetching"));
         load.show();
@@ -541,11 +541,28 @@ public class ModsDialog extends BaseDialog{
                 load.hide();
 
                 if(releases.size == 0){
-                    ui.showInfo("@mods.browser.noreleases");
+                    if(reinstall && !isJava){
+                        githubImportMod(repo, isJava, null, false);
+                    }else{
+                        ui.showInfo("@mods.browser.noreleases");
+                    }
                 }else{
                     //sel.hide();
                     downloads = new BaseDialog("@mods.browser.releases");
                     downloads.cont.pane(p -> {
+                        if(reinstall && !isJava){
+                            p.table(((TextureRegionDrawable)Tex.whiteui).tint(Pal.darkestGray), t -> {
+                                t.add("@mods.browser.current").top().left().growX().wrap().pad(5f).padBottom(15f);
+                                t.row();
+                                t.table(b -> {
+                                    b.defaults().size(150f, 54f).pad(2f);
+                                    b.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + repo));
+                                    b.button("@mods.browser.add", Icon.download, () -> githubImportMod(repo, isJava, null, false));
+                                }).right();
+                            }).margin(5f).growX().pad(5f);
+                            p.row();
+                        }
+
                         for(int j = 0; j < releases.size; j++){
                             var release = releases.get(j);
 

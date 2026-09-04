@@ -350,7 +350,7 @@ public class ModBrowserDialog extends BaseDialog{
                         Core.app.openURI("https://github.com/" + mod.repo);
                     });
 
-                    sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> ui.mods.viewReleases(mod.repo, mod.hasJava));
+                    sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> ui.mods.viewReleases(mod.repo, mod.hasJava, false));
                     sel.keyDown(KeyCode.escape, sel::hide);
                     sel.keyDown(KeyCode.back, sel::hide);
                     sel.show();
