@@ -90,6 +90,7 @@ public class Stat implements Comparable<Stat>{
     targetsAir = new Stat("targetsAir", StatCat.function),
     targetsGround = new Stat("targetsGround", StatCat.function),
     damage = new Stat("damage", StatCat.function),
+    status = new Stat("status", StatCat.function),
     frequency = new Stat("frequency", StatCat.function),
     ammo = new Stat("ammo", StatCat.function),
     ammoCapacity = new Stat("ammoCapacity", StatCat.function),

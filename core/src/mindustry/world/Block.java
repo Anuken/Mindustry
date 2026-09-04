@@ -59,7 +59,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
-    /** If true, this block can input payloads; affects unit payload enter behavior. */
+    /** If true, this block can input payloads. Affects unit payload enter and pathfinding behaviors. */
     public boolean acceptsUnitPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
@@ -264,6 +264,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
     public boolean allowConfigInventory = true;
+    /** If true, the building inventory will be placed diagonally on the top right. */
+    public boolean diagonalConfigInventory = false;
     /** Defines how large selection menus, such as that of sorters, should be. */
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */

@@ -105,7 +105,7 @@ public class Blocks{
     shieldedWall,
 
     //defense
-    mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine,
+    mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine, targetDummy,
 
     //defense - erekir
     radar,
@@ -340,6 +340,7 @@ public class Blocks{
             variants = 0;
             canShadow = false;
             drawEdgeOut = false;
+            supportsBeingOverlaid = false;
         }};
 
         empty = new EmptyFloor("empty");
@@ -2528,6 +2529,10 @@ public class Blocks{
             ambientSoundVolume = 0.03f;
             generateEffect = Fx.generatespark;
 
+            explosionShake = 1f;
+            explosionScorchSize = 1;
+            explosionFireballs = 3;
+
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
             itemDurationMultipliers.put(Items.pyratite, 3f);
@@ -2557,6 +2562,10 @@ public class Blocks{
 
             ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.06f;
+
+            explosionShake = 1f;
+            explosionScorchSize = 2;
+            explosionFireballs = 6;
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
@@ -2628,6 +2637,11 @@ public class Blocks{
             powerProduction = 15f;
             heating = 0.005f;
             coolantPower = 0.125f;
+
+            explosionShake = 4f;
+            explosionScorchSize = 8;
+            explosionIgnitionChance = 0.5f;
+            explosionFireballs = 11;
 
             consumeItem(Items.thorium);
             consumeLiquid(Liquids.cryofluid, heating / coolantPower).update(false);
@@ -3608,13 +3622,14 @@ public class Blocks{
         arc = new PowerTurret("arc"){{
             requirements(Category.turret, with(Items.copper, 50, Items.lead, 50));
             shootType = new LightningBulletType(){{
-                damage = 20;
+                damage = 12;
                 lightningLength = 25;
                 collidesAir = false;
                 ammoMultiplier = 1f;
 
                 //for visual stats only.
-                buildingDamageMultiplier = 0.25f;
+                buildingDamageMultiplier = 0.4f;
+                pierceCap = 5;
 
                 lightningType = new BulletType(0.0001f, 0f){{
                     lifetime = Fx.lightning.lifetime;
@@ -3624,7 +3639,7 @@ public class Blocks{
                     hittable = false;
                     lightColor = Color.white;
                     collidesAir = false;
-                    buildingDamageMultiplier = 0.25f;
+                    buildingDamageMultiplier = 0.4f;
                     shieldDamageMultiplier = 0.2f;
                 }};
             }};
@@ -3640,8 +3655,10 @@ public class Blocks{
             size = 1;
             health = 260;
             shootSound = Sounds.shootArc;
+
             consumePower(3.3f);
             coolant = consumeCoolant(0.1f);
+            coolantMultiplier = 30f;
         }};
 
         parallax = new TractorBeamTurret("parallax"){{
@@ -3728,6 +3745,7 @@ public class Blocks{
             scaledHealth = 300;
             shootSound = Sounds.shootMissile;
             envEnabled |= Env.space;
+            rotateSpeed = 4f;
 
             limitRange(5f);
             coolant = consumeCoolant(0.3f);
@@ -3999,6 +4017,8 @@ public class Blocks{
                     frontColor = Pal.siliconAmmoFront;
                     lifeScaleRandMax = 1.08f;
                     lifeScaleRandMin = 0.95f;
+
+                    unitSort = UnitSorts.closest;
                 }},
                 Items.pyratite, new ArtilleryBulletType(3f, 48){{
                     hitEffect = new MultiEffect(Fx.blastExplosion, Fx.shockwave);
@@ -4076,7 +4096,6 @@ public class Blocks{
             ammoPerShot = 2;
             velocityRnd = 0.2f;
 
-            scaleLifetimeOffset = 1f / 9f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
@@ -4086,6 +4105,8 @@ public class Blocks{
             scaledHealth = 130;
             depositCooldown = 2.0f;
             shootSound = Sounds.shootRipple;
+            scaleLifetimeOffset = 1f / 10f;
+            unitSort = UnitSorts.grouped;
         }};
 
         cyclone = new ItemTurret("cyclone"){{
@@ -4195,7 +4216,7 @@ public class Blocks{
             size = 3;
             recoil = 1.5f;
             recoilTime = 10;
-            rotateSpeed = 10f;
+            rotateSpeed = 7f;
             inaccuracy = 10f;
             shootCone = 30f;
             shootSound = Sounds.shootCyclone;
@@ -4230,7 +4251,7 @@ public class Blocks{
 
             maxAmmo = 40;
             ammoPerShot = 5;
-            rotateSpeed = 2f;
+            rotateSpeed = 1.5f;
             reload = 200f;
             ammoUseEffect = Fx.casing3Double;
             recoil = 5f;
@@ -4313,6 +4334,7 @@ public class Blocks{
 
             scaledHealth = 160;
             coolant = consumeCoolant(1f);
+            rotateSpeed = 4f;
 
             depositCooldown = 2.0f;
             limitRange();
@@ -4333,6 +4355,7 @@ public class Blocks{
             loopSound = Sounds.beamMeltdown;
             loopSoundVolume = 2f;
             envEnabled |= Env.space;
+            rotateSpeed = 1.5f;
 
             shootType = new ContinuousLaserBulletType(78){{
                 length = 200f;
@@ -4680,6 +4703,8 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
+
+                unitSort = UnitSorts.grouped;
             }},
             Items.carbide, new ArtilleryBulletType(4f, 600, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosionSmall, Fx.titanSmokeSmall);
@@ -4717,6 +4742,8 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.2f;
                 fragLifeMin = 1.5f;
+
+                unitSort = UnitSorts.strongest;
 
                 fragBullets = 12;
                     fragBullet = new ArtilleryBulletType(1f, 50, "shell"){{
@@ -4794,6 +4821,8 @@ public class Blocks{
                         buildingDamageMultiplier = 0f;
                     }};
                 }};
+
+                unitSort = UnitSorts.grouped;
             }}
             );
 
@@ -6635,8 +6664,8 @@ public class Blocks{
             requirements(Category.units, with(Items.tungsten, 40, Items.silicon, 50, Items.graphite, 20));
             regionSuffix = "-dark";
             size = 3;
-            reload = 130f;
-            chargeTime = 90f;
+            reload = 45f;
+            chargeTime = 70f;
             range = 700f;
             maxPayloadSize = 2.5f;
             fogRadius = 5;
@@ -6644,7 +6673,7 @@ public class Blocks{
         }};
 
         largePayloadMassDriver = new PayloadMassDriver("large-payload-mass-driver"){{
-            requirements(Category.units, with(Items.phaseFabric, 20, Items.tungsten, 200, Items.silicon, 200, Items.graphite, 100, Items.oxide, 30));
+            requirements(Category.units, with(Items.phaseFabric, 10, Items.tungsten, 120, Items.silicon, 150, Items.graphite, 60, Items.oxide, 30));
             regionSuffix = "-dark";
             size = 5;
             reload = 130f;
@@ -6655,21 +6684,28 @@ public class Blocks{
         }};
 
         smallDeconstructor = new PayloadDeconstructor("small-deconstructor"){{
-            requirements(Category.units, with(Items.beryllium, 100, Items.silicon, 100, Items.oxide, 40, Items.graphite, 80));
+            requirements(Category.units, with(Items.beryllium, 70, Items.silicon, 70, Items.oxide, 25, Items.graphite, 50));
             regionSuffix = "-dark";
             itemCapacity = 100;
+            itemBuffer = itemCapacity - 20;
             consumePower(1f);
             size = 3;
             deconstructSpeed = 3f;
+            separateItemCapacity = true;
+
+            //it just looks weird for anything larger
+            maxPayloadSize = 3;
         }};
 
         deconstructor = new PayloadDeconstructor("deconstructor"){{
             requirements(Category.units, with(Items.beryllium, 250, Items.oxide, 100, Items.silicon, 250, Items.carbide, 50));
             regionSuffix = "-dark";
-            itemCapacity = 250;
+            itemCapacity = 320;
+            itemBuffer = itemCapacity - 20;
             consumePower(3f);
             size = 5;
             deconstructSpeed = 6f;
+            separateItemCapacity = true;
         }};
 
         constructor = new Constructor("constructor"){{
@@ -6688,12 +6724,12 @@ public class Blocks{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 100, Items.tungsten, 200, Items.thorium, 80));
             regionSuffix = "-dark";
             hasPower = true;
-            buildSpeed = 0.75f;
+            buildSpeed = 5f;
             maxBlockSize = 4;
             minBlockSize = 3;
             size = 5;
 
-            consumePower(3f);
+            consumePower(5f);
         }};
 
         payloadLoader = new PayloadLoader("payload-loader"){{
@@ -6774,6 +6810,12 @@ public class Blocks{
             alwaysUnlocked = true;
             ambientSound = Sounds.none;
             allDatabaseTabs = true;
+        }};
+
+        targetDummy = new TargetDummy("target-dummy"){{
+            requirements(Category.defense, BuildVisibility.sandboxOnly, with());
+            size = 2;
+            alwaysUnlocked = true;
         }};
 
         //TODO move

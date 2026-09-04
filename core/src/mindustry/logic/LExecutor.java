@@ -693,7 +693,7 @@ public class LExecutor{
                 if(sense instanceof Content co){
                     to.setnum(se.sense(co));
                     return;
-                }else if(sense instanceof LAccess la && (exec.privileged || !la.isPrivileged())){
+                }else if(sense instanceof LAccess la && (exec.privileged || !la.privileged)){
                     Object objOut = se.senseObject(la);
 
                     if(objOut == Senseable.noSensed){
@@ -1814,6 +1814,7 @@ public class LExecutor{
                     }
                 }
                 case ambientLight -> state.rules.ambientLight.fromDouble(value.num());
+                case unitLight -> state.rules.unitLight = value.bool();
                 case solarMultiplier -> state.rules.solarMultiplier = Math.max(value.numf(), 0f);
                 case dragMultiplier -> state.rules.dragMultiplier = Math.max(value.numf(), 0f);
                 case ban -> {

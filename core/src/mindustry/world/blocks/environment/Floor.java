@@ -54,6 +54,8 @@ public class Floor extends Block{
     public float overlayAlpha = 0.65f;
     /** whether this floor supports an overlay floor */
     public boolean supportsOverlay = false;
+    /** if false, this floor can't be used as an overlay (liquid underlay), even if the floor it's placed on supports it */
+    public boolean supportsBeingOverlaid = true;
     /** shallow water flag used for generation */
     public boolean shallow = false;
     /** Group of blocks that this block does not draw edges on. */
