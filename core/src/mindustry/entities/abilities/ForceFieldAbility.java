@@ -8,6 +8,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -32,17 +33,20 @@ public class ForceFieldAbility extends Ability{
     public float rotation = 0f;
     /** Whether the shield should follow the unit s rotation. */
     public boolean followUnitRot = false;
+
     /** Multiplier on unit speed when its shield is hit. */
     public float unitSlowdown = -1f;
     /** Number of ticks unit slowdown is applied after being hit. */
-    public float slowdownTime = 20f;
+    public float slowdownTime = 80f;
+    /** Number of hits required to reach maximum unit slowdown. */
+    public int shotThreshold = 5;
 
     public Sound breakSound = Sounds.shieldBreakSmall;
     public Sound hitSound = Sounds.shieldHit;
     public float hitSoundVolume = 0.12f;
 
     /** State. */
-    protected float radiusScale, alpha, slowdownTimer;
+    protected float radiusScale, alpha, shots;
     protected boolean wasBroken = true;
 
     private static float realRad;
@@ -58,8 +62,7 @@ public class ForceFieldAbility extends Ability{
             paramUnit.shield -= b.type().shieldDamage(b);
             paramField.alpha = 1f;
             if(paramField.unitSlowdown > 0f){
-                paramUnit.speedMultiplier *= paramField.unitSlowdown;
-                paramField.slowdownTimer = 0f;
+                paramField.shots = Math.min(paramField.shots + 1f, paramField.shotThreshold);
             }
         }
     };
@@ -81,8 +84,6 @@ public class ForceFieldAbility extends Ability{
         this.sides = sides;
         this.rotation = rotation;
     }
-
-    ForceFieldAbility(){}
 
     public float scaledMax(Unit unit){
         return max * Vars.state.rules.unitHealth(unit.team);
@@ -112,10 +113,9 @@ public class ForceFieldAbility extends Ability{
         wasBroken = unit.shield <= 0f;
 
         if(unitSlowdown > 0f){
-            slowdownTimer += Time.delta;
-            if(slowdownTimer > slowdownTime){
-                unit.speedMultiplier = 1f;
-            }
+            //slowdown changes are % based
+            shots = Mathf.approachDelta(shots, 0f, shotThreshold / slowdownTime);
+            unit.speedMultiplier = Mathf.approachDelta(1f, unitSlowdown, Mathf.clamp(shots / shotThreshold));
         }
 
         if(unit.shield < scaledMax(unit)){
@@ -141,7 +141,7 @@ public class ForceFieldAbility extends Ability{
 
         //self-destructing units can have a shield on death
         if(unit.shield > 0f && !wasBroken){
-            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), sides);
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), unit);
             breakSound.at(unit.x, unit.y);
         }
     }

@@ -5438,15 +5438,15 @@ public class Blocks{
                         y = -9f;
                         color = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
                         interval = 20f;
-                    }});
-
-                    abilities.add(new ForceFieldAbility(){{
+                    }},
+                    new ForceFieldAbility(){{
                         followUnitRot = true;
                         radius = 120;
                         regen = 0f;
                         max = 2600f;
                         cooldown = 999999999f;
-                        unitSlowdown = 0.5f;
+                        unitSlowdown = 0.3f;
+                        shotThreshold = 12;
                     }});
                 }};
             }},
@@ -5491,16 +5491,21 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(1800f, 40f){{
+                        bullet = new ExplosionBulletType(1800f, 80f){{
                             //mirror stats
                             ammoMultiplier = 1f;
                             reloadMultiplier = 0.9f;
-                            lightning = 10;
-                            lightningDamage = 45f;
-                            lightningLength = 12;
+                            lightning = 12;
+                            lightningDamage = 50f;
+                            lightningLength = 14;
+                            lightningLengthRand = 4;
 
                             hitColor = engineColor;
-                            shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionSmall);
+                            shootEffect = new MultiEffect(Fx.massiveExplosion, Fx.scatheExplosionLarge, new WaveEffect(){{
+                                lifetime = 14f;
+                                strokeFrom = 8f;
+                                sizeTo = 80f*1.5f;
+                            }});
 
                             collidesAir = false;
                             buildingDamageMultiplier = 0.1f;
@@ -5544,7 +5549,7 @@ public class Blocks{
                                         deathExplosionEffect = Fx.massiveExplosion;
                                         shootOnDeath = true;
                                         shake = 10f;
-                                        bullet = new ExplosionBulletType(180f, 35f){{
+                                        bullet = new ExplosionBulletType(170f, 35f){{
                                             lightning = 4;
                                             lightningDamage = 25f;
                                             lightningLength = 6;
@@ -5567,6 +5572,11 @@ public class Blocks{
                                         y = -9f;
                                         color = Color.grays(0.6f).lerp(Color.valueOf("f7e97e"), 0.5f).a(0.4f);
                                         interval = 5f;
+                                    }},
+                                    new MoveLightningAbility(){{
+                                        chance = 0.03f;
+                                        angleCone = 90f;
+                                        color = hitColor;
                                     }});
                                 }};
                             }};
@@ -5579,6 +5589,15 @@ public class Blocks{
                         y = -9f;
                         color = Color.grays(0.6f).lerp(Color.valueOf("f7e97e"), 0.5f).a(0.4f);
                         interval = 7f;
+                    }},
+                    new MoveLightningAbility(){{
+                        angleCone = 270f;
+                        minSpeed = 0.3f;
+                        chance = 0.3f;
+                        damage = 200f;
+                        length = 14;
+                        lengthRand = 8;
+                        color = hitColor;
                     }});
                 }};
             }}
