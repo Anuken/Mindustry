@@ -741,10 +741,30 @@ public class Block extends UnlockableContent implements Senseable{
             // - confusion
 
             boolean added = false;
+            boolean sharedLiquidBar = false;
 
             //TODO handle in consumer
             //add bars for *specific* consumed liquids
             for(var consl : consumers){
+                if(consl.shared && consl.booster && (consl instanceof ConsumeLiquidBase || consl instanceof ConsumeLiquids)){
+                    added = true;
+
+                    if(!sharedLiquidBar){
+                        sharedLiquidBar = true;
+                        addLiquidBar(build -> {
+                            Liquid first = null;
+                            for(var liquid : content.liquids()){
+                                if(!consumesLiquidShared(liquid)) continue;
+
+                                if(build.liquids.get(liquid) > 0.001f) return liquid;
+                                if(first == null) first = liquid;
+                            }
+                            return first;
+                        });
+                    }
+                    continue;
+                }
+
                 if(consl instanceof ConsumeLiquid liq){
                     added = true;
                     addLiquidBar(liq.liquid);
@@ -787,6 +807,10 @@ public class Block extends UnlockableContent implements Senseable{
 
     public boolean consumesLiquid(Liquid liq){
         return liquidFilter[liq.id];
+    }
+
+    public boolean consumesLiquidShared(Liquid liquid){
+        return Structs.contains(consumers, cons -> cons.shared && cons.booster && cons.consumes(liquid));
     }
 
     public boolean canReplace(Block other){

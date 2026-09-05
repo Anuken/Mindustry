@@ -2932,8 +2932,9 @@ public class Blocks{
             liquidBoostIntensity = 1.8f;
 
             consumePower(3f);
-            consumeLiquid(Liquids.water, 0.1f).boost();
-        }};
+            consumeLiquid(Liquids.water, 0.1f).boost().shared();
+            consumeLiquid(Liquids.cryofluid, 0.1f).boost(2f).shared();
+        }}; 
 
         waterExtractor = new SolidPump("water-extractor"){{
             requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30, Items.copper, 30));
