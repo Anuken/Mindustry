@@ -38,6 +38,7 @@ public class ItemBridge extends Block{
     public float arrowSpacing = 4f, arrowOffset = 2f, arrowPeriod = 0.4f;
     public float arrowTimeScl = 6.2f;
     public float bridgeWidth = 6.5f;
+    /** If true, this bridge will not accept items or liquids when disabled. */
     public boolean noAcceptDisabled = false;
 
     //for autolink
@@ -434,7 +435,7 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, world.tile(link));
+            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, world.tile(link)) && (!noAcceptDisabled || enabled);
         }
 
         @Override
