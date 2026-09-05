@@ -243,7 +243,7 @@ public class ModsDialog extends BaseDialog{
                                         //so does anybody care about version?
                                         //+ "[gray]v" + Strings.stripColors(trimText(item.meta.version)) + "\n"
                                         + (mod.enabled() || hideDisabled ? "" : Core.bundle.get(mod.failed() ? "mod.failed" : "mod.disabled")))
-                                    .wrap().top().width(300f).growX().left();
+                                    .ellipsis(true).top().width(300f).growX().left();
 
                                     text.row();
 
@@ -433,7 +433,7 @@ public class ModsDialog extends BaseDialog{
             if(mod.meta.description != null){
                 desc.add("@editor.description").padRight(10).color(Color.gray).top();
                 desc.row();
-                desc.add(mod.meta.description).growX().wrap().padTop(2);
+                desc.add(mod.meta.description).growX().wrap(true).padTop(2);
                 desc.row();
             }
 
@@ -444,7 +444,7 @@ public class ModsDialog extends BaseDialog{
                 desc.add(state).growX().wrap().row();
             }
 
-        }).width(400f);
+        }).width(Math.min(Core.graphics.getWidth() / Scl.scl(1f), 600f));
 
         Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent u && !u.isHidden()).as();
         if(all.any()){
