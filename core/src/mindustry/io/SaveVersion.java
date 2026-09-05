@@ -416,8 +416,12 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeWorldEntities(DataOutput stream) throws IOException{
+        writeWorldEntities(stream, null);
+    }
+
+    public void writeWorldEntities(DataOutput stream, @Nullable Boolf<Unit> unitFilter) throws IOException{
         //units are not included in Groups.all
-        stream.writeInt(Groups.all.count(Entityc::serialize) + Groups.unit.size());
+        stream.writeInt(Groups.all.count(Entityc::serialize) + (unitFilter == null ? Groups.unit.size() : Groups.unit.count(unitFilter)));
 
         for(Entityc entity : Groups.all){
             if(!entity.serialize()) continue;
@@ -425,7 +429,9 @@ public abstract class SaveVersion extends SaveFileReader{
             writeEntity(entity, stream);
         }
 
-        for(Entityc entity : Groups.unit){
+        for(Unit entity : Groups.unit){
+            if(unitFilter != null && !unitFilter.get(entity)) continue;
+
             writeEntity(entity, stream);
         }
     }
