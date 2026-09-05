@@ -25,6 +25,7 @@ public class GenericCrafter extends Block{
     public @Nullable ItemStack outputItem;
     /** Overwrites outputItem if not null. */
     public @Nullable ItemStack[] outputItems;
+    public @Nullable float[] outputAccumulator;
 
     /** Written to outputLiquids as a single-element array if outputLiquids is null. */
     public @Nullable LiquidStack outputLiquid;
@@ -117,9 +118,8 @@ public class GenericCrafter extends Block{
 
     @Override
     public void init(){
-        if(outputItems == null && outputItem != null){
-            outputItems = new ItemStack[]{outputItem};
-        }
+        initializeOutputItems();
+
         if(outputLiquids == null && outputLiquid != null){
             outputLiquids = new LiquidStack[]{outputLiquid};
         }
@@ -129,7 +129,6 @@ public class GenericCrafter extends Block{
         }
         outputsLiquid = outputLiquids != null;
 
-        if(outputItems != null) hasItems = true;
         if(outputLiquids != null) hasLiquids = true;
 
         super.init();
@@ -139,10 +138,21 @@ public class GenericCrafter extends Block{
     public void afterPatch(){
         super.afterPatch();
 
+        initializeOutputItems();
         outputsLiquid = outputLiquids != null;
-
-        if(outputItems != null) hasItems = true;
         if(outputLiquids != null) hasLiquids = true;
+    }
+
+    private void initializeOutputItems(){
+        if(outputItems == null && outputItem != null){
+            outputItems = new ItemStack[]{outputItem};
+        }
+        if(outputItems != null){
+            hasItems = true;
+            if(outputAccumulator == null || outputAccumulator.length != outputItems.length){
+                outputAccumulator = new float[outputItems.length];
+            }
+        }
     }
 
     @Override
@@ -203,7 +213,7 @@ public class GenericCrafter extends Block{
         public boolean shouldConsume(){
             if(outputItems != null){
                 for(var output : outputItems){
-                    if(items.get(output.item) + output.amount > itemCapacity){
+                    if(items.get(output.item) + scaleOutput(output.amount) > itemCapacity){
                         return false;
                     }
                 }
@@ -274,7 +284,7 @@ public class GenericCrafter extends Block{
             if(outputLiquids != null){
                 max = 0f;
                 for(var s : outputLiquids){
-                    float value = (liquidCapacity - liquids.get(s.liquid)) / (s.amount * edelta());
+                    float value = (liquidCapacity - liquids.get(s.liquid)) / (scaleOutput(s.amount) * edelta());
                     scaling = Math.min(scaling, value);
                     max = Math.max(max, value);
                 }
@@ -298,12 +308,23 @@ public class GenericCrafter extends Block{
             return totalProgress;
         }
 
+        /** Allows scaling the crafter's output dynamically. */
+        public float scaleOutput(float amount){
+            return amount;
+        }
+
         public void craft(){
             consume();
 
-            if(outputItems != null){
-                for(var output : outputItems){
-                    for(int i = 0; i < output.amount; i++){
+            if(outputItems != null && outputAccumulator != null){
+                for(int i = 0; i < outputItems.length; i++){
+                    ItemStack output = outputItems[i];
+
+                    outputAccumulator[i] += scaleOutput(output.amount);
+                    int floored = Mathf.floor(outputAccumulator[i]);
+                    outputAccumulator[i] -= floored;
+
+                    for(int j = 0; j < floored; j++){
                         offload(output.item);
                     }
                 }
