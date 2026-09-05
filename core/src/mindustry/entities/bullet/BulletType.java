@@ -14,6 +14,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.ctype.*;
 import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.part.*;
 import mindustry.entities.pattern.*;
 import mindustry.game.EventType.*;
@@ -120,6 +121,8 @@ public class BulletType extends Content implements Cloneable{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 8f;
+    /** Turret only. Function for choosing which unit to target. Overrides turret sorting */
+    public Sortf unitSort = UnitSorts.closest;
     /** Chance for this bullet to apply a status effect */
     public float statusChance = 1f;
     /** Turret only. If false, blocks will not be targeted. */

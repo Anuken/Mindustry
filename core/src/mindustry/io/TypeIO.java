@@ -475,7 +475,7 @@ public class TypeIO{
             entity = (Unit)EntityMapping.map(typeID & 0xFF).get();
             entity.id(id);
 
-            if(!netClient.isEntityUsed(entity.id())){
+            if(!netClient.isEntityUsed(id)){
                 add = true;
             }
             created = true;

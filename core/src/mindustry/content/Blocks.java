@@ -3652,7 +3652,7 @@ public class Blocks{
             size = 1;
             health = 260;
             shootSound = Sounds.shootArc;
-            
+
             consumePower(3.3f);
             coolant = consumeCoolant(0.1f);
             coolantMultiplier = 30f;
@@ -4014,6 +4014,8 @@ public class Blocks{
                     frontColor = Pal.siliconAmmoFront;
                     lifeScaleRandMax = 1.08f;
                     lifeScaleRandMin = 0.95f;
+
+                    unitSort = UnitSorts.closest;
                 }},
                 Items.pyratite, new ArtilleryBulletType(3f, 48){{
                     hitEffect = new MultiEffect(Fx.blastExplosion, Fx.shockwave);
@@ -4091,7 +4093,6 @@ public class Blocks{
             ammoPerShot = 2;
             velocityRnd = 0.2f;
 
-            scaleLifetimeOffset = 1f / 9f;
             recoil = 6f;
             shake = 2f;
             range = 290f;
@@ -4101,6 +4102,8 @@ public class Blocks{
             scaledHealth = 130;
             depositCooldown = 2.0f;
             shootSound = Sounds.shootRipple;
+            scaleLifetimeOffset = 1f / 10f;
+            unitSort = UnitSorts.grouped;
         }};
 
         cyclone = new ItemTurret("cyclone"){{
@@ -4694,6 +4697,8 @@ public class Blocks{
                 shrinkX = 0.2f;
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.3f;
+
+                unitSort = UnitSorts.grouped;
             }},
             Items.carbide, new ArtilleryBulletType(3.25f, 700, "shell"){{
                 hitEffect = new MultiEffect(Fx.titanExplosionSmall, Fx.titanSmokeSmall);
@@ -4731,6 +4736,8 @@ public class Blocks{
                 shrinkY = 0.1f;
                 buildingDamageMultiplier = 0.2f;
                 fragLifeMin = 1.5f;
+
+                unitSort = UnitSorts.strongest;
 
                 fragBullets = 12;
                     fragBullet = new ArtilleryBulletType(0.5f, 50, "shell"){{
@@ -4808,6 +4815,8 @@ public class Blocks{
                         buildingDamageMultiplier = 0f;
                     }};
                 }};
+
+                unitSort = UnitSorts.grouped;
             }}
             );
 
@@ -6474,6 +6483,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
+            configurable = false;
             consumePower(3f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 40, Items.tungsten, 30));
@@ -6491,6 +6501,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
+            configurable = false;
             consumePower(2.5f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 60, Items.tungsten, 40));
@@ -6509,6 +6520,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
+            configurable = false;
             consumePower(2.5f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
@@ -6529,6 +6541,7 @@ public class Blocks{
             researchCostMultipliers.put(Items.thorium, 0.2f);
 
             size = 5;
+            configurable = false;
             consumePower(4.5f);
             consumeLiquid(Liquids.nitrogen, 10f / 60f);
             consumeItems(with(Items.thorium, 80, Items.silicon, 100));
