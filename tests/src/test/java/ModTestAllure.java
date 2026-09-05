@@ -17,6 +17,8 @@ public class ModTestAllure extends GenericModTest{
 
     @Test
     public void begin(){
+        //As of September 5, the Allure repository has been deleted or made private. I do not know why.
+        if(true) return;
         grabMod("https://github.com/LixieWulf/Allure/archive/c94e83e07ab918c0402b8f3897bba832e42432f0.zip");
         checkExistence("allure");
 
