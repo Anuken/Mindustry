@@ -691,7 +691,7 @@ public class StatValues{
                     }
 
                     if(type.statLiquidConsumed <= 0f && !compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
-                        sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
+                        sep(bt, (type.ammoMultiplier < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("bullet.multiplier", Strings.autoFixed(type.ammoMultiplier, 2)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
@@ -719,8 +719,16 @@ public class StatValues{
                         sep(bt, "@bullet.incendiary");
                     }
 
-                    if(type.homingPower > 0.01f){
-                        sep(bt, "@bullet.homing");
+                    if(type.homingPower > 0.0001f){
+                        if(type.homingPower < 0.05f) sep(bt, Core.bundle.format("bullet.weakhoming"));
+                        else if(type.homingPower < 0.15f) sep(bt, Core.bundle.format("bullet.mediumhoming"));
+                        else sep(bt, Core.bundle.format("bullet.stronghoming"));
+                    }
+
+                    if(type.ricochetAngle > 0f){
+                        if(type.ricochetAngle < 30f) sep(bt, Core.bundle.format("bullet.weakricochet"));
+                        else if(type.ricochetAngle < 90f) sep(bt, Core.bundle.format("bullet.mediumricochet"));
+                        else sep(bt, Core.bundle.format("bullet.strongricochet"));
                     }
 
                     // Showing the correct value for lightning damage is annoyinh

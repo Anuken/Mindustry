@@ -326,6 +326,20 @@ public class BulletType extends Content implements Cloneable{
     /** Speed at which bullet rotates to follow cursor. <= 0 to disable. */
     public float followAimSpeed = 0f;
 
+    /** Maximum half angle at which this bullet will retarget (change angle) towards its next target. Only effective if pierce = true. */
+    public float ricochetAngle = -1f;
+    /** Multiplier on bullet speed upon ricocheting. Affects lifetime proportionally. Does not stack. */
+    public float ricochetSpeed = 1f;
+    /** Multiplier on bullet lifetime upon ricocheting. Does not stack. */
+    public float ricochetLife = 1.15f;
+    /** Range for checking ricochet targets. Accounts for remaining bullet range by default. */
+    public float ricochetRange = -1f;
+    /** Whether the ricochet predicts unit movement. */
+    public boolean predictRicochet = true;
+    /** Minimum angle difference for ricochetEffect to show up. */
+    public float ricochetAngleDiff = 5f;
+    public @Nullable Effect ricochetEffect = Fx.ricochetSpark;
+
     /** Range of healing block suppression effect. */
     public float suppressionRange = -1f;
     /** Duration of healing block suppression effect. */
@@ -483,6 +497,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         handlePierce(b, initialHealth, x, y);
+        if(ricochetAngle > 0f) updateRicochet(b);
     }
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
@@ -531,6 +546,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         handlePierce(b, health, entity.x(), entity.y());
+        if(ricochetAngle > 0f) updateRicochet(b);
     }
 
     public void handlePierce(Bullet b, float initialHealth, float x, float y){
@@ -773,6 +789,37 @@ public class BulletType extends Content implements Cloneable{
         if(followAimSpeed > 0f && b.shooter instanceof Unit u){
             float angle = b.angleTo(u.aimX, u.aimY);
             b.vel.setAngle(Angles.moveToward(b.vel.angle(), angle, followAimSpeed * Time.delta));
+        }
+    }
+
+    public void updateRicochet(Bullet b){
+        float angle = b.rotation();
+        Teamc target = Units.closestTarget(b.team, b.x, b.y, ricochetRange > 0f ? ricochetRange : (1f - (b.time / b.lifetime)) * range + 8f,
+            e -> !b.hasCollided(e.id()) && Angles.within(angle, Angles.angle(b.x, b.y, e.x, e.y), ricochetAngle),
+            t -> !b.hasCollided(t.id) && Angles.within(angle, Angles.angle(b.x, b.y, t.x, t.y), ricochetAngle));
+
+        if(target != null){
+        float tx = target.x(), ty = target.y();
+
+            if(predictRicochet && speed >= 0.01f && target instanceof Hitboxc h){
+                Vec2 predict = Predict.intercept(b, target, h.deltaX(), h.deltaY(), speed);
+                if(Angles.within(angle, Angles.angle(b.x, b.y, predict.x, predict.y), ricochetAngle)){
+                    tx = predict.x;
+                    ty = predict.y;
+                }
+            }
+
+        float newAngle = Angles.angle(b.x, b.y, tx, ty);
+            if(!Angles.near(newAngle, angle, ricochetAngleDiff)) ricochetEffect.at(b.x, b.y, b.rotation(), hitColor);
+            b.rotation(newAngle);
+            b.vel.setAngle(newAngle);
+
+            if(b.collided.size == 1){
+                float len = b.vel.len();
+                b.vel.scl(ricochetSpeed);
+                float newLen = b.vel.len();
+                if(newLen > 0f) b.lifetime = b.time + (b.lifetime - b.time) * ricochetLife * Math.min(1f, len / newLen);
+            }
         }
     }
 
