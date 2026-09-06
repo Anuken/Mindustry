@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.struct.EnumSet;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
@@ -187,7 +188,7 @@ public class GenericCrafter extends Block{
         public float progress;
         public float totalProgress;
         public float warmup;
-        public @Nullable float[] outputAccumulator = new float[outputItems.length];
+        public @Nullable FloatSeq outputAccumulator = outputItems != null && outputItems.length > 0 ? new FloatSeq(outputItems.length) : null;
 
         @Override
         public void draw(){
@@ -307,13 +308,15 @@ public class GenericCrafter extends Block{
         public void craft(){
             consume();
 
-            if(outputItems != null && outputAccumulator != null){
+            if(outputItems != null){
+                if(outputAccumulator == null) outputAccumulator = new FloatSeq();
+                if(outputAccumulator.size != outputItems.length) outputAccumulator.setSize(outputItems.length);
                 for(int i = 0; i < outputItems.length; i++){
                     ItemStack output = outputItems[i];
 
-                    outputAccumulator[i] += scaleOutput(output.amount);
-                    int floored = Mathf.floor(outputAccumulator[i]);
-                    outputAccumulator[i] -= floored;
+                    outputAccumulator.incr(i, scaleOutput(output.amount));
+                    int floored = Mathf.floor(outputAccumulator.get(i));
+                    outputAccumulator.incr(i, -floored);
 
                     for(int j = 0; j < floored; j++){
                         offload(output.item);
