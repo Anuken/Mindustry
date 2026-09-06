@@ -417,7 +417,7 @@ public class StatValues{
                         if(blocks.any()){
                             for(var block : blocks){
                                 c.table(Styles.grayPanel, b -> {
-                                    float effiency = 1f + block.attributes.get(attr) * scaleEff;
+                                    float efficiency = 1f + block.attributes.get(attr) * scaleEff;
     
                                     b.image(block.uiIcon).size(40f).pad(10f).left().scaling(Scaling.fit);
                                     b.table(center -> {
@@ -429,14 +429,14 @@ public class StatValues{
     
                                                 center.table(it -> {
                                                 it.left();
-                                                it.add(displayItem(output.item, scaled, timePeriod / effiency , true)).left().padLeft(6f);
+                                                it.add(displayItem(output.item, scaled, timePeriod / efficiency , true)).left().padLeft(6f);
                                                 }).padRight(8f);
                                             }
                                         }else{
                                             center.add("@none");
                                         }
                                     }).left().grow();
-                                    b.add((effiency < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("stat.efficiency", fixValue(effiency * 100f))).right().pad(10f).padRight(15f);
+                                    b.add((efficiency < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("stat.efficiency", fixValue(efficiency * 100f))).right().pad(10f).padRight(15f);
     
                                 }).growX().pad(5).row();
                             }

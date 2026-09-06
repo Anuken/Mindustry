@@ -25,7 +25,6 @@ public class GenericCrafter extends Block{
     public @Nullable ItemStack outputItem;
     /** Overwrites outputItem if not null. */
     public @Nullable ItemStack[] outputItems;
-    public @Nullable float[] outputAccumulator;
 
     /** Written to outputLiquids as a single-element array if outputLiquids is null. */
     public @Nullable LiquidStack outputLiquid;
@@ -118,7 +117,9 @@ public class GenericCrafter extends Block{
 
     @Override
     public void init(){
-        initializeOutputItems();
+        if(outputItems == null && outputItem != null){
+            outputItems = new ItemStack[]{outputItem};
+        }
 
         if(outputLiquids == null && outputLiquid != null){
             outputLiquids = new LiquidStack[]{outputLiquid};
@@ -129,6 +130,7 @@ public class GenericCrafter extends Block{
         }
         outputsLiquid = outputLiquids != null;
 
+        if(outputItems != null) hasItems = true;
         if(outputLiquids != null) hasLiquids = true;
 
         super.init();
@@ -138,21 +140,9 @@ public class GenericCrafter extends Block{
     public void afterPatch(){
         super.afterPatch();
 
-        initializeOutputItems();
+        if(outputItems != null) hasItems = true;
         outputsLiquid = outputLiquids != null;
         if(outputLiquids != null) hasLiquids = true;
-    }
-
-    private void initializeOutputItems(){
-        if(outputItems == null && outputItem != null){
-            outputItems = new ItemStack[]{outputItem};
-        }
-        if(outputItems != null){
-            hasItems = true;
-            if(outputAccumulator == null || outputAccumulator.length != outputItems.length){
-                outputAccumulator = new float[outputItems.length];
-            }
-        }
     }
 
     @Override
@@ -197,6 +187,7 @@ public class GenericCrafter extends Block{
         public float progress;
         public float totalProgress;
         public float warmup;
+        public @Nullable float[] outputAccumulator = new float[outputItems.length];
 
         @Override
         public void draw(){
