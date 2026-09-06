@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
@@ -2515,6 +2516,22 @@ public class Fx{
         randLenVectors(e.id, 3, e.fin() * 5f, (x, y) -> {
             color(Pal.stoneGray);
             Fill.square(e.x + x, e.y + y, e.fout() + 0.5f, 45);
+        });
+    }),
+
+    pulverizeOre = new Effect(30, e -> {
+        rand.setSeed(e.id);
+        Tile tile = Vars.world.tileWorld(e.x, e.y);
+        Color tileColor;
+        if(tile != null){
+            //account for wall ores
+            tileColor = (tile.block() != Blocks.air) ? tile.block().mapColor : tile.getFloorColor();
+        }else{
+            tileColor = Pal.stoneGray;
+        }
+        randLenVectors(e.id, 3, (1f + 4f * e.fin()) * Mathf.clamp(e.rotation / 2f, 0.5f, 2f), (x, y) -> {
+            color(e.color, rand.chance(0.7) ? tileColor : e.color, e.fin());
+            Fill.square(e.x + x, e.y + y, (e.fout() + 0.5f) * Mathf.clamp(e.rotation / 2.2f, 0.5f, 1.3f), rand.random(30,45));
         });
     }),
 
