@@ -309,8 +309,10 @@ public class GenericCrafter extends Block{
             consume();
 
             if(outputItems != null){
-                if(outputAccumulator == null) outputAccumulator = new FloatSeq();
-                if(outputAccumulator.size != outputItems.length) outputAccumulator.setSize(outputItems.length);
+                if (outputAccumulator == null || outputAccumulator.size != outputItems.length) {
+                    outputAccumulator = new FloatSeq(outputItems.length);
+                    outputAccumulator.setSize(outputItems.length);
+                };
                 for(int i = 0; i < outputItems.length; i++){
                     ItemStack output = outputItems[i];
 
