@@ -4,7 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.struct.EnumSet;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
