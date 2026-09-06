@@ -163,12 +163,11 @@ public class KeybindDialog extends Dialog{
             title.setAlignment(Align.center);
             cont.add(rebindAxis ? bundle.get("keybind.press.axis") : bundle.get("keybind.press")).pad(40f);
 
+            buttons.button("@back", Icon.left, this::hide).size(bw, bh).get().addListener(blocker);
             buttons.button("@settings.unbindKey", Icon.cancel, () -> {
                 keyBind.unset();
                 hide();
             }).size(bw, bh).get().addListener(blocker);
-
-            buttons.button("@back", Icon.left, this::hide).size(bw, bh).get().addListener(blocker);
         }};
 
         rebindKey = keyBind;
