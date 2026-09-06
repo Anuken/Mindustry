@@ -52,13 +52,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         for(Payload pay : payloads){
-            //apparently BasedUser doesn't want this and several plugins use it
-            //if(pay instanceof BuildPayload build){
-            //    build.build.team = team;
-            //}
             pay.set(x, y, rotation);
             pay.update(self(), null);
         }
+        //remove dead payloads after they explode
+        payloads.removeAll(Payload::isDead);
     }
 
     @Override

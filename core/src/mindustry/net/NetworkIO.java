@@ -62,8 +62,11 @@ public class NetworkIO{
 
             writer.writeContentHeader(stream);
             writer.writeMap(stream);
-            writer.writeEntities(stream);
+            //these three calls mimic what writeEntities has, except with a custom filter, which is a bit fragile
+            writer.writeEntityMapping(stream);
             writer.writeTeamBlocks(stream);
+            writer.writeWorldEntities(stream, state.rules.fog ? u -> !u.inFogTo(player.team()) : null);
+
             writer.writeMarkers(stream);
             writer.writeCustomChunks(stream, true);
         }catch(IOException e){
@@ -102,9 +105,11 @@ public class NetworkIO{
             writer.readContentHeader(stream);
             writer.readMap(stream, state);
             writer.readEntities(stream, state);
-            writer.readTeamBlocks(stream);
             writer.readMarkers(stream);
             writer.readCustomChunks(stream);
+
+            Groups.all.each(e -> netClient.addRemovedEntity(e.id()));
+            Groups.unit.each(e -> netClient.addRemovedEntity(e.id()));
         }catch(IOException e){
             throw new RuntimeException(e);
         }finally{

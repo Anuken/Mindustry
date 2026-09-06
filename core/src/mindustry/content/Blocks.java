@@ -6515,6 +6515,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
+            configurable = false;
             consumePower(3f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 40, Items.tungsten, 30));
@@ -6532,6 +6533,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
+            configurable = false;
             consumePower(2.5f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 60, Items.tungsten, 40));
@@ -6550,6 +6552,7 @@ public class Blocks{
             regionSuffix = "-dark";
 
             size = 3;
+            configurable = false;
             consumePower(2.5f);
             consumeLiquid(Liquids.hydrogen, 3f / 60f);
             consumeItems(with(Items.silicon, 50, Items.tungsten, 40));
@@ -6570,6 +6573,7 @@ public class Blocks{
             researchCostMultipliers.put(Items.thorium, 0.2f);
 
             size = 5;
+            configurable = false;
             consumePower(4.5f);
             consumeLiquid(Liquids.nitrogen, 10f / 60f);
             consumeItems(with(Items.thorium, 80, Items.silicon, 100));

@@ -2,9 +2,11 @@ package mindustry.tools;
 
 import arc.*;
 import arc.files.*;
+import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
+import mindustry.game.*;
 import mindustry.game.MapObjectives.*;
 import mindustry.io.*;
 import mindustry.logic.LExecutor.*;
@@ -75,6 +77,10 @@ public class MapFixer{
                     Log.warn("@: instant building enabled!", map.name());
                     state.rules.instantBuild = false;
                     changed = true;
+                }
+
+                if(!Mathf.equal(state.rules.unitCost(Team.sharded), 1f) || !Mathf.equal(state.rules.unitBuildSpeed(Team.sharded), 1f)){
+                    Log.warn("@: unit build speed/cost multipliers are not 1! (Values for cost | build speed: @ | @)", map.name(), state.rules.unitCost(Team.sharded), state.rules.unitBuildSpeed(Team.sharded));
                 }
 
                 { //unlocalized check

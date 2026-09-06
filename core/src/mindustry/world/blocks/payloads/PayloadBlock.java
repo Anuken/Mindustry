@@ -168,6 +168,9 @@ public class PayloadBlock extends Block{
         public void updateTile(){
             if(payload != null){
                 payload.update(null, this);
+                if(payload.isDead()){
+                    payload = null;
+                }
             }
         }
 
