@@ -736,7 +736,10 @@ public class StatValues{
                         int count = (int)(b.length / b.lightningSpacing) * 2 + 2;
                         float damage = b.lightningDamage < 0 ? b.damage : b.lightningDamage;
                         sep(bt, Core.bundle.format("bullet.lightning", count, damage));
-                        note(bt, Core.bundle.format("bullet.lightninginterval", Strings.autoFixed(b.lightningSpacing / tilesize, 2), Strings.autoFixed(b.lightningLength, 2))).left();
+                        String length = b.lightningLengthRand > 0 ?
+                            Strings.format("@[]-[stat]@", Strings.autoFixed(b.lightningLength, 2), Strings.autoFixed(b.lightningLength + b.lightningLengthRand, 2))
+                            : Strings.autoFixed(b.lightningLength, 2);
+                        note(bt, Core.bundle.format("bullet.lightninginterval", Strings.autoFixed(b.lightningSpacing / tilesize, 2), length)).left();
                     }
 
                     if(type instanceof EmpBulletType b && b.radius > 0f){
