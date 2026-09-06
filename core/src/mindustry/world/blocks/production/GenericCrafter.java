@@ -188,7 +188,7 @@ public class GenericCrafter extends Block{
         public float progress;
         public float totalProgress;
         public float warmup;
-        public @Nullable FloatSeq outputAccumulator = outputItems != null && outputItems.length > 0 ? new FloatSeq(outputItems.length) : null;
+        public @Nullable float[] outputAccumulator = outputItems != null && outputItems.length > 0 ? new float[outputItems.length] : null;
 
         @Override
         public void draw(){
@@ -309,16 +309,16 @@ public class GenericCrafter extends Block{
             consume();
 
             if(outputItems != null){
-                if (outputAccumulator == null || outputAccumulator.size != outputItems.length) {
-                    outputAccumulator = new FloatSeq(outputItems.length);
-                    outputAccumulator.setSize(outputItems.length);
-                };
+                //instantiated here instead of created() because of outputItems runtime changes
+                if(outputAccumulator == null || outputAccumulator.length != outputItems.length){
+                    outputAccumulator = new float[outputItems.length];
+                }
                 for(int i = 0; i < outputItems.length; i++){
                     ItemStack output = outputItems[i];
 
-                    outputAccumulator.incr(i, scaleOutput(output.amount));
-                    int floored = Mathf.floor(outputAccumulator.get(i));
-                    outputAccumulator.incr(i, -floored);
+                    outputAccumulator[i] += scaleOutput(output.amount);
+                    int floored = Mathf.floor(outputAccumulator[i]);
+                    outputAccumulator[i] -= floored;
 
                     for(int j = 0; j < floored; j++){
                         offload(output.item);
