@@ -17,9 +17,9 @@ public class ModTestAllure extends GenericModTest{
 
     @Test
     public void begin(){
-        //As of September 5, the Allure repository has been deleted or made private. I do not know why.
-        // Archive version of Allure (archive last pull date: 10 April 2026)
-        grabMod("https://github.com/JasonP01/AllureMod/archive/3d580bda58e98f6339e1b746980b66b791f108ee.zip");
+        //As of September 5 2026, the Allure repository has been deleted or made private. I do not know why.
+        // Archive version of Allure (archive last pull date: 30 July 2026 - latest commit before archive)
+        grabMod("https://github.com/JasonP01/AllureMod/archive/b6e3d4b831b6c8f81d8d366560029aec8759de89.zip");
         checkExistence("allure");
 
         UnitType type = Vars.content.unit("allure-0b11-exodus");
