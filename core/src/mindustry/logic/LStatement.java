@@ -163,8 +163,12 @@ public abstract class LStatement{
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
-        table.add(desc).padLeft(10).left().self(this::param);
-        return field(table, value, setter).width(180f).padRight(10).left();
+        Table sub = new Table();
+        sub.setColor(table.color);
+
+        table.add(sub);
+        sub.add(desc).padLeft(10).left().self(this::param);
+        return field(sub, value, setter).width(180f).padRight(10).left();
     }
 
     /** Puts the text and field in one table, taking up one cell. */
