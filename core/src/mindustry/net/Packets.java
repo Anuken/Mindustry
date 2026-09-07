@@ -71,6 +71,10 @@ public class Packets{
 
     }
 
+    public static class TextureStream extends Streamable{
+
+    }
+
     public static class AssetRequirementStream extends Streamable{
 
     }

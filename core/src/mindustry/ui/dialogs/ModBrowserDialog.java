@@ -7,14 +7,12 @@ import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
-import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Http.*;
 import arc.util.serialization.*;
-import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.gen.*;
@@ -350,61 +348,7 @@ public class ModBrowserDialog extends BaseDialog{
                         Core.app.openURI("https://github.com/" + mod.repo);
                     });
 
-                    sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> {
-                        BaseDialog load = new BaseDialog("");
-                        load.cont.add("[accent]" + Core.bundle.get("mods.browser.fetching"));
-                        load.show();
-                        Http.get(ghApi + "/repos/" + mod.repo + "/releases", res -> {
-                            var json = Jval.read(res.getResultAsString());
-                            JsonArray releases = json.asArray();
-
-                            Core.app.post(() -> {
-                                load.hide();
-
-                                if(releases.size == 0){
-                                    ui.showInfo("@mods.browser.noreleases");
-                                }else{
-                                    sel.hide();
-                                    var downloads = new BaseDialog("@mods.browser.releases");
-                                    downloads.cont.pane(p -> {
-                                        for(int j = 0; j < releases.size; j++){
-                                            var release = releases.get(j);
-
-                                            int index = j;
-                                            p.table(((TextureRegionDrawable)Tex.whiteui).tint(Pal.darkestGray), t -> {
-                                                t.add("[accent]" + release.getString("name") + (index == 0 ? " " + Core.bundle.get("mods.browser.latest") : "")).top().left().growX().wrap().pad(5f);
-                                                t.row();
-                                                t.add((release.getString("published_at")).substring(0, 10).replaceAll("-", "/")).top().left().growX().wrap().pad(5f).color(Color.gray);
-                                                t.row();
-                                                t.table(b -> {
-                                                    b.defaults().size(150f, 54f).pad(2f);
-                                                    b.button("@mods.github.open-release", Icon.link, () -> Core.app.openURI(release.getString("html_url")));
-                                                    b.button("@mods.browser.add", Icon.download, () -> {
-                                                        String releaseUrl = release.getString("url");
-                                                        ui.mods.githubImportMod(mod.repo, mod.hasJava, releaseUrl.substring(releaseUrl.lastIndexOf("/") + 1), true);
-                                                    });
-                                                }).right();
-                                            }).margin(5f).growX().pad(5f);
-
-                                            if(j < releases.size - 1) p.row();
-                                        }
-                                    }).width(500f).scrollX(false).fillY();
-                                    downloads.buttons.button("@back", Icon.left, () -> {
-                                        downloads.clear();
-                                        downloads.hide();
-                                        sel.show();
-                                    }).size(150f, 54f).pad(2f);
-                                    downloads.keyDown(KeyCode.escape, downloads::hide);
-                                    downloads.keyDown(KeyCode.back, downloads::hide);
-                                    downloads.hidden(sel::show);
-                                    downloads.show();
-                                }
-                            });
-                        }, t -> Core.app.post(() -> {
-                            ui.mods.showModError(t);
-                            load.hide();
-                        }));
-                    });
+                    sel.buttons.button("@mods.browser.view-releases", Icon.zoom, () -> ui.mods.viewReleases(mod.repo, mod.hasJava, false));
                     sel.keyDown(KeyCode.escape, sel::hide);
                     sel.keyDown(KeyCode.back, sel::hide);
                     sel.show();

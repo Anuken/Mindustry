@@ -1,0 +1,7 @@
+{
+  "doc": "Loops progress over a fixed time period. Applied via PartProgress's 'op'/'operation' field (e.g. `op: loop`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "time": {
+    "type": "float",
+    "doc": "Length of one loop cycle."
+  }
+}

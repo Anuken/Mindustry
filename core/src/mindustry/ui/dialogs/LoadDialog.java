@@ -92,7 +92,7 @@ public class LoadDialog extends BaseDialog{
         Seq<SaveSlot> array = control.saves.getSaveSlots();
         array.sort((slot, other) -> -Long.compare(slot.getTimestamp(), other.getTimestamp()));
 
-        int maxwidth = Math.max((int)(Core.graphics.getWidth() / Scl.scl(470)), 1);
+        int cols = Math.max((int)(Core.graphics.getWidth() / Scl.scl(470)), 1);
         int i = 0;
         boolean any = false;
 
@@ -166,7 +166,7 @@ public class LoadDialog extends BaseDialog{
 
             button.table(meta -> {
                 meta.left().top();
-                meta.defaults().padBottom(-2).left().width(290f);
+                meta.defaults().padBottom(-2).left().width(280f);
                 meta.row();
                 meta.labelWrap(Core.bundle.format("save.map", color + (slot.getMap() == null ? Core.bundle.get("unknown") : slot.getMap().name())));
                 meta.row();
@@ -178,12 +178,12 @@ public class LoadDialog extends BaseDialog{
                 meta.row();
                 meta.labelWrap(color + slot.getDate());
                 meta.row();
-            }).left().growX().width(250f);
+            }).left().growX().width(260f);
 
             modifyButton(button, slot);
             slots.add(button).uniformX().fillX().pad(4).padRight(8f).margin(10f);
 
-            if(++i % maxwidth == 0){
+            if(++i % cols == 0){
                 slots.row();
             }
         }

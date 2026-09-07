@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -27,6 +28,7 @@ public class Router extends Block{
     }
 
     public class RouterBuild extends Building implements ControlBlock{
+        protected byte[] cycles = new byte[Vars.content.items().size];
         public Item lastItem;
         public Tile lastInput;
         public float time;
@@ -107,7 +109,7 @@ public class Router extends Block{
                 int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
 
                 if(unit.isShooting()){
-                    Building other = nearby(rotation = angle);
+                    Building other = nearby(angle);
                     if(other != null && other.acceptItem(this, item)){
                         return other;
                     }
@@ -116,10 +118,12 @@ public class Router extends Block{
                 return null;
             }
 
-            int counter = rotation;
+            //keep track of target offsets per-item to fix https://github.com/Anuken/Mindustry/issues/12471
+            int id = item.id;
+            int counter = cycles[id];
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
-                if(set) rotation = ((byte)((rotation + 1) % proximity.size));
+                if(set) cycles[id] = ((byte)((cycles[id] + 1) % proximity.size));
                 if(other.tile == from && from.block() == Blocks.overflowGate) continue;
                 if(other.acceptItem(this, item)){
                     return other;

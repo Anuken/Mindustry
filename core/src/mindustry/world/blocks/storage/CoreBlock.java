@@ -171,7 +171,8 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public boolean canBreak(Tile tile){
-        return state.isEditor();
+        //always keep at least 1 core to not lose the save
+        return state.isEditor() || (state.rules.coreBuildAndConfig && tile.block() instanceof CoreBlock && state.teams.cores(tile.team()).size > 1);
     }
 
     @Override
@@ -183,8 +184,8 @@ public class CoreBlock extends StorageBlock{
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         if(tile == null) return false;
-        //in the editor, you can place them anywhere for convenience
-        if(state.isEditor()) return true;
+        //in the editor or with gamerule, you can place them anywhere for convenience
+        if(state.isEditor() || state.rules.coreBuildAndConfig) return true;
 
         CoreBuild core = team.core();
 
@@ -281,6 +282,57 @@ public class CoreBlock extends StorageBlock{
         @Override
         public boolean canUnload(){
             return block.unloadable && state.rules.allowCoreUnloaders;
+        }
+
+        @Override
+        public void buildConfiguration(Table table){
+            if(!state.rules.coreBuildAndConfig) return;
+
+            ButtonGroup<ImageButton> group = new ButtonGroup<>();
+            group.setMinCheckCount(0);
+            Table cont = new Table();
+            cont.defaults().size(32f);
+
+            int i = 0;
+            for(Team team : Team.baseTeams){
+                ImageButton button = cont.button(Tex.whiteui, Styles.clearTogglei, 24f, () -> {
+                }).group(group).get();
+                button.changed(() -> {
+                    if(button.isChecked()){
+                        configure(team.id);
+                    }
+                });
+                button.getStyle().imageUpColor = team.color;
+                button.update(() -> button.setChecked(this.team == team));
+
+                if(i++ % 3 == 2){
+                    cont.row();
+                }
+            }
+
+            ScrollPane pane = new ScrollPane(cont, Styles.smallPane);
+            pane.setScrollingDisabled(true, false);
+            pane.setOverscroll(false, false);
+            table.add(pane).maxHeight(Scl.scl(40f * 2f)).left();
+            table.row();
+        }
+
+        @Override
+        public void configured(@Nullable Unit builder, @Nullable Object value){
+            super.configured(builder, value);
+            if(!state.rules.coreBuildAndConfig || !(value instanceof Integer)) return;
+
+            Team next = Team.get((int)value);
+            if(builder != null && builder.isPlayer()){
+                builder.team(next);
+                builder.getPlayer().team(next);
+            }
+            changeTeam(next);
+        }
+
+        @Override
+        public boolean shouldHideConfigure(Player player){
+            return !state.rules.coreBuildAndConfig;
         }
 
         @Override
@@ -532,6 +584,7 @@ public class CoreBlock extends StorageBlock{
         @Override
         public void created(){
             super.created();
+            block.configurable = state.rules.coreBuildAndConfig;
 
             Events.fire(new CoreChangeEvent(this));
         }
@@ -591,6 +644,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void updateTile(){
+            block.configurable = state.rules.coreBuildAndConfig;
             iframes -= Time.delta;
             thrusterTime -= Time.delta/90f;
         }

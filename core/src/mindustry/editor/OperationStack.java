@@ -3,7 +3,7 @@ package mindustry.editor;
 import arc.struct.*;
 
 public class OperationStack{
-    private static final int maxSize = 10;
+    private static final int maxSize = 30;
     private Seq<DrawOperation> stack = new Seq<>();
     private int index = 0;
 

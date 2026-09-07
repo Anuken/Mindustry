@@ -25,6 +25,8 @@ public class Rules{
     public boolean allowEditRules = false;
     /** Sandbox mode: Enables infinite resources, build range and build speed. */
     public boolean infiniteResources;
+    /** Allow building and deconstructing cores anywhere, as well as showing ui to change teams */
+    public boolean coreBuildAndConfig = false;
     /** Team-specific rules. */
     public TeamRules teams = new TeamRules();
     /** Whether the waves come automatically on a timer. If not, waves come when the play button is pressed. */
@@ -207,6 +209,8 @@ public class Rules{
     public boolean lighting = false;
     /** Ambient light color, used when lighting is enabled. */
     public Color ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+    /** Whether units produce light when lighting is enabled. */
+    public boolean unitLight = true;
     /** team of the player by default. */
     public Team defaultTeam = Team.sharded;
     /** team of the enemy in waves/sectors. */

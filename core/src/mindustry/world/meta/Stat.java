@@ -61,6 +61,7 @@ public class Stat implements Comparable<Stat>{
     powerRange = new Stat("powerRange", StatCat.power),
     powerConnections = new Stat("powerConnections", StatCat.power),
     basePowerGeneration = new Stat("basePowerGeneration", StatCat.power),
+    meltdownTime = new Stat("meltdownTime", StatCat.power), 
     warmupTime = new Stat("warmupTime", StatCat.power),
 
     tiles = new Stat("tiles", StatCat.crafting),
@@ -89,6 +90,7 @@ public class Stat implements Comparable<Stat>{
     targetsAir = new Stat("targetsAir", StatCat.function),
     targetsGround = new Stat("targetsGround", StatCat.function),
     damage = new Stat("damage", StatCat.function),
+    status = new Stat("status", StatCat.function),
     frequency = new Stat("frequency", StatCat.function),
     ammo = new Stat("ammo", StatCat.function),
     ammoCapacity = new Stat("ammoCapacity", StatCat.function),

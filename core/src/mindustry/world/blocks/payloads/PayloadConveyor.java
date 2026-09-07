@@ -134,9 +134,14 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void updateTile(){
+            if(item != null){
+                item.update(null, this);
+                if(item.isDead()){
+                    item = null;
+                }
+            }
 
             if(enabled){
-                if(item != null) item.update(null, this);
                 lastInterp = curInterp;
                 curInterp = fract();
                 //rollover skip

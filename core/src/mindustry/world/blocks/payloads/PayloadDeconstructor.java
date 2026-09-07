@@ -1,5 +1,7 @@
 package mindustry.world.blocks.payloads;
 
+import arc.graphics.*;
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -18,6 +20,8 @@ public class PayloadDeconstructor extends PayloadBlock{
     public float maxPayloadSize = 4;
     public float deconstructSpeed = 2.5f;
     public int dumpRate = 4;
+    /** Any payload with build requirements equalling or exceeding this value is accepted regardless. */
+    public int itemBuffer = 0;
 
     public PayloadDeconstructor(String name){
         super(name);
@@ -45,7 +49,11 @@ public class PayloadDeconstructor extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        addBar("progress", (PayloadDeconstructorBuild e) -> new Bar("bar.progress", Pal.ammo, () -> e.progress));
+        addBar("progress", (PayloadDeconstructorBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.progress", Strings.autoFixed(e.progress * 100f, 0)),
+            () -> Pal.ammo,
+            () -> e.progress
+        ));
     }
 
     public class PayloadDeconstructorBuild extends PayloadBlockBuild<Payload>{
@@ -53,6 +61,8 @@ public class PayloadDeconstructor extends PayloadBlock{
         public @Nullable float[] accum;
         public float progress;
         public float time, speedScl;
+        public static final float overlayDuration = 40f;
+        public float overlayTime = 0;
 
         @Override
         public void draw(){
@@ -85,6 +95,23 @@ public class PayloadDeconstructor extends PayloadBlock{
                 });
             }
 
+            //draw warning
+            if(overlayTime > 0 && deconstructing == null){
+                float z = Draw.z();
+                Draw.z(Layer.flyingUnitLow + 2f);
+                var region = Icon.warning.getRegion();
+                Draw.color(Color.scarlet);
+                Draw.alpha(0.8f * Interp.exp5Out.apply(overlayTime));
+
+                float size = 8f;
+                Draw.rect(region, this.x, this.y, size, size);
+
+                Draw.reset();
+
+                overlayTime = Math.max(overlayTime - Time.delta/overlayDuration, 0f);
+                Draw.z(z);
+            }
+
             Draw.rect(topRegion, x, y);
         }
 
@@ -102,9 +129,28 @@ public class PayloadDeconstructor extends PayloadBlock{
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
-            return deconstructing == null && this.payload == null && super.acceptPayload(source, payload) && payload.requirements().length > 0 && payload.fits(maxPayloadSize);
-        }
+            boolean isFull = false;
 
+            //source equalling this building means it comes from a unit payenter
+            if(source != this){
+                for(var req : payload.requirements()){
+                    float realAmount = req.amount * (payload instanceof BuildPayload ? state.rules.buildCostMultiplier : state.rules.unitCost(team));
+                    if(items.get(req.item) + realAmount >= itemCapacity) isFull = true;
+
+                    //if the payload's requirements are too large within the buffer, receive anyway.
+                    if(realAmount >= itemBuffer){
+                        isFull = false;
+                        break;
+                    }
+                }
+
+                if(isFull && deconstructing == null){
+                    overlayTime = 2.5f;
+                }
+            }
+
+            return !isFull && deconstructing == null && this.payload == null && super.acceptPayload(source, payload) && payload.requirements().length > 0 && payload.fits(maxPayloadSize);
+        }
         @Override
         public void updateTile(){
             super.updateTile();
@@ -127,13 +173,11 @@ public class PayloadDeconstructor extends PayloadBlock{
                 }
 
                 //check if there is enough space to get the items for deconstruction
-                boolean canProgress = items.total() <= itemCapacity;
-                if(canProgress){
-                    for(var ac : accum){
-                        if(ac >= 1f){
-                            canProgress = false;
-                            break;
-                        }
+                boolean canProgress = true;
+                for(var req : reqs){
+                    if(items.get(req.item) >= itemCapacity){
+                        canProgress = false;
+                        break;
                     }
                 }
 
@@ -164,7 +208,7 @@ public class PayloadDeconstructor extends PayloadBlock{
 
                 //transfer items from accumulation buffer into block inventory when they reach integers
                 for(int i = 0; i < reqs.length; i++){
-                    int taken = Math.min((int)accum[i], itemCapacity - items.total());
+                    int taken = Math.min((int)accum[i], itemCapacity - items.get(reqs[i].item));
                     if(taken > 0){
                         items.add(reqs[i].item, taken);
                         accum[i] -= taken;

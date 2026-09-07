@@ -14,6 +14,7 @@ import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
+import mindustry.ai.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
@@ -131,6 +132,7 @@ public class Mods implements Loadable{
             lastOrderedMods = null;
             requiresReload = true;
             //enable the mod on import
+            Core.settings.put("mod-" + loaded.name + "-failed", false);
             if(forceEnable) Core.settings.put("mod-" + loaded.name + "-enabled", true);
             sortMods();
             //try to load the mod's icon so it displays on import
@@ -874,15 +876,20 @@ public class Mods implements Loadable{
                 Fi contentRoot = mod.root.child("content");
                 for(ContentType type : ContentType.all){
                     String lower = type.name().toLowerCase(Locale.ROOT);
-                    Fi folder = contentRoot.child(lower + (lower.endsWith("s") ? "" : "s"));
-                    if(folder.exists()){
-                        for(Fi file : folder.findAll(f -> f.extension().equals("json") || f.extension().equals("hjson"))){
+                    //search both the proper folder name (e.g. "weather", "statuses") and the old nonsensical folder names ("weathers", "status")
+                    String oldName = lower + (lower.endsWith("s") ? "" : "s");
+                    Fi[] folders = {oldName.equals(type.folderName) ? null : contentRoot.child(oldName), contentRoot.child(type.folderName)};
 
-                            //if this is part of the ordered content, put it aside to be dealt with later
-                            if(orderSet != null && orderSet.contains(file.nameWithoutExtension())){
-                                orderedContent.put(file.nameWithoutExtension(), new LoadRun(type, file, mod));
-                            }else{
-                                unorderedContent.add(new LoadRun(type, file, mod));
+                    for(Fi folder : folders){
+                        if(folder != null && folder.exists()){
+                            for(Fi file : folder.findAll(f -> f.extEquals("json") || f.extEquals("hjson"))){
+
+                                //if this is part of the ordered content, put it aside to be dealt with later
+                                if(orderSet != null && orderSet.contains(file.nameWithoutExtension())){
+                                    orderedContent.put(file.nameWithoutExtension(), new LoadRun(type, file, mod));
+                                }else{
+                                    unorderedContent.add(new LoadRun(type, file, mod));
+                                }
                             }
                         }
                     }
@@ -924,6 +931,8 @@ public class Mods implements Loadable{
         //this finishes parsing content fields
         parser.finishParsing();
 
+        UnitStance.loadAfterMods();
+
         Events.fire(new ModContentLoadEvent());
     }
 
@@ -945,6 +954,7 @@ public class Mods implements Loadable{
     public void setEnabled(LoadedMod mod, boolean enabled){
         if(mod.enabled() != enabled){
             Core.settings.put("mod-" + mod.name + "-enabled", enabled);
+            Core.settings.put("mod-" + mod.name + "-failed", false);
             requiresReload = true;
             mod.state = enabled ? ModState.enabled : ModState.disabled;
             mods.each(this::updateDependencies);
@@ -1192,7 +1202,9 @@ public class Mods implements Loadable{
 
             //skip mod loading if it failed
             if(skipModLoading()){
+                boolean wasEnabled = Core.settings.getBool("mod-" + baseName + "-enabled", true);
                 Core.settings.put("mod-" + baseName + "-enabled", false);
+                Core.settings.put("mod-" + baseName + "-failed", wasEnabled);
             }
 
             if(!headless && Core.settings.getBool("mod-" + baseName + "-enabled", true)){
@@ -1265,6 +1277,10 @@ public class Mods implements Loadable{
 
         public boolean shouldBeEnabled(){
             return Core.settings.getBool("mod-" + name + "-enabled", true);
+        }
+
+        public boolean failed(){
+            return Core.settings.getBool("mod-" + name + "-failed", false);
         }
 
         public boolean hasUnmetDependencies(){

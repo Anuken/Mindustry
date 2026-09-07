@@ -1,0 +1,1 @@
+Un juego de gestión de fábricas de duración indefinida con elementos de estrategia a tiempo real y defensa de torres.

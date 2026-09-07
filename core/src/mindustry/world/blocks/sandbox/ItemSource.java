@@ -31,7 +31,7 @@ public class ItemSource extends Block{
         drawCached = true;
         drawDynamic = false;
 
-        config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
+        config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item.removed ? null : item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);
     }
 

@@ -110,6 +110,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     strafePenalty = 0.5f,
     /** multiplier for cost of research in tech tree */
     researchCostMultiplier = 50,
+    /** multiplier for knockback this unit receives */
+    knockbackMultiplier = 1f,
 
     /** for ground units, the layer upon which this unit is drawn */
     groundLayer = Layer.groundUnit,
@@ -740,11 +742,11 @@ public class UnitType extends UnlockableContent implements Senseable{
             table.label(() -> Iconc.settings + " " + (long)unit.flag + "").color(Color.lightGray).growX().wrap().left();
             if(net.active() && ai.controller != null && ai.controller.lastAccessed != null){
                 table.row();
-                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).growX().wrap().left();
+                table.add(Core.bundle.format("lastaccessed", ai.controller.lastAccessed)).width(260f).wrap().left();
             }
         }else if(net.active() && unit.lastCommanded != null){
             table.row();
-            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).growX().wrap().left();
+            table.add(Core.bundle.format("lastcommanded", unit.lastCommanded)).width(260f).wrap().left();
         }
 
         table.row();
@@ -807,7 +809,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
 
-        if(abilities.any()){
+        if(abilities.contains(a -> a.display)){
             stats.add(Stat.abilities, StatValues.abilities(abilities));
         }
 
@@ -1796,7 +1798,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     public void drawLight(Unit unit){
-        if(lightRadius > 0){
+        if(lightRadius > 0 && state.rules.unitLight){
             Drawf.light(unit.x, unit.y, lightRadius, lightColor, lightOpacity);
         }
     }
@@ -2001,6 +2003,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     public static class UnitEngine implements Cloneable{
         public float x, y, radius, rotation;
+        public @Nullable Color color;
 
         public UnitEngine(float x, float y, float radius, float rotation){
             this.x = x;
@@ -2019,7 +2022,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             if(scale <= 0.0001f) return;
 
             float rot = unit.rotation - 90;
-            Color color = type.engineColor == null ? unit.team.color : type.engineColor;
+            Color color = this.color != null ? this.color : type.engineColor == null ? unit.team.color : type.engineColor;
 
             Tmp.v1.set(x, y).rotate(rot);
             float ex = Tmp.v1.x, ey = Tmp.v1.y;

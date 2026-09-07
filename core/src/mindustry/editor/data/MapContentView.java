@@ -162,6 +162,7 @@ public class MapContentView implements AssetView{
                 ui.showConfirm("@asset.delete.confirm",  () -> {
                     contents.remove(content);
                     Vars.content.remove(content.content);
+                    state.data.reloadContent(false);
                     diag.rebuild();
                 });
             }).size(h);
@@ -170,7 +171,7 @@ public class MapContentView implements AssetView{
         }
 
         if(list.getChildren().isEmpty()){
-            list.add("@patch.none");
+            list.add("@none.found");
         }
     }
 

@@ -66,8 +66,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
         try{
             readRegion("content", stream, counter, this::readContentHeader);
-            readRegion("map", stream, counter, in -> readMap(in, saveState.context));
-            readRegion("entities", stream, counter, this::readEntities);
+            readRegion("map", stream, counter, in -> readMap(in, saveState));
+            readRegion("entities", stream, counter, stream1 -> readEntities(stream1, saveState));
             if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
             readRegion("custom", stream, counter, this::readCustomChunks);
         }finally{
@@ -288,7 +288,8 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readMap(DataInput stream, WorldContext context) throws IOException{
+    public void readMap(DataInput stream, SaveReadState state) throws IOException{
+        var context = state.context;
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
@@ -345,7 +346,10 @@ public abstract class SaveVersion extends SaveFileReader{
                 //set block only if this is the center; otherwise, it's handled elsewhere
                 if(isCenter){
                     tile.setBlock(block);
-                    if(tile.build != null) tile.build.enabled = true;
+                    if(tile.build != null){
+                        if(!state.preview) state.allBuildings.add(tile.build);
+                        tile.build.enabled = true;
+                    }
                 }
 
                 //must be assigned after setBlock, because that can reset data
@@ -412,8 +416,12 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeWorldEntities(DataOutput stream) throws IOException{
+        writeWorldEntities(stream, null);
+    }
+
+    public void writeWorldEntities(DataOutput stream, @Nullable Boolf<Unit> unitFilter) throws IOException{
         //units are not included in Groups.all
-        stream.writeInt(Groups.all.count(Entityc::serialize) + Groups.unit.size());
+        stream.writeInt(Groups.all.count(Entityc::serialize) + (unitFilter == null ? Groups.unit.size() : Groups.unit.count(unitFilter)));
 
         for(Entityc entity : Groups.all){
             if(!entity.serialize()) continue;
@@ -421,7 +429,9 @@ public abstract class SaveVersion extends SaveFileReader{
             writeEntity(entity, stream);
         }
 
-        for(Entityc entity : Groups.unit){
+        for(Unit entity : Groups.unit){
+            if(unitFilter != null && !unitFilter.get(entity)) continue;
+
             writeEntity(entity, stream);
         }
     }
@@ -481,7 +491,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readWorldEntities(DataInput stream, Prov[] mapping) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveReadState state) throws IOException{
         IntSet used = new IntSet();
         Seq<Entityc> reassign = new Seq<>();
 
@@ -516,12 +526,12 @@ public abstract class SaveVersion extends SaveFileReader{
 
         Groups.all.each(Entityc::afterReadAll);
         Groups.unit.each(Entityc::afterReadAll);
-        Groups.build.each(Entityc::afterReadAll);
+        state.allBuildings.each(Buildingc::afterReadAll);
     }
 
     public Prov[] readEntityMapping(DataInput stream) throws IOException{
         //copy entityMapping for further mutation; will be used in readWorldEntities
-        Prov[] entityMapping = Arrays.copyOf(EntityMapping.idMap, EntityMapping.idMap.length);
+        var entityMapping = Arrays.copyOf(EntityMapping.idMap, EntityMapping.idMap.length);
 
         short amount = stream.readShort();
         for(int i = 0; i < amount; i++){
@@ -535,10 +545,10 @@ public abstract class SaveVersion extends SaveFileReader{
         return entityMapping;
     }
 
-    public void readEntities(DataInput stream) throws IOException{
+    public void readEntities(DataInput stream, SaveReadState state) throws IOException{
         var mapping = readEntityMapping(stream);
         readTeamBlocks(stream);
-        readWorldEntities(stream, mapping);
+        readWorldEntities(stream, mapping, state);
     }
 
     public void readDataPatches(DataInput stream, SaveReadState saveState) throws IOException{

@@ -20,6 +20,7 @@ public class ClassMap{
         classes.put("LogicAI", mindustry.ai.types.LogicAI.class);
         classes.put("MinerAI", mindustry.ai.types.MinerAI.class);
         classes.put("MissileAI", mindustry.ai.types.MissileAI.class);
+        classes.put("NoAI", mindustry.ai.types.NoAI.class);
         classes.put("PrebuildAI", mindustry.ai.types.PrebuildAI.class);
         classes.put("RepairAI", mindustry.ai.types.RepairAI.class);
         classes.put("SuicideAI", mindustry.ai.types.SuicideAI.class);
@@ -73,6 +74,7 @@ public class ClassMap{
         classes.put("RadialEffect", mindustry.entities.effect.RadialEffect.class);
         classes.put("SeqEffect", mindustry.entities.effect.SeqEffect.class);
         classes.put("SoundEffect", mindustry.entities.effect.SoundEffect.class);
+        classes.put("TriangleEffect", mindustry.entities.effect.TriangleEffect.class);
         classes.put("WaveEffect", mindustry.entities.effect.WaveEffect.class);
         classes.put("WrapEffect", mindustry.entities.effect.WrapEffect.class);
         classes.put("DrawPart", mindustry.entities.part.DrawPart.class);
@@ -185,6 +187,8 @@ public class ClassMap{
         classes.put("ShockMineBuild", mindustry.world.blocks.defense.ShockMine.ShockMineBuild.class);
         classes.put("ShockwaveTower", mindustry.world.blocks.defense.ShockwaveTower.class);
         classes.put("ShockwaveTowerBuild", mindustry.world.blocks.defense.ShockwaveTower.ShockwaveTowerBuild.class);
+        classes.put("TargetDummy", mindustry.world.blocks.defense.TargetDummy.class);
+        classes.put("TargetDummyBuild", mindustry.world.blocks.defense.TargetDummy.TargetDummyBuild.class);
         classes.put("Thruster", mindustry.world.blocks.defense.Thruster.class);
         classes.put("ThrusterBuild", mindustry.world.blocks.defense.Thruster.ThrusterBuild.class);
         classes.put("Wall", mindustry.world.blocks.defense.Wall.class);

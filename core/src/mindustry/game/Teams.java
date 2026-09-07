@@ -269,6 +269,7 @@ public class Teams{
 
     public static class TeamData{
         private static final IntSeq derelictBuffer = new IntSeq();
+        private static final float clusterChunkSize = 70f;
 
         public final Team team;
 
@@ -278,6 +279,8 @@ public class Teams{
         public @Nullable RtsAI rtsAi;
 
         private boolean presentFlag;
+        private IntIntMap clusteredCounts = new IntIntMap();
+        private float lastClusterUpdateTimer = -100f;
 
         /** Enemies with cores or spawn points. */
         public Team[] coreEnemies = {};
@@ -468,6 +471,26 @@ public class Teams{
         /** @return whether this team is controlled by the AI and builds bases. */
         public boolean hasAI(){
             return team.rules().rtsAi || team.rules().buildAi;
+        }
+
+        /** @return approximate number of clustered ground units at a specific position */
+        public int getClustered(float x, float y){
+            //update based on ticks passed (no increment)
+            if(Time.time > lastClusterUpdateTimer + 10f){
+                lastClusterUpdateTimer = Time.time;
+                clusteredCounts.clear();
+                units.each(u -> {
+                    //clusters are for artillery, which can't hit flying units
+                    if(!u.isFlying()){
+                        clusteredCounts.increment(clusterKey(u.x, u.y));
+                    }
+                });
+            }
+            return clusteredCounts.get(clusterKey(x, y));
+        }
+
+        private static int clusterKey(float x, float y){
+            return ((Mathf.floor(x / clusterChunkSize) & 0xFFF) << 12) | (Mathf.floor(y / clusterChunkSize) & 0xFFF);
         }
 
         @Override

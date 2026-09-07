@@ -43,17 +43,17 @@ body:
     id: mods
     attributes:
       label: Mods used
-      description: The mod repositories or zip files that are related to the issue, if applicable.
+      description: The mod repositories or zip files that are related to the issue, if applicable. If you are positive that you have none enabled, write 'none'.
     validations:
-      required: false
+      required: true
   - type: textarea
     id: save-file
     attributes:
       label: Save file
       description: The (zipped) save file you were playing on when the bug happened. If this happened in the campaign, specify the sector, and attach the file you get from Settings -> Game Data -> Export Data. For custom games, attach the .msav file exported from the save dialog, zipped.
-      placeholder: THIS IS REQUIRED FOR ANY ISSUE HAPPENING IN-GAME OR IN MULTIPLAYER, REGARDLESS OF WHETHER YOU THINK IT HAPPENS EVERYWHERE. DO NOT OMIT THIS LINE UNLESS YOU ARE SURE THAT THE ISSUE DOES NOT HAPPEN IN-GAME. IF YOU DO NOT HAVE A SAVE, DON'T WASTE TIME OPENING THIS ISSUE.
+      placeholder: THIS IS REQUIRED FOR ANY IN-GAME ISSUE. IF YOU DO NOT HAVE A SAVE, DO NOT WASTE TIME OPENING THIS ISSUE.
     validations:
-      required: false
+      required: true
   - type: textarea
     id: logs
     attributes:
@@ -72,5 +72,9 @@ body:
           required: true
         - label: I have searched the closed and open issues to make sure that this problem has not already been reported.
           required: true
-        - label: "I am not using Foo's Client, and have made sure the bug is not caused by mods I have installed."
+        - label: "I am not using Foo's Client."
+          required: true
+        - label: "This issue occurs with no mods enabled."
+          required: true
+        - label: "I have attached a valid save file."
           required: true

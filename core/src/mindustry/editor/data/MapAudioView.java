@@ -75,8 +75,6 @@ public class MapAudioView implements AssetView{
                             m.setPosition(value);
                         }
                     });
-                    //only ogg can seek
-                    slider.touchable = asset.path.endsWith(".ogg") ? Touchable.enabled : Touchable.disabled;
                     slider.visible(() -> {
                         boolean valid = lastPlaying == m && m.isPlaying();
                         if(valid){

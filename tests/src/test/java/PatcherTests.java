@@ -173,7 +173,6 @@ public class PatcherTests{
 
     @Test
     void unitWeapons() throws Exception{
-        UnitTypes.dagger.checkStats();
         UnitTypes.dagger.stats.add(Stat.charge, 999);
         assertNotNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
 
@@ -195,7 +194,7 @@ public class PatcherTests{
 
         Vars.logic.reset();
 
-        UnitTypes.dagger.checkStats();
+        UnitTypes.dagger.computeStats();
         assertNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
     }
 

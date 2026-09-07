@@ -42,12 +42,14 @@ public class NetworkIO{
                 }
             }
 
+            var writer = SaveIO.getSaveWriter();
+
             //data patches must be first, as rules can involve patched content
-            SaveIO.getSaveWriter().writeDataPatches(stream, false);
+            writer.writeDataPatches(stream, false);
 
             stream.writeUTF(JsonIO.write(state.rules));
             stream.writeUTF(JsonIO.write(state.mapLocales));
-            SaveIO.getSaveWriter().writeStringMap(stream, state.map.tags);
+            writer.writeStringMap(stream, state.map.tags);
 
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
@@ -58,11 +60,15 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(new Writes(stream));
 
-            SaveIO.getSaveWriter().writeContentHeader(stream);
-            SaveIO.getSaveWriter().writeMap(stream);
-            SaveIO.getSaveWriter().writeTeamBlocks(stream);
-            SaveIO.getSaveWriter().writeMarkers(stream);
-            SaveIO.getSaveWriter().writeCustomChunks(stream, true);
+            writer.writeContentHeader(stream);
+            writer.writeMap(stream);
+            //these three calls mimic what writeEntities has, except with a custom filter, which is a bit fragile
+            writer.writeEntityMapping(stream);
+            writer.writeTeamBlocks(stream);
+            writer.writeWorldEntities(stream, state.rules.fog ? u -> !u.inFogTo(player.team()) : null);
+
+            writer.writeMarkers(stream);
+            writer.writeCustomChunks(stream, true);
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -71,12 +77,13 @@ public class NetworkIO{
     public static void loadWorld(InputStream is){
 
         try(DataInputStream stream = new DataInputStream(is)){
+            var writer = SaveIO.getSaveWriter();
             Time.clear();
-            SaveIO.getSaveWriter().readDataPatches(stream, new SaveReadState(world.context));
+            writer.readDataPatches(stream, new SaveReadState(world.context));
 
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
-            state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
+            state.map = new Map(writer.readStringMap(stream));
 
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
@@ -93,11 +100,16 @@ public class NetworkIO{
             player.id = id;
             player.add();
 
-            SaveIO.getSaveWriter().readContentHeader(stream);
-            SaveIO.getSaveWriter().readMap(stream, world.context);
-            SaveIO.getSaveWriter().readTeamBlocks(stream);
-            SaveIO.getSaveWriter().readMarkers(stream);
-            SaveIO.getSaveWriter().readCustomChunks(stream);
+            var state = new SaveReadState(world.context);
+
+            writer.readContentHeader(stream);
+            writer.readMap(stream, state);
+            writer.readEntities(stream, state);
+            writer.readMarkers(stream);
+            writer.readCustomChunks(stream);
+
+            Groups.all.each(e -> netClient.addRemovedEntity(e.id()));
+            Groups.unit.each(e -> netClient.addRemovedEntity(e.id()));
         }catch(IOException e){
             throw new RuntimeException(e);
         }finally{
@@ -160,6 +172,16 @@ public class NetworkIO{
             }
         }catch(ClosedChannelException ignored){
             //happens when the input stream is closed externally
+        }
+    }
+
+    public static void packTexture(OutputStream os, String name, byte[] pngData){
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeUTF(name);
+            stream.writeInt(pngData.length);
+            stream.write(pngData);
+        }catch(IOException e){
+            throw new RuntimeException(e);
         }
     }
 

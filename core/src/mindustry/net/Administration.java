@@ -7,6 +7,7 @@ import arc.util.*;
 import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
+import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.gen.*;
@@ -14,7 +15,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
-import java.io.*;
 import java.util.regex.*;
 
 import static mindustry.Vars.*;
@@ -635,7 +635,7 @@ public class Administration{
         }
     }
 
-    public static class PlayerInfo implements Serializable{
+    public static class PlayerInfo implements AllowSerialization{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
         public Seq<String> ips = new Seq<>();

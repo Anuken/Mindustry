@@ -114,6 +114,15 @@ public abstract class DataAsset implements Comparable<DataAsset>{
         }
     }
 
+    public static boolean validPath(String path){
+        for(String part : path.replace('\\', '/').split("/")){
+            if(part.equals("..") || part.equals(".")){
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public String toString(){
         return getClass().getSimpleName() + "{" + path + "}";

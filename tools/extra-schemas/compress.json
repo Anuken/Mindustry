@@ -1,0 +1,11 @@
+{
+  "doc": "Compresses progress into the [start, end] sub-range. Applied via PartProgress's 'op'/'operation' field (e.g. `op: compress`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "start": {
+    "type": "float",
+    "doc": "Start of the compressed range."
+  },
+  "end": {
+    "type": "float",
+    "doc": "End of the compressed range."
+  }
+}

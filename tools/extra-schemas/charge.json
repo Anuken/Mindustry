@@ -1,0 +1,4 @@
+{
+  "doc": "Weapon charge, 0 when beginning to charge, 1 when finished. A sensor value for PartProgress.type - not an operation (see PartProgress and the 'op' field for those).",
+  "superclass": "mindustry.entities.part.DrawPart$PartProgress"
+}

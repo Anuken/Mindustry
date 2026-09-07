@@ -91,6 +91,13 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         }
     }
 
+    public void update(Boolf<T> filter){
+        for(index = 0; index < array.size; index++){
+            var item = array.items[index];
+            if(filter.get(item)) array.items[index].update();
+        }
+    }
+
     /** Calls {@link #fixedUpdate(int, int)} with a maximum of 10 updates per frame. */
     public void fixedUpdate(int targetFps){
         fixedUpdate(targetFps, 10);
@@ -217,6 +224,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         return tree;
     }
 
+    public Seq<T> rawSeq(){
+        return array;
+    }
+
     /** Resizes the internal quadtree, if it is enabled.*/
     public void resize(float x, float y, float w, float h){
         if(tree != null){
@@ -340,5 +351,10 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     @Override
     public Iterator<T> iterator(){
         return array.iterator();
+    }
+
+    @Override
+    public String toString(){
+        return array.toString();
     }
 }

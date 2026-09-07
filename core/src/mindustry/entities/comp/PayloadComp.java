@@ -52,13 +52,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         for(Payload pay : payloads){
-            //apparently BasedUser doesn't want this and several plugins use it
-            //if(pay instanceof BuildPayload build){
-            //    build.build.team = team;
-            //}
             pay.set(x, y, rotation);
             pay.update(self(), null);
         }
+        //remove dead payloads after they explode
+        payloads.removeAll(Payload::isDead);
     }
 
     @Override
@@ -144,6 +142,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(on != null && on.build != null && on.build.team == team && on.build.acceptPayload(on.build, payload)){
             Fx.unitDrop.at(on.build);
             on.build.handlePayload(on.build, payload);
+            playPayloadDropSound(payload);
             return true;
         }
 
@@ -200,12 +199,8 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
         u.add();
         u.unloaded();
-        Sound dropSound =
-            payload.size() <= 12f ? Sounds.payloadDrop1 :
-            payload.size() <= 20f ? Sounds.payloadDrop2 :
-            Sounds.payloadDrop3;
-        dropSound.at(self(), Mathf.random(0.9f, 1.1f));
         Events.fire(new PayloadDropEvent(self(), u));
+        playPayloadDropSound(payload);
 
         return true;
     }
@@ -230,6 +225,14 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         return false;
+    }
+
+    void playPayloadDropSound(Payload payload){
+        Sound dropSound =
+            payload.size() <= 12f ? Sounds.payloadDrop1 :
+            payload.size() <= 20f ? Sounds.payloadDrop2 :
+            Sounds.payloadDrop3;
+        dropSound.at(self(), Mathf.random(0.9f, 1.1f));
     }
 
     void contentInfo(Table table, float itemSize, float width){

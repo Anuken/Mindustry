@@ -101,6 +101,10 @@ public class Weapon implements Cloneable{
     public float velocityRnd = 0f;
     /** extra velocity that is added as a fraction */
     public float extraVelocity = 0f;
+    /** fraction of lifetime that is random */
+    public float lifeRnd = 0f;
+    /** extra lifetime that is added as a fraction */
+    public float extraLife = 0f;
     /** The half-radius of the cone in which shooting will start. */
     public float shootCone = 5f;
     /** Cone in which the weapon can rotate relative to its mount. */
@@ -117,8 +121,10 @@ public class Weapon implements Cloneable{
     public boolean ignoreRotation = false;
     /** If true, this weapon cannot be used to attack targets. */
     public boolean noAttack = false;
-    /** min velocity required for this weapon to shoot */
+    /** min velocity required for this weapon to shoot. -1 to disable the limit. */
     public float minShootVelocity = -1f;
+    /** max velocity at which this weapon to shoot. -1 to disable the limit. */
+    public float maxShootVelocity = -1f;
     /** should the shoot effects follow the unit (effects need followParent set to true for this to work) */
     public boolean parentizeEffects;
     /** internal value used for alternation - do not change! */
@@ -434,7 +440,7 @@ public class Weapon implements Cloneable{
         !(bullet.killShooter && mount.totalShots > 0) && //if the bullet kills the shooter, you should only ever be able to shoot once
         (!alternate || wasFlipped == flipSprite) &&
         mount.warmup >= minWarmup && //must be warmed up
-        velLen >= minShootVelocity && //check velocity requirements
+        velLen >= minShootVelocity && (maxShootVelocity == -1 || velLen <= maxShootVelocity)  && //check velocity requirements
         (mount.reload <= 0.0001f || (alwaysContinuous && mount.bullet == null)) && //reload has to be 0, or it has to be an always-continuous weapon
         (alwaysShooting || Angles.within(rotate ? mount.rotation : unit.rotation + baseRotation, mount.targetRotation, shootCone)) //has to be within the cone
         ){
@@ -497,7 +503,8 @@ public class Weapon implements Cloneable{
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset + ySpread),
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX + xOffset + xSpread, this.shootY + yOffset + ySpread),
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY) + angleOffset,
-        lifeScl = bullet.scaleLife ? Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : 1f,
+        baseLife = (1f - lifeRnd) + Mathf.random(lifeRnd) + extraLife,
+        lifeScl = bullet.scaleLife ? baseLife * Mathf.clamp(Mathf.dst(bulletX, bulletY, mount.aimX, mount.aimY) / bullet.range) : baseLife,
         angle = shootAngle + Mathf.range(inaccuracy + bullet.inaccuracy);
 
         Entityc shooter = unit.controller() instanceof MissileAI ai ? ai.shooter : unit; //Pass the missile's shooter down to its bullets

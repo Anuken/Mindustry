@@ -43,6 +43,7 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void setBars(){
+        stats.timePeriod = itemDuration;
         super.setBars();
 
         addBar("power", (GeneratorBuild entity) -> new Bar(() ->
@@ -54,6 +55,7 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemDuration;
         super.setStats();
 
         if(hasItems){
@@ -62,13 +64,20 @@ public class ImpactReactor extends PowerGenerator{
 
         if(consPower != null){
             //exponential decay formula
-            float max = -(float)Math.log(0.001f) / warmupSpeed / 60f;
-            float equal = -(float)Math.log(1f - Mathf.pow(consPower.usage / powerProduction, 1f / 5f)) / warmupSpeed / 60f;
-            stats.add(Stat.warmupTime, t -> {
-                t.add(Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized() + (consPower != null ?
-                " ~ " + Strings.autoFixed(equal, 2) + " " + StatUnit.seconds.localized() + " " + StatUnit.powerEquilibrium.localized() : ""));
-            });
+            float max = statWarmup(0.001f);
+            float t90 = statWarmup(0.1f), t99 = statWarmup(0.01f);
+            float equal = statWarmup(1f - Mathf.pow(consPower.usage / powerProduction, 1f / 5f));
+
+            stats.add(Stat.warmupTime, t -> t.add(
+                Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized() +
+                (consPower != null ? " ~ " + Strings.autoFixed(equal, 2) + " " + StatUnit.seconds.localized() + " " + StatUnit.powerEquilibrium.localized() : "")
+            ).tooltip(Core.bundle.format("bar.lerpwarmuptime", Strings.autoFixed(t90, 2), Strings.autoFixed(t99, 2))));
         }
+    }
+
+    //progress remaining
+    public float statWarmup(float progress){
+        return -(float)Math.log(progress) / warmupSpeed / 60f;
     }
 
     public class ImpactReactorBuild extends GeneratorBuild{

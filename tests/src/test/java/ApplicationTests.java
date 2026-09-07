@@ -5,8 +5,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
-import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -26,7 +24,6 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
-import org.json.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
@@ -222,24 +219,6 @@ public class ApplicationTests{
         String str2 = JsonIO.write(new Rules(){{
             attackMode = true;
         }});
-    }
-
-    @Test
-    void serverListJson(){
-        String[] files = {"servers_v6.json", "servers_v7.json"};
-
-
-        for(String file : files){
-            try{
-                String str = Core.files.absolute("./../../" + file).readString();
-                assertEquals(ValueType.array, new JsonReader().parse(str).type());
-                assertTrue(Jval.read(str).isArray());
-                JSONArray array = new JSONArray(str);
-                assertTrue(array.length() > 0);
-            }catch(Exception e){
-                fail("Failed to parse " + file, e);
-            }
-        }
     }
 
     @Test

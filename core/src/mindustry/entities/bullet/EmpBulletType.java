@@ -1,5 +1,6 @@
 package mindustry.entities.bullet;
 
+import arc.math.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -57,7 +58,9 @@ public class EmpBulletType extends BasicBulletType{
                         hitPowerEffect.at(other.x, other.y, b.angleTo(other), hitColor);
                         chainEffect.at(x, y, 0, hitColor, other);
                         other.damage(damage * unitDamageScl);
-                        other.apply(status, statusDuration);
+                        if(Mathf.chance(statusChance)){
+                            other.apply(status, statusDuration);
+                        }
                     }
                 });
             }
