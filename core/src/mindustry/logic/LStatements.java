@@ -73,8 +73,6 @@ public class LStatements{
 
             field(table, target, str -> target = str);
 
-            row(table);
-
             table.add(bundle("at"));
 
             field(table, address, str -> address = str);
@@ -104,8 +102,6 @@ public class LStatements{
             table.add(bundle("to"));
 
             field(table, target, str -> target = str);
-
-            row(table);
 
             table.add(bundle("at"));
 
@@ -162,7 +158,6 @@ public class LStatements{
             }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
 
             if(type != GraphicsType.stroke){
-                row(table);
             }
 
             table.table(s -> {
@@ -460,8 +455,6 @@ public class LStatements{
 
             field(table, target, v -> target = v);
 
-            row(table);
-
             //Q: why don't you just use arrays for this?
             //A: arrays aren't as easy to serialize so the code generator doesn't handle them
             int c = 0;
@@ -469,7 +462,6 @@ public class LStatements{
 
                 fields(table, bundle(type.params[i]), i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
 
-                if(++c % 2 == 0) row(table);
             }
         }
 
@@ -499,7 +491,6 @@ public class LStatements{
 
                 fields(table, radar, v -> radar = v);
 
-                row(table);
             }
 
             for(int i = 0; i < 3; i++){
@@ -514,17 +505,11 @@ public class LStatements{
                         if(fi == 0) target1 = t; else if(fi == 1) target2 = t; else target3 = t;
                     }, 2, cell -> cell.size(100, 50)));
                 }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
-
-                if(i == 1){
-                    row(table);
-                }
             }
 
             table.add(bundle("order")).self(this::param);
 
             fields(table, sortOrder, v -> sortOrder = v);
-
-            table.row();
 
             table.add(bundle("sort")).self(this::param);
 
@@ -568,8 +553,6 @@ public class LStatements{
             field(table, to, str -> to = str);
 
             table.add(" = ");
-
-            row(table);
 
             tfield = field(table, type, str -> type = str).padRight(0f).get();
 
@@ -731,13 +714,10 @@ public class LStatements{
 
                 field(table, a, str -> a = str);
             }else{
-                row(table);
-
                 //"function"-type operations have the name at the left and arguments on the right
                 if(op.func){
                     if(LCanvas.useRows()){
                         table.left();
-                        table.row();
                         table.table(c -> {
                             c.color.set(category().color);
                             c.left();
@@ -815,7 +795,6 @@ public class LStatements{
                 }, comp0, str -> comp0 = str, comp1, str -> comp1 = str);
             }).left();
 
-            table.row();
             table.table(t -> {
                 t.setColor(table.color);
 
@@ -887,8 +866,6 @@ public class LStatements{
 
             table.add(bundle("-lookup"));
 
-            row(table);
-
             table.button(b -> {
                 b.label(() -> bundle(type));
                 b.clicked(() -> showSelect(b, GlobalVars.lookableContent, type, o -> {
@@ -923,8 +900,6 @@ public class LStatements{
             table.add(" = ");
             table.add(bundle("pack"));
 
-            row(table);
-
             fields(table, r, str -> r = str);
             fields(table, g, str -> g = str);
             fields(table, b, str -> b = str);
@@ -952,8 +927,6 @@ public class LStatements{
             fields(table, g, str -> g = str);
             fields(table, b, str -> b = str);
             fields(table, a, str -> a = str);
-
-            row(table);
 
             table.add(" = ");
             table.add(bundle("unpack"));
@@ -1142,16 +1115,14 @@ public class LStatements{
             table.button(b -> {
                 b.label(() -> bundle(type));
                 b.clicked(() -> showSelect(b, Structs.filter(LUnitControl.class, LUnitControl.all, t ->
-                    t == LUnitControl.build ? state.rules.logicUnitBuild :
-                    t == LUnitControl.deconstruct ? state.rules.logicUnitDeconstruct :
-                    true
+                t == LUnitControl.build ? state.rules.logicUnitBuild :
+                t == LUnitControl.deconstruct ? state.rules.logicUnitDeconstruct :
+                true
                 ), type, t -> {
                     type = t;
                     rebuild(table);
                 }, 2, cell -> cell.size(120, 50)));
             }, Styles.logict, () -> {}).size(120, 40).color(table.color).left().padLeft(2);
-
-            row(table);
 
             //Q: why don't you just use arrays for this?
             //A: arrays aren't as easy to serialize so the code generator doesn't handle them
@@ -1159,12 +1130,6 @@ public class LStatements{
             for(int i = 0; i < type.params.length; i++){
 
                 fields(table, bundle(type.params[i]), i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : i == 3 ? p4 : p5, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v).width(100f);
-
-                if(++c % 2 == 0) row(table);
-
-                if(i == 3){
-                    table.row();
-                }
             }
         }
 
@@ -1230,19 +1195,15 @@ public class LStatements{
 
             switch(locate){
                 case building -> {
-                    row(table);
                     table.add(bundle("group")).left().self(this::param);
                     table.button(b -> {
                         b.label(() -> bundle(flag));
                         b.clicked(() -> showSelect(b, BlockFlag.allLogic, flag, t -> flag = t, 2, cell -> cell.size(110, 50)));
                     }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
-                    row(table);
-
                     table.add(bundle("enemy")).left().self(this::param);
 
                     fields(table, enemy, str -> enemy = str);
 
-                    table.row();
                 }
 
                 case ore -> {
@@ -1275,11 +1236,9 @@ public class LStatements{
                     });
 
 
-                    table.row();
                 }
 
                 case spawn, damaged -> {
-                    table.row();
                 }
             }
 
@@ -1288,8 +1247,6 @@ public class LStatements{
 
             table.add(bundle("outY")).left().self(this::param);
             fields(table, outY, str -> outY = str);
-
-            row(table);
 
             table.add(bundle("found")).left().self(this::param);
             fields(table, outFound, str -> outFound = str);
@@ -1337,12 +1294,8 @@ public class LStatements{
 
             fields(table, bundle("team"), team, str -> team = str);
 
-            row(table);
-
             fields(table, "x", x, str -> x = str);
             fields(table, "y", y, str -> y = str);
-
-            table.row();
 
             if(shape == QueryShape.circle){
                 fields(table, bundle("radius"), w, str -> w = str);
@@ -1379,8 +1332,6 @@ public class LStatements{
 
             table.add(" = ");
             table.add(bundle("get"));
-
-            row(table);
 
             table.button(b -> {
                 b.label(() -> bundle(layer));
@@ -1432,23 +1383,17 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
 
-            row(table);
-
             table.add(bundle("at"));
 
             fields(table, x, str -> x = str);
             table.add(", ");
             fields(table, y, str -> y = str);
 
-            row(table);
-
             table.add(bundle("to"));
 
             fields(table, block, str -> block = str);
 
             if(layer == TileLayer.block){
-                row(table);
-
                 table.add(bundle("team"));
                 fields(table, team, str -> team = str);
 
@@ -1484,15 +1429,11 @@ public class LStatements{
             table.add(bundle("-spawn"));
             field(table, type, str -> type = str).colspan(!LCanvas.useRows() ? 1 : 2);
 
-            row(table);
-
             table.add(bundle("at"));
             fields(table, x, str -> x = str);
 
             table.add(", ");
             fields(table, y, str -> y = str);
-
-            table.row();
 
             if(!LCanvas.useRows()){
                 table.add();
@@ -1503,8 +1444,6 @@ public class LStatements{
 
             table.add(bundle("rot"));
             fields(table, rotation, str -> rotation = str).left();
-
-            row(table);
 
             table.add(bundle("effect"));
             fields(table, effect, str -> effect = str).left();
@@ -1536,23 +1475,16 @@ public class LStatements{
 
             table.add(bundle("-bullet"));
 
-            row(table);
-
             fields(table, bundle("from"), from, str -> from = str);
             fields(table, bundle("index"), index, str -> index = str);
-            row(table);
             fields(table, "x", x, str -> x = str);
             fields(table, "y", y, str -> y = str);
-            table.row();
             fields(table, bundle("rotation"), rotation, str -> rotation = str);
             fields(table, bundle("team"), team, str -> team = str);
-            row(table);
             fields(table, bundle("owner"), owner, str -> owner = str);
             fields(table, bundle("damage"), damage, str -> damage = str);
-            table.row();
             fields(table, bundle("velocityScl"), velocityScl, str -> velocityScl = str);
             fields(table, bundle("lifeScl"), lifeScl, str -> lifeScl = str);
-            row(table);
             fields(table, bundle("aimX"), aimX, str -> aimX = str);
             fields(table, bundle("aimY"), aimY, str -> aimY = str);
         }
@@ -1565,9 +1497,9 @@ public class LStatements{
         @Override
         public LInstruction build(LAssembler builder){
             return new SpawnBulletI(
-                builder.var(result), builder.var(from), builder.var(index), builder.var(x), builder.var(y), builder.var(rotation),
-                builder.var(team), builder.var(owner), builder.var(damage), builder.var(velocityScl), builder.var(lifeScl),
-                builder.var(aimX), builder.var(aimY)
+            builder.var(result), builder.var(from), builder.var(index), builder.var(x), builder.var(y), builder.var(rotation),
+            builder.var(team), builder.var(owner), builder.var(damage), builder.var(velocityScl), builder.var(lifeScl),
+            builder.var(aimX), builder.var(aimY)
             );
         }
 
@@ -1611,15 +1543,11 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-2f).color(table.color);
 
-            row(table);
-
             table.add(bundle(clear ? "from" : "to")).left();
 
             fields(table, unit, str -> unit = str).left();
 
             if(!clear && !isPermanent()){
-                row(table);
-
                 table.add(bundle("for")).left();
 
                 fields(table, duration, str -> duration = str).left();
@@ -1664,8 +1592,6 @@ public class LStatements{
 
             table.add(" = ");
             table.add(bundle("weather"));
-
-            row(table);
 
             tfield = field(table, weather, str -> weather = str).padRight(0f).get();
 
@@ -1819,11 +1745,8 @@ public class LStatements{
                 case mapArea -> {
                     table.add(" = ");
 
-                    row(table);
-
                     fields(table, "x", p1, s -> p1 = s);
                     fields(table, "y", p2, s -> p2 = s);
-                    row(table);
                     fields(table, "w", p3, s -> p3 = s);
                     fields(table, "h", p4, s -> p4 = s);
                 }
@@ -1834,7 +1757,6 @@ public class LStatements{
 
                     fields(table, bundle("of"), p1, s -> p1 = s);
                     table.add(" = ");
-                    row(table);
                     field(table, value, s -> value = s);
                 }
                 case ban, unban -> {
@@ -1894,8 +1816,6 @@ public class LStatements{
                     table.add(bundle("sec"));
                 }
             }
-            row(table);
-
             table.add(bundle("success"));
             fields(table, outSuccess, str -> outSuccess = str);
         }
@@ -1947,8 +1867,6 @@ public class LStatements{
                     fields(table, p1, str -> p1 = str);
                     table.add(" y ");
                     fields(table, p2, str -> p2 = str);
-
-                    row(table);
 
                     table.add(bundle("speed"));
                     fields(table, p3, str -> p3 = str);
@@ -2004,12 +1922,8 @@ public class LStatements{
 
             EffectEntry entry = LogicFx.get(type);
 
-            row(table);
-
             fields(table, "x", x, str -> x = str);
             fields(table, "y", y, str -> y = str);
-            row(table);
-
             if(entry != null){
                 if(entry.color){
                     fields(table, bundle("color"), color, str -> color = str).width(120f);
@@ -2019,8 +1933,6 @@ public class LStatements{
                         build(table);
                     });
                 }
-
-                row(table);
 
                 if(entry.size || entry.rotate){
                     fields(table, bundle(entry.size ? "size" : "rotation"), sizerot, str -> sizerot = str);
@@ -2056,16 +1968,12 @@ public class LStatements{
         public void build(Table table){
             fields(table, bundle("team"), team, str -> team = str);
             fields(table, "x", x, str -> x = str);
-            row(table);
             fields(table, "y", y, str -> y = str);
             fields(table, bundle("radius"), radius, str -> radius = str);
-            table.row();
             fields(table, bundle("damage"), damage, str -> damage = str);
             fields(table, bundle("air"), air, str -> air = str);
-            row(table);
             fields(table, bundle("ground"), ground, str -> ground = str);
             fields(table, bundle("pierce"), pierce, str -> pierce = str);
-            table.row();
             fields(table, bundle("effect"), effect, str -> effect = str);
         }
 
@@ -2130,27 +2038,19 @@ public class LStatements{
                 }, 2, c -> c.width(150f)));
             }, Styles.logict, () -> {}).size(160f, 40f).margin(5f).pad(4f).color(table.color);
 
-            row(table);
-
             fields(table, bundle("team"), team, s -> team = s);
 
             if(type != FetchType.coreCount && type != FetchType.playerCount && type != FetchType.unitCount && type != FetchType.buildCount){
                 table.add(" # ");
 
-                row(table);
-
                 fields(table, index, i -> index = i);
             }
 
             if(type == FetchType.buildCount || type == FetchType.build){
-                row(table);
-
                 fields(table, bundle("block"), extra, i -> extra = i);
             }
 
             if(type == FetchType.unitCount || type == FetchType.unit){
-                row(table);
-
                 fields(table, bundle("unit"), extra, i -> extra = i);
             }
         }
@@ -2386,13 +2286,9 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
-            row(table);
-
             table.add(bundle("of")).self(this::param);
 
             field(table, of, str -> of = str).colspan(2);
-
-            row(table);
 
             table.add(bundle("to"));
 
@@ -2434,8 +2330,6 @@ public class LStatements{
                 build(table);
             }).size(160f, 40f).pad(4f).color(table.color);
 
-            row(table);
-
             field(table, id, str -> id = str).padRight(0f).get();
 
             table.button(b -> {
@@ -2443,12 +2337,8 @@ public class LStatements{
                 b.clicked(() -> showSoundSelect(b, table));
             }, Styles.logict, () -> {}).size(40).color(table.color).left().padLeft(-1);
 
-            row(table);
-
             fieldst(table, bundle("volume"), volume, str -> volume = str);
             fieldst(table, bundle("pitch"), pitch, str -> pitch = str);
-
-            table.row();
 
             if(positional){
                 fieldst(table, "x", x, str -> x = str);
@@ -2457,8 +2347,6 @@ public class LStatements{
             }else{
                 fieldst(table, bundle("pan"), pan, str -> pan = str);
             }
-
-            table.row();
 
             fieldst(table, bundle("limit"), limit, str -> limit = str);
         }
@@ -2682,8 +2570,6 @@ public class LStatements{
                 }, 3, cell -> cell.size(140, 50)));
             }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
 
-            row(table);
-
             fieldst(table, bundle("of-id-"), id, str -> id = str);
 
             //Q: why don't you just use arrays for this?
@@ -2730,8 +2616,6 @@ public class LStatements{
                     }
                 });
 
-                if(i == 0) row(table);
-                if(i == 2) table.row();
             }
         }
 
@@ -2770,13 +2654,9 @@ public class LStatements{
 
             fieldst(table, "id", id, str -> id = str);
 
-            row(table);
-
             fieldst(table, "x", x, v -> x = v);
 
             fieldst(table, "y", y, v -> y = v);
-
-            row(table);
 
             fieldst(table, bundle("replace"), replace, v -> replace = v);
         }
