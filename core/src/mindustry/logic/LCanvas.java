@@ -101,7 +101,7 @@ public class LCanvas extends Table{
     }
 
     public void rebuild(){
-        targetWidth = Math.max(400f, Core.graphics.getWidth() / Scl.scl(1f) * 0.95f - Scl.scl(80f));
+        targetWidth = Core.graphics.isPortrait() ? 400f : Mathf.clamp(Core.graphics.getWidth() / Scl.scl(1f) * 0.95f - Scl.scl(80f), 400f, 1200f);
         float s = pane != null ? pane.getVisualScrollY() : 0f;
         String toLoad = statements != null ? save() : null;
 
