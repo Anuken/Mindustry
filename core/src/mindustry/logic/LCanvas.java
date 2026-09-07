@@ -497,6 +497,7 @@ public class LCanvas extends Table{
             t.left();
             t.marginLeft(4);
             t.setColor(color);
+            if(st.useWrapping()) t.marginRight(4f);
             st.build(t);
 
             add(t).pad(4).padTop(2).left().grow();
