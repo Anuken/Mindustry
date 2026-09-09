@@ -691,7 +691,7 @@ public class LExecutor{
             //note that remote units/buildings can be sensed as well
             if(target instanceof Senseable se){
                 if(sense instanceof LAccess la){
-                    if(exec.privileged || !la.isPrivileged()){
+                    if(exec.privileged || !la.privileged){
                         Object objOut = se.senseObject(la);
 
                         if(objOut == Senseable.noSensed){
