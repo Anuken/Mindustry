@@ -17,14 +17,16 @@ public class ModTestAllure extends GenericModTest{
 
     @Test
     public void begin(){
-        grabMod("https://github.com/LixieWulf/Allure/archive/7dff39df9b07719315a8379a88542fa0fe80fd30.zip");
+        //As of September 5 2026, the Allure repository has been deleted or made private. I do not know why.
+        // Archive version of Allure (archive last pull date: 30 July 2026 - latest commit before archive)
+        grabMod("https://github.com/JasonP01/AllureMod/archive/b6e3d4b831b6c8f81d8d366560029aec8759de89.zip");
         checkExistence("allure");
 
         UnitType type = Vars.content.unit("allure-0b11-exodus");
         assertNotNull(type, "A mod unit must be loaded.");
         assertTrue(type.weapons.size > 0, "A mod unit must have a weapon.");
 
-        Vars.world.loadMap(maps.loadInternalMap("groundZero"));
+        Vars.world.loadMap(maps.loadInternalMap("serpulo/groundZero"));
 
         Unit unit = type.spawn(0, 0);
 

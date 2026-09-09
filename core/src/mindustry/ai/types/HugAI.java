@@ -54,7 +54,7 @@ public class HugAI extends AIController{
         }
 
         if(unit.type.canBoost && unit.elevation > 0.001f && !unit.onSolid()){
-            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, unit.type.riseSpeed);
+            unit.elevation = Mathf.approachDelta(unit.elevation, 0f, unit.type.descentSpeed);
         }
 
         faceTarget();

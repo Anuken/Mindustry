@@ -78,7 +78,7 @@ public class MapPlayDialog extends BaseDialog{
         //only maps with survival are valid for high scores
         if(Gamemode.survival.valid(map)){
             cont.row();
-            cont.label((() -> Core.bundle.format("level.highscore", map.getHightScore()))).pad(3f);
+            cont.label((() -> Core.bundle.format("level.highscore", map.getHighScore()))).pad(3f);
         }
 
         buttons.clearChildren();

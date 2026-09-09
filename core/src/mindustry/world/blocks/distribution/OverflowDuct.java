@@ -33,6 +33,8 @@ public class OverflowDuct extends Block{
         priority = TargetPriority.transport;
         envEnabled = Env.space | Env.terrestrial | Env.underwater;
         regionRotated1 = 1;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override

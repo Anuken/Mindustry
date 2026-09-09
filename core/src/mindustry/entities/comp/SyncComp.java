@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 import java.nio.*;
@@ -21,7 +22,7 @@ abstract class SyncComp implements Entityc{
     void afterSync(){}
     void interpolate(){}
 
-    boolean isSyncHidden(Player player){
+    boolean isSyncHidden(Team team){
         return false;
     }
 

@@ -169,7 +169,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Unitc{
             Color floorColor = tile == null ? Color.clear : tile.getFloorColor();
             Floor floor = tile == null ? Blocks.air.asFloor() : tile.floor();
 
-            if(floor.isDeep()){
+            if(tile != null && tile.isDeep()){
                 deeps ++;
                 lastDeepFloor = floor;
             }
@@ -179,7 +179,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Unitc{
                 //create effect when transitioning to a group it can't move in
                 if(!move && (moving || !type.legContinuousMove) && i % div == l.group){
                     if(!headless && !inFogTo(player.team())){
-                        if(floor.isLiquid){
+                        if(floor.isLiquid && tile != null && tile.block() == Blocks.air){
                             floor.walkEffect.at(l.base.x, l.base.y, type.rippleScale, floorColor);
                             floor.walkSound.at(x, y, 1f, floor.walkSoundVolume);
                         }else{

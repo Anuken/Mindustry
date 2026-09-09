@@ -78,7 +78,7 @@ public class SoundPriority{
         sameGroup(shootArc, shootPulsar);
 
         for(var sound : Core.assets.getAll(Sound.class, new Seq<>())){
-            sound.setMinConcurrentInterrupt(Math.min(0.25f, sound.getLength() * 0.5f));
+            sound.setMinConcurrentInterruptFraction(0.25f, 0.5f);
         }
 
         mechStepSmall.setMinConcurrentInterrupt(0.5f);

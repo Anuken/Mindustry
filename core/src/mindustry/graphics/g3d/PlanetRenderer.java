@@ -107,6 +107,12 @@ public class PlanetRenderer implements Disposable{
         renderPlanet(solarSystem, params);
         renderTransparent(solarSystem, params);
 
+        //TODO: will draw under icons and look bad. maybe limit arcs based on facing dot product
+        if(params.renderer != null){
+            batch.proj().mul(params.planet.getTransform(mat));
+            params.renderer.renderOverProjections(params.planet);
+        }
+
         bloom.render();
 
         Events.fire(Trigger.universeDrawEnd);
@@ -115,9 +121,6 @@ public class PlanetRenderer implements Disposable{
 
         if(params.renderer != null){
             params.renderer.renderProjections(params.planet);
-
-            batch.proj().mul(params.planet.getTransform(mat));
-            params.renderer.renderOverProjections(params.planet);
         }
 
         Gl.disable(Gl.cullFace);

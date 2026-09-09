@@ -1,7 +1,7 @@
 package mindustry.io.versions;
 
 import arc.util.io.*;
-import mindustry.world.*;
+import mindustry.io.*;
 
 import java.io.*;
 
@@ -15,13 +15,13 @@ public class LegacyRegionSaveVersion extends ShortChunkSaveVersion{
     }
 
     @Override
-    public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
-        readRegion("meta", stream, counter, in -> readMeta(in, context));
+    public void read(DataInputStream stream, CounterInputStream counter, SaveReadState saveState) throws IOException{
+        readRegion("meta", stream, counter, in -> readMeta(in, saveState));
         readRegion("content", stream, counter, this::readContentHeader);
 
         try{
-            readRegion("map", stream, counter, in -> readMap(in, context));
-            readRegion("entities", stream, counter, this::readEntities);
+            readRegion("map", stream, counter, in -> readMap(in, saveState));
+            readRegion("entities", stream, counter, in -> readEntities(in, saveState));
         }finally{
             content.setTemporaryMapper(null);
 

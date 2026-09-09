@@ -28,4 +28,8 @@ public class SaveMeta{
         this.tags = tags;
         this.mods = JsonIO.read(String[].class, tags.get("mods", "[]"));
     }
+
+    public boolean isMap(){
+        return tags.containsKey("name");
+    }
 }

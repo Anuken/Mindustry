@@ -16,14 +16,11 @@ public abstract class NetConnection{
     public boolean mobile, modclient;
     public @Nullable Player player;
     public boolean kicked = false;
-    public long syncTime;
 
     /** When this connection was established. */
     public long connectTime = Time.millis();
     /** ID of last received client snapshot. */
     public int lastReceivedClientSnapshot = -1;
-    /** Count of snapshots sent from server. */
-    public int snapshotsSent;
     /** Timestamp of last received snapshot. */
     public long lastReceivedClientTime;
     /** Build requests that have been recently rejected. This is cleared every snapshot. */
@@ -32,8 +29,11 @@ public abstract class NetConnection{
     public Ratekeeper chatRate = new Ratekeeper();
     /** Handles packet spam rate limits. */
     public Ratekeeper packetRate = new Ratekeeper();
+    /** Entities that only this player will get synced to them. */
+    public Seq<Syncc> localEntities = new Seq<>(false);
 
-    public boolean hasConnected, hasBegunConnecting, hasDisconnected;
+    //TODO: refactor to state enum
+    public boolean hasConnected, hasBegunConnecting, determiningAssets, receivingAssets, hasDisconnected;
     public float viewWidth, viewHeight, viewX, viewY;
 
     public NetConnection(String address){
@@ -95,6 +95,16 @@ public abstract class NetConnection{
         return true;
     }
 
+    public void sendStreamAsync(Streamable stream, ByteArrayOutputStream data){
+        //default implementation assumes async stream sending is allowed
+        sendStream(stream, data);
+    }
+
+    public void sendStream(Streamable stream, ByteArrayOutputStream data){
+        stream.stream = new ByteArrayInputStream(data.toByteArray());
+        sendStream(stream);
+    }
+
     public void sendStream(Streamable stream){
         try{
             int cid;
@@ -116,6 +126,10 @@ public abstract class NetConnection{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    public void blacklist(){
+        netServer.admins.blacklistDos(address);
     }
 
     public abstract void send(Object object, boolean reliable);

@@ -103,6 +103,7 @@ public class Build{
             tile.build.checkAllowUpdate();
             tile.build.updateProximity();
             tile.build.onRepaired();
+            world.tileChanges ++; //repair should count as a tile change
 
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
 
@@ -232,6 +233,9 @@ public class Build{
         if(!type.requiresWater && !contactsShallows(tile.x, tile.y, type) && !type.placeableLiquid){
             return false;
         }
+
+        //check limits for non-AI teams
+        if(type.isOverPlacementLimit(team)) return false;
 
         int offsetx = -(type.size - 1) / 2;
         int offsety = -(type.size - 1) / 2;

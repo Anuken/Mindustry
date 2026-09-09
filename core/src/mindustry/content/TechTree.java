@@ -85,7 +85,7 @@ public class TechTree{
         /** For roots only. If true, this needs to be unlocked before it is selectable in the research dialog. Does not apply when you are on the planet itself. */
         public boolean requiresUnlock = false;
         /** Requirement node. */
-        public @Nullable TechNode parent;
+        public @Nullable TechNode parent, rootNode;
         /** Multipliers for research costs on a per-item basis. Inherits from parent. */
         public @Nullable ObjectFloatMap<Item> researchCostMultipliers;
         /** Content to be researched. */
@@ -104,6 +104,7 @@ public class TechTree{
         public TechNode(@Nullable TechNode parent, UnlockableContent content, ItemStack[] requirements){
             if(parent != null){
                 parent.children.add(this);
+                rootNode = parent.rootNode == null ? parent : parent.rootNode;
                 planet = parent.planet;
                 researchCostMultipliers = parent.researchCostMultipliers;
             }else if(researchCostMultipliers == null){
@@ -194,7 +195,9 @@ public class TechTree{
 
             //save finished requirements by item type
             for(ItemStack stack : finishedRequirements){
-                Core.settings.put("req-" + content.name + "-" + stack.item.name, stack.amount);
+                String key = "req-" + content.name + "-" + stack.item.name;
+                //don't write a bunch of zeroes to the settings
+                if(Core.settings.getInt(key, 0) != stack.amount) Core.settings.put(key, stack.amount);
             }
         }
     }

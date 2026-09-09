@@ -23,6 +23,8 @@ public class OverflowGate extends Block{
         unloadable = false;
         canOverdrive = false;
         itemCapacity = 0;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override

@@ -18,6 +18,7 @@ import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
+import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
@@ -99,21 +100,24 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(WorldLoadEvent.class, e -> {
-            //enable infinite ammo for wave team by default
-            state.rules.waveTeam.rules().infiniteAmmo = true;
 
             if(state.isCampaign()){
                 //enable building AI on campaign unless the preset disables it
-
                 state.rules.coreIncinerates = true;
                 state.rules.infiniteResources = false;
                 state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
+                state.rules.worldProcessorPlayerLink = false;
+
                 if(state.getPlanet().enemyInfiniteItems){
                     state.rules.waveTeam.rules().infiniteResources = true;
                     state.rules.waveTeam.rules().fillItems = true;
                 }
                 state.rules.waveTeam.rules().buildSpeedMultiplier *= state.getPlanet().enemyBuildSpeedMultiplier;
+
+                if(state.getPlanet().enemyFactoryActivationDelay > 0f && state.rules.waveTeam.rules().unitFactoryActivationDelay == 0f){
+                    state.rules.waveTeam.rules().unitFactoryActivationDelay = state.getPlanet().enemyFactoryActivationDelay;
+                }
             }
 
             //save settings
@@ -132,8 +136,32 @@ public class Logic implements ApplicationListener{
                 state.rules.waveTeam.data().destroyToDerelict();
             }
 
+            if(e.sector.planet.sectorCaptureReplacements.size > 0){
+                boolean any = false;
+                //faster mapping, avoids objectmap per-tile
+                Floor[] map = new Floor[content.blocks().size];
+                for(var entry : e.sector.planet.sectorCaptureReplacements){
+                    if(indexer.isBlockPresent(entry.key)){
+                        map[entry.key.id] = entry.value.asFloor();
+                        any = true;
+                    }
+                }
+                if(any){
+                    world.tiles.eachTile(t -> {
+                        Floor result = map[t.floor().id];
+                        if(result != null){
+                            t.setFloor(result);
+                        }
+                    });
+                }
+            }
+
             if(!net.client() && e.sector.planet.generator != null){
                 e.sector.planet.generator.onSectorCaptured(e.sector);
+            }
+
+            if(checkCampaignStats()){
+                state.getPlanet().stats().sectorsCaptured ++;
             }
         });
 
@@ -157,11 +185,16 @@ public class Logic implements ApplicationListener{
         }));
 
         Events.on(BlockBuildEndEvent.class, e -> {
-            if(e.team == state.rules.defaultTeam){
+
+            if((e.team == state.rules.defaultTeam || e.unit != null && e.unit.team == state.rules.defaultTeam)){
                 if(e.breaking){
                     state.stats.buildingsDeconstructed++;
                 }else{
                     state.stats.buildingsBuilt++;
+                }
+
+                if(checkCampaignStats()){
+                    (e.breaking ? state.getPlanet().stats().buildingsDeconstructed : state.getPlanet().stats().buildingsBuilt).increment(e.tile.block());
                 }
             }
         });
@@ -169,26 +202,54 @@ public class Logic implements ApplicationListener{
         Events.on(BlockDestroyEvent.class, e -> {
             if(e.tile.team() == state.rules.defaultTeam){
                 state.stats.buildingsDestroyed ++;
-            }
-        });
 
-        Events.on(BlockDestroyEvent.class, e -> {
-            if(e.tile.team() != state.rules.defaultTeam){
+                if(checkCampaignStats()){
+                    state.getPlanet().stats().buildingsDestroyed.increment(e.tile.block());
+                }
+            }else{ //...should derelict blocks count as 'destroyed'? technically, they could be destroyed by the enemy, but that is very rare
                 state.stats.destroyedBlockCount.increment(e.tile.block());
+
+                if(checkCampaignStats()){
+                    state.getPlanet().stats().enemyBuildingsDestroyed.increment(e.tile.block());
+                }
             }
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
-            if(e.unit.team() != state.rules.defaultTeam){
+            if(e.unit.team != state.rules.defaultTeam){
                 state.stats.enemyUnitsDestroyed ++;
+            }
+
+            if(checkCampaignStats()){
+                (e.unit.team != state.rules.defaultTeam ? state.getPlanet().stats().enemyUnitsDestroyed : state.getPlanet().stats().unitsDestroyed).increment(e.unit.type);
             }
         });
 
         Events.on(UnitCreateEvent.class, e -> {
             if(e.unit.team == state.rules.defaultTeam){
                 state.stats.unitsCreated++;
+
+                if(checkCampaignStats()){
+                    state.getPlanet().stats().unitsProduced.increment(e.unit.type);
+                }
             }
         });
+
+        Events.on(WaveEvent.class, e -> {
+            if(checkCampaignStats()){
+                state.getPlanet().stats().wavesLasted ++;
+            }
+        });
+
+        Events.on(GameOverEvent.class, e -> {
+            if(checkCampaignStats()){
+                state.getPlanet().stats().sectorsLost ++;
+            }
+        });
+    }
+
+    private boolean checkCampaignStats(){
+        return state.isCampaign() && !net.client();
     }
 
     private void checkOverlappingPlans(Team team, Tile tile){
@@ -236,19 +297,18 @@ public class Logic implements ApplicationListener{
     }
 
     public void reset(){
-        State prev = state.getState();
-        state.patcher.unapply();
-        //recreate gamestate - sets state to menu
-        state = new GameState();
-        //fire change event, since it was technically changed
-        Events.fire(new StateChangeEvent(prev, State.menu));
-
         Groups.clear();
         Time.clear();
         Events.fire(new ResetEvent());
         world.tiles = new Tiles(0, 0);
 
-        //save settings on reset
+        state.data.unload();
+        State prev = state.getState();
+        //recreate gamestate - sets state to menu
+        state = new GameState();
+        //fire change event, since it was technically changed
+        Events.fire(new StateChangeEvent(prev, State.menu));
+
         Core.settings.manualSave();
     }
 
@@ -400,10 +460,50 @@ public class Logic implements ApplicationListener{
         Core.settings.manualSave();
     }
 
+    protected void updateEntities(){
+        boolean editor = state.isEditor();
+
+        PerfCounter.entityUpdate.begin();
+
+        PerfCounter.entityMisc.begin();
+        Groups.updatePooling();
+        Groups.bullet.updatePhysics();
+        Groups.unit.updatePhysics();
+        Groups.player.update();
+        Groups.effect.update();
+        if(!editor) Groups.all.update();
+        PerfCounter.entityMisc.end();
+
+        PerfCounter.unitUpdate.begin();
+        if(editor){
+            Groups.unit.update(u -> u.isPlayer() || u.spawnedByCore);
+        }else{
+            Groups.unit.update();
+        }
+        PerfCounter.unitUpdate.end();
+
+        PerfCounter.powerUpdate.begin();
+        if(!editor) Groups.powerGraph.update();
+        PerfCounter.powerUpdate.end();
+
+        PerfCounter.buildingUpdate.begin();
+        if(!editor) Groups.build.update();
+        PerfCounter.buildingUpdate.end();
+
+        PerfCounter.bulletUpdate.begin();
+        if(!editor) Groups.bullet.update();
+        if(!editor) Groups.bullet.collide();
+        PerfCounter.bulletUpdate.end();
+
+        PerfCounter.entityUpdate.end();
+    }
+
     @Override
     public void update(){
         PerfCounter.frame.end();
         PerfCounter.frame.begin();
+
+        PerfCounter.stateUpdate.begin();
 
         Events.fire(Trigger.update);
         universe.updateGlobal();
@@ -504,9 +604,7 @@ public class Logic implements ApplicationListener{
                 state.envAttrs.add(state.rules.attributes);
                 Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
-                PerfCounter.entityUpdate.begin();
-                Groups.update();
-                PerfCounter.entityUpdate.end();
+                updateEntities();
 
                 Events.fire(Trigger.afterGameUpdate);
             }
@@ -517,6 +615,8 @@ public class Logic implements ApplicationListener{
         }else if(netServer.isWaitingForPlayers() && runStateCheck){
             checkGameState();
         }
+
+        PerfCounter.stateUpdate.end(PerfCounter.entityUpdate.latestValueNs());
     }
 
     /** @return whether the wave timer is paused due to enemies */

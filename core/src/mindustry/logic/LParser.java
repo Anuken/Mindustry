@@ -2,6 +2,7 @@ package mindustry.logic;
 
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 
@@ -24,6 +25,11 @@ public class LParser{
     LParser(String text, boolean privileged){
         this.privileged = privileged;
         this.chars = text.toCharArray();
+
+        //normalize CRLF and lone-CR line endings to LF in place; avoids extra allocations, and an extra \n is harmless
+        for(int i = 0; i < chars.length; i++){
+            if(chars[i] == '\r') chars[i] = '\n';
+        }
     }
 
     void comment(){
@@ -37,19 +43,46 @@ public class LParser{
 
     String string(){
         int from = pos;
+        int utflen = 0;
 
         while(++pos < chars.length){
-            var c = chars[pos];
+            char c = chars[pos];
+
+            //skip over \n, \" and \\ escape sequences
+            //this doesn't actually transform the sequences, as that would output invalid characters into Statement fields and break round-trip parsing
+            if(c == '\\' && pos + 1 < chars.length && (chars[pos + 1] == 'n' || chars[pos + 1] == '"' || chars[pos + 1] == '\\')){
+                utflen += 2;
+                pos ++; //consume the escaped character too
+                continue;
+            }
+
+            //uXXXX: validate 4 hex digits
+            if(c == '\\' && pos + 1 < chars.length && chars[pos + 1] == 'u'){
+                if(pos + 5 >= chars.length) error("Invalid \\u escape; expected 4 hex digits.");
+                for(int j = pos + 2; j <= pos + 5; j++){
+                    if(Character.digit(chars[j], 16) == -1) error("Invalid \\u escape; expected 4 hex digits.");
+                }
+                utflen += 3; //decoded char may take up to 3 bytes in modified UTF-8
+                pos += 5; //consume u and the 4 hex digits
+                continue;
+            }
+
             if(c == '\n'){
                 error("Missing closing quote \" before end of line.");
             }else if(c == '"'){
                 break;
             }
+
+            // See ByteBufferOutput.writeUTF()
+            utflen += c != 0 && c <= 0x7F ? 1 : c <= 0x7FF ? 2 : 3;
         }
 
         if(pos >= chars.length || chars[pos] != '"') error("Missing closing quote \" before end of file.");
+        if(utflen > 65535) error("String value too long.");
 
-        return new String(chars, from, ++pos - from);
+        pos ++; //move past the closing quote
+
+        return new String(chars, from, pos - from);
     }
 
     String token(){
@@ -57,7 +90,7 @@ public class LParser{
 
         while(pos < chars.length){
             char c = chars[pos];
-            if(c == '\n' || c == ' ' || c == '#' || c == '\t' || c == ';') break;
+            if(c == '\n' || c == ' ' || c == '#' || c == '\t' || c == ';' || c == '"') break;
             pos ++;
         }
 
@@ -69,6 +102,11 @@ public class LParser{
         if(tokens[0].equals("op")){
             //legacy name change
             tokens[1] = opNameChanges.get(tokens[1], tokens[1]);
+        }
+        if(tokens[0].equals("status")){
+            if(Vars.content.statusEffect(tokens[1]) != null){
+                tokens[1] = "@status-" + tokens[1];
+            }
         }
     }
 
@@ -113,7 +151,11 @@ public class LParser{
                 if(jumpLocations.size >= maxJumps){
                     error("Too many jump locations. Max jumps: " + maxJumps);
                 }
-                jumpLocations.put(tokens[0].substring(0, tokens[0].length() - 1), line);
+                String label = tokens[0].substring(0, tokens[0].length() - 1);
+                if(jumpLocations.containsKey(label)){
+                    error("Jump label already defined: \"" + label + "\".");
+                }
+                jumpLocations.put(label, line);
             }else{
                 boolean wasJump;
                 String jumpLoc = null;
@@ -176,7 +218,6 @@ public class LParser{
         while(pos < chars.length && line < LExecutor.maxInstructions){
             switch(chars[pos]){
                 case '\n', ';', ' ' -> pos ++; //skip newlines and spaces
-                case '\r' -> pos += 2; //skip the newline after the \r
                 default -> statement();
             }
         }

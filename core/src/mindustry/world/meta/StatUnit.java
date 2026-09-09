@@ -14,12 +14,14 @@ public class StatUnit{
 
     blocks = new StatUnit("blocks"),
     blocksSquared = new StatUnit("blocksSquared"),
+    worldUnits = new StatUnit("worldUnits"),
     tilesSecond = new StatUnit("tilesSecond"),
     powerSecond = new StatUnit("powerSecond", "[accent]" + Iconc.power + "[]"),
     liquidSecond = new StatUnit("liquidSecond", "[sky]" + Iconc.liquid + "[]"),
     itemsSecond = new StatUnit("itemsSecond"),
     liquidUnits = new StatUnit("liquidUnits", "[sky]" + Iconc.liquid + "[]"),
     powerUnits = new StatUnit("powerUnits", "[accent]" + Iconc.power + "[]"),
+    powerEquilibrium = new StatUnit("powerEquilibrium"),
     heatUnits = new StatUnit("heatUnits", "[red]" + Iconc.waves + "[]"),
     degrees = new StatUnit("degrees"),
     seconds = new StatUnit("seconds"),
@@ -29,12 +31,14 @@ public class StatUnit{
     perMinute = new StatUnit("perMinute", false),
     perShot = new StatUnit("perShot", false),
     perLeg = new StatUnit("perLeg"),
+    perSide = new StatUnit("perSide"),
     timesSpeed = new StatUnit("timesSpeed", false),
     multiplier = new StatUnit("multiplier", false),
     percent = new StatUnit("percent", false),
     shieldHealth = new StatUnit("shieldHealth"),
     none = new StatUnit("none"),
-    items = new StatUnit("items");
+    items = new StatUnit("items"),
+    instant = new StatUnit("instant");
 
     public final boolean space;
     public final String name;

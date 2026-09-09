@@ -94,7 +94,7 @@ public enum EditorTool{
             });
         }
     },
-    fill(KeyCode.g, "replaceall", "fillteams", "fillerase", "fillcliffs"){
+    fill(KeyCode.g, "replaceall", "fillteams", "fillerase", "fillcliffs", "fillunderliquid"){
         {
             edit = true;
         }
@@ -213,6 +213,23 @@ public enum EditorTool{
 
                     t.data = (byte)rotation;
                 });
+            }else if(mode == 4){ //fill under liquid
+                if(editor.drawBlock instanceof Floor f && !f.isLiquid){
+                    if(!tile.floor().isLiquid) return;
+
+                    Block dest = tile.floor(), destoverlay = tile.overlay();
+
+                    Boolf<Tile> tester;
+                    Cons<Tile> setter;
+                    tester = t -> t.floor() == dest && t.overlay() == destoverlay;
+                    setter = t -> {
+                        if(t.overlay() != editor.drawBlock){
+                            t.setOverlay(editor.drawBlock.asFloor());
+                        }
+                    };
+                    
+                    fill(x, y, false, tester, setter);
+                }
             }
         }
 

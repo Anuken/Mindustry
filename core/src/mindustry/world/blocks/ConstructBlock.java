@@ -170,8 +170,6 @@ public class ConstructBlock extends Block{
 
         public float progress = 0;
         public float buildCost;
-        public float previousHealth;
-        public float damaged;
         public @Nullable Object lastConfig;
         public @Nullable Unit lastBuilder;
         public boolean wasConstructing, activeDeconstruct;
@@ -214,8 +212,19 @@ public class ConstructBlock extends Block{
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(progress);
-            return super.sense(sensor);
+            return switch(sensor){
+                case progress -> Mathf.clamp(progress);
+                case breaking -> activeDeconstruct ? 1 : 0;
+                default -> super.sense(sensor);
+            };
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            return switch(sensor){
+                case building -> current;
+                default -> super.senseObject(sensor);
+            };
         }
 
         @Override
@@ -295,11 +304,9 @@ public class ConstructBlock extends Block{
             maxProgress = core == null || team.rules().infiniteResources ? maxProgress : checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
-            scaleHealth(progress);
 
             if(progress >= 1f || state.rules.infiniteResources){
-                boolean canFinish = true;
-                scaleHealth(1f);
+                boolean canFinish = !current.isOverPlacementLimit(team);
 
                 //look at leftover resources to consume, get them from the core if necessary, delay building if not
                 if(!infinite){
@@ -361,7 +368,7 @@ public class ConstructBlock extends Block{
                     if(core != null && requirements[i].item.unlockedNowHost()){ //only accept items that are unlocked
                         int accepting = Math.min(accumulated, core.storageCapacity - core.items.get(requirements[i].item));
                         //transfer items directly, as this is not production.
-                        core.items.add(requirements[i].item, accepting);
+                        if(!state.rules.infiniteResources) core.items.add(requirements[i].item, accepting);
                         itemsLeft[i] += accepting;
                         accumulator[i] -= accepting;
                     }else{
@@ -371,7 +378,6 @@ public class ConstructBlock extends Block{
             }
 
             progress = Mathf.clamp(progress - amount);
-            scaleHealth(progress);
 
             if(progress <= current.deconstructThreshold || state.rules.infiniteResources){
                 //add any leftover items that weren't obtained due to rounding errors
@@ -433,14 +439,6 @@ public class ConstructBlock extends Block{
         @Override
         public float progress(){
             return progress;
-        }
-
-        public void scaleHealth(float progress){
-            float maxHealth = tile.build.maxHealth = current.constructHealthMultiplier() > 0f ? current.constructHealthMultiplier() : tile.block() instanceof ConstructBlock b ? b.health : 10f;
-
-            if(previousHealth > tile.build.health + 0.001f) damaged += previousHealth - tile.build.health;
-            previousHealth = tile.build.health = progress * maxHealth - damaged;
-            tile.build.health = Mathf.clamp(tile.build.health, 0f, maxHealth);
         }
 
         public void setConstruct(Block previous, Block block){

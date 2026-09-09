@@ -75,10 +75,14 @@ public class OverlayRenderer{
     public void drawBottom(){
         InputHandler input = control.input;
 
+        if(renderer.showOtherBuildPlans){
+            input.drawOtherBuildPlans();
+        }
+
         if(player.dead()) return;
 
         if(player.isBuilder()){
-            player.unit().drawBuildPlans();
+            input.drawBuildPlans();
         }
 
         input.drawBottom();
@@ -86,7 +90,7 @@ public class OverlayRenderer{
 
     public void drawTop(){
 
-        if(!player.dead() && ui.hudfrag.shown){
+        if(!player.dead() && ui.hudfrag.shown()){
             if(Core.settings.getBool("playerindicators")){
                 for(Player player : Groups.player){
                     if(Vars.player != player && Vars.player.team() == player.team()){

@@ -16,6 +16,8 @@ import mindustry.logic.LCanvas.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 import static mindustry.logic.LCanvas.*;
 
@@ -81,34 +83,52 @@ public abstract class LStatement{
         tooltip(label, text);
     }
 
-    protected String sanitize(String value){
+    /** Sanitizes variable input strings from text fields into values that will not break logic parsing. */
+    public static String sanitize(String value){
         if(value.length() == 0){
             return "";
         }else if(value.length() == 1){
-            if(value.charAt(0) == '"' || value.charAt(0) == ';' || value.charAt(0) == ' '){
+            if(value.charAt(0) == '"' || value.charAt(0) == ';' || value.charAt(0) == ' ' ||
+            value.charAt(0) == '\n' || value.charAt(0) == '\t' || value.charAt(0) == '#'){
                 return "invalid";
             }
         }else{
             StringBuilder res = new StringBuilder(value.length());
             if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
                 res.append('\"');
-                //strip out extra quotes
+                //escape characters that would otherwise break out of the string or corrupt it.
                 for(int i = 1; i < value.length() - 1; i++){
-                    if(value.charAt(i) == '"'){
-                        res.append('\'');
-                    }else{
-                        res.append(value.charAt(i));
+                    char c = value.charAt(i);
+                    //exception: allow escape sequences in strings: \n, \", \\, uXXXX
+                    if(c == '\\' && i + 1 < value.length() - 1){
+                        char next = value.charAt(i + 1);
+                        if(next == '"' || next == '\\' || next == 'n'){
+                            res.append(c).append(next);
+                            i ++; //consumed the escape target too
+                            continue;
+                        }else if(next == 'u' && i + 5 < value.length() - 1 && isHex(value, i + 2)){
+                            res.append(value, i, i + 6);
+                            i += 5; //consumed u and the 4 hex digits too
+                            continue;
+                        }
+                    }
+                    switch(c){
+                        case '"' -> res.append("\\\"");
+                        case '\\' -> res.append("\\\\");
+                        case '\n' -> res.append("\\n");
+                        default -> res.append(c);
                     }
                 }
                 res.append('\"');
             }else{
-                //otherwise, strip out semicolons, spaces and quotes
+                //otherwise, strip out/replace anything the tokenizer would treat as a delimiter or
+                //comment start for an unquoted token: semicolons, spaces, quotes, tabs, newlines and '#'
                 for(int i = 0; i < value.length(); i++){
                     char c = value.charAt(i);
                     res.append(switch(c){
                         case ';' -> 's';
                         case '"' -> '\'';
-                        case ' ' -> '_';
+                        case ' ', '\t', '\n', '#' -> '_';
                         default -> c;
                     });
                 }
@@ -118,6 +138,45 @@ public abstract class LStatement{
         }
 
         return value;
+    }
+
+    /** True if the 4 characters at value[from..from+3] are all hex digits. */
+    private static boolean isHex(String value, int from){
+        for(int i = from; i < from + 4; i++){
+            if(Character.digit(value.charAt(i), 16) == -1) return false;
+        }
+        return true;
+    }
+
+    protected static boolean logicLocalization(){
+        return Core.settings.getBool("logiclocalization", true);
+    }
+
+    public static String bundle(String key){
+        if(!logicLocalization()) return key;
+        return Core.bundle.get("name.token." + key, key);
+    }
+
+    protected static String bundle(Enum<?> value){
+        if(value instanceof LogicOp op){
+            return selectTranslate(op.symbol);
+        }else if(value instanceof ConditionOp op){
+            return selectTranslate(op.symbol);
+        }
+        String name = value.name().toLowerCase(Locale.ROOT);
+        String labelKey = value.getClass().getSimpleName().toLowerCase(Locale.ROOT) + ".label." + name;
+        if(logicLocalization() && Core.bundle.has(labelKey)){
+            return Core.bundle.get(labelKey);
+        }
+        return value.name();
+    }
+
+    protected static String selectTranslate(String text){
+        if(text == null || text.isEmpty() || !logicLocalization()) return text;
+        return switch(text){
+            case "not", "and", "or", "b-and", "xor", "flip", "always" -> bundle(text);
+            default -> text;
+        };
     }
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
@@ -176,7 +235,8 @@ public abstract class LStatement{
             t.defaults().size(60f, 38f);
 
             for(T p : values){
-                sizer.get(t.button(p.toString(), Styles.logicTogglet, () -> {
+                String btnText = (p instanceof Enum e) ? bundle(e) : bundle(p.toString());
+                sizer.get(t.button(btnText, Styles.logicTogglet, () -> {
                     getter.get(p);
                     hide.run();
                 }).self(c -> {
@@ -213,7 +273,7 @@ public abstract class LStatement{
                 int val = nameToAlign.get(align);
                 if(!hor && !Align.isCenterHorizontal(val)) continue;
                 if(!ver && !Align.isCenterVertical(val)) continue;
-                t.button(align, Styles.logicTogglet, () -> {
+                t.button(bundle(align), Styles.logicTogglet, () -> {
                     setter.get(val);
                     hide.run();
                 }).checked(current == nameToAlign.get(align)).grow();
@@ -224,6 +284,10 @@ public abstract class LStatement{
     }
 
     protected static void showSelectTable(Button b, Cons2<Table, Runnable> hideCons){
+        showSelectTable(b, hideCons, () -> {});
+    }
+
+    protected static void showSelectTable(Button b, Cons2<Table, Runnable> hideCons, Runnable hideCallback){
         Table t = new Table(Tex.paneSolid){
             @Override
             public float getPrefHeight(){
@@ -243,6 +307,7 @@ public abstract class LStatement{
         Runnable hide = () -> {
             Core.app.post(hitter::remove);
             t.actions(Actions.fadeOut(0.3f, Interp.fade), Actions.remove());
+            hideCallback.run();
         };
 
         hitter.fillParent = true;
@@ -256,6 +321,7 @@ public abstract class LStatement{
                 Core.app.post(() -> {
                     hitter.remove();
                     t.remove();
+                    hideCallback.run();
                 });
                 return;
             }
@@ -294,6 +360,15 @@ public abstract class LStatement{
 
     public String typeName(){
         return getClass().getSimpleName().replace("Statement", "");
+    }
+
+    public String statementKey(){
+        return typeName().toLowerCase(Locale.ROOT);
+    }
+
+    public String localizedName(){
+        if(logicLocalization()) return Core.bundle.get("instruction." + statementKey(), name());
+        return statementKey();
     }
 
     public String name(){

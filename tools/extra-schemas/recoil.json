@@ -1,0 +1,4 @@
+{
+  "doc": "Weapon recoil with no curve applied. A sensor value for PartProgress.type - not an operation (see PartProgress and the 'op' field for those).",
+  "superclass": "mindustry.entities.part.DrawPart$PartProgress"
+}

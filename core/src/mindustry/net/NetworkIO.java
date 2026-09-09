@@ -1,6 +1,8 @@
 package mindustry.net;
 
 import arc.*;
+import arc.files.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
@@ -11,11 +13,14 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.maps.Map;
+import mindustry.mod.*;
+import mindustry.mod.data.*;
 import mindustry.net.Administration.*;
 import mindustry.type.*;
 
 import java.io.*;
 import java.nio.*;
+import java.nio.channels.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -37,9 +42,14 @@ public class NetworkIO{
                 }
             }
 
+            var writer = SaveIO.getSaveWriter();
+
+            //data patches must be first, as rules can involve patched content
+            writer.writeDataPatches(stream, false);
+
             stream.writeUTF(JsonIO.write(state.rules));
             stream.writeUTF(JsonIO.write(state.mapLocales));
-            SaveIO.getSaveWriter().writeStringMap(stream, state.map.tags);
+            writer.writeStringMap(stream, state.map.tags);
 
             stream.writeInt(state.wave);
             stream.writeFloat(state.wavetime);
@@ -50,12 +60,15 @@ public class NetworkIO{
             stream.writeInt(player.id);
             player.write(new Writes(stream));
 
-            SaveIO.getSaveWriter().writeContentHeader(stream);
-            SaveIO.getSaveWriter().writeContentPatches(stream);
-            SaveIO.getSaveWriter().writeMap(stream);
-            SaveIO.getSaveWriter().writeTeamBlocks(stream);
-            SaveIO.getSaveWriter().writeMarkers(stream);
-            SaveIO.getSaveWriter().writeCustomChunks(stream, true);
+            writer.writeContentHeader(stream);
+            writer.writeMap(stream);
+            //these three calls mimic what writeEntities has, except with a custom filter, which is a bit fragile
+            writer.writeEntityMapping(stream);
+            writer.writeTeamBlocks(stream);
+            writer.writeWorldEntities(stream, state.rules.fog ? u -> !u.inFogTo(player.team()) : null);
+
+            writer.writeMarkers(stream);
+            writer.writeCustomChunks(stream, true);
         }catch(IOException e){
             throw new RuntimeException(e);
         }
@@ -64,10 +77,13 @@ public class NetworkIO{
     public static void loadWorld(InputStream is){
 
         try(DataInputStream stream = new DataInputStream(is)){
+            var writer = SaveIO.getSaveWriter();
             Time.clear();
+            writer.readDataPatches(stream, new SaveReadState(world.context));
+
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
-            state.map = new Map(SaveIO.getSaveWriter().readStringMap(stream));
+            state.map = new Map(writer.readStringMap(stream));
 
             state.wave = stream.readInt();
             state.wavetime = stream.readFloat();
@@ -84,16 +100,88 @@ public class NetworkIO{
             player.id = id;
             player.add();
 
-            SaveIO.getSaveWriter().readContentHeader(stream);
-            SaveIO.getSaveWriter().readContentPatches(stream);
-            SaveIO.getSaveWriter().readMap(stream, world.context);
-            SaveIO.getSaveWriter().readTeamBlocks(stream);
-            SaveIO.getSaveWriter().readMarkers(stream);
-            SaveIO.getSaveWriter().readCustomChunks(stream);
+            var state = new SaveReadState(world.context);
+
+            writer.readContentHeader(stream);
+            writer.readMap(stream, state);
+            writer.readEntities(stream, state);
+            writer.readMarkers(stream);
+            writer.readCustomChunks(stream);
+
+            Groups.all.each(e -> netClient.addRemovedEntity(e.id()));
+            Groups.unit.each(e -> netClient.addRemovedEntity(e.id()));
         }catch(IOException e){
             throw new RuntimeException(e);
         }finally{
             content.setTemporaryMapper(null);
+        }
+    }
+
+    public static void writeRequiredAssets(OutputStream os, Seq<DataAsset> assets){
+
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeInt(assets.size);
+            //can't use iterator as this seq might be accessed by multiple threads
+            for(int i = 0; i < assets.size; i ++){
+                var asset = assets.get(i);
+                if(asset.byteHash == null) throw new RuntimeException("Invalid asset (missing hash): " + asset.path);
+                stream.write(asset.byteHash);
+            }
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Seq<String> readRequiredAssets(InputStream is){
+        Seq<String> result = new Seq<>();
+        byte[] bytes = new byte[32];
+        try(DataInputStream stream = new DataInputStream(is)){
+            int amount = stream.readInt();
+            for(int i = 0; i < amount; i++){
+                stream.readFully(bytes);
+                result.add(DataAssetCache.encodeHash(bytes));
+            }
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    public static void writeAssets(OutputStream os, Seq<DataAsset> assets){
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeInt(assets.size);
+            for(var asset : assets){
+                Fi file = asset.getCacheFileNoNull();
+                byte[] bytes = file.readBytes();
+                stream.writeInt(bytes.length);
+                stream.write(bytes);
+            }
+        }catch(IOException e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void loadAssets(InputStream is) throws IOException{
+        try(DataInputStream stream = new DataInputStream(is)){
+            int amount = stream.readInt();
+            for(int i = 0; i < amount; i++){
+                int len = stream.readInt();
+                byte[] bytes = new byte[len];
+                stream.readFully(bytes);
+                assetCache.add(bytes);
+            }
+        }catch(ClosedChannelException ignored){
+            //happens when the input stream is closed externally
+        }
+    }
+
+    public static void packTexture(OutputStream os, String name, byte[] pngData){
+        try(DataOutputStream stream = new DataOutputStream(os)){
+            stream.writeUTF(name);
+            stream.writeInt(pngData.length);
+            stream.write(pngData);
+        }catch(IOException e){
+            throw new RuntimeException(e);
         }
     }
 

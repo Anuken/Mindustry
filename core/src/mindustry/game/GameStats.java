@@ -22,7 +22,7 @@ public class GameStats{
     /** Record of enemy blocks that have been destroyed (from any source) by count. */
     public ObjectIntMap<Block> destroyedBlockCount = new ObjectIntMap<>();
     /**
-     * Record of items that have entered the core through transport blocks. Used for objectives only.
+     * Record of items that have entered the core through transport blocks. Used for tutorial objectives only.
      * This can easily be ""spoofed"" with unloaders, so don't use it for anything remotely important.
      * */
     public ObjectIntMap<Item> coreItemCount = new ObjectIntMap<>();

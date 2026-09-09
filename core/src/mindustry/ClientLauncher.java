@@ -6,6 +6,7 @@ import arc.assets.loaders.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
+import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
@@ -14,9 +15,11 @@ import mindustry.audio.*;
 import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Saves.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
@@ -65,19 +68,18 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         if(gl30 == null && !isIntel) Log.warn("[GL] Your device or video drivers do not support OpenGL 3. This will cause performance issues.");
 
-        if(NvGpuInfo.hasMemoryInfo()) Log.info("[GL] Total available VRAM: @mb", NvGpuInfo.getMaxMemoryKB()/1024);
+        if(NvGpuInfo.hasMemoryInfo()) Log.info("[GL] Total available VRAM: @", Strings.formatByteCount(NvGpuInfo.getMaxMemoryKB() * 1000L));
 
         if(maxTextureSize < 4096) Log.warn("[GL] Your maximum texture size is below the recommended minimum of 4096. This will cause severe performance issues.");
 
         Log.info("[JAVA] Version: @", OS.javaVersion);
-        if(Core.app.isAndroid()){
-            Log.info("[ANDROID] API level: @", Core.app.getVersion());
-        }
+
+        if(Core.app.isAndroid()) Log.info("[ANDROID] API level: @", Core.app.getVersion());
+        if(Core.app.isIOS()) Log.info("[iOS] OS version: @", Core.app.getVersion());
+
         long ram = Runtime.getRuntime().maxMemory();
-        boolean gb = ram >= 1024 * 1024 * 1024;
-        if(!OS.isIos){
-            Log.info("[RAM] Available: @ @", Strings.fixed(gb ? ram / 1024f / 1024 / 1024f : ram / 1024f / 1024f, 1), gb ? "GB" : "MB");
-        }
+
+        if(!OS.isIos) Log.info("[RAM] Available: @", Strings.formatByteCount(ram));
 
         Time.setDeltaProvider(() -> {
             float result = Core.graphics.getDeltaTime() * 60f;
@@ -99,20 +101,12 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             @Override
             public Sound loadSync(AssetManager manager, String fileName, Fi file, SoundParameter parameter){
                 if(parameter != null && parameter.sound != null){
-                    mainExecutor.submit(() -> parameter.sound.load(file));
+                    parameter.sound.loadLazy(file);
 
                     return parameter.sound;
                 }else{
                     Sound sound = new Sound();
-
-                    mainExecutor.submit(() -> {
-                        try{
-                            sound.load(file);
-                        }catch(Throwable t){
-                            Log.err("Error loading sound: " + file, t);
-                        }
-                    });
-
+                    sound.loadLazy(file);
                     return sound;
                 }
             }
@@ -191,6 +185,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
         assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
+
+        Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> t.setWrap(TextureWrap.repeat);
     }
 
     @Override
@@ -271,6 +267,16 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         }
 
         PerfCounter.update.end();
+
+        long rawUpdate = PerfCounter.update.latestValueNs();
+        for(var other : PerfCounter.displayedCounters){
+            if(other != PerfCounter.other) rawUpdate -= other.latestValueNs();
+        }
+        PerfCounter.other.add(rawUpdate);
+
+        for(var counter : PerfCounter.all){
+            counter.checkUpdate();
+        }
     }
 
     @Override
@@ -302,5 +308,54 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         if(finished){
             super.pause();
         }
+    }
+
+    @Override
+    public void fileDropped(Fi file){
+        if(OS.isIos || OS.isAndroid) return;
+
+        if(file.extEquals(saveExtension) || file.extEquals(schematicExtension)){
+            handleFileImport(file);
+        }
+    }
+
+    public static void runOnClientLoad(Runnable run){
+        if(clientLoaded){
+            run.run();
+        }else{
+            Events.on(ClientLoadEvent.class, e -> run.run());
+        }
+    }
+
+    /** Can be called from any thread. The file must exist and not have any permission nonsense guarding it. */
+    public static void handleFileImport(Fi file){
+        Core.app.post(() -> {
+            try{
+                if(Schematics.isSchematic(file)){
+                    ui.schematics.show();
+                    ui.schematics.importAndShow(file);
+                }else{
+                    SaveMeta meta = SaveIO.getMeta(file);
+                    if(!meta.isMap()){ //open save
+                        if(meta.rules.sector == null){
+                            //not sure if this is a great idea, but leaving the editor open would lead to catastrophic bugs
+                            if(ui.editor.isShown()) ui.editor.hide();
+                            if(ui.maps.isShown()) ui.maps.hide();
+
+                            SaveSlot slot = control.saves.importSave(file);
+                            ui.load.runLoadSave(slot);
+                        }else{
+                            ui.showErrorMessage("@save.nocampaign");
+                        }
+                    }else{ //open map
+                        if(!ui.maps.isShown()) ui.maps.show();
+                        ui.maps.tryImportMap(file, result -> ui.maps.showMap(result));
+                    }
+                }
+            }catch(Throwable e){
+                Log.err("Failed to import file", e);
+                ui.showException("@save.import.invalid", e);
+            }
+        });
     }
 }

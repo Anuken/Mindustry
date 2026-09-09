@@ -18,7 +18,6 @@ import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
-import mindustry.type.ammo.*;
 import mindustry.type.unit.*;
 import mindustry.type.weapons.*;
 import mindustry.world.meta.*;
@@ -79,6 +78,7 @@ public class UnitTypes{
 
     //special building tethered (has payload capability, because it's necessary sometimes)
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
+    public static @EntityDef({TargetDummyc.class, Unitc.class}) UnitType dummy;
 
     //tank
     public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, locus, precept, vanquish, conquer;
@@ -123,7 +123,6 @@ public class UnitTypes{
             hitSize = 10f;
             health = 550;
             armor = 4f;
-            ammoType = new ItemAmmoType(Items.coal);
             immunities.add(StatusEffects.burning);
 
             weapons.add(new Weapon("flamethrower"){{
@@ -159,7 +158,6 @@ public class UnitTypes{
             health = 900;
             armor = 9f;
             mechFrontSway = 0.55f;
-            ammoType = new ItemAmmoType(Items.graphite);
             stepSound = Sounds.mechStepSmall;
             stepSoundPitch = 0.8f;
             stepSoundVolume = 0.65f;
@@ -176,8 +174,8 @@ public class UnitTypes{
                 bullet = new ArtilleryBulletType(2f, 20, "shell"){{
                     hitEffect = Fx.blastExplosion;
                     knockback = 0.8f;
-                    lifetime = 120f - 35f / 2f;
-                    rangeOverride = 240f;
+                    lifetime = 120f - (35f - 8f) / 2f;
+                    maxRange = 240f;
                     width = height = 14f;
                     collides = true;
                     collidesTiles = true;
@@ -194,9 +192,8 @@ public class UnitTypes{
             hitSize = 22f;
             rotateSpeed = 2.1f;
             health = 9000;
-            armor = 10f;
+            armor = 20f;
             mechFrontSway = 1f;
-            ammoType = new ItemAmmoType(Items.thorium);
 
             mechStepParticles = true;
             stepShake = 0.15f;
@@ -296,13 +293,12 @@ public class UnitTypes{
             hitSize = 30f;
             rotateSpeed = 1.65f;
             health = 24000;
-            armor = 18f;
+            armor = 30f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 1.6f;
             mechFrontSway = 1.9f;
             mechSideSway = 0.6f;
-            ammoType = new ItemAmmoType(Items.thorium);
             stepSound = Sounds.mechStepHeavy;
             stepSoundPitch = 0.9f;
             stepSoundVolume = 0.45f;
@@ -360,20 +356,25 @@ public class UnitTypes{
 
         nova = new UnitType("nova"){{
             canBoost = true;
-            boostMultiplier = 1.5f;
+            boostMultiplier = 2f;
             speed = 0.55f;
             hitSize = 8f;
-            health = 120f;
+            health = 200f;
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
-            ammoType = new PowerAmmoType(1000);
+            abilities.add(new RepairFieldAbility(20f, 60f * 2, 100f){{
+                sameTypeHealMult = 0.15f;
+                maxTargets = 6;
+
+                smartHeal = true;
+                smartDowntime = 60 * 4f;
+            }});
 
             weapons.add(new Weapon("heal-weapon"){{
                 top = false;
                 shootY = 2f;
-                reload = 24f;
+                reload = 30f;
                 x = 4.5f;
                 alternate = false;
                 ejectEffect = Fx.none;
@@ -383,6 +384,9 @@ public class UnitTypes{
                 bullet = new LaserBoltBulletType(5.2f, 13){{
                     lifetime = 30f;
                     healPercent = 5f;
+                    pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -398,13 +402,12 @@ public class UnitTypes{
             health = 320f;
             buildSpeed = 0.5f;
             armor = 4f;
-            riseSpeed = 0.07f;
+            riseSpeed = descentSpeed = 0.07f;
 
             mineTier = 2;
             mineSpeed = 3f;
 
             abilities.add(new ShieldRegenFieldAbility(20f, 40f, 60f * 5, 60f));
-            ammoType = new PowerAmmoType(1300);
 
             weapons.add(new Weapon("heal-shotgun-weapon"){{
                 top = false;
@@ -454,10 +457,9 @@ public class UnitTypes{
             canBoost = true;
             armor = 9f;
             mechLandShake = 2f;
-            riseSpeed = 0.05f;
+            riseSpeed = descentSpeed = 0.05f;
 
             mechFrontSway = 0.55f;
-            ammoType = new PowerAmmoType(1500);
             stepSound = Sounds.mechStepSmall;
             stepSoundPitch = 0.9f;
             stepSoundVolume = 0.6f;
@@ -502,7 +504,6 @@ public class UnitTypes{
 
             mechStepParticles = true;
             stepShake = 0.15f;
-            ammoType = new PowerAmmoType(2500);
             drownTimeMultiplier = 1.3f;
 
             speed = 0.44f;
@@ -510,10 +511,10 @@ public class UnitTypes{
             engineOffset = 12f;
             engineSize = 6f;
             lowAltitude = true;
-            riseSpeed = 0.02f;
+            riseSpeed = descentSpeed = 0.02f;
 
             health = 8200f;
-            armor = 9f;
+            armor = 16f;
             canBoost = true;
             mechLandShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
@@ -584,7 +585,7 @@ public class UnitTypes{
         corvus = new UnitType("corvus"){{
             hitSize = 29f;
             health = 18000f;
-            armor = 9f;
+            armor = 14f;
             stepShake = 1.5f;
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 1.6f;
@@ -600,7 +601,6 @@ public class UnitTypes{
             legForwardScl = 0.58f;
             hovering = true;
             shadowElevation = 0.2f;
-            ammoType = new PowerAmmoType(4000);
             groundLayer = Layer.legUnit;
 
             speed = 0.3f;
@@ -667,7 +667,6 @@ public class UnitTypes{
             health = 150;
             mechSideSway = 0.25f;
             range = 40f;
-            ammoType = new ItemAmmoType(Items.coal);
             stepSound = Sounds.walkerStepTiny;
             stepSoundVolume = 0.2f;
 
@@ -691,6 +690,7 @@ public class UnitTypes{
                     splashDamageRadius = 44f;
                     instantDisappear = true;
                     splashDamage = 80f;
+                    buildingDamageMultiplier = 0.68f;
                     killShooter = true;
                     hittable = false;
                     collidesAir = true;
@@ -717,7 +717,6 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             hovering = true;
             armor = 3f;
-            ammoType = new ItemAmmoType(Items.coal);
 
             shadowElevation = 0.2f;
             groundLayer = Layer.legUnit - 1f;
@@ -754,8 +753,7 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
-            armor = 5f;
-            ammoType = new PowerAmmoType(1000);
+            armor = 9f;
 
             shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
@@ -776,7 +774,7 @@ public class UnitTypes{
                 y = -1.5f;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.5f;
+                    sapStrength = 0.4f;
                     length = 75f;
                     damage = 23;
                     shootEffect = Fx.shootSmall;
@@ -796,7 +794,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootSap;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.8f;
+                    sapStrength = 0.7f;
                     length = 40f;
                     damage = 18;
                     shootEffect = Fx.shootSmall;
@@ -814,7 +812,7 @@ public class UnitTypes{
             speed = 0.62f;
             hitSize = 23f;
             health = 8000;
-            armor = 6f;
+            armor = 14f;
 
             rotateSpeed = 2.7f;
 
@@ -828,7 +826,6 @@ public class UnitTypes{
             legLengthScl = 0.96f;
             rippleScale = 2f;
             legSpeed = 0.2f;
-            ammoType = new PowerAmmoType(2000);
 
             stepSound = Sounds.walkerStep;
             stepSoundVolume = 0.85f;
@@ -919,7 +916,7 @@ public class UnitTypes{
             speed = 0.5f;
             hitSize = 26f;
             health = 22000;
-            armor = 13f;
+            armor = 22f;
             lightRadius = 140f;
             stepSound = Sounds.walkerStep;
             stepSoundVolume = 1.1f;
@@ -936,7 +933,6 @@ public class UnitTypes{
             legLengthScl = 0.93f;
             rippleScale = 3f;
             legSpeed = 0.19f;
-            ammoType = new ItemAmmoType(Items.graphite, 8);
 
             legSplashDamage = 80;
             legSplashRange = 60;
@@ -1108,7 +1104,6 @@ public class UnitTypes{
             itemCapacity = 0;
             targetFlags = new BlockFlag[]{BlockFlag.factory, null};
             circleTarget = true;
-            ammoType = new ItemAmmoType(Items.graphite);
             omniMovement = false;
             rotateSpeed = 4.5f;
             circleTargetRadius = 40f;
@@ -1157,7 +1152,6 @@ public class UnitTypes{
             targetFlags = new BlockFlag[]{BlockFlag.launchPad, BlockFlag.storage, BlockFlag.battery, null};
             engineOffset = 12f;
             engineSize = 3f;
-            ammoType = new ItemAmmoType(Items.graphite);
 
             weapons.add(new Weapon("zenith-missiles"){{
                 reload = 40f;
@@ -1175,7 +1169,7 @@ public class UnitTypes{
                     shrinkY = 0f;
                     drag = -0.003f;
                     homingRange = 60f;
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     splashDamageRadius = 25f;
                     splashDamage = 15f;
                     lifetime = 50f;
@@ -1198,12 +1192,11 @@ public class UnitTypes{
             flying = true;
             lowAltitude = true;
             health = 7200;
-            armor = 9f;
+            armor = 17f;
             engineOffset = 21;
             engineSize = 5.3f;
             hitSize = 46f;
             targetFlags = new BlockFlag[]{BlockFlag.generator, BlockFlag.core, null};
-            ammoType = new ItemAmmoType(Items.thorium);
 
             loopSound = Sounds.loopHover;
 
@@ -1278,9 +1271,8 @@ public class UnitTypes{
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            armor = 13f;
+            armor = 22f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
-            ammoType = new ItemAmmoType(Items.thorium);
 
             loopSound = Sounds.loopHover;
 
@@ -1365,8 +1357,6 @@ public class UnitTypes{
             controlSelectGlobal = false;
             wreckSoundVolume = deathSoundVolume = 0.7f;
 
-            ammoType = new PowerAmmoType(500);
-
             mineTier = 1;
             mineSpeed = 2.5f;
         }};
@@ -1381,17 +1371,20 @@ public class UnitTypes{
             accel = 0.1f;
             range = 130f;
             health = 400;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.4f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
 
-            ammoType = new PowerAmmoType(900);
             mineTier = 2;
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
 
-            abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
+            abilities.add(new RepairFieldAbility(){{
+                amount = 5f;
+                reload = 60f * 8f;
+                range = 50f;
+            }});
 
             weapons.add(new Weapon("poly-weapon"){{
                 top = false;
@@ -1410,7 +1403,7 @@ public class UnitTypes{
                     weaveMag = 4;
                     weaveScale = 4;
                     lifetime = 50f;
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     shootEffect = Fx.shootHeal;
                     smokeEffect = Fx.hitLaser;
                     hitEffect = despawnEffect = Fx.hitLaser;
@@ -1446,8 +1439,6 @@ public class UnitTypes{
             buildSpeed = 2.6f;
             isEnemy = false;
 
-            ammoType = new PowerAmmoType(1100);
-
             weapons.add(
             new Weapon("heal-weapon-mount"){{
                 shootSound = Sounds.shootLaser;
@@ -1480,7 +1471,7 @@ public class UnitTypes{
         }};
 
         quad = new UnitType("quad"){{
-            armor = 8f;
+            armor = 10f;
             health = 6000;
             speed = 1.2f;
             rotateSpeed = 2f;
@@ -1500,8 +1491,6 @@ public class UnitTypes{
             range = 140f;
             targetAir = false;
             targetFlags = new BlockFlag[]{BlockFlag.battery, BlockFlag.factory, null};
-
-            ammoType = new PowerAmmoType(3000);
 
             loopSound = Sounds.loopHover;
 
@@ -1558,7 +1547,7 @@ public class UnitTypes{
         oct = new UnitType("oct"){{
             aiController = DefenderAI::new;
 
-            armor = 16f;
+            armor = 20f;
             health = 24000;
             speed = 0.8f;
             rotateSpeed = 1f;
@@ -1574,7 +1563,6 @@ public class UnitTypes{
             drawShields = false;
             lowAltitude = true;
             buildBeamOffset = 43;
-            ammoCapacity = 1;
 
             loopSound = Sounds.loopHover;
 
@@ -1656,7 +1644,6 @@ public class UnitTypes{
             accel = 0.3f;
             rotateSpeed = 2.6f;
             faceTarget = false;
-            ammoType = new ItemAmmoType(Items.graphite);
 
             moveSoundVolume = 0.55f;
             moveSoundPitchMin = moveSoundPitchMax = 0.9f;
@@ -1719,7 +1706,6 @@ public class UnitTypes{
             hitSize = 20f;
             armor = 7f;
             faceTarget = false;
-            ammoType = new ItemAmmoType(Items.graphite);
 
             moveSoundVolume = 0.7f;
             moveSoundPitchMin = moveSoundPitchMax = 0.77f;
@@ -1786,7 +1772,6 @@ public class UnitTypes{
                 inaccuracy = 5f;
                 velocityRnd = 0.1f;
                 shootSound = Sounds.shootMissileShort;
-                ammoType = new ItemAmmoType(Items.thorium);
 
                 ejectEffect = Fx.none;
                 bullet = new MissileBulletType(2.7f, 12){{
@@ -1820,7 +1805,6 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.3f;
             faceTarget = false;
-            ammoType = new ItemAmmoType(Items.thorium);
 
             moveSoundVolume = 1f;
             moveSound = Sounds.shipMoveBig;
@@ -1914,7 +1898,6 @@ public class UnitTypes{
             accel = 0.19f;
             rotateSpeed = 0.9f;
             faceTarget = false;
-            ammoType = new PowerAmmoType(4000);
 
             moveSoundVolume = 1.1f;
             moveSound = Sounds.shipMoveBig;
@@ -1969,7 +1952,6 @@ public class UnitTypes{
             trailScl = 1.3f;
             faceTarget = false;
             range = 100f;
-            ammoType = new PowerAmmoType(900);
             armor = 3f;
 
             moveSoundVolume = 0.4f;
@@ -2084,7 +2066,6 @@ public class UnitTypes{
             waveTrailX = 5.5f;
             waveTrailY = -4f;
             trailScl = 1.9f;
-            ammoType = new ItemAmmoType(Items.coal);
 
             abilities.add(new StatusFieldAbility(StatusEffects.overclock, 60f * 6, 60f * 6f, 60f));
 
@@ -2157,7 +2138,6 @@ public class UnitTypes{
             hitSize = 20f;
             armor = 6f;
             faceTarget = false;
-            ammoType = new ItemAmmoType(Items.graphite);
 
             moveSoundVolume = 0.7f;
             moveSoundPitchMin = moveSoundPitchMax = 0.77f;
@@ -2300,8 +2280,6 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.4f;
             faceTarget = false;
-            ammoType = new PowerAmmoType(3500);
-            ammoCapacity = 40;
 
             moveSoundVolume = 1f;
             moveSound = Sounds.shipMoveBig;
@@ -2349,11 +2327,10 @@ public class UnitTypes{
             speed = 0.65f;
             drag = 0.17f;
             hitSize = 58f;
-            armor = 16f;
+            armor = 20f;
             accel = 0.2f;
             rotateSpeed = 1.1f;
             faceTarget = false;
-            ammoType = new PowerAmmoType(4500);
 
             moveSoundVolume = 1.1f;
             moveSound = Sounds.shipMoveBig;
@@ -2366,6 +2343,89 @@ public class UnitTypes{
 
             buildSpeed = 3.5f;
             rotateToBuilding = false;
+
+            weapons.add(new Weapon("emp-cannon-mount"){{
+                rotate = true;
+
+                x = 70f/4f;
+                y = -26f/4f;
+
+                reload = 65f;
+                shake = 3f;
+                rotateSpeed = 2f;
+                shadow = 30f;
+                shootY = 7f;
+                recoil = 4f;
+                cooldownTime = reload - 10f;
+                shootSound = Sounds.shootNavanax;
+
+                bullet = new EmpBulletType(){{
+                    float rad = 100f;
+
+                    scaleLife = true;
+                    lightOpacity = 0.7f;
+                    unitDamageScl = 0.8f;
+                    healPercent = 20f;
+                    timeIncrease = 3f;
+                    timeDuration = 60f * 20f;
+                    powerDamageScl = 3f;
+                    damage = 110;
+                    hitColor = lightColor = Pal.heal;
+                    lightRadius = 70f;
+                    clipSize = 250f;
+                    shootEffect = Fx.hitEmpSpark;
+                    smokeEffect = Fx.shootBigSmoke2;
+                    lifetime = 60f;
+                    sprite = "circle-bullet";
+                    backColor = Pal.heal;
+                    frontColor = Color.white;
+                    width = height = 12f;
+                    shrinkY = 0f;
+                    speed = 5f;
+                    trailLength = 20;
+                    trailWidth = 6f;
+                    trailColor = Pal.heal;
+                    trailInterval = 3f;
+                    splashDamage = 110f;
+                    splashDamageRadius = rad;
+                    hitShake = 4f;
+                    trailRotation = true;
+                    status = StatusEffects.electrified;
+                    hitSound = Sounds.explosionNavanax;
+
+                    trailEffect = new Effect(16f, e -> {
+                        color(Pal.heal);
+                        for(int s : Mathf.signs){
+                            Drawf.tri(e.x, e.y, 4f, 30f * e.fslope(), e.rotation + 90f*s);
+                        }
+                    });
+
+                    hitEffect = new Effect(50f, 100f, e -> {
+                        e.scaled(7f, b -> {
+                            color(Pal.heal, b.fout());
+                            Fill.circle(e.x, e.y, rad);
+                        });
+
+                        color(Pal.heal);
+                        stroke(e.fout() * 3f);
+                        Lines.circle(e.x, e.y, rad);
+
+                        int points = 10;
+                        float offset = Mathf.randomSeed(e.id, 360f);
+                        for(int i = 0; i < points; i++){
+                            float angle = i* 360f / points + offset;
+                            //for(int s : Mathf.zeroOne){
+                                Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle/* + s*180f*/);
+                            //}
+                        }
+
+                        Fill.circle(e.x, e.y, 12f * e.fout());
+                        color();
+                        Fill.circle(e.x, e.y, 6f * e.fout());
+                        Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
+                    });
+                }};
+            }});
 
             for(float mountY : new float[]{-117/4f, 50/4f}){
                 for(float sign : Mathf.signs){
@@ -2425,88 +2485,7 @@ public class UnitTypes{
                 particles = 10;
                 color = particleColor = effectColor = Pal.heal;
             }});
-            weapons.add(new Weapon("emp-cannon-mount"){{
-                rotate = true;
 
-                x = 70f/4f;
-                y = -26f/4f;
-
-                reload = 65f;
-                shake = 3f;
-                rotateSpeed = 2f;
-                shadow = 30f;
-                shootY = 7f;
-                recoil = 4f;
-                cooldownTime = reload - 10f;
-                shootSound = Sounds.shootNavanax;
-
-                bullet = new EmpBulletType(){{
-                    float rad = 100f;
-
-                    scaleLife = true;
-                    lightOpacity = 0.7f;
-                    unitDamageScl = 0.8f;
-                    healPercent = 20f;
-                    timeIncrease = 3f;
-                    timeDuration = 60f * 20f;
-                    powerDamageScl = 3f;
-                    damage = 60;
-                    hitColor = lightColor = Pal.heal;
-                    lightRadius = 70f;
-                    clipSize = 250f;
-                    shootEffect = Fx.hitEmpSpark;
-                    smokeEffect = Fx.shootBigSmoke2;
-                    lifetime = 60f;
-                    sprite = "circle-bullet";
-                    backColor = Pal.heal;
-                    frontColor = Color.white;
-                    width = height = 12f;
-                    shrinkY = 0f;
-                    speed = 5f;
-                    trailLength = 20;
-                    trailWidth = 6f;
-                    trailColor = Pal.heal;
-                    trailInterval = 3f;
-                    splashDamage = 70f;
-                    splashDamageRadius = rad;
-                    hitShake = 4f;
-                    trailRotation = true;
-                    status = StatusEffects.electrified;
-                    hitSound = Sounds.explosionNavanax;
-
-                    trailEffect = new Effect(16f, e -> {
-                        color(Pal.heal);
-                        for(int s : Mathf.signs){
-                            Drawf.tri(e.x, e.y, 4f, 30f * e.fslope(), e.rotation + 90f*s);
-                        }
-                    });
-
-                    hitEffect = new Effect(50f, 100f, e -> {
-                        e.scaled(7f, b -> {
-                            color(Pal.heal, b.fout());
-                            Fill.circle(e.x, e.y, rad);
-                        });
-
-                        color(Pal.heal);
-                        stroke(e.fout() * 3f);
-                        Lines.circle(e.x, e.y, rad);
-
-                        int points = 10;
-                        float offset = Mathf.randomSeed(e.id, 360f);
-                        for(int i = 0; i < points; i++){
-                            float angle = i* 360f / points + offset;
-                            //for(int s : Mathf.zeroOne){
-                                Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 6f, 50f * e.fout(), angle/* + s*180f*/);
-                            //}
-                        }
-
-                        Fill.circle(e.x, e.y, 12f * e.fout());
-                        color();
-                        Fill.circle(e.x, e.y, 6f * e.fout());
-                        Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
-                    });
-                }};
-            }});
         }};
 
         //endregion
@@ -2543,7 +2522,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(2.5f, 11){{
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     width = 1.5f;
                     height = 4.5f;
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -2554,9 +2533,11 @@ public class UnitTypes{
                     backColor = trailColor = Pal.yellowBoltFront;
                     hitColor = Pal.yellowBoltFront;
                     frontColor = Color.white;
+                    lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
+                    homingPower = 0.02f;
                 }};
             }});
         }};
@@ -2592,7 +2573,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(3f, 11){{
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     width = 1.5f;
                     height = 4.5f;
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -2603,9 +2584,11 @@ public class UnitTypes{
                     backColor = trailColor = Pal.yellowBoltFront;
                     hitColor = Pal.yellowBoltFront;
                     frontColor = Color.white;
+                    lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
+                    homingPower = 0.03f;
                 }};
             }});
         }};
@@ -2645,7 +2628,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootAlpha;
 
                 bullet = new LaserBoltBulletType(3.5f, 11){{
-                    keepVelocity = false;
+                    scaleKeepVelocity = true;
                     width = 1.5f;
                     height = 5f;
                     hitEffect = despawnEffect = Fx.hitBulletColor;
@@ -2656,9 +2639,10 @@ public class UnitTypes{
                     backColor = trailColor = Pal.yellowBoltFront;
                     hitColor = Pal.yellowBoltFront;
                     frontColor = Color.white;
+                    lightColor = Pal.yellowBoltFront;
 
                     lifetime = 70f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.04f;
                 }};
             }});
@@ -2890,7 +2874,7 @@ public class UnitTypes{
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.shootTank;
                 layerOffset = 0.0001f;
-                reload = 70f;
+                reload = 80f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
@@ -2903,17 +2887,18 @@ public class UnitTypes{
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
 
-                bullet = new BasicBulletType(8f, 190){{
+                bullet = new BasicBulletType(8f, 150f){{
                     sprite = "missile-large";
                     width = 9.5f;
-                    height = 13f;
-                    lifetime = 18f;
+                    height = 18f;
+                    lifetime = 16f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
                     pierceCap = 2;
                     pierce = true;
                     pierceBuilding = true;
+
                     hitColor = backColor = trailColor = Color.valueOf("feb380");
                     frontColor = Color.white;
                     trailWidth = 3.1f;
@@ -2921,19 +2906,21 @@ public class UnitTypes{
                     hitEffect = despawnEffect = Fx.blastExplosion;
                     splashDamageRadius = 20f;
                     splashDamage = 50f;
+                    maxRange = 190f;
 
                     fragOnHit = false;
+                    pierceFragCap = 1;
                     fragRandomSpread = 0f;
                     fragSpread = 10f;
                     fragBullets = 5;
                     fragVelocityMin = 1f;
                     despawnSound = Sounds.explosionDull;
 
-                    fragBullet = new BasicBulletType(8f, 35){{
+                    fragBullet = new BasicBulletType(8f, 35f){{
                         sprite = "missile-large";
                         width = 8f;
-                        height = 12f;
-                        lifetime = 15f;
+                        height = 16f;
+                        lifetime = 10f;
                         hitSize = 4f;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
@@ -2950,7 +2937,7 @@ public class UnitTypes{
             for(float f : new float[]{34f / 4f, -36f / 4f}){
                 int fi = i ++;
                 weapons.add(new Weapon("vanquish-point-weapon"){{
-                    reload = 35f + fi * 5;
+                    reload = 22 + fi * 5;
                     x = 48f / 4f;
                     y = f;
                     shootY = 5.5f;
@@ -2959,16 +2946,21 @@ public class UnitTypes{
                     rotateSpeed = 2f;
                     shootSound = Sounds.shootStell;
 
-                    bullet = new BasicBulletType(4.5f, 25){{
+                    bullet = new BasicBulletType(12f, 50f){{
+                        sprite = "missile-large";
                         width = 6.5f;
                         height = 11f;
+                        shrinkY = 0f;
+                        shrinkX = 0.2f;
+                        lifetime = 15f;
                         shootEffect = Fx.sparkShoot;
                         smokeEffect = Fx.shootBigSmoke;
                         hitColor = backColor = trailColor = Color.valueOf("feb380");
                         frontColor = Color.white;
-                        trailWidth = 1.5f;
-                        trailLength = 4;
-                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                        trailWidth = 2.5f;
+                        trailLength = 5;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.hitBulletColor;
                     }};
                 }});
             }
@@ -3106,6 +3098,7 @@ public class UnitTypes{
                             float fin = 0.05f + (j + 1) / (float)count;
                             float spd = speed;
                             float life = lifetime / Mathf.lerp(fin, 1f, 0.5f);
+                            boolean show = j == 0 && i > 0;
                             spawnBullets.add(new BasicBulletType(spd * fin, 60){{
                                 drag = 0.002f;
                                 width = 12f;
@@ -3115,6 +3108,7 @@ public class UnitTypes{
                                 hitSize = 5f;
                                 pierceCap = 2;
                                 pierce = true;
+                                showStats = show;
                                 pierceBuilding = true;
                                 hitColor = backColor = trailColor = Color.valueOf("feb380");
                                 frontColor = Color.white;
@@ -3357,7 +3351,7 @@ public class UnitTypes{
             drag = 0.1f;
             hitSize = 21f;
             rotateSpeed = 3f;
-            health = 2900;
+            health = 2700;
             armor = 7f;
             fogRadius = 40f;
             stepShake = 0f;
@@ -3472,9 +3466,9 @@ public class UnitTypes{
                         trailColor = engineColor = Pal.techBlue;
                         engineSize = 1.75f;
                         engineLayer = Layer.effect;
-                        speed = 3.7f;
+                        speed = 3.35f;
                         maxRange = 6f;
-                        lifetime = 60f * 1.5f;
+                        lifetime = 60f * 1.66f;
                         outlineColor = Pal.darkOutline;
                         health = 55;
                         lowAltitude = true;
@@ -3495,8 +3489,9 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
+                            shootOnDeathEffect = Fx.massiveExplosion;
                             bullet = new ExplosionBulletType(140f, 25f){{
-                                shootEffect = new MultiEffect(Fx.massiveExplosion, new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
+                                shootEffect = new MultiEffect(new WrapEffect(Fx.dynamicSpikes, Pal.techBlue, 24f), new WaveEffect(){{
                                     colorFrom = colorTo = Pal.techBlue;
                                     sizeTo = 40f;
                                     lifetime = 12f;
@@ -3532,9 +3527,9 @@ public class UnitTypes{
                 region = "tecta-shield";
                 radius = 45f;
                 angle = 82f;
-                regen = 40f / 60f;
+                regen = 45f / 60f;
                 cooldown = 60f * 8f;
-                max = 2200f;
+                max = 2500f;
                 y = -20f;
                 width = 8f;
                 whenShooting = false;
@@ -3551,8 +3546,6 @@ public class UnitTypes{
             stepShake = 0.5f;
             legExtension = -5f;
             legBaseOffset = 5f;
-
-            ammoType = new PowerAmmoType(2000);
 
             legSplashDamage = 32;
             legSplashRange = 30;
@@ -3580,14 +3573,14 @@ public class UnitTypes{
                 velocityRnd = 0.33f;
                 heatColor = Color.red;
 
-                bullet = new MissileBulletType(4.2f, 60){{
+                bullet = new MissileBulletType(4.2f, 51){{
                     homingPower = 0.2f;
                     weaveMag = 4;
                     weaveScale = 4;
                     lifetime = 55f;
                     shootEffect = Fx.shootBig2;
                     smokeEffect = Fx.shootSmokeTitan;
-                    splashDamage = 70f;
+                    splashDamage = 60f;
                     splashDamageRadius = 30f;
                     frontColor = Color.white;
                     hitSound = Sounds.none;
@@ -3647,8 +3640,6 @@ public class UnitTypes{
             legStraightLength = 0.9f;
             legMaxLength = 1.2f;
 
-            ammoType = new PowerAmmoType(2000);
-
             legSplashDamage = 32;
             legSplashRange = 32;
             drownTimeMultiplier = 0.5f;
@@ -3678,7 +3669,7 @@ public class UnitTypes{
                 shadow = 10f;
 
                 shootStatus = StatusEffects.slow;
-                shootStatusDuration = reload + 1f;
+                shootStatusDuration = reload + 170f;
 
                 shoot.shots = 1;
                 heatColor = Color.red;
@@ -3896,17 +3887,35 @@ public class UnitTypes{
                 mirror = false;
                 shoot = new ShootHelix();
 
-                bullet = new BasicBulletType(5f, 34){{
+                bullet = new BasicBulletType(5f, 22f / 0.75f){{
                     width = 7f;
                     height = 12f;
                     lifetime = 18f;
+                    //floating point inaccuracy makes 0.6f show as -39%
+                    buildingDamageMultiplier = 0.599999f;
+                    blockArmorMultiplier = 0.5f;
                     shootEffect = Fx.sparkShoot;
                     smokeEffect = Fx.shootBigSmoke;
                     hitColor = backColor = trailColor = Pal.suppress;
                     frontColor = Color.white;
                     trailWidth = 1.5f;
                     trailLength = 5;
-                    hitEffect = despawnEffect = Fx.hitBulletColor;
+                    hitEffect = despawnEffect = new MultiEffect(Fx.hitSquaresColor, Fx.squareWaveEffect);
+
+                    fragOnDespawn = false;
+                    fragBullets = 2;
+                    fragBullet = new BasicBulletType(3f, 10){{
+                        width = 5f;
+                        height = 8f;
+                        lifetime = 14f;
+                        fragVelocityMax = 1f;
+                        fragVelocityMin = 0.7f;
+                        hitColor = backColor = trailColor = Pal.suppress;
+                        frontColor = Color.white;
+                        trailWidth = 1.2f;
+                        trailLength = 4;
+                        hitEffect = despawnEffect = Fx.hitBulletColor;
+                    }};
                 }};
             }});
         }};
@@ -4045,7 +4054,7 @@ public class UnitTypes{
             health = 6000f;
             armor = 4f;
             hitSize = 36f;
-            payloadCapacity = Mathf.sqr(3f) * tilePayload;
+            payloadCapacity = Mathf.sqr(4f) * tilePayload;
             researchCostMultiplier = 0f;
             targetAir = false;
 
@@ -4120,8 +4129,9 @@ public class UnitTypes{
                                 mirror = false;
                                 reload = 1f;
                                 shootOnDeath = true;
-                                bullet = new ExplosionBulletType(110f, 25f) {{
-                                    shootEffect = Fx.massiveExplosion;
+                                shootOnDeathEffect = Fx.massiveExplosion;
+                                bullet = new ExplosionBulletType(110f, 25f){{
+                                    shootEffect = new WrapEffect(Fx.shootQuellPulse, Pal.suppress);
                                     collidesAir = false;
                                 }};
                             }});
@@ -4262,14 +4272,15 @@ public class UnitTypes{
                             mirror = false;
                             reload = 1f;
                             shootOnDeath = true;
+                            shootOnDeathEffect = Fx.massiveExplosion;
                             bullet = new ExplosionBulletType(140f, 25f){{
                                 collidesAir = false;
                                 suppressionRange = 140f;
                                 shootEffect = new ExplosionEffect(){{
                                     lifetime = 50f;
                                     waveStroke = 5f;
-                                    waveLife = 8f;
-                                    waveColor = Color.white;
+                                    waveLife = 12f;
+                                    waveColor = Pal.sap.cpy().mul(1.8f);
                                     sparkColor = smokeColor = Pal.suppress;
                                     waveRad = 40f;
                                     smokeSize = 4f;
@@ -4619,6 +4630,40 @@ public class UnitTypes{
             createWreck = false;
             envEnabled = Env.any;
             envDisabled = Env.none;
+        }};
+
+        dummy = new UnitType("dummy"){{
+            controller = u -> new NoAI();
+
+            envEnabled = Env.any;
+            envDisabled = 0;
+            isEnemy = false;
+            allowedInPayloads = false;
+            logicControllable = false;
+            playerControllable = false;
+            hidden = true;
+            hoverable = false;
+            canBoost = true;
+            useUnitCap = false;
+            killable = false;
+            physics = false;
+
+            flyingLayer = Layer.flyingUnit - 1f;
+            drag = 0.33f;
+            hitSize = 12f;
+            hideDetails = false;
+            engineOffset = 7f;
+            engineSize = 2f;
+            for(int i = 0; i < 3; i++){
+                engines.add(new UnitEngine(Geometry.d4x(i) * engineOffset, Geometry.d4y(i) * engineOffset, engineSize, i * 90));
+            }
+        }
+
+        @Override
+        public void drawBody(Unit unit) {
+            applyColor(unit);
+            Drawf.spinSprite(region, unit.x, unit.y, unit.rotation - 90);
+            Draw.reset();
         }};
 
         //endregion

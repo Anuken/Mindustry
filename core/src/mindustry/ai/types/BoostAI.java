@@ -10,12 +10,14 @@ public class BoostAI extends AIController{
     public void updateUnit(){
         if(unit.controller() instanceof CommandAI ai){
             ai.defaultBehavior();
-            unit.updateBoosting(true);
+            unit.updateBoosting(true, true);
 
             //auto land when near target
             if(ai.attackTarget != null && unit.within(ai.attackTarget, unit.range())){
                 unit.command().command(UnitCommand.moveCommand);
             }
+        }else{
+            unit.updateBoosting(true, true);
         }
     }
 }

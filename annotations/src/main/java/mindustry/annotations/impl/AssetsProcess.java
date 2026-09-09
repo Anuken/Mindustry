@@ -142,6 +142,19 @@ public class AssetsProcess extends BaseProcessor{
             .addParameter(int.class, "id")
             .returns(Sound.class)
             .addStatement("return (Sound)idToSound.get(id, () -> Sounds.none)").build());
+
+            type.addMethod(MethodSpec.methodBuilder("registerSound")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(Sound.class, "sound")
+            .addParameter(int.class, "id")
+            .returns(void.class)
+            .addStatement("idToSound.put(id, sound); soundToId.put(sound, id);").build());
+
+            type.addMethod(MethodSpec.methodBuilder("unregisterSound")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(Sound.class, "sound")
+            .returns(void.class)
+            .addStatement("int id = soundToId.get(sound); if(id != 0){ soundToId.remove(sound); idToSound.remove(id); }").build());
         }
 
         HashSet<String> names = new HashSet<>();

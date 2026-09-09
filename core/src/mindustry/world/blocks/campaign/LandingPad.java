@@ -71,7 +71,7 @@ public class LandingPad extends Block{
         lightRadius = 90f;
 
         config(Item.class, (LandingPadBuild build, Item item) -> {
-            if(!build.accessible()) return;
+            if(!build.accessible() || !item.isOnPlanet(state.getPlanet()) || !item.unlockedNow()) return;
 
             build.config = item;
         });
@@ -181,6 +181,7 @@ public class LandingPad extends Block{
                 }
 
                 waiting.each((item, pads) -> {
+                    pads.removeAll(l -> l.config != item);
                     if(pads.size > 0){
                         pads.sort(p -> p.priority);
 
@@ -337,7 +338,7 @@ public class LandingPad extends Block{
                         Call.landingPadLanded(tile);
                     }else{
                         //queue landing for next frame
-                        waiting.get(config, Seq::new).add(this);
+                        waiting.get(config, () -> new Seq<>(false)).add(this);
                     }
                 }
             }

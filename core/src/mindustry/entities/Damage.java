@@ -107,9 +107,9 @@ public class Damage{
             float damagePerWave = explosiveness / 2f;
 
             for(int i = 0; i < waves; i++){
-                var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                 int f = i;
                 Time.run(i * 2f, () -> {
+                    var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
                     if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
                         damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
                     }
@@ -263,10 +263,10 @@ public class Damage{
         if(hitter.type.collidesGround && hitter.type.collidesTiles){
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
-            World.raycastEachWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
+            World.raycastEachNoDiagonalWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
                 Building tile = world.build(cx, cy);
                 boolean collide = tile != null && tile.collide(hitter) && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
-                    && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
+                && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
                 if(collide){
                     collided.add(collidePool.obtain().set(cx * tilesize, cy * tilesize, tile));
 
@@ -468,14 +468,19 @@ public class Damage{
         damage(team, x, y, radius, damage, false, air, ground);
     }
 
-    /** Applies a status effect to all enemy units in a range. */
     public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground){
+        status(team, x, y, radius, effect, duration, air, ground, 1f);
+    }
+
+    public static void status(Team team, float x, float y, float radius, StatusEffect effect, float duration, boolean air, boolean ground, float chance){
         Cons<Unit> cons = entity -> {
             if(entity.team == team || !entity.checkTarget(air, ground) || !entity.hittable() || !entity.within(x, y, radius)){
                 return;
             }
 
-            entity.apply(effect, duration);
+            if(Mathf.chance(chance)){
+                entity.apply(effect, duration);
+            }
         };
 
         rect.setSize(radius * 2).setCenter(x, y);
@@ -485,7 +490,6 @@ public class Damage{
             Units.nearby(rect, cons);
         }
     }
-
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
         damage(team, x, y, radius, damage, complete, true, true);
@@ -498,6 +502,11 @@ public class Damage{
 
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source){
+        damage(team, x, y, radius, damage, complete, air, ground, scaled, source, 1);
+    }
+
+    /** Damages all entities and blocks in a radius that are enemies of the team. */
+    public static void damage(Team team, float x, float y, float radius, float damage, boolean complete, boolean air, boolean ground, boolean scaled, @Nullable Bullet source, float armorMult){
         Cons<Unit> cons = unit -> {
             if(unit.team == team  || !unit.checkTarget(air, ground) || !unit.hittable() || !unit.within(x, y, radius + (scaled ? unit.hitSize / 2f : 0f))){
                 return;
@@ -506,7 +515,11 @@ public class Damage{
             boolean dead = unit.dead;
 
             float amount = calculateDamage(scaled ? Math.max(0, unit.dst(x, y) - unit.type.hitSize/2) : unit.dst(x, y), radius, damage);
-            unit.damage(amount);
+            if(armorMult != 1){
+                unit.damageArmorMult(amount, armorMult);
+            }else{
+                unit.damage(amount);
+            }
 
             if(source != null){
                 Events.fire(bulletDamageEvent.set(unit, source));

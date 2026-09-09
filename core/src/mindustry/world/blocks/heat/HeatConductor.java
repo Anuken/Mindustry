@@ -8,6 +8,7 @@ import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.draw.*;
@@ -22,6 +23,7 @@ public class HeatConductor extends Block{
         update = solid = rotate = true;
         rotateDraw = false;
         size = 3;
+        noUpdateDisabled = true;
     }
 
     @Override
@@ -85,7 +87,13 @@ public class HeatConductor extends Block{
             if(lastHeatUpdate == Vars.state.updateId) return;
 
             lastHeatUpdate = Vars.state.updateId;
-            heat = calculateHeat(sideHeat, cameFrom);
+            heat = enabled ? calculateHeat(sideHeat, cameFrom) : 0f;
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.heat) return heat;
+            return super.sense(sensor);
         }
 
         @Override

@@ -23,6 +23,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.input.InputHandler.*;
 import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
@@ -48,6 +49,7 @@ public class Schematics implements Loadable{
 
     private static final byte[] header = {'m', 's', 'c', 'h'};
     private static final byte version = 1;
+    private static final boolean limitSchematicSize = true;
 
     private static final int padding = 2;
     private static final int maxPreviewsMobile = 32;
@@ -172,7 +174,7 @@ public class Schematics implements Loadable{
     public void savePreview(Schematic schematic, Fi file){
         FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
-        buffer.begin(Color.clear);
+        buffer.begin();
         Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
         file.writePng(pixmap);
         buffer.end();
@@ -245,20 +247,34 @@ public class Schematics implements Loadable{
             Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
             Draw.color();
 
-            Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
+            Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config){
+                @Override
+                public Tile tile(){
+                    //fake tile to return for previews to work properly
+                    emptyTile.x = (short)x;
+                    emptyTile.y = (short)y;
+                    return emptyTile;
+                }
+            });
 
             Draw.flush();
             //scale each plan to fit schematic
             Draw.trans().scale(resolution / tilesize, resolution / tilesize).translate(tilesize*1.5f, tilesize*1.5f);
 
+            QueryEachable eachPlans = new QueryEachable(null, plans);
+
             //draw plans
             plans.each(req -> {
                 req.animScale = 1f;
                 req.worldContext = false;
-                req.block.drawPlanRegion(req, plans);
+                req.block.drawPlanRegion(req, eachPlans);
             });
 
-            plans.each(req -> req.block.drawPlanConfigTop(req, plans));
+            plans.each(req -> req.block.drawPlanConfigTop(req, eachPlans));
+
+            //reset state
+            emptyTile.x = 0;
+            emptyTile.y = 0;
 
             Draw.flush();
             Draw.trans().idt();
@@ -518,6 +534,21 @@ public class Schematics implements Loadable{
 
     //region IO methods
 
+    public static boolean isSchematic(Fi file){
+        try{
+            try(InputStream input = file.read()){
+                for(byte b : header){
+                    if(input.read() != b){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }catch(Throwable t){
+            return false;
+        }
+    }
+
     /** Loads a schematic from base64. May throw an exception. */
     public static Schematic readBase64(String schematic){
         try{
@@ -550,7 +581,7 @@ public class Schematics implements Loadable{
         try(DataInputStream stream = new DataInputStream(new InflaterInputStream(input))){
             short width = stream.readShort(), height = stream.readShort();
 
-            if(width > 128 || height > 128) throw new IOException("Invalid schematic: Too large (max possible size is 128x128)");
+            if(limitSchematicSize && (width > 128 || height > 128)) throw new IOException("Invalid schematic: Too large (max possible size is 128x128)");
 
             StringMap map = new StringMap();
             int tags = stream.readUnsignedByte();
@@ -591,7 +622,7 @@ public class Schematics implements Loadable{
 
             int total = stream.readInt();
 
-            if(total > 128 * 128) throw new IOException("Invalid schematic: Too many blocks.");
+            if(limitSchematicSize && total > 128 * 128) throw new IOException("Invalid schematic: Too many blocks.");
 
             Reads read = new Reads(stream);
 

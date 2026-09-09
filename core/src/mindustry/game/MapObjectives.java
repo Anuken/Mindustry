@@ -70,7 +70,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             TextMarker::new,
             LineMarker::new,
             TextureMarker::new,
-            QuadMarker::new
+            QuadMarker::new,
+            LightMarker::new
         );
 
         registerLegacyMarker("Minimap", PointMarker::new);
@@ -176,9 +177,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     }
 
     /** Base abstract class for any in-map objective. */
-    public static abstract class MapObjective{
+    public static abstract class MapObjective implements AllowSerialization{
         public boolean hidden;
         public @Nullable @Multiline String details;
+        public @Nullable @LogicCode String completionLogicCode;
         public @Unordered String[] flagsAdded = {};
         public @Unordered String[] flagsRemoved = {};
         public ObjectiveMarker[] markers = {};
@@ -207,9 +209,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             state.rules.objectiveFlags.removeAll(flagsRemoved);
             state.rules.objectiveFlags.addAll(flagsAdded);
             completed = true;
+
+            LExecutor.runLogicScript(completionLogicCode);
         }
 
-        /** @return True if all {@link #parents} are completed, rendering this objective able to execute. */
+        /** @return true if all {@link #parents} are completed, rendering this objective able to execute. */
         public final boolean dependencyFinished(){
             if(depFinished) return true;
 
@@ -220,7 +224,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             return depFinished = true;
         }
 
-        /** @return True if this objective is done (practically, has been removed from the executor). */
+        /** @return true if this objective is done (practically, has been removed from the executor). */
         public final boolean isCompleted(){
             return completed;
         }
@@ -306,12 +310,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.research", content.emoji(), content.localizedName);
+            return Core.bundle.format("objective.research", content.emoji() + " ", content.localizedName);
         }
 
         @Override
         public void validate(){
             if(content == null) content = Items.copper;
+        }
+
+        @Override
+        public String toString(){
+            return "research: " + content;
         }
     }
 
@@ -332,12 +341,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.produce", content.emoji(), content.localizedName);
+            return Core.bundle.format("objective.produce", content.emoji() + " ", content.localizedName);
         }
 
         @Override
         public void validate(){
             if(content == null) content = Items.copper;
+        }
+
+        @Override
+        public String toString(){
+            return "produce: " + content;
         }
     }
 
@@ -360,12 +374,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji(), item.localizedName);
+            return Core.bundle.format("objective.item", state.rules.defaultTeam.items().get(item), amount, item.emoji()  + " ", item.localizedName);
         }
 
         @Override
         public void validate(){
             if(item == null) item = Items.copper;
+        }
+
+        @Override
+        public String toString(){
+            return "item: " + item + " x"  + amount;
         }
     }
 
@@ -388,12 +407,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji(), item.localizedName);
+            return Core.bundle.format("objective.coreitem", state.stats.coreItemCount.get(item), amount, item.emoji() + " ", item.localizedName);
         }
 
         @Override
         public void validate(){
             if(item == null) item = Items.copper;
+        }
+
+        @Override
+        public String toString(){
+            return "coreItem: " + item + " x"  + amount;
         }
     }
 
@@ -416,12 +440,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.build", count - state.stats.placedBlockCount.get(block, 0), block.emoji() + " ", block.localizedName);
         }
 
         @Override
         public void validate(){
             if(block == null) block = Blocks.conveyor;
+        }
+
+        @Override
+        public String toString(){
+            return "buildCount: " + block + " x"  + count;
         }
     }
 
@@ -444,12 +473,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji(), unit.localizedName);
+            return Core.bundle.format("objective.buildunit", count - state.rules.defaultTeam.data().countType(unit), unit.emoji() + " ", unit.localizedName);
         }
 
         @Override
         public void validate(){
             if(unit == null) unit = UnitTypes.dagger;
+        }
+
+        @Override
+        public String toString(){
+            return "unitCount: " + unit + " x"  + count;
         }
     }
 
@@ -471,6 +505,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.format("objective.destroyunits", count - state.stats.enemyUnitsDestroyed);
+        }
+
+        @Override
+        public String toString(){
+            return "destroyUnits: " + count;
         }
     }
 
@@ -525,7 +564,9 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                             text = "";
                         }
                     }
-                    return Core.bundle.format(text.substring(1), timeString.toString());
+                    //the 'escelating' typo was fixed in the bundle+maps, but existing saves don't have that fix, so it has to be changed here
+                    String actualText = text.equals("@objective.enemyescelating") ? "@objective.enemyescalating" : text;
+                    return Core.bundle.format(actualText.substring(1), timeString.toString());
                 }else{
                     try{
                         return Core.bundle.formatString(text, timeString.toString());
@@ -538,6 +579,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }
 
             return null;
+        }
+
+        @Override
+        public String toString(){
+            return "timer: " + duration;
         }
     }
 
@@ -562,12 +608,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyblock", block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.destroyblock", block.emoji() + " ", block.localizedName);
         }
 
         @Override
         public void validate(){
             if(block == null) block = Blocks.router;
+        }
+
+        @Override
+        public String toString(){
+            return "destroyBlock: " + block  + ":" + team + " " + pos;
         }
     }
 
@@ -602,12 +653,17 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         @Override
         public String text(){
-            return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji(), block.localizedName);
+            return Core.bundle.format("objective.destroyblocks", progress(), positions.length, block.emoji() + " ", block.localizedName);
         }
 
         @Override
         public void validate(){
             if(block == null) block = Blocks.router;
+        }
+
+        @Override
+        public String toString(){
+            return "destroyBlocks: " + block + ":" + team + " " + Arrays.toString(positions);
         }
     }
 
@@ -621,6 +677,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         @Override
         public String text(){
             return Core.bundle.get("objective.command");
+        }
+
+        @Override
+        public String toString(){
+            return "commandMode";
         }
     }
 
@@ -653,6 +714,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 return text;
             }
         }
+
+        @Override
+        public String toString(){
+            return "flag: " + flag;
+        }
     }
 
     /** Destroy all enemy core(s). */
@@ -666,17 +732,21 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String text(){
             return Core.bundle.get("objective.destroycore");
         }
+
+        @Override
+        public String toString(){
+            return "destroyCore";
+        }
     }
 
-    /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay. */
+    /** Marker used for drawing various content to indicate something along with an objective. Mostly used as UI overlay.  */
     public static abstract class ObjectiveMarker implements JsonSerializable{
-        /** Internal use only! Do not access. */
-        public transient int arrayIndex;
-
-        /** Whether to display marker in the world. */
-        public boolean world = true;
-        /** Whether to display marker on minimap. */
-        public boolean minimap = false;
+        /** Whether to display marker in the world. Do not modify directly if added, use control() instead. */
+        public @IndexBool int world = 1;
+        /** Whether to display marker on the minimap. Do not modify directly if added, use control() instead. */
+        public @IndexBool int minimap = -1;
+        /** Whether to use the marker as light. Do not modify directly if added, use control() instead. */
+        public @IndexBool int light = -1;
         /** Whether to scale marker corresponding to player's zoom level. */
         public boolean autoscale = false;
         /** On which z-sorting layer is marker drawn. */
@@ -684,13 +754,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         public void draw(float scaleFactor){}
 
+        public void drawLight(float scaleFactor){
+            draw(scaleFactor);
+        }
+
         /** Control marker with world processor code. Ignores NaN (null) values. */
         public void control(LMarkerControl type, double p1, double p2, double p3){
             if(Double.isNaN(p1)) return;
 
             switch(type){
-                case world -> world = !Mathf.equal((float)p1, 0f);
-                case minimap -> minimap = !Mathf.equal((float)p1, 0f);
+                case world -> state.markers.updateMarker(state.markers.worldMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.world, (m, i) -> m.world = i);
+                case minimap -> state.markers.updateMarker(state.markers.mapMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.minimap, (m, i) -> m.minimap = i);
+                case light -> state.markers.updateMarker(state.markers.lightMarkers, this, !Mathf.equal((float)p1, 0f), m -> m.light, (m, i) -> m.light = i);
                 case autoscale -> autoscale = !Mathf.equal((float)p1, 0f);
                 case drawLayer -> drawLayer = (float)p1;
             }
@@ -704,6 +779,26 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public String typeName(){
             String className = getClass().getSimpleName().replace("Marker", "");
             return Core.bundle == null ? className : Core.bundle.get("marker." + className.toLowerCase() + ".name", className);
+        }
+
+        @Override
+        public void write(Json json){
+            json.writeFields(this);
+        }
+
+        private void updateField(JsonValue value){
+            if(value != null && value.type() != JsonValue.ValueType.longValue){
+                value.set(value.asBoolean() ? 1 : -1, null);
+            }
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData){
+            updateField(jsonData.get("world"));
+            updateField(jsonData.get("minimap"));
+            updateField(jsonData.get("light"));
+            json.readFields(this, jsonData);
+            if(jsonData.has("textureName")) setTexture(jsonData.getString("textureName"));
         }
 
         public static String fetchText(String text){
@@ -730,17 +825,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }else{
                 return UI.formatIcons(text);
             }
-        }
-
-        @Override
-        public void write(Json json){
-            json.writeFields(this);
-        }
-
-        @Override
-        public void read(Json json, JsonValue jsonData){
-            json.readFields(this, jsonData);
-            if(jsonData.has("textureName")) setTexture(jsonData.getString("textureName"));
         }
     }
 
@@ -909,8 +993,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             Draw.z(drawLayer);
             Lines.stroke(Scl.scl((1f - fin) * stroke + 0.1f), color);
             Lines.circle(pos.x, pos.y, rad * fin);
+        }
 
-            Draw.reset();
+        @Override
+        public void drawLight(float scaleFactor){
+            float rad = radius * tilesize * scaleFactor;
+
+            renderer.lights.add(pos.x, pos.y, rad, color, color.a);
         }
 
         @Override
@@ -968,8 +1057,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                     Fill.arc(pos.x, pos.y, radius * scaleFactor, (startAngle - endAngle) / 360f, rotation + endAngle, sides);
                 }
             }
-
-            Draw.reset();
         }
 
         @Override
@@ -1106,6 +1193,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
 
         @Override
+        public void drawLight(float scaleFactor){
+            renderer.lights.line(pos.x, pos.y, endPos.x, endPos.y, stroke, color1, color1.a);
+        }
+
+        @Override
         public void control(LMarkerControl type, double p1, double p2, double p3){
             super.control(type, p1, p2, p3);
 
@@ -1184,6 +1276,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public void draw(float scaleFactor){
             if(fetchedRegion == null) setTexture(texture.value);
             prepareTexture(this, texture.value);
+
+            float width = this.width, height = this.height;
 
             // Zero width/height scales marker to original texture's size
             if(Mathf.equal(width, 0f)) width = fetchedRegion.width * fetchedRegion.scl() * Draw.xscl;
@@ -1318,6 +1412,48 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }
     }
 
+    /** Displays a single point light. */
+    public static class LightMarker extends PosMarker{
+        public float radius = 5f;
+        public Color color = Color.valueOf("ffd37f");
+
+        public LightMarker(int x, int y){
+            this.pos.set(x, y);
+        }
+
+        public LightMarker(int x, int y, Color color){
+            this.pos.set(x, y);
+            this.color = color;
+        }
+
+        public LightMarker(int x, int y, float radius, Color color){
+            this.pos.set(x, y);
+            this.radius = radius;
+            this.color = color;
+        }
+
+        public LightMarker(){}
+
+        @Override
+        public void drawLight(float scaleFactor){
+            float rad = radius * tilesize * scaleFactor;
+
+            renderer.lights.add(pos.x, pos.y, rad, color, color.a);
+        }
+
+        @Override
+        public void control(LMarkerControl type, double p1, double p2, double p3){
+            super.control(type, p1, p2, p3);
+
+            if(!Double.isNaN(p1)){
+                switch(type){
+                    case radius -> radius = (float)p1;
+                    case color -> color.fromDouble(p1);
+                }
+            }
+        }
+    }
+
     private static void lookupRegion(Object texture, TextureRegion out){
         if(texture instanceof String name){
             TextureRegion region = Core.atlas.find(name);
@@ -1331,8 +1467,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         }else if(texture instanceof UnlockableContent u){
             out.set(u.fullIcon);
         }else if(texture instanceof LogicDisplayBuild d && d.isAdded()){
-            d.ensureBuffer();
-            d.getBufferRegion(out);
+            d.rootDisplay.ensureBuffer();
+            d.rootDisplay.getBufferRegion(out);
         }else if(texture instanceof CanvasBuild c && c.isAdded()){
             c.updateTexture();
             if(c.texture != null) out.set(c.texture);
@@ -1343,10 +1479,10 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     private static void prepareTexture(ObjectiveMarker marker, Object texture){
         if(texture instanceof LogicDisplayBuild d && d.isAdded()){
-            if(d.buffer == null || d.buffer.isDisposed()){
+            if(d.rootDisplay.buffer == null || d.rootDisplay.buffer.isDisposed()){
                 marker.setTexture("error");
             }else{
-                d.processCommands();
+                d.rootDisplay.processCommands();
             }
         }else if(texture instanceof CanvasBuild c && c.isAdded()){
             if(c.texture == null || c.texture.isDisposed()){
@@ -1400,6 +1536,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Retention(RUNTIME)
     public @interface Vertices{}
 
+    /** For {@code int}; treats it as a boolean with -1 for false and any other value for true (defaulting to 1) */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface IndexBool{}
+
     /** For {@code byte}; treats it as a world label flag. */
     @Target(FIELD)
     @Retention(RUNTIME)
@@ -1427,6 +1568,11 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
     @Target(FIELD)
     @Retention(RUNTIME)
     public @interface Multiline{}
+
+    /** For {@link String}; indicates that text corresponds to logic code. */
+    @Target(FIELD)
+    @Retention(RUNTIME)
+    public @interface LogicCode{}
 
     /** For {@code float}; multiplies the UI input by 60. */
     @Target(FIELD)

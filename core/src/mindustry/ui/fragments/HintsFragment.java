@@ -42,7 +42,7 @@ public class HintsFragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
+        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown();
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -82,6 +82,7 @@ public class HintsFragment{
         });
 
         Events.run(Trigger.cannotUpgrade, () -> events.add("cannotupgrade"));
+        Events.run(Trigger.fireCreate, () -> events.add("fire"));
 
         Events.on(ResetEvent.class, e -> {
             placedBlocks.clear();
@@ -248,13 +249,8 @@ public class HintsFragment{
         ),
 
         waveFire(
-            () -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(),
+            () -> ui.hints.events.contains("fire") && Blocks.wave.unlockedNow(),
             () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
-        ),
-
-        generator(
-            () -> control.input.block == Blocks.combustionGenerator,
-            () -> ui.hints.placedBlocks.contains(Blocks.combustionGenerator)
         ),
 
         rebuildSelect(
@@ -263,7 +259,7 @@ public class HintsFragment{
         ),
 
         guardian(
-            () -> state.boss() != null && isSerpulo() && state.boss().armor >= 4,
+            () -> state.boss() != null && isSerpulo() && state.boss().armor >= 4 && Blocks.salvo.unlocked() && !state.boss().isFlying(),
             () -> state.boss() == null
         ),
 
@@ -281,12 +277,14 @@ public class HintsFragment{
             && state.rules.defaultTeam.core() != null
             && state.rules.defaultTeam.core().block == Blocks.coreShard
             && state.rules.defaultTeam.core().items.has(Blocks.coreFoundation.requirements),
-            () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)),
+            () -> ui.hints.placedBlocks.contains(Blocks.coreFoundation)
+        ),
 
         serpuloCoreZone(
             () -> state.isCampaign() && state.getPlanet() == Planets.serpulo && Vars.indexer.isBlockPresent(Blocks.coreZone) &&
                 (!state.rules.attackMode || state.stats.getDestroyed(Blocks.coreShard) + state.stats.getDestroyed(Blocks.coreFoundation) + state.stats.getDestroyed(Blocks.coreNucleus) > 0),
-            () -> state.rules.defaultTeam.cores().size > 1),
+            () -> state.rules.defaultTeam.cores().size > 1
+        ),
 
         presetLaunch(
             () -> state.isCampaign() && state.getSector().preset == null,

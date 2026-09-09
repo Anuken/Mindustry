@@ -1,17 +1,22 @@
 package mindustry.world.meta;
 
+import arc.*;
+import arc.scene.ui.layout.*;
 import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 
+import java.util.*;
+
 /** Hold and organizes a list of block stats. */
 @NoPatch
 public class Stats{
     /** Whether to display stats with categories. If false, categories are completely ignored during display. */
     public boolean useCategories = false;
-    /** Whether these stats are initialized yet. */
+    /** @deprecated does nothing, will be removed in v9 */
+    @Deprecated
     public boolean intialized = false;
     /** Production time period in ticks. Used for crafters. **/
     public float timePeriod = -1;
@@ -80,6 +85,10 @@ public class Stats{
         add(stat, StatValues.blocks(attr, floating, scale, startZero));
     }
 
+    public void add(Stat stat, Attribute attr, boolean floating, float scale1, float scale2, @Nullable Seq<ItemStack> outputs, float timePeriod, boolean startZero){
+        add(stat, StatValues.blocks(attr, floating, scale1, scale2, outputs, timePeriod, startZero));
+    }
+
     /** Adds a single string value with this stat. */
     public void add(Stat stat, String format, Object... args){
         add(stat, StatValues.string(format, args));
@@ -130,5 +139,14 @@ public class Stats{
             dirty = false;
         }
         return map;
+    }
+
+    public void statInfo(Cell<?> cell, Stat stat){
+        if(cell == null || stat == null) return;
+
+        String key = "stat." + stat.name.toLowerCase(Locale.ROOT);
+        if(Core.bundle.has(key + ".info")){
+            cell.tooltip("@" + key + ".info");
+        }
     }
 }

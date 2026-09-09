@@ -56,7 +56,7 @@ public class MapEditor{
             tags.put("steamid",  map.file.parent().name());
         }
         load(() -> MapIO.loadMap(map, context));
-        renderer.resize(width(), height());
+        if(!headless) renderer.resize(width(), height());
         loading = false;
     }
 
@@ -65,7 +65,7 @@ public class MapEditor{
 
         createTiles(pixmap.width, pixmap.height);
         load(() -> MapIO.readImage(pixmap, tiles()));
-        renderer.resize(width(), height());
+        if(!headless) renderer.resize(width(), height());
     }
 
     public void updateRenderer(){
