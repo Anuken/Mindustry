@@ -127,7 +127,7 @@ public class CustomRulesDialog extends BaseDialog{
                 ruleSearch = text.trim().replaceAll(" +", " ").toLowerCase();
                 setupMain();
             }).growX().pad(8).get();
-            field.setMessageText("@player.search");
+            field.setMessageText("@players.search");
             field.setCursorPosition(ruleSearch.length());
             Core.scene.setKeyboardFocus(field);
         }).fillX().row();
