@@ -5426,12 +5426,12 @@ public class Blocks{
                     }});
 
                     abilities.add(new MoveEffectAbility(){{
-                                      effect = Fx.missileTrailSmoke;
-                                      rotation = 180f;
-                                      y = -9f;
-                                      color = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
-                                      interval = 20f;
-                                  }},
+                        effect = Fx.missileTrailSmoke;
+                        rotation = 180f;
+                        y = -9f;
+                        color = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
+                        interval = 20f;
+                    }},
                     new ForceFieldAbility(){{
                         followUnitRot = true;
                         radius = 120;
