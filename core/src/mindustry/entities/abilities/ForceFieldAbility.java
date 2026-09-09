@@ -8,6 +8,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
@@ -30,27 +31,43 @@ public class ForceFieldAbility extends Ability{
     public int sides = 6;
     /** Rotation of shield. */
     public float rotation = 0f;
+    /** Whether the shield should follow the unit s rotation. */
+    public boolean followUnitRot = false;
+
+    /** Multiplier on unit speed when its shield is hit. */
+    public float unitSlowdown = -1f;
+    /** Number of ticks unit slowdown is applied after being hit. */
+    public float slowdownTime = 80f;
+    /** Number of hits required to reach maximum unit slowdown. */
+    public int shotThreshold = 5;
 
     public Sound breakSound = Sounds.shieldBreakSmall;
     public Sound hitSound = Sounds.shieldHit;
     public float hitSoundVolume = 0.12f;
 
     /** State. */
-    protected float radiusScale, alpha;
+    protected float radiusScale, alpha, shots;
     protected boolean wasBroken = true;
 
     private static float realRad;
     private static Unit paramUnit;
     private static ForceFieldAbility paramField;
     private static final Cons<Bullet> shieldConsumer = b -> {
-        if(b.team != paramUnit.team && b.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation, b.x(), b.y()) && paramUnit.shield > 0){
+        if(b.team != paramUnit.team && b.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation +
+        (paramField.followUnitRot ? paramUnit.rotation : 0f), b.x(), b.y()) && paramUnit.shield > 0){
+
             b.absorb();
             Fx.absorb.at(b);
             paramField.hitSound.at(b.x, b.y, 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
             paramUnit.shield -= b.type().shieldDamage(b);
             paramField.alpha = 1f;
+            if(paramField.unitSlowdown > 0f){
+                paramField.shots = Math.min(paramField.shots + 1f, paramField.shotThreshold);
+            }
         }
     };
+
+    public ForceFieldAbility(){}
 
     public ForceFieldAbility(float radius, float regen, float max, float cooldown){
         this.radius = radius;
@@ -67,8 +84,6 @@ public class ForceFieldAbility extends Ability{
         this.sides = sides;
         this.rotation = rotation;
     }
-
-    ForceFieldAbility(){}
 
     public float scaledMax(Unit unit){
         return max * Vars.state.rules.unitHealth(unit.team);
@@ -97,6 +112,12 @@ public class ForceFieldAbility extends Ability{
 
         wasBroken = unit.shield <= 0f;
 
+        if(unitSlowdown > 0f){
+            //slowdown changes are % based
+            shots = Mathf.approachDelta(shots, 0f, shotThreshold / slowdownTime);
+            unit.speedMultiplier = Mathf.approachDelta(1f, unitSlowdown, Mathf.clamp(shots / shotThreshold));
+        }
+
         if(unit.shield < scaledMax(unit)){
             unit.shield += Time.delta * regen;
         }
@@ -120,7 +141,7 @@ public class ForceFieldAbility extends Ability{
 
         //self-destructing units can have a shield on death
         if(unit.shield > 0f && !wasBroken){
-            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), sides);
+            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), unit);
             breakSound.at(unit.x, unit.y);
         }
     }
@@ -134,14 +155,14 @@ public class ForceFieldAbility extends Ability{
 
             if(Vars.renderer.animateShields){
                 Draw.z(Layer.shields + 0.001f * alpha);
-                Fill.poly(unit.x, unit.y, sides, realRad, rotation);
+                Fill.poly(unit.x, unit.y, sides, realRad, rotation + (followUnitRot ? unit.rotation : 0f));
             }else{
                 Draw.z(Layer.shields);
                 Lines.stroke(1.5f);
                 Draw.alpha(0.09f);
-                Fill.poly(unit.x, unit.y, sides, radius, rotation);
+                Fill.poly(unit.x, unit.y, sides, radius, rotation + (followUnitRot ? unit.rotation : 0f));
                 Draw.alpha(1f);
-                Lines.poly(unit.x, unit.y, sides, radius, rotation);
+                Lines.poly(unit.x, unit.y, sides, radius, rotation + (followUnitRot ? unit.rotation : 0f));
             }
         }
     }
