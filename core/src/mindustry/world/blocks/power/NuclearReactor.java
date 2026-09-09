@@ -31,7 +31,7 @@ public class NuclearReactor extends PowerGenerator{
     /** heating per frame * fullness */
     public float heating = 0.01f;
     /** max heat this block can output per side */
-    public float heatOutput = 12f;
+    public float heatOutput = 8f;
     /** rate at which heat progress increases */
     public float heatWarmupRate = 1f;
     /** rate at which fuel consumption scales with heat */
@@ -75,6 +75,7 @@ public class NuclearReactor extends PowerGenerator{
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemDuration;
         super.setStats();
 
         stats.add(Stat.meltdownTime, table -> {
@@ -90,13 +91,9 @@ public class NuclearReactor extends PowerGenerator{
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
-        if(heatOutput > 0f && (ui.planet.isShown() ? ui.planet.state.planet : state.isGame() ? state.getPlanet() : null) == Planets.erekir){
-            stats.add(Stat.output, table -> {
-                //using StatUnit.localized() strips the icon
-                String unit = "[red]" + Iconc.waves + "[] " + Strings.fixed(heatOutput, 0) + " " + Core.bundle.get("unit.heatunitsperside");
-
-                table.add(Core.bundle.format("bar.upto", unit));
-            });
+        if(heatOutput > 0f && (ui != null && (ui.planet.isShown() ? ui.planet.state.planet : state.isGame() ? state.getPlanet() : null) == Planets.erekir)){
+            //using StatUnit.localized() strips the icon
+            stats.add(Stat.output, table -> table.add(Core.bundle.format("bar.upto", "[red]" + Iconc.waves + "[] " + Strings.fixed(heatOutput, 0) + " " + Core.bundle.get("unit.heatunitsperside"))));
         }
     }
 

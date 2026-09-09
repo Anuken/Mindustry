@@ -292,6 +292,12 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                         remove();
                     }
 
+                    if(type.laserBullet && build.absorbLasers()){
+                        hit = true;
+                        remove();
+                        return;
+                    }
+
                     //stop raycasting when building is hit
                     if(type.pierceBuilding) return;
                 }

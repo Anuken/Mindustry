@@ -28,8 +28,8 @@ public class Save11 extends SaveVersion{
 
         try{
             readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
-            readRegion("map", stream, counter, in -> readMap(in, saveState.context));
-            readRegion("entities", stream, counter, this::readEntities);
+            readRegion("map", stream, counter, in -> readMap(in, saveState));
+            readRegion("entities", stream, counter, in -> readEntities(in, saveState));
             readRegion("markers", stream, counter, this::readMarkers);
             readRegion("custom", stream, counter, this::readCustomChunks);
         }finally{

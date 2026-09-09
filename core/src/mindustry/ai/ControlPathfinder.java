@@ -1134,6 +1134,13 @@ public class ControlPathfinder implements Runnable{
         initialCost = tileOn == null ? 0 : cost.getCost(team, pathfinder.tiles[tileOn.array()]),
         destPos = destX + destY * wwidth;
 
+        //do not allow commanding into areas outside the map bounds
+        if(!world.isInMapArea(World.toTile(destination.x), World.toTile(destination.y))){
+            pathResult.move = false;
+            pathResult.unreachable = true;
+            return pathResult;
+        }
+
         PathRequest request = unitRequests.get(unit);
 
         unit.hitboxTile(Tmp.r3);

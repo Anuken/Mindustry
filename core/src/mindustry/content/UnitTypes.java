@@ -78,6 +78,7 @@ public class UnitTypes{
 
     //special building tethered (has payload capability, because it's necessary sometimes)
     public static @EntityDef({Unitc.class, BuildingTetherc.class, Payloadc.class}) UnitType manifold, assemblyDrone;
+    public static @EntityDef({TargetDummyc.class, Unitc.class}) UnitType dummy;
 
     //tank
     public static @EntityDef({Unitc.class, Tankc.class}) UnitType stell, locus, precept, vanquish, conquer;
@@ -191,7 +192,7 @@ public class UnitTypes{
             hitSize = 22f;
             rotateSpeed = 2.1f;
             health = 9000;
-            armor = 10f;
+            armor = 20f;
             mechFrontSway = 1f;
 
             mechStepParticles = true;
@@ -292,7 +293,7 @@ public class UnitTypes{
             hitSize = 30f;
             rotateSpeed = 1.65f;
             health = 24000;
-            armor = 18f;
+            armor = 30f;
             mechStepParticles = true;
             stepShake = 0.75f;
             drownTimeMultiplier = 1.6f;
@@ -355,19 +356,25 @@ public class UnitTypes{
 
         nova = new UnitType("nova"){{
             canBoost = true;
-            boostMultiplier = 1.5f;
+            boostMultiplier = 2f;
             speed = 0.55f;
             hitSize = 8f;
-            health = 120f;
+            health = 200f;
             buildSpeed = 0.3f;
             armor = 1f;
 
-            abilities.add(new RepairFieldAbility(10f, 60f * 4, 60f));
+            abilities.add(new RepairFieldAbility(20f, 60f * 2, 100f){{
+                sameTypeHealMult = 0.15f;
+                maxTargets = 6;
+
+                smartHeal = true;
+                smartDowntime = 60 * 4f;
+            }});
 
             weapons.add(new Weapon("heal-weapon"){{
                 top = false;
                 shootY = 2f;
-                reload = 24f;
+                reload = 30f;
                 x = 4.5f;
                 alternate = false;
                 ejectEffect = Fx.none;
@@ -377,6 +384,9 @@ public class UnitTypes{
                 bullet = new LaserBoltBulletType(5.2f, 13){{
                     lifetime = 30f;
                     healPercent = 5f;
+                    pierce = true;
+                    pierceBuilding = true;
+                    pierceCap = 2;
                     collidesTeam = true;
                     backColor = Pal.heal;
                     frontColor = Color.white;
@@ -504,7 +514,7 @@ public class UnitTypes{
             riseSpeed = descentSpeed = 0.02f;
 
             health = 8200f;
-            armor = 9f;
+            armor = 16f;
             canBoost = true;
             mechLandShake = 4f;
             immunities = ObjectSet.with(StatusEffects.burning);
@@ -575,7 +585,7 @@ public class UnitTypes{
         corvus = new UnitType("corvus"){{
             hitSize = 29f;
             health = 18000f;
-            armor = 9f;
+            armor = 14f;
             stepShake = 1.5f;
             rotateSpeed = 1.5f;
             drownTimeMultiplier = 1.6f;
@@ -743,7 +753,7 @@ public class UnitTypes{
             legMoveSpace = 1.4f;
             legBaseOffset = 2f;
             hovering = true;
-            armor = 5f;
+            armor = 9f;
 
             shadowElevation = 0.3f;
             groundLayer = Layer.legUnit;
@@ -764,7 +774,7 @@ public class UnitTypes{
                 y = -1.5f;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.5f;
+                    sapStrength = 0.4f;
                     length = 75f;
                     damage = 23;
                     shootEffect = Fx.shootSmall;
@@ -784,7 +794,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootSap;
 
                 bullet = new SapBulletType(){{
-                    sapStrength = 0.8f;
+                    sapStrength = 0.7f;
                     length = 40f;
                     damage = 18;
                     shootEffect = Fx.shootSmall;
@@ -802,7 +812,7 @@ public class UnitTypes{
             speed = 0.62f;
             hitSize = 23f;
             health = 8000;
-            armor = 6f;
+            armor = 14f;
 
             rotateSpeed = 2.7f;
 
@@ -906,7 +916,7 @@ public class UnitTypes{
             speed = 0.5f;
             hitSize = 26f;
             health = 22000;
-            armor = 13f;
+            armor = 22f;
             lightRadius = 140f;
             stepSound = Sounds.walkerStep;
             stepSoundVolume = 1.1f;
@@ -1182,7 +1192,7 @@ public class UnitTypes{
             flying = true;
             lowAltitude = true;
             health = 7200;
-            armor = 9f;
+            armor = 17f;
             engineOffset = 21;
             engineSize = 5.3f;
             hitSize = 46f;
@@ -1261,7 +1271,7 @@ public class UnitTypes{
             engineOffset = 38;
             engineSize = 7.3f;
             hitSize = 58f;
-            armor = 13f;
+            armor = 22f;
             targetFlags = new BlockFlag[]{BlockFlag.reactor, BlockFlag.battery, BlockFlag.core, null};
 
             loopSound = Sounds.loopHover;
@@ -1361,7 +1371,7 @@ public class UnitTypes{
             accel = 0.1f;
             range = 130f;
             health = 400;
-            buildSpeed = 0.5f;
+            buildSpeed = 0.4f;
             engineOffset = 6.5f;
             hitSize = 9f;
             lowAltitude = true;
@@ -1370,7 +1380,11 @@ public class UnitTypes{
             mineSpeed = 3.5f;
             wreckSoundVolume = 0.9f;
 
-            abilities.add(new RepairFieldAbility(5f, 60f * 8, 50f));
+            abilities.add(new RepairFieldAbility(){{
+                amount = 5f;
+                reload = 60f * 8f;
+                range = 50f;
+            }});
 
             weapons.add(new Weapon("poly-weapon"){{
                 top = false;
@@ -1457,7 +1471,7 @@ public class UnitTypes{
         }};
 
         quad = new UnitType("quad"){{
-            armor = 8f;
+            armor = 10f;
             health = 6000;
             speed = 1.2f;
             rotateSpeed = 2f;
@@ -1533,7 +1547,7 @@ public class UnitTypes{
         oct = new UnitType("oct"){{
             aiController = DefenderAI::new;
 
-            armor = 16f;
+            armor = 20f;
             health = 24000;
             speed = 0.8f;
             rotateSpeed = 1f;
@@ -2313,7 +2327,7 @@ public class UnitTypes{
             speed = 0.65f;
             drag = 0.17f;
             hitSize = 58f;
-            armor = 16f;
+            armor = 20f;
             accel = 0.2f;
             rotateSpeed = 1.1f;
             faceTarget = false;
@@ -2355,7 +2369,7 @@ public class UnitTypes{
                     timeIncrease = 3f;
                     timeDuration = 60f * 20f;
                     powerDamageScl = 3f;
-                    damage = 60;
+                    damage = 110;
                     hitColor = lightColor = Pal.heal;
                     lightRadius = 70f;
                     clipSize = 250f;
@@ -2372,7 +2386,7 @@ public class UnitTypes{
                     trailWidth = 6f;
                     trailColor = Pal.heal;
                     trailInterval = 3f;
-                    splashDamage = 70f;
+                    splashDamage = 110f;
                     splashDamageRadius = rad;
                     hitShake = 4f;
                     trailRotation = true;
@@ -2522,7 +2536,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.02f;
                 }};
             }});
@@ -2573,7 +2587,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 60f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.03f;
                 }};
             }});
@@ -2628,7 +2642,7 @@ public class UnitTypes{
                     lightColor = Pal.yellowBoltFront;
 
                     lifetime = 70f;
-                    buildingDamageMultiplier = 0.01f;
+                    buildingDamageMultiplier = 0f;
                     homingPower = 0.04f;
                 }};
             }});
@@ -4616,6 +4630,40 @@ public class UnitTypes{
             createWreck = false;
             envEnabled = Env.any;
             envDisabled = Env.none;
+        }};
+
+        dummy = new UnitType("dummy"){{
+            controller = u -> new NoAI();
+
+            envEnabled = Env.any;
+            envDisabled = 0;
+            isEnemy = false;
+            allowedInPayloads = false;
+            logicControllable = false;
+            playerControllable = false;
+            hidden = true;
+            hoverable = false;
+            canBoost = true;
+            useUnitCap = false;
+            killable = false;
+            physics = false;
+
+            flyingLayer = Layer.flyingUnit - 1f;
+            drag = 0.33f;
+            hitSize = 12f;
+            hideDetails = false;
+            engineOffset = 7f;
+            engineSize = 2f;
+            for(int i = 0; i < 3; i++){
+                engines.add(new UnitEngine(Geometry.d4x(i) * engineOffset, Geometry.d4y(i) * engineOffset, engineSize, i * 90));
+            }
+        }
+
+        @Override
+        public void drawBody(Unit unit) {
+            applyColor(unit);
+            Drawf.spinSprite(region, unit.x, unit.y, unit.rotation - 90);
+            Draw.reset();
         }};
 
         //endregion

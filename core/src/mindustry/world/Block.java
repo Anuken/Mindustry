@@ -58,7 +58,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
-    /** If true, this block can input payloads; affects unit payload enter behavior. */
+    /** If true, this block can input payloads. Affects unit payload enter and pathfinding behaviors. */
     public boolean acceptsUnitPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
@@ -263,6 +263,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean commandable;
     /** If true, the building inventory can be shown with the config. */
     public boolean allowConfigInventory = true;
+    /** If true, the building inventory will be placed diagonally on the top right. */
+    public boolean diagonalConfigInventory = false;
     /** Defines how large selection menus, such as that of sorters, should be. */
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
@@ -385,6 +387,8 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Team forceTeam;
     /** Whether this block has instant transfer.*/
     public boolean instantTransfer = false;
+    /** Maximum number of instantTransfer consecutive blocks. */
+    public int maxConsecutive = 2;
     /** Whether you can rotate this block after it is placed. */
     public boolean quickRotate = true;
     /** If true, this derelict block can be repair by clicking it. */
@@ -653,7 +657,8 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         if(instantTransfer){
-            stats.add(Stat.maxConsecutive, 2, StatUnit.none);
+            stats.add(Stat.itemsMoved, StatUnit.instant.localized());
+            stats.add(Stat.maxConsecutive, maxConsecutive, StatUnit.none);
         }
 
         for(var c : consumers){
@@ -662,7 +667,10 @@ public class Block extends UnlockableContent implements Senseable{
 
         //Note: Power stats are added by the consumers.
         if(hasLiquids) stats.add(Stat.liquidCapacity, liquidCapacity, StatUnit.liquidUnits);
-        if(hasItems && itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+        if(hasItems){
+            if(itemCapacity > 0) stats.add(Stat.itemCapacity, itemCapacity, StatUnit.items);
+            else if (instantTransfer || itemCapacity == 0) stats.add(Stat.itemCapacity, Core.bundle.format("none") + ". " + Core.bundle.format("unabletoclog"));
+        }
     }
 
     public <T extends Building> void addBar(String name, Func<T, Bar> sup){

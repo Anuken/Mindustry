@@ -2505,23 +2505,30 @@ public class Fx{
     }),
 
     pulverizeRed = new Effect(40, e -> {
+        color(Pal.redDust, Pal.stoneGray, e.fin());
         randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
-            color(Pal.redDust, Pal.stoneGray, e.fin());
             Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.5f, 45);
         });
     }),
 
     pulverizeSmall = new Effect(30, e -> {
+        color(Pal.stoneGray);
         randLenVectors(e.id, 3, e.fin() * 5f, (x, y) -> {
-            color(Pal.stoneGray);
             Fill.square(e.x + x, e.y + y, e.fout() + 0.5f, 45);
         });
     }),
 
     pulverizeMedium = new Effect(30, e -> {
+        color(Pal.stoneGray);
         randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
-            color(Pal.stoneGray);
             Fill.square(e.x + x, e.y + y, e.fout() + 0.5f, 45);
+        });
+    }),
+
+    unitMine = new Effect(30, e -> {
+        color(e.color, Pal.stoneGray, e.finpowdown());
+        randLenVectors(e.id, 4, e.fin() * 6f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, e.fout() * 1.3f + 0.4f, 45);
         });
     }),
 

@@ -160,7 +160,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean inMapArea(){
-        return !state.rules.limitMapArea || Rect.contains(state.rules.limitX , state.rules.limitY , state.rules.limitWidth, state.rules.limitHeight, x, y);
+        return world.isInMapArea(x, y);
     }
 
     public float worldx(){

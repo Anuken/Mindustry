@@ -5,6 +5,7 @@ import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.input.*;
 import arc.scene.*;
 import arc.scene.style.*;
 import arc.scene.ui.TextButton.*;
@@ -15,6 +16,7 @@ import arc.util.*;
 import arc.util.Http.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import arc.util.serialization.Jval.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -33,6 +35,8 @@ public class ModsDialog extends BaseDialog{
     protected float modImportProgress;
     protected boolean cancelledImport;
     protected BaseDialog currentContent;
+    protected BaseDialog downloads;
+    protected BaseDialog modDetails;
 
     protected float scroll = 0f;
     //only records mods that have a valid repo!
@@ -44,7 +48,14 @@ public class ModsDialog extends BaseDialog{
         super("@mods");
         addCloseButton();
 
-        buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
+        if(mods.list().contains(LoadedMod::failed)){
+            buttons.button("@mods.restore", Icon.power, () -> {
+                mods.list().each(LoadedMod::failed, m -> mods.setEnabled(m, true));
+                setup();
+            });
+        }else{ //no room for both buttons on mobile
+            buttons.button("@mods.guide", Icon.link, () -> Core.app.openURI(modGuideURL)).size(210, 64f);
+        }
 
         if(!mobile){
             buttons.button("@mods.openfolder", Icon.link, () -> Core.app.openFolder(modDirectory.absolutePath()));
@@ -227,12 +238,9 @@ public class ModsDialog extends BaseDialog{
                                     boolean hideDisabled = !mod.isSupported() || mod.hasUnmetDependencies() || mod.hasContentErrors();
                                     String shortDesc = mod.meta.shortDescription();
 
-                                    text.add("[accent]" + Strings.stripColors(mod.meta.displayName) + "\n" +
-                                        (shortDesc.length() > 0 ? "[lightgray]" + shortDesc + "\n" : "")
-                                        //so does anybody care about version?
-                                        //+ "[gray]v" + Strings.stripColors(trimText(item.meta.version)) + "\n"
-                                        + (mod.enabled() || hideDisabled ? "" : Core.bundle.get("mod.disabled") + ""))
-                                    .wrap().top().width(300f).growX().left();
+                                    text.add("[accent]" + Strings.stripColors(mod.meta.displayName) + "\n"
+                                        + (mod.enabled() || hideDisabled ? (shortDesc.length() > 0 ? "[lightgray]" + shortDesc : "") : Core.bundle.get(mod.failed() ? "mod.failed" : "mod.disabled")))
+                                    .ellipsis(true).top().width(300f).growX().left();
 
                                     text.row();
 
@@ -384,22 +392,22 @@ public class ModsDialog extends BaseDialog{
     }
 
     private void showMod(LoadedMod mod){
-        BaseDialog dialog = new BaseDialog(mod.meta.displayName);
+        modDetails = new BaseDialog(mod.meta.displayName);
 
-        dialog.addCloseButton();
+        modDetails.addCloseButton();
 
         if(!mobile){
-            dialog.buttons.button("@mods.openfolder", Icon.link, () -> Core.app.openFolder(mod.file.absolutePath()));
+            modDetails.buttons.button("@mods.openfolder", Icon.link, () -> Core.app.openFolder(mod.file.absolutePath()));
         }
 
         if(mod.getRepo() != null){
             boolean showImport = !mod.hasSteamID();
-            dialog.buttons.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + mod.getRepo()));
-            if(mobile && showImport) dialog.buttons.row();
-            if(showImport) dialog.buttons.button("@mods.browser.reinstall", Icon.download, () -> githubImportMod(mod.getRepo(), mod.isJava(), null, false));
+            modDetails.buttons.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + mod.getRepo()));
+            if(mobile && showImport) modDetails.buttons.row();
+            if(showImport) modDetails.buttons.button("@mods.browser.reinstall", Icon.download, () -> viewReleases(mod.getRepo(), mod.isJava(), true));
         }
 
-        dialog.cont.pane(desc -> {
+        modDetails.cont.pane(desc -> {
             desc.center();
             desc.defaults().padTop(10).left();
 
@@ -422,7 +430,7 @@ public class ModsDialog extends BaseDialog{
             if(mod.meta.description != null){
                 desc.add("@editor.description").padRight(10).color(Color.gray).top();
                 desc.row();
-                desc.add(mod.meta.description).growX().wrap().padTop(2);
+                desc.add(mod.meta.description).growX().wrap(true).padTop(2);
                 desc.row();
             }
 
@@ -433,12 +441,12 @@ public class ModsDialog extends BaseDialog{
                 desc.add(state).growX().wrap().row();
             }
 
-        }).width(400f);
+        }).width(Math.min(Core.graphics.getWidth() / Scl.scl(1f), 600f));
 
         Seq<UnlockableContent> all = Seq.with(content.getContentMap()).<Content>flatten().select(c -> c.minfo.mod == mod && c instanceof UnlockableContent u && !u.isHidden()).as();
         if(all.any()){
-            dialog.cont.row();
-            dialog.cont.button("@mods.viewcontent", Icon.book, () -> {
+            modDetails.cont.row();
+            modDetails.cont.button("@mods.viewcontent", Icon.book, () -> {
                 BaseDialog d = new BaseDialog(mod.meta.displayName);
                 d.cont.pane(cs -> {
                     int i = 0;
@@ -460,7 +468,7 @@ public class ModsDialog extends BaseDialog{
             }).size(300, 50).pad(4);
         }
 
-        dialog.show();
+        modDetails.show();
     }
 
     protected void handleMod(String repo, HttpResponse result, boolean forceEnable){
@@ -488,6 +496,8 @@ public class ModsDialog extends BaseDialog{
                 try{
                     setup();
                     ui.loadfrag.hide();
+                    if(downloads != null) downloads.hide();
+                    if(modDetails != null) modDetails.hide();
                 }catch(Throwable e){
                     ui.showException(e);
                 }
@@ -514,6 +524,76 @@ public class ModsDialog extends BaseDialog{
         }else{
             ui.showException(error);
         }
+    }
+
+    public void viewReleases(String repo, boolean isJava, boolean reinstall) {
+        BaseDialog load = new BaseDialog("");
+        load.cont.add("[accent]" + Core.bundle.get("mods.browser.fetching"));
+        load.show();
+        Http.get(ghApi + "/repos/" + repo + "/releases", res -> {
+            var json = Jval.read(res.getResultAsString());
+            JsonArray releases = json.asArray();
+
+            Core.app.post(() -> {
+                load.hide();
+
+                if(releases.size == 0){
+                    if(reinstall && !isJava){
+                        githubImportMod(repo, isJava, null, false);
+                    }else{
+                        ui.showInfo("@mods.browser.noreleases");
+                    }
+                }else{
+                    downloads = new BaseDialog("@mods.browser.releases");
+                    downloads.cont.pane(p -> {
+                        if(reinstall && !isJava){
+                            p.table(((TextureRegionDrawable)Tex.whiteui).tint(Pal.darkestGray), t -> {
+                                t.add("@mods.browser.current").top().left().growX().wrap().pad(5f).padBottom(15f);
+                                t.row();
+                                t.table(b -> {
+                                    b.defaults().size(150f, 54f).pad(2f);
+                                    b.button("@mods.github.open", Icon.link, () -> Core.app.openURI("https://github.com/" + repo));
+                                    b.button("@mods.browser.add", Icon.download, () -> githubImportMod(repo, isJava, null, false));
+                                }).right();
+                            }).margin(5f).growX().pad(5f);
+                            p.row();
+                        }
+
+                        for(int j = 0; j < releases.size; j++){
+                            var release = releases.get(j);
+
+                            int index = j;
+                            p.table(((TextureRegionDrawable)Tex.whiteui).tint(Pal.darkestGray), t -> {
+                                t.add("[accent]" + release.getString("name") + (index == 0 ? " " + Core.bundle.get("mods.browser.latest") : "")).top().left().growX().wrap().pad(5f);
+                                t.row();
+                                t.add((release.getString("published_at")).substring(0, 10).replaceAll("-", "/")).top().left().growX().wrap().pad(5f).color(Color.gray);
+                                t.row();
+                                t.table(b -> {
+                                    b.defaults().size(150f, 54f).pad(2f);
+                                    b.button("@mods.github.open-release", Icon.link, () -> Core.app.openURI(release.getString("html_url")));
+                                    b.button("@mods.browser.add", Icon.download, () -> {
+                                        String releaseUrl = release.getString("url");
+                                        githubImportMod(repo, isJava, releaseUrl.substring(releaseUrl.lastIndexOf("/") + 1), true);
+                                    });
+                                }).right();
+                            }).margin(5f).growX().pad(5f);
+
+                            if(j < releases.size - 1) p.row();
+                        }
+                    }).width(500f).scrollX(false).fillY();
+                    downloads.buttons.button("@back", Icon.left, () -> {
+                        downloads.clear();
+                        downloads.hide();
+                    }).size(150f, 54f).pad(2f);
+                    downloads.keyDown(KeyCode.escape, downloads::hide);
+                    downloads.keyDown(KeyCode.back, downloads::hide);
+                    downloads.show();
+                }
+            });
+        }, t -> Core.app.post(() -> {
+            showModError(t);
+            load.hide();
+        }));
     }
 
     public void githubImportMod(String repo, boolean isJava, boolean forceEnable){

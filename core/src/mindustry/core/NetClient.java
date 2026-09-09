@@ -167,11 +167,16 @@ public class NetClient implements ApplicationListener{
         net.handleClient(TextureStream.class, data -> {
             try(DataInputStream in = new DataInputStream(data.stream)){
                 String name = in.readUTF();
-                byte[] pngData = in.readAllBytes();
+                int length = in.readInt();
+                byte[] pngData = new byte[length];
+                in.readFully(pngData);
                 if(!headless){
                     //empty image data means we're removing the texture instead. see NetServer.removeTexture()
-                    if(pngData.length == 0) state.data.removeTexture(name);
-                    else state.data.addTexture(name, pngData);
+                    if(pngData.length == 0){
+                        state.data.removeTexture(name);
+                    }else{
+                        state.data.addTexture(name, pngData);
+                    }
                 }
             }catch(IOException e){
                 Log.err("Failed to read server texture stream", e);
@@ -384,7 +389,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(called = Loc.client, variants = Variant.one)
+    @Remote(called = Loc.client, variants = Variant.one, priority = PacketPriority.high)
     public static void connect(String ip, int port){
         if(!steam && (ip.startsWith("steam:") || ip.startsWith("steamserver:"))) return;
         netClient.disconnectQuietly();

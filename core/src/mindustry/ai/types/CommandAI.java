@@ -17,12 +17,13 @@ import static mindustry.Vars.*;
 
 public class CommandAI extends AIController{
     protected static final int maxCommandQueueSize = 50, avoidInterval = 10;
-    protected static final Vec2 vecOut = new Vec2(), vecMovePos = new Vec2();
+    protected static final Vec2 moveTarget = new Vec2(), offsetedDestination = new Vec2(), currentDestination = new Vec2();
     protected static final UnitPayload tmpPayload = new UnitPayload(null);
     protected static final int transferStateNone = 0, transferStateLoad = 1, transferStateUnload = 2;
 
     public Seq<Position> commandQueue = new Seq<>(5);
     public @Nullable Vec2 targetPos;
+    public @Nullable Building targetBuild;
     public @Nullable Teamc attackTarget;
     /** Group of units that were all commanded to reach the same point. */
     public @Nullable UnitGroup group;
@@ -227,14 +228,14 @@ public class CommandAI extends AIController{
             }
         }
 
-        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.type.allowedInPayloads && unit.buildOn() != null &&
-            (targetPos == null || (world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y) == unit.buildOn()))){
-
-            var build = unit.buildOn();
-            tmpPayload.unit = unit;
-            if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
-                Call.unitEnteredPayload(unit, build);
-                return; //no use updating after this, the unit is gone!
+        if(!net.client() && command == UnitCommand.enterPayloadCommand && unit.type.allowedInPayloads && (targetPos == null ? unit.buildOn() != null : targetBuild != null)){
+            var build = targetPos == null ? unit.buildOn() : targetBuild;
+            if(build.canControlSelect(unit)){
+                tmpPayload.unit = unit;
+                if(build.team == unit.team && build.acceptPayload(build, tmpPayload)){
+                    Call.unitEnteredPayload(unit, build);
+                    return; //no use updating after this, the unit is gone!
+                }
             }
         }
 
@@ -275,20 +276,31 @@ public class CommandAI extends AIController{
 
         if(targetPos != null){
             boolean move = true, isFinalPoint = commandQueue.size == 0;
-            vecOut.set(targetPos);
-            vecMovePos.set(targetPos);
+            //actual final point that it needs to go to
+            currentDestination.set(targetPos);
+            targetBuild = world.buildWorld(targetPos.x, targetPos.y);
+            if(unit.isGrounded() && targetBuild != null && targetBuild.tile.solid() && targetBuild.block.acceptsUnitPayloads && unit.type.pathCostId != ControlPathfinder.costIdLegs && !ramming){
+                Tile best = targetBuild.findClosestEdge(unit, Tile::solid);
+                if(best != null){
+                    currentDestination.set(best);
+                }
+            }
+            //target straight-line point it is currently moving to; can include pathfinding sub-waypoints
+            moveTarget.set(currentDestination);
+            //destination + formation offset
+            offsetedDestination.set(currentDestination);
 
             //the enter payload command requires an exact position
             if(group != null && group.valid && groupIndex < group.units.size && command != UnitCommand.enterPayloadCommand){
-                vecMovePos.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
+                offsetedDestination.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
             }
 
             Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
 
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
-                (command == UnitCommand.enterPayloadCommand && unit.within(targetPos, 4f) || (targetBuild != null && !unit.type.circleTarget && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
-                (command == UnitCommand.loopPayloadCommand && unit.within(vecMovePos, 10f))
+                (command == UnitCommand.enterPayloadCommand && unit.within(currentDestination, 4f) || (targetBuild != null && !unit.type.circleTarget && unit.within(targetBuild, targetBuild.block.size * tilesize/2f * 0.9f))) ||
+                (command == UnitCommand.loopPayloadCommand && unit.within(offsetedDestination, 10f))
             ){
                 move = false;
             }
@@ -327,27 +339,27 @@ public class CommandAI extends AIController{
                 //TODO maybe stop moving too?
                 if(withinAttackRange){
                     move = true;
-                    vecOut.set(vecMovePos);
+                    moveTarget.set(offsetedDestination);
                 }else{
-                    var result = controlPath.getPathPosition(unit, vecMovePos, targetPos);
+                    var result = controlPath.getPathPosition(unit, offsetedDestination, currentDestination);
 
                     unreachable = result.unreachable;
                     move &= result.move && (!blockingUnit || timeSpentBlocked > maxBlockTime);
-                    if(result.move) vecOut.set(result.dest);
+                    if(result.move) moveTarget.set(result.dest);
 
                     //do not wiggle in place
-                    if(unit.type.naval && result.next != null && !unit.canPass(result.next.x, result.next.y) && move && unit.tileOn() == world.tileWorld(vecOut.x, vecOut.y)){
+                    if(unit.type.naval && result.next != null && !unit.canPass(result.next.x, result.next.y) && move && unit.tileOn() == world.tileWorld(moveTarget.x, moveTarget.y)){
                         move = false;
                     }
                 }
 
                 //rare case where unit must be perfectly aligned (happens with 1-tile gaps)
-                alwaysArrive = vecOut.epsilonEquals(unit.tileX() * tilesize, unit.tileY() * tilesize);
+                alwaysArrive = moveTarget.epsilonEquals(unit.tileX() * tilesize, unit.tileY() * tilesize);
                 //we've reached the final point if the returned coordinate is equal to the supplied input
-                isFinalPoint &= vecMovePos.epsilonEquals(vecOut, 4.1f);
+                isFinalPoint &= offsetedDestination.epsilonEquals(moveTarget, 4.1f);
 
                 //if the path is invalid, stop trying and record the end as unreachable
-                if(unit.team.isAI() && (unreachable || unit.isPathImpassable(World.toTile(vecMovePos.x), World.toTile(vecMovePos.y)))){
+                if(unit.team.isAI() && (unreachable || unit.isPathImpassable(World.toTile(offsetedDestination.x), World.toTile(offsetedDestination.y)))){
                     if(attackTarget instanceof Building build){
                         unreachableBuildings.addUnique(build.pos());
                     }
@@ -356,7 +368,7 @@ public class CommandAI extends AIController{
                     return;
                 }
             }else{
-                vecOut.set(vecMovePos);
+                moveTarget.set(offsetedDestination);
             }
 
             if(command == UnitCommand.loopPayloadCommand){
@@ -368,7 +380,7 @@ public class CommandAI extends AIController{
                     target = attackTarget;
                     circleAttack(unit.type.circleTargetRadius);
                 }else{
-                    moveTo(vecOut,
+                    moveTo(moveTarget,
                     withinAttackRange ? engageRange :
                     unit.isGrounded() ? 0f :
                     attackTarget != null && !ramming ? engageRange : 0f,
@@ -382,20 +394,20 @@ public class CommandAI extends AIController{
             }
 
             if(unit.isFlying() && move && !(unit.type.circleTarget && !unit.type.omniMovement) && (attackTarget == null || !unit.within(attackTarget, unit.type.range))){
-                unit.lookAt(vecMovePos);
+                unit.lookAt(offsetedDestination);
             }else{
                 faceTarget();
             }
 
             //reached destination, end pathfinding
-            if(attackTarget == null && (unit.within(vecMovePos, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f)) ||
+            if(attackTarget == null && (unit.within(offsetedDestination, command.exactArrival && commandQueue.size == 0 ? 1f : Math.max(5f, unit.hitSize / 2f)) ||
                 //for circling units, it doesn't need to reach the exact waypoint.
-                (!unit.type.omniMovement && unit.type.flying && !unit.type.rotateMoveFirst && !command.exactArrival && Angles.angleDist(unit.angleTo(vecMovePos), unit.rotation) > 60f &&
-                    unit.within(vecMovePos, Math.min(50f, 360f / unit.type.rotateSpeed * unit.type.speed / (Mathf.pi * 2f)))))){
+                (!unit.type.omniMovement && unit.type.flying && !unit.type.rotateMoveFirst && !command.exactArrival && Angles.angleDist(unit.angleTo(offsetedDestination), unit.rotation) > 60f &&
+                    unit.within(offsetedDestination, Math.min(50f, 360f / unit.type.rotateSpeed * unit.type.speed / (Mathf.pi * 2f)))))){
                 finishPath();
             }
 
-            if(stopWhenInRange && targetPos != null && unit.within(vecMovePos, engageRange * 0.9f)){
+            if(stopWhenInRange && targetPos != null && unit.within(offsetedDestination, engageRange * 0.9f)){
                 finishPath();
                 stopWhenInRange = false;
             }
@@ -517,7 +529,7 @@ public class CommandAI extends AIController{
 
     @Override
     public void hit(Bullet bullet){
-        if(unit.team.isAI() && 
+        if(unit.team.isAI() &&
            //excluding bullets
            (!(bullet.owner instanceof Bullet) && bullet.owner instanceof Teamc teamc) && teamc.team() != unit.team && attackTarget == null &&
             //can only counter-attack every few seconds to prevent rapidly changing targets

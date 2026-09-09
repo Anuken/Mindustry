@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
@@ -120,6 +121,7 @@ public class GenericCrafter extends Block{
         if(outputItems == null && outputItem != null){
             outputItems = new ItemStack[]{outputItem};
         }
+
         if(outputLiquids == null && outputLiquid != null){
             outputLiquids = new LiquidStack[]{outputLiquid};
         }
@@ -139,9 +141,8 @@ public class GenericCrafter extends Block{
     public void afterPatch(){
         super.afterPatch();
 
-        outputsLiquid = outputLiquids != null;
-
         if(outputItems != null) hasItems = true;
+        outputsLiquid = outputLiquids != null;
         if(outputLiquids != null) hasLiquids = true;
     }
 
@@ -187,6 +188,7 @@ public class GenericCrafter extends Block{
         public float progress;
         public float totalProgress;
         public float warmup;
+        public @Nullable float[] outputAccumulator = outputItems != null && outputItems.length > 0 ? new float[outputItems.length] : null;
 
         @Override
         public void draw(){
@@ -203,7 +205,7 @@ public class GenericCrafter extends Block{
         public boolean shouldConsume(){
             if(outputItems != null){
                 for(var output : outputItems){
-                    if(items.get(output.item) + output.amount > itemCapacity){
+                    if(items.get(output.item) + scaleOutput(output.amount) > itemCapacity){
                         return false;
                     }
                 }
@@ -274,7 +276,7 @@ public class GenericCrafter extends Block{
             if(outputLiquids != null){
                 max = 0f;
                 for(var s : outputLiquids){
-                    float value = (liquidCapacity - liquids.get(s.liquid)) / (s.amount * edelta());
+                    float value = (liquidCapacity - liquids.get(s.liquid)) / (scaleOutput(s.amount) * edelta());
                     scaling = Math.min(scaling, value);
                     max = Math.max(max, value);
                 }
@@ -298,12 +300,27 @@ public class GenericCrafter extends Block{
             return totalProgress;
         }
 
+        /** Allows scaling the crafter's output dynamically. */
+        public float scaleOutput(float amount){
+            return amount;
+        }
+
         public void craft(){
             consume();
 
             if(outputItems != null){
-                for(var output : outputItems){
-                    for(int i = 0; i < output.amount; i++){
+                //instantiated here instead of created() because of outputItems runtime changes
+                if(outputAccumulator == null || outputAccumulator.length != outputItems.length){
+                    outputAccumulator = new float[outputItems.length];
+                }
+                for(int i = 0; i < outputItems.length; i++){
+                    ItemStack output = outputItems[i];
+
+                    outputAccumulator[i] += scaleOutput(output.amount);
+                    int floored = Mathf.floor(outputAccumulator[i]);
+                    outputAccumulator[i] -= floored;
+
+                    for(int j = 0; j < floored; j++){
                         offload(output.item);
                     }
                 }

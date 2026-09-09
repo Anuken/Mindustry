@@ -106,10 +106,11 @@ public class MapIO{
                 }
             };
 
+            //version 12 has content patches here, version 11 has them after the content header
             if(ver.version >= 12) ver.skipChunk(stream);
             ver.readRegion("content", stream, counter, MapIO::readPreviewContentHeader);
             if(ver.version == 11) ver.skipChunk(stream);
-            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext(){
+            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new SaveReadState(new WorldContext(){
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
                 @Override public void begin(){
@@ -149,11 +150,8 @@ public class MapIO{
 
                 @Override
                 public Tile create(int x, int y, int floorID, int overlayID, int wallID){
-                    if(overlayID != 0){
-                        floors.set(x, floors.height - 1 - y, colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict));
-                    }else{
-                        floors.set(x, floors.height - 1 - y, colorFor(Blocks.air, content.block(floorID), Blocks.air, Team.derelict));
-                    }
+                    floors.set(x, floors.height - 1 - y, colorFor(Blocks.air, content.block(floorID), content.block(overlayID), Team.derelict));
+
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;
                     }
@@ -179,7 +177,9 @@ public class MapIO{
                         }
                     }
                 }
-            }));
+            }){{
+                preview = true;
+            }}));
 
             floors.draw(walls, true);
             walls.dispose();
@@ -232,7 +232,8 @@ public class MapIO{
         if(wall.synthetic()){
             return team.color.rgba();
         }
-        return (((Floor)overlay).wallOre ? overlay.mapColor : wall.solid ? wall.mapColor : !overlay.useColor ? floor.mapColor : overlay.mapColor).rgba();
+        return (((Floor)overlay).wallOre ? overlay.mapColor.rgba() : wall.solid ? wall.mapColor.rgba() : !overlay.useColor ? floor.mapColor.rgba() :
+            (!(overlay instanceof OverlayFloor) ? Pixmap.blend((overlay.mapColor.rgba() & ~0xff) | 128, floor.mapColor.rgba()) : overlay.mapColor.rgba()));
     }
 
     public static Pixmap writeImage(Tiles tiles){

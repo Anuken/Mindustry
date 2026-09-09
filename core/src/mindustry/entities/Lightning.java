@@ -47,7 +47,7 @@ public class Lightning{
         bhit = false;
 
         for(int i = 0; i < length / 2; i++){
-            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, hitter);
+            hitCreate.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, null);
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f)));
 
             if(lines.size > 1){
@@ -76,6 +76,10 @@ public class Lightning{
                         entities.add(u);
                     }
                 });
+            }
+
+            if(hitter != null && hitter.type.pierceCap > 0 && hit.size >= hitter.type.pierceCap){
+                break;
             }
 
             Unit furthest = Geometry.findFurthest(x, y, entities);
