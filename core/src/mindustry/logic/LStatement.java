@@ -163,24 +163,27 @@ public abstract class LStatement{
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
-        Table sub = new Table();
-        sub.setColor(table.color);
-
-        table.add(sub);
-        sub.add(desc).padLeft(10).left().self(this::param);
-        return field(sub, value, setter).width(180f).padRight(10).left();
+        return fields(table, desc, LCanvas.useRows(), value, setter);
     }
 
-    /** Puts the text and field in one table, taking up one cell. */
-    protected Cell<TextField> fieldst(Table table, String desc, String value, Cons<String> setter){
-        Cell[] result = {null};
-        table.table(t -> {
-            t.setColor(table.color);
-            t.add(desc).padLeft(10).left().self(this::param);
-            result[0] = field(t, value, setter).width(180f).padRight(10).left();
-        });
+    protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
+        return field(table, value, setter).width(180f);
+    }
 
-        return result[0];
+    protected Cell<TextField> fields(Table table, String desc, boolean nameAfterField, String value, Cons<String> setter){
+        Table sub = new Table();
+        sub.setColor(table.color);
+        table.add(sub);
+        float width = 180f;
+
+        if(nameAfterField){
+            var result = field(sub, value, setter).width(width).padLeft(8f).padRight(4f).left();
+            sub.add(desc).padRight(5f).self(this::param);
+            return result;
+        }else{
+            sub.add(desc).padLeft(10).self(this::param);
+            return field(sub, value, setter).width(width).padRight(10).left();
+        }
     }
 
     /** Adds color edit button */
@@ -198,10 +201,6 @@ public abstract class LStatement{
                 ui.picker.show(current, setter);
             });
         }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
-    }
-
-    protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
-        return field(table, value, setter).width(85f);
     }
 
     protected void row(Table table){
