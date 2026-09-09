@@ -4411,7 +4411,7 @@ public class Blocks{
                 pierceCap = 4;
                 pierce = true;
                 pierceBuilding = true;
-                ricochetAngle = 20f;
+                maxRicochetangle = 20f;
                 ricochetSpeed = 2f;
                 hitColor = backColor = trailColor = Pal.tungstenShot;
                 frontColor = Color.white;

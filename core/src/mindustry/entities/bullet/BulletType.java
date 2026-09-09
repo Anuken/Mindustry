@@ -327,7 +327,7 @@ public class BulletType extends Content implements Cloneable{
     public float followAimSpeed = 0f;
 
     /** Maximum half angle at which this bullet will retarget (change angle) towards its next target. Only effective if pierce = true. */
-    public float ricochetAngle = -1f;
+    public float maxRicochetangle = -1f;
     /** Multiplier on bullet speed upon ricocheting. Affects lifetime proportionally. Does not stack. */
     public float ricochetSpeed = 1f;
     /** Multiplier on bullet lifetime upon ricocheting. Does not stack. */
@@ -497,7 +497,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         handlePierce(b, initialHealth, x, y);
-        if(ricochetAngle > 0f) updateRicochet(b);
+        if(maxRicochetangle > 0f) updateRicochet(b);
     }
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
@@ -546,7 +546,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         handlePierce(b, health, entity.x(), entity.y());
-        if(ricochetAngle > 0f) updateRicochet(b);
+        if(maxRicochetangle > 0f) updateRicochet(b);
     }
 
     public void handlePierce(Bullet b, float initialHealth, float x, float y){
@@ -795,15 +795,15 @@ public class BulletType extends Content implements Cloneable{
     public void updateRicochet(Bullet b){
         float angle = b.rotation();
         Teamc target = Units.closestTarget(b.team, b.x, b.y, ricochetRange > 0f ? ricochetRange : (1f - (b.time / b.lifetime)) * range + 8f,
-            e -> !b.hasCollided(e.id()) && Angles.within(angle, Angles.angle(b.x, b.y, e.x, e.y), ricochetAngle),
-            t -> !b.hasCollided(t.id) && Angles.within(angle, Angles.angle(b.x, b.y, t.x, t.y), ricochetAngle));
+            e -> !b.hasCollided(e.id()) && Angles.within(angle, Angles.angle(b.x, b.y, e.x, e.y), maxRicochetangle),
+            t -> !b.hasCollided(t.id) && Angles.within(angle, Angles.angle(b.x, b.y, t.x, t.y), maxRicochetangle));
 
         if(target != null){
         float tx = target.x(), ty = target.y();
 
             if(predictRicochet && speed >= 0.01f && target instanceof Hitboxc h){
                 Vec2 predict = Predict.intercept(b, target, h.deltaX(), h.deltaY(), speed);
-                if(Angles.within(angle, Angles.angle(b.x, b.y, predict.x, predict.y), ricochetAngle)){
+                if(Angles.within(angle, Angles.angle(b.x, b.y, predict.x, predict.y), maxRicochetangle)){
                     tx = predict.x;
                     ty = predict.y;
                 }

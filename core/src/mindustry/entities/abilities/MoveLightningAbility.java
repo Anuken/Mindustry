@@ -52,8 +52,7 @@ public class MoveLightningAbility extends Ability{
 
     protected float side = 1f;
 
-    public MoveLightningAbility(){
-    }
+    public MoveLightningAbility(){}
 
     public MoveLightningAbility(float damage, int length, float chance, float y, float minSpeed, float maxSpeed, Color color, String heatRegion){
         this.damage = damage;

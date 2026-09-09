@@ -725,9 +725,9 @@ public class StatValues{
                         else sep(bt, Core.bundle.format("bullet.stronghoming"));
                     }
 
-                    if(type.ricochetAngle > 0f){
-                        if(type.ricochetAngle < 30f) sep(bt, Core.bundle.format("bullet.weakricochet"));
-                        else if(type.ricochetAngle < 90f) sep(bt, Core.bundle.format("bullet.mediumricochet"));
+                    if(type.maxRicochetangle > 0f){
+                        if(type.maxRicochetangle < 30f) sep(bt, Core.bundle.format("bullet.weakricochet"));
+                        else if(type.maxRicochetangle < 90f) sep(bt, Core.bundle.format("bullet.mediumricochet"));
                         else sep(bt, Core.bundle.format("bullet.strongricochet"));
                     }
 
