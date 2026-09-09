@@ -1009,7 +1009,7 @@ public class Fx{
             float angle = (360f / shards) * i * rand.random(0.9f, 1f) + e.fin() * 60f;
             float dist = e.finpow() * 100f;
             float width = rand.random(0.5f, 1f) * 6f;
-            float length = 3f + e.fout() * rand.random(0.5f, 1f) * 32f; 
+            float length = 3f + e.fout() * rand.random(0.5f, 1f) * 32f;
             float tx = e.x + Mathf.cosDeg(angle) * dist;
             float ty = e.y + Mathf.sinDeg(angle) * dist;
 
@@ -1830,11 +1830,19 @@ public class Fx{
     }).layer(Layer.bullet - 1f),
 
     corrosionVapor = new Effect(50f, e -> {
-        color(e.color);
-        alpha(Interp.pow2Out.apply(e.fslope()) * 0.5f);
+        if(!(e.data instanceof Unit unit)) return;
+        float scale = unit.type.hitSize;
 
-        randLenVectors(e.id, 2, 8f + e.finpow() * 3f, (x, y) -> {
-            Fill.circle(e.x + x, e.y + y, 3f);
+        rand.setSeed(e.id);
+        Color blend = rand.random(1f) > 0.6f ? Color.valueOf("94c487") : (rand.random(1f) < 0.2f ? Color.white : e.color);
+        color(blend, Color.white, Interp.pow2In.apply(e.fin()) * rand.random(0.15f, 0.35f));
+        alpha(Interp.pow2Out.apply(e.fslope()) * rand.random(0.4f, 0.65f));
+
+        float length = 4f + scale * 0.5f + e.finpow() * (3f + rand.range(1.5f));
+        float radMult = Interp.pow2Out.apply(e.fslope()) * 0.8f * Mathf.clamp(scale / 14f, 0.8f, 1.4f);
+        randLenVectors(e.id, Mathf.clamp(Mathf.round(scale / 8f), 2, 4), length, (x, y) -> {
+            float radius = (2.6f + Mathf.absin(x + y + rand.range(2f), 6f, 0.8f)) * radMult;
+            Fill.circle(e.x + x, e.y + e.fin() * (2f + rand.range(1.5f)) + y, Mathf.clamp(radius, 2.2f, 3.8f));
         });
     }),
 
@@ -3412,4 +3420,4 @@ public class Fx{
 
         Draw.reset();
     });
-}
+    }

@@ -33,6 +33,8 @@ public class MoveLightningAbility extends Ability{
     public float x = 0f;
     /** Spread angle for the lightning */
     public float angleCone = 0f;
+    /** Fixed rotation offset for the lightning, relative to unit rotation. */
+    public float angleOffset = 0f;
     /** Whether the spawn side alternates */
     public boolean alternate = true;
     /** Jittering heat sprite like the shield on v5 Javelin */
@@ -41,6 +43,8 @@ public class MoveLightningAbility extends Ability{
     public @Nullable BulletType bullet;
     /** Bullet angle parameters */
     public float bulletAngle = 0f, bulletSpread = 0f;
+    /** Bullet spawned at each lightning node.  */
+    public @Nullable BulletType lightningType = null;
 
     public Effect shootEffect = Fx.sparkShoot;
     public boolean parentizeEffects;
@@ -48,7 +52,8 @@ public class MoveLightningAbility extends Ability{
 
     protected float side = 1f;
 
-    public MoveLightningAbility(){}
+    public MoveLightningAbility(){
+    }
 
     public MoveLightningAbility(float damage, int length, float chance, float y, float minSpeed, float maxSpeed, Color color, String heatRegion){
         this.damage = damage;
@@ -89,7 +94,8 @@ public class MoveLightningAbility extends Ability{
             shootSound.at(x, y);
 
             if(length > 0){
-                Lightning.create(unit.team, color, damage, x + unit.vel.x, y + unit.vel.y, unit.rotation + Mathf.range(angleCone/2), length + Mathf.random(lengthRand));
+                Lightning.create(lightningType == null ? Bullets.damageLightning : lightningType, unit.team, color, damage * state.rules.unitDamage(unit.team),
+                x + unit.vel.x, y + unit.vel.y, unit.rotation + Mathf.range(angleCone / 2) + angleOffset, length + Mathf.random(lengthRand));
             }
 
             if(bullet != null){
