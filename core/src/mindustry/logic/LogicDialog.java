@@ -45,16 +45,16 @@ public class LogicDialog extends BaseDialog{
 
         shown(this::setup);
         shown(() -> {
-            wasRows = LCanvas.useRows();
+            wasRows = LCanvas.isCompact();
             wasPortrait = Core.graphics.isPortrait();
         });
         hidden(() -> consumer.get(canvas.save()));
         onResize(() -> {
-            if(wasRows != LCanvas.useRows() || wasPortrait != Core.graphics.isPortrait()){
+            if(wasRows != LCanvas.isCompact() || wasPortrait != Core.graphics.isPortrait()){
                 setup();
                 canvas.rebuild();
                 wasPortrait = Core.graphics.isPortrait();
-                wasRows = LCanvas.useRows();
+                wasRows = LCanvas.isCompact();
             }
         });
 

@@ -65,7 +65,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(bundle("read"));
+            table.add(bundle("read")).padLeft(3f);
 
             field(table, output, str -> output = str);
 
@@ -95,7 +95,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(bundle("write"));
+            table.add(bundle("write")).padLeft(3f);
 
             field(table, input, str -> input = str);
 
@@ -154,10 +154,10 @@ public class LStatements{
                     }
 
                     rebuild(table);
-                }, 2, cell -> cell.size(100, 50)));
-            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+                }, 2, cell -> cell.size(120, 50)));
+            }, Styles.logict, () -> {}).size(120, 40).color(table.color).left().padLeft(2);
 
-            if(useRows()) table.add().width(200f);
+            if(isCompact()) table.add().width(200f);
 
             switch(type){
                 case clear -> {
@@ -169,11 +169,10 @@ public class LStatements{
                     fields(table, "r", x, v -> x = v);
                     fields(table, "g", y, v -> y = v);
                     fields(table, "b", p1, v -> p1 = v);
-                    row(table);
                     fields(table, "a", p2, v -> p2 = v);
                 }
                 case col -> {
-                    fields(table, bundle("color"), x, v -> x = v).width(144f);
+                    fields(table, "color", x, v -> x = v).width(144f);
                     col(table, x, res -> {
                         x = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
                         build(table);
@@ -186,52 +185,42 @@ public class LStatements{
                 case line -> {
                     fields(table, "x", x, v -> x = v);
                     fields(table, "y", y, v -> y = v);
-                    row(table);
                     fields(table, "x2", p1, v -> p1 = v);
                     fields(table, "y2", p2, v -> p2 = v);
                 }
                 case rect, lineRect -> {
                     fields(table, "x", x, v -> x = v);
                     fields(table, "y", y, v -> y = v);
-                    row(table);
-                    fields(table, bundle("width"), p1, v -> p1 = v);
-                    fields(table, bundle("height"), p2, v -> p2 = v);
+                    fields(table, "width", p1, v -> p1 = v);
+                    fields(table, "height", p2, v -> p2 = v);
                 }
                 case poly, linePoly -> {
                     fields(table, "x", x, v -> x = v);
                     fields(table, "y", y, v -> y = v);
-                    row(table);
-                    fields(table, bundle("sides"), p1, v -> p1 = v);
-                    fields(table, bundle("radius"), p2, v -> p2 = v);
-                    row(table);
-                    fields(table, bundle("rotation"), p3, v -> p3 = v);
+                    fields(table, "sides", p1, v -> p1 = v);
+                    fields(table, "radius", p2, v -> p2 = v);
+                    fields(table, "rotation", p3, v -> p3 = v);
                 }
                 case triangle -> {
                     fields(table, "x", x, v -> x = v);
                     fields(table, "y", y, v -> y = v);
-                    row(table);
                     fields(table, "x2", p1, v -> p1 = v);
                     fields(table, "y2", p2, v -> p2 = v);
-                    row(table);
                     fields(table, "x3", p3, v -> p3 = v);
                     fields(table, "y3", p4, v -> p4 = v);
                 }
                 case image -> {
                     fields(table, "x", x, v -> x = v);
                     fields(table, "y", y, v -> y = v);
-                    row(table);
-                    fields(table, bundle("image"), p1, v -> p1 = v);
-                    fields(table, bundle("size"), p2, v -> p2 = v);
-                    row(table);
-                    fields(table, bundle("rotation"), p3, v -> p3 = v);
+                    fields(table, "image", p1, v -> p1 = v);
+                    fields(table, "size", p2, v -> p2 = v);
+                    fields(table, "rotation", p3, v -> p3 = v);
                 }
                 case print -> {
                     fields(table, "x", x, v -> x = v);
                     fields(table, "y", y, v -> y = v);
 
-                    row(table);
-
-                    fields(table, bundle("align"), p1, v -> p1 = v).width(170f);
+                    fields(table, "align", p1, v -> p1 = v).width(170f);
                     fieldAlignSelect(table, () -> p1, v -> {
                         p1 = v;
                         rebuild(table);
@@ -242,7 +231,7 @@ public class LStatements{
                     fields(table, "y", y, v -> y = v);
                 }
                 case rotate -> {
-                    fields(table, bundle("degrees"), p1, v -> p1 = v);
+                    fields(table, "degrees", p1, v -> p1 = v);
                 }
             }
         }
@@ -297,7 +286,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(bundle("char"));
+            table.add(bundle("char")).padLeft(3f);
             TextField field = field(table, value, str -> value = str).get();
             table.button(b -> {
                 b.image(Icon.pencilSmall);
@@ -358,7 +347,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(bundle("to"));
+            table.add(bundle("to")).padLeft(3f);
             field(table, target, str -> target = str);
         }
 
@@ -435,15 +424,15 @@ public class LStatements{
 
             table.left();
 
-            table.add(bundle("set"));
+            table.add(bundle("set")).padLeft(3f);
 
             table.button(b -> {
-                b.label(() -> bundle(type));
+                b.label(() -> bundle(type)).labelAlign(Align.center).grow().wrap();
                 b.clicked(() -> showSelect(b, LAccess.controls, type, t -> {
                     type = t;
                     rebuild(table);
-                }, 2, cell -> cell.size(100, 50)));
-            }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+                }, 2, cell -> cell.size(110, 50)));
+            }, Styles.logict, () -> {}).size(110, 40).color(table.color).left().padLeft(2);
 
             table.add(bundle("of")).self(this::param);
 
@@ -454,7 +443,7 @@ public class LStatements{
             int c = 0;
             for(int i = 0; i < type.params.length; i++){
 
-                fields(table, bundle(type.params[i]), i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
+                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
 
             }
         }
@@ -480,43 +469,43 @@ public class LStatements{
         public void build(Table table){
             table.defaults().left();
 
+            fields(table, output, v -> output = v);
+
+            table.add(" = ");
+
             if(buildFrom()){
-                table.add(bundle("from")).self(this::param);
-
-                fields(table, radar, v -> radar = v);
-
+                fields(table, "from", radar, v -> radar = v);
             }
+
+            Table inner = new Table();
+            inner.setColor(table.color);
+            table.add(inner).padLeft(2f);
 
             for(int i = 0; i < 3; i++){
                 int fi = i;
                 Prov<RadarTarget> get = () -> (fi == 0 ? target1 : fi == 1 ? target2 : target3);
 
-                table.add(bundle(i == 0 ? "target" : "and")).self(this::param);
-
-                table.button(b -> {
+                inner.button(b -> {
                     b.label(() -> bundle(get.get()));
                     b.clicked(() -> showSelect(b, RadarTarget.all, get.get(), t -> {
                         if(fi == 0) target1 = t; else if(fi == 1) target2 = t; else target3 = t;
-                    }, 2, cell -> cell.size(100, 50)));
-                }, Styles.logict, () -> {}).size(90, 40).color(table.color).left().padLeft(2);
+                    }, 2, cell -> cell.size(110, 50)));
+                }, Styles.logict, () -> {}).size(110, 40).color(table.color).left();
             }
 
-            table.add(bundle("order")).self(this::param);
+            fields(table, "order", sortOrder, v -> sortOrder = v);
 
-            fields(table, sortOrder, v -> sortOrder = v);
+            table.table(t -> {
+                t.setColor(table.color);
+                if(!isCompact()) t.add(bundle("sort")).padRight(4f).self(this::param);
 
-            table.add(bundle("sort")).self(this::param);
+                t.button(b -> {
+                    b.label(() -> bundle(sort));
+                    b.clicked(() -> showSelect(b, RadarSort.all, sort, sr -> sort = sr, 2, cell -> cell.size(100, 50)));
+                }, Styles.logict, () -> {}).size(180, 40).color(table.color);
 
-            table.button(b -> {
-                b.label(() -> bundle(sort));
-                b.clicked(() -> showSelect(b, RadarSort.all, sort, t -> {
-                    sort = t;
-                }, 2, cell -> cell.size(100, 50)));
-            }, Styles.logict, () -> {}).size(130, 40).color(table.color).left().padLeft(2);
-
-            table.add(bundle("output")).self(this::param).padLeft(2);
-
-            fields(table, output, v -> output = v);
+                if(isCompact()) t.add(bundle("sort")).padLeft(4f).self(this::param);
+            });
         }
 
         public boolean buildFrom(){
@@ -710,7 +699,7 @@ public class LStatements{
             }else{
                 //"function"-type operations have the name at the left and arguments on the right
                 if(op.func){
-                    if(LCanvas.useRows()){
+                    if(LCanvas.isCompact()){
                         table.left();
                         table.table(c -> {
                             c.color.set(category().color);
@@ -774,29 +763,21 @@ public class LStatements{
             table.clearChildren();
             table.left();
 
-            table.table(t -> {
-                t.setColor(table.color);
+            Table t = table;
 
-                field(t, result, str -> result = str);
-                t.add(" = ");
-                t.add(bundle("if"));
+            field(t, result, str -> result = str);
+            t.add(" = ");
+            t.add(bundle("if"));
 
-                row(t);
+            JumpStatement.addOp(this, t, op, o -> {
+                op = o;
+                rebuild(table);
+            }, comp0, str -> comp0 = str, comp1, str -> comp1 = str);
 
-                JumpStatement.addOp(this, t, op, o -> {
-                    op = o;
-                    rebuild(table);
-                }, comp0, str -> comp0 = str, comp1, str -> comp1 = str);
-            }).left();
-
-            table.table(t -> {
-                t.setColor(table.color);
-
-                t.add(bundle("then"));
-                field(t, a, str -> a = str).width(130f);
-                t.add(bundle("else"));
-                field(t, b, str -> b = str).width(130f);
-            }).left();
+            t.add(bundle("then"));
+            field(t, a, str -> a = str).width(130f);
+            t.add(bundle("else"));
+            field(t, b, str -> b = str).width(130f);
         }
 
         @Override
@@ -1009,7 +990,7 @@ public class LStatements{
         }
 
         public static void addOp(LStatement st, Table t, ConditionOp op, Cons<ConditionOp> getter, String comp0, Cons<String> set0, String comp1, Cons<String> set2){
-            float w = !useRows() ? 180f : 140f;
+            float w = !isCompact() ? 180f : 140f;
 
             if(op != ConditionOp.always) st.field(t, comp0, set0).width(w);
 
@@ -1053,7 +1034,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(bundle("type"));
+            table.add(bundle("type")).padLeft(3f);
 
             TextField field = field(table, type, str -> type = str).get();
 
@@ -1111,12 +1092,12 @@ public class LStatements{
                 }, 2, cell -> cell.size(120, 50)));
             }, Styles.logict, () -> {}).size(180, 40).color(table.color).left().padLeft(2);
 
-            if(useRows()) table.add().width(200f);
+            if(isCompact()) table.add().width(200f);
 
             //Q: why don't you just use arrays for this?
             //A: arrays aren't as easy to serialize so the code generator doesn't handle them
             for(int i = 0; i < type.params.length; i++){
-                fields(table, bundle(type.params[i]), i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : i == 3 ? p4 : p5, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v);
+                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : i == 3 ? p4 : p5, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : i == 3 ? v -> p4 = v : v -> p5 = v);
             }
         }
 
@@ -1265,19 +1246,19 @@ public class LStatements{
                 b.clicked(() -> showSelect(b, QueryType.queryable, type, o -> {
                     type = o;
                     build(table);
-                }));
+                }, 4, c -> c.width(100f)));
             }, Styles.logict, () -> {}).size(100f, 40f).pad(4f).color(table.color);
 
-            fields(table, bundle("team"), team, str -> team = str);
+            fields(table, "team", team, str -> team = str);
 
             fields(table, "x", x, str -> x = str);
             fields(table, "y", y, str -> y = str);
 
             if(shape == QueryShape.circle){
-                fields(table, bundle("radius"), w, str -> w = str);
+                fields(table, "radius", w, str -> w = str);
             }else{
-                fields(table, bundle("width"), w, str -> w = str);
-                fields(table, bundle("height"), h, str -> h = str);
+                fields(table, "width", w, str -> w = str);
+                fields(table, "height", h, str -> h = str);
             }
         }
 
@@ -1304,21 +1285,17 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            fields(table, result, str -> result = str);
+            fields(table, " =", true, result, str -> result = str);
 
-            table.add(" = ");
-            table.add(bundle("get"));
+            table.table(t -> {
+                t.button(b -> {
+                    b.label(() -> bundle(layer));
+                    b.clicked(() -> showSelect(b, TileLayer.all, layer, o -> layer = o));
+                }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
+            });
 
-            table.button(b -> {
-                b.label(() -> bundle(layer));
-                b.clicked(() -> showSelect(b, TileLayer.all, layer, o -> layer = o));
-            }, Styles.logict, () -> {}).size(120f, 40f).pad(4f).color(table.color);
-
-            table.add(bundle("at"));
-
-            fields(table, x, str -> x = str);
-            table.add(", ");
-            fields(table, y, str -> y = str);
+            fields(table, "x", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
         }
 
         @Override
@@ -1349,7 +1326,8 @@ public class LStatements{
 
         void rebuild(Table table){
             table.clearChildren();
-            table.add(bundle("set"));
+
+            table.add(bundle("set")).padRight(4f).padLeft(6f);
 
             table.button(b -> {
                 b.label(() -> bundle(layer));
@@ -1357,24 +1335,17 @@ public class LStatements{
                     layer = o;
                     rebuild(table);
                 }));
-            }, Styles.logict, () -> {}).size(64f, 40f).pad(4f).color(table.color);
+            }, Styles.logict, () -> {}).size(100f, 40f).pad(4f).color(table.color);
 
-            table.add(bundle("at"));
+            if(isCompact()) table.add().width(200f);
 
-            fields(table, x, str -> x = str);
-            table.add(", ");
-            fields(table, y, str -> y = str);
-
-            table.add(bundle("to"));
-
-            fields(table, block, str -> block = str);
+            fields(table, "x", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
+            fields(table, "block", block, str -> block = str);
 
             if(layer == TileLayer.block){
-                table.add(bundle("team"));
-                fields(table, team, str -> team = str);
-
-                table.add(bundle("rotation"));
-                fields(table, rotation, str -> rotation = str);
+                fields(table, "team", team, str -> team = str);
+                fields(table, "rotation", rotation, str -> rotation = str);
             }
         }
 
@@ -1400,18 +1371,12 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            fields(table, "-spawn", result, str -> result = str);
-
+            fields(table, "-spawn", true, result, str -> result = str);
             fields(table, "type", type, str -> type = str);
-
             fields(table, "x", x, str -> x = str);
-
             fields(table, "y", y, str -> y = str);
-
             fields(table, "team", team, str -> team = str);
-
             fields(table, "angle", rotation, str -> rotation = str);
-
             fields(table, "effect", effect, str -> effect = str);
         }
 
@@ -1437,20 +1402,20 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            fields(table, "-bullet", result, str -> result = str);
+            fields(table, "-bullet", true, result, str -> result = str);
 
-            fields(table, bundle("from"), from, str -> from = str);
-            fields(table, bundle("index"), index, str -> index = str);
+            fields(table, "from", from, str -> from = str);
+            fields(table, "index", index, str -> index = str);
             fields(table, "x", x, str -> x = str);
             fields(table, "y", y, str -> y = str);
-            fields(table, bundle("rotation"), rotation, str -> rotation = str);
-            fields(table, bundle("team"), team, str -> team = str);
-            fields(table, bundle("owner"), owner, str -> owner = str);
-            fields(table, bundle("damage"), damage, str -> damage = str);
-            fields(table, bundle("velocityScl"), velocityScl, str -> velocityScl = str);
-            fields(table, bundle("lifeScl"), lifeScl, str -> lifeScl = str);
-            fields(table, bundle("aimX"), aimX, str -> aimX = str);
-            fields(table, bundle("aimY"), aimY, str -> aimY = str);
+            fields(table, "rotation", rotation, str -> rotation = str);
+            fields(table, "team", team, str -> team = str);
+            fields(table, "owner", owner, str -> owner = str);
+            fields(table, "damage", damage, str -> damage = str);
+            fields(table, "velocityScl", velocityScl, str -> velocityScl = str);
+            fields(table, "lifeScl", lifeScl, str -> lifeScl = str);
+            fields(table, "aimX", aimX, str -> aimX = str);
+            fields(table, "aimY", aimY, str -> aimY = str);
         }
 
         @Override
@@ -1507,16 +1472,10 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-2f).color(table.color);
 
-            table.add(bundle(clear ? "from" : "to")).left();
-
-            fields(table, unit, str -> unit = str).left();
+            fields(table, "target", unit, str -> unit = str).left();
 
             if(!clear && !isPermanent()){
-                table.add(bundle("for")).left();
-
-                fields(table, duration, str -> duration = str).left();
-
-                table.add(bundle("sec")).left();
+                fields(table, "seconds", duration, str -> duration = str).left();
             }
         }
 
@@ -1628,9 +1587,7 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(40f).padLeft(-1).color(table.color);
 
-            table.add(bundle("state"));
-
-            fields(table, state, str -> state = str);
+            fields(table, "state", state, str -> state = str);
         }
 
         @Override
@@ -1655,14 +1612,9 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(bundle("natural"));
-            fields(table, natural, str -> natural = str);
-
-            table.add("x ").visible(() -> !natural.equals("true"));
-            fields(table, x, str -> x = str).visible(() -> !natural.equals("true"));
-
-            table.add(" y ").visible(() -> !natural.equals("true"));
-            fields(table, y, str -> y = str).visible(() -> !natural.equals("true"));
+            fields(table, "natural", natural, str -> natural = str);
+            fields(table, "x", x, str -> x = str);
+            fields(table, "y", y, str -> y = str);
         }
 
         @Override
@@ -1716,7 +1668,7 @@ public class LStatements{
                         p1 = "@sharded";
                     }
 
-                    fields(table, bundle("of"), p1, s -> p1 = s);
+                    fields(table, "of", p1, s -> p1 = s);
                     table.add(" = ");
                     field(table, value, s -> value = s);
                 }
@@ -1766,7 +1718,7 @@ public class LStatements{
                 }, 2, c -> c.width(150f)));
             }, Styles.logict, () -> {}).size(160f, 40f).padLeft(2).color(table.color);
 
-            if(useRows()) table.add().width(200f);
+            if(isCompact()) table.add().width(200f);
 
             switch(type){
                 case announce, toast  -> {
@@ -1813,33 +1765,26 @@ public class LStatements{
                 }, 3, cell -> cell.size(120f, 40f)));
             }, Styles.logict, () -> {}).size(120f, 40f).padLeft(2).color(table.color);
 
+            if(isCompact()) table.add().width(200f);
+
             switch(action){
                 case active, getHud -> {
-                    table.add(bundle("result"));
-                    fields(table, p1, str -> p1 = str);
+                    fields(table, "result", p1, str -> p1 = str);
                 }
                 case pan -> {
-                    table.add(" x ");
-                    fields(table, p1, str -> p1 = str);
-                    table.add(" y ");
-                    fields(table, p2, str -> p2 = str);
-
-                    table.add(bundle("speed"));
-                    fields(table, p3, str -> p3 = str);
+                    fields(table, "x", p1, str -> p1 = str);
+                    fields(table, "y", p2, str -> p2 = str);
+                    fields(table, "speed", p3, str -> p3 = str);
                 }
                 case zoom -> {
-                    table.add(bundle("level"));
-                    fields(table, p1, str -> p1 = str);
+                    fields(table, "level", p1, str -> p1 = str);
                 }
                 case shake -> {
-                    table.add(bundle("amount"));
-                    fields(table, p1, str -> p1 = str);
-                    table.add(bundle("duration"));
-                    fields(table, p2, str -> p2 = str);
+                    fields(table, "amount", p1, str -> p1 = str);
+                    fields(table, "duration", p2, str -> p2 = str);
                 }
                 case setHud -> {
-                    table.add(bundle("shown"));
-                    fields(table, p1, str -> p1 = str);
+                    fields(table, "shown", p1, str -> p1 = str);
                 }
             }
         }
@@ -1876,28 +1821,33 @@ public class LStatements{
                 }));
             }, Styles.logict, () -> {}).size(150f, 40f).margin(5f).pad(4f).color(table.color).colspan(2);
 
+            if(isCompact()) table.add().width(200f);
+
             EffectEntry entry = LogicFx.get(type);
 
             fields(table, "x", x, str -> x = str);
             fields(table, "y", y, str -> y = str);
             if(entry != null){
                 if(entry.color){
-                    fields(table, bundle("color"), color, str -> color = str).width(120f);
-
-                    col(table, color, res -> {
-                        color = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
-                        build(table);
-                    });
+                    fields(table, "color", color, str -> color = str).width(120f);
+                    colpick(table);
                 }
 
                 if(entry.size || entry.rotate){
-                    fields(table, bundle(entry.size ? "size" : "rotation"), sizerot, str -> sizerot = str);
+                    fields(table, entry.size ? "size" : "rotation", sizerot, str -> sizerot = str);
                 }
 
                 if(entry.data != null){
-                    fields(table, bundle("data"), data, str -> data = str);
+                    fields(table, "data", data, str -> data = str);
                 }
             }
+        }
+
+        void colpick(Table table){
+            col(table, color, res -> {
+                color = "%" + res.toString().substring(0, res.a >= 1f ? 6 : 8);
+                build(table);
+            });
         }
 
         @Override
@@ -1922,15 +1872,15 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            fields(table, bundle("team"), team, str -> team = str);
+            fields(table, "team", team, str -> team = str);
             fields(table, "x", x, str -> x = str);
             fields(table, "y", y, str -> y = str);
-            fields(table, bundle("radius"), radius, str -> radius = str);
-            fields(table, bundle("damage"), damage, str -> damage = str);
-            fields(table, bundle("air"), air, str -> air = str);
-            fields(table, bundle("ground"), ground, str -> ground = str);
-            fields(table, bundle("pierce"), pierce, str -> pierce = str);
-            fields(table, bundle("effect"), effect, str -> effect = str);
+            fields(table, "radius", radius, str -> radius = str);
+            fields(table, "damage", damage, str -> damage = str);
+            fields(table, "air", air, str -> air = str);
+            fields(table, "ground", ground, str -> ground = str);
+            fields(table, "pierce", pierce, str -> pierce = str);
+            fields(table, "effect", effect, str -> effect = str);
         }
 
         @Override
@@ -1994,7 +1944,7 @@ public class LStatements{
                 }, 2, c -> c.width(150f)));
             }, Styles.logict, () -> {}).size(160f, 40f).margin(5f).pad(4f).color(table.color);
 
-            fields(table, bundle("team"), team, s -> team = s);
+            fields(table, "team", team, s -> team = s);
 
             if(type != FetchType.coreCount && type != FetchType.playerCount && type != FetchType.unitCount && type != FetchType.buildCount){
                 table.add(" # ");
@@ -2003,11 +1953,11 @@ public class LStatements{
             }
 
             if(type == FetchType.buildCount || type == FetchType.build){
-                fields(table, bundle("block"), extra, i -> extra = i);
+                fields(table, "block", extra, i -> extra = i);
             }
 
             if(type == FetchType.unitCount || type == FetchType.unit){
-                fields(table, bundle("unit"), extra, i -> extra = i);
+                fields(table, "unit", extra, i -> extra = i);
             }
         }
 
@@ -2095,7 +2045,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            float width = LCanvas.useRows() ? 100f : 190f;
+            float width = LCanvas.isCompact() ? 100f : 190f;
 
             fields(table, result, str -> result = str).width(width);
 
@@ -2127,9 +2077,9 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            float width = LCanvas.useRows() ? 100f : 190f;
+            float width = LCanvas.isCompact() ? 100f : 190f;
 
-            fields(table, bundle(flag), str -> flag = str).width(width);
+            fields(table, flag, str -> flag = str).width(width);
 
             table.add(" = ");
 
@@ -2161,7 +2111,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            table.add(bundle("set"));
+            table.add(bundle("set")).padLeft(6f);
 
             tfield = field(table, type, str -> type = str).padRight(0f).get();
 
@@ -2244,11 +2194,11 @@ public class LStatements{
 
             table.add(bundle("of")).self(this::param);
 
-            field(table, of, str -> of = str).colspan(2);
+            field(table, of, str -> of = str).width(isCompact() ? 170f : 180f);
 
             table.add(bundle("to"));
 
-            field(table, value, str -> value = str).colspan(2);
+            field(table, value, str -> value = str).width(isCompact() ? 170f : 180f);
         }
 
         private void stype(String text){
@@ -2487,11 +2437,11 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            float width = LCanvas.useRows() ? 100f : 190f;
+            float width = LCanvas.isCompact() ? 100f : 190f;
 
-            fields(table, bundle("music"), name, str -> name = str).width(width);
+            fields(table, "music", name, str -> name = str).width(width);
 
-            fields(table, bundle("interrupt"), interrupt, str -> interrupt = str).width(width);
+            fields(table, "interrupt", interrupt, str -> interrupt = str).width(width);
         }
 
         @Override
@@ -2523,7 +2473,7 @@ public class LStatements{
         void rebuild(Table table){
             table.clearChildren();
 
-            table.add(bundle("set"));
+            table.add(bundle("set")).padLeft(6f);
 
             table.button(b -> {
                 b.label(() -> bundle(type));
@@ -2543,7 +2493,7 @@ public class LStatements{
                 String value = f == 0 ? p1 : f == 1 ? p2 : p3;
                 Cons<String> setter = f == 0 ? v -> p1 = v : f == 1 ? v -> p2 = v : v -> p3 = v;
 
-                fields(table, bundle(type.params[f]), value, setter);
+                fields(table, type.params[f], value, setter);
 
                 if(type == LMarkerControl.color || (type == LMarkerControl.colori && f == 1)){
                     col(table, value, res -> {
@@ -2608,7 +2558,7 @@ public class LStatements{
                     type = bundle(t);
                     build(table);
                 }, 2, cell -> cell.size(160, 50)));
-            }, Styles.logict, () -> {}).size(190, 40).color(table.color).left().padLeft(2);
+            }, Styles.logict, () -> {}).size(180, 40).color(table.color).left().padLeft(2);
 
             fields(table, "id", id, str -> id = str);
 

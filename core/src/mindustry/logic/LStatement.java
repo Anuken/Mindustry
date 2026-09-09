@@ -163,7 +163,7 @@ public abstract class LStatement{
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
-        return fields(table, desc, LCanvas.useRows(), value, setter);
+        return fields(table, desc, LCanvas.isCompact(), value, setter);
     }
 
     protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
@@ -175,13 +175,14 @@ public abstract class LStatement{
         sub.setColor(table.color);
         table.add(sub);
         float width = 180f;
+        String text = bundle(desc);
 
         if(nameAfterField){
-            var result = field(sub, value, setter).width(width).padLeft(8f).padRight(4f).left();
-            sub.add(desc).padRight(5f).self(this::param);
+            var result = field(sub, value, setter).width(width).padRight(4f).left();
+            sub.add(text).padRight(12f).self(this::param);
             return result;
         }else{
-            sub.add(desc).padLeft(10).self(this::param);
+            sub.add(text).padLeft(10).self(this::param);
             return field(sub, value, setter).width(width).padRight(10).left();
         }
     }
@@ -201,12 +202,6 @@ public abstract class LStatement{
                 ui.picker.show(current, setter);
             });
         }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
-    }
-
-    protected void row(Table table){
-        if(LCanvas.useRows()){
-            table.row();
-        }
     }
 
     protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
