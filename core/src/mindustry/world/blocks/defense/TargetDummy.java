@@ -181,7 +181,7 @@ public class TargetDummy extends Block{
 
         @Override
         public void drawSelect(){
-            Drawf.square(x, y, dummySize, 0f, team.color);
+            Drawf.square(x, y, dummySize/Mathf.sqrt2 - 1f, 0f, team.color);
         }
 
         public String displayDPS(boolean round){
