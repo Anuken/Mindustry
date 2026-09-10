@@ -964,7 +964,7 @@ public class LStatements{
             table.add().growX();
             table.add(new JumpButton(() -> dest, s -> dest = s, this.elem)).size(30).right().padRight(-8f);
 
-            String name = name();
+            String name = localizedName();
 
             //hack way of finding the title label...
             Core.app.post(() -> {
@@ -972,7 +972,7 @@ public class LStatements{
                 if(table.parent != null){
                     Label title = table.parent.find("statement-name");
                     if(title != null){
-                        title.update(() -> title.setText((dest != null ? bundle(name) + " -> " + dest.index : bundle(name))));
+                        title.update(() -> title.setText((dest != null ? name + " -> " + dest.index : name)));
                     }
                 }
             });
