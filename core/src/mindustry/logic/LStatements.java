@@ -231,7 +231,7 @@ public class LStatements{
                     fields(table, "y", y, v -> y = v);
                 }
                 case rotate -> {
-                    fields(table, "degrees", p1, v -> p1 = v);
+                    fields(table, "angle", p1, v -> p1 = v);
                 }
             }
         }
@@ -798,7 +798,7 @@ public class LStatements{
         @Override
         public void build(Table table){
             field(table, value, str -> value = str);
-            table.add(bundle("sec"));
+            table.add(bundle("seconds"));
         }
 
         @Override
