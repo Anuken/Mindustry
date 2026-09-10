@@ -787,7 +787,7 @@ public class JoinDialog extends BaseDialog{
             //not important
             return "";
         }else{
-            return Core.bundle.format("server.version", host.version, host.versionType);
+            return Core.bundle.format("server.version", host.version, "official".equals(host.versionType) ? "" : host.versionType);
         }
     }
 
