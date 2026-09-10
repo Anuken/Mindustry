@@ -84,6 +84,7 @@ public class MapPatchesView implements AssetView{
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
                 ui.showConfirm("@patch.delete.confirm",  () -> {
                     patches.remove(patch);
+                    state.data.reloadPatches(patches);
                     diag.rebuild();
                 });
             }).size(h);

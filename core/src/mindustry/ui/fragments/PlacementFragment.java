@@ -404,7 +404,7 @@ public class PlacementFragment{
                                         line.left();
                                         line.image(stack.item.uiIcon).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
-                                        line.labelWrap(() -> {
+                                        line.label(() -> {
                                             Building core = player.core();
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
                                             if(core == null || state.rules.infiniteResources) return "*/" + stackamount;
@@ -413,7 +413,7 @@ public class PlacementFragment{
                                             String color = (amount < stackamount / 2f ? "[scarlet]" : amount < stackamount ? "[accent]" : "[white]");
 
                                             return color + UI.formatAmount(amount) + "[white]/" + stackamount;
-                                        }).padLeft(5);
+                                        }).padLeft(5).wrap(true); //TODO: in practice wrapping does nothing and items will go offscreen, is this fine?
                                     }).left();
                                     req.row();
                                 }

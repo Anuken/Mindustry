@@ -60,8 +60,12 @@ public class LCanvas extends Table{
     }
 
     /** @return if statement elements should have rows. */
-    public static boolean useRows(){
+    public static boolean isCompact(){
         return Core.graphics.getWidth() < Scl.scl(900f) * 1.2f;
+    }
+
+    public static float getTargetWidth(){
+        return isCompact() ? 410f : Mathf.clamp(Core.graphics.getWidth() / Scl.scl(1f) * 0.95f - Scl.scl(80f), 400f, 1200f);
     }
 
     public static void tooltip(Cell<?> cell, String key){
@@ -101,7 +105,7 @@ public class LCanvas extends Table{
     }
 
     public void rebuild(){
-        targetWidth = useRows() ? 400f : 900f;
+        targetWidth = getTargetWidth();
         float s = pane != null ? pane.getVisualScrollY() : 0f;
         String toLoad = statements != null ? save() : null;
 
@@ -492,12 +496,15 @@ public class LCanvas extends Table{
 
             row();
 
-            table(t -> {
-                t.left();
-                t.marginLeft(4);
-                t.setColor(color);
-                st.build(t);
-            }).pad(4).padTop(2).left().grow();
+            Table t = st.useWrapping() ? new WrapTable() : new Table();
+
+            t.left();
+            t.marginLeft(4);
+            t.setColor(color);
+            if(st.useWrapping()) t.marginRight(4f);
+            st.build(t);
+
+            add(t).pad(4).padTop(2).left().grow();
 
             marginBottom(7);
         }
