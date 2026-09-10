@@ -6,6 +6,7 @@ import mindustry.graphics.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
+import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
 /** A crafter that requires contact from heater blocks to craft. */
@@ -33,6 +34,28 @@ public class HeatCrafter extends GenericCrafter{
     }
 
     @Override
+    public void init(){
+        initializePower();
+        super.init();
+    }
+
+    @Override
+    public void afterPatch(){
+        super.afterPatch();
+        initializePower();
+        reinitializeConsumers();
+    }
+
+    //power usage should account for heat
+    public void initializePower(){
+        if(consPower != null && !consPower.buffered && !(consPower instanceof ConsumePowerCondition)){
+            float usage = consPower.usage;
+            removeConsumers(c -> c instanceof ConsumePower);
+            consumePowerCond(usage, (HeatCrafterBuild b) -> heatRequirement <= 0f || b.heat > 0f);
+        }
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 
@@ -50,11 +73,6 @@ public class HeatCrafter extends GenericCrafter{
             heat = calculateHeat(sideHeat);
 
             super.updateTile();
-        }
-
-        @Override
-        public boolean shouldConsume(){
-            return (heatRequirement <= 0f || heat > 0) && super.shouldConsume();
         }
 
         @Override

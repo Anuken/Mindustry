@@ -201,6 +201,7 @@ public class GenericCrafter extends Block{
             drawer.drawLight(this);
         }
 
+        /** Checks whether this block can output. */
         @Override
         public boolean shouldConsume(){
             if(outputItems != null){

@@ -109,7 +109,7 @@ public abstract class BlockProducer extends PayloadBlock{
 
         @Override
         public boolean shouldConsume(){
-            return super.shouldConsume() && recipe() != null;
+            return super.shouldConsume() && recipe() != null && payload == null;
         }
 
         @Override
