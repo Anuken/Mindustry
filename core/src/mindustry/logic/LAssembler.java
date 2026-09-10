@@ -81,7 +81,7 @@ public class LAssembler{
         }
     }
 
-    /** Decodes \n, \" and \\ escape sequences in a string literal's contents (quotes already stripped). */
+    /** Decodes \n, \", \\ and uXXXX escape sequences in a string literal's contents (quotes already stripped). */
     static String unescape(String s){
         if(s.indexOf('\\') == -1) return s;
 
@@ -97,6 +97,10 @@ public class LAssembler{
                 }else if(next == '"' || next == '\\'){
                     out.append(next);
                     i ++;
+                    continue;
+                }else if(next == 'u' && i + 5 < s.length()){
+                    out.append((char)Integer.parseInt(s.substring(i + 2, i + 6), 16));
+                    i += 5;
                     continue;
                 }
             }

@@ -62,6 +62,10 @@ public abstract class LStatement{
         return read.size == 0 ? null : read.first();
     }
 
+    public boolean useWrapping(){
+        return true;
+    }
+
     public boolean hidden(){
         return false;
     }
@@ -99,12 +103,16 @@ public abstract class LStatement{
                 //escape characters that would otherwise break out of the string or corrupt it.
                 for(int i = 1; i < value.length() - 1; i++){
                     char c = value.charAt(i);
-                    //exception: allow escape sequences in strings: \n, \", \\
+                    //exception: allow escape sequences in strings: \n, \", \\, uXXXX
                     if(c == '\\' && i + 1 < value.length() - 1){
                         char next = value.charAt(i + 1);
                         if(next == '"' || next == '\\' || next == 'n'){
                             res.append(c).append(next);
                             i ++; //consumed the escape target too
+                            continue;
+                        }else if(next == 'u' && i + 5 < value.length() - 1 && isHex(value, i + 2)){
+                            res.append(value, i, i + 6);
+                            i += 5; //consumed u and the 4 hex digits too
                             continue;
                         }
                     }
@@ -134,6 +142,14 @@ public abstract class LStatement{
         }
 
         return value;
+    }
+
+    /** True if the 4 characters at value[from..from+3] are all hex digits. */
+    private static boolean isHex(String value, int from){
+        for(int i = from; i < from + 4; i++){
+            if(Character.digit(value.charAt(i), 16) == -1) return false;
+        }
+        return true;
     }
 
     protected static boolean logicLocalization(){
@@ -169,24 +185,32 @@ public abstract class LStatement{
 
     protected Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, s -> setter.get(sanitize(s)))
-            .size(144f, 40f).pad(2f).color(table.color);
+            .size(180f, 40f).pad(2f).color(table.color);
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
-        table.add(desc).padLeft(10).left().self(this::param);
-        return field(table, value, setter).width(85f).padRight(10).left();
+        return fields(table, desc, LCanvas.isCompact(), value, setter);
     }
 
-    /** Puts the text and field in one table, taking up one cell. */
-    protected Cell<TextField> fieldst(Table table, String desc, String value, Cons<String> setter){
-        Cell[] result = {null};
-        table.table(t -> {
-            t.setColor(table.color);
-            t.add(desc).padLeft(10).left().self(this::param);
-            result[0] = field(t, value, setter).width(85f).padRight(10).left();
-        });
+    protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
+        return field(table, value, setter).width(180f);
+    }
 
-        return result[0];
+    protected Cell<TextField> fields(Table table, String desc, boolean nameAfterField, String value, Cons<String> setter){
+        Table sub = new Table();
+        sub.setColor(table.color);
+        table.add(sub);
+        float width = 180f;
+        String text = bundle(desc);
+
+        if(nameAfterField){
+            var result = field(sub, value, setter).width(width).padRight(4f).left();
+            sub.add(text).padRight(12f).self(this::param);
+            return result;
+        }else{
+            sub.add(text).padLeft(10).self(this::param);
+            return field(sub, value, setter).width(width).padRight(10).left();
+        }
     }
 
     /** Adds color edit button */
@@ -204,16 +228,6 @@ public abstract class LStatement{
                 ui.picker.show(current, setter);
             });
         }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
-    }
-
-    protected Cell<TextField> fields(Table table, String value, Cons<String> setter){
-        return field(table, value, setter).width(85f);
-    }
-
-    protected void row(Table table){
-        if(LCanvas.useRows()){
-            table.row();
-        }
     }
 
     protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){

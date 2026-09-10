@@ -122,18 +122,15 @@ public class CustomRulesDialog extends BaseDialog{
     void setup(){
         cont.clear();
         cont.table(t -> {
-            t.add("@search").padRight(10);
+            t.image(Icon.zoom).padRight(8);
             var field = t.field(ruleSearch, text -> {
                 ruleSearch = text.trim().replaceAll(" +", " ").toLowerCase();
                 setupMain();
-            }).grow().pad(8).get();
+            }).growX().pad(8).get();
+            field.setMessageText("@players.search");
             field.setCursorPosition(ruleSearch.length());
             Core.scene.setKeyboardFocus(field);
-            t.button(Icon.cancel, Styles.emptyi, () -> {
-                ruleSearch = "";
-                setupMain();
-            }).padLeft(10f).size(35f);
-        }).row();
+        }).fillX().row();
         Cell<ScrollPane> paneCell = cont.pane(m -> main = m);
 
         setupMain();

@@ -83,6 +83,21 @@ public class LogicTests{
         "escaped backslash sitting right before the closing quote",
         "set result \"end\\\\\"",
         "end\\"
+        ),
+        Arguments.of(
+        "\\u0041 decodes to the corresponding unicode character",
+        "set result \"\\u0041\"",
+        "A"
+        ),
+        Arguments.of(
+        "\\uf8ff decodes to the corresponding unicode character",
+        "set result \"\\uf8ff\\uf8ff\"",
+        ""
+        ),
+        Arguments.of(
+        "\\u escapes combined with other escapes in one string",
+        "set result \"\\u0041\\n\\u0042\\\\end\"",
+        "A\nB\\end"
         )
         );
     }
@@ -140,7 +155,32 @@ public class LogicTests{
         Arguments.of("a raw '#' in an unquoted value gets neutralized so it can't start a comment", "a#b", "a_b"),
         Arguments.of("a lone newline character is invalid on its own, same as a lone space", "\n", "invalid"),
         Arguments.of("a lone tab character is invalid on its own, same as a lone space", "\t", "invalid"),
-        Arguments.of("a lone '#' character is invalid on its own, same as a lone space", "#", "invalid")
+        Arguments.of("a lone '#' character is invalid on its own, same as a lone space", "#", "invalid"),
+        Arguments.of(
+        "a well-formed \\uXXXX escape inside a quoted value passes through untouched",
+        "\"\\u0041\"",
+        "\"\\u0041\""
+        ),
+        Arguments.of(
+        "\\uXXXX combined with other escapes inside a quoted value",
+        "\"\\u0041\\n\\u0042\\\\end\"",
+        "\"\\u0041\\n\\u0042\\\\end\""
+        ),
+        Arguments.of(
+        "a malformed \\u escape with too few digits still escapes the backslash instead of throwing",
+        "\"\\u12\"",
+        "\"\\\\u12\""
+        ),
+        Arguments.of(
+        "a malformed \\u escape with non-hex digits still escapes the backslash instead of throwing",
+        "\"\\u12zz\"",
+        "\"\\\\u12zz\""
+        ),
+        Arguments.of(
+        "a \\u escape truncated by the closing quote still escapes the backslash instead of throwing",
+        "\"a\\u123\"",
+        "\"a\\\\u123\""
+        )
         );
     }
 
@@ -232,6 +272,22 @@ public class LogicTests{
         Arguments.of(
         "a string that never closes before the line ends, with trailing content after it",
         "set result \"asd\nset bar 5"
+        ),
+        Arguments.of(
+        "a \\u escape with non-hex digits is rejected",
+        "set result \"\\u12zz\""
+        ),
+        Arguments.of(
+        "a \\u escape with non-hex digits is rejected",
+        "set result \"\\u1h23\""
+        ),
+        Arguments.of(
+        "a \\u escape with non-hex digits is rejected",
+        "set result \"\\uhh23\""
+        ),
+        Arguments.of(
+        "a \\u escape truncated by the closing quote is rejected",
+        "set result \"\\u12\""
         )
         );
     }
