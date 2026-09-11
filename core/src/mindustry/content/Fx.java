@@ -118,6 +118,22 @@ public class Fx{
         Draw.scl = p;
     }),
 
+    //water equivalent of wreck decals - Effect.decal() doesn't render on liquids
+    unitDrown = new Effect(3600f, e -> {
+        if(!(e.data instanceof TextureRegion reg)) return;
+
+        Draw.z(Layer.scorch);
+        mixcol(e.color, 1f);
+        alpha(0.85f * (1f - Mathf.curve(e.fin(), 0.98f)));
+        rect(reg, e.x, e.y, e.rotation);
+        reset();
+
+        //small ripples drifting over the debris, so the water still reads as moving on top of it
+        if(Mathf.chanceDelta(0.02f)){
+            Fx.ripple.at(e.x + Mathf.range(reg.width / 3f), e.y + Mathf.range(reg.height / 3f), 0.6f, e.color);
+        }
+    }),
+
     unitSpirit = new Effect(17f, e -> {
         if(!(e.data instanceof Position to)) return;
 
