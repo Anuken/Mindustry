@@ -392,13 +392,15 @@ public class SoundControl{
             ambientThread.inputSources.add(source);
         }else{
             launchingAmbientThread = true;
-            ambientThread = new AudioThread();
-            ambientThread.setDaemon(true);
+            AudioThread thread = new AudioThread();
+            thread.setDaemon(true);
+            ambientThread = thread;
 
             //start thread with all the sources that were added during launch
             Core.app.post(() -> {
-                if(ambientThread != null){
-                    if(!ambientThread.isAlive()) ambientThread.start();
+                //only start if this is still the active thread, and only ever once
+                if(ambientThread == thread){
+                    thread.start();
                     launchingAmbientThread = false;
                 }
             });
