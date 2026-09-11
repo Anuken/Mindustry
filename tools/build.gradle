@@ -8,6 +8,7 @@ import arc.packer.*
 import arc.struct.*
 import arc.util.*
 import arc.util.io.*
+import arc.util.serialization.*
 import groovy.transform.*
 
 import java.util.concurrent.*
@@ -279,5 +280,62 @@ tasks.register('updateBundles'){
 
             child.writeString(result.toString())
         })
+    }
+}
+
+tasks.register('updateContributors'){
+    doLast{
+        Log.info("Update contributors file")
+        try{
+            def contributors = []
+
+            int page = 1
+            int perPage = 90
+
+            while(true){
+                Jval response = null
+
+                Http.get("https://api.github.com/repos/Anuken/Mindustry/contributors?per_page=${perPage}&page=${page}")
+                        .error{
+                            Log.err("Failed to fetch contributor information", it)
+                            done = true
+                        }
+                        .block{
+                            response = Jval.read(it.getResultAsString())
+                        }
+
+                if(response == null) break
+
+                int count = 0
+
+                response.each{
+                    contributors.add([
+                            id: it.getInt("id"),
+                            name: it.getString("login"),
+                            contributions: it.getInt("contributions")
+                    ])
+
+                    count++
+                }
+
+                if(count < perPage) break
+
+                page++
+            }
+
+            contributors.removeIf{ it.id == 10100000} //remove game developer from contributors
+            contributors.removeIf{ (it.name == "actions-user") } //remove game developer from contributors
+            contributors.sort{ a, b -> b.contributions <=> a.contributions}
+
+            StringBuilder output = new StringBuilder()
+
+            contributors.each{
+                output.append(it.name).append('\n')
+            }
+
+            Fi.get("core/assets/contributors").writeString(output.toString())
+        }catch(Throwable exception){
+            Log.err(exception)
+        }
     }
 }
