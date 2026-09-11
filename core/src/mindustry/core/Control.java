@@ -412,6 +412,9 @@ public class Control implements ApplicationListener, Loadable{
             if(settings.getBool("savecreate") && !world.isInvalidMap() && !playtest){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
             }
+            if(!world.isInvalidMap() && !playtest){
+                map.setLastPlayed();
+            }
             Events.fire(Trigger.newGame);
 
             //booted out of map, resume editing
