@@ -7,9 +7,8 @@ import mindustry.game.MapObjectives.*;
 import mindustry.io.*;
 
 import java.io.*;
-import java.util.*;
 
-public class MapMarkers implements Iterable<ObjectiveMarker>{
+public class MapMarkers{
     /** Maps marker unique ID to marker. */
     private IntMap<ObjectiveMarker> map = new IntMap<>();
 
@@ -110,12 +109,5 @@ public class MapMarkers implements Iterable<ObjectiveMarker>{
             setter.set(markers.peek(), index);
             markers.remove(index);
         }
-    }
-
-    /** @deprecated use the seq fields instead */
-    @Deprecated
-    @Override
-    public Iterator<ObjectiveMarker> iterator(){
-        return worldMarkers.iterator();
     }
 }
