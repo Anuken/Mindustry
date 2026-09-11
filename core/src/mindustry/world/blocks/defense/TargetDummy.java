@@ -243,7 +243,8 @@ public class TargetDummy extends Block{
                 t.field(Strings.autoFixed(resetTime / 60f, 2), TextFieldFilter.floatsOnly, s -> configureFloat(3, Strings.parseFloat(s) * 60f)).padLeft(8f).growX();
                 t.add(StatUnit.seconds.localized()).padLeft(8).row();
                 t.add(Core.bundle.get("stat.hitsize"));
-                t.field("" + (dummySize/tilesize), TextFieldFilter.floatsOnly, s -> configureFloat(4, Strings.parseFloat(s) * tilesize)).padLeft(8f).growX();
+                t.field("" + (dummySize/tilesize), TextFieldFilter.floatsOnly, s -> configureFloat(4, Strings.parseFloat(s) * tilesize))
+                    .valid(val -> Strings.parseFloat(val, Float.MAX_VALUE) <= 50f).padLeft(8f).growX();
                 t.add(StatUnit.blocks.localized()).padLeft(8f);
             }).top().grow().margin(8f);
         }
