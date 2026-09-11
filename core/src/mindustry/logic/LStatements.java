@@ -1947,9 +1947,7 @@ public class LStatements{
             fields(table, "team", team, s -> team = s);
 
             if(type != FetchType.coreCount && type != FetchType.playerCount && type != FetchType.unitCount && type != FetchType.buildCount){
-                table.add(" # ");
-
-                fields(table, index, i -> index = i);
+                fields(table, "#", index, i -> index = i);
             }
 
             if(type == FetchType.buildCount || type == FetchType.build){
