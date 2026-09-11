@@ -327,6 +327,7 @@ public class JsonIO{
                             exec.all.get(i).parents.add(exec.all.get(val));
                         }
                     }
+                    i++;
                 }
 
                 return exec;
