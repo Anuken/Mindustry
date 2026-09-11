@@ -124,7 +124,7 @@ public class Schematic implements Publishable, Comparable<Schematic>{
     }
 
     public static Schematic ofBlock(Block block){
-        return new Schematic(Seq.with(new Stile(block, 0, 0, null, (byte)0)), new StringMap(), block.size, block.size);
+        return new Schematic(Seq.with(new Stile(block, -block.sizeOffset, -block.sizeOffset, null, (byte)0)), new StringMap(), block.size, block.size);
     }
 
     public static class Stile{
