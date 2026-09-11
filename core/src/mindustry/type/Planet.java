@@ -151,6 +151,8 @@ public class Planet extends UnlockableContent{
     public boolean alwaysPlayMusic = false;
     /** Default core block for launching. */
     public Block defaultCore = Blocks.coreShard;
+    /** Default loadout schematic; if not set, gets initialized to the default core provided. */
+    public @Nullable Schematic defaultLoadout;
     /** Parent body that this planet orbits around. If null, this planet is considered to be in the middle of the solar system. */
     public @Nullable Planet parent;
     /** The root parent of the whole solar system this planet is in. */
@@ -450,6 +452,8 @@ public class Planet extends UnlockableContent{
         applyDefaultRules(campaignRules);
         loadRules();
         loadStats();
+
+        if(defaultLoadout == null) defaultLoadout = Schematic.ofBlock(defaultCore);
 
         if(techTree == null){
             techTree = TechTree.roots.find(n -> n.planet == this);

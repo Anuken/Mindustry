@@ -182,6 +182,7 @@ public class Planets{
             clipRadius = 2f;
             defaultEnv = Env.space;
             icon = "commandRally";
+            defaultCore = Blocks.coreBastion;
             generator = new AsteroidGenerator();
             cgen.get((AsteroidGenerator)generator);
 

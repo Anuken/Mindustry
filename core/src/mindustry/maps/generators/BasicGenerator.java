@@ -9,7 +9,6 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.Astar.*;
 import mindustry.content.*;
-import mindustry.game.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -25,8 +24,6 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     //for drawing
     protected @Nullable Block floor, block, ore;
-
-    public Schematic defaultLoadout = Loadouts.basicShard;
 
     @Override
     public void generate(Tiles tiles, WorldParams params){
