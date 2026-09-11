@@ -231,7 +231,7 @@ public class LStatements{
                     fields(table, "y", y, v -> y = v);
                 }
                 case rotate -> {
-                    fields(table, "degrees", p1, v -> p1 = v);
+                    fields(table, "angle", p1, v -> p1 = v);
                 }
             }
         }
@@ -265,7 +265,7 @@ public class LStatements{
 
         @Override
         public void build(Table table){
-            field(table, value, str -> value = str).width(0f).growX().padRight(3);
+            field(table, value, str -> value = str).width(LCanvas.getTargetWidth() - Scl.scl(20f)).padRight(3);
         }
 
         @Override
@@ -798,7 +798,7 @@ public class LStatements{
         @Override
         public void build(Table table){
             field(table, value, str -> value = str);
-            table.add(bundle("sec"));
+            table.add(bundle("seconds"));
         }
 
         @Override
@@ -964,7 +964,7 @@ public class LStatements{
             table.add().growX();
             table.add(new JumpButton(() -> dest, s -> dest = s, this.elem)).size(30).right().padRight(-8f);
 
-            String name = name();
+            String name = localizedName();
 
             //hack way of finding the title label...
             Core.app.post(() -> {
@@ -972,7 +972,7 @@ public class LStatements{
                 if(table.parent != null){
                     Label title = table.parent.find("statement-name");
                     if(title != null){
-                        title.update(() -> title.setText((dest != null ? bundle(name) + " -> " + dest.index : bundle(name))));
+                        title.update(() -> title.setText((dest != null ? name + " -> " + dest.index : name)));
                     }
                 }
             });
@@ -1947,9 +1947,7 @@ public class LStatements{
             fields(table, "team", team, s -> team = s);
 
             if(type != FetchType.coreCount && type != FetchType.playerCount && type != FetchType.unitCount && type != FetchType.buildCount){
-                table.add(" # ");
-
-                fields(table, index, i -> index = i);
+                fields(table, "#", index, i -> index = i);
             }
 
             if(type == FetchType.buildCount || type == FetchType.build){

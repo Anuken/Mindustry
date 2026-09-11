@@ -54,7 +54,7 @@ public class ColorPicker extends BaseDialog{
 
             t.defaults().padBottom(6).width(370f).height(44f);
 
-            t.stack(new Image(new TextureRegion(hueTex)), hSlider = new Slider(0f, 360f, 0.3f, false){{
+            t.stack(new Image(new TextureRegion(hueTex)), hSlider = new Slider(0f, 360f, 0.0001f, false){{
                 setValue(h);
                 moved(value -> {
                     h = value;
@@ -75,7 +75,7 @@ public class ColorPicker extends BaseDialog{
                         x, y + height, first
                     );
                 }
-            }, sSlider = new Slider(0f, 1f, 0.001f, false){{
+            }, sSlider = new Slider(0f, 1f, 0.0001f, false){{
                 setValue(s);
                 moved(value -> {
                     s = value;
@@ -96,7 +96,7 @@ public class ColorPicker extends BaseDialog{
                     x, y + height, first
                     );
                 }
-            }, vSlider = new Slider(0f, 1f, 0.001f, false){{
+            }, vSlider = new Slider(0f, 1f, 0.0001f, false){{
                 setValue(v);
 
                 moved(value -> {
@@ -119,7 +119,7 @@ public class ColorPicker extends BaseDialog{
                         x, y + height, first
                         );
                     }
-                }, aSlider = new Slider(0f, 1f, 0.001f, false){{
+                }, aSlider = new Slider(0f, 1f, 0.0001f, false){{
                     setValue(a);
 
                     moved(value -> {

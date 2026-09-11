@@ -53,6 +53,12 @@ public class HeatCrafter extends GenericCrafter{
         }
 
         @Override
+        public BlockStatus status(){
+            if(heatRequirement > 0 && heat <= 0f && enabled) return BlockStatus.noInput;
+            return super.status();
+        }
+
+        @Override
         public boolean shouldConsume(){
             return (heatRequirement <= 0f || heat > 0) && super.shouldConsume();
         }

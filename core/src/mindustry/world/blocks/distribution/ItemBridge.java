@@ -71,7 +71,7 @@ public class ItemBridge extends Block{
     }
 
     @Override
-    public void setStats() {
+    public void setStats(){
         super.setStats();
         if(transportTime != 0f){
             stats.add(Stat.itemsMoved, 60f / transportTime, StatUnit.itemsSecond);

@@ -38,6 +38,7 @@ public class TargetDummy extends Block{
         configurable = logicConfigurable = true;
         underBullets = true;
         targetable = false;
+        allowedInPayloads = false;
 
         saveConfig = true;
 
@@ -89,6 +90,11 @@ public class TargetDummy extends Block{
         public boolean boosting;
         public float unitArmor;
         public Team unitTeam = Team.derelict;
+
+        @Override
+        public boolean canPickup(){
+            return false;
+        }
 
         @Override
         public void created(){
@@ -238,12 +244,16 @@ public class TargetDummy extends Block{
                 t.check(Core.bundle.get("rules.enemyteam"), unitTeam != team, b -> configureFloat(0, Mathf.num(b))).colspan(3).row();
                 t.check(Core.bundle.get("stat.flying"), boosting, b -> configureFloat(1, Mathf.num(b))).colspan(3).row();
                 t.add(Core.bundle.get("stat.armor"));
-                t.field("" + (int)unitArmor, TextFieldFilter.digitsOnly, s -> configureFloat(2, Strings.parseInt(s))).width(200f).padLeft(8f).colspan(2).row();
+                t.field("" + (int)unitArmor, TextFieldFilter.digitsOnly, s -> configureFloat(2, Strings.parseInt(s))).valid(val -> Strings.parseInt(val, Integer.MAX_VALUE) < 100_000).width(200f).padLeft(8f).colspan(2).row();
                 t.add(Core.bundle.get("stat.resettime"));
-                t.field(Strings.autoFixed(resetTime / 60f, 2), TextFieldFilter.floatsOnly, s -> configureFloat(3, Strings.parseFloat(s) * 60f)).padLeft(8f).growX();
+                t.field(Strings.autoFixed(resetTime / 60f, 2), TextFieldFilter.floatsOnly, s -> configureFloat(3, Strings.parseFloat(s) * 60f)).valid(Strings::canParsePositiveFloat).padLeft(8f).growX();
                 t.add(StatUnit.seconds.localized()).padLeft(8).row();
                 t.add(Core.bundle.get("stat.hitsize"));
-                t.field("" + (dummySize/tilesize), TextFieldFilter.floatsOnly, s -> configureFloat(4, Strings.parseFloat(s) * tilesize)).padLeft(8f).growX();
+                t.field("" + (dummySize/tilesize), TextFieldFilter.floatsOnly, s -> configureFloat(4, Strings.parseFloat(s) * tilesize))
+                .valid(val -> {
+                    float parsed = Strings.parseFloat(val, Float.MAX_VALUE);
+                    return parsed >= 0.1f && parsed <= 50f;
+                }).padLeft(8f).growX();
                 t.add(StatUnit.blocks.localized()).padLeft(8f);
             }).top().grow().margin(8f);
         }
