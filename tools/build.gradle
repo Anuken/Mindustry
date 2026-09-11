@@ -323,8 +323,7 @@ tasks.register('updateContributors'){
                 page++
             }
 
-            contributors.removeIf{ it.id == 10100000} //remove game developer from contributors
-            contributors.removeIf{ (it.name == "actions-user") } //remove game developer from contributors
+            contributors.removeIf{ it.id == 10100000 || it.name == "actions-user" } //remove game developer and bots from contributors
             contributors.sort{ a, b -> b.contributions <=> a.contributions}
 
             StringBuilder output = new StringBuilder()
