@@ -38,6 +38,7 @@ public class TargetDummy extends Block{
         configurable = logicConfigurable = true;
         underBullets = true;
         targetable = false;
+        allowedInPayloads = false;
 
         saveConfig = true;
 
@@ -89,6 +90,11 @@ public class TargetDummy extends Block{
         public boolean boosting;
         public float unitArmor;
         public Team unitTeam = Team.derelict;
+
+        @Override
+        public boolean canPickup(){
+            return false;
+        }
 
         @Override
         public void created(){

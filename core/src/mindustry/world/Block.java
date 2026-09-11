@@ -67,6 +67,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsItems = false;
     /** If true, this block won't be affected by the onlyDepositCore rule. */
     public boolean alwaysAllowDeposit = false;
+    /** If false, this block cannot be placed in payloads. */
+    public boolean allowedInPayloads = true;
     /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this block. Overrides the itemDepositCooldown if non-negative. */
     public float depositCooldown = -1f;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
@@ -172,7 +174,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean updateInUnits = true;
     /** if true, this block updates in payloads in units regardless of the experimental game rule */
     public boolean alwaysUpdateInUnits = false;
-    /** if true, this block can be picked up in payloads */
+    /** @deprecated use allowedInPayloads instead */
+    @Deprecated
     public boolean canPickup = true;
     /** if false, only incinerable liquids are dropped when deconstructing; otherwise, all liquids are dropped. */
     public boolean deconstructDropAllLiquid = false;

@@ -4647,6 +4647,8 @@ public class UnitTypes{
             useUnitCap = false;
             killable = false;
             physics = false;
+            internal = true;
+            internalGenerateSprites = true;
 
             flyingLayer = Layer.flyingUnit - 1f;
             drag = 0.33f;
