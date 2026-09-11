@@ -13,6 +13,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.editor.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -54,7 +55,7 @@ public abstract class MapListDialog extends BaseDialog{
         }
     }
 
-    private static class MapViewSettings{
+    public static class MapViewSettings{
         boolean
         showBuiltIn = true,
         showCustom = true,
