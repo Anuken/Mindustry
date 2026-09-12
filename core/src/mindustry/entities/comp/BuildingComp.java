@@ -788,6 +788,17 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return block.itemCapacity;
     }
 
+    public boolean hasSharedLiquid(Liquid liquid){
+        if(liquids == null) return false;
+
+        for(var other : content.liquids()){
+            if(other != liquid && liquids.get(other) > 0.001f && block.consumesLiquidShared(other)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** Remove a stack from this inventory, and return the amount removed. */
     public int removeStack(Item item, int amount){
         if(items == null) return 0;
@@ -871,7 +882,11 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public boolean acceptLiquid(Building source, Liquid liquid){
-        return block.hasLiquids && block.consumesLiquid(liquid);
+        return block.hasLiquids && block.consumesLiquid(liquid) && (!block.consumesLiquidShared(liquid) || liquids.get(liquid) > 0.001f || !hasSharedLiquid(liquid));
+    }
+
+    public float acceptLiquidAmount(Building source, Liquid liquid, float amount){
+        return acceptLiquid(source, liquid) ? amount : 0f;
     }
 
     public void handleLiquid(Building source, Liquid liquid, float amount){
@@ -918,8 +933,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void transferLiquid(Building next, float amount, Liquid liquid){
         float flow = Math.min(next.block.liquidCapacity - next.liquids.get(liquid), amount);
+        flow = Math.min(flow, next.acceptLiquidAmount(self(), liquid, flow));
 
-        if(next.acceptLiquid(self(), liquid)){
+        if(flow > 0f){
             next.handleLiquid(self(), liquid, flow);
             liquids.remove(liquid, flow);
         }
@@ -950,11 +966,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             float fract = liquids.get(liquid) / block.liquidCapacity * block.liquidPressure;
             float flow = Math.min(Mathf.clamp((fract - ofract)) * (block.liquidCapacity), liquids.get(liquid));
             flow = Math.min(flow, next.block.liquidCapacity - next.liquids.get(liquid));
+            float accepted = flow > 0f && ofract <= fract ? next.acceptLiquidAmount(self(), liquid, flow) : 0f;
 
-            if(flow > 0f && ofract <= fract && next.acceptLiquid(self(), liquid)){
-                next.handleLiquid(self(), liquid, flow);
-                liquids.remove(liquid, flow);
-                return flow;
+            if(accepted > 0f){
+                next.handleLiquid(self(), liquid, accepted);
+                liquids.remove(liquid, accepted);
+                return accepted;
                 //handle reactions between different liquid types ▼
             }else if(!next.block.consumesLiquid(liquid) && next.liquids.currentAmount() / next.block.liquidCapacity > 0.1f && fract > 0.1f){
                 //TODO !IMPORTANT! uses current(), which is 1) wrong for multi-liquid blocks and 2) causes unwanted reactions, e.g. hydrogen + slag in pump
