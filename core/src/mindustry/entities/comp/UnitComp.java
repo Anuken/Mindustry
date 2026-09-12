@@ -929,11 +929,20 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         if(!headless && type.createScorch){
+            Tile deathTile = world.tileWorld(x, y);
+            //decals don't render on liquids, so wreckage sinks instead of leaving a mark on top
+            boolean sinks = deathTile != null && !deathTile.floor().hasSurface();
+            Color sinkColor = sinks ? deathTile.floor().mapColor : null;
+
             for(int i = 0; i < type.wreckRegions.length; i++){
                 if(type.wreckRegions[i].found()){
                     float range = type.hitSize /4f;
                     Tmp.v1.rnd(range);
-                    Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    if(sinks){
+                        Fx.unitDrown.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90, sinkColor, type.wreckRegions[i]);
+                    }else{
+                        Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    }
                 }
             }
         }
