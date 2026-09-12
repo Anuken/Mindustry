@@ -328,7 +328,7 @@ public class Fonts{
 
             @Override
             public float imageSize(){
-                return size;
+                return size / Scl.scl(1f);
             }
         };
 

@@ -440,11 +440,8 @@ public class LStatements{
 
             //Q: why don't you just use arrays for this?
             //A: arrays aren't as easy to serialize so the code generator doesn't handle them
-            int c = 0;
             for(int i = 0; i < type.params.length; i++){
-
-                fields(table, type.params[i], i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
-
+                fields(table, type.params[i], type.params.length > 1 && LCanvas.isCompact(), i == 0 ? p1 : i == 1 ? p2 : i == 2 ? p3 : p4, i == 0 ? v -> p1 = v : i == 1 ? v -> p2 = v : i == 2 ? v -> p3 = v : v -> p4 = v);
             }
         }
 
@@ -537,7 +534,7 @@ public class LStatements{
 
             table.add(" = ");
 
-            tfield = field(table, type, str -> type = str).padRight(0f).get();
+            tfield = field(table, type, str -> type = str).width(LCanvas.isCompact() ? 140f : 180f).padRight(0f).get();
 
             table.button(b -> {
                 b.image(Icon.pencilSmall);
@@ -699,16 +696,7 @@ public class LStatements{
             }else{
                 //"function"-type operations have the name at the left and arguments on the right
                 if(op.func){
-                    if(LCanvas.isCompact()){
-                        table.left();
-                        table.table(c -> {
-                            c.color.set(category().color);
-                            c.left();
-                            funcs(c, table);
-                        }).colspan(2).left();
-                    }else{
-                        funcs(table, table);
-                    }
+                    funcs(table, table);
                 }else{
                     field(table, a, str -> a = str);
 
@@ -2406,7 +2394,7 @@ public class LStatements{
         private static String soundCategory(String entryName){
             String normalized = entryName.replace('\\', '/');
             int end = normalized.lastIndexOf('/');
-            if(end < 0) return "Data Patch";
+            if(end < 0) return "data patch";
 
             int start = normalized.lastIndexOf('/', end - 1);
             return normalized.substring(start + 1, end);

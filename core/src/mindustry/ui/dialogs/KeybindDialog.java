@@ -167,6 +167,7 @@ public class KeybindDialog extends Dialog{
             buttons.button("@back", Icon.left, this::hide).size(bw, bh).get().addListener(blocker);
             buttons.button("@settings.unbindKey", Icon.cancel, () -> {
                 keyBind.unset();
+                keyBind.save();
                 hide();
             }).size(bw, bh).get().addListener(blocker);
         }};

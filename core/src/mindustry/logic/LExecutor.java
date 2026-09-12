@@ -1590,7 +1590,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            Tile tile = world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
+            Tile tile = world.tile(x.numi(), y.numi());
             if(tile != null && block.obj() instanceof Block b){
                 switch(layer){
                     case ore -> {
