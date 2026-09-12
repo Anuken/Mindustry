@@ -296,13 +296,12 @@ tasks.register('updateContributors'){
                 Jval response = null
 
                 Http.get("https://api.github.com/repos/Anuken/Mindustry/contributors?per_page=${perPage}&page=${page}")
-                        .error{
-                            Log.err("Failed to fetch contributor information", it)
-                            done = true
-                        }
-                        .block{
-                            response = Jval.read(it.getResultAsString())
-                        }
+                .error{
+                    Log.err("Failed to fetch contributor information", it)
+                }
+                .block{
+                    response = Jval.read(it.getResultAsString())
+                }
 
                 if(response == null) break
 
@@ -310,9 +309,9 @@ tasks.register('updateContributors'){
 
                 response.each{
                     contributors.add([
-                            id: it.getInt("id"),
-                            name: it.getString("login"),
-                            contributions: it.getInt("contributions")
+                        id: it.getInt("id"),
+                        name: it.getString("login"),
+                        contributions: it.getInt("contributions")
                     ])
 
                     count++
@@ -332,8 +331,8 @@ tasks.register('updateContributors'){
                     name = name.trim()
                     if(!name.isEmpty() && !name.startsWith("#")){
                         contributors.add([
-                                name: name,
-                                contributions: 1
+                            name: name,
+                            contributions: 1
                         ])
                     }
                 }
@@ -350,7 +349,7 @@ tasks.register('updateContributors'){
 
             Fi.get("core/assets/contributors").writeString(output.toString())
         }catch(Throwable exception){
-            Log.err(exception)
+            Log.err("Failed to update contributors", exception)
         }
     }
 }
