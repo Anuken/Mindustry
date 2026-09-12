@@ -36,6 +36,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     public float baseEfficiency = 0f;
     public float speed = 0f;
+    public float displayedSpeed = 0f;
     public boolean outputRouter = true;
     /** (minimum) amount of loading docks needed to fill a line. */
     public float recharge = 2f;
@@ -64,7 +65,7 @@ public class StackConveyor extends Block implements Autotiler{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
+        stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
     }
 
     @Override
