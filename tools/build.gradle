@@ -323,6 +323,22 @@ tasks.register('updateContributors'){
                 page++
             }
 
+            Fi thirdParty = Fi.get("core/assets-raw/3rd-party-contributors")
+
+            if(thirdParty.exists()){
+                thirdParty.readString("UTF-8")
+                .split("\\r?\\n")
+                .each{ name ->
+                    name = name.trim()
+                    if(!name.isEmpty() && !name.startsWith("#")){
+                        contributors.add([
+                                name: name,
+                                contributions: 1
+                        ])
+                    }
+                }
+            }
+
             contributors.removeIf{ it.id == 10100000 || it.name == "actions-user" } //remove game developer and bots from contributors
             contributors.sort{ a, b -> b.contributions <=> a.contributions}
 
