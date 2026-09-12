@@ -312,7 +312,7 @@ public class PlacementFragment{
 
                         button.update(() -> { //color unplacable things gray
                             Building core = player.core();
-                            Color color = (state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
+                            Color color = (state.rules.isInfiniteResources(player.team()) || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -407,7 +407,7 @@ public class PlacementFragment{
                                         line.label(() -> {
                                             Building core = player.core();
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
-                                            if(core == null || state.rules.infiniteResources) return "*/" + stackamount;
+                                            if(core == null || state.rules.isInfiniteResources(player.team())) return "*/" + stackamount;
 
                                             int amount = core.items.get(stack.item);
                                             String color = (amount < stackamount / 2f ? "[scarlet]" : amount < stackamount ? "[accent]" : "[white]");

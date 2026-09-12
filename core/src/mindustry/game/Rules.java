@@ -343,6 +343,10 @@ public class Rules{
         return unitFactoryActivationDelay + teams.get(team).unitFactoryActivationDelay;
     }
 
+    public boolean isInfiniteResources(Team team){
+        return infiniteResources || teams.get(team).infiniteResources;
+    }
+
     /** A team-specific ruleset. */
     public static class TeamRule{
         /** Whether, when AI is enabled, ships should be spawned from the core. TODO remove / unnecessary? */
