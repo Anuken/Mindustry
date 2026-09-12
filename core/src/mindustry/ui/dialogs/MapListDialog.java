@@ -255,7 +255,7 @@ public abstract class MapListDialog extends BaseDialog{
                 tab.table(t -> {
                     t.add("@editor.filters.priorities").padBottom(6f).row();
                     t.table(Tex.button, right -> {
-                        TextureRegionDrawable[] icons = {Icon.fileText, Icon.players, Icon.hammer, Icon.play, Icon.eye};
+                        TextureRegionDrawable[] icons = {Icon.fileText, Icon.players, Icon.hammer, Icon.play, Icon.eyeSmall};
 
                         for(int i = 0; i < MapPriority.all.length; i++){
                             var prio = MapPriority.all[i];
