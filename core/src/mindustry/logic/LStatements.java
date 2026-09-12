@@ -2394,7 +2394,7 @@ public class LStatements{
         private static String soundCategory(String entryName){
             String normalized = entryName.replace('\\', '/');
             int end = normalized.lastIndexOf('/');
-            if(end < 0) return "Data Patch";
+            if(end < 0) return "data patch";
 
             int start = normalized.lastIndexOf('/', end - 1);
             return normalized.substring(start + 1, end);
