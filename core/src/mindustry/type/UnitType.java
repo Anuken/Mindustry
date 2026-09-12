@@ -986,14 +986,13 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
         }
 
-        if(fogRadius < 0){
-            //TODO depend on range?
-            fogRadius = Math.max(58f * 3f, hitSize * 2f) / 8f;
-        }
-
         if(!weapons.contains(w -> w.useAttackRange)){
             if(range < 0 || range == Float.MAX_VALUE) range = mineRange;
             if(maxRange < 0 || maxRange == Float.MAX_VALUE) maxRange = mineRange;
+        }
+
+        if(fogRadius < 0){
+            fogRadius = Math.max(58f * 3f, Math.min(maxRange * 0.75f, 500f)) / 8f;
         }
 
         if(mechStride < 0){

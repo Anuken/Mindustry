@@ -2469,10 +2469,10 @@ public class Blocks{
         }};
 
         reinforcedLiquidTank = new LiquidRouter("reinforced-liquid-tank"){{
-            requirements(Category.liquid, with(Items.tungsten, 40, Items.beryllium, 50));
+            requirements(Category.liquid, with(Items.tungsten, 25, Items.beryllium, 40));
             size = 3;
             solid = true;
-            liquidCapacity = 2700f;
+            liquidCapacity = 3000f;
             liquidPadding = 2f;
             health = 900;
         }};
@@ -5058,7 +5058,7 @@ public class Blocks{
         }};
 
         afflict = new PowerTurret("afflict"){{
-            requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
+            requirements(Category.turret, with(Items.surgeAlloy, 125, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
             buildCostMultiplier = 1f;
 
             shootType = new BasicBulletType(){{

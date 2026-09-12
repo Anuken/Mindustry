@@ -3354,7 +3354,6 @@ public class UnitTypes{
             rotateSpeed = 3f;
             health = 2700;
             armor = 7f;
-            fogRadius = 40f;
             stepShake = 0f;
 
             stepSound = Sounds.walkerStepSmall;
@@ -3867,7 +3866,6 @@ public class UnitTypes{
             armor = 3f;
             hitSize = 12f;
             engineSize = 0;
-            fogRadius = 25;
             itemCapacity = 0;
 
             setEnginesMirror(
@@ -3932,7 +3930,6 @@ public class UnitTypes{
             hitSize = 25f;
             engineSize = 4.3f;
             engineOffset = 54f / 4f;
-            fogRadius = 25;
             itemCapacity = 0;
             lowAltitude = true;
 
