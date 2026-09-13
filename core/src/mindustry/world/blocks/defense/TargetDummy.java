@@ -39,6 +39,7 @@ public class TargetDummy extends Block{
         underBullets = true;
         targetable = false;
         allowedInPayloads = false;
+        canOverdrive = false;
 
         saveConfig = true;
 
