@@ -413,6 +413,7 @@ public class Logic implements ApplicationListener{
 
         //map is over, no more world processor objective stuff
         state.rules.disableWorldProcessors = true;
+        state.markers.clear(); //TODO: should this optional?
 
         Call.clearObjectives();
 
