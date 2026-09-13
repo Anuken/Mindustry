@@ -5,15 +5,14 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.TextField.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.graphics.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -42,15 +41,14 @@ public class TargetDummy extends Block{
 
         saveConfig = true;
 
-        config(FloatSeq.class, (TargetDummyBuild tile, FloatSeq config) -> {
-            if(config.size > 0){
-                tile.unitTeam = tile.team;
-                if(config.get(0) == 1) tile.unitTeam = Team.get(tile.dummyTeam());
-            }
-            if(config.size > 1) tile.boosting = config.get(1) == 1;
-            if(config.size > 2) tile.unitArmor = config.get(2);
-            if(config.size > 3) tile.resetTime = config.get(3);
-            if(config.size > 4) tile.dummySize = config.get(4);
+        config(int[].class, (TargetDummyBuild tile, int[] config) -> {
+            if(config.length != 5) return; //invalid, must have 5 values exactly
+            tile.unitTeam = tile.team;
+            if(config[0] == 1) tile.unitTeam = Team.get(tile.dummyTeam());
+            tile.boosting = config[1] == 1;
+            tile.unitArmor = config[2];
+            tile.resetTime = config[3];
+            tile.dummySize = Float.intBitsToFloat(config[4]);
         });
     }
 
@@ -241,15 +239,15 @@ public class TargetDummy extends Block{
                 t.background(Styles.black6);
                 t.defaults().left();
 
-                t.check(Core.bundle.get("rules.enemyteam"), unitTeam != team, b -> configureFloat(0, Mathf.num(b))).colspan(3).row();
-                t.check(Core.bundle.get("stat.flying"), boosting, b -> configureFloat(1, Mathf.num(b))).colspan(3).row();
+                t.check(Core.bundle.get("rules.enemyteam"), unitTeam != team, b -> configureInt(0, Mathf.num(b))).colspan(3).row();
+                t.check(Core.bundle.get("stat.flying"), boosting, b -> configureInt(1, Mathf.num(b))).colspan(3).row();
                 t.add(Core.bundle.get("stat.armor"));
-                t.field("" + (int)unitArmor, TextFieldFilter.digitsOnly, s -> configureFloat(2, Strings.parseInt(s))).valid(val -> Strings.parseInt(val, Integer.MAX_VALUE) < 100_000).width(200f).padLeft(8f).colspan(2).row();
+                t.field("" + (int)unitArmor, TextFieldFilter.digitsOnly, s -> configureInt(2, Strings.parseInt(s))).valid(val -> Strings.parseInt(val, Integer.MAX_VALUE) < 100_000).width(200f).padLeft(8f).colspan(2).row();
                 t.add(Core.bundle.get("stat.resettime"));
-                t.field(Strings.autoFixed(resetTime / 60f, 2), TextFieldFilter.floatsOnly, s -> configureFloat(3, Strings.parseFloat(s) * 60f)).valid(Strings::canParsePositiveFloat).padLeft(8f).growX();
+                t.field(Strings.autoFixed(resetTime / 60f, 2), TextFieldFilter.floatsOnly, s -> configureInt(3, (int)(Strings.parseFloat(s) * 60f))).valid(Strings::canParsePositiveFloat).padLeft(8f).growX();
                 t.add(StatUnit.seconds.localized()).padLeft(8).row();
                 t.add(Core.bundle.get("stat.hitsize"));
-                t.field("" + (dummySize/tilesize), TextFieldFilter.floatsOnly, s -> configureFloat(4, Strings.parseFloat(s) * tilesize))
+                t.field("" + (dummySize/tilesize), TextFieldFilter.floatsOnly, s -> configureInt(4, Float.floatToIntBits(Strings.parseFloat(s) * tilesize)))
                 .valid(val -> {
                     float parsed = Strings.parseFloat(val, Float.MAX_VALUE);
                     return parsed >= 0.1f && parsed <= 50f;
@@ -259,10 +257,10 @@ public class TargetDummy extends Block{
         }
 
         //helper to send the rest of values, since config does not support arrays
-        public void configureFloat(int index, float value){
-            FloatSeq seq = FloatSeq.with(Mathf.num(unitTeam != team), Mathf.num(boosting), unitArmor, resetTime, dummySize);
-            seq.set(index, value);
-            configure(seq);
+        public void configureInt(int index, int value){
+            int[] values = config();
+            values[index] = value;
+            configure(values);
         }
 
         public int dummyTeam(){
@@ -271,8 +269,9 @@ public class TargetDummy extends Block{
         }
 
         @Override
-        public Object config(){
-            return FloatSeq.with(Mathf.num(unitTeam != team), Mathf.num(boosting), unitArmor, resetTime, dummySize);
+        public int[] config(){
+            //note: float[] is not supported in build 160
+            return new int[]{Mathf.num(unitTeam != team), Mathf.num(boosting), (int)unitArmor, (int)resetTime, Float.floatToIntBits(dummySize)};
         }
 
         @Override
