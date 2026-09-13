@@ -16,6 +16,13 @@ public class MapMarkers{
     public Seq<ObjectiveMarker> mapMarkers = new Seq<>(false);
     public Seq<ObjectiveMarker> lightMarkers = new Seq<>(false);
 
+    public void clear(){
+        worldMarkers.clear();
+        mapMarkers.clear();
+        lightMarkers.clear();
+        map.clear();
+    }
+
     public void add(int id, ObjectiveMarker marker){
         if(marker == null) return;
         var prev = map.put(id, marker);
