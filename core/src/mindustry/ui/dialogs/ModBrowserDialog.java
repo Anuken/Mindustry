@@ -249,7 +249,7 @@ public class ModBrowserDialog extends BaseDialog{
                                 if(mod.hasIcon){
                                     Fi cacheFolder = Vars.mobile ? Core.files.cache("modIconCache"): dataDirectory.child("modIconCache");
                                     cacheFolder.mkdirs();
-                                    Fi cacheFile = cacheFolder.child(Strings.sanitizeFilename(mod.repo + mod.lastUpdated) + ".png");
+                                    Fi cacheFile = cacheFolder.child(Strings.sanitizeFilename(mod.repo + "_" + mod.iconHash) + ".png");
 
                                     if(!cacheFile.exists()){ //fetch from Github
                                         ConsT<HttpResponse, Exception> fetch = res -> {
