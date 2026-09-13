@@ -3,6 +3,7 @@ package mindustry.world.blocks.units;
 import arc.*;
 import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
+import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -27,6 +28,8 @@ import mindustry.world.blocks.payloads.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import java.util.*;
+
 import static mindustry.Vars.*;
 
 public class Reconstructor extends UnitBlock{
@@ -34,12 +37,15 @@ public class Reconstructor extends UnitBlock{
     public Seq<UnitType[]> upgrades = new Seq<>();
     public int[] capacities = {};
 
+    public Sound createSound = Sounds.unitCreate;
+    public float createSoundVolume = 1f;
+
     public Reconstructor(String name){
         super(name);
         regionRotated1 = 1;
         regionRotated2 = 2;
         commandable = true;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
         configurable = true;
         config(UnitCommand.class, (ReconstructorBuild build, UnitCommand command) -> build.command = command);
         configClear((ReconstructorBuild build) -> build.command = null);
@@ -62,7 +68,12 @@ public class Reconstructor extends UnitBlock{
     public void setBars(){
         super.setBars();
 
-        addBar("progress", (ReconstructorBuild entity) -> new Bar("bar.progress", Pal.ammo, entity::fraction));
+        addBar("progress", (ReconstructorBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.progress", Strings.autoFixed(e.fraction() * 100f, 0)),
+            () -> Pal.ammo,
+            e::fraction
+        ));
+
         addBar("units", (ReconstructorBuild e) ->
         new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
@@ -119,8 +130,19 @@ public class Reconstructor extends UnitBlock{
 
     @Override
     public void init(){
-        capacities = new int[Vars.content.items().size];
+        initCapacities();
+        super.init();
+    }
 
+    @Override
+    public void afterPatch(){
+        initCapacities();
+        super.afterPatch();
+    }
+
+    public void initCapacities(){
+        capacities = new int[Vars.content.items().size];
+        itemCapacity = 10;
         ConsumeItems cons = findConsumer(c -> c instanceof ConsumeItems);
         if(cons != null){
             for(ItemStack stack : cons.items){
@@ -130,8 +152,12 @@ public class Reconstructor extends UnitBlock{
         }
 
         consumeBuilder.each(c -> c.multiplier = b -> state.rules.unitCost(b.team));
+    }
 
-        super.init();
+    @Override
+    public void checkContentArrayCapacity(int items, int liquids){
+        super.checkContentArrayCapacity(items, liquids);
+        if(capacities.length != items) capacities = Arrays.copyOf(capacities, items);
     }
 
     public void addUpgrade(UnitType from, UnitType to){
@@ -156,6 +182,12 @@ public class Reconstructor extends UnitBlock{
         @Override
         public void onCommand(Vec2 target){
             commandPos = target;
+            if(command != null && command.snapToBuilding){
+                var build = world.buildWorld(target.x, target.y);
+                if(build != null && build.team == this.team){
+                    commandPos.set(build);
+                }
+            } 
         }
 
         @Override
@@ -165,7 +197,7 @@ public class Reconstructor extends UnitBlock{
 
         public boolean canSetCommand(){
             var output = unit();
-            return output != null && output.commands.size > 1 && output.allowChangeCommands;
+            return output == null || output.allowChangeCommands;
         }
 
         @Override
@@ -182,25 +214,20 @@ public class Reconstructor extends UnitBlock{
         public void buildConfiguration(Table table){
             var unit = unit();
 
-            if(unit == null){
-                deselect();
-                return;
-            }
-
             var group = new ButtonGroup<ImageButton>();
             group.setMinCheckCount(0);
-            int i = 0, columns = 4;
+            int i = 0, columns = 5;
 
             table.background(Styles.black6);
 
-            var list = unit().commands;
+            var list = unit == null ? Vars.content.unitCommands().copy() : unit().commands;
             for(var item : list){
-                ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 40f, () -> {
+                ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 44f, () -> {
                     configure(item);
                     deselect();
                 }).tooltip(item.localized()).group(group).get();
 
-                button.update(() -> button.setChecked(command == item || (command == null && unit.defaultCommand == item)));
+                button.update(() -> button.setChecked(command == item || (command == null && unit != null && unit.defaultCommand == item)));
 
                 if(++i % columns == 0){
                     table.row();
@@ -233,6 +260,12 @@ public class Reconstructor extends UnitBlock{
             }
 
             return upgrade != null && (team.isAI() || upgrade.unlockedNowHost()) && !upgrade.isBanned();
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(!team.activateUnitFactories()) return BlockStatus.inactiveUnitFactory;
+            return super.status();
         }
 
         @Override
@@ -315,6 +348,7 @@ public class Reconstructor extends UnitBlock{
                                 payload.unit.command().command(command == null && payload.unit.type.defaultCommand != null ? payload.unit.type.defaultCommand : command);
                             }
 
+                            createSound.at(this, 1f + Mathf.range(0.06f), createSoundVolume);
                             progress %= 1f;
                             Effect.shake(2f, 3f, this);
                             Fx.producesmoke.at(this);
@@ -338,7 +372,7 @@ public class Reconstructor extends UnitBlock{
 
         @Override
         public boolean shouldConsume(){
-            return constructing && enabled;
+            return constructing && enabled && team.activateUnitFactories();
         }
 
         @Override

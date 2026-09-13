@@ -62,20 +62,38 @@ public class MenuFragment{
 
         parent.fill(c -> c.bottom().right().button(Icon.discord, new ImageButtonStyle(){{
             up = discordBanner;
-        }}, ui.discord::show).marginTop(9f).marginLeft(10f).tooltip("@discord").size(84, 45).name("discord"));
+        }}, ui.discord::show).visible(() -> !ui.consolefrag.shown()).marginTop(9f).marginLeft(10f).tooltip("@discord").size(84, 45).name("discord"));
 
         //info icon
         if(mobile){
-            parent.fill(c -> c.bottom().left().button("", new TextButtonStyle(){{
-                font = Fonts.def;
-                fontColor = Color.white;
-                up = infoBanner;
-            }}, ui.about::show).size(84, 45).name("info"));
-
+            //left/right gutter areas
             parent.fill((x, y, w, h) -> {
-                if(Core.scene.marginBottom > 0){
-                    Tex.paneTop.draw(0, 0, Core.graphics.getWidth(), Core.scene.marginBottom);
+                x = 0f;
+                y = 0f;
+                w = Core.graphics.getWidth();
+                h = Core.graphics.getHeight();
+                if(Core.scene.marginLeft > 0){
+                    paneRight.draw(x, y, Core.scene.marginLeft, h);
                 }
+
+                if(Core.scene.marginRight > 0){
+                    paneLeft.draw(x + w - Core.scene.marginRight, y, Core.scene.marginRight, h);
+                }
+
+                if(Core.scene.marginBottom > 0){
+                    Tex.paneTop.draw(Core.scene.marginLeft, 0, Core.graphics.getWidth() - Core.scene.marginRight - Core.scene.marginLeft, Core.scene.marginBottom);
+                }
+            });
+
+            parent.fill(c -> {
+                c.bottom().left();
+                c.button(Icon.terminal, () -> ui.consolefrag.toggleMobile()).visible(() -> !ui.consolefrag.shown() && Core.settings.getBool("console")).pad(4f).size(60f).left().row();
+
+                c.button("", new TextButtonStyle(){{
+                    font = Fonts.def;
+                    fontColor = Color.white;
+                    up = infoBanner;
+                }}, ui.about::show).size(84, 45).visible(() -> !ui.consolefrag.shown()).name("info");
             });
         }else if(becontrol.active()){
             parent.fill(c -> c.bottom().right().button("@be.check", Icon.refresh, () -> {

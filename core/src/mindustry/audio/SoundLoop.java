@@ -50,7 +50,7 @@ public class SoundLoop{
         if(id != -1){
             Core.audio.stop(id);
             id = -1;
-            volume = baseVolume = -1;
+            volume = 0f;
         }
     }
 }

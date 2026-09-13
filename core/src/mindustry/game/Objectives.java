@@ -29,6 +29,11 @@ public class Objectives{
                 (content.techNode == null || content.techNode.parent == null || content.techNode.parent.content.unlockedHost()) ?
                     (content.emoji() + " " + content.localizedName) : "???");
         }
+
+        @Override
+        public String toString(){
+            return "research: " + content;
+        }
     }
 
     public static class Produce implements Objective{
@@ -50,6 +55,11 @@ public class Objectives{
             return Core.bundle.format("requirement.produce",
                 content.unlockedHost() ? (content.emoji() + " " + content.localizedName) : "???");
         }
+
+        @Override
+        public String toString(){
+            return "produce: " + content;
+        }
     }
 
     public static class SectorComplete implements Objective{
@@ -69,6 +79,11 @@ public class Objectives{
         @Override
         public String display(){
             return Core.bundle.format("requirement.capture", preset.localizedName);
+        }
+
+        @Override
+        public String toString(){
+            return "sectorComplete: " + preset;
         }
     }
 
@@ -90,6 +105,11 @@ public class Objectives{
         public String display(){
             return Core.bundle.format("requirement.onsector", preset.localizedName);
         }
+
+        @Override
+        public String toString(){
+            return "onSector: " + preset;
+        }
     }
 
     public static class OnPlanet implements Objective{
@@ -109,6 +129,11 @@ public class Objectives{
         @Override
         public String display(){
             return Core.bundle.format("requirement.onplanet", planet.localizedName);
+        }
+
+        @Override
+        public String toString(){
+            return "onPlanet: " + planet;
         }
     }
 

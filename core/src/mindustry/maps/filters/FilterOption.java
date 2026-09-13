@@ -42,7 +42,7 @@ public abstract class FilterOption{
         boolean display = true;
 
         SliderOption(String name, Floatp getter, Floatc setter, float min, float max){
-            this(name, getter, setter, min, max, (max - min) / 200);
+            this(name, getter, setter, min, max, 0.00001f);
         }
 
         SliderOption(String name, Floatp getter, Floatc setter, float min, float max, float step){

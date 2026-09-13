@@ -29,6 +29,7 @@ public class RepairTower extends Block{
         update = true;
         solid = true;
         suppressable = true;
+        flags = EnumSet.of(BlockFlag.repair);
     }
 
     @Override

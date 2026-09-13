@@ -206,7 +206,7 @@ public class Generators{
                     Pixmap result = new Pixmap(size, size);
                     byte[][] mask = new byte[size][size];
 
-                    byte val = (byte)bi;
+                    int val = (bi & 0xff) == 128 ? 128 : (byte)bi;
                     //check each bit/direction
                     for(int j = 0; j < 8; j++){
                         if((val & (1 << j)) != 0){

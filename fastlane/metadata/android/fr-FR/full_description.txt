@@ -1,0 +1,34 @@
+Mindustry est un jeu de construction d'usines, avec des éléments de tower defense et de RTS. Créez des chaînes d'approvisionnement élaborées pour alimenter vos tourelles, produire des matériaux de construction et fabriquer des unités. Donnez des ordres à vos unités pour capturer des bases ennemies et développez votre production. Défendez votre noyau contre des vagues d'ennemis.
+
+<h2>Caractéristiques du jeu</h2>
+ 
+- Utilisez des blocs de production pour créer une grande variété de matériaux avancés
+- Défendez vos structures contre des vagues ennemies
+- Jouez avec vos amis en coop multijoueur multiplateforme, ou affrontez-les dans des matchs PvP par équipes
+- Distribuez des liquides et faites face à des défis permanents, comme des incendies ou des raids aériens
+- Tirez le meilleur parti de votre production en fournissant des liquides de refroidissement
+- Produisez une grande variété d'unités pour gérer automatiquement votre base ou attaquer les bases ennemies
+- Mettez en place des chaînes d'assemblage pour construire des armées d'unités mécanisées
+- Utilisez vos unités pour affronter des bases ennemies
+
+
+<h2>Campagne</h2>
+
+- Conquérez les planètes Serpulo et Erekir en progressant à travers 35 cartes faites à la main et plus de 250 secteurs générés procéduralement
+- Capturez des territoires et installez des usines pour produire des ressources pendant que vous jouez sur d'autres secteurs
+- Défendez vos secteurs contre des invasions périodiques
+- Coordonnez la distribution des ressources entre les secteurs via des rampes de lancement
+- Recherchez de nouveaux blocs pour alimenter votre progression
+- Invitez vos amis pour accomplir des missions ensemble
+- Plus de 250 blocs à débloquer
+- Plus de 50 types de drones, de mécas et de vaisseaux
+
+
+<h2>Parties personnalisées &amp; multijoueur multiplateforme</h2>
+
+- 16+ cartes intégrées pour les parties personnalisées, en plus des deux campagnes complètes
+- Jouez en coop, en PvP ou en mode bac à sable
+- Rejoignez un serveur dédié public ou invitez vos amis dans votre propre session privée
+- Règles de jeu personnalisables : modifiez le coût des blocs, les statistiques des ennemis, les objets de départ, le rythme des vagues et plus encore
+- Éditeur de cartes complet avec prise en charge des scripts
+- Prise en charge des mods, avec navigateur de mods intégré

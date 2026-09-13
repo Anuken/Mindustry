@@ -3,7 +3,6 @@ package mindustry.entities.comp;
 import arc.math.*;
 import arc.math.geom.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.async.PhysicsProcess.*;
 import mindustry.gen.*;
 
 /** Affected by physics.
@@ -13,8 +12,7 @@ import mindustry.gen.*;
 abstract class PhysicsComp implements Velc, Hitboxc{
     @Import float hitSize, x, y;
     @Import Vec2 vel;
-
-    transient PhysicRef physref;
+    transient boolean hasPhysicsRef;
 
     //mass is simply the area of this object
     float mass(){

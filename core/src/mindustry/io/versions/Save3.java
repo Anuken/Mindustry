@@ -2,6 +2,7 @@ package mindustry.io.versions;
 
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.io.*;
 
 import java.io.*;
 
@@ -14,7 +15,7 @@ public class Save3 extends LegacySaveVersion{
     }
 
     @Override
-    public void readEntities(DataInput stream) throws IOException{
+    public void readEntities(DataInput stream, SaveReadState state) throws IOException{
         int teamc = stream.readInt();
         for(int i = 0; i < teamc; i++){
             Team team = Team.get(stream.readInt());

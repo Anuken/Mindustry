@@ -16,12 +16,32 @@ public class Tiles implements Iterable<Tile>{
     final Puddle[] puddles;
     final Fire[] fires;
 
+    @Nullable long[] tmpFloorState, tmpBlockState;
+
     public Tiles(int width, int height){
         this.array = new Tile[width * height];
         this.width = width;
         this.height = height;
         this.puddles = new Puddle[width * height];
         this.fires = new Fire[width * height];
+    }
+
+    public long getTmpFloorState(int pos){
+        return tmpFloorState == null ? 0 : tmpFloorState[pos];
+    }
+
+    public void setTmpFloorState(int pos, long value){
+        if(tmpFloorState == null || tmpFloorState.length != array.length) tmpFloorState = new long[array.length];
+        tmpFloorState[pos] = value;
+    }
+
+    public long getTmpBlockState(int pos){
+        return tmpBlockState == null ? 0 : tmpBlockState[pos];
+    }
+
+    public void setTmpBlockState(int pos, long value){
+        if(tmpBlockState == null || tmpBlockState.length != array.length) tmpBlockState = new long[array.length];
+        tmpBlockState[pos] = value;
     }
 
     public Puddle getPuddle(int pos){

@@ -1,0 +1,4 @@
+{
+  "doc": "Weapon warmup, 0 when not firing, 1 when actively shooting. Not equivalent to heat. A sensor value for PartProgress.type - not an operation (see PartProgress and the 'op' field for those).",
+  "superclass": "mindustry.entities.part.DrawPart$PartProgress"
+}

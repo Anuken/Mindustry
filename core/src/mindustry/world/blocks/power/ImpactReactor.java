@@ -38,27 +38,46 @@ public class ImpactReactor extends PowerGenerator{
         explosionDamage = 1900 * 4;
         explosionMinWarmup = 0.3f;
         explodeEffect = Fx.impactReactorExplosion;
-        explodeSound = Sounds.explosionbig;
+        explodeSound = Sounds.explosionReactor2;
     }
 
     @Override
     public void setBars(){
+        stats.timePeriod = itemDuration;
         super.setBars();
 
         addBar("power", (GeneratorBuild entity) -> new Bar(() ->
         Core.bundle.format("bar.poweroutput",
-        Strings.fixed(Math.max(entity.getPowerProduction() - consPower.usage, 0) * 60 * entity.timeScale(), 1)),
+        Strings.fixed(Math.max(entity.getPowerProduction() - (consPower == null ? 0f : consPower.usage), 0) * 60 * entity.timeScale(), 1)),
         () -> Pal.powerBar,
         () -> entity.productionEfficiency));
     }
 
     @Override
     public void setStats(){
+        stats.timePeriod = itemDuration;
         super.setStats();
 
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
+
+        if(consPower != null){
+            //exponential decay formula
+            float max = statWarmup(0.001f);
+            float t90 = statWarmup(0.1f), t99 = statWarmup(0.01f);
+            float equal = statWarmup(1f - Mathf.pow(consPower.usage / powerProduction, 1f / 5f));
+
+            stats.add(Stat.warmupTime, t -> t.add(
+                Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized() +
+                (consPower != null ? " ~ " + Strings.autoFixed(equal, 2) + " " + StatUnit.seconds.localized() + " " + StatUnit.powerEquilibrium.localized() : "")
+            ).tooltip(Core.bundle.format("bar.lerpwarmuptime", Strings.autoFixed(t90, 2), Strings.autoFixed(t99, 2))));
+        }
+    }
+
+    //progress remaining
+    public float statWarmup(float progress){
+        return -(float)Math.log(progress) / warmupSpeed / 60f;
     }
 
     public class ImpactReactorBuild extends GeneratorBuild{
@@ -67,14 +86,14 @@ public class ImpactReactor extends PowerGenerator{
         @Override
         public void updateTile(){
             if(efficiency >= 0.9999f && power.status >= 0.99f){
-                boolean prevOut = getPowerProduction() <= consPower.requestedPower(this);
+                boolean prevOut = consPower != null && getPowerProduction() <= consPower.requestedPower(this);
 
                 warmup = Mathf.lerpDelta(warmup, 1f, warmupSpeed * timeScale);
                 if(Mathf.equal(warmup, 1f, 0.001f)){
                     warmup = 1f;
                 }
 
-                if(!prevOut && (getPowerProduction() > consPower.requestedPower(this))){
+                if(!prevOut && consPower != null && (getPowerProduction() > consPower.requestedPower(this))){
                     Events.fire(Trigger.impactPower);
                 }
 

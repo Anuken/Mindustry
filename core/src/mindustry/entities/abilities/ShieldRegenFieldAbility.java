@@ -1,6 +1,8 @@
 package mindustry.entities.abilities;
 
 import arc.*;
+import arc.audio.*;
+import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -13,6 +15,8 @@ public class ShieldRegenFieldAbility extends Ability{
     public float amount = 1, max = 100f, reload = 100, range = 60;
     public Effect applyEffect = Fx.shieldApply;
     public Effect activeEffect = Fx.shieldWave;
+    public Sound sound = Sounds.shieldWave;
+    public float soundVolume = 0.7f;
     public boolean parentizeEffects;
 
     protected float timer;
@@ -34,7 +38,7 @@ public class ShieldRegenFieldAbility extends Ability{
         t.row();
         t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
         t.row();
-        t.add(abilityStat("pulseregen", Strings.autoFixed(amount, 2)));
+        t.add(abilityStat("pulseregen", Strings.autoFixed(amount, 2)) + "[lightgray] ~ []" + abilityStat("regen", Strings.autoFixed(amount * 60f / reload, 2)));
         t.row();
         t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
     }
@@ -57,6 +61,7 @@ public class ShieldRegenFieldAbility extends Ability{
 
             if(applied){
                 activeEffect.at(unit.x, unit.y, unit.type.shieldColor(unit));
+                sound.at(unit, 1f + Mathf.range(0.1f), soundVolume);
             }
 
             timer = 0f;

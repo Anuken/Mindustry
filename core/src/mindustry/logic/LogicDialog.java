@@ -45,16 +45,16 @@ public class LogicDialog extends BaseDialog{
 
         shown(this::setup);
         shown(() -> {
-            wasRows = LCanvas.useRows();
+            wasRows = LCanvas.isCompact();
             wasPortrait = Core.graphics.isPortrait();
         });
         hidden(() -> consumer.get(canvas.save()));
         onResize(() -> {
-            if(wasRows != LCanvas.useRows() || wasPortrait != Core.graphics.isPortrait()){
+            if(wasRows != LCanvas.isCompact() || wasPortrait != Core.graphics.isPortrait()){
                 setup();
                 canvas.rebuild();
                 wasPortrait = Core.graphics.isPortrait();
-                wasRows = LCanvas.useRows();
+                wasRows = LCanvas.isCompact();
             }
         });
 
@@ -130,15 +130,15 @@ public class LogicDialog extends BaseDialog{
                         dialog.hide();
                     }).marginLeft(12f).row();
 
-                    t.button("@schematic.copy", Icon.copy, style, () -> {
+                    t.button("@copy.clipboard", Icon.copy, style, () -> {
                         dialog.hide();
                         Core.app.setClipboardText(canvas.save());
                     }).marginLeft(12f).row();
 
-                    t.button("@schematic.copy.import", Icon.download, style, () -> {
+                    t.button("@load.clipboard", Icon.download, style, () -> {
                         dialog.hide();
                         try{
-                            canvas.load(Core.app.getClipboardText().replace("\r\n", "\n"));
+                            canvas.load(Core.app.getClipboardText());
                         }catch(Throwable e){
                             ui.showException(e);
                         }
@@ -254,6 +254,10 @@ public class LogicDialog extends BaseDialog{
     }
 
     public void showAddDialog(){
+        showAddDialog(-1);
+    }
+
+    public void showAddDialog(int position){
         BaseDialog dialog = new BaseDialog("@add");
         dialog.cont.table(table -> {
             String[] searchText = {""};
@@ -278,7 +282,7 @@ public class LogicDialog extends BaseDialog{
 
                     search.keyDown(KeyCode.enter, () -> {
                         if(!searchText[0].isEmpty() && matched[0] != null){
-                            canvas.add((LStatement)matched[0].get());
+                            canvas.addAt(position == -1 ? canvas.statements.getChildren().size : position, (LStatement)matched[0].get());
                             dialog.hide();
                         }
                     });
@@ -296,7 +300,8 @@ public class LogicDialog extends BaseDialog{
                     for(Prov<LStatement> prov : LogicIO.allStatements){
                         LStatement example = prov.get();
                         if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged) ||
-                            (!text.isEmpty() && !example.name().toLowerCase(Locale.ROOT).contains(text) && !example.typeName().toLowerCase(Locale.ROOT).contains(text))) continue;
+                            (!text.isEmpty() && !example.localizedName().toLowerCase(Locale.ROOT).contains(text) && !example.typeName().toLowerCase(Locale.ROOT).contains(text)) ||
+                            (!privileged && !state.rules.logicUnitControl && example.category() == LCategory.unit)) continue;
 
                         if(matched[0] == null){
                             matched[0] = prov;
@@ -325,10 +330,10 @@ public class LogicDialog extends BaseDialog{
                         style.fontColor = category.color;
                         style.font = Fonts.outline;
 
-                        cat.button(example.name(), style, () -> {
-                            canvas.add(prov.get());
+                        cat.button(example.localizedName(), style, () -> {
+                            canvas.addAt(position == -1 ? canvas.statements.getChildren().size : position, prov.get());
                             dialog.hide();
-                        }).size(130f, 50f).self(c -> tooltip(c, "lst." + example.name())).top().left();
+                        }).size(130f, 50f).self(c -> tooltip(c, "lst." + example.statementKey())).top().left();
 
                         if(cat.getChildren().size % 3 == 0) cat.row();
                     }
@@ -346,6 +351,7 @@ public class LogicDialog extends BaseDialog{
         this.privileged = privileged;
         this.forceRestart = false;
         canvas.statements.clearChildren();
+        canvas.pane.setScrollYForce(0f);
         canvas.rebuild();
         canvas.privileged = privileged;
         try{

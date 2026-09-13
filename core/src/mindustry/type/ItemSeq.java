@@ -124,6 +124,7 @@ public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
     }
 
     public void add(Item item, int amount){
+        if(item.id >= values.length) return; //data patches can change item array length
         values[item.id] += amount;
         total += amount;
     }

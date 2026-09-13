@@ -4,24 +4,21 @@ import arc.*;
 import arc.Input.*;
 import arc.backend.robovm.*;
 import arc.files.*;
-import arc.func.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Saves.*;
-import mindustry.io.*;
 import mindustry.net.*;
+import mindustry.ui.FileChooser.*;
 import mindustry.ui.*;
 import org.robovm.apple.coregraphics.*;
 import org.robovm.apple.foundation.*;
 import org.robovm.apple.uikit.*;
 import org.robovm.objc.block.*;
+import rhino.*;
 
-import java.io.*;
 import java.util.*;
-import java.util.zip.*;
 
 import static mindustry.Vars.*;
 import static org.robovm.apple.foundation.NSPathUtilities.*;
@@ -43,16 +40,16 @@ public class IOSLauncher extends IOSApplication.Delegate{
         return new IOSApplication(new ClientLauncher(){
 
             @Override
-            public void showFileChooser(boolean open, String titleIgn, String extension, Cons<Fi> cons){
-                if(!open){ //when exporting, just share it.
+            public void showFileChooser(FileChooserParams params){
+                if(!params.open){ //when exporting, just share it.
                     //ask for export name
                     Core.input.getTextInput(new TextInput(){{
                         title = Core.bundle.get("filename");
                         accepted = name -> {
                             try{
                                 //write result
-                                Fi result = tmpDirectory.child(name + "." + extension);
-                                cons.get(result);
+                                Fi result = tmpDirectory.child(name + "." + params.extensions[0]);
+                                params.handleChooseResult(result);
 
                                 //import the document
                                 shareFile(result);
@@ -79,33 +76,35 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
                     @Override
                     public void didPickDocumentsAtURLs(UIDocumentBrowserViewController controller, NSArray<NSURL> documentURLs){
-                        if(documentURLs.size() < 1) return;
+                        if(documentURLs.isEmpty()) return;
 
-                        NSURL url = documentURLs.first();
+                        Seq<Fi> results = new Seq<>();
                         NSFileCoordinator coord = new NSFileCoordinator(null);
-                        url.startAccessingSecurityScopedResource();
-                        try{
-                            coord.coordinateReadingItem(url, NSFileCoordinatorReadingOptions.ForUploading, result -> {
-
-                                Fi src = Core.files.absolute(result.getAbsoluteURL().getPath());
-                                Fi dst = Core.files.absolute(getDocumentsDirectory()).child(src.name());
-                                src.copyTo(dst);
-
-                                Core.app.post(() -> {
-                                    try{
-                                        cons.get(dst);
-                                    }catch(Throwable t){
-                                        ui.showException(t);
-                                    }
+                        for(NSURL url : documentURLs){
+                            url.startAccessingSecurityScopedResource();
+                            try{
+                                coord.coordinateReadingItem(url, NSFileCoordinatorReadingOptions.ForUploading, result -> {
+                                    Fi src = Core.files.absolute(result.getAbsoluteURL().getPath());
+                                    Fi dst = Core.files.absolute(getDocumentsDirectory()).child(src.name());
+                                    src.copyTo(dst);
+                                    results.add(dst);
                                 });
-                            });
-                        }catch(Throwable e){
-                            ui.showException(e);
+                            }catch(Throwable e){
+                                ui.showException(e);
+                            }
+
+                            url.stopAccessingSecurityScopedResource();
+
+                            cont.dismissViewController(true, () -> {});
                         }
 
-                        url.stopAccessingSecurityScopedResource();
-
-                        cont.dismissViewController(true, () -> {});
+                        Core.app.post(() -> {
+                            try{
+                                params.handleChooseResult(results.toArray(Fi.class));
+                            }catch(Throwable t){
+                                ui.showException(t);
+                            }
+                        });
                     }
 
                     @Override
@@ -135,6 +134,13 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 cont.setDelegate(new ChooserDelegate());
 
                 UIApplication.getSharedApplication().getKeyWindow().getRootViewController().presentViewController(cont, true, () -> {});
+            }
+            @Override
+            public Context getScriptContext(){
+                Context context = Context.getCurrentContext();
+                if(context == null) context = Context.enter();
+                context.setOptimizationLevel(-1);
+                return context;
             }
 
             @Override
@@ -187,17 +193,13 @@ public class IOSLauncher extends IOSApplication.Delegate{
 
     @Override
     public boolean openURL(UIApplication app, NSURL url, UIApplicationOpenURLOptions options){
-        openURL(url);
+        handleAppURL(url);
         return false;
     }
 
     @Override
     public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions options){
         boolean b = super.didFinishLaunching(application, options);
-
-        if(options != null && options.has(UIApplicationLaunchOptions.Keys.URL())){
-            openURL(((NSURL)options.get(UIApplicationLaunchOptions.Keys.URL())));
-        }
 
         Events.on(ClientLoadEvent.class, e -> Core.app.post(() -> Core.app.post(() -> Core.scene.table(Styles.black9, t -> {
             t.visible(() -> {
@@ -212,36 +214,16 @@ public class IOSLauncher extends IOSApplication.Delegate{
         return b;
     }
 
-    void openURL(NSURL url){
+    void handleAppURL(NSURL url){
+        if(url == null) return;
+        try{
+            Fi file = new Fi(getDocumentsDirectory()).child(url.getLastPathComponent());
+            new Fi(url.getPath()).copyTo(file);
 
-        Core.app.post(() -> Core.app.post(() -> {
-            Fi file = Core.files.absolute(getDocumentsDirectory()).child(url.getLastPathComponent());
-            Core.files.absolute(url.getPath()).copyTo(file);
-
-            if(file.extension().equalsIgnoreCase(saveExtension)){ //open save
-
-                try{
-                    if(SaveIO.isSaveValid(file)){
-                        SaveMeta meta = SaveIO.getMeta(new DataInputStream(new InflaterInputStream(file.read(Streams.defaultBufferSize))));
-                        if(meta.tags.containsKey("name")){
-                            //is map
-                            if(!ui.editor.isShown()){
-                                ui.editor.show();
-                            }
-
-                            ui.editor.beginEditMap(file);
-                        }else{
-                            SaveSlot slot = control.saves.importSave(file);
-                            ui.load.runLoadSave(slot);
-                        }
-                    }else{
-                        ui.showErrorMessage("@save.import.invalid");
-                    }
-                }catch(Throwable e){
-                    ui.showException("@save.import.fail", e);
-                }
-            }
-        }));
+            ClientLauncher.runOnClientLoad(() -> ClientLauncher.handleFileImport(file));
+        }catch(Exception e){
+            Log.err(e);
+        }
     }
 
     public static void main(String[] argv){

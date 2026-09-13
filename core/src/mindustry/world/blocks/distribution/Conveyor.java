@@ -46,7 +46,7 @@ public class Conveyor extends Block implements Autotiler{
         conveyorPlacement = true;
         underBullets = true;
 
-        ambientSound = Sounds.conveyor;
+        ambientSound = Sounds.loopConveyor;
         ambientSoundVolume = 0.0022f;
         unloadable = false;
         noUpdateDisabled = false;
@@ -55,7 +55,7 @@ public class Conveyor extends Block implements Autotiler{
     @Override
     public void setStats(){
         super.setStats();
-        
+
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
     }
@@ -142,7 +142,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f && !state.rules.editor ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);

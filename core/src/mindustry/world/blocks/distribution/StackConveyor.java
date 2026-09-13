@@ -53,8 +53,10 @@ public class StackConveyor extends Block implements Autotiler{
         conveyorPlacement = true;
         underBullets = true;
         priority = TargetPriority.transport;
+        drawCached = true;
+        buildingCacheLayer = BuildingCacheLayer.under;
 
-        ambientSound = Sounds.conveyor;
+        ambientSound = Sounds.loopConveyor;
         ambientSoundVolume = 0.004f;
     }
 
@@ -119,9 +121,7 @@ public class StackConveyor extends Block implements Autotiler{
         boolean proxUpdating = false;
 
         @Override
-        public void draw(){
-            Draw.z(Layer.block - 0.2f);
-
+        public void drawCached(){
             Draw.rect(regions[state], x, y, rotdeg());
 
             for(int i = 0; i < 4; i++){
@@ -133,7 +133,7 @@ public class StackConveyor extends Block implements Autotiler{
             //draw inputs
             if(state == stateLoad){
                 for(int i = 0; i < 4; i++){
-                    int dir = rotation - i;
+                    int dir = Mathf.mod(rotation - i, 4);
                     var near = nearby(dir);
                     if((blendprox & (1 << i)) != 0 && i != 0 && near != null && !near.block.squareSprite){
                         Draw.rect(sliced(regions[0], SliceMode.bottom), x + Geometry.d4x(dir) * tilesize*0.75f, y + Geometry.d4y(dir) * tilesize*0.75f, (float)(dir*90));
@@ -141,16 +141,18 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }else if(state == stateUnload){ //front unload
                 //TOOD hacky front check
-                if((blendprox & (1)) != 0 && !front().block.squareSprite){
+                if((blendprox & (1)) != 0 && front() != null && !front().block.squareSprite){
                     Draw.rect(sliced(regions[0], SliceMode.top), x + Geometry.d4x(rotation) * tilesize*0.75f, y + Geometry.d4y(rotation) * tilesize*0.75f, rotation * 90f);
                 }
             }
+        }
 
+        @Override
+        public void draw(){
             Draw.z(Layer.block - 0.1f);
 
             Tile from = world.tile(link);
 
-            //TODO do not draw for certain configurations?
             if(glowRegion.found() && power != null && power.status > 0f){
                 Draw.z(Layer.blockAdditive);
                 Draw.color(glowColor, glowAlpha * power.status);
@@ -185,7 +187,6 @@ public class StackConveyor extends Block implements Autotiler{
 
             //item
             float size = itemSize * Mathf.lerp(Math.min((float)items.total() / itemCapacity, 1), 1f, 0.4f);
-            Drawf.shadow(Tmp.v1.x, Tmp.v1.y, size * 1.2f);
             Draw.rect(lastItem.fullIcon, Tmp.v1.x, Tmp.v1.y, size, size, 0);
         }
 
@@ -193,7 +194,12 @@ public class StackConveyor extends Block implements Autotiler{
         public void dropped(){
             super.dropped();
             var prev = Geometry.d4[(rotation + 2) % 4];
-            link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+            if(items.any()){
+                link = Point2.pack(tile.x + prev.x, tile.y + prev.y);
+                cooldown = 0f;
+            }else{
+                link = -1;
+            }
         }
 
         @Override
@@ -201,7 +207,7 @@ public class StackConveyor extends Block implements Autotiler{
             Draw.z(Layer.block - 0.15f);
             super.drawCracks();
         }
-        
+
         @Override
         public void payloadDraw(){
             Draw.rect(block.fullIcon, x, y);
@@ -210,6 +216,7 @@ public class StackConveyor extends Block implements Autotiler{
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
+            recache();
 
             int lastState = state;
 
@@ -293,19 +300,16 @@ public class StackConveyor extends Block implements Autotiler{
                 }
             }else{ //transfer
                 if(state != stateLoad || (items.total() >= getMaximumAccepted(lastItem))){
-                    if(front() instanceof StackConveyorBuild e && e.team == team){
-                        //sleep if its occupied
-                        if(e.link == -1){
-                            e.items.add(items);
-                            e.lastItem = lastItem;
-                            e.link = tile.pos();
-                            //▲ to | from ▼
-                            link = -1;
-                            items.clear();
+                    if(front() instanceof StackConveyorBuild e && e.team == team && e.link == -1){
+                        e.items.add(items);
+                        e.lastItem = lastItem;
+                        e.link = tile.pos();
+                        //▲ to | from ▼
+                        link = -1;
+                        items.clear();
 
-                            cooldown = recharge;
-                            e.cooldown = 1;
-                        }
+                        cooldown = recharge;
+                        e.cooldown = 1;
                     }
                 }
             }

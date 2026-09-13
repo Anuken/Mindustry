@@ -88,7 +88,6 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
             //force removal without pool free
             Groups.all.remove(self());
             Groups.draw.remove(self());
-            Groups.puddle.remove(self());
             added = false;
             return;
         }

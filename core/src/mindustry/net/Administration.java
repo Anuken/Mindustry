@@ -7,16 +7,22 @@ import arc.util.*;
 import arc.util.Log.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
+import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
+import java.util.regex.*;
+
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
 
 public class Administration{
+    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
+    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
     public Seq<String> bannedIPs = new Seq<>();
     public Seq<String> whitelist = new Seq<>();
     public Seq<ChatFilter> chatFilters = new Seq<>();
@@ -24,10 +30,10 @@ public class Administration{
     public Seq<String> subnetBans = new Seq<>();
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
+    public Seq<Pattern> bannedNames = new Seq<>();
 
     private boolean modified, loaded;
-    /** All player info. Maps UUIDs to info. This persists throughout restarts. Do not modify directly. */
-    public ObjectMap<String, PlayerInfo> playerInfo = new ObjectMap<>();
+    private ObjectMap<String, IdEncounterInfo> encounteredIDsForIp = new ObjectMap<>();
 
     public Administration(){
         load();
@@ -129,6 +135,11 @@ public class Administration{
 
     public boolean isSubnetBanned(String ip){
         return subnetBans.contains(ip::startsWith);
+    }
+
+    public void addNameBan(String regex) throws PatternSyntaxException{
+        bannedNames.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
+        save();
     }
 
     /** Adds a chat filter. This will transform the chat messages of every player.
@@ -278,6 +289,24 @@ public class Administration{
         return true;
     }
 
+    public boolean checkUuidChanges(String address, String uuid){
+        if(Config.uuidChangeLimit.num() <= 1) return false;
+
+        var set = encounteredIDsForIp.get(address, IdEncounterInfo::new);
+        //clear encountered list every hour
+        if(Time.timeSinceMillis(set.initialTime) > 1000L * 60 * 60 * Config.uuidChangeTimePeriod.num()){
+            set.ids.clear();
+            set.initialTime = Time.millis();
+        }
+        set.ids.add(uuid);
+
+        if(set.ids.size > Config.uuidChangeLimit.num()){
+            banPlayerIP(address);
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Returns list of all players with admin status
      */
@@ -369,11 +398,15 @@ public class Administration{
     }
 
     public boolean isIPBanned(String ip){
-        return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned);
+        return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned) || (steam && ip.startsWith("steam") && SteamAdmin.isBanned(ip));
     }
 
     public boolean isIDBanned(String uuid){
         return getCreateInfo(uuid).banned;
+    }
+
+    public boolean isNameBanned(String name){
+        return bannedNames.size > 0 && bannedNames.contains(p -> p.matcher(name).find());
     }
 
     public boolean isAdmin(String id, String usid){
@@ -464,6 +497,7 @@ public class Administration{
             Core.settings.putJson("ip-bans", String.class, bannedIPs);
             Core.settings.putJson("whitelist-ids", String.class, whitelist);
             Core.settings.putJson("banned-subnets", String.class, subnetBans);
+            Core.settings.putJson("banned-names", String.class, bannedNames.map(Pattern::pattern));
             modified = false;
         }
     }
@@ -477,12 +511,21 @@ public class Administration{
         bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
         whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
         subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
+
+        Seq<String> nameRegexes = Core.settings.getJson("banned-names", Seq.class, String.class, Seq::new);
+        for(var regex : nameRegexes){
+            try{
+                bannedNames.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
+            }catch(Exception ignored){
+            }
+        }
     }
 
     /**
      * Server configuration definition. Each config value can be a string, boolean or number.
      * Creating a new Config instance implicitly adds it to the list of server configs. This can be used for custom plugin configuration.
      * */
+    //TODO: move this into a non-nested class, this is messy and annoying to read
     public static class Config{
         public static final Seq<Config> all = new Seq<>();
 
@@ -504,6 +547,8 @@ public class Administration{
         messageRateLimit = new Config("messageRateLimit", "Message rate limit in seconds. 0 to disable.", 0),
         messageSpamKick = new Config("messageSpamKick", "How many times a player must send a message before the cooldown to get kicked. 0 to disable.", 3),
         packetSpamLimit = new Config("packetSpamLimit", "Limit for packet count sent within 3sec that will lead to a blacklist + kick.", 300),
+        uuidChangeLimit = new Config("uuidChangeLimit", "Limit for how many UUID changes an IP can send in the time frame specified by uuidChangeTimePeriod before it gets banned.", 10),
+        uuidChangeTimePeriod = new Config("uuidChangeTimePeriod", "Time window for the uuidChangeLimit config, in hours.", 3),
         chatSpamLimit = new Config("chatSpamLimit", "Limit for chat packet count sent within 2sec that will lead to a blacklist + kick. Not the same as a rate limit.", 20),
         socketInput = new Config("socketInput", "Allows a local application to control this server through a local TCP socket.", false, "socket", () -> Events.fire(Trigger.socketConfigChanged)),
         socketInputPort = new Config("socketInputPort", "The port for socket input.", 6859, () -> Events.fire(Trigger.socketConfigChanged)),
@@ -590,7 +635,7 @@ public class Administration{
         }
     }
 
-    public static class PlayerInfo{
+    public static class PlayerInfo implements AllowSerialization{
         public String id;
         public String lastName = "<unknown>", lastIP = "<unknown>";
         public Seq<String> ips = new Seq<>();
@@ -679,9 +724,14 @@ public class Administration{
 
         /** valid only for command unit events */
         public @Nullable int[] unitIDs;
+        public @Nullable UnitCommand unitCommand;
 
         /** valid only for command building events */
         public @Nullable int[] buildingPositions;
+
+        /** valid only for location pings */
+        public @Nullable String pingText;
+        public float pingX, pingY;
 
         public PlayerAction set(Player player, ActionType type, Tile tile){
             this.player = player;
@@ -712,7 +762,11 @@ public class Administration{
     }
 
     public enum ActionType{
-        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload
+        breakBlock, placeBlock, rotate, configure, withdrawItem, depositItem, control, buildSelect, command, removePlanned, commandUnits, commandBuilding, respawn, pickupBlock, dropPayload, pingLocation
     }
 
+    static class IdEncounterInfo{
+        long initialTime;
+        ObjectSet<String> ids = new ObjectSet<>();
+    }
 }

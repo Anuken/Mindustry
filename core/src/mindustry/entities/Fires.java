@@ -26,6 +26,7 @@ public class Fires{
             fire.set(tile.worldx(), tile.worldy());
             fire.add();
             set(tile, fire);
+            Events.fire(Trigger.fireCreate);
         }else{
             fire.lifetime = baseLifetime;
             fire.time = 0f;

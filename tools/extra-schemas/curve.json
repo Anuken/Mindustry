@@ -1,0 +1,15 @@
+{
+  "doc": "Applies an interpolation curve to progress, or slices out a sub-range and interpolates within it. Set either 'interp', or both 'offset' and 'duration'. Applied via PartProgress's 'op'/'operation' field (e.g. `op: curve`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "interp": {
+    "type": "arc.util.Interp",
+    "doc": "Interpolation curve to apply directly to progress."
+  },
+  "offset": {
+    "type": "float",
+    "doc": "Start of the sub-range to slice out."
+  },
+  "duration": {
+    "type": "float",
+    "doc": "Length of the sub-range to slice out."
+  }
+}

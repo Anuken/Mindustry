@@ -2,6 +2,7 @@ package mindustry.io.versions;
 
 import arc.func.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 
 import java.io.*;
 
@@ -13,7 +14,7 @@ public class LegacySaveVersion2 extends LegacyRegionSaveVersion{
     }
 
     @Override
-    public void readWorldEntities(DataInput stream, Prov[] mapping) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveReadState state) throws IOException{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){

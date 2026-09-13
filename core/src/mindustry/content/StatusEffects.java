@@ -60,6 +60,7 @@ public class StatusEffects{
         slow = new StatusEffect("slow"){{
             color = Pal.lightishGray;
             speedMultiplier = 0.4f;
+            show = false;
 
             init(() -> opposite(fast));
         }};
@@ -171,6 +172,7 @@ public class StatusEffects{
         shielded = new StatusEffect("shielded"){{
             color = Pal.accent;
             healthMultiplier = 3f;
+            show = false;
         }};
 
         boss = new StatusEffect("boss"){{
@@ -192,8 +194,8 @@ public class StatusEffects{
 
         corroded = new StatusEffect("corroded"){{
             color = Color.valueOf("e4ffd6");
-            intervalDamage = 25f;
-            intervalDamageTime = 30f;
+            intervalDamage = 20f;
+            intervalDamageTime = 15f;
 
             effectChance = 0.1f;
             effect = Fx.corrosionVapor;
@@ -202,10 +204,12 @@ public class StatusEffects{
         disarmed = new StatusEffect("disarmed"){{
             color = Color.valueOf("e9ead3");
             disarm = true;
+            show = false;
         }};
 
         invincible = new StatusEffect("invincible"){{
             healthMultiplier = Float.POSITIVE_INFINITY;
+            show = false;
         }};
 
         dynamic = new StatusEffect("dynamic"){{

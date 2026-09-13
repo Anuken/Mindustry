@@ -58,6 +58,16 @@ abstract class HealthComp implements Entityc, Posc{
         damagePierce(amount, true);
     }
 
+    /** Damage and multiply armor received. */
+    void damageArmorMult(float amount, float armorMult, boolean withEffect){
+        damage(amount, withEffect);
+    }
+
+    /** Damage and multiply armor received. */
+    void damageArmorMult(float amount, float armorMult){
+        damageArmorMult(amount, armorMult, true);
+    }
+
     void damage(float amount){
         if(Float.isNaN(health)) health = 0f;
 
@@ -84,6 +94,10 @@ abstract class HealthComp implements Entityc, Posc{
 
     void damageContinuousPierce(float amount){
         damagePierce(amount * Time.delta, hitTime <= -20 + hitDuration);
+    }
+
+    void damageContinuousArmorMult(float amount, float armorMult){
+        damageArmorMult(amount * Time.delta, armorMult, hitTime <= -20 + hitDuration);
     }
 
     void clampHealth(){

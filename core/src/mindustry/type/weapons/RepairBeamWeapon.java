@@ -56,11 +56,11 @@ public class RepairBeamWeapon extends Weapon{
         autoTarget = true;
         controllable = false;
         rotate = true;
-        useAmmo = false;
         mountType = HealBeamMount::new;
         recoil = 0f;
         noAttack = true;
         useAttackRange = false;
+        activeSound = Sounds.beamHeal;
     }
 
     @Override

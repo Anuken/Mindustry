@@ -1,7 +1,9 @@
 package mindustry.ctype;
 
 import mindustry.*;
+import mindustry.mod.*;
 
+@NoPatch
 public abstract class MappableContent extends Content{
     public final String name;
 

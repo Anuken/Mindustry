@@ -22,6 +22,10 @@ public abstract class Packet{
     public void read(Reads read){}
     public void write(Writes write){}
 
+    public boolean allow(boolean server){
+        return true;
+    }
+
     public void read(Reads read, int length){
         read(read);
     }

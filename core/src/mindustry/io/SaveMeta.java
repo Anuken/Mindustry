@@ -22,10 +22,14 @@ public class SaveMeta{
         this.build = build;
         this.timestamp = timestamp;
         this.timePlayed = timePlayed;
-        this.map = maps.all().find(m -> m.name().equals(map));
+        this.map = maps == null ? null : maps.all().find(m -> m.name().equals(map));
         this.wave = wave;
         this.rules = rules;
         this.tags = tags;
         this.mods = JsonIO.read(String[].class, tags.get("mods", "[]"));
+    }
+
+    public boolean isMap(){
+        return tags.containsKey("name");
     }
 }

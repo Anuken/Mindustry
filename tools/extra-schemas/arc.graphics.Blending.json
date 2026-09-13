@@ -1,0 +1,5 @@
+{
+  "doc": "Handles sprite blending.",
+  "superclass": "Enum",
+  "values": ["normal", "additive", "disabled"]
+}

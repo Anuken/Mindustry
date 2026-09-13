@@ -71,6 +71,15 @@ public class ConsumeGenerator extends PowerGenerator{
     }
 
     @Override
+    public void afterPatch(){
+        super.afterPatch();
+
+        filterItem = findConsumer(c -> c instanceof ConsumeItemFilter);
+        filterLiquid = findConsumer(c -> c instanceof ConsumeLiquidFilter);
+        if(filterItem instanceof ConsumeItemEfficiency eff) eff.itemDurationMultipliers = itemDurationMultipliers;
+    }
+
+    @Override
     public void setStats(){
         stats.timePeriod = itemDuration;
         super.setStats();

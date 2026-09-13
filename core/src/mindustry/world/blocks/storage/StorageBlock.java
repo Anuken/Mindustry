@@ -28,6 +28,8 @@ public class StorageBlock extends Block{
         flags = EnumSet.of(BlockFlag.storage);
         allowResupply = true;
         envEnabled = Env.any;
+        drawCached = true;
+        drawDynamic = false;
     }
 
     @Override
@@ -51,6 +53,11 @@ public class StorageBlock extends Block{
         @Override
         public boolean acceptItem(Building source, Item item){
             return linkedCore != null ? linkedCore.acceptItem(source, item) : items.get(item) < getMaximumAccepted(item);
+        }
+
+        @Override
+        public boolean canUnload(){
+            return linkedCore == null ? super.canUnload() : linkedCore.canUnload();
         }
 
         @Override
@@ -125,6 +132,11 @@ public class StorageBlock extends Block{
         @Override
         public boolean canPickup(){
             return linkedCore == null;
+        }
+
+        @Override
+        public boolean allowDeposit(){
+            return linkedCore != null || super.allowDeposit();
         }
     }
 }

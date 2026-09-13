@@ -8,6 +8,6 @@ uniform mat4 u_trans;
 varying vec4 v_col;
 
 void main(){
-	v_col = a_color;
-    gl_Position = u_proj * u_trans * a_position;
+  v_col = a_color;
+  gl_Position = u_proj * u_trans * a_position;
 }

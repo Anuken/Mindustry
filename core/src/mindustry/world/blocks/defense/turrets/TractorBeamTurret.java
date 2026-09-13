@@ -30,8 +30,9 @@ public class TractorBeamTurret extends BaseTurret{
     public Color laserColor = Color.white;
     public StatusEffect status = StatusEffects.none;
     public float statusDuration = 300;
+    public float statusChance = 1f;
 
-    public Sound shootSound = Sounds.tractorbeam;
+    public Sound shootSound = Sounds.beamParallax;
     public float shootSoundVolume = 0.9f;
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
@@ -59,6 +60,9 @@ public class TractorBeamTurret extends BaseTurret{
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
+        if(status != StatusEffects.none && statusChance > 0f){
+            stats.add(Stat.status, StatValues.statusText(status, statusDuration, statusChance));
+        }
     }
 
     @Override
@@ -76,6 +80,11 @@ public class TractorBeamTurret extends BaseTurret{
 
         @Override
         public void updateTile(){
+            if(activationTimer > 0){
+                activationTimer -= Time.delta;
+                return;
+            }
+
             float eff = efficiency * coolantMultiplier, edelta = eff * delta();
 
             //retarget
@@ -117,10 +126,10 @@ public class TractorBeamTurret extends BaseTurret{
                 //shoot when possible
                 if(Angles.within(rotation, dest, shootCone)){
                     if(damage > 0){
-                        target.damageContinuous(damage * eff * timeScale * state.rules.blockDamage(team));
+                        target.damageContinuousPierce(damage * eff * timeScale * state.rules.blockDamage(team));
                     }
 
-                    if(status != StatusEffects.none){
+                    if(status != StatusEffects.none && Mathf.chance(statusChance)){
                         target.apply(status, statusDuration);
                     }
 

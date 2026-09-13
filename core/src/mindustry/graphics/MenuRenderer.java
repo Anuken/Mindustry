@@ -243,6 +243,7 @@ public class MenuRenderer implements Disposable{
         flyerType.sample.elevation = 1f;
         flyerType.sample.team = Team.sharded;
         flyerType.sample.rotation = flyerRot;
+        flyerType.sample.setType(flyerType);
         flyerType.sample.heal();
 
         flyers((x, y) -> {

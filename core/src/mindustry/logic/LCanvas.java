@@ -60,13 +60,17 @@ public class LCanvas extends Table{
     }
 
     /** @return if statement elements should have rows. */
-    public static boolean useRows(){
+    public static boolean isCompact(){
         return Core.graphics.getWidth() < Scl.scl(900f) * 1.2f;
+    }
+
+    public static float getTargetWidth(){
+        return isCompact() ? 410f : Mathf.clamp(Core.graphics.getWidth() / Scl.scl(1f) * 0.95f - Scl.scl(80f), 400f, 1200f);
     }
 
     public static void tooltip(Cell<?> cell, String key){
         String lkey = key.toLowerCase().replace(" ", "");
-        if(Core.settings.getBool("logichints", true) && Core.bundle.has(lkey)){
+        if(Core.bundle.has(lkey)){
             var tip = new Tooltip(t -> t.background(Styles.black8).margin(4f).add("[lightgray]" + Core.bundle.get(lkey)).style(Styles.outlineLabel));
 
             //mobile devices need long-press tooltips
@@ -88,7 +92,6 @@ public class LCanvas extends Table{
             }else{
                 cell.get().addListener(tip);
             }
-
         }
     }
 
@@ -102,7 +105,7 @@ public class LCanvas extends Table{
     }
 
     public void rebuild(){
-        targetWidth = useRows() ? 400f : 900f;
+        targetWidth = getTargetWidth();
         float s = pane != null ? pane.getVisualScrollY() : 0f;
         String toLoad = statements != null ? save() : null;
 
@@ -129,6 +132,10 @@ public class LCanvas extends Table{
 
     public void add(LStatement statement){
         statements.addChild(new StatementElem(statement));
+    }
+
+    public void addAt(int at, LStatement statement){
+        statements.addChildAt(at, new StatementElem(statement));
     }
 
     public String save(){
@@ -209,7 +216,7 @@ public class LCanvas extends Table{
             seq.clear();
 
             float totalHeight = getChildren().sumf(e -> e.getPrefHeight() + space);
-            if(height != totalHeight || width != Scl.scl(targetWidth)){
+            if(!Mathf.equal(height, totalHeight, 1f) || !Mathf.equal(width, Scl.scl(targetWidth), 1f)){
                 height = prefHeight = totalHeight;
                 width = prefWidth = Scl.scl(targetWidth);
                 invalidateHierarchy();
@@ -428,13 +435,17 @@ public class LCanvas extends Table{
                 t.margin(6f);
                 t.touchable = Touchable.enabled;
 
-                t.add(st.name()).style(Styles.outlineLabel).name("statement-name").color(color).padRight(8);
+                t.add(st.localizedName()).style(Styles.outlineLabel).name("statement-name").color(color).padRight(8);
                 t.add().growX();
 
                 addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
+                //taken from foo's client
+                t.button(Icon.add, Styles.logici, () -> Vars.ui.logic.showAddDialog(index + 1))
+                .disabled(b -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).size(24f).padRight(6);
+
                 t.button(Icon.copy, Styles.logici, () -> {
-                }).size(24f).padRight(6).get().tapped(this::copy);
+                }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).get().tapped(this::copy);
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
@@ -447,6 +458,8 @@ public class LCanvas extends Table{
 
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        //don't start dragging when pressing the menu buttons
+                        if(event.targetActor instanceof Image) return false;
 
                         if(button == KeyCode.mouseMiddle){
                             copy();
@@ -483,12 +496,15 @@ public class LCanvas extends Table{
 
             row();
 
-            table(t -> {
-                t.left();
-                t.marginLeft(4);
-                t.setColor(color);
-                st.build(t);
-            }).pad(4).padTop(2).left().grow();
+            Table t = st.useWrapping() ? new WrapTable() : new Table();
+
+            t.left();
+            t.marginLeft(4);
+            t.setColor(color);
+            if(st.useWrapping()) t.marginRight(4f);
+            st.build(t);
+
+            add(t).pad(4).padTop(2).left().grow();
 
             marginBottom(7);
         }

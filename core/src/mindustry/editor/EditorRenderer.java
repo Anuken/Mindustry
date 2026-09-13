@@ -85,10 +85,11 @@ public class EditorRenderer implements Disposable{
         //don't process terrain updates every frame (helps with lag on low end devices)
         boolean doUpdate = Core.graphics.getFrameId() % 2 == 0;
 
-        if(doUpdate) renderer.blocks.floor.checkChanges(!editor.showTerrain);
-
         boolean prev = renderer.animateWater;
         renderer.animateWater = false;
+
+        Tmp.m4.set(Draw.trans());
+        Draw.trans().idt();
 
         Tmp.v3.set(Core.camera.position);
         Core.camera.position.set(world.width()/2f * tilesize, world.height()/2f * tilesize);
@@ -96,7 +97,7 @@ public class EditorRenderer implements Disposable{
         Core.camera.height = 999999f;
         Core.camera.mat.set(Draw.proj()).mul(Tmp.m3.setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize)).translate(4f, 4f));
         if(editor.showFloor){
-            renderer.blocks.floor.drawFloor();
+            renderer.blocks.floor.drawFloor(doUpdate, !editor.showTerrain);
         }
 
         Tmp.m2.set(Draw.proj());
@@ -118,7 +119,7 @@ public class EditorRenderer implements Disposable{
 
         renderer.blocks.floor.beginDraw();
         if(editor.showTerrain){
-            renderer.blocks.floor.drawLayer(CacheLayer.walls);
+            renderer.blocks.floor.drawLayer(CacheLayer.walls, doUpdate);
         }
         renderer.animateWater = prev;
 
@@ -144,7 +145,9 @@ public class EditorRenderer implements Disposable{
             }
         }
 
+
         Core.camera.position.set(Tmp.v3);
+        Draw.trans(Tmp.m4);
     }
 
     void updateStatic(int x, int y){
@@ -226,7 +229,7 @@ public class EditorRenderer implements Disposable{
             y * tilesize + block.offset - height / 2f,
             width/2f, height/2f,
             width, height,
-            tile.build == null || !block.rotate ? 0 : tile.build.rotdeg(),
+            tile.build == null || !block.rotate || !block.rotateDrawEditor ? 0 : tile.build.rotdeg(),
             Color.whiteFloatBits);
 
             if(tile.build != null){
@@ -243,7 +246,7 @@ public class EditorRenderer implements Disposable{
         tmpTiles.clear();
 
         if(!cache.isEmpty()){
-            cache.build(renderer.blocks.floor.getIndexData());
+            cache.build(SpriteIndices.get());
             chunks[cx][cy] = cache;
         }
     }

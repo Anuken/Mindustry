@@ -24,7 +24,7 @@ public class ConsumeItems extends Consume{
         block.hasItems = true;
         block.acceptsItems = true;
         for(var stack : items){
-            block.itemFilter[stack.item.id] = true;
+            if(stack.item.id < block.itemFilter.length) block.itemFilter[stack.item.id] = true;
         }
     }
 
