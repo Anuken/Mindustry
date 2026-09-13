@@ -590,7 +590,7 @@ public class Schematics implements Loadable{
 
             ContentMapper mapper = null;
 
-            //set up content mapping if found; this should not fail
+            //set up content mapping if found
             if(map.containsKey("contentMap")){
                 IntMap<ObjectIntMap<String>> nameMap = JsonIO.json.fromJson(IntMap.class, ObjectIntMap.class, map.get("contentMap", "{}"));
                 IntMap<IntMap<Content>> contentMap = new IntMap<>();
@@ -604,12 +604,7 @@ public class Schematics implements Loadable{
                 mapper = (type, id) -> contentMap.get(type.ordinal(), IntMap::new).get(id);
             }
 
-            String[] labels = null;
-
-            //try to read the categories, but skip if it fails
-            try{
-                labels = JsonIO.read(String[].class, map.get("labels", "[]"));
-            }catch(Exception ignored){}
+            String[] labels = Jval.read(map.get("labels", "[]")).asStringArray();
 
             IntMap<Block> blocks = new IntMap<>();
             int length = stream.readUnsignedByte();
