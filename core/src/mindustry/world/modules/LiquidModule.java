@@ -20,9 +20,9 @@ public class LiquidModule extends BlockModule{
     public static float flowVisualRefreshInterval = 15f;
 
     private static final Interval flowTimer = new Interval(2);
-    private static WindowedMean[] cacheFlow;
-    private static float[] cacheSums;
-    private static float[] displayFlow;
+    private static @Nullable WindowedMean[] cacheFlow;
+    private static @Nullable float[] cacheSums;
+    private static @Nullable float[] displayFlow;
     private static final Bits cacheBits = new Bits();
 
     private float[] liquids = new float[content.liquids().size];
@@ -32,7 +32,10 @@ public class LiquidModule extends BlockModule{
 
     public void updateFlow(){
         if(flowTimer.get(1, flowPollInterval)){
-            if(flow == null){
+            int len = content.liquids().size;
+            if(liquids.length != len) liquids = Arrays.copyOf(liquids, len);
+
+            if(flow == null || flow.length != len || cacheSums == null || cacheFlow == null){
                 if(cacheFlow == null || cacheFlow.length != liquids.length){
                     cacheFlow = new WindowedMean[liquids.length];
                     for(int i = 0; i < liquids.length; i++){
@@ -152,6 +155,10 @@ public class LiquidModule extends BlockModule{
 
     public void checkArrayCapacity(int size){
         if(liquids.length != size) liquids = Arrays.copyOf(liquids, size);
+        cacheFlow = null;
+        cacheSums = null;
+        displayFlow = null;
+        flow = null;
     }
 
     @Override
