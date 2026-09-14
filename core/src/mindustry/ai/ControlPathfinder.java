@@ -164,6 +164,7 @@ public class ControlPathfinder implements Runnable{
 
         //main thread only!
         long lastUpdateId = state.updateId;
+        long lastRecomputeTime;
 
         //both threads
         volatile boolean notFound = false;
@@ -1192,7 +1193,9 @@ public class ControlPathfinder implements Runnable{
         long fieldKey = FieldIndex.get(destPos, costId, team);
 
         //use existing request if it exists.
-        if(request != null && request.destination == destPos){
+        if(request != null && (request.destination == destPos ||
+            //can only recompute path only twice a second, unless it's far away
+            (Time.timeSinceMillis(request.lastRecomputeTime) < 1000 && Mathf.dst(destX, destY, request.destination % wwidth, request.destination / wwidth) <= 4f))){
             request.lastUpdateId = state.updateId;
 
             Tile initialTileOn = tileOn;
@@ -1313,6 +1316,7 @@ public class ControlPathfinder implements Runnable{
             unitRequests.put(unit, request = new PathRequest(unit, team, costId, destPos));
 
             PathRequest f = request;
+            request.lastRecomputeTime = Time.millis();
 
             //on the pathfinding thread: initialize the request
             queue.post(() -> {
