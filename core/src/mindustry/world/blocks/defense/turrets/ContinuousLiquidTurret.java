@@ -34,7 +34,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         //mirror stats onto each bullet (purely visual)
         ammoTypes.each((l, b) -> b.statLiquidConsumed = liquidConsumed);
 
-        stats.replace(Stat.ammo, StatValues.ammo(ammoTypes));
+        stats.replace(Stat.ammo, StatValues.ammo(ammoTypes, name));
     }
 
     @Override

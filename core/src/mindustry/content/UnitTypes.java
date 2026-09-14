@@ -3155,7 +3155,7 @@ public class UnitTypes{
             drag = 0.11f;
             hitSize = 9f;
             rotateSpeed = 3f;
-            health = 680;
+            health = 690;
             armor = 4f;
             legStraightness = 0.3f;
             stepShake = 0f;
@@ -3212,8 +3212,9 @@ public class UnitTypes{
                     knockback = 0.8f;
                     lifetime = 46f;
                     width = height = 9f;
-                    splashDamageRadius = 19f;
+                    splashDamageRadius = 23f;
                     splashDamage = 30f;
+                    scaledSplashDamage = true;
 
                     trailLength = 27;
                     trailWidth = 2.5f;
@@ -3353,7 +3354,6 @@ public class UnitTypes{
             rotateSpeed = 3f;
             health = 2700;
             armor = 7f;
-            fogRadius = 40f;
             stepShake = 0f;
 
             stepSound = Sounds.walkerStepSmall;
@@ -3866,7 +3866,6 @@ public class UnitTypes{
             armor = 3f;
             hitSize = 12f;
             engineSize = 0;
-            fogRadius = 25;
             itemCapacity = 0;
 
             setEnginesMirror(
@@ -3931,7 +3930,6 @@ public class UnitTypes{
             hitSize = 25f;
             engineSize = 4.3f;
             engineOffset = 54f / 4f;
-            fogRadius = 25;
             itemCapacity = 0;
             lowAltitude = true;
 
