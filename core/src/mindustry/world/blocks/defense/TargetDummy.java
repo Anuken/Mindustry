@@ -22,6 +22,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class TargetDummy extends Block{
+    static final float maxDummySize = 30f;
+
     public final int dpsUpdateTime = timers++;
     public UnitType unitType = UnitTypes.dummy;
     public float pullScale = 0.33f;
@@ -39,7 +41,6 @@ public class TargetDummy extends Block{
         targetable = false;
         allowedInPayloads = false;
         canOverdrive = false;
-
         saveConfig = true;
 
         config(int[].class, (TargetDummyBuild tile, int[] config) -> {
@@ -47,9 +48,10 @@ public class TargetDummy extends Block{
             tile.unitTeam = tile.team;
             if(config[0] == 1) tile.unitTeam = Team.get(tile.dummyTeam());
             tile.boosting = config[1] == 1;
-            tile.unitArmor = config[2];
+            tile.unitArmor = Mathf.clamp(config[2], 0, 100_000);
             tile.resetTime = config[3];
-            tile.dummySize = Float.intBitsToFloat(config[4]);
+            tile.dummySize = Mathf.clamp(Float.intBitsToFloat(config[4]), 0.1f, maxDummySize * tilesize);
+            if(Float.isNaN(tile.dummySize) || Float.isInfinite(tile.dummySize)) tile.dummySize = 8f;
         });
     }
 
@@ -251,7 +253,7 @@ public class TargetDummy extends Block{
                 t.field("" + (dummySize/tilesize), TextFieldFilter.floatsOnly, s -> configureInt(4, Float.floatToIntBits(Strings.parseFloat(s) * tilesize)))
                 .valid(val -> {
                     float parsed = Strings.parseFloat(val, Float.MAX_VALUE);
-                    return parsed >= 0.1f && parsed <= 50f;
+                    return parsed >= 0.1f && parsed <= maxDummySize;
                 }).padLeft(8f).growX();
                 t.add(StatUnit.blocks.localized()).padLeft(8f);
             }).top().grow().margin(8f);

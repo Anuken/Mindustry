@@ -259,7 +259,8 @@ public class CommandAI extends AIController{
                 targetPos = new Vec2();
                 lastTargetPos = targetPos;
             }
-            targetPos.set(attackTarget);
+            //don't target where target dummies are right now, target their block
+            targetPos.set(attackTarget instanceof TargetDummyUnit t && t.building != null ? t.building : attackTarget);
 
             if(unit.isGrounded() && attackTarget instanceof Building build && build.tile.solid() && unit.type.pathCostId != ControlPathfinder.costIdLegs && !ramming){
                 Tile best = build.findClosestEdge(unit, Tile::solid);
