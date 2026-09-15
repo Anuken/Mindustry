@@ -971,10 +971,11 @@ public class NetServer implements ApplicationListener{
             netServer.sendWorldData(player);
         }else{
             Seq<DataAsset> res = new Seq<>();
-            IntSet requestedIds = new IntSet();
             Seq<DataAsset> allAssets = state.data.getAllExternalAssets();
+            Bits requestedIds = new Bits(allAssets.size);
             for(short id : ids){
-                if(id >= allAssets.size || id < 0 || !requestedIds.add(id)) continue;
+                if(id >= allAssets.size || id < 0 || requestedIds.get(id)) continue;
+                requestedIds.set(id);
                 res.add(allAssets.get(id));
             }
 
