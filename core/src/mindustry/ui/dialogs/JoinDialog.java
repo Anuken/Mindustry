@@ -387,6 +387,15 @@ public class JoinDialog extends BaseDialog{
         hosts.row();
         hosts.image().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
         hosts.row();
+        if(eye){
+            hosts.table(t -> {
+                t.add("@search").padRight(10);
+                t.field(serverSearch, text ->
+                serverSearch = text.trim().replaceAll(" +", " ").toLowerCase()
+                ).grow().pad(8).get().keyDown(KeyCode.enter, this::refreshCommunity);
+                t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
+            }).width((targetWidth() + 5f) * columns()).height(70f).pad(4).row();
+        }
         hosts.add(coll).width((targetWidth() + 5f) * columns());
         hosts.row();
     }
@@ -409,14 +418,6 @@ public class JoinDialog extends BaseDialog{
         if(!fetchedServers){
             fetchServers();
         }
-
-        global.table(t -> {
-            t.add("@search").padRight(10);
-            t.field(serverSearch, text ->
-                serverSearch = text.trim().replaceAll(" +", " ").toLowerCase()
-            ).grow().pad(8).get().keyDown(KeyCode.enter, this::refreshCommunity);
-            t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
-        }).width((targetWidth() + 5f) * columns()).height(70f).pad(4).row();
 
         //if the servers have been fetched, use the fetched list
         //otherwise use the cached list + the extra servers that may have been included by mods
@@ -786,7 +787,7 @@ public class JoinDialog extends BaseDialog{
             //not important
             return "";
         }else{
-            return Core.bundle.format("server.version", host.version, host.versionType);
+            return Core.bundle.format("server.version", host.version, "official".equals(host.versionType) ? "" : host.versionType);
         }
     }
 

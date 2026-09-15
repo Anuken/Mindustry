@@ -178,6 +178,7 @@ public class NetworkIO{
     public static void packTexture(OutputStream os, String name, byte[] pngData){
         try(DataOutputStream stream = new DataOutputStream(os)){
             stream.writeUTF(name);
+            stream.writeInt(pngData.length);
             stream.write(pngData);
         }catch(IOException e){
             throw new RuntimeException(e);

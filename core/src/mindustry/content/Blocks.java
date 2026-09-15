@@ -1093,6 +1093,7 @@ public class Blocks{
             hasLiquids = false;
             itemCapacity = 30;
             boostScale = 0.15f;
+            outputScale = 0.15f;
             drawer = new DrawMulti(new DrawDefault(), new DrawFlame(Color.valueOf("ffef99")));
             ambientSound = Sounds.loopSmelter;
             ambientSoundVolume = 0.07f;
@@ -2069,8 +2070,8 @@ public class Blocks{
         conveyor = new Conveyor("conveyor"){{
             requirements(Category.distribution, with(Items.copper, 1));
             health = 45;
-            speed = 0.046f;
-            displayedSpeed = 6.5f;
+            speed = 0.035f;
+            displayedSpeed = 5f;
             researchCost = with(Items.copper, 5);
         }};
 

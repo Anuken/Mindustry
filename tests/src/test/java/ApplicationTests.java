@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.DynamicTest.*;
 public class ApplicationTests{
     static Map testMap;
     static boolean initialized;
-    //core/assets
     static final Fi testDataFolder = new Fi("../../tests/build/test_data");
 
     @BeforeAll

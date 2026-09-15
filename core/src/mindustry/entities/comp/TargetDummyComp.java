@@ -22,4 +22,11 @@ abstract class TargetDummyComp implements Unitc, Healthc{
             td.dummyHit(amount);
         }
     }
+
+    @Override
+    @Replace
+    public boolean canLand(){
+        //dummies should always respect the boost config even when the landing area is obstructed (usually by other dummies)
+        return true;
+    }
 }

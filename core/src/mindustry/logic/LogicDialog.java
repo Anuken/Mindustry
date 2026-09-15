@@ -45,16 +45,16 @@ public class LogicDialog extends BaseDialog{
 
         shown(this::setup);
         shown(() -> {
-            wasRows = LCanvas.useRows();
+            wasRows = LCanvas.isCompact();
             wasPortrait = Core.graphics.isPortrait();
         });
         hidden(() -> consumer.get(canvas.save()));
         onResize(() -> {
-            if(wasRows != LCanvas.useRows() || wasPortrait != Core.graphics.isPortrait()){
+            if(wasRows != LCanvas.isCompact() || wasPortrait != Core.graphics.isPortrait()){
                 setup();
                 canvas.rebuild();
                 wasPortrait = Core.graphics.isPortrait();
-                wasRows = LCanvas.useRows();
+                wasRows = LCanvas.isCompact();
             }
         });
 
@@ -138,7 +138,7 @@ public class LogicDialog extends BaseDialog{
                     t.button("@load.clipboard", Icon.download, style, () -> {
                         dialog.hide();
                         try{
-                            canvas.load(Core.app.getClipboardText().replace("\r\n", "\n"));
+                            canvas.load(Core.app.getClipboardText());
                         }catch(Throwable e){
                             ui.showException(e);
                         }

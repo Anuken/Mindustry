@@ -78,7 +78,11 @@ public class MapEditor{
             if(build != null && tile.isCenter()){
                 builds.add(build);
             }
-            tiles.seti(i, new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0));
+
+            var newTile = new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0);
+            newTile.floorData = tile.floorData;
+            newTile.extraData = tile.extraData;
+            tiles.seti(i, newTile);
         }
 
         for(var build : builds){

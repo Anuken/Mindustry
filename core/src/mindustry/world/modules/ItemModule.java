@@ -47,8 +47,10 @@ public class ItemModule extends BlockModule{
     public void updateFlow(){
         //update the flow at N fps at most
         if(flowTimer.get(1, flowPollInterval)){
+            int len = content.items().size;
+            if(items.length != len) items = Arrays.copyOf(items, len);
 
-            if(flow == null){
+            if(flow == null || flow.length != len || cacheSums == null || cacheFlow == null){
                 if(cacheFlow == null || cacheFlow.length != items.length){
                     cacheFlow = new WindowedMean[items.length];
                     for(int i = 0; i < items.length; i++){
@@ -290,6 +292,10 @@ public class ItemModule extends BlockModule{
 
     public void checkArrayCapacity(int size){
         if(items.length != size) items = Arrays.copyOf(items, size);
+        cacheFlow = null;
+        cacheSums = null;
+        displayFlow = null;
+        flow = null;
     }
 
     @Override

@@ -333,6 +333,11 @@ public class World{
         }
     }
 
+    /** @return whether the coordinates are inside the map's defined limit rect. */
+    public boolean isInMapArea(int x, int y){
+        return tiles.in(x, y) && (!state.rules.limitMapArea || Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight, x, y));
+    }
+
     public Context filterContext(Map map){
         return new FilterContext(map);
     }

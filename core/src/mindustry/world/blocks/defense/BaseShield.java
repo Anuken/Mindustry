@@ -62,7 +62,7 @@ public class BaseShield extends Block{
         hasPower = true;
         update = solid = true;
         rebuildable = false;
-        canPickup = true;
+        allowedInPayloads = false;
     }
 
     @Override
