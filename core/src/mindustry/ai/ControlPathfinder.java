@@ -457,7 +457,7 @@ public class ControlPathfinder implements Runnable{
         Cluster[][] dim1 = clusters[team];
 
         if(dim1 == null){
-            dim1 = clusters[team] = new Cluster[Team.all.length][];
+            dim1 = clusters[team] = new Cluster[costTypes.size][];
         }
 
         Cluster[] dim2 = dim1[pathCost];
