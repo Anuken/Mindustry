@@ -211,10 +211,7 @@ public abstract class BaseProcessor extends AbstractProcessor{
         if(round++ >= rounds) return false; //only process 1 round
         if(rootDirectory == null){
             try{
-                String path = Fi.get(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no")
-                .toUri().toURL().toString().substring(OS.isWindows ? 6 : "file:".length()))
-                .parent().parent().parent().parent().parent().parent().parent().toString().replace("%20", " ");
-                rootDirectory = Fi.get(path).parent();
+                rootDirectory = new Fi(new File(filer.getResource(StandardLocation.CLASS_OUTPUT, "no", "no").toUri())).parent().parent().parent().parent().parent().parent().parent().parent();
             }catch(IOException e){
                 throw new RuntimeException(e);
             }

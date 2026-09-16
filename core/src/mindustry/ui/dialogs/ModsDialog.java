@@ -17,6 +17,7 @@ import arc.util.Http.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
+import mindustry.core.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -26,10 +27,13 @@ import mindustry.mod.Mods.*;
 import mindustry.ui.*;
 
 import java.util.*;
+import java.util.regex.*;
 
 import static mindustry.Vars.*;
 
 public class ModsDialog extends BaseDialog{
+    private static final Pattern modVersionPattern = Pattern.compile("\\[[vb](\\d+)(?:\\.(\\d+))?\\]");
+
     public ModBrowserDialog browser;
 
     protected float modImportProgress;
@@ -685,5 +689,52 @@ public class ModsDialog extends BaseDialog{
                 }
             }, this::importFail);
         }
+    }
+
+    /** @return {major, minor} parsed from a leading/trailing "[v{major}]" or "[v{major}.{minor}]" tag, or null if none is found at either end (or the numbers are unparseable). */
+    public static @Nullable int[] parseVersionTag(String str){
+        if(str == null) return null;
+
+        Matcher m = modVersionPattern.matcher(str);
+        while(m.find()){
+            if(m.start() == 0 || m.end() == str.length()){
+                int major = Strings.parseInt(m.group(1));
+                if(major == Integer.MIN_VALUE) return null;
+                int minor = m.group(2) != null ? Strings.parseInt(m.group(2)) : 0;
+                if(minor == Integer.MIN_VALUE) return null;
+                return new int[]{major, minor};
+            }
+        }
+        return null;
+    }
+
+    public static @Nullable int[] parseVersion(String str){
+        if(str == null || str.isEmpty()) return null;
+
+        int dot = str.indexOf('.');
+        String majorStr = dot == -1 ? str : str.substring(0, dot);
+        String minorStr = dot == -1 ? null : str.substring(dot + 1);
+
+        if(majorStr.isEmpty() || (dot != -1 && (minorStr.isEmpty() || str.indexOf('.', dot + 1) != -1))) return null;
+
+        int major = Strings.parseInt(majorStr);
+        if(major == Integer.MIN_VALUE) return null;
+        int minor = minorStr != null ? Strings.parseInt(minorStr) : 0;
+        if(minor == Integer.MIN_VALUE) return null;
+
+        return new int[]{major, minor};
+    }
+
+    /** @return whether the specified release name and its tags match the current game build (e.g. "Bingus Mod [v160]" should only match build 160) */
+    public static boolean matchesGameVersion(String releaseTitle){
+        return matchesGameVersion(parseVersionTag(releaseTitle));
+    }
+
+    public static boolean matchesGameVersion(@Nullable int[] tag){
+        //version not specified, matches anything.
+        if(tag == null) return true;
+        //must match exactly; custom builds (-1) do not match.
+        //for revisions, either match if the revision is unspecified (v160 -> matches ALL 160.x builds), OR, if it is specified, match the exact version (the mod author must have had a good reason for it)
+        return Version.build == tag[0] && (tag[1] == 0 || Version.revision == tag[1]);
     }
 }
