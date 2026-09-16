@@ -122,6 +122,8 @@ public class LExecutor{
     /** Loads with a specified assembler. Resets all variables. */
     public void load(LAssembler builder){
         stop = false;
+        textBuffer.setLength(0);
+        graphicsBuffer.clear();
         nameMap = null;
         //retain constants that are links, which, by convention, don't start with @ (builtin) or _ (numeric constant)
         vars = builder.vars.values().toSeq().retainAll(var -> !var.constant || var.name.charAt(0) != '_' && var.name.charAt(0) != '@').toArray(LVar.class);

@@ -174,7 +174,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** @return whether there is solid, un-occupied ground under this unit. */
     public boolean canLand(){
-        return !onSolid() && Units.count(x, y, physicSize(), f -> f != self() && f.isGrounded()) == 0;
+        float psize = physicSize();
+        return !onSolid() && !Units.any(x - psize/2f, y - psize/2f, psize, psize, f -> f != self() && f.isGrounded());
     }
 
     public boolean inRange(Position other){
