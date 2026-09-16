@@ -235,8 +235,6 @@ public class PlayerListFragment{
                         dialog.cont.button("@back", Icon.left, dialog::hide).padTop(-1f).size(220f, 55f);
 
                         dialog.show();
-
-
                     }).size(h);
                 }
             }else if(!user.isLocal() && !user.admin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
