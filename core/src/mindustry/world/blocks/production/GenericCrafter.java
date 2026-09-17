@@ -335,7 +335,8 @@ public class GenericCrafter extends Block{
         public void dumpOutputs(){
             if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
                 for(ItemStack output : outputItems){
-                    for(int i = 0; i < Math.max(1, Mathf.round(scaleOutput(output.amount))); i++){
+                    int amount = Math.max(1, Mathf.round(scaleOutput(output.amount)));
+                    for(int i = 0; i < amount; i++){
                         if(!dump(output.item)) break;
                     }
                 }
