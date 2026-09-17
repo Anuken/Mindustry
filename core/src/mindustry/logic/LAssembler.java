@@ -11,9 +11,6 @@ import mindustry.logic.LExecutor.*;
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
 
-    private static final long invalidNumNegative = Long.MIN_VALUE;
-    private static final long invalidNumPositive = Long.MAX_VALUE;
-
     public boolean privileged;
     /** Maps names to variable. */
     public OrderedMap<String, LVar> vars = new OrderedMap<>();
@@ -110,6 +107,9 @@ public class LAssembler{
     }
 
     double parseDouble(String symbol){
+        //trivial optimization: avoid unnecessary parsing of logic constants
+        if(symbol.isEmpty() || symbol.charAt(0) == '@') return Double.NaN;
+
         //parse hex/binary syntax
         if(symbol.startsWith("0b")) return parseLong(false, symbol, 2, 2, symbol.length());
         if(symbol.startsWith("+0b")) return parseLong(false, symbol, 2, 3, symbol.length());
@@ -123,10 +123,15 @@ public class LAssembler{
         return Strings.parseDouble(symbol, Double.NaN);
     }
 
-    double parseLong(boolean negative, String s, int radix, int start, int end) {
-        long usedInvalidNum = negative ? invalidNumPositive : invalidNumNegative;
-        long l = Strings.parseLong(s, radix, start, end, usedInvalidNum);
-        return l == usedInvalidNum ? Double.NaN : negative ? -l : l;
+    double parseLong(boolean negative, String s, int radix, int start, int end){
+        if(start >= end) return Double.NaN;
+        while(start < end && s.charAt(start) == '0') start++;
+        if(start == end) return 0; //one or more zeroes
+
+        //parseUnsignedLong will refuse a leading plus or minus sign, which is desired here
+        //using zero for invalid value, as zero can't be returned at this point
+        long l = Strings.parseUnsignedLong(s, radix, start, end, 0);
+        return l == 0 ? Double.NaN : negative ? -l : l;
     }
 
     double parseColor(String symbol){
