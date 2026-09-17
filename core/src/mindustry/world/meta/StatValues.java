@@ -234,6 +234,9 @@ public class StatValues{
         "[lightgray] ~ [stat]" + Strings.autoFixed(duration / 60f, 1) +
         "[lightgray] " + Core.bundle.get("unit.seconds"));
     }
+    public static String statusText(StatusEffect status, float duration){
+        return statusText(status, duration, 1f);
+    }
 
     /** Displays an item with a specified amount. */
     private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content, boolean tooltip){
@@ -819,13 +822,9 @@ public class StatValues{
                         else sep(bt, Core.bundle.format("bullet.strongricochet"));
                     }
 
-                    // Showing the correct value for lightning damage is annoyinh
+                    // Showing the correct value for lightning damage is annoying
                     if(type.lightning > 0){
-                        sep(bt, Core.bundle.format(
-                        "bullet.lightning",
-                        type.lightning,
-                        type.lightningDamage < 0 ? type.damage : type.lightningDamage
-                        ));
+                        sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                     }
 
                     if(type instanceof LaserBulletType b && b.lightningSpacing > 0){

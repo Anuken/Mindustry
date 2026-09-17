@@ -91,8 +91,8 @@ public class ShieldArcAbility extends Ability{
                 Fx.absorb.at(unit);
                 paramField.pushEffect.at(unit.x, unit.y,paramUnit.team.color);
 
-                // consider missile hp and gamerule to damage the shield
-                paramField.data -= unit.health() * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
+                // consider total missile damage and gamerule to damage the shield
+                paramField.data -= unit.type.damageEstimate * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
                 paramField.alpha = 1f;
 
             }else if(paramField.pushUnits && (paramField.pushDiffLayer || paramUnit.isFlying() == unit.isFlying())){
@@ -146,7 +146,7 @@ public class ShieldArcAbility extends Ability{
     public Sound hitSound = Sounds.shieldHit;
     public float hitSoundVolume = 0.12f;
     /** Multiplier for shield damage taken from missile units. */
-    public float missileUnitMultiplier = 2f;
+    public float missileUnitMultiplier = 0.8f;
 
     /** Whether to draw the arc line. */
     public boolean drawArc = true;

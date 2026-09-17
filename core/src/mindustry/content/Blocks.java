@@ -2042,8 +2042,7 @@ public class Blocks{
             size = 3;
             consumeLiquids(LiquidStack.with(Liquids.cyanogen, 1.5f / 60f));
             consumePower(100f / 60f);
-            range = 170f;
-            reload = 80f;
+            status =  StatusEffects.slow;
         }};
 
         //TODO 5x5??
@@ -3208,11 +3207,11 @@ public class Blocks{
         }};
 
         coreCitadel = new CoreBlock("core-citadel"){{
-            requirements(Category.effect, with(Items.silicon, 4000, Items.beryllium, 4000, Items.tungsten, 3000, Items.oxide, 1000));
+            requirements(Category.effect, with(Items.silicon, 2000, Items.beryllium, 3000, Items.tungsten, 1000, Items.oxide, 500));
 
             unitType = UnitTypes.incite;
-            health = 16000;
-            itemCapacity = 3000;
+            health = 12000;
+            itemCapacity = 4000;
             size = 5;
             thrusterLength = 40/4f;
             armor = 10f;
@@ -3226,11 +3225,11 @@ public class Blocks{
         }};
 
         coreAcropolis = new CoreBlock("core-acropolis"){{
-            requirements(Category.effect, with(Items.beryllium, 6000, Items.silicon, 5000, Items.tungsten, 5000, Items.carbide, 3000, Items.oxide, 3000));
+            requirements(Category.effect, with(Items.silicon, 3000, Items.beryllium, 6000, Items.tungsten, 2000, Items.oxide, 1500, Items.carbide, 750));
 
             unitType = UnitTypes.emanate;
             health = 30000;
-            itemCapacity = 4000;
+            itemCapacity = 6000;
             size = 6;
             thrusterLength = 48/4f;
             armor = 15f;
@@ -6004,7 +6003,7 @@ public class Blocks{
             shootType = new FlakBulletType(8f, 70f){{
                 sprite = "missile-large";
 
-                lifetime = 40f;
+                lifetime = 33f;
                 width = 12f;
                 height = 22f;
 
@@ -6036,11 +6035,13 @@ public class Blocks{
                 intervalBullet = new LightningBulletType() {{
                     lightningColor = circleColor;
                     lightningCone = 15f;
-                    lightningLength = 35;
+                    lightningLength = 30;
                     lightningLengthRand = 5;
                     damage = 18f;
                 }};
 
+                //mostly removes visual "overrange"
+                int sideOffSet = 3;
                 fragBullet = new LaserBulletType(65f){{
                     colors = new Color[]{haloColor.cpy().a(0.4f), haloColor, Color.white};
                     buildingDamageMultiplier = 0.25f;
@@ -6048,15 +6049,17 @@ public class Blocks{
                     hitEffect = Fx.hitLancer;
                     sideAngle = 175f;
                     sideWidth = 1f;
-                    sideLength = 40f;
+                    sideLength = sideOffSet;
+                    lengthOffset = sideOffSet - 40f;
                     lifetime = 22f;
                     drawSize = 400f;
-                    length = 120f;
+                    length = 160f;
                     pierceCap = 2;
                     optimalLifeFract = 1f;
                 }};
 
                 intervalBullets = 1;
+                fragBullets = 9;
                 fragSpread = fragRandomSpread = intervalRandomSpread = 0f;
                 bulletInterval = 20f;
 
@@ -6741,7 +6744,6 @@ public class Blocks{
             filter = Seq.with(Blocks.tungstenWallLarge, Blocks.berylliumWallLarge, Blocks.carbideWallLarge, Blocks.reinforcedSurgeWallLarge, Blocks.reinforcedLiquidContainer, Blocks.reinforcedContainer, Blocks.beamNode);
         }};
 
-        //yes this block is pretty much useless
         largeConstructor = new Constructor("large-constructor"){{
             requirements(Category.units, with(Items.silicon, 150, Items.oxide, 100, Items.tungsten, 200, Items.thorium, 80));
             regionSuffix = "-dark";
@@ -6758,7 +6760,7 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 80, Items.silicon, 160, Items.tungsten, 90));
             regionSuffix = "-dark";
             hasPower = true;
-            consumePower(2f);
+            consumePower(1f);
             size = 3;
             fogRadius = 5;
         }};
@@ -6767,7 +6769,7 @@ public class Blocks{
             requirements(Category.units, with(Items.graphite, 140, Items.silicon, 220, Items.tungsten, 180));
             regionSuffix = "-dark";
             hasPower = true;
-            consumePower(2f);
+            consumePower(1f);
             size = 3;
             fogRadius = 5;
         }};

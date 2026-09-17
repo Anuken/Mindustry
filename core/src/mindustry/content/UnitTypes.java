@@ -3692,7 +3692,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new ArtilleryBulletType(5.5f, 260){{
+                bullet = new ArtilleryBulletType(5.5f, 500){{
                     collidesTiles = collides = true;
                     lifetime = 60f;
                     shootEffect = Fx.shootBigColor;
@@ -3728,7 +3728,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    splashDamage = 120f;
+                    splashDamage = 300f;
                     splashDamageRadius = 36f;
 
                     fragBullets = 15;

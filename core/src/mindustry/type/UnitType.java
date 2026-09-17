@@ -102,6 +102,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     wreckHealthMultiplier = 0.25f,
     /** a VERY ROUGH estimate of unit DPS; initialized in init() */
     dpsEstimate = -1,
+    /** a VERY ROUGH estimate of total unit damage; initialized in init() */
+    damageEstimate = -1,
     /** graphics clipping size; <0 to calculate automatically */
     clipSize = -1,
     /** multiplier for how slowly this unit drowns - higher numbers, slower drowning. */
@@ -1120,6 +1122,7 @@ public class UnitType extends UnlockableContent implements Senseable{
         }
 
         estimateDps();
+        estimateDamage();
 
         //only do this after everything else was initialized
         sample = constructor.get();
@@ -1136,8 +1139,15 @@ public class UnitType extends UnlockableContent implements Senseable{
                 dpsEstimate /= 15f;
             }
         }
+        if(damageEstimate < 0){
+            damageEstimate = weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f);
+        }
 
         return dpsEstimate;
+    }
+
+    public float estimateDamage(){
+        return damageEstimate < 0 ? weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f) : damageEstimate;
     }
 
     @CallSuper
