@@ -11,11 +11,15 @@ import mindustry.world.meta.*;
 /** A crafter that gains efficiency from attribute tiles. */
 public class AttributeCrafter extends GenericCrafter{
     public Attribute attribute = Attribute.heat;
+    /** Base efficiency of the crafter. */
     public float baseEfficiency = 1f;
+    /** Maximum efficiency/output boost from attributes. */
     public float maxBoost = 1f;
+    /** Minimum efficiency required to place this block. */
     public float minEfficiency = -1f;
-    public boolean displayEfficiency = true;
-    public boolean displayScaledOutput = true;
+    /** Whether to show this bar in the UI. */
+    public boolean displayEfficiency = true, displayScaledOutput = true;
+    /** Whether liquid consumption scales with efficiency. */
     public boolean scaleLiquidConsumption = false;
     /** Scaled output (yield) multiplier, scales with attribute. <=0 to disable. */
     public float outputScale = 0f;
@@ -34,12 +38,10 @@ public class AttributeCrafter extends GenericCrafter{
 
         drawPlaceText(
         (displayEfficiency && boostScale > 0f ?
-            Core.bundle.format("bar.efficiency",
-            (int)((baseEfficiency + Math.min(maxBoost, boostScale * sumAttribute(attribute, x, y))) * 100f))
+        Core.bundle.format("bar.efficiency", (int)((baseEfficiency + Math.min(maxBoost, boostScale * sumAttribute(attribute, x, y))) * 100f))
         : "") +
-        (displayScaledOutput && outputScale > 0f ? "\n" +
-            Core.bundle.format("bar.yield",
-            (int)(Math.min(maxBoost, outputScale * sumAttribute(attribute, x, y)) * 100f))
+        (displayScaledOutput && outputScale > 0f ?
+        "\n" + Core.bundle.format("bar.yield", (int)((1f + Math.min(maxBoost, outputScale * sumAttribute(attribute, x, y))) * 100f))
         : ""), x, y, valid);
     }
 
@@ -59,7 +61,7 @@ public class AttributeCrafter extends GenericCrafter{
         if(displayScaledOutput && outputScale > 0f){
             addBar("yield", (AttributeCrafterBuild entity) ->
             new Bar(
-            () -> Core.bundle.format("bar.yield", (int)((entity.outputMultiplier() - baseEfficiency) * 100)),
+            () -> Core.bundle.format("bar.yield", (int)(entity.outputMultiplier() * 100)),
             () -> Pal.lightOrange,
             entity::outputMultiplier));
         }
