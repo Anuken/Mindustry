@@ -473,8 +473,8 @@ public class BulletType extends Content implements Cloneable{
 
         float fragRange = b.fragBullet != null ? b.fragBullet.calculateRange(b.fragVelocityMax, b.fragLifeMax) + b.fragOffsetMax : 0f;
 
-        return Math.max(spawnRange, b.range <= 0f ? b.calculateRange() : b.range) + Math.max(b.splashDamageRadius + 4f, Math.max(fragRange,
-        Math.max(calculateRangeRecursive(b.intervalBullet), Math.max(lightningRange, Math.max(incendRange, pddleRange)))));
+        return Math.max(spawnRange, (b.range <= 0f ? b.calculateRange() : b.range) + Math.max(b.splashDamageRadius + 4f, Math.max(fragRange,
+        Math.max(calculateRangeRecursive(b.intervalBullet), Math.max(lightningRange, Math.max(incendRange, pddleRange))))));
     }
 
     /** @return continuous damage in damage/sec, or -1 if not continuous. */
