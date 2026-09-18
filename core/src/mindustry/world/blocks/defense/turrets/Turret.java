@@ -209,7 +209,7 @@ public class Turret extends ReloadTurret{
 
     @Override
     public void init(){
-        if(shootY == Float.NEGATIVE_INFINITY) shootY = size * tilesize / 2f;
+        setShootY();
         if(elevation < 0) elevation = size / 2f;
         if(recoilTime < 0f) recoilTime = reload;
         if(cooldownTime < 0f) cooldownTime = reload;
@@ -221,6 +221,10 @@ public class Turret extends ReloadTurret{
 
         super.init();
         trackingRange = Math.max(range, trackingRange);
+    }
+
+    public void setShootY(){
+        if(shootY == Float.NEGATIVE_INFINITY) shootY = size * tilesize / 2f;
     }
 
     @Override
@@ -249,6 +253,23 @@ public class Turret extends ReloadTurret{
         float realRange = bullet.rangeChange + range;
         //doesn't handle drag
         bullet.lifetime = (realRange + margin + bullet.extraRangeMargin + 10f) / bullet.speed;
+    }
+
+    public void calculateOverlap(ObjectMap<?, BulletType> ammoTypes){
+        setShootY();
+        if(targetGround){
+            ammoTypes.each((item, type) -> {
+                //absoluteRange must be initialized
+                type.init();
+                placeOverlapRange = Math.max(placeOverlapRange, Math.max(range + type.rangeChange, type.absoluteRange) + shootY + placeOverlapMargin);
+            });
+        }
+    }
+
+    public void calculateOverlap(BulletType type){
+        setShootY();
+        type.init();
+        placeOverlapRange = Math.max(placeOverlapRange, Math.max(range, type.absoluteRange) + shootY + placeOverlapMargin);
     }
 
     @Override

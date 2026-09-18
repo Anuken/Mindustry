@@ -163,12 +163,14 @@ public class BulletType extends Content implements Cloneable{
     public float rangeOverride = -1f;
     /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence range. */
     public float rangeChange = 0f;
+    /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence minRange */
+    public float minRangeChange = 0f;
     /** When used in turrets with limitRange() applied, this adds extra range to the bullets that extends past targeting range. Only particularly relevant in vanilla. */
     public float extraRangeMargin = 0f;
     /** Range initialized in init(). */
     public float range = 0f;
-    /** When used in a turret with multiple ammo types, this can be set to a non-zero value to influence minRange */
-    public float minRangeChange = 0f;
+    /** Absolute max range, including frags, aoe, lightning, etc. Initialized in init(). */
+    public float absoluteRange = 0f;
     /** % of block health healed **/
     public float healPercent = 0f;
     /** flat amount of block health healed */
@@ -408,6 +410,7 @@ public class BulletType extends Content implements Cloneable{
         super.afterPatch();
 
         range = calculateRange();
+        absoluteRange = calculateRangeRecursive(this);
     }
 
     @Override
@@ -441,10 +444,37 @@ public class BulletType extends Content implements Cloneable{
 
     /** @return maximum distance the bullet this bullet type has can travel. */
     protected float calculateRange(){
+        return calculateRange(1f, 1f);
+    }
+
+    protected float calculateRange(float velocityScl, float lifetimeScl){
         if(rangeOverride > 0) return rangeOverride;
         if(spawnUnit != null) return spawnUnit.lifetime * spawnUnit.speed;
         if(despawnUnit != null) return despawnUnit.lifetime * despawnUnit.speed;
-        return Math.max(Mathf.zero(drag) ? speed * lifetime : speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
+        float speedScale = speed * velocityScl;
+        float lifeScale = lifetime * lifetimeScl;
+
+        return Math.max(Mathf.zero(drag) ? speedScale * lifeScale : speedScale * (1f - Mathf.pow(1f - drag, lifeScale)) / drag, maxRange);
+    }
+
+    /** @return maximum distance this bullet (including all its children) can travel. */
+    protected float calculateRangeRecursive(BulletType b){
+        if(b == null) return 0f;
+
+        //createLightningInternal can extend up to 7.5x length with enough rng
+        float lightningRange = b.lightning > 0 ? (b.lightningLength + b.lightningLengthRand * 0.8f) * 6.5f + calculateRangeRecursive(b.lightningType) : 0f;
+        float incendRange = incendAmount > 0 ? incendSpread + 4f : 0f;
+        float pddleRange = puddleAmount > 0 ? puddleRange + 4f : 0f;
+
+        float spawnRange = 0f;
+        for(var spawn : b.spawnBullets){
+            spawnRange = Math.max(spawnRange, calculateRangeRecursive(spawn));
+        }
+
+        float fragRange = b.fragBullet != null ? b.fragBullet.calculateRange(b.fragVelocityMax, b.fragLifeMax) + b.fragOffsetMax : 0f;
+
+        return (b.range <= 0f ? b.calculateRange() : b.range) + Math.max(b.splashDamageRadius + 4f, Math.max(fragRange,
+        Math.max(calculateRangeRecursive(b.intervalBullet), Math.max(spawnRange, Math.max(lightningRange, Math.max(incendRange, pddleRange))))));
     }
 
     /** @return continuous damage in damage/sec, or -1 if not continuous. */
@@ -485,8 +515,9 @@ public class BulletType extends Content implements Cloneable{
         handlePierce(b, initialHealth, x, y);
     }
 
-    public void hitEntity(Bullet b, Hitboxc entity, float health){
+    public void hitEntity(Bullet b, Hitboxc entity, float healthIn){
         boolean wasDead = entity instanceof Unit u && u.dead;
+        float health = healthIn;
 
         if(entity instanceof Healthc h){
             float damage = b.damage;
@@ -865,6 +896,7 @@ public class BulletType extends Content implements Cloneable{
 
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
         range = calculateRange();
+        absoluteRange = calculateRangeRecursive(this);
     }
 
     @Override

@@ -44,6 +44,7 @@ public class BuildTurret extends BaseTurret{
         sync = false;
         rotateSpeed = 10f;
         suppressable = true;
+        disableOverlapCheck = true;
     }
 
     @Override

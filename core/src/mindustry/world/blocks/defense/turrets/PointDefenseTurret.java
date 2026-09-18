@@ -38,8 +38,8 @@ public class PointDefenseTurret extends ReloadTurret{
 
         rotateSpeed = 20f;
         reload = 30f;
-
         coolantMultiplier = 2f;
+        disableOverlapCheck = true;
     }
 
     @Override

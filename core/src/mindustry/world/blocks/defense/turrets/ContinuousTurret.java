@@ -26,6 +26,13 @@ public class ContinuousTurret extends Turret{
     }
 
     @Override
+    public void init(){
+        calculateOverlap(shootType);
+
+        super.init();
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
 

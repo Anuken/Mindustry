@@ -6003,7 +6003,7 @@ public class Blocks{
                 flakInterval = 20f;
                 despawnShake = 3f;
 
-                intervalBullet = new LightningBulletType() {{
+                intervalBullet = new LightningBulletType(){{
                     lightningColor = circleColor;
                     lightningCone = 15f;
                     lightningLength = 35;

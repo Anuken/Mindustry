@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 
 public class BaseTurret extends Block{
     public float range = 80f;
-    public float placeOverlapMargin = 8 * 7f;
+    public float placeOverlapMargin = 8f * 2f;
     public float rotateSpeed = 5;
     public float fogRadiusMultiplier = 1f;
     public boolean disableOverlapCheck = false;

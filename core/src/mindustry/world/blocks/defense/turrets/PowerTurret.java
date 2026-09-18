@@ -14,6 +14,13 @@ public class PowerTurret extends Turret{
     }
 
     @Override
+    public void init(){
+        calculateOverlap(shootType);
+
+        super.init();
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
         stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
