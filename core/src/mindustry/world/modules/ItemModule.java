@@ -97,7 +97,7 @@ public class ItemModule extends BlockModule{
 
     /** @return a specific item's flow rate in items/s; any value < 0 means not ready.*/
     public float getFlowRate(Item item){
-        return flow == null ? -1f : displayFlow[item.id] * 60;
+        return flow == null ? -1f : displayFlow != null ? displayFlow[item.id] * 60 : -1f;
     }
 
     public boolean hasFlowItem(Item item){
