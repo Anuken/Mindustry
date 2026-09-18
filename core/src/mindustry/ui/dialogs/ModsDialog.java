@@ -109,7 +109,11 @@ public class ModsDialog extends BaseDialog{
                 var mod = repoToMod.get(entry.repo);
                 if(mod != null){
                     modToListing.put(mod, entry);
-                    if(Strings.checkNewerSemver(entry.version, mod.meta.version)) withUpdates.add(mod);
+                    var release = entry.getMatchingRelease();
+                    //Only compare to the release that fits the current version the client is using, if one exists; don't look for updates that don't match the version
+                    if(Strings.checkNewerSemver(entry.version, release == null ? mod.meta.version : release.version)){
+                        withUpdates.add(mod);
+                    }
                 }
             }
 
@@ -175,8 +179,15 @@ public class ModsDialog extends BaseDialog{
                             if(text.startsWith("https://github.com/")) text = text.substring("https://github.com/".length());
 
                             Core.settings.put("lastmod", text);
-                            //there's no good way to know if it's a java mod here, so assume it's not
-                            githubImportMod(text, false, null, true);
+                            var listing = browser.getCachedMod(text);
+                            if(listing != null){
+                                //auto-choose release when a listing is found
+                                githubImportMod(listing);
+                            }else{
+                                //this will auto-detect whether it's java, then grab latest release unconditionally
+                                //TODO: would be nice to grab version-appropriate release but I don't want to copy-paste browser logic for this
+                                githubImportMod(text, false, null, true);
+                            }
                         });
                     }).margin(12f);
                 });
@@ -530,7 +541,7 @@ public class ModsDialog extends BaseDialog{
         }
     }
 
-    public void viewReleases(String repo, boolean isJava, boolean reinstall) {
+    public void viewReleases(String repo, boolean isJava, boolean reinstall){
         BaseDialog load = new BaseDialog("");
         load.cont.add("[accent]" + Core.bundle.get("mods.browser.fetching"));
         load.show();
@@ -598,6 +609,11 @@ public class ModsDialog extends BaseDialog{
             showModError(t);
             load.hide();
         }));
+    }
+
+    public void githubImportMod(ModListing mod){
+        var matchingRelease = mod.getMatchingRelease();
+        githubImportMod(mod.repo, mod.hasJava, matchingRelease == null ? null : matchingRelease.id, true);
     }
 
     public void githubImportMod(String repo, boolean isJava, boolean forceEnable){
@@ -699,7 +715,8 @@ public class ModsDialog extends BaseDialog{
         while(m.find()){
             if(m.start() == 0 || m.end() == str.length()){
                 int major = Strings.parseInt(m.group(1));
-                if(major == Integer.MIN_VALUE) return null;
+                //any major version below 15 is likely a major-version tag like [v7] and should be ignored
+                if(major == Integer.MIN_VALUE || major < 15) return null;
                 int minor = m.group(2) != null ? Strings.parseInt(m.group(2)) : 0;
                 if(minor == Integer.MIN_VALUE) return null;
                 return new int[]{major, minor};

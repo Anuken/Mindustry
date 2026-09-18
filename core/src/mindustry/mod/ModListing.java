@@ -10,7 +10,7 @@ public class ModListing{
     public boolean hasScripts, hasJava, iosCompatible, legacyCompatible, hasIcon;
     /** game build -> release ID + mod version */
     public @Nullable ArrayMap<String, ModRelease> releases;
-    public String[] contentTypes = {};
+    public String[] tags = {};
     public int stars;
 
     @Override
@@ -29,21 +29,29 @@ public class ModListing{
         '}';
     }
 
+    /** @return the specific release that matches the current game version, or null if no specific match is found (i.e. /latest should be used) */
     public @Nullable ModRelease getMatchingRelease(){
         if(releases == null) return null;
-        for(int i = 0; i < releases.size; i ++){
-            String key = releases.keys[i];
-            if(ModsDialog.matchesGameVersion(ModsDialog.parseVersion(key))){
-                return releases.values[i];
+        for(var entry : releases){
+            if(ModsDialog.matchesGameVersion(ModsDialog.parseVersion(entry.key))){
+                return entry.value;
             }
         }
         return null;
     }
 
     public static class ModRelease{
-        /** Github release ID */
+        /** Github release ID ($API/releases/$ID) */
         public String id = "";
         /** Actual mod version string in release's mod.json */
         public String version = "";
+
+        @Override
+        public String toString(){
+            return "ModRelease{" +
+            "id='" + id + '\'' +
+            ", version='" + version + '\'' +
+            '}';
+        }
     }
 }
