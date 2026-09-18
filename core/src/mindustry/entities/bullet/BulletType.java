@@ -515,9 +515,8 @@ public class BulletType extends Content implements Cloneable{
         handlePierce(b, initialHealth, x, y);
     }
 
-    public void hitEntity(Bullet b, Hitboxc entity, float healthIn){
+    public void hitEntity(Bullet b, Hitboxc entity, float health){
         boolean wasDead = entity instanceof Unit u && u.dead;
-        float health = healthIn;
 
         if(entity instanceof Healthc h){
             float damage = b.damage;
