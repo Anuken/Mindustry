@@ -22,7 +22,7 @@ I **especially** do not want to see PRs that apply any kind of automated analysi
 
 ### Do not make AI "contributions".
 
-If I see a PR with significant amounts of code that's obviously written by AI, I will reject your PR, and you will be blocked. Don't waste my time with slop.
+If I see a PR with code that's obviously written by AI, I will reject your PR, and you will be blocked. Don't waste my time with slop.
 
 Asking AI questions, and using that information to help you write code? Fine. Using it to actually write code? No.
 
@@ -67,7 +67,6 @@ What you'll usually need to change:
 ### Avoid boxed types (Integer, Boolean)
 Never create variables or collections with boxed types `Seq<Integer>` or `ObjectMap<Integer, ...>`. Use the collections specialized for this task, e.g. `IntSeq` and `IntMap`.
 
-
 ### Do not allocate anything if possible.
 Never allocate `new` objects in the main loop. If you absolutely require new objects, use `Pools` to obtain and free object instances. 
 Otherwise, use the `Tmp` variables for things like vector/shape operations, or create `static` variables for re-use.
@@ -76,7 +75,6 @@ If using a list, make it a static variable and clear it every time it is used. R
 ### Avoid bloated code and unnecessary getters/setters.
 This is situational, but in essence, what it means is to avoid using any sort of getters and setters unless absolutely necessary. Public or protected fields should suffice for most things. 
 If something needs to be encapsulated in the future, IntelliJ can handle it with a few clicks.
-
 
 ### Do not create methods unless necessary.
 Unless a block of code is very large or used in more than 1-2 places, don't split it up into a separate method. Making unnecessary methods only creates confusion, and may slightly decrease performance.  
