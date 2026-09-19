@@ -408,8 +408,9 @@ public class UI implements ApplicationListener, Loadable{
         table.touchable = Touchable.disabled;
         table.setFillParent(true);
         if(cinfo.visible && !state.isMenu()) table.marginTop(cinfo.getPrefHeight() / Scl.scl() / 2);
-        table.update(() -> {
+        table.visible(() -> {
             if(state.isMenu()) table.remove();
+            return ui.hudfrag.shown;
         });
         table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interp.fade), Actions.remove());
         table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
@@ -431,11 +432,12 @@ public class UI implements ApplicationListener, Loadable{
         }
         table.setFillParent(true);
         table.touchable = Touchable.disabled;
-        table.update(() -> {
+        table.visible(() -> {
             if(state.isMenu()){
                 table.remove();
                 if(id != null) popups.remove(id);
             }
+            return ui.hudfrag.shown;
         });
         table.actions(Actions.delay(duration), Actions.remove(), Actions.run(() -> { if(id != null) popups.remove(id); }));
         table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
