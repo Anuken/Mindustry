@@ -144,7 +144,7 @@ public class Drawf{
         x2 = close.x, y2 = close.y,
         x3 = vecs[1].x, y3 = vecs[1].y;
 
-        if(renderer.animateShields){
+        if(renderer.animateSurfaces){
             if(close != vecs[0] && close != vecs[1]){
                 Fill.tri(x, y, x1, y1, x2, y2);
                 Fill.tri(x, y, x3, y3, x2, y2);

@@ -130,7 +130,7 @@ public class BaseShield extends Block{
 
                 Draw.color(shieldColor == null ? team.color : shieldColor, Color.white, Mathf.clamp(hit));
 
-                if(renderer.animateShields){
+                if(renderer.animateSurfaces){
                     Fill.poly(x, y, sides, radius);
                 }else{
                     Lines.stroke(1.5f);

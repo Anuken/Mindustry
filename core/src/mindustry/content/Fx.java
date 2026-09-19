@@ -1378,7 +1378,7 @@ public class Fx{
 
     forceShrink = new Effect(20, e -> {
         color(e.color, e.fout());
-        if(renderer.animateShields){
+        if(renderer.animateSurfaces){
             Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
         }else{
             stroke(1.5f);

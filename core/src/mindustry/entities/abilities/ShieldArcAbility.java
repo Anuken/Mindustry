@@ -220,7 +220,7 @@ public class ShieldArcAbility extends Ability{
             Draw.color(color == null ? unit.type.shieldColor(unit) : color, Color.white, Mathf.clamp(alpha));
             var pos = paramPos.set(x, y).rotate(unit.rotation - 90f).add(unit);
 
-            if(!Vars.renderer.animateShields){
+            if(!Vars.renderer.animateSurfaces){
                 Draw.alpha(0.4f);
             }
 

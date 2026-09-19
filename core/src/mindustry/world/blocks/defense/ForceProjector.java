@@ -312,7 +312,7 @@ public class ForceProjector extends Block{
                 if(radius > 0.001f){
                     Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
-                    if(renderer.animateShields){
+                    if(renderer.animateSurfaces){
                         Draw.z(Layer.shields + 0.001f * hit);
                         Fill.poly(x, y, sides, radius, shieldRotation);
                     }else{
