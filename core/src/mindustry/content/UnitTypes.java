@@ -2862,6 +2862,7 @@ public class UnitTypes{
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
+            rotateSpeed = 1.2f;
             floorMultiplier = 0.5f;
             drownTimeMultiplier = 1.25f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
@@ -2870,6 +2871,13 @@ public class UnitTypes{
 
             tankMoveVolume *= 1.25f;
             tankMoveSound = Sounds.tankMoveHeavy;
+
+            abilities.add(new LastStandAbility(){{
+                speedMultiplier = 1.5f;
+                rotateSpeedMultiplier = 2.5f;
+                exponent = 1.5f;
+                minHealth = 0.3f;
+            }});
 
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.shootTank;
