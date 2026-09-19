@@ -33,6 +33,7 @@ public class StatUnit{
     perLeg = new StatUnit("perLeg"),
     perSide = new StatUnit("perSide"),
     timesSpeed = new StatUnit("timesSpeed", false),
+    bulletSpeed = new StatUnit("bulletSpeed", true),
     multiplier = new StatUnit("multiplier", false),
     percent = new StatUnit("percent", false),
     shieldHealth = new StatUnit("shieldHealth"),

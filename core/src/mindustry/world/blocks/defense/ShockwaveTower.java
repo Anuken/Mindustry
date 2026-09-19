@@ -1,5 +1,7 @@
 package mindustry.world.blocks.defense;
 
+import static mindustry.Vars.*;
+
 import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
@@ -13,27 +15,43 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LAccess;
+import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import static mindustry.Vars.*;
 
 public class ShockwaveTower extends Block{
     public int timerCheck = timers ++;
 
-    public float range = 110f;
-    public float reload = 60f * 1.5f;
-    public float bulletDamage = 160;
-    public float falloffCount = 20f;
-    public float shake = 2f;
-    //checking for bullets every frame is costly, so only do it at intervals even when ready.
+    public float range = 170f;
+    public float reload = 45f;
+    /** Base damage dealt to bullets. */
+    public float bulletDamage = 80;
+    /** Multiplier for damage dealt to missile units. */
+    public float unitDamageMultiplier = -1f;
+    /** Linearly decreases {@link #bulletDamage} when the number of bullets is higher than this value. */
+    public int falloffCount = 12;
+    /** Linearly decreases bullet speed up to this multiplier, proportional to (damage dealt to bullet / initial bullet damage). */
+    public float slowdownMultiplier = 0.3f;
+    /** Checking for bullets every frame is costly, so only do it at intervals even when ready. */
     public float checkInterval = 8f;
+    /** % of reload randomly added or subtracted from the reload counter. Used for desyncing. <=0f to disable. */
+    public float randReloadRange = 0.1f;
+    /** What % of reload is needed to consider firing an extra time. The remaining time will be added to reload.  */
+    public float quickFirePercentage = 0.5f;
+    /** When cumulative bullet damage reaches {@link #bulletDamage} multiplied by this value, consider firing an extra time. */
+    public float quickFireThreshold = 5f;
+
     public Sound shootSound = Sounds.shockwaveTower;
     public Color waveColor = Pal.accent, heatColor = Pal.turretHeat, shapeColor = Color.valueOf("f29c83");
     public float cooldownMultiplier = 1f;
     public Effect hitEffect = Fx.hitSquaresColor;
     public Effect waveEffect = Fx.pointShockwave;
+    public float shake = 2f;
+
+    /** Status effect applied to missile units hit. */
+    public StatusEffect status = StatusEffects.none;
+    public float statusDuration = 60f;
 
     //TODO switch to drawers eventually or something
     public float shapeRotateSpeed = 1f, shapeRadius = 6f;
@@ -51,9 +69,27 @@ public class ShockwaveTower extends Block{
     public void setStats(){
         super.setStats();
 
-        stats.add(Stat.damage, bulletDamage, StatUnit.none);
+        stats.add(Stat.damage, t -> {
+            t.add("[stat]" + Strings.autoFixed(bulletDamage, 2) +
+            (unitDamageMultiplier > 0f ? "[lightgray] ~ [stat]" + Strings.autoFixed(bulletDamage * unitDamageMultiplier, 2) + "[white] " + Core.bundle.get("bar.appliedmissiles") : "") +
+            (falloffCount > 0 ? "[lightgray] ~ [white]" + Core.bundle.format("bar.falloffprojectile", Strings.format("[negstat]@+[lightgray]", falloffCount)) : ""));
+        });
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
         stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);
+        if(status != StatusEffects.none || slowdownMultiplier > 0f){
+            stats.add(Stat.slowdown, table -> {
+                table.table(t -> {
+                    t.defaults().left();
+                    if(slowdownMultiplier > 0f){
+                        t.add(Core.bundle.format("bar.upto", Strings.format("[stat]@", Strings.autoFixed((slowdownMultiplier - 1f) * 100f, 0)))
+                        + StatUnit.percent.localized() + "[white] " + StatUnit.bulletSpeed.localized()).left().row();
+                    }
+                    if(status != StatusEffects.none){
+                        t.add(StatValues.statusText(status, statusDuration) + "[white] " + Core.bundle.get("bar.appliedmissiles")).left();
+                    }
+                });
+            });
+        }
     }
 
     @Override
@@ -65,38 +101,26 @@ public class ShockwaveTower extends Block{
 
     public class ShockwaveTowerBuild extends Building{
         public float reloadCounter = Mathf.random(reload);
-        public float heat = 0f;
-        public Seq<Bullet> targets = new Seq<>();
+        public float damageSum = 0f, heat = 0f, setReload = reload;
+        public boolean wasReady, isQuickFire;
+        public Seq<Bullet> bullets = new Seq<>();
+        public Seq<Unit> units = new Seq<>();
 
         @Override
         public void updateTile(){
-            if(potentialEfficiency > 0 && (reloadCounter += edelta()) >= reload && timer(timerCheck, checkInterval)){
-                targets.clear();
-                Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
-                    if(b.team != team && b.type.hittable && b.within(x, y, range + 1f)){
-                        targets.add(b);
-                    }
-                });
+            if(potentialEfficiency > 0){
+                reloadCounter += edelta();
+                boolean fire = reloadCounter >= setReload;
 
-                if(targets.size > 0){
-                    heat = 1f;
-                    reloadCounter = 0f;
-                    waveEffect.at(x, y, range, waveColor);
-                    shootSound.at(x, y, 1f + Mathf.range(0.15f), 1f);
-                    Effect.shake(shake, shake, this);
-                    float waveDamage = Math.min(bulletDamage, bulletDamage * falloffCount / targets.size);
+                //wasReady is used to immediately force a scan once when the tower is ready
+                if((wasReady || timer(timerCheck, checkInterval)) && (fire || (!isQuickFire && reloadCounter >= setReload * quickFirePercentage))){
+                    findTargets();
 
-                    for(var target : targets){
-                        if(target.damage > waveDamage){
-                            target.damage -= waveDamage;
-                        }else{
-                            target.remove();
-                        }
-                        hitEffect.at(target.x, target.y, waveColor);
-                    }
-
-                    if(team == state.rules.defaultTeam){
-                        Events.fire(Trigger.shockwaveTowerUse);
+                    isQuickFire = !fire && damageSum >= bulletDamage * quickFireThreshold;
+                    if((bullets.size > 0 || units.size > 0) && (fire || isQuickFire)){
+                        fireEffect();
+                    }else{
+                        wasReady = false;
                     }
                 }
             }
@@ -104,16 +128,72 @@ public class ShockwaveTower extends Block{
             heat = Mathf.clamp(heat - Time.delta / reload * cooldownMultiplier);
         }
 
+        public void findTargets(){
+            bullets.clear();
+            units.clear();
+            damageSum = 0f;
+
+            if (Groups.bullet.isEmpty()) return;
+
+            Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
+                if(b.team != team && b.type.hittable && b.within(x, y, range + 1f)){
+                    bullets.add(b);
+                    damageSum += b.damage;
+                }
+            });
+
+            if(status != StatusEffects.none){
+                Units.nearby(x - range, y - range, range * 2, range * 2, u -> {
+                    if(u.team != team && u.isMissile() && u.within(x, y, range + 1f)){
+                        units.add(u);
+                        damageSum += u.type.damageEstimate;
+                    }
+                });
+            }
+        }
+
+        public void fireEffect(){
+            heat = 1f;
+            wasReady = true;
+
+            setReload = isQuickFire ? 2f * reload - reloadCounter : reload;
+            reloadCounter = randReloadRange > 0f ? Mathf.range(reload * randReloadRange) : 0f;
+
+            waveEffect.at(x, y, range, waveColor);
+            shootSound.at(x, y, 1f + Mathf.range(0.15f), 1f);
+            Effect.shake(shake, shake, this);
+
+            float totalTargets = bullets.size + units.size;
+            float waveDamage = Math.min(bulletDamage, bulletDamage * falloffCount / totalTargets);
+
+            for(var bullet : bullets){
+                float ratio = Math.min(waveDamage / Math.max(bullet.type.damage, 1f), 1f);
+                if(bullet.damage > waveDamage){
+                    bullet.damage -= waveDamage;
+                    bullet.vel.scl(Mathf.lerp(1f, slowdownMultiplier, ratio));
+                }else{
+                    bullet.remove();
+                }
+                hitEffect.at(bullet.x, bullet.y, waveColor);
+            }
+
+            for(var unit : units){
+                if(unitDamageMultiplier > 0f) unit.damage(waveDamage * unitDamageMultiplier);
+                unit.apply(status, statusDuration * falloffCount / totalTargets);
+                hitEffect.at(unit.x, unit.y, waveColor);
+            }
+
+            if(team == state.rules.defaultTeam) Events.fire(Trigger.shockwaveTowerUse);
+        }
 
         @Override
-        public double sense(LAccess sensor) {
+        public double sense(LAccess sensor){
             return switch(sensor){
-                case progress -> reloadCounter / reload;
+                case progress -> Mathf.clamp(reloadCounter / reload);
                 case heat -> heat;
                 default -> super.sense(sensor);
             };
         }
-
 
         @Override
         public float warmup(){
@@ -122,7 +202,7 @@ public class ShockwaveTower extends Block{
 
         @Override
         public boolean shouldConsume(){
-            return reloadCounter < reload;
+            return reloadCounter < setReload;
         }
 
         @Override

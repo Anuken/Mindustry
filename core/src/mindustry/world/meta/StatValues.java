@@ -234,6 +234,9 @@ public class StatValues{
         "[lightgray] ~ [stat]" + Strings.autoFixed(duration / 60f, 1) +
         "[lightgray] " + Core.bundle.get("unit.seconds"));
     }
+    public static String statusText(StatusEffect status, float duration){
+        return statusText(status, duration, 1f);
+    }
 
     /** Displays an item with a specified amount. */
     private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content, boolean tooltip){
@@ -757,7 +760,8 @@ public class StatValues{
                         bt.row();
                     }
 
-                    if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
+                    // delayFrags as a workaround to show railbullettype damage and splash
+                    if(type.damage > 0 && (type.collides || type.delayFrags || type.splashDamage <= 0)){
                         bt.add(Core.bundle.format("bullet.damage", type.damage) + (type.continuousDamage() > 0 ?
                         "[lightgray] ~ [stat]" + Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized() : ""));
                     }
@@ -779,7 +783,7 @@ public class StatValues{
                     }
 
                     if(type.statLiquidConsumed <= 0f && !compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
-                        sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
+                        sep(bt, (type.ammoMultiplier < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("bullet.multiplier", Strings.autoFixed(type.ammoMultiplier, 2)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
@@ -787,8 +791,8 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.reload", ammoStat(val)));
                     }
 
-                    if(type.knockback > 0){
-                        sep(bt, Core.bundle.format("bullet.knockback", Strings.autoFixed(type.knockback, 2)));
+                    if(type.knockback != 0f){
+                        sep(bt, Core.bundle.format("bullet.knockback", (type.knockback < 0f ? "[negstat]" : "") + Strings.autoFixed(type.knockback, 2)));
                     }
 
                     if(type.healPercent > 0f){
@@ -807,17 +811,21 @@ public class StatValues{
                         sep(bt, "@bullet.incendiary");
                     }
 
-                    if(type.homingPower > 0.01f){
-                        sep(bt, "@bullet.homing");
+                    if(type.homingPower > 0.0001f){
+                        if(type.homingPower < 0.05f) sep(bt, Core.bundle.format("bullet.weakhoming"));
+                        else if(type.homingPower < 0.15f) sep(bt, Core.bundle.format("bullet.mediumhoming"));
+                        else sep(bt, Core.bundle.format("bullet.stronghoming"));
                     }
 
-                    // Showing the correct value for lightning damage is annoyinh
+                    if(type.maxRicochetAngle > 0f){
+                        if(type.maxRicochetAngle < 30f) sep(bt, Core.bundle.format("bullet.weakricochet"));
+                        else if(type.maxRicochetAngle < 90f) sep(bt, Core.bundle.format("bullet.mediumricochet"));
+                        else sep(bt, Core.bundle.format("bullet.strongricochet"));
+                    }
+
+                    // Showing the correct value for lightning damage is annoying
                     if(type.lightning > 0){
-                        sep(bt, Core.bundle.format(
-                        "bullet.lightning",
-                        type.lightning,
-                        type.lightningDamage < 0 ? type.damage : type.lightningDamage
-                        ));
+                        sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                     }
 
                     if(type instanceof LaserBulletType b && b.lightningSpacing > 0){
