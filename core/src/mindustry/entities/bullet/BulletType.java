@@ -353,6 +353,10 @@ public class BulletType extends Content implements Cloneable{
     public @Nullable BulletType lightningType = null;
     /** Maximum number of times the same unit can be hit by a lightning chain. <= 0 for unlimited. */
     public int lightningHits = -1;
+    /** Whether lightning can home onto units. */
+    public boolean lightningHomingUnit = true;
+    /** Whether lightning can home onto tiles. */
+    public boolean lightningHomingTiles = false;
 
     /** Scale of bullet weave pattern. Higher -> less vibration. */
     public float weaveScale = 1f;
