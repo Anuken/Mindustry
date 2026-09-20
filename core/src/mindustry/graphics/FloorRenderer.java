@@ -32,11 +32,11 @@ import static mindustry.Vars.*;
 public class FloorRenderer{
     public static boolean growSprites = true;
 
-    private static final VertexAttribute[] attributes = {VertexAttribute.packedPosition, VertexAttribute.color, VertexAttribute.packedTexCoords};
+    private static final VertexAttribute[] attributes = {VertexAttribute.packedPosition, VertexAttribute.color, VertexAttribute.packedTexCoords, VertexAttribute.depthCoords};
     private static final int
         chunksize = 30, //todo 32?
         chunkunits = chunksize * tilesize,
-        vertexSize = 1 + 1 + 1,
+        vertexSize = 1 + 1 + 1 + 1,
         spriteSize = vertexSize * 4,
         maxSprites = chunksize * chunksize * 9;
     private static final float packPad = tilesize * 8f;
@@ -50,7 +50,6 @@ public class FloorRenderer{
     private Shader shader;
     private Mat combinedMat = new Mat();
     private Texture texture;
-    private TextureRegion error;
 
     private ChunkMesh[][][] cache;
     private boolean[][] dirty;
@@ -73,25 +72,29 @@ public class FloorRenderer{
         attribute vec4 a_position;
         attribute vec4 a_color;
         attribute vec2 a_texCoord0;
+        attribute float a_depth;
         
         uniform mat4 u_projectionViewMatrix;
         varying vec4 v_color;
         varying vec2 v_texCoords;
+        varying float v_depth;
 
         void main(){
            v_color = a_color;
            v_color.a = v_color.a * (255.0/254.0);
            v_texCoords = a_texCoord0;
+           v_depth = a_depth;
            gl_Position =  u_projectionViewMatrix * a_position;
         }
         """,
         """
         varying vec4 v_color;
         varying vec2 v_texCoords;
-        uniform sampler2D u_texture;
+        varying float v_depth;
+        uniform highp sampler2DArray u_texture;
 
         void main(){
-          gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+          gl_FragColor = v_color * texture(u_texture, vec3(v_texCoords, v_depth));
         }
         """);
 
@@ -366,7 +369,6 @@ public class FloorRenderer{
         dirty = new boolean[chunksx][chunksy];
 
         texture = Core.atlas.find("grass1").texture;
-        error = Core.atlas.find("env-error");
 
         packWidth = world.unitWidth() + packPad *2f;
         packHeight = world.unitHeight() + packPad *2f;
@@ -410,13 +412,6 @@ public class FloorRenderer{
 
         @Override
         protected void draw(TextureRegion region, float x, float y, float originX, float originY, float width, float height, float rotation){
-
-            //substitute invalid regions with error
-            if(region.texture != texture && region != error){
-                draw(error, x, y, originX, originY, width, height, rotation);
-                return;
-            }
-
             float[] verts = vertices;
             int idx = vidx;
             vidx += spriteSize;
@@ -456,24 +451,29 @@ public class FloorRenderer{
                 float v = region.v2;
                 float u2 = region.u2;
                 float v2 = region.v;
+                float depth = region.getDepth();
 
                 float color = this.colorPacked;
 
-                verts[idx] = pack(x1, y1);
-                verts[idx + 1] = color;
-                verts[idx + 2] = Pack.packUv(u, v);
+                verts[idx]      = pack(x1, y1);
+                verts[idx + 1]  = color;
+                verts[idx + 2]  = Pack.packUv(u, v);
+                verts[idx + 3]  = depth;
 
-                verts[idx + 3] = pack(x2, y2);
-                verts[idx + 4] = color;
-                verts[idx + 5] = Pack.packUv(u, v2);
+                verts[idx + 4]  = pack(x2, y2);
+                verts[idx + 5]  = color;
+                verts[idx + 6]  = Pack.packUv(u, v2);
+                verts[idx + 7]  = depth;
 
-                verts[idx + 6] = pack(x3, y3);
-                verts[idx + 7] = color;
-                verts[idx + 8] = Pack.packUv(u2, v2);
+                verts[idx + 8]  = pack(x3, y3);
+                verts[idx + 9]  = color;
+                verts[idx + 10] = Pack.packUv(u2, v2);
+                verts[idx + 11] = depth;
 
-                verts[idx + 9] = pack(x4, y4);
-                verts[idx + 10] = color;
-                verts[idx + 11] = Pack.packUv(u2, v);
+                verts[idx + 12] = pack(x4, y4);
+                verts[idx + 13] = color;
+                verts[idx + 14] = Pack.packUv(u2, v);
+                verts[idx + 15] = depth;
             }else{
                 float fx2 = x + width;
                 float fy2 = y + height;
@@ -481,24 +481,29 @@ public class FloorRenderer{
                 float v = region.v2;
                 float u2 = region.u2;
                 float v2 = region.v;
+                float depth = region.getDepth();
 
                 float color = this.colorPacked;
 
-                verts[idx] = pack(x, y);
-                verts[idx + 1] = color;
-                verts[idx + 2] = Pack.packUv(u, v);
+                verts[idx]      = pack(x, y);
+                verts[idx + 1]  = color;
+                verts[idx + 2]  = Pack.packUv(u, v);
+                verts[idx + 3]  = depth;
 
-                verts[idx + 3] = pack(x, fy2);
-                verts[idx + 4] = color;
-                verts[idx + 5] = Pack.packUv(u, v2);
+                verts[idx + 4]  = pack(x, fy2);
+                verts[idx + 5]  = color;
+                verts[idx + 6]  = Pack.packUv(u, v2);
+                verts[idx + 7]  = depth;
 
-                verts[idx + 6] = pack(fx2, fy2);
-                verts[idx + 7] = color;
-                verts[idx + 8] = Pack.packUv(u2, v2);
+                verts[idx + 8]  = pack(fx2, fy2);
+                verts[idx + 9]  = color;
+                verts[idx + 10] = Pack.packUv(u2, v2);
+                verts[idx + 11] = depth;
 
-                verts[idx + 9] = pack(fx2, y);
-                verts[idx + 10] = color;
-                verts[idx + 11] = Pack.packUv(u2, v);
+                verts[idx + 12] = pack(fx2, y);
+                verts[idx + 13] = color;
+                verts[idx + 14] = Pack.packUv(u2, v);
+                verts[idx + 15] = depth;
             }
 
         }
@@ -519,20 +524,23 @@ public class FloorRenderer{
 
         @Override
         protected void draw(Texture texture, float[] spriteVertices, int offset, int count){
-            if(spriteVertices.length != 20){
-                throw new IllegalArgumentException("cached vertices must be in non-mixcolor format (20 per sprite, 5 per vertex)");
+            //TODO broken
+            if(spriteVertices.length != 24){
+                throw new IllegalArgumentException("cached vertices must be in non-mixcolor format (24 per sprite, 6 per vertex: x y color u v depth)");
             }
 
             float[] verts = vertices;
             float[] src = spriteVertices;
             int idx = vidx;
             int sidx = offset;
+            float depth = texture.getDepth();
 
             //convert 5-float format to internal packed 3-float format
             for(int i = 0; i < 4; i++){
                 verts[idx++] = pack(src[sidx++], src[sidx++]);
                 verts[idx++] = src[sidx++];
                 verts[idx++] = Pack.packUv(src[sidx++], src[sidx++]);
+                verts[idx++] = depth;
             }
 
             vidx += spriteSize;

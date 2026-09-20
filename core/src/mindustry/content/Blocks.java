@@ -2919,13 +2919,11 @@ public class Blocks{
             requirements(Category.production, with(Items.copper, 65, Items.silicon, 60, Items.titanium, 50, Items.thorium, 75));
             drillTime = 280;
             size = 4;
-            drawRim = true;
             hasPower = true;
             tier = 5;
             updateEffect = Fx.pulverizeRed;
             updateEffectChance = 0.03f;
             drillEffect = Fx.mineHuge;
-            rotateSpeed = 6f;
             warmupSpeed = 0.01f;
             itemCapacity = 20;
 
@@ -2934,6 +2932,21 @@ public class Blocks{
 
             consumePower(3f);
             consumeLiquid(Liquids.water, 0.1f).boost();
+
+            drawer = new DrawMulti(new DrawDefault(), new DrawGlowRegion("-rim"){{
+                blending = Blending.additive;
+                color = Color.valueOf("ff5512");
+                layer = Layer.block;
+                glowIntensity = 0.35f;
+                glowScale = 4f;
+                alpha = 1f;
+            }}, new DrawRegion("-rotator"){{
+                spinSprite = true;
+                layer = Layer.block + 0.1f;
+                rotateSpeed = 6;
+            }}, new DrawRegion("-top"){{
+                layer = Layer.block + 0.2f;
+            }});
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{

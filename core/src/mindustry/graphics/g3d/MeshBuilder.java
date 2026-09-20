@@ -2,18 +2,19 @@ package mindustry.graphics.g3d;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.maps.generators.*;
 
 public class MeshBuilder{
-    private static final boolean packNormals = Core.gl30 != null && (Core.app.isMobile() || Core.graphics.getGLVersion().atLeast(3, 3));
+    private static final boolean packNormals = (Core.app.isMobile() || Core.graphics.getGLVersion().atLeast(3, 3));
     private static volatile float[] tmpHeights = new float[14580]; //highest amount of corners in vanilla
 
     /** Note that the resulting icosphere does not have normals or a color. */
     public static Mesh buildIcosphere(int divisions, float radius){
-        MeshResult result = Icosphere.create(divisions);
+        Icosphere.MeshResult result = Icosphere.create(divisions);
 
         Mesh mesh = begin(result.vertices.size / 3, result.indices.size, false, false, false);
 
@@ -24,14 +25,14 @@ public class MeshBuilder{
             items[i] *= radius;
         }
 
-        mesh.getVerticesBuffer().put(items, 0, result.vertices.size);
+        mesh.getVertices().put(items, 0, result.vertices.size);
 
         short[] indices = new short[result.indices.size];
         for(int i = 0; i < result.indices.size; i++){
             indices[i] = (short)result.indices.items[i];
         }
 
-        mesh.getIndicesBuffer().put(indices);
+        mesh.getIndices().put(indices);
 
         return end(mesh);
     }
@@ -59,7 +60,7 @@ public class MeshBuilder{
                 floats[6] = v2.z * scale;
                 floats[7] = col;
 
-                mesh.getVerticesBuffer().put(floats);
+                mesh.getVertices().put(floats);
             }
         }
 
@@ -175,7 +176,7 @@ public class MeshBuilder{
                     shorts[11] = (short)(position + 5);
                 }
 
-                mesh.getIndicesBuffer().put(shorts, 0, c.length > 5 ? 12 : 9);
+                mesh.getIndices().put(shorts, 0, c.length > 5 ? 12 : 9);
 
                 position += c.length;
             }else{
@@ -211,26 +212,26 @@ public class MeshBuilder{
         }
 
         if(emissive){
-            attributes.add(new VertexAttribute(4, GL20.GL_UNSIGNED_BYTE, true, "a_emissive"));
+            attributes.add(new VertexAttribute(4, Gl.unsignedByte, true, "a_emissive"));
         }
 
         Mesh mesh = new Mesh(true, vertices, indices, attributes.toArray(VertexAttribute.class));
 
-        mesh.getVerticesBuffer().limit(mesh.getVerticesBuffer().capacity());
-        mesh.getVerticesBuffer().position(0);
+        mesh.getVertices().limit(mesh.getVertices().capacity());
+        mesh.getVertices().position(0);
 
         if(indices > 0){
-            mesh.getIndicesBuffer().limit(mesh.getIndicesBuffer().capacity());
-            mesh.getIndicesBuffer().position(0);
+            mesh.getIndices().limit(mesh.getIndices().capacity());
+            mesh.getIndices().position(0);
         }
 
         return mesh;
     }
 
     private static Mesh end(Mesh mesh){
-        mesh.getVerticesBuffer().limit(mesh.getVerticesBuffer().position());
+        mesh.getVertices().limit(mesh.getVertices().position());
         if(mesh.getNumIndices() > 0){
-            mesh.getIndicesBuffer().limit(mesh.getIndicesBuffer().position());
+            mesh.getIndices().limit(mesh.getIndices().position());
         }
 
         return mesh;
@@ -282,7 +283,7 @@ public class MeshBuilder{
             if(floats.length > 7) floats[7] = emissive;
         }
 
-        mesh.getVerticesBuffer().put(floats);
+        mesh.getVertices().put(floats);
     }
 
     private static float packNormals(float x, float y, float z){

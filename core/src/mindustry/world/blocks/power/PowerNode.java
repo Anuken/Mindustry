@@ -15,6 +15,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -389,12 +390,45 @@ public class PowerNode extends PowerBlock{
     public class PowerNodeBuild extends Building{
 
         @Override
+        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LAccess.config && p1 instanceof Building b){
+                //toggles linking for the building
+                configured(null, b.pos());
+            }
+        }
+
+        @Override
+        public double sense(Object object){
+            if(object instanceof Building b){
+                //return true if linked to the building
+                return power.links.contains(b.pos()) ? 1 : 0;
+            }
+            return super.sense(object);
+        }
+
+        @Override
+        public Object senseObject(double value){
+            //return link index by number
+            int i = (int)value;
+            if(i >= 0 && i < power.links.size){
+                return world.build(power.links.get(i));
+            }
+
+            return super.senseObject(value);
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.links) return power.links.size;
+            return super.sense(sensor);
+        }
+
+        @Override
         public void created(){ // Called when one is placed/loaded in the world
             if(autolink && laserRange > maxRange) maxRange = laserRange;
 
             super.created();
         }
-
 
         @Override
         public void placed(){

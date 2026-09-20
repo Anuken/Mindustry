@@ -558,7 +558,7 @@ public abstract class SaveVersion extends SaveFileReader{
         //the requiredPlanets filter needs this, since the rules aren't read yet
         if(headless){
             try{
-                Planet planet = content.planet(new JsonReader().parse(saveState.ruleString).getString("planet", Planets.serpulo.name));
+                Planet planet = content.planet(Jval.read(saveState.ruleString).getString("planet", Planets.serpulo.name));
                 state.rules.planet = planet == null ? Planets.serpulo : planet;
             }catch(Exception ignored){}
         }

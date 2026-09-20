@@ -56,17 +56,17 @@ public class LogicScript{
 
     /*
     @Override
-    public void write(Json json){
-        json.writeValue("script", script);
-        if(timeout > 0) json.writeValue("timeout", timeout);
-        if(resetVars) json.writeValue("resetVars", resetVars);
+    public void write(Json json, JsonWriter writer){
+        json.writeValue(writer, "script", script);
+        if(timeout > 0) json.writeValue(writer, "timeout", timeout);
+        if(resetVars) json.writeValue(writer, "resetVars", resetVars);
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData){
+    public void read(Json json, Jval jsonData){
         if(jsonData.isObject()){
             timeout = Math.min(maxTimeoutMs, jsonData.getInt("timeout", 0));
-            resetVars = jsonData.getBoolean("resetVars", false);
+            resetVars = jsonData.getBool("resetVars", false);
             script = jsonData.getString("script", "");
         }else{
             script = jsonData.asString();

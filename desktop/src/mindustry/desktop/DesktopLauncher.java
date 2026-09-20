@@ -3,32 +3,31 @@ package mindustry.desktop;
 import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
-import arc.backend.sdl.jni.*;
 import arc.discord.*;
 import arc.discord.DiscordRPC.*;
-import arc.filedialogs.*;
 import arc.files.*;
+import arc.graphics.gl.*;
 import arc.math.*;
-import arc.profiling.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 import arc.util.serialization.*;
 import mindustry.*;
-import mindustry.core.*;
+import mindustry.core.Version;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
 import mindustry.service.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.ui.FileChooser.*;
 import mindustry.ui.dialogs.*;
 import steamworks.*;
+import org.lwjgl.*;
+import org.lwjgl.sdl.*;
+import org.lwjgl.system.*;
 
 import java.io.*;
 
@@ -56,18 +55,16 @@ public class DesktopLauncher extends ClientLauncher{
                 coreProfile = true;
                 width = 900;
                 height = 700;
+                appName = "Mindustry";
+                appIdentifier = "io.anuke.mindustry";
+                appVersion = Version.buildString();
 
-                //on Windows, Intel drivers might be buggy with OpenGL 3.x, so only use 2.x. See https://github.com/Anuken/Mindustry/issues/11041
-                if(IntelGpuCheck.wasIntel()){
-                    allowGl30 = false;
-                    coreProfile = false;
-                    glVersions = new int[][]{{2, 1}, {2, 0}};
-                }else if(OS.isMac){
+                if(OS.isMac){
                     //MacOS supports 4.1 at most
-                    glVersions = new int[][]{{4, 1}, {3, 2}, {2, 1}, {2, 0}};
+                    glVersions = new int[][]{{4, 1}, {3, 2}};
                 }else{
                     //try essentially every OpenGL version
-                    glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {2, 1}, {2, 0}};
+                    glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
                 }
 
                 for(int i = 0; i < arg.length; i++){
@@ -81,14 +78,18 @@ public class DesktopLauncher extends ClientLauncher{
                                 if(str.contains(".")){
                                     String[] split = str.split("\\.");
                                     if(split.length == 2 && Strings.canParsePositiveInt(split[0]) && Strings.canParsePositiveInt(split[1])){
-                                        glVersions = new int[][]{{Strings.parseInt(split[0]), Strings.parseInt(split[1])}};
-                                        allowGl30 = true; //when a version is explicitly specified always allow GL 3
+                                        if(Strings.parseInt(split[0]) < 3){
+                                            Log.err("OpenGL 3.0 is required for Mindustry to run. Ignoring command-line GL version arguments.");
+                                        }else{
+                                            glVersions = new int[][]{{Strings.parseInt(split[0]), Strings.parseInt(split[1])}};
+                                        }
                                         break;
                                     }
                                 }
                                 Log.err("Invalid GL version format string: '@'. GL version must be of the form <major>.<minor>", str);
                             }
                             case "coreGl" -> coreProfile = true;
+                            case "noAngle" -> useAngle = false;
                             case "compatibilityGl" -> coreProfile = false;
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
@@ -96,12 +97,11 @@ public class DesktopLauncher extends ClientLauncher{
                             case "testMobile" -> testMobile = true;
                             case "gltrace" -> {
                                 Events.on(ClientCreateEvent.class, e -> {
-                                    var profiler = new GLProfiler(Core.graphics);
-                                    profiler.enable();
+                                    GLProfiler.enable();
                                     Core.app.addListener(new ApplicationListener(){
                                         @Override
                                         public void update(){
-                                            profiler.reset();
+                                            GLProfiler.reset();
                                         }
                                     });
                                 });
@@ -303,7 +303,7 @@ public class DesktopLauncher extends ClientLauncher{
         String finalMessage = Strings.getFinalMessage(e);
         String total = Strings.getCauses(e).toString();
 
-        if(total.contains("Couldn't create window") || total.contains("OpenGL 2.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")|| total.contains("unsupported combination of formats")){
+        if(total.contains("Couldn't create window") || total.contains("OpenGL 3.0 or higher") || total.toLowerCase().contains("pixel format") || total.contains("GLEW")|| total.contains("unsupported combination of formats")){
 
             message(
                 total.contains("Couldn't create window") ? "A graphics initialization error has occured! Try to update your graphics drivers:\n" + finalMessage :
@@ -342,61 +342,58 @@ public class DesktopLauncher extends ClientLauncher{
 
     @Override
     public void showFileChooser(FileChooserParams params){
-        Threads.daemon(() -> {
-            try{
-                FileDialogs.loadNatives();
-                var ext = params.extensions;
 
-                String result;
-                String[] patterns = new String[ext.length];
-                for(int i = 0; i < ext.length; i++){
-                    patterns[i] = "*." + ext[i];
-                }
+        SDL_DialogFileFilter.Buffer filters = SDL_DialogFileFilter.calloc(params.extensions.length);
+        try(MemoryStack stack = MemoryStack.stackPush()){
+            for(int i = 0; i < params.extensions.length; i++){
+                String extName = params.extensions[i];
 
-                //on MacOS, .msav is not properly recognized until I put garbage into the array?
-                if(patterns.length == 1 && OS.isMac && params.open){
-                    patterns = new String[]{"", "*." + ext[0]};
-                }
+                var filter = SDL_DialogFileFilter.calloc(stack)
+                .name(MemoryUtil.memUTF8(extName.isEmpty() ? "All Files" : "." + extName + " files"))
+                .pattern(MemoryUtil.memUTF8(extName.isEmpty() ? "*" : extName));
 
-                if(params.open){
-                    result = FileDialogs.openFileDialog(params.title, FileChooserDialog.getLastDirectory().absolutePath() + "/", patterns, "." + ext[0] + " files", params.allowMultiple);
-                }else{
-                    result = FileDialogs.saveFileDialog(params.title, FileChooserDialog.getLastDirectory().child(params.fileName).absolutePath(), patterns, "." + ext[0] + " files");
-                }
-
-                if(result == null) return;
-
-                if(result.length() > 1 && result.contains("\n")){
-                    result = result.split("\n")[0];
-                }
-
-                //cancelled selection, ignore result
-                if(result.isEmpty() || result.equals("\n")) return;
-                if(result.endsWith("\n")) result = result.substring(0, result.length() - 1);
-
-                Fi[] resultFiles = Seq.with(result.split("\\|")).map(Core.files::absolute).toArray(Fi.class);
-
-                if(result.isEmpty()) return;
-
-                Core.app.post(() -> {
-                    FileChooserDialog.setLastDirectory(resultFiles[0].isDirectory() ? resultFiles[0] : resultFiles[0].parent());
-
-                    if(!params.open){
-                        Fi single = resultFiles[0];
-                        //fix extension to match filters
-                        if(!Structs.contains(params.extensions, single::extEquals)){
-                            single = single.parent().child(single.nameWithoutExtension() + "." + ext[0]);
-                        }
-                        params.handleChooseResult(single);
-                    }else{
-                        params.handleChooseResult(resultFiles);
-                    }
-                });
-            }catch(Throwable error){
-                Log.err("Failed to execute native file chooser", error);
-                Core.app.post(() -> FileChooser.showFallbackFileChooser(params));
+                filters.put(i, filter);
             }
-        });
+        }
+        SDL_DialogFileCallbackI callback = (userData, files, filter) -> {
+            if(files == 0) return;
+
+            int count = 0;
+            while(MemoryUtil.memGetAddress(files + (long)count * Pointer.POINTER_SIZE) != 0){
+                count ++;
+            }
+
+            if(count == 0) return;
+
+            PointerBuffer pointerBuffer = MemoryUtil.memPointerBuffer(files, count);
+            Fi[] resultFiles = new Fi[count];
+            for(int i = 0; i < count; i++){
+                resultFiles[i] = Core.files.absolute(pointerBuffer.getStringUTF8(i));
+            }
+
+            Core.app.post(() -> {
+                FileChooserDialog.setLastDirectory(resultFiles[0].isDirectory() ? resultFiles[0] : resultFiles[0].parent());
+
+                if(!params.open){
+                    Fi single = resultFiles[0];
+                    //fix extension to match filters
+                    if(!Structs.contains(params.extensions, single::extEquals)){
+                        single = single.parent().child(single.nameWithoutExtension() + "." + params.extensions[0]);
+                    }
+                    params.handleChooseResult(single);
+                }else{
+                    params.handleChooseResult(resultFiles);
+                }
+            });
+        };
+
+        if(params.open){
+            SDLDialog.SDL_ShowOpenFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooserDialog.getLastDirectory().absolutePath(), params.allowMultiple);
+        }else{
+            SDLDialog.SDL_ShowSaveFileDialog(callback, 0, ((SdlApplication)Core.app).getWindow(), filters, FileChooserDialog.getLastDirectory().child(params.fileName).absolutePath());
+        }
+
+        filters.free();
     }
 
     @Override
@@ -521,6 +518,6 @@ public class DesktopLauncher extends ClientLauncher{
     }
 
     private static void message(String message){
-        SDL.SDL_ShowSimpleMessageBox(SDL.SDL_MESSAGEBOX_ERROR, "oh no", message);
+        SDLMessageBox.SDL_ShowSimpleMessageBox(SDLMessageBox.SDL_MESSAGEBOX_ERROR, "oh no", message, 0);
     }
 }

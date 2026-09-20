@@ -23,7 +23,6 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.input.InputHandler.*;
 import mindustry.logic.*;
 import mindustry.mod.*;
@@ -174,9 +173,6 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean updateInUnits = true;
     /** if true, this block updates in payloads in units regardless of the experimental game rule */
     public boolean alwaysUpdateInUnits = false;
-    /** @deprecated use allowedInPayloads instead */
-    @Deprecated
-    public boolean canPickup = true;
     /** if false, only incinerable liquids are dropped when deconstructing; otherwise, all liquids are dropped. */
     public boolean deconstructDropAllLiquid = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
@@ -1588,7 +1584,7 @@ public class Block extends UnlockableContent implements Senseable{
 
                     Drawf.checkBleed(out);
 
-                    packer.add(PageType.main, name + "-team-" + team.name, out);
+                    packer.add(name + "-team-" + team.name, out);
                     toDispose.add(out);
                 }
             }
@@ -1609,7 +1605,7 @@ public class Block extends UnlockableContent implements Senseable{
                 PixmapRegion region = packer.get(atlasRegion);
                 Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
                 Drawf.checkBleed(out);
-                packer.add(PageType.main, atlasRegion.name, out);
+                packer.add(atlasRegion.name, out);
                 toDispose.add(out);
             }
         }
@@ -1624,7 +1620,7 @@ public class Block extends UnlockableContent implements Senseable{
 
                 Drawf.checkBleed(outlined);
 
-                packer.add(PageType.main, regionName + "-outline", outlined);
+                packer.add(regionName + "-outline", outlined);
                 toDispose.add(outlined);
             }
         }
@@ -1639,11 +1635,11 @@ public class Block extends UnlockableContent implements Senseable{
                         base.draw(packer.get(gen[i]), true);
                     }
                 }
-                packer.add(PageType.main, "block-" + name + "-full", base);
+                packer.add("block-" + name + "-full", base);
 
                 toDispose.add(base);
             }else{
-                if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", packer.get(gen[0]));
+                if(gen[0] != null) packer.add("block-" + name + "-full", packer.get(gen[0]));
             }
         }
 
@@ -1687,8 +1683,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(Content content){
-        if(content instanceof Item item){
+    public double sense(Object object){
+        if(object instanceof Item item){
             if(state.rules.infiniteResources) return 0;
 
             for(ItemStack r : requirements){

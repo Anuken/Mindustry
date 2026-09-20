@@ -13,7 +13,6 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -141,12 +140,6 @@ public abstract class UnlockableContent extends MappableContent{
         return minfo.mod == null || isPatchContent() ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
     }
 
-    /** @deprecated just call computeStats() every time, there's no reason to cache it. This will be removed in v9. */
-    @Deprecated
-    public void checkStats(){
-        computeStats();
-    }
-
     /** Initializes stats on demand. Called every time the block stats are shown. */
     public void setStats(){
     }
@@ -171,11 +164,11 @@ public abstract class UnlockableContent extends MappableContent{
 
     }
 
-    protected void makeOutline(PageType page, MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
-        makeOutline(page, packer, region, makeNew, outlineColor, outlineRadius, 0);
+    protected void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
+        makeOutline(packer, region, makeNew, outlineColor, outlineRadius, 0);
     }
 
-    protected void makeOutline(PageType page, MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius, int padding){
+    protected void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius, int padding){
         if(region instanceof AtlasRegion at && region.found()){
             String name = at.name;
             if(!makeNew || !packer.has(name + "-outline")){
@@ -184,7 +177,7 @@ public abstract class UnlockableContent extends MappableContent{
                     PixmapRegion base = packer.get(region);
                     var result = Pixmaps.outline(base, outlineColor, outlineRadius, padding);
                     Drawf.checkBleed(result);
-                    packer.add(page, regName, result);
+                    packer.add(regName, result);
                     result.dispose();
                 }
             }
@@ -196,7 +189,7 @@ public abstract class UnlockableContent extends MappableContent{
             PixmapRegion base = packer.get(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);
-            packer.add(PageType.main, name, result);
+            packer.add(name, result);
             result.dispose();
         }
     }

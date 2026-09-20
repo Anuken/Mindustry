@@ -84,11 +84,6 @@ public class ImagePacker{
             }
 
             @Override
-            public PixmapRegion getPixmap(AtlasRegion region){
-                return new PixmapRegion(get(region.name));
-            }
-
-            @Override
             public boolean has(String s){
                 return cache.containsKey(s);
             }

@@ -83,6 +83,14 @@ public class Map implements Comparable<Map>, Publishable{
         Core.settings.put("hiscore" + file.nameWithoutExtension() + tags.get("steamid", ""), score);
     }
 
+    public long getLastPlayed(){
+        return Core.settings.getLong("lastplayed" + file.nameWithoutExtension() + tags.get("steamid", ""), 0);
+    }
+
+    public void setLastPlayed(){
+        Core.settings.put("lastplayed" + file.nameWithoutExtension() + tags.get("steamid", ""), Time.millis());
+    }
+
     /** Returns the result of applying this map's rules to the specified gamemode.*/
     public Rules applyRules(Gamemode mode){
         //mode specific defaults have been applied

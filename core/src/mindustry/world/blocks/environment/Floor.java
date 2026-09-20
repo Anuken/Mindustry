@@ -12,7 +12,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -241,7 +240,7 @@ public class Floor extends Block{
             }
         }
 
-        packer.add(PageType.environment, name + "-edge", result);
+        packer.add(name + "-edge", result);
         result.dispose();
     }
 

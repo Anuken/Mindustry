@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
@@ -13,7 +14,7 @@ import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 
 public class PlanetRenderer implements Disposable{
-    public static final float outlineRad = 1.17f, camLength = 4f;
+    public static final float camLength = 4f;
     public static final Color
     outlineColor = Pal.accent.cpy().a(1f),
     hoverColor = Pal.accent.cpy().a(0.5f),
@@ -23,7 +24,7 @@ public class PlanetRenderer implements Disposable{
     /** Camera used for rendering. */
     public final Camera3D cam = new Camera3D();
     /** Raw vertex batch. */
-    public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
+    public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, false);
 
     public final PlaneBatch3D projector = new PlaneBatch3D();
     public final Mat3D mat = new Mat3D();
@@ -37,10 +38,16 @@ public class PlanetRenderer implements Disposable{
     //seed: 8kmfuix03fw
     public final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
 
+    private final FrameBuffer framebuffer = new FrameBuffer(Format.defaultColorDepth);
+
     public PlanetRenderer(){
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
         cam.far = 150f;
+    }
+
+    public FrameBuffer getDepthFramebuffer(){
+        return framebuffer;
     }
 
     /** Render the entire planet scene to the screen. */
@@ -69,7 +76,7 @@ public class PlanetRenderer implements Disposable{
         }else{
             cam.position.set(params.planet.position).add(params.camPos);
         }
-        //cam.up.set(params.camUp); //TODO broken
+
         cam.lookAt(params.planet.position);
         cam.update();
         //write back once it changes.
@@ -80,6 +87,8 @@ public class PlanetRenderer implements Disposable{
         batch.proj(cam.combined);
 
         Events.fire(Trigger.universeDrawBegin);
+
+        framebuffer.resize(w, h);
 
         //begin bloom
         bloom.resize(w, h);
@@ -104,7 +113,13 @@ public class PlanetRenderer implements Disposable{
         Events.fire(Trigger.universeDraw);
 
         Planet solarSystem = params.planet.solarSystem;
+        framebuffer.begin(Color.clear);
         renderPlanet(solarSystem, params);
+        framebuffer.end();
+
+        var blit = Shaders.depthScreenspace;
+        Draw.blit(blit);
+
         renderTransparent(solarSystem, params);
 
         //TODO: will draw under icons and look bad. maybe limit arcs based on facing dot product
@@ -196,11 +211,11 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
-        planet.drawArc(batch, a, b, from, to, length, timeScale, pointCount);
+        planet.drawArc(planet, batch, a, b, from, to, length, timeScale, pointCount);
     }
 
     public void drawArcLine(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount, float stroke){
-        planet.drawArcLine(batch, a, b, from, to, length, timeScale, pointCount, stroke);
+        planet.drawArcLine(planet, batch, a, b, from, to, length, timeScale, pointCount, stroke);
     }
 
     public void drawBorders(Sector sector, Color base, float alpha){
@@ -237,7 +252,7 @@ public class PlanetRenderer implements Disposable{
     public void drawSpecialSelection(Sector sector, Color color, float stroke, float length){
         drawSelection(sector, color, stroke, length);
 
-        float arad = (outlineRad + length) * sector.planet.radius;
+        float arad = (sector.planet.outlineScale + length) * sector.planet.radius;
         float span = 0.1f;
 
         for(int i = 0; i < sector.tile.corners.length; i += 2){

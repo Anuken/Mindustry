@@ -180,9 +180,7 @@ public class IOSLauncher extends IOSApplication.Delegate{
                 forced = false;
                 UINavigationController.attemptRotationToDeviceOrientation();
             }
-        }, new IOSApplicationConfiguration(){{
-            useGL30 = true;
-        }});
+        }, new IOSApplicationConfiguration());
     }
 
     @Override

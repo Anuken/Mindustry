@@ -30,7 +30,6 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
     {
         baseSeed = 2;
-        defaultLoadout = Loadouts.basicBastion;
     }
 
     @Override
