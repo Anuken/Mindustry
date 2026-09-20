@@ -95,7 +95,12 @@ public class SchemaGenerator{
 
             var root = getTypeDecl(field.getDeclaringClass());
             if(root != null) root.getFieldByName(field.getName()).ifPresent(fdec -> {
-                String[] docAndDefault = determineJavadocAndDefault(field, fdec, fdec.getVariables().getFirst().orElseThrow());
+                var variable = fdec.getVariables().stream()
+                .filter(v -> v.getNameAsString().equals(field.getName()))
+                .findFirst().orElse(null);
+                if(variable == null) return;
+
+                String[] docAndDefault = determineJavadocAndDefault(field, fdec, variable);
                 if(docAndDefault[0] != null) inner.put("doc", docAndDefault[0]);
                 if(docAndDefault[1] != null) inner.put("default", docAndDefault[1]);
             });
@@ -302,8 +307,14 @@ public class SchemaGenerator{
                 initValue = "[]";
             }
 
-            //field
-            if(initValue.contains(".") && !(baseField.getType().isArray())){
+            //numeric literal: drop the Java-only suffix (f/F/d/D/L), keep the decimal point for JSON
+            boolean numeric = initValue.matches("-?(\\d+\\.?\\d*|\\.\\d+)([eE][-+]?\\d+)?[fFdDlL]?");
+            if(numeric){
+                initValue = initValue.replaceAll("[fFdDlL]$", "");
+            }
+
+            //field reference, e.g. Category.turret -> turret (never applied to numbers)
+            if(!numeric && initValue.contains(".") && !(baseField.getType().isArray())){
                 var split = initValue.split("\\.");
                 initValue = split[split.length - 1];
             }
