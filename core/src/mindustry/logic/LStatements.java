@@ -2541,7 +2541,7 @@ public class LStatements{
                 b.label(() -> bundle(type));
 
                 b.clicked(() -> showSelect(b, MapObjectives.allMarkerTypeNames.toArray(String.class), type, t -> {
-                    type = bundle(t);
+                    type = t;
                     build(table);
                 }, 2, cell -> cell.size(160, 50)));
             }, Styles.logict, () -> {}).size(180, 40).color(table.color).left().padLeft(2);
