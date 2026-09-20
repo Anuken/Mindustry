@@ -499,6 +499,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     /** the fraction of solids under this block necessary for it to reach crawlSlowdown. */
     crawlSlowdownFrac = 0.55f;
 
+    /** for naval units only: crush rectangle half-extents, rotated with the unit */
+    public int crushRadX = 1, crushRadY = 1;
+
     //MISSILE UNITS
 
     /** lifetime of this missile. */
