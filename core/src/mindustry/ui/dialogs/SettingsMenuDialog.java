@@ -462,7 +462,7 @@ public class SettingsMenuDialog extends BaseDialog{
             return s + "%";
         });
 
-        graphics.sliderPref("unitlaseropacity", 100, 0, 100, 5, s -> s + "%");
+        graphics.sliderPref("minelaseropacity", 100, 0, 100, 5, s -> s + "%");
         graphics.sliderPref("bridgeopacity", 100, 0, 100, 5, s -> s + "%");
 
         graphics.sliderPref("maxmagnificationmultiplierpercent", 100, 100, 200, 25, s -> {
