@@ -351,6 +351,8 @@ public class BulletType extends Content implements Cloneable{
     public float lightningAngle = 0f;
     /** The bullet created at lightning points. */
     public @Nullable BulletType lightningType = null;
+    /** Maximum number of times the same unit can be hit by a lightning chain. <= 0 for unlimited. */
+    public int lightningHits = -1;
 
     /** Scale of bullet weave pattern. Higher -> less vibration. */
     public float weaveScale = 1f;

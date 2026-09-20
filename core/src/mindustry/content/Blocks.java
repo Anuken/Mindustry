@@ -1,6 +1,7 @@
 package mindustry.content;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import mindustry.*;
@@ -3624,14 +3625,20 @@ public class Blocks{
                 lightningLength = 25;
                 collidesAir = false;
                 ammoMultiplier = 1f;
+                pierceCap = 3;
 
                 //for visual stats only.
                 buildingDamageMultiplier = 0.4f;
-                pierceCap = 5;
 
                 lightningType = new BulletType(0.0001f, 0f){{
                     lifetime = Fx.lightning.lifetime;
-                    hitEffect = Fx.hitLancer;
+                    hitEffect = new Effect(4f, 6f, e -> {
+                        Draw.color(Color.purple);
+                        Draw.z(Layer.effect + 1);
+                        Lines.stroke(3f);
+                        Lines.square(e.x,e.y,3);
+                        Draw.reset();
+                    });
                     despawnEffect = Fx.none;
                     status = StatusEffects.shocked;
                     hittable = false;
