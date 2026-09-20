@@ -78,6 +78,7 @@ public class DataManager{
         PixmapRegion error = new PixmapRegion(Pixmaps.blankPixmap());
         UnlockableContent[] currentContent = {null};
         String[] currentHash = {null};
+        Fi serverGeneratedDir = Vars.dataDirectory.child("assets/sprites/generated");
 
         MultiPacker saver = new MultiPacker(false){
             @Override
@@ -89,10 +90,17 @@ public class DataManager{
                     if(name.startsWith(DataImagePacker.regionPrefix)) name = name.substring(DataImagePacker.regionPrefix.length());
                     String path = "generated/" + currentHash[0] + "/" + name + ".png";
                     ImageAsset newImage = new ImageAsset();
-                    newImage.setPath(path);
-                    //it would be nice to do this async, but the pixmap typically gets disposed right after add() exist
+
+                    //it would be nice to do this async, but the pixmap typically gets disposed right after add()
                     byte[] bytes = PixmapIO.writePngBytes(region.pixmap);
-                    newImage.updateData(bytes);
+                    if(Vars.headless){ //TODO: doesn't actually work on the server yet
+                        Fi file = serverGeneratedDir.child(name + ".png");
+                        file.writeBytes(bytes);
+                        newImage.readOverride(path, file);
+                    }else{
+                        newImage.setPath(path);
+                        newImage.updateData(bytes);
+                    }
 
                     images.add(newImage);
                     packed[0] ++;
@@ -150,17 +158,15 @@ public class DataManager{
         imagePixmaps.each((key, val) -> val.pixmap.dispose());
         error.pixmap.dispose();
 
-        if(packed[0] > 0 || forcePack){
+        if(!Vars.headless && (packed[0] > 0 || forcePack)){
             reloadImages();
 
-            if(!Vars.headless){
-                for(var cont : contentToPack){
-                    try{
-                        cont.loadIcon();
-                        cont.load();
-                    }catch(Exception e){
-                        Log.err("Failed to load icons for " + cont, e);
-                    }
+            for(var cont : contentToPack){
+                try{
+                    cont.loadIcon();
+                    cont.load();
+                }catch(Exception e){
+                    Log.err("Failed to load icons for " + cont, e);
                 }
             }
         }
