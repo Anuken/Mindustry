@@ -1308,6 +1308,7 @@ public class UnitTypes{
                     sideLength = 80f;
                     width = 25f;
                     length = 230f;
+                    shieldDamageMultiplier = 2f;
                     shootEffect = Fx.shockwave;
                     colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
                 }};

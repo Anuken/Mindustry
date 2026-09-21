@@ -102,7 +102,7 @@ public class PointLaserBulletType extends BulletType{
 
     @Override
     public float shieldDamage(Bullet b){
-        return b.damage / damageInterval * Time.delta;
+        return b.damage / damageInterval * Time.delta * shieldDamageMultiplier;
     }
 
     @Override
