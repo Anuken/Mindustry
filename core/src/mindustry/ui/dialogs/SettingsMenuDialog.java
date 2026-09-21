@@ -501,6 +501,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
+        graphics.checkPref("smaa", false);
         graphics.checkPref("effects", true);
         graphics.checkPref("atmosphere", true);
         graphics.checkPref("drawlight", true);

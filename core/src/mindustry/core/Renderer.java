@@ -33,6 +33,7 @@ public class Renderer implements ApplicationListener{
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
+    public final SMAA smaa = new SMAA();
     public PlanetRenderer planets;
 
     public @Nullable Bloom bloom;
@@ -218,6 +219,10 @@ public class Renderer implements ApplicationListener{
 
             if(renderer.pixelate){
                 pixelator.drawPixelate();
+            }else if(smaa.enabled()){
+                smaa.begin();
+                draw();
+                smaa.end();
             }else{
                 draw();
             }
@@ -262,6 +267,7 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void dispose(){
+        smaa.dispose();
         Events.fire(new DisposeEvent());
     }
 
