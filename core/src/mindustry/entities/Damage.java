@@ -298,7 +298,7 @@ public class Damage{
      * If the shields only absorb part of the damage, the bullet's damage is reduced accordingly.
      * @return the length of the laser, cut short if a shield absorbed it.
      */
-    private static float findShieldLength(Bullet b, float length, boolean laser, boolean absorb){
+    public static float findShieldLength(Bullet b, float length, boolean laser, boolean absorb){
         float damage = b.type.shieldDamage(b);
         if(!(laser || b.type.shieldAbsorb) || length <= 0f || damage <= 0f) return length;
 
