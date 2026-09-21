@@ -9,6 +9,8 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.world.meta.*;
+
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -75,7 +77,7 @@ public class RepairFieldAbility extends Ability{
         }
         if(sameTypeHealMult != 1f){
             t.row();
-            t.add(abilityStat("sametypehealmultiplier", (sameTypeHealMult < 1f ? "[negstat]" : "") + Strings.autoFixed(sameTypeHealMult * 100f, 2)));
+            t.add(abilityStat("sametypehealmultiplier", StatValues.multStat(sameTypeHealMult, false)));
         }
         if(maxTargets > 0){
             t.row();

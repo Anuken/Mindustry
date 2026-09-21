@@ -75,7 +75,7 @@ public class EnergyFieldAbility extends Ability{
             t.row();
             t.add(Core.bundle.format("bullet.healpercent", Strings.autoFixed(healPercent, 2)));
             t.row();
-            t.add(abilityStat("sametypehealmultiplier", (sameTypeHealMult < 1f ? "[negstat]" : "") + Strings.autoFixed(sameTypeHealMult * 100f, 2)));
+            t.add(abilityStat("sametypehealmultiplier", StatValues.multStat(sameTypeHealMult, false)));
         }
     }
 

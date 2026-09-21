@@ -2733,6 +2733,7 @@ public class UnitTypes{
                 bullet = new RailBulletType(){{
                     length = 160f;
                     damage = 48f;
+                    shieldDamageMultiplier = 2;
                     hitColor = Color.valueOf("feb380");
                     hitEffect = endEffect = Fx.hitBulletColor;
                     pierceDamageFactor = 0.8f;

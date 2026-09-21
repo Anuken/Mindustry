@@ -783,7 +783,7 @@ public class StatValues{
                     }
 
                     if(type.statLiquidConsumed <= 0f && !compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
-                        sep(bt, (type.ammoMultiplier < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("bullet.multiplier", Strings.autoFixed(type.ammoMultiplier, 2)));
+                        sep(bt, Core.bundle.format("bullet.multiplier", multStat(type.ammoMultiplier)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
@@ -792,7 +792,7 @@ public class StatValues{
                     }
 
                     if(type.knockback != 0f){
-                        sep(bt, Core.bundle.format("bullet.knockback", (type.knockback < 0f ? "[negstat]" : "") + Strings.autoFixed(type.knockback, 2)));
+                        sep(bt, Core.bundle.format("bullet.knockback", multStat(type.knockback)));
                     }
 
                     if(type.healPercent > 0f){
@@ -853,8 +853,7 @@ public class StatValues{
                             sep(bt, Core.bundle.format("bullet.empdamage", Strings.autoFixed(b.powerDamageScl * 100f, 2)));
                         }
                         if(b.hitUnits){
-                            sep(bt, Core.bundle.format("bullet.empunitdamage",
-                            (b.unitDamageScl < 1f ? "[negstat]" : "") + Strings.autoFixed(b.unitDamageScl * 100f, 2)));
+                            sep(bt, Core.bundle.format("bullet.empunitdamage", multStat(b.unitDamageScl,false)));
                         }
                     }
 
@@ -969,7 +968,7 @@ public class StatValues{
     }
 
     /** Adds an info table with an icon and description key from the bundle */
-    private static Cell<?> tableInfo(Table table, String key){
+    public static Cell<?> tableInfo(Table table, String key){
         if(!Core.bundle.has(key)) return null;
         return table.table(t -> {
             if(!Vars.headless) t.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
@@ -978,7 +977,7 @@ public class StatValues{
     }
 
     /** Adds a note under a value */
-    private static Cell<?> note(Table table, String text){
+    public static Cell<?> note(Table table, String text){
         table.row();
         return table.table(t -> {
             if(!Vars.headless) t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
@@ -993,12 +992,16 @@ public class StatValues{
     }
 
     //for AmmoListValue
-    private static String ammoStat(float val){
+    public static String ammoStat(float val){
         return (val > 0 ? "[stat]+" : "[negstat]") + Strings.autoFixed(val, 1);
     }
 
-    private static String multStat(float val){
-        return (val >= 1 ? "[stat]" : "[negstat]") + Strings.autoFixed(val, 2);
+    public static String multStat(float val){
+        return multStat(val, true);
+    }
+
+    public static String multStat(float val, boolean decimal){
+        return (val >= 1 ? "[stat]" : "[negstat]") + Strings.autoFixed(val * (decimal ? 1f : 100f), 2);
     }
 
     private static TextureRegion icon(UnlockableContent t){
