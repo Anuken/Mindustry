@@ -1219,8 +1219,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(constructor == null) throw new IllegalArgumentException("No constructor set up for unit '" + name + "', add this argument to your units field: `constructor = UnitEntity::create`");
 

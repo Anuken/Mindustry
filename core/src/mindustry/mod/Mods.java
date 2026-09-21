@@ -156,7 +156,7 @@ public class Mods implements Loadable{
         long startTime = Time.millis();
 
         //TODO this should estimate sprite sizes per page
-        MultiPacker packer = new MultiPacker(4096);
+        PackContext packer = new PackContext(4096);
         var textureResize = new ObjectFloatMap<String>();
         int[] totalSprites = {0};
         //all packing tasks to await
@@ -244,7 +244,7 @@ public class Mods implements Loadable{
                     u.load();
                     u.loadIcon();
                     if(u.generateIcons && !c.minfo.mod.meta.pregenerated){
-                        u.createIcons(packer);
+                        u.packSprites(packer);
                     }
                 }
             });
@@ -301,7 +301,7 @@ public class Mods implements Loadable{
         }
     }
 
-    private void packSprites(MultiPacker packer, Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks, ObjectFloatMap<String> textureResize){
+    private void packSprites(PackContext packer, Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks, ObjectFloatMap<String> textureResize){
         boolean bleed = Core.settings.getBool("linear", true) && !mod.meta.pregenerated;
         float textureScale = mod.meta.texturescale;
 

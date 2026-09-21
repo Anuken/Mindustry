@@ -977,11 +977,6 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
-    /** @return special icons to outline and save with an -outline variant. Vanilla only. */
-    public TextureRegion[] makeIconRegions(){
-        return new TextureRegion[0];
-    }
-
     protected TextureRegion[] icons(){
         //use team region in vanilla team blocks
         TextureRegion r = variants > 0 ? Core.atlas.find(name + "1") : region;
@@ -1551,8 +1546,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(!synthetic()){
             PixmapRegion image = packer.get(fullIcon);

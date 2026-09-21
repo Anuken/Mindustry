@@ -160,15 +160,15 @@ public abstract class UnlockableContent extends MappableContent{
      * No regions are loaded at this point; grab pixmaps from the packer.
      * */
     @CallSuper
-    public void createIcons(MultiPacker packer){
+    public void packSprites(PackContext packer){
 
     }
 
-    protected void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
+    protected void makeOutline(PackContext packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
         makeOutline(packer, region, makeNew, outlineColor, outlineRadius, 0);
     }
 
-    protected void makeOutline(MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius, int padding){
+    protected void makeOutline(PackContext packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius, int padding){
         if(region instanceof AtlasRegion at && region.found()){
             String name = at.name;
             if(!makeNew || !packer.has(name + "-outline")){
@@ -184,7 +184,7 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
-    protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
+    protected void makeOutline(PackContext packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
         if(region.found() && packer.registerOutlined(name)){
             PixmapRegion base = packer.get(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
@@ -194,7 +194,7 @@ public abstract class UnlockableContent extends MappableContent{
         }
     }
 
-    protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor){
+    protected void makeOutline(PackContext packer, TextureRegion region, String name, Color outlineColor){
         makeOutline(packer, region, name, outlineColor, 4);
     }
 

@@ -46,7 +46,6 @@ public class DesktopLauncher extends ClientLauncher{
             Vars.loadLogger();
             Vars.loadFileLogger(new Fi(Version.isSteam ? "saves" : OS.getAppDataDirectoryString(appName)).child("last_log.txt"));
 
-            check32Bit();
             checkJavaVersion();
 
             new SdlApplication(new DesktopLauncher(arg), new SdlConfig(){{
@@ -126,23 +125,6 @@ public class DesktopLauncher extends ClientLauncher{
             "\n" +
             "It is recommended to download Java from adoptium.net.\n" +
             "Do not download from java.com, as that will give you Java 8 by default.");
-        }
-    }
-
-    static void check32Bit(){
-        if(OS.isWindows && !OS.is64Bit){
-            String versionWarning = "";
-
-            if(Version.isSteam){
-                versionWarning = "\n\nIf you are unable to upgrade, consider switching to the legacy v7 branch on Steam, which is the last release that supported 32-bit windows:\n(properties -> betas -> select version-7.0 in the drop-down box).";
-            }else if(OS.javaVersion.equals("1.8.0_151-1-ojdkbuild")){ //version string of JVM packaged with the 32-bit version of the game on itch/steam
-                versionWarning = "\n\nMake sure you have downloaded the 64-bit version of the game, not the 32-bit one.";
-            }else if(OS.javaVersionNumber < 25){
-                //technically, java 25 isn't required yet, but it might be in the future, so tell users to get that one
-                versionWarning = "\n\nYour current Java version is: " + OS.javaVersionNumber + ". To run the game, upgrade to Java 25 on a 64-bit machine.";
-            }
-
-            ErrorDialog.show("You are running a 32-bit installation of Windows and/or a 32-bit JVM. 32-bit windows is no longer supported." + versionWarning);
         }
     }
 

@@ -119,8 +119,8 @@ public class Item extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         //create transitions
         if(frames > 0 && transitionFrames > 0){

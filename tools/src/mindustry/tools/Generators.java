@@ -324,11 +324,6 @@ public class Generators{
 
                 TextureRegion[] regions = block.getGeneratedIcons();
 
-                for(TextureRegion region : block.makeIconRegions()){
-                    GenRegion gen = (GenRegion)region;
-                    save(get(region).outline(block.outlineColor, block.outlineRadius), gen.name + "-outline");
-                }
-
                 Pixmap shardTeamTop = null;
 
                 if(block.teamRegion.found()){

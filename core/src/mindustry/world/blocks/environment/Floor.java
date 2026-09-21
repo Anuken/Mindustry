@@ -221,8 +221,8 @@ public class Floor extends Block{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(blendGroup != this){
             return;

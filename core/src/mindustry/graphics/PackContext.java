@@ -7,12 +7,11 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
 
-//TODO: this needs to pack to a texture array
-public class MultiPacker implements Disposable{
+public class PackContext implements Disposable{
     private PixmapPacker packer;
     private ObjectSet<String> outlined = new ObjectSet<>();
 
-    public MultiPacker(int size){
+    public PackContext(int size){
         if(size > 0){
             packer = new PixmapPacker(size, size, 2, true);
         }

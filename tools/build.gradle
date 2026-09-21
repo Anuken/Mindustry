@@ -94,7 +94,7 @@ tasks.register('pack'){
             println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f} seconds"
         }
 
-        println("\n\nPacking normal 4096 sprites...\n\n")
+        println("Running sprite packer...")
 
         //pack normal sprites
         TexturePacker.process(new File(rootDir, "core/assets-raw/sprites_out/").absolutePath, new File(rootDir, "core/assets/sprites/").absolutePath, "sprites.aatls")

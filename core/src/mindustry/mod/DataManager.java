@@ -80,7 +80,7 @@ public class DataManager{
         UnlockableContent[] currentContent = {null};
         String[] currentHash = {null};
 
-        MultiPacker saver = new MultiPacker(0){
+        PackContext saver = new PackContext(0){
             @Override
             public void add(String name, PixmapRegion region, int[] splits, int[] pads){
                 try{
@@ -137,7 +137,7 @@ public class DataManager{
             currentHash[0] = hashes.get(content);
 
             try{
-               content.createIcons(saver);
+               content.packSprites(saver);
             }catch(Throwable e){
                 Log.err(e);
             }

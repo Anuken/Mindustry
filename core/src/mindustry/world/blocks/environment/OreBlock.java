@@ -41,7 +41,7 @@ public class OreBlock extends OverlayFloor{
 
     @Override
     @OverrideCallSuper
-    public void createIcons(MultiPacker packer){
+    public void packSprites(PackContext packer){
         for(int i = 0; i < variants; i++){
             //use name (e.g. "ore-copper1"), fallback to "copper1" as per the old naming system
             PixmapRegion shadow = Core.atlas.has(name + (i + 1)) ?

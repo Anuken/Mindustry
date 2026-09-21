@@ -30,7 +30,7 @@ public class ShallowLiquid extends Floor{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
+    public void packSprites(PackContext packer){
         //TODO might not be necessary at all, but I am not sure yet
         //super.createIcons(packer);
 

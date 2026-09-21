@@ -231,8 +231,8 @@ public class StatusEffect extends UnlockableContent{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(outline){
             makeOutline(packer, uiIcon, false, Pal.gray, 3);

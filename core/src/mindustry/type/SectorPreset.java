@@ -119,8 +119,8 @@ public class SectorPreset extends UnlockableContent{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(outline && Core.atlas.has("sector-" + name)){
             makeOutline(packer, Core.atlas.find("sector-" + name), false, outlineColor, outlineRadius, outlineRadius);
