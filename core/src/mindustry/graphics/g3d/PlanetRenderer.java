@@ -41,6 +41,9 @@ public class PlanetRenderer implements Disposable{
 
     private final FrameBuffer framebuffer = new FrameBuffer(Format.defaultColorDepth);
 
+    /** Distance from the orbiting planet's surface (in world units) over which the orbit ring fades in, so it doesn't cut harshly into the planet. */
+    public float orbitFadeDistance = 1.1f;
+
     public PlanetRenderer(){
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
@@ -192,9 +195,23 @@ public class PlanetRenderer implements Disposable{
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
-        int points = (int)(radius * 10);
-        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray.write(Tmp.c1).a(params.uiAlpha)));
+        //a line loop can't be split across flushes, so cap the point count at the batch size
+        int points = Math.min((int)(radius * 10), batch.getMaxVertices());
+
+        for(int i = 0; i < points; i++){
+            float angle = i / (float)points * Mathf.PI2;
+            float x = center.x + Mathf.cos(angle) * radius, z = center.z + Mathf.sin(angle) * radius;
+
+            batch.vertex(x, center.y, z, orbitColor(planet, x, center.y, z, params.uiAlpha));
+        }
+
         batch.flush(Gl.lineLoop);
+    }
+
+    /** @return packed color bits for an orbit vertex at the specified position. Fades to nothing at the surface of the orbiting planet, reaching full alpha {@link #orbitFadeDistance} away from it. */
+    private float orbitColor(Planet planet, float x, float y, float z, float alpha){
+        float fade = Mathf.clamp((planet.position.dst(x, y, z) - (planet.radius + 0.85f)) / Math.max(orbitFadeDistance, 0.0001f));
+        return Color.toFloatBits(Pal.gray.r, Pal.gray.g, Pal.gray.b, alpha * fade);
     }
 
     public void renderSectors(Planet planet, PlanetParams params){
