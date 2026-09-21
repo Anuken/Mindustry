@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.TaskQueue;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
