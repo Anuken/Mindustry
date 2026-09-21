@@ -110,7 +110,7 @@ public class Damage{
                 int f = i;
                 Time.run(i * 2f, () -> {
                     var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
-                    if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
+                    if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ShieldProvider s && s.absorbExplosion(x, y, damagePerWave))){
                         damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
                     }
 

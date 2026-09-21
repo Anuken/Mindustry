@@ -162,7 +162,7 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceBuild extends Building implements Ranged, ExplosionShield{
+    public class ForceBuild extends Building implements Ranged, ShieldProvider{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
 
@@ -275,6 +275,11 @@ public class ForceProjector extends Block{
                 buildup += damage * crashDamageMultiplier;
             }
             return absorb;
+        }
+
+        @Override
+        public float getShieldBounds(){
+            return radius + phaseRadiusBoost;
         }
 
         public float realRadius(){

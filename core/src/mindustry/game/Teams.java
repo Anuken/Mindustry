@@ -295,6 +295,8 @@ public class Teams{
         public @Nullable QuadTree<Building> buildingTree;
         /** Turrets by range. Null if not active. */
         public @Nullable QuadTree<Building> turretTree;
+        /** ShieldProvider instances. */
+        public @Nullable QuadTree<Building> shieldTree;
         /** Quadtree for units of this team. Do not access directly. */
         public @Nullable QuadTree<Unit> unitTree;
         /** Current unit cap. Do not modify externally. */
@@ -313,6 +315,8 @@ public class Teams{
         public Seq<Building> buildings = new Seq<>(false);
         /** Units of this team by type. Updated each frame. */
         public @Nullable Seq<Unit>[] unitsByType;
+        /** Stores all damaged buildings. Do not access directly. */
+        public Seq<Building> damagedBuildings = new Seq<>();
 
         public TeamData(Team team){
             this.team = team;
