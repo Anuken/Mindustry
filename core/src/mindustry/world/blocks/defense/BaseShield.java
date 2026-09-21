@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.content.*;
@@ -12,6 +13,7 @@ import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
@@ -23,6 +25,7 @@ public class BaseShield extends Block{
     public @Nullable Color shieldColor;
 
     protected static BaseShieldBuild paramBuild;
+    protected static final Vec2 laserHit = new Vec2();
     //protected static Effect paramEffect;
     protected static final Cons<Bullet> bulletConsumer = bullet -> {
         if(bullet.team != paramBuild.team && bullet.type.absorbable && bullet.within(paramBuild, paramBuild.radius())){
@@ -79,7 +82,7 @@ public class BaseShield extends Block{
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, radius, player.team().color);
     }
 
-    public class BaseShieldBuild extends Building{
+    public class BaseShieldBuild extends Building implements ShieldProvider{
         public boolean broken = false;
         public float hit = 0f;
         public float smoothRadius;
@@ -100,6 +103,40 @@ public class BaseShield extends Block{
 
         public float radius(){
             return smoothRadius;
+        }
+
+        @Override
+        public float absorbExplosion(float ex, float ey, float damage){
+            float rad = radius();
+            return rad > 1f && within(ex, ey, rad) ? damage : 0f;
+        }
+
+        @Override
+        public @Nullable Vec2 intersectLaser(float x1, float y1, float x2, float y2, float damage){
+            float rad = radius();
+            if(rad <= 1f) return null;
+
+            float dx = x2 - x1, dy = y2 - y1, fx = x1 - x, fy = y1 - y;
+            float c = fx * fx + fy * fy - rad * rad;
+
+            //starts inside
+            if(c <= 0f) return laserHit.set(x1, y1);
+
+            float a = dx * dx + dy * dy, b = fx * dx + fy * dy, disc = b * b - a * c;
+            if(a <= 0f || disc < 0f) return null;
+
+            float t = (-b - Mathf.sqrt(disc)) / a;
+            return t >= 0f && t <= 1f ? laserHit.set(x1 + dx * t, y1 + dy * t) : null;
+        }
+
+        @Override
+        public float absorbLaser(float lx, float ly, float damage){
+            return damage;
+        }
+
+        @Override
+        public float getShieldBounds(){
+            return radius;
         }
 
         @Override

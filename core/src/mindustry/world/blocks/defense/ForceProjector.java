@@ -267,14 +267,16 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public boolean absorbExplosion(float ex, float ey, float damage){
-            boolean absorb = !broken && Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, ex, ey);
-            if(absorb){
+        public float absorbExplosion(float ex, float ey, float damage){
+            if(broken || !Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, ex, ey)) return 0f;
+
+            float absorbed = Math.min(damage, Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0f) / crashDamageMultiplier);
+            if(absorbed > 0f){
                 absorbEffect.at(ex, ey);
                 hit = 1f;
                 buildup += damage * crashDamageMultiplier;
             }
-            return absorb;
+            return absorbed;
         }
 
         @Override

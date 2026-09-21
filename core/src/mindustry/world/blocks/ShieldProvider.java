@@ -4,8 +4,8 @@ import arc.math.geom.*;
 import arc.util.*;
 
 public interface ShieldProvider{
-    /** @return whether the shield was able to absorb the explosion; this should apply damage to the shield if true is returned. */
-    boolean absorbExplosion(float x, float y, float damage);
+    /** @return how much of the explosion damage the shield absorbed, 0 if the point isn't inside it; this should apply damage to the shield if any was absorbed. */
+    float absorbExplosion(float x, float y, float damage);
     /** @return maximum (not current size!) half-size of the shield square bounding box */
     float getShieldBounds();
 

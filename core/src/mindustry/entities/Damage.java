@@ -18,7 +18,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -110,9 +109,9 @@ public class Damage{
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
-                    if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ShieldProvider s && s.absorbExplosion(x, y, damagePerWave))){
-                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                    float absorbed = absorbExplosion(ignoreTeam, x, y, damagePerWave);
+                    if(absorbed < damagePerWave){
+                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave - absorbed, false);
                     }
 
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
@@ -142,6 +141,37 @@ public class Damage{
                 Fires.create(tile);
             }
         }
+    }
+
+    /**
+     * Applies an explosion at a point to the enemy shields covering it, one after another, until all of its damage is absorbed.
+     * @return how much of the damage was absorbed.
+     */
+    public static float absorbExplosion(@Nullable Team team, float x, float y, float damage){
+        if(team == null) return 0f;
+
+        float remaining = damage;
+
+        var shields = indexer.getEnemyShields(team, x, y, 0f, 0f);
+        for(int i = 0; i < shields.size && remaining > 0f; i++){
+            if(shields.get(i) instanceof ShieldProvider shield){
+                remaining -= shield.absorbExplosion(x, y, remaining);
+            }
+        }
+
+        var units = Units.enemyShields(team, x, y, 0f, 0f);
+        for(int i = 0; i < units.size && remaining > 0f; i++){
+            Unit unit = units.get(i);
+            if(unit.dead) continue;
+
+            for(Ability ability : unit.abilities){
+                if(remaining > 0f && ability instanceof UnitShieldProvider shield){
+                    remaining -= shield.absorbExplosion(unit, x, y, remaining);
+                }
+            }
+        }
+
+        return damage - remaining;
     }
 
     public static @Nullable Building findAbsorber(Team team, float x1, float y1, float x2, float y2){

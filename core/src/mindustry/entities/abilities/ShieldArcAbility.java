@@ -177,7 +177,7 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
 
     @Override
     public @Nullable Vec2 intersectLaser(Unit unit, float x1, float y1, float x2, float y2, float damage){
-        if(data <= 0f || !(unit.isShooting || !whenShooting)) return null;
+        if(!active(unit)) return null;
 
         Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
         float cx = Tmp.v1.x, cy = Tmp.v1.y;
@@ -186,8 +186,7 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
         float dx = x2 - x1, dy = y2 - y1, a = dx * dx + dy * dy;
         float fx = x1 - cx, fy = y1 - cy, start = fx * fx + fy * fy;
 
-        //starts inside the band
-        if(start >= inner * inner && start <= outer * outer && inSpan(cx, cy, x1, y1, rot, half)){
+        if(inBand(cx, cy, x1, y1, rot)){
             return laserHit.set(x1, y1);
         }
 
@@ -225,7 +224,21 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
     }
 
     @Override
+    public float absorbExplosion(Unit unit, float ex, float ey, float damage){
+        if(!active(unit)) return 0f;
+
+        Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
+        if(!inBand(Tmp.v1.x, Tmp.v1.y, ex, ey, unit.rotation + angleOffset)) return 0f;
+
+        return absorb(unit, ex, ey, damage);
+    }
+
+    @Override
     public float absorbLaser(Unit unit, float lx, float ly, float damage){
+        return absorb(unit, lx, ly, damage);
+    }
+
+    protected float absorb(Unit unit, float lx, float ly, float damage){
         float absorbed = Math.min(damage, Math.max(data, 0f));
         if(absorbed > 0f){
             Fx.absorb.at(lx, ly);
@@ -242,6 +255,16 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
             alpha = 1f;
         }
         return absorbed;
+    }
+
+    protected boolean active(Unit unit){
+        return data > 0f && (unit.isShooting || !whenShooting);
+    }
+
+    /** @return whether a point is within the shield's band and angle. */
+    protected boolean inBand(float cx, float cy, float px, float py, float rotation){
+        float dst2 = Mathf.dst2(cx, cy, px, py), inner = Math.max(radius - width, 0f), outer = radius + width;
+        return dst2 >= inner * inner && dst2 <= outer * outer && inSpan(cx, cy, px, py, rotation, angle / 2f);
     }
 
     protected boolean inSpan(float cx, float cy, float px, float py, float rotation, float half){

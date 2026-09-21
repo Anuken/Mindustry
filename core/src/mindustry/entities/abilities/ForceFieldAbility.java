@@ -86,7 +86,18 @@ public class ForceFieldAbility extends Ability implements UnitShieldProvider{
     }
 
     @Override
+    public float absorbExplosion(Unit unit, float x, float y, float damage){
+        if(unit.shield <= 0f || !Intersector.isInRegularPolygon(sides, unit.x, unit.y, radiusScale * radius, rotation, x, y)) return 0f;
+
+        return absorb(unit, x, y, damage);
+    }
+
+    @Override
     public float absorbLaser(Unit unit, float x, float y, float damage){
+        return absorb(unit, x, y, damage);
+    }
+
+    protected float absorb(Unit unit, float x, float y, float damage){
         float absorbed = Math.min(damage, Math.max(unit.shield, 0f));
         if(absorbed > 0f){
             Fx.absorb.at(x, y);
