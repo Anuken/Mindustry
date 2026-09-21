@@ -482,7 +482,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootLancer;
 
                 bullet = new LaserBulletType(){{
-                    damage = 45f;
+                    damage = 55f;
                     recoil = 0f;
                     sideAngle = 45f;
                     sideWidth = 1f;

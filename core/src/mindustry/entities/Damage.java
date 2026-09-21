@@ -10,6 +10,7 @@ import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -26,7 +27,7 @@ public class Damage{
     private static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
     private static final Rect rect = new Rect();
     private static final Rect hitrect = new Rect();
-    private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
+    private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2(), polyHit = new Vec2();
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
     private static final Seq<Collided> collided = new Seq<>(), shieldHits = new Seq<>();
@@ -236,6 +237,31 @@ public class Damage{
         return findShieldLength(b, result, laser, absorb);
     }
 
+    /** @return the first point where a segment enters a regular polygon, stored in a shared vector, or null if it doesn't. */
+    public static @Nullable Vec2 raycastRegularPolygon(int sides, float cx, float cy, float radius, float rotation, float x1, float y1, float x2, float y2){
+        if(radius <= 0f) return null;
+
+        if(Intersector.isInRegularPolygon(sides, cx, cy, radius, rotation, x1, y1)){
+            return polyHit.set(x1, y1);
+        }
+
+        float best = Float.MAX_VALUE;
+        for(int i = 0; i < sides; i++){
+            Tmp.v1.trns(rotation + i * 360f / sides, radius).add(cx, cy);
+            Tmp.v2.trns(rotation + (i + 1) * 360f / sides, radius).add(cx, cy);
+
+            if(Intersector.intersectSegments(x1, y1, x2, y2, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, Tmp.v3)){
+                float dst = Tmp.v3.dst2(x1, y1);
+                if(dst < best){
+                    best = dst;
+                    polyHit.set(Tmp.v3);
+                }
+            }
+        }
+
+        return best == Float.MAX_VALUE ? null : polyHit;
+    }
+
     /**
      * Finds the enemy shields hit by a laser, in order, until one absorbs the rest of its damage.
      * @param absorb whether to actually apply the hits to the shields; otherwise the first shield is assumed to absorb everything.
@@ -261,13 +287,31 @@ public class Damage{
             }
         }
 
+        var units = Units.enemyShields(b.team, rect.x, rect.y, rect.width, rect.height);
+        for(int i = 0; i < units.size; i++){
+            Unit unit = units.get(i);
+            if(unit.dead) continue;
+
+            for(Ability ability : unit.abilities){
+                if(ability instanceof UnitShieldProvider shield){
+                    Vec2 hit = shield.intersectLaser(unit, seg1.x, seg1.y, seg2.x, seg2.y, damage);
+                    if(hit != null){
+                        shieldHits.add(collidePool.obtain().set(hit.x, hit.y, unit, shield));
+                    }
+                }
+            }
+        }
+
         float result = length, remaining = damage;
 
         shieldHits.sort(c -> Mathf.dst2(seg1.x, seg1.y, c.x, c.y));
         for(int i = 0; i < shieldHits.size; i++){
             Collided c = shieldHits.get(i);
 
-            float absorbed = absorb ? ((ShieldProvider)c.target).absorbLaser(c.x, c.y, remaining) : remaining;
+            float absorbed = remaining;
+            if(absorb){
+                absorbed = c.ability != null ? c.ability.absorbLaser((Unit)c.target, c.x, c.y, remaining) : ((ShieldProvider)c.target).absorbLaser(c.x, c.y, remaining);
+            }
             remaining -= absorbed;
 
             if(remaining <= 0f){
@@ -739,6 +783,8 @@ public class Damage{
     public static class Collided implements Pool.Poolable{
         public float x, y;
         public Teamc target;
+        /** Set when the target is a unit hit through one of its shield abilities. */
+        public @Nullable UnitShieldProvider ability;
 
         public Collided set(float x, float y, Teamc target){
             this.x = x;
@@ -747,9 +793,15 @@ public class Damage{
             return this;
         }
 
+        public Collided set(float x, float y, Teamc target, UnitShieldProvider ability){
+            this.ability = ability;
+            return set(x, y, target);
+        }
+
         @Override
         public void reset(){
             target = null;
+            ability = null;
         }
     }
 }

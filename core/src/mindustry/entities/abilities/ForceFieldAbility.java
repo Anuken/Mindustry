@@ -11,13 +11,14 @@ import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class ForceFieldAbility extends Ability{
+public class ForceFieldAbility extends Ability implements UnitShieldProvider{
     /** Shield radius. */
     public float radius = 60f;
     /** Shield regen speed in damage/tick. */
@@ -72,6 +73,27 @@ public class ForceFieldAbility extends Ability{
 
     public float scaledMax(Unit unit){
         return max * Vars.state.rules.unitHealth(unit.team);
+    }
+
+    @Override
+    public float shieldBounds(){
+        return radius;
+    }
+
+    @Override
+    public @Nullable Vec2 intersectLaser(Unit unit, float x1, float y1, float x2, float y2, float damage){
+        return unit.shield > 0f ? Damage.raycastRegularPolygon(sides, unit.x, unit.y, radiusScale * radius, rotation, x1, y1, x2, y2) : null;
+    }
+
+    @Override
+    public float absorbLaser(Unit unit, float x, float y, float damage){
+        float absorbed = Math.min(damage, Math.max(unit.shield, 0f));
+        if(absorbed > 0f){
+            Fx.absorb.at(x, y);
+            unit.shield -= damage;
+            alpha = 1f;
+        }
+        return absorbed;
     }
 
     @Override

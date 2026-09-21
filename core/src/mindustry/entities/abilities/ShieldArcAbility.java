@@ -15,11 +15,12 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
-public class ShieldArcAbility extends Ability{
+public class ShieldArcAbility extends Ability implements UnitShieldProvider{
 
     private static Unit paramUnit;
     private static ShieldArcAbility paramField;
     private static Vec2 paramPos = new Vec2();
+    private static final Vec2 laserHit = new Vec2();
     private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
             !(b.within(paramPos, paramField.radius - paramField.width) && paramPos.within(b.x - b.deltaX, b.y - b.deltaY, paramField.radius - paramField.width)) &&
@@ -167,6 +168,84 @@ public class ShieldArcAbility extends Ability{
 
     public float scaledMax(Unit unit){
         return max * Vars.state.rules.unitHealth(unit.team);
+    }
+
+    @Override
+    public float shieldBounds(){
+        return Mathf.len(x, y) + radius + width;
+    }
+
+    @Override
+    public @Nullable Vec2 intersectLaser(Unit unit, float x1, float y1, float x2, float y2, float damage){
+        if(data <= 0f || !(unit.isShooting || !whenShooting)) return null;
+
+        Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
+        float cx = Tmp.v1.x, cy = Tmp.v1.y;
+        float rot = unit.rotation + angleOffset, half = angle / 2f;
+        float inner = Math.max(radius - width, 0f), outer = radius + width;
+        float dx = x2 - x1, dy = y2 - y1, a = dx * dx + dy * dy;
+        float fx = x1 - cx, fy = y1 - cy, start = fx * fx + fy * fy;
+
+        //starts inside the band
+        if(start >= inner * inner && start <= outer * outer && inSpan(cx, cy, x1, y1, rot, half)){
+            return laserHit.set(x1, y1);
+        }
+
+        float best = Float.MAX_VALUE;
+
+        //crossings of the outer and inner arcs, as fractions along the segment
+        if(a > 0f){
+            float b = 2f * (fx * dx + fy * dy);
+            for(int i = 0; i < 2; i++){
+                float r = i == 0 ? outer : inner;
+                float disc = b * b - 4f * a * (start - r * r);
+                if(disc < 0f) continue;
+
+                float sqrt = Mathf.sqrt(disc);
+                for(int s : Mathf.signs){
+                    float t = (-b + sqrt * s) / (2f * a);
+                    if(t >= 0f && t <= 1f && t < best && inSpan(cx, cy, x1 + dx * t, y1 + dy * t, rot, half)){
+                        best = t;
+                    }
+                }
+            }
+        }
+
+        //crossings of the radial end edges
+        if(angle < 360f){
+            for(int s : Mathf.signs){
+                float ex = Angles.trnsx(rot + half * s, 1f), ey = Angles.trnsy(rot + half * s, 1f);
+                if(Intersector.intersectSegments(x1, y1, x2, y2, cx + ex * inner, cy + ey * inner, cx + ex * outer, cy + ey * outer, Tmp.v2)){
+                    best = Math.min(best, Tmp.v2.dst(x1, y1) / Mathf.sqrt(a));
+                }
+            }
+        }
+
+        return best == Float.MAX_VALUE ? null : laserHit.set(x1 + dx * best, y1 + dy * best);
+    }
+
+    @Override
+    public float absorbLaser(Unit unit, float lx, float ly, float damage){
+        float absorbed = Math.min(damage, Math.max(data, 0f));
+        if(absorbed > 0f){
+            Fx.absorb.at(lx, ly);
+
+            if(data <= damage){
+                Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
+                data -= cooldown * regen;
+
+                Fx.arcShieldBreak.at(Tmp.v1.x, Tmp.v1.y, 0, color == null ? unit.type.shieldColor(unit) : color, unit);
+                breakSound.at(Tmp.v1.x, Tmp.v1.y);
+            }
+
+            data -= damage;
+            alpha = 1f;
+        }
+        return absorbed;
+    }
+
+    protected boolean inSpan(float cx, float cy, float px, float py, float rotation, float half){
+        return angle >= 360f || Angles.within(Angles.angle(cx, cy, px, py), rotation, half);
     }
 
     @Override

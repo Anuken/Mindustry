@@ -195,6 +195,9 @@ public class Teams{
             if(data.unitTree != null){
                 data.unitTree.clear();
             }
+            if(data.unitShieldTree != null){
+                data.unitShieldTree.clear();
+            }
 
             if(data.typeCounts != null){
                 Arrays.fill(data.typeCounts, 0);
@@ -215,6 +218,9 @@ public class Teams{
             if(unit.type == null) continue;
             TeamData data = unit.team.data();
             data.tree().insert(unit);
+            if(unit.type.shieldBounds > 0f && !unit.dead){
+                data.unitShieldTree().insert(unit);
+            }
             data.units.add(unit);
             data.presentFlag = true;
 
@@ -299,6 +305,8 @@ public class Teams{
         public @Nullable QuadTree<Building> shieldTree;
         /** Quadtree for units of this team. Do not access directly. */
         public @Nullable QuadTree<Unit> unitTree;
+        /** Quadtree for units of this team that have shield abilities. Rebuilt each frame; do not access directly. */
+        public @Nullable QuadTree<Unit> unitShieldTree;
         /** Current unit cap. Do not modify externally. */
         public int unitCap;
         /** Total unit count. */
@@ -446,6 +454,11 @@ public class Teams{
             return unitTree;
         }
 
+        public QuadTree<Unit> unitShieldTree(){
+            if(unitShieldTree == null) unitShieldTree = new UnitShieldQuadtree(Vars.world.getQuadBounds(new Rect()));
+            return unitShieldTree;
+        }
+
         public int countType(UnitType type){
             return typeCounts == null || typeCounts.length <= type.id ? 0 : typeCounts[type.id];
         }
@@ -511,6 +524,24 @@ public class Teams{
         if(build != null && build.getPayload() instanceof UnitPayload && build.takePayload() instanceof UnitPayload unit){
             unit.dump();
             unit.unit.killed();
+        }
+    }
+
+    static class UnitShieldQuadtree extends QuadTree<Unit>{
+
+        public UnitShieldQuadtree(Rect bounds){
+            super(bounds);
+        }
+
+        @Override
+        public void hitbox(Unit unit){
+            //padded by speed, as the tree is built before units move each frame
+            tmp.setCentered(unit.x, unit.y, (unit.type.shieldBounds + unit.type.speed * 2f) * 2f);
+        }
+
+        @Override
+        protected QuadTree<Unit> newChild(Rect rect){
+            return new UnitShieldQuadtree(rect);
         }
     }
 

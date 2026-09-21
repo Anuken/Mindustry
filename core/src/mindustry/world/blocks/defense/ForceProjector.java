@@ -57,7 +57,6 @@ public class ForceProjector extends Block{
     //lambdas need to be static to prevent GC
     protected static ForceProjector paramBlock;
     protected static ForceBuild paramEntity;
-    protected static final Vec2 laserHit = new Vec2();
     protected static final Cons<Bullet> shieldConsumer = bullet -> {
         if(bullet.team != paramEntity.team && bullet.type.absorbable && !bullet.absorbed &&
             Intersector.isInRegularPolygon(paramBlock.sides, paramEntity.x, paramEntity.y, paramEntity.realRadius(), paramBlock.shieldRotation, bullet.x, bullet.y)){
@@ -280,28 +279,7 @@ public class ForceProjector extends Block{
 
         @Override
         public @Nullable Vec2 intersectLaser(float x1, float y1, float x2, float y2, float damage){
-            float radius = realRadius();
-            if(broken || radius <= 0f) return null;
-
-            if(Intersector.isInRegularPolygon(sides, x, y, radius, shieldRotation, x1, y1)){
-                return laserHit.set(x1, y1);
-            }
-
-            float best = Float.MAX_VALUE;
-            for(int i = 0; i < sides; i++){
-                Tmp.v1.trns(shieldRotation + i * 360f / sides, radius).add(x, y);
-                Tmp.v2.trns(shieldRotation + (i + 1) * 360f / sides, radius).add(x, y);
-
-                if(Intersector.intersectSegments(x1, y1, x2, y2, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, Tmp.v3)){
-                    float dst = Tmp.v3.dst2(x1, y1);
-                    if(dst < best){
-                        best = dst;
-                        laserHit.set(Tmp.v3);
-                    }
-                }
-            }
-
-            return best == Float.MAX_VALUE ? null : laserHit;
+            return broken ? null : Damage.raycastRegularPolygon(sides, x, y, realRadius(), shieldRotation, x1, y1, x2, y2);
         }
 
         @Override

@@ -285,6 +285,8 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** list of "abilities", which are various behaviors that update each frame */
     public Seq<Ability> abilities = new Seq<>();
+    /** Maximum reach of shield abilities from the unit's center; 0 if there are none. Set in init(). */
+    public float shieldBounds;
     /** All weapons that this unit will shoot with. */
     public Seq<Weapon> weapons = new Seq<>();
     /** None of the status effects in this set can be applied to this unit. */
@@ -1033,6 +1035,8 @@ public class UnitType extends UnlockableContent implements Senseable{
             ab.init(this);
         }
 
+        updateShieldBounds();
+
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
         for(Weapon w : weapons){
@@ -1303,6 +1307,16 @@ public class UnitType extends UnlockableContent implements Senseable{
         pathCost = null;
         pathCostId = -1;
         initPathType();
+        updateShieldBounds();
+    }
+
+    public void updateShieldBounds(){
+        shieldBounds = 0f;
+        for(Ability ab : abilities){
+            if(ab instanceof UnitShieldProvider shield){
+                shieldBounds = Math.max(shieldBounds, shield.shieldBounds());
+            }
+        }
     }
 
     public void beforeParse(){
