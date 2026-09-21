@@ -29,7 +29,7 @@ public class Damage{
     private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
-    private static final Seq<Collided> collided = new Seq<>();
+    private static final Seq<Collided> collided = new Seq<>(), shieldHits = new Seq<>();
     private static final Pool<Collided> collidePool = Pools.get(Collided.class, Collided::new);
     private static final Seq<Building> builds = new Seq<>();
     private static final FloatSeq distances = new FloatSeq();
@@ -153,16 +153,26 @@ public class Damage{
     }
 
     public static float findLength(Bullet b, float length, boolean laser, int pierceCap){
+        return findLength(b, length, laser, pierceCap, false);
+    }
+
+    private static float findLength(Bullet b, float length, boolean laser, int pierceCap, boolean absorb){
         if(pierceCap > 0){
-            length = findPierceLength(b, pierceCap, laser, length);
+            length = findPierceLength(b, pierceCap, laser, length, absorb);
         }else if(laser){
-            length = findLaserLength(b, length);
+            length = findLaserLength(b, length, absorb);
+        }else{
+            length = findShieldLength(b, length, false, absorb);
         }
 
         return length;
     }
 
     public static float findLaserLength(Bullet b, float length){
+        return findLaserLength(b, length, false);
+    }
+
+    private static float findLaserLength(Bullet b, float length, boolean absorb){
         vec.trnsExact(b.rotation(), length);
 
         furthest = null;
@@ -170,7 +180,9 @@ public class Damage{
         boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y),
         (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && (furthest.build != null && furthest.build.absorbLasers()));
 
-        return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+        float result = found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+
+        return findShieldLength(b, result, true, absorb);
     }
 
     public static float findPierceLength(Bullet b, int pierceCap, float length){
@@ -178,6 +190,10 @@ public class Damage{
     }
 
     public static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length){
+        return findPierceLength(b, pierceCap, laser, length, false);
+    }
+
+    private static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length, boolean absorb){
         vec.trnsExact(b.rotation(), length);
         rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
 
@@ -215,14 +231,66 @@ public class Damage{
 
         //return either the length when not enough things were pierced,
         //or the last pierced object if there were enough blockages
-        return Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+        float result = Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+
+        return findShieldLength(b, result, laser, absorb);
+    }
+
+    /**
+     * Finds the enemy shields hit by a laser, in order, until one absorbs the rest of its damage.
+     * @param absorb whether to actually apply the hits to the shields; otherwise the first shield is assumed to absorb everything.
+     * If the shields only absorb part of the damage, the bullet's damage is reduced accordingly.
+     * @return the length of the laser, cut short if a shield absorbed it.
+     */
+    private static float findShieldLength(Bullet b, float length, boolean laser, boolean absorb){
+        float damage = b.type.shieldDamage(b);
+        if(!(laser || b.type.shieldAbsorb) || length <= 0f || damage <= 0f) return length;
+
+        seg1.set(b.x, b.y);
+        seg2.trnsExact(b.rotation(), length).add(seg1);
+        rect.setPosition(seg1.x, seg1.y).setSize(seg2.x - seg1.x, seg2.y - seg1.y).normalize();
+
+        var shields = indexer.getEnemyShields(b.team, rect.x, rect.y, rect.width, rect.height);
+        for(int i = 0; i < shields.size; i++){
+            Building build = shields.get(i);
+            if(build instanceof ShieldProvider shield){
+                Vec2 hit = shield.intersectLaser(seg1.x, seg1.y, seg2.x, seg2.y, damage);
+                if(hit != null){
+                    shieldHits.add(collidePool.obtain().set(hit.x, hit.y, build));
+                }
+            }
+        }
+
+        float result = length, remaining = damage;
+
+        shieldHits.sort(c -> Mathf.dst2(seg1.x, seg1.y, c.x, c.y));
+        for(int i = 0; i < shieldHits.size; i++){
+            Collided c = shieldHits.get(i);
+
+            float absorbed = absorb ? ((ShieldProvider)c.target).absorbLaser(c.x, c.y, remaining) : remaining;
+            remaining -= absorbed;
+
+            if(remaining <= 0f){
+                result = Mathf.dst(seg1.x, seg1.y, c.x, c.y);
+                break;
+            }
+        }
+
+        if(absorb && remaining > 0f && remaining < damage){
+            b.damage *= remaining / damage;
+        }
+
+        collidePool.freeAll(shieldHits);
+        shieldHits.clear();
+
+        return result;
     }
 
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
-        float resultLength = findPierceLength(b, pierceCap, laser, length);
+        float resultLength = findPierceLength(b, pierceCap, laser, length, true);
 
-        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
+        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap, false);
 
         b.fdata = resultLength;
 
@@ -254,7 +322,11 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
-        length = findLength(hitter, length, laser, pierceCap);
+        collideLine(hitter, team, x, y, angle, length, large, laser, pierceCap, true);
+    }
+
+    private static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap, boolean absorb){
+        length = findLength(hitter, length, laser, pierceCap, absorb);
         hitter.fdata = length;
 
         collidedBlocks.clear();

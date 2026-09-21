@@ -683,7 +683,7 @@ public class BlockIndexer{
 
         @Override
         public void hitbox(T build){
-            tmp.setCentered(build.x, build.y, build.getShieldBounds());
+            tmp.setCentered(build.x, build.y, build.getShieldBounds() * 2f);
         }
 
         @Override
