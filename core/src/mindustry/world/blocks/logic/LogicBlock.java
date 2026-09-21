@@ -172,8 +172,8 @@ public class LogicBlock extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         if(!privileged){
             stats.add(Stat.linkRange, range / 8, StatUnit.blocks);

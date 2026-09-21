@@ -38,8 +38,8 @@ public class DuctJunction extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         //4 tems is misleading
         stats.remove(Stat.itemCapacity);
     }

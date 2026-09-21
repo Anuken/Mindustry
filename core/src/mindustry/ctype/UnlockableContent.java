@@ -22,9 +22,6 @@ import static mindustry.Vars.*;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
-    /** Stat storage for this content. Initialized on demand. */
-    @NoPatch
-    public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description & details. May be null. */
@@ -119,9 +116,6 @@ public abstract class UnlockableContent extends MappableContent{
     @Override
     public void afterPatch(){
         super.afterPatch();
-
-        //reset stats
-        stats = new Stats();
     }
 
     public boolean isBanned(){
@@ -141,13 +135,12 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     /** Initializes stats on demand. Called every time the block stats are shown. */
-    public void setStats(){
-    }
+    public void setStats(Stats stats){}
 
     public Stats computeStats(){
-        this.stats = new Stats();
-        setStats();
-        return this.stats;
+        var stats = new Stats();
+        setStats(stats);
+        return stats;
     }
 
     /** Display any extra info after details. */

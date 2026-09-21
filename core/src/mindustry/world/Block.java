@@ -637,12 +637,16 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.useCategories = true;
 
         stats.add(Stat.size, "@x@", size, size);
+
+        if(unitCapModifier != 0){
+            stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
+        }
 
         if(synthetic()){
             stats.add(Stat.health, health, StatUnit.none);
@@ -723,10 +727,6 @@ public class Block extends UnlockableContent implements Senseable{
                 () -> Pal.items,
                 () -> (float)entity.items.total() / itemCapacity)
             );
-        }
-
-        if(unitCapModifier != 0){
-            stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
         }
 
         //liquids added last

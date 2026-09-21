@@ -27,8 +27,8 @@ public class Junction extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         //(60f / speed * capacity) returns 13.84 which is not the actual value (non linear, depends on fps)
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);

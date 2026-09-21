@@ -788,7 +788,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);

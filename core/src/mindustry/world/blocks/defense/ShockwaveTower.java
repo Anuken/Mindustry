@@ -48,8 +48,8 @@ public class ShockwaveTower extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.damage, bulletDamage, StatUnit.none);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);

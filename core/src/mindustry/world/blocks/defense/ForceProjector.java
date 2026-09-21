@@ -105,11 +105,11 @@ public class ForceProjector extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         boolean consItems = itemConsumer != null;
 
         if(consItems) stats.timePeriod = phaseUseTime;
-        super.setStats();
+        super.setStats(stats);
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
         stats.add(Stat.range, radius / tilesize, StatUnit.blocks);
         stats.add(Stat.regenerationRate, cooldownNormal * 60f, StatUnit.perSecond);

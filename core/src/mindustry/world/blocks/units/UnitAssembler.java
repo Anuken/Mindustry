@@ -203,8 +203,8 @@ public class UnitAssembler extends PayloadBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.output, table -> {
             table.row();

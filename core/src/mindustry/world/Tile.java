@@ -201,11 +201,6 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         this.block = block;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Block> T cblock(){
-        return (T)block;
-    }
-
     public Team team(){
         return build == null ? Team.derelict : build.team;
     }

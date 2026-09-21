@@ -58,8 +58,8 @@ public class Unloader extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.add(Stat.speed, 60f / speed, StatUnit.itemsSecond);
     }
 

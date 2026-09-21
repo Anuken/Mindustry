@@ -101,7 +101,7 @@ public class Item extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.addPercent(Stat.explosiveness, explosiveness);
         stats.addPercent(Stat.flammability, flammability);
         stats.addPercent(Stat.radioactivity, radioactivity);

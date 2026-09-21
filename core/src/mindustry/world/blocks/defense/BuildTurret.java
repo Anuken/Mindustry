@@ -78,8 +78,8 @@ public class BuildTurret extends BaseTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.addPercent(Stat.buildSpeed, buildSpeed);
     }

@@ -16,8 +16,8 @@ public class SolarGenerator extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.remove(generationType);
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }

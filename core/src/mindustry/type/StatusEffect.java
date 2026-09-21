@@ -94,7 +94,7 @@ public class StatusEffect extends UnlockableContent{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         if(damageMultiplier != 1) stats.addMultModifier(Stat.damageMultiplier, damageMultiplier);
         if(healthMultiplier != 1) stats.addMultModifier(Stat.healthMultiplier, healthMultiplier);
         if(speedMultiplier != 1) stats.addMultModifier(Stat.speedMultiplier, speedMultiplier);

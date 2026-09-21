@@ -122,8 +122,8 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.unitType, table -> {
             table.row();

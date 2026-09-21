@@ -19,10 +19,10 @@ public class BufferedItemBridge extends ItemBridge{
         hasItems = true;
         canOverdrive = true;
     }
-    
+
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         //Hard to calculate, fps and overdive reliant. Movement speed taken from testing
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
