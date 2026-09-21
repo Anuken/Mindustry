@@ -162,7 +162,7 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceBuild extends Building implements Ranged, ExplosionShield{
+    public class ForceBuild extends Building implements Ranged, ShieldProvider{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
 
@@ -267,14 +267,37 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public boolean absorbExplosion(float ex, float ey, float damage){
-            boolean absorb = !broken && Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, ex, ey);
-            if(absorb){
+        public float absorbExplosion(float ex, float ey, float damage){
+            if(broken || !Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, ex, ey)) return 0f;
+
+            float absorbed = Math.min(damage, Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0f) / crashDamageMultiplier);
+            if(absorbed > 0f){
                 absorbEffect.at(ex, ey);
                 hit = 1f;
                 buildup += damage * crashDamageMultiplier;
             }
-            return absorb;
+            return absorbed;
+        }
+
+        @Override
+        public @Nullable Vec2 intersectLaser(float x1, float y1, float x2, float y2, float damage){
+            return broken ? null : Damage.raycastRegularPolygon(sides, x, y, realRadius(), shieldRotation, x1, y1, x2, y2);
+        }
+
+        @Override
+        public float absorbLaser(float lx, float ly, float damage){
+            float absorbed = broken ? 0f : Math.min(damage, Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0f));
+            if(absorbed > 0f){
+                absorbEffect.at(lx, ly);
+                hit = 1f;
+                buildup += damage;
+            }
+            return absorbed;
+        }
+
+        @Override
+        public float getShieldBounds(){
+            return radius + phaseRadiusBoost;
         }
 
         public float realRadius(){
@@ -312,7 +335,7 @@ public class ForceProjector extends Block{
                 if(radius > 0.001f){
                     Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
-                    if(renderer.animateShields){
+                    if(renderer.animateSurfaces){
                         Draw.z(Layer.shields + 0.001f * hit);
                         Fill.poly(x, y, sides, radius, shieldRotation);
                     }else{

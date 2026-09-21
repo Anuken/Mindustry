@@ -33,12 +33,13 @@ public class Renderer implements ApplicationListener{
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
+    public final SMAA smaa = new SMAA();
     public PlanetRenderer planets;
 
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, animateWater, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false, showPings = true, showOtherBuildPlans = true;
+    public boolean animateSurfaces, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false, showPings = true, showOtherBuildPlans = true;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in, used by cutscenes */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -164,8 +165,7 @@ public class Renderer implements ApplicationListener{
         mineLaserOpacity = settings.getInt("minelaseropacity") / 100f;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
-        animateWater = settings.getBool("animatedwater"); //TODO: rename to animatedSurfaces or something
-        animateShields = animateWater; //vestigial: TODO, remove
+        animateSurfaces = settings.getBool("animatedwater");
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
@@ -219,6 +219,10 @@ public class Renderer implements ApplicationListener{
 
             if(renderer.pixelate){
                 pixelator.drawPixelate();
+            }else if(smaa.enabled()){
+                smaa.begin();
+                draw();
+                smaa.end();
             }else{
                 draw();
             }
@@ -263,6 +267,7 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void dispose(){
+        smaa.dispose();
         Events.fire(new DisposeEvent());
     }
 
@@ -313,7 +318,7 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(animateWater || animateShields){
+        if(animateSurfaces || animateSurfaces){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
@@ -399,7 +404,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.draw(Layer.plans, overlays::drawBottom);
 
-        if(animateShields && Shaders.shield != null){
+        if(animateSurfaces && Shaders.shield != null){
             //TODO would be nice if there were a way to detect if any shields or build beams actually *exist* before beginning/ending buffers, otherwise you're just blitting and swapping shaders for nothing
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
                 effectBuffer.end();

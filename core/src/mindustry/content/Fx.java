@@ -121,17 +121,25 @@ public class Fx{
     //water equivalent of wreck decals - Effect.decal() doesn't render on liquids
     unitDrown = new Effect(3600f, e -> {
         if(!(e.data instanceof TextureRegion reg)) return;
-
-        Draw.z(Layer.scorch);
-        mixcol(e.color, 1f);
-        alpha(0.85f * (1f - Mathf.curve(e.fin(), 0.98f)));
-        rect(reg, e.x, e.y, e.rotation);
-        reset();
-
         //small ripples drifting over the debris, so the water still reads as moving on top of it
-        if(Mathf.chanceDelta(0.02f)){
-            Fx.ripple.at(e.x + Mathf.range(reg.width / 3f), e.y + Mathf.range(reg.height / 3f), 0.6f, e.color);
+        if(!state.isPaused() && Mathf.chanceDelta(0.0002f * (reg.width * reg.height) / (50f * 50f))){
+            float x = e.x + Mathf.range(reg.width * reg.scale / 4f / 3f), y = e.y + Mathf.range(reg.height * reg.scale / 4f / 3f);
+            Tile tile = world.tileWorld(x, y);
+            if(tile != null && tile.floor().isLiquid && tile.block() == Blocks.air){
+                Fx.rippleSlow.at(x, y, Mathf.random(0.4f, 1f), tile.floor().mapColor);
+            }
         }
+
+        //capture position
+        float x = e.x, y = e.y, rotation = e.rotation, fin = e.fin();
+        float color = e.color.toFloatBits();
+        Drawf.underwater(() -> {
+            Draw.z(Layer.scorch);
+            mixcol(color);
+            alpha(0.85f * (1f - Mathf.curve(fin, 0.98f)));
+            rect(reg, x, y, rotation);
+            reset();
+        });
     }),
 
     unitSpirit = new Effect(17f, e -> {
@@ -1378,7 +1386,7 @@ public class Fx{
 
     forceShrink = new Effect(20, e -> {
         color(e.color, e.fout());
-        if(renderer.animateShields){
+        if(renderer.animateSurfaces){
             Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
         }else{
             stroke(1.5f);
@@ -2746,6 +2754,12 @@ public class Fx{
         color(Tmp.c1.set(e.color).mul(1.5f));
         stroke(e.fout() * 1.4f);
         Lines.circle(e.x, e.y, (2f + e.fin() * 4f) * e.rotation);
+    }).layer(Layer.debris),
+
+    rippleSlow = new Effect(120, e -> {
+        color(Tmp.c1.set(e.color).mul(1.5f), 0.6f);
+        stroke(e.fout() * 1.4f);
+        Lines.circle(e.x, e.y, (e.fin() * 7f) * e.rotation);
     }).layer(Layer.debris),
 
     bubble = new Effect(20, e -> {

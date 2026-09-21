@@ -501,6 +501,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
+        graphics.checkPref("smaa", false);
         graphics.checkPref("effects", true);
         graphics.checkPref("atmosphere", true);
         graphics.checkPref("drawlight", true);
@@ -520,7 +521,7 @@ public class SettingsMenuDialog extends BaseDialog{
             graphics.checkPref("mouseposition", false);
         }
         graphics.checkPref("fps", false);
-        graphics.checkPref("playerindicators", true);
+        graphics.checkPref("playerindicators", false);
         graphics.checkPref("showpings", true);
         graphics.checkPref("showotherbuildplans", true);
         graphics.checkPref("indicators", true);

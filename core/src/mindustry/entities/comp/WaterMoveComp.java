@@ -4,10 +4,12 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.EntityCollisions.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
@@ -18,11 +20,16 @@ import static mindustry.Vars.*;
 
 @Component
 abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Unitc{
+    private static final float crushInterval = 5f;
+
+    @Import Team team;
+    @Import boolean disarmed;
     @Import float x, y, rotation, speedMultiplier;
     @Import UnitType type;
 
     private transient Trail tleft = new Trail(1), tright = new Trail(1);
     private transient Color trailColor = Blocks.water.mapColor.cpy().mul(1.5f);
+    private transient float crushTimer = Mathf.random(crushInterval);
 
     @Override
     public void update(){
@@ -34,6 +41,22 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Unitc{
             int sign = i == 0 ? -1 : 1;
             float cx = Angles.trnsx(rotation - 90, type.waveTrailX * sign, type.waveTrailY) + x, cy = Angles.trnsy(rotation - 90, type.waveTrailX * sign, type.waveTrailY) + y;
             t.update(cx, cy, world.floorWorld(cx, cy).isLiquid && !flying ? 1 : 0);
+        }
+
+        if(type.crushDamage > 0 && !disarmed){
+            if((crushTimer += Time.delta) >= crushInterval){
+                crushTimer %= crushInterval;
+
+                for(int cx = -type.crushRadX; cx <= type.crushRadX; cx++){
+                    for(int cy = -type.crushRadY; cy <= type.crushRadY; cy++){
+                        Tmp.v1.trns(rotation - 90f, cx * tilesize, cy * tilesize);
+                        var other = Vars.world.buildWorld(x + Tmp.v1.x, y + Tmp.v1.y);
+                        if(other != null && other.team != team && other.floor().isLiquid && !other.block.solid){
+                            other.damage(team, type.crushFragile && other.block.crushFragile ? 99999999f : type.crushDamage * crushInterval);
+                        }
+                    }
+                }
+            }
         }
     }
 

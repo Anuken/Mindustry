@@ -8,6 +8,7 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -52,6 +53,8 @@ public class PlanetRenderer implements Disposable{
 
     /** Render the entire planet scene to the screen. */
     public void render(PlanetParams params){
+        boolean aa = Vars.renderer.smaa.enabled();
+        if(aa) Vars.renderer.smaa.begin();
         Draw.flush();
         Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
@@ -142,6 +145,7 @@ public class PlanetRenderer implements Disposable{
         Gl.disable(Gl.depthTest);
 
         cam.update();
+        if(aa) Vars.renderer.smaa.end();
     }
 
     public void renderPlanet(Planet planet, PlanetParams params){

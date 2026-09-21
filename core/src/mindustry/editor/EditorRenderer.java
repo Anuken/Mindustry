@@ -91,8 +91,8 @@ public class EditorRenderer implements Disposable{
         //don't process terrain updates every frame (helps with lag on low end devices)
         boolean doUpdate = Core.graphics.getFrameId() % 2 == 0;
 
-        boolean prev = renderer.animateWater;
-        renderer.animateWater = false;
+        boolean prev = renderer.animateSurfaces;
+        renderer.animateSurfaces = false;
 
         Tmp.m4.set(Draw.trans());
         Draw.trans().idt();
@@ -128,7 +128,7 @@ public class EditorRenderer implements Disposable{
         if(editor.showTerrain){
             renderer.blocks.floor.drawLayer(CacheLayer.walls, doUpdate);
         }
-        renderer.animateWater = prev;
+        renderer.animateSurfaces = prev;
 
         if(chunks == null) return;
 

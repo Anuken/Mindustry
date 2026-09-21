@@ -482,7 +482,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootLancer;
 
                 bullet = new LaserBulletType(){{
-                    damage = 45f;
+                    damage = 55f;
                     recoil = 0f;
                     sideAngle = 45f;
                     sideWidth = 1f;
@@ -1583,6 +1583,7 @@ public class UnitTypes{
             accel = 0.4f;
             rotateSpeed = 3.3f;
             faceTarget = false;
+            crushDamage = 6f;
 
             trailLength = 20;
             waveTrailX = 4f;
@@ -1644,6 +1645,9 @@ public class UnitTypes{
             accel = 0.3f;
             rotateSpeed = 2.6f;
             faceTarget = false;
+            crushDamage = 8f;
+            crushRadX = 1;
+            crushRadY = 2;
 
             moveSoundVolume = 0.55f;
             moveSoundPitchMin = moveSoundPitchMax = 0.9f;
@@ -1706,6 +1710,9 @@ public class UnitTypes{
             hitSize = 20f;
             armor = 7f;
             faceTarget = false;
+            crushDamage = 12f;
+            crushRadX = 1;
+            crushRadY = 2;
 
             moveSoundVolume = 0.7f;
             moveSoundPitchMin = moveSoundPitchMax = 0.77f;
@@ -1805,6 +1812,9 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.3f;
             faceTarget = false;
+            crushDamage = 15f;
+            crushRadX = 2;
+            crushRadY = 3;
 
             moveSoundVolume = 1f;
             moveSound = Sounds.shipMoveBig;
@@ -1898,6 +1908,9 @@ public class UnitTypes{
             accel = 0.19f;
             rotateSpeed = 0.9f;
             faceTarget = false;
+            crushDamage = 17f;
+            crushRadX = 2;
+            crushRadY = 5;
 
             moveSoundVolume = 1.1f;
             moveSound = Sounds.shipMoveBig;
@@ -1953,6 +1966,7 @@ public class UnitTypes{
             faceTarget = false;
             range = 100f;
             armor = 3f;
+            crushDamage = 6f;
 
             moveSoundVolume = 0.4f;
             moveSound = Sounds.shipMove;
@@ -2057,6 +2071,7 @@ public class UnitTypes{
             accel = 0.4f;
             rotateSpeed = 4f;
             faceTarget = false;
+            crushDamage = 8f;
 
             moveSoundVolume = 0.55f;
             moveSoundPitchMin = moveSoundPitchMax = 0.9f;
@@ -2138,6 +2153,8 @@ public class UnitTypes{
             hitSize = 20f;
             armor = 6f;
             faceTarget = false;
+            crushDamage = 12f;
+            crushRadY = 2;
 
             moveSoundVolume = 0.7f;
             moveSoundPitchMin = moveSoundPitchMax = 0.77f;
@@ -2273,6 +2290,7 @@ public class UnitTypes{
         aegires = new UnitType("aegires"){{
             health = 12000;
             armor = 12f;
+            crushDamage = 15f;
 
             speed = 0.7f;
             drag = 0.17f;
@@ -2280,6 +2298,8 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.4f;
             faceTarget = false;
+            crushRadX = 2;
+            crushRadY = 3;
 
             moveSoundVolume = 1f;
             moveSound = Sounds.shipMoveBig;
@@ -2331,6 +2351,9 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.1f;
             faceTarget = false;
+            crushDamage = 17f;
+            crushRadX = 3;
+            crushRadY = 5;
 
             moveSoundVolume = 1.1f;
             moveSound = Sounds.shipMoveBig;
