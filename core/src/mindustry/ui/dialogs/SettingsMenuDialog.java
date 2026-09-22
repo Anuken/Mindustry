@@ -536,8 +536,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         });
 
-        //iOS (and possibly Android) devices do not support linear filtering well, so disable it
-        graphics.checkPref("linear", !mobile, b -> {
+        graphics.checkPref("linear", true, b -> {
             atlas.getTexture().setFilter(b ? TextureFilter.linear : TextureFilter.nearest);
         });
 

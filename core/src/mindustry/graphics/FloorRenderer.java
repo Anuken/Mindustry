@@ -76,7 +76,7 @@ public class FloorRenderer{
         
         uniform mat4 u_projectionViewMatrix;
         varying vec4 v_color;
-        varying vec2 v_texCoords;
+        varying highp vec2 v_texCoords;
         varying float v_depth;
 
         void main(){
@@ -89,7 +89,7 @@ public class FloorRenderer{
         """,
         """
         varying vec4 v_color;
-        varying vec2 v_texCoords;
+        varying highp vec2 v_texCoords;
         varying float v_depth;
         uniform highp sampler2DArray u_texture;
 
