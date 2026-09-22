@@ -343,7 +343,7 @@ public class ForceProjector extends Block{
             if(!broken){
                 float radius = realRadius();
 
-                if(radius > 0.001f){
+                if(radius > 0.001f && Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, radius * 2f + 2f))){
                     Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
                     if(renderer.animateSurfaces){

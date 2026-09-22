@@ -405,16 +405,20 @@ public class Renderer implements ApplicationListener{
         Draw.draw(Layer.plans, overlays::drawBottom);
 
         if(animateSurfaces && Shaders.shield != null){
-            if(indexer.anyShields(camera.bounds(Tmp.r1))){
-                Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
-                    effectBuffer.end();
+            Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
+                boolean drawn = batch.hasPending();
+                effectBuffer.end();
+                if(drawn){
                     Shaders.shield.render(effectBuffer);
-                });
-            }
+                }
+            });
 
             Draw.drawRange(Layer.buildBeam, 1f, () -> effectBuffer.begin(Color.clear), () -> {
+                boolean drawn = batch.hasPending();
                 effectBuffer.end();
-                effectBuffer.blit(Shaders.buildBeam);
+                if(drawn){
+                    effectBuffer.blit(Shaders.buildBeam);
+                }
             });
         }
 
