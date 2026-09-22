@@ -392,6 +392,18 @@ public class BlockIndexer{
         return breturn;
     }
 
+    public boolean anyShields(Rect r){
+        var all = state.teams.present;
+        for(int i = 0; i < all.size; i++){
+            Team enemy = all.items[i].team;
+
+            var data = enemy.data();
+            if(data.shieldTree != null && data.shieldTree.any(r.x, r.y, r.width, r.height)) return true;
+            if(data.unitShieldTree != null && data.unitShieldTree.any(r.x, r.y, r.width, r.height)) return true;
+        }
+        return false;
+    }
+
     /** Get all enemy blocks with a flag. */
     public Seq<Building> getEnemy(Team team, BlockFlag type){
         breturn.clear();

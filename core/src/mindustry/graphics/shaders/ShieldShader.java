@@ -8,7 +8,7 @@ import arc.util.*;
 
 public class ShieldShader extends LoadShader{
     /** Outline width in world units. */
-    public float outlineWidth = 1.8f;
+    public float outlineWidth = 1.6f;
 
     protected FrameBuffer rows = new FrameBuffer(), field = new FrameBuffer();
     protected Shader rowShader = new FieldShader("shieldrow"), colShader = new FieldShader("shieldcol");
