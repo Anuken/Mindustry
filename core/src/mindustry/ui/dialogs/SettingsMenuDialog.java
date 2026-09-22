@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.gl.*;
 import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
@@ -401,9 +402,11 @@ public class SettingsMenuDialog extends BaseDialog{
         });
 
         game.checkPref("savecreate", true);
+        game.checkPref("skipcoreanimation", false);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+        game.checkPref("logiclocalization", true);
 
         if(!mobile){
             game.checkPref("backgroundpause", true);
@@ -501,7 +504,25 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
-        graphics.checkPref("smaa", false);
+        Log.info(useDefaultSmaa());
+        graphics.checkPref("smaa", useDefaultSmaa());
+
+        graphics.checkPref("linear", true, b -> {
+            atlas.getTexture().setFilter(b ? TextureFilter.linear : TextureFilter.nearest);
+        });
+
+        if(Core.settings.getBool("linear")){
+            atlas.getTexture().setFilter(TextureFilter.linear);
+        }
+
+        graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
+
+        graphics.checkPref("pixelate", false, val -> {
+            if(val){
+                Events.fire(Trigger.enablePixelation);
+            }
+        });
+
         graphics.checkPref("effects", true);
         graphics.checkPref("atmosphere", true);
         graphics.checkPref("drawlight", true);
@@ -527,26 +548,7 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("indicators", true);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
-
-        graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
-
-        graphics.checkPref("pixelate", false, val -> {
-            if(val){
-                Events.fire(Trigger.enablePixelation);
-            }
-        });
-
-        graphics.checkPref("linear", true, b -> {
-            atlas.getTexture().setFilter(b ? TextureFilter.linear : TextureFilter.nearest);
-        });
-
-        if(Core.settings.getBool("linear")){
-            atlas.getTexture().setFilter(TextureFilter.linear);
-        }
-
-        graphics.checkPref("skipcoreanimation", false);
         graphics.checkPref("hidedisplays", false);
-        graphics.checkPref("logiclocalization", true);
 
         if(OS.isMac){
             graphics.checkPref("macnotch", false);
@@ -644,6 +646,32 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         prefs.add(tables.get(index));
+    }
+
+    private static boolean useDefaultSmaa(){
+        if(mobile || Gl.getInt(Gl.maxTextureSize) < 16384){
+            return false;
+        }
+
+        GLVersion gl = Core.graphics.getGLVersion();
+        String renderer = gl.rendererString == null ? "" : gl.rendererString.toLowerCase();
+
+        String[] goodRenderers = {
+        //nvidia discrete
+        "geforce gtx", "geforce rtx", "nvidia titan", "quadro rtx", "nvidia rtx",
+
+        //amd discrete
+        "radeon rx",
+
+        //intel discrete
+        "intel(r) arc",
+        };
+
+        for(String good : goodRenderers){
+            if(renderer.contains(good)) return true;
+        }
+
+        return true;
     }
 
     @Override
