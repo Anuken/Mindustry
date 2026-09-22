@@ -41,6 +41,7 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float coolantConsumption = 0.1f;
+    public float activationDuration = 60f * 9f;
     public boolean consumeCoolant = true;
     public float crashDamageMultiplier = 2f;
     public Sound breakSound = Sounds.shieldBreak;
@@ -165,6 +166,14 @@ public class ForceProjector extends Block{
     public class ForceBuild extends Building implements Ranged, ShieldProvider{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
+        //1 = inactive, booting up, 0 = activated
+        public float activationTimer;
+
+        @Override
+        public void placed(){
+            super.placed();
+            activationTimer = 1f;
+        }
 
         @Override
         public void setProp(LAccess prop, double value){
@@ -207,6 +216,8 @@ public class ForceProjector extends Block{
         public void updateTile(){
             boolean phaseValid = itemConsumer != null && itemConsumer.efficiency(this) > 0;
 
+            activationTimer = Math.max(0f, activationTimer - Time.delta / activationDuration);
+
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
             if(phaseValid && !broken && timer(timerUse, phaseUseTime / timeScale) && efficiency > 0){
@@ -239,7 +250,7 @@ public class ForceProjector extends Block{
                 broken = false;
             }
 
-            if(buildup >= shieldHealth + phaseShieldBoost * phaseHeat && !broken){
+            if(buildup >= (shieldHealth + phaseShieldBoost * phaseHeat) * Math.max(1f - Interp.pow5Out.apply(activationTimer), 0.00001f) && !broken){
                 broken = true;
                 buildup = shieldHealth;
                 shieldBreakEffect.at(x, y, realRadius(), team.color, block);

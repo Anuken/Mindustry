@@ -318,7 +318,7 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(animateSurfaces || animateSurfaces){
+        if(animateSurfaces){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
