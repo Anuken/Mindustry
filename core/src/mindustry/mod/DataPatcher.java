@@ -195,8 +195,8 @@ public class DataPatcher{
 
             //register global variables
             for(var cont : all){
-                if(!cont.hasErrored() && cont instanceof UnlockableContent u && Vars.logicVars.get("@" + u.name) == null){
-                    addedVars.add(Vars.logicVars.put("@" + u.name, u, false));
+                if(!cont.hasErrored() && cont instanceof UnlockableContent u && Vars.logicVars.get("@" + (u instanceof StatusEffect ? "status-" : "") + u.name) == null){
+                    addedVars.add(Vars.logicVars.put("@" + (u instanceof StatusEffect ? "status-" : "") + u.name, u, false));
                 }
             }
 

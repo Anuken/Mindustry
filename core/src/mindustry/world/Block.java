@@ -760,7 +760,7 @@ public class Block extends UnlockableContent implements Senseable{
             }
 
             //nothing was added, so it's safe to add a dynamic liquid bar (probably?)
-            if(!added){
+            if(!added && liquidCapacity > 0f){
                 addLiquidBar(build -> build.liquids.current());
             }
         }

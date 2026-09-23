@@ -972,8 +972,10 @@ public class NetServer implements ApplicationListener{
         }else{
             Seq<DataAsset> res = new Seq<>();
             Seq<DataAsset> allAssets = state.data.getAllExternalAssets();
+            Bits requestedIds = new Bits(allAssets.size);
             for(short id : ids){
-                if(id >= allAssets.size || id < 0) continue;
+                if(id >= allAssets.size || id < 0 || requestedIds.get(id)) continue;
+                requestedIds.set(id);
                 res.add(allAssets.get(id));
             }
 

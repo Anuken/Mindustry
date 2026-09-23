@@ -6,6 +6,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
@@ -553,6 +554,14 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void readDataPatches(DataInput stream, SaveReadState saveState) throws IOException{
         stream.readInt(); //version - ignored for now
+
+        //the requiredPlanets filter needs this, since the rules aren't read yet
+        if(headless){
+            try{
+                Planet planet = content.planet(new JsonReader().parse(saveState.ruleString).getString("planet", Planets.serpulo.name));
+                state.rules.planet = planet == null ? Planets.serpulo : planet;
+            }catch(Exception ignored){}
+        }
 
         int total = stream.readInt();
         Seq<DataAsset> assets = new Seq<>(total);

@@ -47,8 +47,10 @@ public class ItemModule extends BlockModule{
     public void updateFlow(){
         //update the flow at N fps at most
         if(flowTimer.get(1, flowPollInterval)){
+            int len = content.items().size;
+            if(items.length != len) items = Arrays.copyOf(items, len);
 
-            if(flow == null){
+            if(flow == null || flow.length != len || cacheSums == null || cacheFlow == null){
                 if(cacheFlow == null || cacheFlow.length != items.length){
                     cacheFlow = new WindowedMean[items.length];
                     for(int i = 0; i < items.length; i++){
@@ -95,7 +97,7 @@ public class ItemModule extends BlockModule{
 
     /** @return a specific item's flow rate in items/s; any value < 0 means not ready.*/
     public float getFlowRate(Item item){
-        return flow == null ? -1f : displayFlow[item.id] * 60;
+        return flow == null ? -1f : displayFlow != null ? displayFlow[item.id] * 60 : -1f;
     }
 
     public boolean hasFlowItem(Item item){
@@ -290,6 +292,10 @@ public class ItemModule extends BlockModule{
 
     public void checkArrayCapacity(int size){
         if(items.length != size) items = Arrays.copyOf(items, size);
+        cacheFlow = null;
+        cacheSums = null;
+        displayFlow = null;
+        flow = null;
     }
 
     @Override

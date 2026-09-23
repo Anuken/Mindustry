@@ -132,8 +132,7 @@ public class PlayerListFragment{
             });
 
             button.add(iconTable).size(h);
-            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).style(Styles.outlineLabel).width(170f).pad(10);
-            button.add().grow();
+            button.add("[#" + user.color().toString().toUpperCase() + "]" + user.name()).style(Styles.outlineLabel).growX().wrap(true).pad(10);
 
             button.background(Tex.underline);
 
@@ -236,8 +235,6 @@ public class PlayerListFragment{
                         dialog.cont.button("@back", Icon.left, dialog::hide).padTop(-1f).size(220f, 55f);
 
                         dialog.show();
-
-
                     }).size(h);
                 }
             }else if(!user.isLocal() && !user.admin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
@@ -249,7 +246,7 @@ public class PlayerListFragment{
                 .size(h);
             }
 
-            content.add(button).width(350f).height(h + 14);
+            content.add(button).width(mobile ? 350f : 470f).height(h + 14);
             content.row();
         }
 

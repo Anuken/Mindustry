@@ -12,6 +12,7 @@ import arc.util.*;
 import arc.util.Log.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
+import mindustry.graphics.*;
 import mindustry.mod.data.*;
 
 import java.io.*;
@@ -106,6 +107,8 @@ public class DataImagePacker{
 
                 try{
                     Pixmap pixmap = new Pixmap(cacheFile);
+                    Pixmaps.antialias(pixmap);
+                    Drawf.checkBleed(pixmap);
                     //don't add the double dp prefix, only add it if it's not already present
                     String name = (image.isGenerated() && image.name.contains("-dp-") ? "" : regionPrefix) + image.name;
 
@@ -178,7 +181,7 @@ public class DataImagePacker{
     public void unload(){
         if(patchAtlas != null){
             for(var texture : patchAtlas.getTextures()){
-                if(texture != null) patchAtlas.getTextures().remove(texture);
+                if(texture != null) Core.atlas.getTextures().remove(texture);
             }
             for(var region : patchAtlas.getRegions()){
                 if(region != null){

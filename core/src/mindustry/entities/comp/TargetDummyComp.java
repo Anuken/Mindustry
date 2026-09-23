@@ -16,10 +16,18 @@ abstract class TargetDummyComp implements Unitc, Healthc{
         }
     }
 
+    @Replace
     @Override
     public void rawDamage(float amount){
         if(building instanceof TargetDummyBuild td){
             td.dummyHit(amount);
         }
+    }
+
+    @Override
+    @Replace
+    public boolean canLand(){
+        //dummies should always respect the boost config even when the landing area is obstructed (usually by other dummies)
+        return true;
     }
 }
