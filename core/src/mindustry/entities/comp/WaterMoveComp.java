@@ -51,7 +51,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Unitc{
                     for(int cy = -type.crushRadY; cy <= type.crushRadY; cy++){
                         Tmp.v1.trns(rotation - 90f, cx * tilesize, cy * tilesize);
                         var other = Vars.world.buildWorld(x + Tmp.v1.x, y + Tmp.v1.y);
-                        if(other != null && other.team != team && other.floor().isLiquid && !other.block.solid){
+                        if(other != null && other.team != team && other.floor().isLiquid && !other.block.solid && !other.block.solidifes){
                             other.damage(team, type.crushFragile && other.block.crushFragile ? 99999999f : type.crushDamage * crushInterval);
                         }
                     }
