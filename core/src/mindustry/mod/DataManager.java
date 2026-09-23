@@ -3,7 +3,6 @@ package mindustry.mod;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -80,9 +79,14 @@ public class DataManager{
         UnlockableContent[] currentContent = {null};
         String[] currentHash = {null};
 
-        PackContext saver = new PackContext(0){
+        PackContext saver = new PackContext(){
             @Override
-            public void add(String name, PixmapRegion region, int[] splits, int[] pads){
+            public @Nullable PixmapRegion getOrNull(String name){
+                return get(name);
+            }
+
+            @Override
+            public void add(String name, PixmapRegion region, int[] splits, int[] pads, boolean noCrop){
                 try{
                     if(region.pixmap.width > 2000) throw new IllegalArgumentException("Max image size exceeded");
 
@@ -105,11 +109,6 @@ public class DataManager{
             @Override
             public boolean has(String name){
                 return imageMap.containsKey(name);
-            }
-
-            @Override
-            public @Nullable PixmapRegion get(TextureRegion region){
-                return get(((AtlasRegion)region).name);
             }
 
             @Override
@@ -137,7 +136,7 @@ public class DataManager{
             currentHash[0] = hashes.get(content);
 
             try{
-               content.packSprites(saver);
+                content.packSprites(saver);
             }catch(Throwable e){
                 Log.err(e);
             }

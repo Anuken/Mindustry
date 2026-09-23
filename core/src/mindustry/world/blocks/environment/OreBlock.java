@@ -42,11 +42,13 @@ public class OreBlock extends OverlayFloor{
     @Override
     @OverrideCallSuper
     public void packSprites(PackContext packer){
+        Pixmap full = null;
+
         for(int i = 0; i < variants; i++){
             //use name (e.g. "ore-copper1"), fallback to "copper1" as per the old naming system
-            PixmapRegion shadow = Core.atlas.has(name + (i + 1)) ?
-                packer.get(name + (i + 1)) :
-                packer.get(itemDrop.name + (i + 1));
+            PixmapRegion shadow = packer.has(name + (i + 1)) ?
+            packer.get(name + (i + 1)) :
+            packer.get(itemDrop.name + (i + 1));
 
             Pixmap image = shadow.crop();
 
@@ -63,12 +65,20 @@ public class OreBlock extends OverlayFloor{
 
             packer.add(name + (i + 1), image);
 
-            if(i == 0){
+            //the last variant is the best looking one on purpose, so it represents the ore in icons
+            if(i == variants - 1){
                 packer.add("block-" + name + "-full", image);
+                full = image;
+            }else{
+                image.dispose();
             }
-
-            image.dispose();
         }
+
+        if(isVanilla() && full != null){
+            saveScaled(packer, full, "block-" + name + "-ui", Math.min(full.width, maxUiIcon));
+        }
+
+        if(full != null) full.dispose();
     }
 
     @Override

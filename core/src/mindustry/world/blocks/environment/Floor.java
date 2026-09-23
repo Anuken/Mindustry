@@ -172,9 +172,9 @@ public class Floor extends Block{
                 //edges must be 3x3
                 var error = Core.atlas.find("error");
                 edges = new TextureRegion[][]{
-                    new TextureRegion[]{error, error, error},
-                    new TextureRegion[]{error, error, error},
-                    new TextureRegion[]{error, error, error},
+                new TextureRegion[]{error, error, error},
+                new TextureRegion[]{error, error, error},
+                new TextureRegion[]{error, error, error},
                 };
             }
         }
@@ -224,11 +224,7 @@ public class Floor extends Block{
     public void packSprites(PackContext packer){
         super.packSprites(packer);
 
-        if(blendGroup != this){
-            return;
-        }
-
-        if(Core.atlas.has(name + "-edge")) return;
+        if(packer.has(name + "-edge") || blendGroup != this || !drawEdgeOut) return;
 
         var image = packer.get(icons()[0]);
         var edge = packer.get(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
@@ -240,7 +236,7 @@ public class Floor extends Block{
             }
         }
 
-        packer.add(name + "-edge", result);
+        packer.add(name + "-edge", result, true);
         result.dispose();
     }
 

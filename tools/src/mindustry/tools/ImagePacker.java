@@ -5,7 +5,6 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.math.geom.*;
 import arc.mock.*;
 import arc.struct.*;
 import arc.util.*;
@@ -235,37 +234,8 @@ public class ImagePacker{
         Fi.get(path + ".png").writePng(pix);
     }
 
-    static void drawCenter(Pixmap pix, Pixmap other){
-        pix.draw(other, pix.width/2 - other.width/2, pix.height/2 - other.height/2, true);
-    }
-
-    static void saveScaled(Pixmap pix, String name, int size){
-        Pixmap scaled = new Pixmap(size, size);
-        scaled.draw(pix, 0, 0, pix.width, pix.height, 0, 0, size, size, true, true);
-        save(scaled, name);
-    }
-
-    static void drawScaledFit(Pixmap base, Pixmap image){
-        Vec2 size = Scaling.fit.apply(image.width, image.height, base.width, base.height);
-        int wx = (int)size.x, wy = (int)size.y;
-        base.draw(image, 0, 0, image.width, image.height, base.width/2 - wx/2, base.height/2 - wy/2, wx, wy, true, true);
-    }
-
     static void delete(String name){
         ((GenRegion)Core.atlas.find(name)).path.delete();
-    }
-
-    static void replace(String name, Pixmap image){
-        replace(name, name, image);
-    }
-
-    static void replace(String path, String name, Pixmap image){
-        Fi.get(path + ".png").writePng(image);
-        ((GenRegion)Core.atlas.find(name)).path.delete();
-    }
-
-    static void replace(TextureRegion region, Pixmap image){
-        replace(((GenRegion)region).name, image);
     }
 
     static void err(String message, Object... args){

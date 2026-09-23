@@ -56,6 +56,7 @@ public class BuildTurret extends BaseTurret{
         unitType = new UnitType("turret-unit-" + name){{
             hidden = true;
             internal = true;
+            packSprites = false;
             speed = 0f;
             hitSize = 0f;
             health = 1;

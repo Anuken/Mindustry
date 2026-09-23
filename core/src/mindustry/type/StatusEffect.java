@@ -1,6 +1,8 @@
 package mindustry.type;
 
 import arc.graphics.*;
+import arc.graphics.g2d.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
@@ -66,6 +68,8 @@ public class StatusEffect extends UnlockableContent{
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
     public boolean outline = true;
+    /** True to tint the sprite by the color. Always applied in vanilla. */
+    public boolean applyTint = false;
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -233,6 +237,18 @@ public class StatusEffect extends UnlockableContent{
     @Override
     public void packSprites(PackContext packer){
         super.packSprites(packer);
+
+        if((isVanilla() || applyTint) && uiIcon instanceof AtlasRegion at && packer.has(at.name)){
+            PixmapRegion base = packer.get(uiIcon);
+            Pixmap tinted = new Pixmap(base.width, base.height);
+            for(int x = 0; x < base.width; x++){
+                for(int y = 0; y < base.height; y++){
+                    tinted.setRaw(x, y, Color.muli(base.getRaw(x, y), color.rgba()));
+                }
+            }
+            packer.add(at.name, tinted);
+            tinted.dispose();
+        }
 
         if(outline){
             makeOutline(packer, uiIcon, false, Pal.gray, 3);

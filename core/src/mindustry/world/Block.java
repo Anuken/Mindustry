@@ -1547,12 +1547,18 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         Seq<Pixmap> toDispose = new Seq<>();
+        PixmapRegion shardTeamTop = null;
 
         //generate paletted team regions
         if(teamRegion != null && teamRegion.found()){
             for(Team team : Team.all){
+                if(!team.hasPalette) continue;
+
+                String teamName = name + "-team-" + team.name;
+                PixmapRegion result;
+
                 //if there's an override, don't generate anything
-                if(team.hasPalette && !Core.atlas.has(name + "-team-" + team.name)){
+                if(!Core.atlas.has(teamName)){
                     var base = packer.get(teamRegion);
                     Pixmap out = new Pixmap(base.width, base.height);
 
@@ -1571,9 +1577,14 @@ public class Block extends UnlockableContent implements Senseable{
 
                     Drawf.checkBleed(out);
 
-                    packer.add(name + "-team-" + team.name, out);
+                    packer.add(teamName, out);
                     toDispose.add(out);
+                    result = new PixmapRegion(out);
+                }else{
+                    result = packer.get(Core.atlas.find(teamName));
                 }
+
+                if(team == Team.sharded) shardTeamTop = result;
             }
 
             teamRegions = new TextureRegion[Team.all.length];
@@ -1587,13 +1598,25 @@ public class Block extends UnlockableContent implements Senseable{
         var gen = icons();
 
         if(outlineIcon){
-            AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1];
-            if(atlasRegion.found()){
+            int outlinedIdx = outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length - 1;
+            AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIdx];
+            if(packer.has(atlasRegion.name)){
                 PixmapRegion region = packer.get(atlasRegion);
-                Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
-                Drawf.checkBleed(out);
-                packer.add(atlasRegion.name, out);
-                toDispose.add(out);
+
+                //unpadded, with any layers above the outlined one composited in; used only for the full icon substitution below
+                last = Pixmaps.outline(region, outlineColor, outlineRadius);
+                for(int i = outlinedIdx + 1; i < gen.length; i++){
+                    if(gen[i] instanceof AtlasRegion above && packer.has(above.name)){
+                        last.draw(packer.get(above), true);
+                    }
+                }
+                toDispose.add(last);
+
+                //padded, replaces the region actually used in-game so the outline isn't clipped at tile edges
+                Pixmap padded = Pixmaps.outline(region, outlineColor, outlineRadius, 1);
+                Drawf.checkBleed(padded);
+                packer.add(atlasRegion.name, padded);
+                toDispose.add(padded);
             }
         }
 
@@ -1601,7 +1624,7 @@ public class Block extends UnlockableContent implements Senseable{
         getRegionsToOutline(toOutline);
 
         for(var region : toOutline){
-            if(region instanceof AtlasRegion atlas && atlas.found()){
+            if(region instanceof AtlasRegion atlas && packer.has(atlas.name)){
                 String regionName = atlas.name;
                 Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
@@ -1613,21 +1636,34 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         if(gen.length > 0 && gen[0] != null && gen[0].found()){
-            if(gen.length > 1){
-                Pixmap base = packer.get(gen[0]).crop();
-                for(int i = 1; i < gen.length; i++){
-                    if(i == gen.length - 1 && last != null){
-                        base.draw(last, 0, 0, true);
-                    }else{
-                        base.draw(packer.get(gen[i]), true);
-                    }
-                }
-                packer.add("block-" + name + "-full", base);
-
-                toDispose.add(base);
-            }else{
-                if(gen[0] != null) packer.add("block-" + name + "-full", packer.get(gen[0]));
+            Pixmap base = packer.get(gen[0]).crop();
+            if(teamRegions != null && gen[0] == teamRegions[Team.sharded.id] && shardTeamTop != null){
+                base.draw(shardTeamTop, true);
             }
+
+            for(int i = 1; i < gen.length; i++){
+                if(i == gen.length - 1 && last != null){
+                    base.draw(last, 0, 0, true);
+                }else{
+                    base.draw(packer.get(gen[i]), true);
+                }
+
+                if(teamRegions != null && gen[i] == teamRegions[Team.sharded.id] && shardTeamTop != null){
+                    base.draw(shardTeamTop, true);
+                }
+            }
+
+            //a single-region block with no team overlay just reuses its own region, no need for a redundant "-full" copy
+            boolean trivial = gen.length == 1 && gen[0] == Core.atlas.find(name) && shardTeamTop == null;
+            if(!trivial){
+                packer.add("block-" + name + "-full", base);
+            }
+
+            if(isVanilla()){
+                saveScaled(packer, base, "block-" + name + "-ui", Math.min(base.width, maxUiIcon));
+            }
+
+            toDispose.add(base);
         }
 
         toDispose.each(Pixmap::dispose);

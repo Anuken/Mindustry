@@ -4601,6 +4601,7 @@ public class UnitTypes{
             itemCapacity = 0;
             hidden = true;
             internal = true;
+            packSprites = false;
         }};
 
         manifold = new ErekirUnitType("manifold"){{
@@ -4672,7 +4673,6 @@ public class UnitTypes{
             killable = false;
             physics = false;
             internal = true;
-            internalGenerateSprites = true;
 
             flyingLayer = Layer.flyingUnit - 1f;
             drag = 0.33f;

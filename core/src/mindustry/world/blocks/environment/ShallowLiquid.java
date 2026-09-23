@@ -31,8 +31,7 @@ public class ShallowLiquid extends Floor{
 
     @Override
     public void packSprites(PackContext packer){
-        //TODO might not be necessary at all, but I am not sure yet
-        //super.createIcons(packer);
+        super.packSprites(packer);
 
         if(liquidBase != null && floorBase != null){
             var overlay = packer.get(liquidBase.region);

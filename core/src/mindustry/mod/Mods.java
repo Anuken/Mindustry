@@ -156,7 +156,7 @@ public class Mods implements Loadable{
         long startTime = Time.millis();
 
         //TODO this should estimate sprite sizes per page
-        PackContext packer = new PackContext(4096);
+        ModPackContext packer = new ModPackContext(4096);
         var textureResize = new ObjectFloatMap<String>();
         int[] totalSprites = {0};
         //all packing tasks to await
@@ -232,7 +232,7 @@ public class Mods implements Loadable{
         entries.sort(Structs.comparingInt(o -> -Math.max(o.region.width, o.region.height)));
 
         for(var entry : entries){
-            packer.add(entry.name, entry.region, entry.splits, entry.pads);
+            packer.add(entry.name, entry.region, entry.splits, entry.pads, false);
         }
 
         TextureAtlas oldAtlas = Core.atlas;
@@ -243,7 +243,7 @@ public class Mods implements Loadable{
                 if(c instanceof UnlockableContent u && c.minfo.mod != null){
                     u.load();
                     u.loadIcon();
-                    if(u.generateIcons && !c.minfo.mod.meta.pregenerated){
+                    if(u.packSprites && !c.minfo.mod.meta.pregenerated){
                         u.packSprites(packer);
                     }
                 }
@@ -252,7 +252,7 @@ public class Mods implements Loadable{
 
         waitForMain(() -> {
             //replace old atlas data
-            Core.atlas = packer.create(filter);
+            Core.atlas = packer.packer.generateTextureAtlas(filter, filter, false, true, 1);
 
             textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
             renderer.loadFluidFrames();
@@ -580,7 +580,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           ui.showErrorMessage("@mod.scripts.disable");
+            ui.showErrorMessage("@mod.scripts.disable");
         }
 
         //show list of errored content
@@ -1405,6 +1405,52 @@ public class Mods implements Loadable{
         public ModDependency(String name, boolean required){
             this.name = name;
             this.required = required;
+        }
+    }
+
+    /** PackContext backed by a runtime PixmapPacker; used to build the mod-patched atlas. */
+    public static class ModPackContext extends PackContext implements Disposable{
+        public final PixmapPacker packer;
+
+        public ModPackContext(int size){
+            packer = new PixmapPacker(size, size, 2, true);
+        }
+
+        @Override
+        public @Nullable PixmapRegion getOrNull(String name){
+            return packer.getRegion(name);
+        }
+
+        @Override
+        public boolean has(String name){
+            return packer.getRect(name) != null;
+        }
+
+        @Override
+        public void add(String name, PixmapRegion region, int[] splits, int[] pads, boolean noCrop){
+            packer.pack(name, region, splits, pads);
+        }
+
+        public void printStats(){
+            if(Log.level != Log.LogLevel.debug) return;
+
+            Log.debug("[Atlas] " + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&r", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
+            int i = 0;
+            for(var page : packer.getPages()){
+                float totalArea = 0;
+                for(var region : page.getRects().values()){
+                    totalArea += region.area();
+                }
+
+                Log.debug("[Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
+
+                i ++;
+            }
+        }
+
+        @Override
+        public void dispose(){
+            packer.forceDispose();
         }
     }
 }

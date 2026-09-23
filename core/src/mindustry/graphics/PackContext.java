@@ -5,17 +5,10 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.Log.*;
 
-public class PackContext implements Disposable{
-    private PixmapPacker packer;
+/** Base for anything that content's packSprites() can add generated sprites to. */
+public abstract class PackContext{
     private ObjectSet<String> outlined = new ObjectSet<>();
-
-    public PackContext(int size){
-        if(size > 0){
-            packer = new PixmapPacker(size, size, 2, true);
-        }
-    }
 
     public PixmapRegion get(TextureRegion region){
         return get(((AtlasRegion)region).name);
@@ -28,26 +21,7 @@ public class PackContext implements Disposable{
         return out;
     }
 
-    public @Nullable PixmapRegion getOrNull(String name){
-        return packer.getRegion(name);
-    }
-
-    public void printStats(){
-        if(Log.level != LogLevel.debug) return;
-
-        Log.debug("[Atlas] " + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&r", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
-        int i = 0;
-        for(var page : packer.getPages()){
-            float totalArea = 0;
-            for(var region : page.getRects().values()){
-                totalArea += region.area();
-            }
-
-            Log.debug("[Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
-
-            i ++;
-        }
-    }
+    public abstract @Nullable PixmapRegion getOrNull(String name);
 
     /** @return whether this image was not already outlined. */
     public boolean registerOutlined(String named){
@@ -58,30 +32,20 @@ public class PackContext implements Disposable{
         return outlined.contains(name);
     }
 
-    public boolean has(String name){
-        return packer.getRect(name) != null;
-    }
+    public abstract boolean has(String name);
 
     public void add(String name, Pixmap pix){
         add(name, new PixmapRegion(pix));
     }
 
     public void add(String name, PixmapRegion region){
-        add(name, region, null, null);
+        add(name, region, null, null, false);
     }
 
-    public void add(String name, PixmapRegion region, int[] splits, int[] pads){
-        packer.pack(name, region, splits, pads);
+    public void add(String name, Pixmap pix, boolean noCrop){
+        add(name, new PixmapRegion(pix), null, null, noCrop);
     }
 
-    public TextureAtlas create(TextureFilter filter){
-        return packer.generateTextureAtlas(filter, filter, false, true, 1);
-    }
-
-    @Override
-    public void dispose(){
-        if(packer != null){
-            packer.forceDispose();
-        }
-    }
+    /** @param noCrop is true, regions will be saved to a folder where x/y whitespace trimming is not applied. Only relevant in vanilla (mods have no such trimming) */
+    public abstract void add(String name, PixmapRegion region, int[] splits, int[] pads, boolean noCrop);
 }

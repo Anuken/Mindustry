@@ -198,6 +198,7 @@ public class Renderer implements ApplicationListener{
         camera.height = graphics.getHeight() / camerascale;
 
         Lod.update();
+        content.items().each(Item::updateAnimation);
 
         if(state.isMenu()){
             landTime = 0f;

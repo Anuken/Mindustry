@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
@@ -22,6 +23,9 @@ import static mindustry.Vars.*;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
+    /** Max width/height of a generated -ui icon; only produced for vanilla content, see saveScaled/drawScaledFit. */
+    public static final int maxUiIcon = 64;
+
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description & details. May be null. */
@@ -34,8 +38,8 @@ public abstract class UnlockableContent extends MappableContent{
     public boolean hideDetails = true;
     /** Whether this is hidden from the Core Database. */
     public boolean hideDatabase = false;
-    /** If false, all icon generation is disabled for this content; createIcons is not called. */
-    public boolean generateIcons = true;
+    /** If false, all icon generation is disabled for this content; packSprites is not called. */
+    public boolean packSprites = true;
     /** How big the content appears in certain selection menus */
     public float selectionSize = 24f;
     /** Icon of the content to use in UI. */
@@ -162,7 +166,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     protected void makeOutline(PackContext packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius, int padding){
-        if(region instanceof AtlasRegion at && region.found()){
+        if(region instanceof AtlasRegion at && packer.has(at.name)){
             String name = at.name;
             if(!makeNew || !packer.has(name + "-outline")){
                 String regName = name + (makeNew ? "-outline" : "");
@@ -178,7 +182,7 @@ public abstract class UnlockableContent extends MappableContent{
     }
 
     protected void makeOutline(PackContext packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
-        if(region.found() && packer.registerOutlined(name)){
+        if(region instanceof AtlasRegion at && packer.has(at.name) && packer.registerOutlined(name)){
             PixmapRegion base = packer.get(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);
@@ -189,6 +193,21 @@ public abstract class UnlockableContent extends MappableContent{
 
     protected void makeOutline(PackContext packer, TextureRegion region, String name, Color outlineColor){
         makeOutline(packer, region, name, outlineColor, 4);
+    }
+
+    /** Stretches image into a size x size square; used for -ui icons that are already roughly square, e.g. blocks. */
+    protected static void saveScaled(PackContext packer, Pixmap image, String name, int size){
+        Pixmap scaled = new Pixmap(size, size);
+        scaled.draw(image, 0, 0, image.width, image.height, 0, 0, size, size, true, true);
+        packer.add(name, scaled);
+        scaled.dispose();
+    }
+
+    /** Fits image into base preserving aspect ratio, centered; used for -ui icons that may not be square, e.g. units. */
+    protected static void drawScaledFit(Pixmap base, Pixmap image){
+        Vec2 size = Scaling.fit.apply(image.width, image.height, base.width, base.height);
+        int wx = (int)size.x, wy = (int)size.y;
+        base.draw(image, 0, 0, image.width, image.height, base.width / 2 - wx / 2, base.height / 2 - wy / 2, wx, wy, true, true);
     }
 
     /** @return items needed to research this content */

@@ -2,7 +2,6 @@ package mindustry.tools;
 
 import arc.*;
 import arc.files.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -11,9 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.ctype.*;
-import mindustry.entities.part.*;
 import mindustry.game.*;
-import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -27,8 +24,6 @@ import static mindustry.Vars.*;
 import static mindustry.tools.ImagePacker.*;
 
 public class Generators{
-    static final int maxUiIcon = 128;
-
     private static float fluid(boolean gas, double x, double y, float frame){
         int keyframes = gas ? 4 : 3;
 
@@ -68,6 +63,7 @@ public class Generators{
 
     public static void run(){
         ObjectMap<Block, Pixmap> gens = new ObjectMap<>();
+        FilePackContext ctx = new FilePackContext();
 
         generate("autotiles", () -> {
             for(Block block : content.blocks().select(b -> (b.isFloor() && b.asFloor().autotile) || (b instanceof StaticWall && ((StaticWall)b).autotile))){
@@ -93,8 +89,11 @@ public class Generators{
                             //save the bottom right region as the "main" sprite for previews
                             Pixmap out = new Pixmap(basePath);
                             Pixmap cropped = out.crop(32, 32, 32, 32);
-                            if(!iconPath.exists()){
+                            boolean isFallback = !iconPath.exists();
+                            if(isFallback){
                                 iconPath.writePng(cropped);
+                                //the static atlas cache predates this run, so packSprites() can't see this new file unless we seed it directly
+                                ctx.seed(block.name, cropped);
                             }
                             out.dispose();
                             gens.put(block, cropped);
@@ -313,111 +312,50 @@ public class Generators{
             }
         });
 
-        generate("block-icons", () -> {
+        generate("content-sprites", () -> {
+            for(Seq<Content> arr : content.getContentMap()){
+                for(var content: arr){
+                    if(content instanceof UnlockableContent u && u.packSprites){
+                        try{
+                            u.packSprites(ctx);
+                        }catch(Throwable e){
+                            Log.err("Failed to pack sprites for: " + u.name, e);
+                        }
+                    }
+                }
+            }
+
+            ctx.printStats();
+        });
+
+        //vanilla blocks more accurate block color scanning based on total pixel average
+        generate("block-colors", () -> {
             Pixmap colors = new Pixmap(content.blocks().size, 1);
 
             for(Block block : content.blocks()){
                 if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
 
-                Seq<TextureRegion> toOutline = new Seq<>();
-                block.getRegionsToOutline(toOutline);
-
-                TextureRegion[] regions = block.getGeneratedIcons();
-
-                Pixmap shardTeamTop = null;
-
-                if(block.teamRegion.found()){
-                    Pixmap teamr = get(block.teamRegion);
-
-                    for(Team team : Team.all){
-                        if(team.hasPalette){
-                            Pixmap out = new Pixmap(teamr.width, teamr.height);
-                            teamr.each((x, y) -> {
-                                int color = teamr.getRaw(x, y);
-                                int index = color == 0xffffffff ? 0 : color == 0xdcc6c6ff ? 1 : color == 0x9d7f7fff ? 2 : -1;
-                                out.setRaw(x, y, index == -1 ? teamr.getRaw(x, y) : team.palettei[index]);
-                            });
-                            save(out, block.name + "-team-" + team.name);
-
-                            if(team == Team.sharded){
-                                shardTeamTop = out;
-                            }
-                        }
-                    }
-                }
-
-                for(TextureRegion region : toOutline){
-                    Pixmap pix = get(region).outline(block.outlineColor, block.outlineRadius);
-                    save(pix, ((GenRegion)region).name + "-outline");
-                }
-
-                if(regions.length == 0){
-                    continue;
-                }
-
                 try{
-                    Pixmap last = null;
-                    if(block.outlineIcon){
-                        GenRegion region = (GenRegion)regions[block.outlinedIcon >= 0 ? block.outlinedIcon : regions.length -1];
-                        Pixmap base = get(region);
-                        Pixmap out = last = base.outline(block.outlineColor, block.outlineRadius);
+                    TextureRegion[] regions = block.getGeneratedIcons();
 
-                        //do not run for legacy ones
-                        if(block.outlinedIcon >= 0){
-                            //prevents the regions above from being ignored/invisible/etc
-                            for(int i = block.outlinedIcon + 1; i < regions.length; i++){
-                                out.draw(get(regions[i]), true);
-                            }
-                        }
+                    PixmapRegion image =
+                    ctx.has("block-" + block.name + "-full") ? ctx.get("block-" + block.name + "-full") :
+                    regions.length > 0 && regions[0].found() ? ctx.get(regions[0]) :
+                    null;
 
-                        region.path.delete();
+                    Pixmap fallback = image == null && gens.containsKey(block) ? gens.get(block) : null;
 
-                        //1 pixel of padding to prevent edges with linear filtering
-                        int padding = 1;
-                        Pixmap padded = new Pixmap(base.width + padding*2, base.height + padding*2);
-                        padded.draw(base, padding, padding);
-                        padded = padded.outline(block.outlineColor, block.outlineRadius);
+                    if(image == null && fallback == null) continue;
 
-                        save(padded, region.name);
-                    }
-
-                    Pixmap image;
-
-                    if(regions[0].found()){
-                        image = get(regions[0]);
-
-                        int i = 0;
-                        for(TextureRegion region : regions){
-                            i++;
-                            if(i != regions.length || last == null){
-                                image.draw(get(region), true);
-                            }else{
-                                image.draw(last, true);
-                            }
-
-                            //draw shard (default team top) on top of first sprite
-                            if(region == block.teamRegions[Team.sharded.id] && shardTeamTop != null){
-                                image.draw(shardTeamTop, true);
-                            }
-                        }
-
-                        if(!(regions.length == 1 && regions[0] == Core.atlas.find(block.name) && shardTeamTop == null)){
-                            save(image, "block-" + block.name + "-full");
-                        }
-
-                        saveScaled(image, "../ui/block-" + block.name + "-ui", Math.min(image.width, maxUiIcon));
-                    }else if(gens.containsKey(block)){
-                        image = gens.get(block);
-                    }else{
-                        continue;
-                    }
+                    int width = image != null ? image.width : fallback.width;
+                    int height = image != null ? image.height : fallback.height;
 
                     boolean hasEmpty = false;
                     Color average = new Color(), c = new Color();
                     float asum = 0f;
-                    for(int x = 0; x < image.width; x++){
-                        for(int y = 0; y < image.height; y++){
-                            Color color = c.set(image.get(x, y));
+                    for(int x = 0; x < width; x++){
+                        for(int y = 0; y < height; y++){
+                            Color color = c.set(image != null ? image.get(x, y) : fallback.get(x, y));
                             average.r += color.r*color.a;
                             average.g += color.g*color.a;
                             average.b += color.b*color.a;
@@ -466,43 +404,6 @@ public class Generators{
             });
         });
 
-        generate("item-icons", () -> {
-            for(UnlockableContent item : Seq.<UnlockableContent>withArrays(content.items(), content.liquids(), content.statusEffects())){
-                if(item instanceof StatusEffect && !has(item.getContentType().name() + "-" + item.name)){
-                    continue;
-                }
-
-                Pixmap base = get(item.getContentType().name() + "-" + item.name);
-                //tint status effect icon color
-                if(item instanceof StatusEffect){
-                    StatusEffect stat = (StatusEffect)item;
-                    Pixmap tint = base;
-                    base.each((x, y) -> tint.setRaw(x, y, Color.muli(tint.getRaw(x, y), stat.color.rgba())));
-
-                    //outline the image
-                    Pixmap container = new Pixmap(tint.width + 6, tint.height + 6);
-                    container.draw(base, 3, 3, true);
-                    base = container.outline(Pal.gray, 3);
-                }
-
-                save(base, "../ui/" + item.getContentType().name() + "-" + item.name + "-ui");
-            }
-        });
-
-        generate("sector-icons", () -> {
-            for(SectorPreset item : content.sectors()){
-                if(!has("sector-" + item.name)){
-                    continue;
-                }
-
-                Pixmap base = get("sector-" + item.name);
-                Pixmap container = new Pixmap(base.width + 10, base.height + 10);
-                container.draw(base, 5, 5, true);
-
-                replace("../ui/sector-" + item.name, "sector-" + item.name, container.outline(Pal.darkerGray, 5));
-            }
-        });
-
         generate("team-icons", () -> {
             for(Team team : Team.all){
                 if(has("team-" + team.name)){
@@ -516,206 +417,19 @@ public class Generators{
             }
         });
 
-        generate("unit-icons", () -> content.units().each(type -> {
-            if(type.internal && !type.internalGenerateSprites) return; //internal hidden units don't generate
+        //vanilla-only: random wreck debris
+        generate("unit-wrecks", () -> content.units().each(type -> {
+            if(!type.packSprites) return;
 
-            ObjectSet<String> outlined = new ObjectSet<>();
+            String fullName = "unit-" + type.name + "-full";
+            //fall back to the plain body region for the (currently unused) case of generateFullIcon == false
+            if(!ctx.has(fullName) && !ctx.has(type.name)) return;
+
+            Pixmap image = ctx.get(ctx.has(fullName) ? fullName : type.name).crop();
 
             try{
-                Unit sample = type.constructor.get();
-
-                Func<Pixmap, Pixmap> outline = i -> i.outline(type.outlineColor, 3);
-                Cons<TextureRegion> outliner = t -> {
-                    if(t != null && t.found()){
-                        replace(t, outline.get(get(t)));
-                    }
-                };
-
-                Seq<TextureRegion> toOutline = new Seq<>();
-                type.getRegionsToOutline(toOutline);
-
-                for(TextureRegion region : toOutline){
-                    Pixmap pix = get(region).outline(type.outlineColor, type.outlineRadius);
-                    save(pix, ((GenRegion)region).name + "-outline");
-                }
-
-                Seq<DrawPart> allParts = new Seq<>();
-
-                //this code is complete trash
-                Cons<Seq<DrawPart>>[] allDrawIter = new Cons[]{null};
-                allDrawIter[0] = seq -> {
-                    for(DrawPart part : seq){
-                        allParts.add(part);
-                        if(part instanceof RegionPart){
-                            allDrawIter[0].get(((RegionPart)part).children);
-                        }
-                    }
-                };
-                allDrawIter[0].get(type.parts);
-
-                for(DrawPart part : allParts){
-                    if(part instanceof RegionPart && ((RegionPart)part).replaceOutline){
-                        for(TextureRegion r : ((RegionPart)part).regions){
-                            outliner.get(r);
-                        }
-                    }
-                }
-
-                Seq<Weapon> weapons = type.weapons;
-                weapons.each(Weapon::load);
-                weapons.removeAll(w -> !w.region.found());
-
-                for(Weapon weapon : weapons){
-                    if(outlined.add(weapon.name) && has(weapon.name)){
-                        //only non-top weapons need separate outline sprites (this is mostly just mechs)
-                        if(!weapon.top || weapon.parts.contains(p -> p.under)){
-                            save(outline.get(get(weapon.name)), weapon.name + "-outline");
-                        }else{
-                            //replace weapon with outlined version, no use keeping standard around
-                            outliner.get(weapon.region);
-                        }
-                    }
-                }
-
-                //generate tank animation
-                if(sample instanceof Tankc){
-                    Pixmap pix = get(type.treadRegion);
-
-                    for(int r = 0; r < type.treadRects.length; r++){
-                        Rect treadRect = type.treadRects[r];
-                        //slice is always 1 pixel wide
-                        Pixmap slice = pix.crop((int)(treadRect.x + pix.width/2f), (int)(treadRect.y + pix.height/2f), 1, (int)treadRect.height);
-                        int frames = type.treadFrames;
-                        for(int i = 0; i < frames; i++){
-                            int pullOffset = type.treadPullOffset;
-                            Pixmap frame = new Pixmap(slice.width, slice.height);
-                            for(int y = 0; y < slice.height; y++){
-                                int idx = y + i;
-                                if(idx >= slice.height){
-                                    idx -= slice.height;
-                                    idx += pullOffset;
-                                    idx = Mathf.mod(idx, slice.height);
-                                }
-
-                                frame.setRaw(0, y, slice.getRaw(0, idx));
-                            }
-                            save(frame, type.name + "-treads" + r + "-" + i);
-                        }
-                    }
-                }
-
-                outliner.get(type.jointRegion);
-                outliner.get(type.footRegion);
-                outliner.get(type.legBaseRegion);
-                outliner.get(type.baseJointRegion);
-                if(sample instanceof Legsc) outliner.get(type.legRegion);
-                if(sample instanceof Tankc) outliner.get(type.treadRegion);
-
-                //TODO: for drawBody false, an empty pixmap is used; this is a hack
-                Pixmap image = type.segments > 0 ? get(type.segmentRegions[0]) : type.drawBody ? outline.get(get(type.previewRegion)) : new Pixmap(1, 1);
-
-                Func<Weapon, Pixmap> weaponRegion = weapon -> Core.atlas.has(weapon.name + "-preview") ? get(weapon.name + "-preview") : get(weapon.region);
-                Cons2<Weapon, Pixmap> drawWeapon = (weapon, pixmap) ->
-                image.draw(weapon.flipSprite ? pixmap.flipX() : pixmap,
-                (int)(weapon.x / Draw.scl + image.width / 2f - weapon.region.width / 2f),
-                (int)(-weapon.y / Draw.scl + image.height / 2f - weapon.region.height / 2f),
-                true
-                );
-
-                boolean anyUnder = false;
-
-                //draw each extra segment on top before it is saved as outline
-                if(sample instanceof Crawlc){
-                    for(int i = 0; i < type.segments; i++){
-                        //replace(type.segmentRegions[i], outline.get(get(type.segmentRegions[i])));
-                        save(outline.get(get(type.segmentRegions[i])), type.name + "-segment-outline" + i);
-
-                        if(i > 0){
-                            drawCenter(image, get(type.segmentRegions[i]));
-                        }
-                    }
-                    save(image, type.name);
-                }
-
-                //outline is currently never needed, although it could theoretically be necessary
-                if(type.needsBodyOutline()){
-                    save(image, type.name + "-outline");
-                }else if(type.segments == 0 && type.drawBody){
-                    replace(type.name, type.segments > 0 ? get(type.segmentRegions[0]) : outline.get(get(type.region)));
-                }
-
-                //draw weapons that are under the base
-                for(Weapon weapon : weapons.select(w -> w.layerOffset < 0)){
-                    drawWeapon.get(weapon, outline.get(weaponRegion.get(weapon)));
-                    anyUnder = true;
-                }
-
-                //draw over the weapons under the image
-                if(anyUnder){
-                    image.draw(outline.get(get(type.previewRegion)), true);
-                }
-
-                //draw treads
-                if(sample instanceof Tankc){
-                    Pixmap treads = outline.get(get(type.treadRegion));
-                    image.draw(treads, image.width / 2 - treads.width / 2, image.height / 2 - treads.height / 2, true);
-                    image.draw(get(type.previewRegion), true);
-                }
-
-                //draw mech parts
-                if(sample instanceof Mechc){
-                    drawCenter(image, get(type.baseRegion));
-                    drawCenter(image, get(type.legRegion));
-                    drawCenter(image, get(type.legRegion).flipX());
-                    image.draw(get(type.previewRegion), true);
-                }
-
-                //draw weapon outlines on base
-                for(Weapon weapon : weapons){
-                    //skip weapons under unit
-                    if(weapon.layerOffset < 0) continue;
-
-                    drawWeapon.get(weapon, outline.get(weaponRegion.get(weapon)));
-                }
-
-                //draw base region on top to mask weapons
-                if(type.drawCell) image.draw(get(type.previewRegion), true);
-
-                if(type.drawCell){
-                    Pixmap baseCell = get(type.cellRegion);
-                    Pixmap cell = baseCell.copy();
-
-                    //replace with 0xffd37fff : 0xdca463ff for sharded colors?
-                    cell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
-
-                    image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2, true);
-                }
-
-                for(Weapon weapon : weapons){
-                    //skip weapons under unit
-                    if(weapon.layerOffset < 0) continue;
-
-                    Pixmap reg = weaponRegion.get(weapon);
-                    Pixmap wepReg = weapon.top ? outline.get(reg) : reg;
-
-                    drawWeapon.get(weapon, wepReg);
-
-                    if(weapon.cellRegion.found()){
-                        Pixmap weaponCell = get(weapon.cellRegion);
-                        weaponCell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
-                        drawWeapon.get(weapon, weaponCell);
-                    }
-                }
-
-                //TODO I can save a LOT of space by not creating a full icon.
-                if(type.generateFullIcon){
-                    save(image, "unit-" + type.name + "-full");
-                }
-
                 Rand rand = new Rand();
                 rand.setSeed(type.name.hashCode());
-
-                //generate random wrecks
 
                 int splits = 3;
                 float degrees = rand.random(360f);
@@ -745,76 +459,12 @@ public class Generators{
                 for(int i = 0; i < wrecks.length; i++){
                     save(wrecks[i], "../rubble/" + type.name + "-wreck" + i);
                 }
-
-                int maxd = Math.min(Math.max(image.width, image.height), maxUiIcon);
-                Pixmap fit = new Pixmap(maxd, maxd);
-                drawScaledFit(fit, image);
-
-                save(fit, "../ui/unit-" + type.name + "-ui");
             }catch(IllegalArgumentException e){
-                Log.err("WARNING: Skipping unit @: @", type.name, e.getMessage());
+                Log.err("WARNING: Skipping wrecks for unit @: @", type.name, e.getMessage());
+            }finally{
+                image.dispose();
             }
-
         }));
-
-        generate("ore-icons", () -> {
-            content.blocks().<OreBlock>each(b -> b instanceof OreBlock, ore -> {
-                int shadowColor = Color.rgba8888(0, 0, 0, 0.3f);
-
-                for(int i = 0; i < ore.variants; i++){
-                    //get base image to draw on
-                    Pixmap base = get(ore.variantRegions[i]);
-                    Pixmap image = base.copy();
-
-                    int offset = image.width / tilesize - 1;
-
-                    for(int x = 0; x < image.width; x++){
-                        for(int y = offset; y < image.height; y++){
-                            //draw semi transparent background
-                            if(base.getA(x, y - offset) != 0){
-                                image.setRaw(x, y, Pixmap.blend(shadowColor, base.getRaw(x, y)));
-                            }
-                        }
-                    }
-
-                    image.draw(base, true);
-
-                    replace(ore.variantRegions[i], image);
-
-                    save(image, "../blocks/environment/" + ore.name + (i + 1));
-
-                    save(image, "block-" + ore.name + "-full");
-                    save(image, "../ui/block-" + ore.name + "-ui");
-                }
-            });
-        });
-
-        generate("edges", () -> {
-            content.blocks().<Floor>each(b -> b instanceof Floor && !(b instanceof OverlayFloor) && !b.isAir(), floor -> {
-
-                if(has(floor.name + "-edge") || floor.blendGroup != floor || (!floor.drawEdgeOut)){
-                    return;
-                }
-
-                try{
-                    Pixmap image = gens.get(floor);
-                    if(image == null) image = get(floor.getGeneratedIcons()[0]);
-                    Pixmap edge = get("edge-stencil");
-                    Pixmap result = new Pixmap(edge.width, edge.height);
-
-                    for(int x = 0; x < edge.width; x++){
-                        for(int y = 0; y < edge.height; y++){
-                            result.set(x, y, Color.muli(edge.getRaw(x, y), image.get(x % image.width, y % image.height)));
-                        }
-                    }
-
-                    save(result, "../blocks/environment/" + floor.name + "-edge");
-
-                }catch(Exception e){
-                    Log.err("Failed to generate edge for " + floor, e);
-                }
-            });
-        });
 
         generate("scorches", () -> {
             for(int size = 0; size < 10; size++){
@@ -842,6 +492,8 @@ public class Generators{
                 }
             }
         });
+
+        ctx.dispose();
     }
 
     /** Generates a scorch pixmap based on parameters. Thread safe. */
