@@ -3,7 +3,6 @@ package mindustry.game;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -781,26 +780,6 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             return Core.bundle == null ? className : Core.bundle.get("marker." + className.toLowerCase() + ".name", className);
         }
 
-        @Override
-        public void write(Json json){
-            json.writeFields(this);
-        }
-
-        private void updateField(JsonValue value){
-            if(value != null && value.type() != JsonValue.ValueType.longValue){
-                value.set(value.asBoolean() ? 1 : -1, null);
-            }
-        }
-
-        @Override
-        public void read(Json json, JsonValue jsonData){
-            updateField(jsonData.get("world"));
-            updateField(jsonData.get("minimap"));
-            updateField(jsonData.get("light"));
-            json.readFields(this, jsonData);
-            if(jsonData.has("textureName")) setTexture(jsonData.getString("textureName"));
-        }
-
         public static String fetchText(String text){
             if(text == null) return "";
 
@@ -825,6 +804,26 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
             }else{
                 return UI.formatIcons(text);
             }
+        }
+
+        @Override
+        public void write(Json json, JsonWriter writer){
+            json.writeFields(writer, this);
+        }
+
+        private void updateField(Jval value, String name){
+            Jval sub = value.get(name);
+            if(sub != null && sub.isBoolean()) value.put(name, sub.asBool() ? 1 : -1);
+        }
+
+        @Override
+        public void read(Json json, Jval jsonData){
+            updateField(jsonData, "world");
+            updateField(jsonData, "minimap");
+            updateField(jsonData, "light");
+
+            json.readFields(this, jsonData);
+            if(jsonData.has("textureName")) setTexture(jsonData.getString("textureName"));
         }
     }
 
@@ -1497,18 +1496,18 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
         public Object value = "white";
 
         @Override
-        public void write(Json json){
+        public void write(Json json, JsonWriter writer){
             if(value instanceof String s){
-                json.writeValue("string", s);
+                json.writeValue(writer, "string", s);
             }else if(value instanceof UnlockableContent c){
-                json.writeValue("content", c.name);
+                json.writeValue(writer, "content", c.name);
             }else if(value instanceof Building b){
-                json.writeValue("building", b.pos());
+                json.writeValue(writer, "building", b.pos());
             }
         }
 
         @Override
-        public void read(Json json, JsonValue jsonData){
+        public void read(Json json, Jval jsonData){
             if(jsonData.has("string")){
                 value = jsonData.get("string").asString();
             }else if(jsonData.has("content")){

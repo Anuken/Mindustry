@@ -9,7 +9,6 @@ import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.maps.generators.*;
 import mindustry.mod.Mods.*;
 
@@ -120,11 +119,11 @@ public class SectorPreset extends UnlockableContent{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(outline && Core.atlas.has("sector-" + name)){
-            makeOutline(PageType.ui, packer, Core.atlas.find("sector-" + name), false, outlineColor, outlineRadius, outlineRadius);
+            makeOutline(packer, Core.atlas.find("sector-" + name), false, outlineColor, outlineRadius, outlineRadius);
         }
     }
 

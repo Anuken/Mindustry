@@ -27,7 +27,6 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -286,6 +285,8 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** list of "abilities", which are various behaviors that update each frame */
     public Seq<Ability> abilities = new Seq<>();
+    /** Maximum reach of shield abilities from the unit's center; 0 if there are none. Set in init(). */
+    public float shieldBounds;
     /** All weapons that this unit will shoot with. */
     public Seq<Weapon> weapons = new Seq<>();
     /** None of the status effects in this set can be applied to this unit. */
@@ -378,9 +379,6 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** amount of items this unit can carry; <0 to determine based on hitSize. */
     public int itemCapacity = -1;
-    /** @deprecated only kept for compatibility with some turrets that query this field! Remove this from your code immediately! */
-    @Deprecated
-    public int ammoCapacity = 1;
 
     /** max hardness of ore that this unit can mine (<0 to disable) */
     public int mineTier = -1;
@@ -502,6 +500,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     crushDamage = 0f,
     /** the fraction of solids under this block necessary for it to reach crawlSlowdown. */
     crawlSlowdownFrac = 0.55f;
+
+    /** for naval units only: crush rectangle half-extents, rotated with the unit */
+    public int crushRadX = 1, crushRadY = 1;
 
     //MISSILE UNITS
 
@@ -787,7 +788,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
@@ -1034,6 +1035,8 @@ public class UnitType extends UnlockableContent implements Senseable{
             ab.init(this);
         }
 
+        updateShieldBounds();
+
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
         for(Weapon w : weapons){
@@ -1216,8 +1219,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(constructor == null) throw new IllegalArgumentException("No constructor set up for unit '" + name + "', add this argument to your units field: `constructor = UnitEntity::create`");
 
@@ -1233,7 +1236,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
                 Drawf.checkBleed(outlined);
 
-                packer.add(PageType.main, regionName + "-outline", outlined);
+                packer.add(regionName + "-outline", outlined);
                 outlined.dispose();
             }
         }
@@ -1248,7 +1251,7 @@ public class UnitType extends UnlockableContent implements Senseable{
             for(var outlineTarget : outlineSeq){
                 if(!outlineTarget.found()) continue;
 
-                makeOutline(PageType.main, packer, outlineTarget, alwaysCreateOutline && region == outlineTarget, outlineColor, outlineRadius);
+                makeOutline(packer, outlineTarget, alwaysCreateOutline && region == outlineTarget, outlineColor, outlineRadius);
             }
 
             if(sample instanceof Crawlc){
@@ -1259,7 +1262,7 @@ public class UnitType extends UnlockableContent implements Senseable{
 
             for(Weapon weapon : weapons){
                 if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name)) && (weapon.top || !packer.isOutlined(weapon.name) || weapon.parts.contains(p -> p.under))){
-                    makeOutline(PageType.main, packer, weapon.region, !weapon.top || weapon.parts.contains(p -> p.under), outlineColor, outlineRadius);
+                    makeOutline(packer, weapon.region, !weapon.top || weapon.parts.contains(p -> p.under), outlineColor, outlineRadius);
                 }
             }
         }
@@ -1286,7 +1289,7 @@ public class UnitType extends UnlockableContent implements Senseable{
                         frame.setRaw(0, y, slice.getRaw(0, idx));
                     }
 
-                    packer.add(PageType.main, name + "-treads" + r + "-" + i, frame);
+                    packer.add(name + "-treads" + r + "-" + i, frame);
                     frame.dispose();
                 }
                 slice.dispose();
@@ -1304,6 +1307,16 @@ public class UnitType extends UnlockableContent implements Senseable{
         pathCost = null;
         pathCostId = -1;
         initPathType();
+        updateShieldBounds();
+    }
+
+    public void updateShieldBounds(){
+        shieldBounds = 0f;
+        for(Ability ab : abilities){
+            if(ab instanceof UnitShieldProvider shield){
+                shieldBounds = Math.max(shieldBounds, shield.shieldBounds());
+            }
+        }
     }
 
     public void beforeParse(){

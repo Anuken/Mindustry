@@ -10,6 +10,7 @@ import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -17,7 +18,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -26,10 +26,10 @@ public class Damage{
     private static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
     private static final Rect rect = new Rect();
     private static final Rect hitrect = new Rect();
-    private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
+    private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2(), polyHit = new Vec2();
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
-    private static final Seq<Collided> collided = new Seq<>();
+    private static final Seq<Collided> collided = new Seq<>(), shieldHits = new Seq<>();
     private static final Pool<Collided> collidePool = Pools.get(Collided.class, Collided::new);
     private static final Seq<Building> builds = new Seq<>();
     private static final FloatSeq distances = new FloatSeq();
@@ -109,9 +109,9 @@ public class Damage{
             for(int i = 0; i < waves; i++){
                 int f = i;
                 Time.run(i * 2f, () -> {
-                    var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
-                    if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
-                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                    float absorbed = absorbExplosion(ignoreTeam, x, y, damagePerWave);
+                    if(absorbed < damagePerWave){
+                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave - absorbed, false);
                     }
 
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
@@ -143,6 +143,37 @@ public class Damage{
         }
     }
 
+    /**
+     * Applies an explosion at a point to the enemy shields covering it, one after another, until all of its damage is absorbed.
+     * @return how much of the damage was absorbed.
+     */
+    public static float absorbExplosion(@Nullable Team team, float x, float y, float damage){
+        if(team == null) return 0f;
+
+        float remaining = damage;
+
+        var shields = indexer.getEnemyShields(team, x, y, 0f, 0f);
+        for(int i = 0; i < shields.size && remaining > 0f; i++){
+            if(shields.get(i) instanceof ShieldProvider shield){
+                remaining -= shield.absorbExplosion(x, y, remaining);
+            }
+        }
+
+        var units = Units.enemyShields(team, x, y, 0f, 0f);
+        for(int i = 0; i < units.size && remaining > 0f; i++){
+            Unit unit = units.get(i);
+            if(unit.dead) continue;
+
+            for(Ability ability : unit.abilities){
+                if(remaining > 0f && ability instanceof UnitShieldProvider shield){
+                    remaining -= shield.absorbExplosion(unit, x, y, remaining);
+                }
+            }
+        }
+
+        return damage - remaining;
+    }
+
     public static @Nullable Building findAbsorber(Team team, float x1, float y1, float x2, float y2){
         tmpBuilding = null;
 
@@ -153,16 +184,26 @@ public class Damage{
     }
 
     public static float findLength(Bullet b, float length, boolean laser, int pierceCap){
+        return findLength(b, length, laser, pierceCap, false);
+    }
+
+    private static float findLength(Bullet b, float length, boolean laser, int pierceCap, boolean absorb){
         if(pierceCap > 0){
-            length = findPierceLength(b, pierceCap, laser, length);
+            length = findPierceLength(b, pierceCap, laser, length, absorb);
         }else if(laser){
-            length = findLaserLength(b, length);
+            length = findLaserLength(b, length, absorb);
+        }else{
+            length = findShieldLength(b, length, false, absorb);
         }
 
         return length;
     }
 
     public static float findLaserLength(Bullet b, float length){
+        return findLaserLength(b, length, false);
+    }
+
+    private static float findLaserLength(Bullet b, float length, boolean absorb){
         vec.trnsExact(b.rotation(), length);
 
         furthest = null;
@@ -170,7 +211,9 @@ public class Damage{
         boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y),
         (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && (furthest.build != null && furthest.build.absorbLasers()));
 
-        return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+        float result = found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+
+        return findShieldLength(b, result, true, absorb);
     }
 
     public static float findPierceLength(Bullet b, int pierceCap, float length){
@@ -178,6 +221,10 @@ public class Damage{
     }
 
     public static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length){
+        return findPierceLength(b, pierceCap, laser, length, false);
+    }
+
+    private static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length, boolean absorb){
         vec.trnsExact(b.rotation(), length);
         rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
 
@@ -215,14 +262,109 @@ public class Damage{
 
         //return either the length when not enough things were pierced,
         //or the last pierced object if there were enough blockages
-        return Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+        float result = Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+
+        return findShieldLength(b, result, laser, absorb);
+    }
+
+    /** @return the first point where a segment enters a regular polygon, stored in a shared vector, or null if it doesn't. */
+    public static @Nullable Vec2 raycastRegularPolygon(int sides, float cx, float cy, float radius, float rotation, float x1, float y1, float x2, float y2){
+        if(radius <= 0f) return null;
+
+        if(Intersector.isInRegularPolygon(sides, cx, cy, radius, rotation, x1, y1)){
+            return polyHit.set(x1, y1);
+        }
+
+        float best = Float.MAX_VALUE;
+        for(int i = 0; i < sides; i++){
+            Tmp.v1.trns(rotation + i * 360f / sides, radius).add(cx, cy);
+            Tmp.v2.trns(rotation + (i + 1) * 360f / sides, radius).add(cx, cy);
+
+            if(Intersector.intersectSegments(x1, y1, x2, y2, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, Tmp.v3)){
+                float dst = Tmp.v3.dst2(x1, y1);
+                if(dst < best){
+                    best = dst;
+                    polyHit.set(Tmp.v3);
+                }
+            }
+        }
+
+        return best == Float.MAX_VALUE ? null : polyHit;
+    }
+
+    /**
+     * Finds the enemy shields hit by a laser, in order, until one absorbs the rest of its damage.
+     * @param absorb whether to actually apply the hits to the shields; otherwise the first shield is assumed to absorb everything.
+     * If the shields only absorb part of the damage, the bullet's damage is reduced accordingly.
+     * @return the length of the laser, cut short if a shield absorbed it.
+     */
+    public static float findShieldLength(Bullet b, float length, boolean laser, boolean absorb){
+        float damage = b.type.shieldDamage(b);
+        if(!(laser || b.type.shieldAbsorb) || length <= 0f || damage <= 0f) return length;
+
+        seg1.set(b.x, b.y);
+        seg2.trnsExact(b.rotation(), length).add(seg1);
+        rect.setPosition(seg1.x, seg1.y).setSize(seg2.x - seg1.x, seg2.y - seg1.y).normalize();
+
+        var shields = indexer.getEnemyShields(b.team, rect.x, rect.y, rect.width, rect.height);
+        for(int i = 0; i < shields.size; i++){
+            Building build = shields.get(i);
+            if(build instanceof ShieldProvider shield){
+                Vec2 hit = shield.intersectLaser(seg1.x, seg1.y, seg2.x, seg2.y, damage);
+                if(hit != null){
+                    shieldHits.add(collidePool.obtain().set(hit.x, hit.y, build));
+                }
+            }
+        }
+
+        var units = Units.enemyShields(b.team, rect.x, rect.y, rect.width, rect.height);
+        for(int i = 0; i < units.size; i++){
+            Unit unit = units.get(i);
+            if(unit.dead) continue;
+
+            for(Ability ability : unit.abilities){
+                if(ability instanceof UnitShieldProvider shield){
+                    Vec2 hit = shield.intersectLaser(unit, seg1.x, seg1.y, seg2.x, seg2.y, damage);
+                    if(hit != null){
+                        shieldHits.add(collidePool.obtain().set(hit.x, hit.y, unit, shield));
+                    }
+                }
+            }
+        }
+
+        float result = length, remaining = damage;
+
+        shieldHits.sort(c -> Mathf.dst2(seg1.x, seg1.y, c.x, c.y));
+        for(int i = 0; i < shieldHits.size; i++){
+            Collided c = shieldHits.get(i);
+
+            float absorbed = remaining;
+            if(absorb){
+                absorbed = c.ability != null ? c.ability.absorbLaser((Unit)c.target, c.x, c.y, remaining) : ((ShieldProvider)c.target).absorbLaser(c.x, c.y, remaining);
+            }
+            remaining -= absorbed;
+
+            if(remaining <= 0f){
+                result = Mathf.dst(seg1.x, seg1.y, c.x, c.y);
+                break;
+            }
+        }
+
+        if(absorb && remaining > 0f && remaining < damage){
+            b.damage *= remaining / damage;
+        }
+
+        collidePool.freeAll(shieldHits);
+        shieldHits.clear();
+
+        return result;
     }
 
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
-        float resultLength = findPierceLength(b, pierceCap, laser, length);
+        float resultLength = findPierceLength(b, pierceCap, laser, length, true);
 
-        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
+        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap, false);
 
         b.fdata = resultLength;
 
@@ -254,7 +396,11 @@ public class Damage{
      * Only enemies of the specified team are damaged.
      */
     public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
-        length = findLength(hitter, length, laser, pierceCap);
+        collideLine(hitter, team, x, y, angle, length, large, laser, pierceCap, true);
+    }
+
+    private static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap, boolean absorb){
+        length = findLength(hitter, length, laser, pierceCap, absorb);
         hitter.fdata = length;
 
         collidedBlocks.clear();
@@ -667,6 +813,8 @@ public class Damage{
     public static class Collided implements Pool.Poolable{
         public float x, y;
         public Teamc target;
+        /** Set when the target is a unit hit through one of its shield abilities. */
+        public @Nullable UnitShieldProvider ability;
 
         public Collided set(float x, float y, Teamc target){
             this.x = x;
@@ -675,9 +823,15 @@ public class Damage{
             return this;
         }
 
+        public Collided set(float x, float y, Teamc target, UnitShieldProvider ability){
+            this.ability = ability;
+            return set(x, y, target);
+        }
+
         @Override
         public void reset(){
             target = null;
+            ability = null;
         }
     }
 }

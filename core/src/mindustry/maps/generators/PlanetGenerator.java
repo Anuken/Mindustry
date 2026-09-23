@@ -125,7 +125,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         }
 
         //sort counts in descending order
-        Seq<Entry<Block>> entries = floorc.entries().toArray();
+        Seq<Entry<Block>> entries = floorc.entries().toSeq();
         entries.sort(e -> -e.value);
         //remove all blocks occurring < 30 times - unimportant
         entries.removeAll(e -> e.value < 30);

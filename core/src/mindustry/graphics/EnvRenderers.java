@@ -3,7 +3,6 @@ package mindustry.graphics;
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;

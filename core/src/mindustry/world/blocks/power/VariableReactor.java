@@ -64,8 +64,8 @@ public class VariableReactor extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.input, maxHeat, StatUnit.heatUnits);
     }

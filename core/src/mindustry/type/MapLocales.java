@@ -12,22 +12,22 @@ import static arc.Core.*;
 public class MapLocales extends ObjectMap<String, StringMap> implements JsonSerializable{
 
     @Override
-    public void write(Json json){
+    public void write(Json json, JsonWriter writer){
         for(var entry : entries()){
-            json.writeValue(entry.key, entry.value, StringMap.class, String.class);
+            json.writeValue(writer, entry.key, entry.value, StringMap.class, String.class);
         }
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData){
-        for(JsonValue value : jsonData){
+    public void read(Json json, Jval jsonData){
+        for(var entry : jsonData.asObject()){
             StringMap map = new StringMap();
 
-            for(JsonValue child = value.child; child != null; child = child.next){
-                map.put(child.name, json.readValue(String.class, null, child));
+            for(var innerEntry : entry.value.asObject()){
+                map.put(innerEntry.key, innerEntry.value.asString());
             }
 
-            put(value.name, map);
+            put(entry.key, map);
         }
     }
 

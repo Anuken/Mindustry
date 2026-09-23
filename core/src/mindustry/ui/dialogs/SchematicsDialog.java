@@ -12,7 +12,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
-import arc.scene.utils.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ctype.*;
@@ -652,7 +651,8 @@ public class SchematicsDialog extends BaseDialog{
                 for(var tag : tags){
                     if(schem.labels.contains(tag)) continue;
 
-                    var next = Elem.newButton(tag, () -> {
+                    TextButton next = new TextButton(tag);
+                    next.changed(() -> {
                         addTag(schem, tag);
                         buildTags(schem, t, name);
                         dialog.hide();

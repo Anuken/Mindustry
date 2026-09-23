@@ -41,6 +41,7 @@ public class ForceProjector extends Block{
     public float cooldownLiquid = 1.5f;
     public float cooldownBrokenBase = 0.35f;
     public float coolantConsumption = 0.1f;
+    public float activationDuration = 60f * 9f;
     public boolean consumeCoolant = true;
     public float crashDamageMultiplier = 2f;
     public Sound breakSound = Sounds.shieldBreak;
@@ -105,11 +106,11 @@ public class ForceProjector extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         boolean consItems = itemConsumer != null;
 
         if(consItems) stats.timePeriod = phaseUseTime;
-        super.setStats();
+        super.setStats(stats);
         stats.add(Stat.shieldHealth, shieldHealth, StatUnit.none);
         stats.add(Stat.range, radius / tilesize, StatUnit.blocks);
         stats.add(Stat.regenerationRate, cooldownNormal * 60f, StatUnit.perSecond);
@@ -162,9 +163,17 @@ public class ForceProjector extends Block{
         Draw.color();
     }
 
-    public class ForceBuild extends Building implements Ranged, ExplosionShield{
+    public class ForceBuild extends Building implements Ranged, ShieldProvider{
         public boolean broken = true;
         public float buildup, radscl, hit, warmup, phaseHeat;
+        //1 = inactive, booting up, 0 = activated
+        public float activationTimer;
+
+        @Override
+        public void placed(){
+            super.placed();
+            activationTimer = 1f;
+        }
 
         @Override
         public void setProp(LAccess prop, double value){
@@ -207,6 +216,8 @@ public class ForceProjector extends Block{
         public void updateTile(){
             boolean phaseValid = itemConsumer != null && itemConsumer.efficiency(this) > 0;
 
+            activationTimer = Math.max(0f, activationTimer - Time.delta / activationDuration);
+
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
             if(phaseValid && !broken && timer(timerUse, phaseUseTime / timeScale) && efficiency > 0){
@@ -239,7 +250,7 @@ public class ForceProjector extends Block{
                 broken = false;
             }
 
-            if(buildup >= shieldHealth + phaseShieldBoost * phaseHeat && !broken){
+            if(buildup >= (shieldHealth + phaseShieldBoost * phaseHeat) * Math.max(1f - Interp.pow5Out.apply(activationTimer), 0.00001f) && !broken){
                 broken = true;
                 buildup = shieldHealth;
                 shieldBreakEffect.at(x, y, realRadius(), team.color, block);
@@ -267,14 +278,37 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public boolean absorbExplosion(float ex, float ey, float damage){
-            boolean absorb = !broken && Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, ex, ey);
-            if(absorb){
+        public float absorbExplosion(float ex, float ey, float damage){
+            if(broken || !Intersector.isInRegularPolygon(sides, x, y, realRadius(), shieldRotation, ex, ey)) return 0f;
+
+            float absorbed = Math.min(damage, Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0f) / crashDamageMultiplier);
+            if(absorbed > 0f){
                 absorbEffect.at(ex, ey);
                 hit = 1f;
                 buildup += damage * crashDamageMultiplier;
             }
-            return absorb;
+            return absorbed;
+        }
+
+        @Override
+        public @Nullable Vec2 intersectLaser(float x1, float y1, float x2, float y2, float damage){
+            return broken ? null : Damage.raycastRegularPolygon(sides, x, y, realRadius(), shieldRotation, x1, y1, x2, y2);
+        }
+
+        @Override
+        public float absorbLaser(float lx, float ly, float damage){
+            float absorbed = broken ? 0f : Math.min(damage, Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0f));
+            if(absorbed > 0f){
+                absorbEffect.at(lx, ly);
+                hit = 1f;
+                buildup += damage;
+            }
+            return absorbed;
+        }
+
+        @Override
+        public float getShieldBounds(){
+            return radius + phaseRadiusBoost;
         }
 
         public float realRadius(){
@@ -309,10 +343,10 @@ public class ForceProjector extends Block{
             if(!broken){
                 float radius = realRadius();
 
-                if(radius > 0.001f){
+                if(radius > 0.001f && Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(x, y, radius * 2f + 2f))){
                     Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
-                    if(renderer.animateShields){
+                    if(renderer.animateSurfaces){
                         Draw.z(Layer.shields + 0.001f * hit);
                         Fill.poly(x, y, sides, radius, shieldRotation);
                     }else{

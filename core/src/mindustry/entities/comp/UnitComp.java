@@ -25,12 +25,10 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.meta.*;
 
-import static java.lang.Float.NaN;
+import static java.lang.Float.*;
 import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
@@ -333,19 +331,19 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public double sense(Content content){
-        if(content == stack().item) return stack().amount;
-        if(content instanceof UnitType u){
+    public double sense(Object object){
+        if(object == stack().item) return stack().amount;
+        if(object instanceof UnitType u){
             return ((Object)this) instanceof Payloadc pay ?
                     (pay.payloads().isEmpty() ? 0 :
                     pay.payloads().count(p -> p instanceof UnitPayload up && up.unit.type == u)) : 0;
         }
-        if(content instanceof Block b){
+        if(object instanceof Block b){
             return ((Object)this) instanceof Payloadc pay ?
                     (pay.payloads().isEmpty() ? 0 :
                     pay.payloads().count(p -> p instanceof BuildPayload bp && bp.build.block == b)) : 0;
         }
-        if(content instanceof StatusEffect s){
+        if(object instanceof StatusEffect s){
             return hasEffect(s) ? getDuration(s) / 60 : 0;
         }
         return NaN;
@@ -922,19 +920,28 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
-            var shields = indexer.getEnemy(team, BlockFlag.shield);
             float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 2.5f * state.rules.unitCrashDamage(team);
-            if(shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, crashDamage))){
-                Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage, true, false, true);
+            float absorbed = Damage.absorbExplosion(team, x, y, crashDamage);
+            if(absorbed < crashDamage){
+                Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage - absorbed, true, false, true);
             }
         }
 
         if(!headless && type.createScorch){
+            Tile deathTile = world.tileWorld(x, y);
+            //decals don't render on liquids, so wreckage sinks instead of leaving a mark on top
+            boolean sinks = deathTile != null && !deathTile.floor().hasSurface();
+            Color sinkColor = sinks ? deathTile.floor().mapColor : null;
+
             for(int i = 0; i < type.wreckRegions.length; i++){
                 if(type.wreckRegions[i].found()){
                     float range = type.hitSize /4f;
                     Tmp.v1.rnd(range);
-                    Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    if(sinks){
+                        Fx.unitDrown.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90, sinkColor, type.wreckRegions[i]);
+                    }else{
+                        Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    }
                 }
             }
         }

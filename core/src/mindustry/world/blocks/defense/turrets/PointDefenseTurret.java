@@ -48,8 +48,8 @@ public class PointDefenseTurret extends ReloadTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);
         stats.add(Stat.damage, bulletDamage, StatUnit.none);

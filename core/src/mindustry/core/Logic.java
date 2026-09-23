@@ -108,6 +108,7 @@ public class Logic implements ApplicationListener{
                 state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
                 state.rules.worldProcessorPlayerLink = false;
+                state.rules.logicUnitDeconstruct = true;
 
                 if(state.getPlanet().enemyInfiniteItems){
                     state.rules.waveTeam.rules().infiniteResources = true;

@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -42,7 +41,7 @@ public class OreBlock extends OverlayFloor{
 
     @Override
     @OverrideCallSuper
-    public void createIcons(MultiPacker packer){
+    public void packSprites(PackContext packer){
         for(int i = 0; i < variants; i++){
             //use name (e.g. "ore-copper1"), fallback to "copper1" as per the old naming system
             PixmapRegion shadow = Core.atlas.has(name + (i + 1)) ?
@@ -62,10 +61,10 @@ public class OreBlock extends OverlayFloor{
                 }
             }
 
-            packer.add(PageType.environment, name + (i + 1), image);
+            packer.add(name + (i + 1), image);
 
             if(i == 0){
-                packer.add(PageType.main, "block-" + name + "-full", image);
+                packer.add("block-" + name + "-full", image);
             }
 
             image.dispose();

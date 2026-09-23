@@ -11,7 +11,6 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.world.meta.*;
 
 public class StatusEffect extends UnlockableContent{
@@ -95,7 +94,7 @@ public class StatusEffect extends UnlockableContent{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         if(damageMultiplier != 1) stats.addMultModifier(Stat.damageMultiplier, damageMultiplier);
         if(healthMultiplier != 1) stats.addMultModifier(Stat.healthMultiplier, healthMultiplier);
         if(speedMultiplier != 1) stats.addMultModifier(Stat.speedMultiplier, speedMultiplier);
@@ -232,11 +231,11 @@ public class StatusEffect extends UnlockableContent{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(outline){
-            makeOutline(PageType.ui, packer, uiIcon, false, Pal.gray, 3);
+            makeOutline(packer, uiIcon, false, Pal.gray, 3);
         }
     }
 

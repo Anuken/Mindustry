@@ -20,8 +20,8 @@ public class ColoredFloor extends Floor{
     /** If the alpha value of the color is set to this value, colors are interpolated across corners. This is essentially linear filtering for the whole "image". */
     public static final int flagSmoothBlend = 2;
 
-    //4x (pos2 color uv2)
-    private static final float[] verts = new float[4 * 5];
+    //4x (pos2 color uv2 depth)
+    private static final float[] verts = new float[4 * 6];
 
     public Color defaultColor = Color.white;
     protected int defaultColorRgba;
@@ -85,30 +85,35 @@ public class ColoredFloor extends Floor{
             var region = autotileRegions[TileBitmask.values[bits]];
             float s = Vars.tilesize/2f;
             float x = tile.worldx(), y = tile.worldy();
+            float depth = region.getDepth();
 
             verts[0] = x - s;
             verts[1] = y - s;
             verts[2] = sample(this, tile.x, tile.y, tile.x - 1, tile.y - 1, tile.x, tile.y - 1, tile.x - 1, tile.y);
             verts[3] = region.u;
             verts[4] = region.v2;
+            verts[5] = depth;
 
-            verts[5] = x + s;
-            verts[6] = y - s;
-            verts[7] = sample(this, tile.x, tile.y, tile.x, tile.y - 1, tile.x + 1, tile.y - 1, tile.x + 1, tile.y);
-            verts[8] = region.u2;
-            verts[9] = region.v2;
+            verts[6] = x + s;
+            verts[7] = y - s;
+            verts[8] = sample(this, tile.x, tile.y, tile.x, tile.y - 1, tile.x + 1, tile.y - 1, tile.x + 1, tile.y);
+            verts[9] = region.u2;
+            verts[10] = region.v2;
+            verts[11] = depth;
 
-            verts[10] = x + s;
-            verts[11] = y + s;
-            verts[12] = sample(this, tile.x, tile.y, tile.x + 1, tile.y + 1, tile.x, tile.y + 1, tile.x + 1, tile.y);
-            verts[13] = region.u2;
-            verts[14] = region.v;
+            verts[12] = x + s;
+            verts[13] = y + s;
+            verts[14] = sample(this, tile.x, tile.y, tile.x + 1, tile.y + 1, tile.x, tile.y + 1, tile.x + 1, tile.y);
+            verts[15] = region.u2;
+            verts[16] = region.v;
+            verts[17] = depth;
 
-            verts[15] = x - s;
-            verts[16] = y + s;
-            verts[17] = sample(this, tile.x, tile.y, tile.x - 1, tile.y + 1, tile.x, tile.y + 1, tile.x - 1, tile.y);
-            verts[18] = region.u;
-            verts[19] = region.v;
+            verts[18] = x - s;
+            verts[19] = y + s;
+            verts[20] = sample(this, tile.x, tile.y, tile.x - 1, tile.y + 1, tile.x, tile.y + 1, tile.x - 1, tile.y);
+            verts[21] = region.u;
+            verts[22] = region.v;
+            verts[23] = depth;
 
             Draw.vert(region.texture, verts, 0, verts.length);
         }else{

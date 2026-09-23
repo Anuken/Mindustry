@@ -23,8 +23,8 @@ public class LaserTurret extends PowerTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.remove(Stat.booster);
         if(coolant != null){

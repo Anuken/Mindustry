@@ -8,7 +8,6 @@ import arc.util.*;
 import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
@@ -102,7 +101,7 @@ public class Item extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.addPercent(Stat.explosiveness, explosiveness);
         stats.addPercent(Stat.flammability, flammability);
         stats.addPercent(Stat.radioactivity, radioactivity);
@@ -120,8 +119,8 @@ public class Item extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         //create transitions
         if(frames > 0 && transitionFrames > 0){
@@ -137,7 +136,7 @@ public class Item extends UnlockableContent implements Senseable{
                     int index = i * (transitionFrames + 1) + j;
 
                     Pixmap res = Pixmaps.blend(pixmaps[i], pixmaps[(i + 1) % frames], f);
-                    packer.add(PageType.main, name + "-t" + index, res);
+                    packer.add(name + "-t" + index, res);
                     res.dispose();
                 }
             }

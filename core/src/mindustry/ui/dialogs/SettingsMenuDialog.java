@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
@@ -26,6 +25,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.zip.*;
 
 import static arc.Core.*;
@@ -402,9 +402,11 @@ public class SettingsMenuDialog extends BaseDialog{
         });
 
         game.checkPref("savecreate", true);
+        game.checkPref("skipcoreanimation", false);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+        game.checkPref("logiclocalization", true);
 
         if(!mobile){
             game.checkPref("backgroundpause", true);
@@ -502,6 +504,24 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
+        graphics.checkPref("smaa", enableSmaa());
+
+        graphics.checkPref("linear", true, b -> {
+            atlas.getTexture().setFilter(b ? TextureFilter.linear : TextureFilter.nearest);
+        });
+
+        if(Core.settings.getBool("linear")){
+            atlas.getTexture().setFilter(TextureFilter.linear);
+        }
+
+        graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
+
+        graphics.checkPref("pixelate", false, val -> {
+            if(val){
+                Events.fire(Trigger.enablePixelation);
+            }
+        });
+
         graphics.checkPref("effects", true);
         graphics.checkPref("atmosphere", true);
         graphics.checkPref("drawlight", true);
@@ -521,39 +541,13 @@ public class SettingsMenuDialog extends BaseDialog{
             graphics.checkPref("mouseposition", false);
         }
         graphics.checkPref("fps", false);
-        graphics.checkPref("playerindicators", true);
+        graphics.checkPref("playerindicators", false);
         graphics.checkPref("showpings", true);
         graphics.checkPref("showotherbuildplans", true);
         graphics.checkPref("indicators", true);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
-
-        graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
-
-        graphics.checkPref("pixelate", false, val -> {
-            if(val){
-                Events.fire(Trigger.enablePixelation);
-            }
-        });
-
-        //iOS (and possibly Android) devices do not support linear filtering well, so disable it
-        graphics.checkPref("linear", !mobile, b -> {
-            for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
-                tex.setFilter(filter, filter);
-            }
-        });
-
-        if(Core.settings.getBool("linear")){
-            for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = TextureFilter.linear;
-                tex.setFilter(filter, filter);
-            }
-        }
-
-        graphics.checkPref("skipcoreanimation", false);
         graphics.checkPref("hidedisplays", false);
-        graphics.checkPref("logiclocalization", true);
 
         if(OS.isMac){
             graphics.checkPref("macnotch", false);
@@ -651,6 +645,31 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         prefs.add(tables.get(index));
+    }
+
+    private static boolean enableSmaa(){
+        if(mobile || maxTextureSize < 16384 || Core.graphics.getGLVersion().rendererString == null){
+            return false;
+        }
+
+        String renderer = Core.graphics.getGLVersion().rendererString.toLowerCase(Locale.ROOT);
+
+        String[] goodRenderers = {
+        //nvidia discrete
+        "geforce gtx", "geforce rtx", "nvidia titan", "quadro rtx", "nvidia rtx",
+
+        //amd discrete
+        "radeon rx",
+
+        //intel discrete
+        "intel(r) arc",
+        };
+
+        for(String good : goodRenderers){
+            if(renderer.contains(good)) return true;
+        }
+
+        return false;
     }
 
     @Override

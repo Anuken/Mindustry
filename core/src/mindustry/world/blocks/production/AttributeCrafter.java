@@ -74,10 +74,10 @@ public class AttributeCrafter extends GenericCrafter{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         if(outputScale > 0f){
-            stats.add(baseEfficiency <= 0.0001f ? Stat.tiles : 
+            stats.add(baseEfficiency <= 0.0001f ? Stat.tiles :
                 Stat.affinities, attribute, floating, boostScale * size * size, outputScale * size * size, Seq.with(outputItems), craftTime, !displayEfficiency);
         }else{
             stats.add(baseEfficiency <= 0.0001f ? Stat.tiles : Stat.affinities, attribute, floating, boostScale * size * size, !displayEfficiency);

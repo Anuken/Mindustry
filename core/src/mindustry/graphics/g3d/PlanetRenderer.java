@@ -4,16 +4,18 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
 import mindustry.type.*;
 
 public class PlanetRenderer implements Disposable{
-    public static final float outlineRad = 1.17f, camLength = 4f;
+    public static final float camLength = 4f;
     public static final Color
     outlineColor = Pal.accent.cpy().a(1f),
     hoverColor = Pal.accent.cpy().a(0.5f),
@@ -23,7 +25,7 @@ public class PlanetRenderer implements Disposable{
     /** Camera used for rendering. */
     public final Camera3D cam = new Camera3D();
     /** Raw vertex batch. */
-    public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, 0);
+    public final VertexBatch3D batch = new VertexBatch3D(20000, false, true, false);
 
     public final PlaneBatch3D projector = new PlaneBatch3D();
     public final Mat3D mat = new Mat3D();
@@ -37,14 +39,25 @@ public class PlanetRenderer implements Disposable{
     //seed: 8kmfuix03fw
     public final CubemapMesh skybox = new CubemapMesh(new Cubemap("cubemaps/stars/"));
 
+    private final FrameBuffer framebuffer = new FrameBuffer(Format.defaultColorDepth);
+
+    /** Distance from the orbiting planet's surface (in world units) over which the orbit ring fades in, so it doesn't cut harshly into the planet. */
+    public float orbitFadeDistance = 1.1f;
+
     public PlanetRenderer(){
         projector.setScaling(1f / 150f);
         cam.fov = 60f;
         cam.far = 150f;
     }
 
+    public FrameBuffer getDepthFramebuffer(){
+        return framebuffer;
+    }
+
     /** Render the entire planet scene to the screen. */
     public void render(PlanetParams params){
+        boolean aa = Vars.renderer.smaa.enabled();
+        if(aa) Vars.renderer.smaa.begin();
         Draw.flush();
         Gl.clear(Gl.depthBufferBit);
         Gl.enable(Gl.depthTest);
@@ -69,7 +82,7 @@ public class PlanetRenderer implements Disposable{
         }else{
             cam.position.set(params.planet.position).add(params.camPos);
         }
-        //cam.up.set(params.camUp); //TODO broken
+
         cam.lookAt(params.planet.position);
         cam.update();
         //write back once it changes.
@@ -80,6 +93,8 @@ public class PlanetRenderer implements Disposable{
         batch.proj(cam.combined);
 
         Events.fire(Trigger.universeDrawBegin);
+
+        framebuffer.resize(w, h);
 
         //begin bloom
         bloom.resize(w, h);
@@ -104,7 +119,13 @@ public class PlanetRenderer implements Disposable{
         Events.fire(Trigger.universeDraw);
 
         Planet solarSystem = params.planet.solarSystem;
+        framebuffer.begin(Color.clear);
         renderPlanet(solarSystem, params);
+        framebuffer.end();
+
+        var blit = Shaders.depthScreenspace;
+        Draw.blit(blit);
+
         renderTransparent(solarSystem, params);
 
         //TODO: will draw under icons and look bad. maybe limit arcs based on facing dot product
@@ -127,6 +148,7 @@ public class PlanetRenderer implements Disposable{
         Gl.disable(Gl.depthTest);
 
         cam.update();
+        if(aa) Vars.renderer.smaa.end();
     }
 
     public void renderPlanet(Planet planet, PlanetParams params){
@@ -173,9 +195,23 @@ public class PlanetRenderer implements Disposable{
 
         Vec3 center = planet.parent.position;
         float radius = planet.orbitRadius;
-        int points = (int)(radius * 10);
-        Angles.circleVectors(points, radius, (cx, cy) -> batch.vertex(Tmp.v32.set(center).add(cx, 0, cy), Pal.gray.write(Tmp.c1).a(params.uiAlpha)));
+        //a line loop can't be split across flushes, so cap the point count at the batch size
+        int points = Math.min((int)(radius * 10), batch.getMaxVertices());
+
+        for(int i = 0; i < points; i++){
+            float angle = i / (float)points * Mathf.PI2;
+            float x = center.x + Mathf.cos(angle) * radius, z = center.z + Mathf.sin(angle) * radius;
+
+            batch.vertex(x, center.y, z, orbitColor(planet, x, center.y, z, params.uiAlpha));
+        }
+
         batch.flush(Gl.lineLoop);
+    }
+
+    /** @return packed color bits for an orbit vertex at the specified position. Fades to nothing at the surface of the orbiting planet, reaching full alpha {@link #orbitFadeDistance} away from it. */
+    private float orbitColor(Planet planet, float x, float y, float z, float alpha){
+        float fade = Mathf.clamp((planet.position.dst(x, y, z) - (planet.radius + 0.85f)) / Math.max(orbitFadeDistance, 0.0001f));
+        return Color.toFloatBits(Pal.gray.r, Pal.gray.g, Pal.gray.b, alpha * fade);
     }
 
     public void renderSectors(Planet planet, PlanetParams params){
@@ -196,11 +232,11 @@ public class PlanetRenderer implements Disposable{
     }
 
     public void drawArc(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount){
-        planet.drawArc(batch, a, b, from, to, length, timeScale, pointCount);
+        planet.drawArc(planet, batch, a, b, from, to, length, timeScale, pointCount);
     }
 
     public void drawArcLine(Planet planet, Vec3 a, Vec3 b, Color from, Color to, float length, float timeScale, int pointCount, float stroke){
-        planet.drawArcLine(batch, a, b, from, to, length, timeScale, pointCount, stroke);
+        planet.drawArcLine(planet, batch, a, b, from, to, length, timeScale, pointCount, stroke);
     }
 
     public void drawBorders(Sector sector, Color base, float alpha){
@@ -237,7 +273,7 @@ public class PlanetRenderer implements Disposable{
     public void drawSpecialSelection(Sector sector, Color color, float stroke, float length){
         drawSelection(sector, color, stroke, length);
 
-        float arad = (outlineRad + length) * sector.planet.radius;
+        float arad = (sector.planet.outlineScale + length) * sector.planet.radius;
         float span = 0.1f;
 
         for(int i = 0; i < sector.tile.corners.length; i += 2){

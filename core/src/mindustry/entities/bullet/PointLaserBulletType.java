@@ -79,6 +79,14 @@ public class PointLaserBulletType extends BulletType{
         updateTrailEffects(b);
         updateBulletInterval(b);
 
+        float dst = b.dst(b.aimX, b.aimY);
+        float length = Damage.findShieldLength(b, dst, true, laserAbsorb);
+        if(length < dst){
+            Tmp.v1.set(b.aimX - b.x, b.aimY - b.y).setLength(length);
+            b.aimX = Tmp.v1.x + b.x;
+            b.aimY = Tmp.v1.y + b.y;
+        }
+
         if(b.timer.get(0, damageInterval)){
             Damage.collidePoint(b, b.team, hitEffect, b.aimX, b.aimY);
         }
@@ -90,6 +98,11 @@ public class PointLaserBulletType extends BulletType{
         if(shake > 0){
             Effect.shake(shake, shake, b);
         }
+    }
+
+    @Override
+    public float shieldDamage(Bullet b){
+        return b.damage / damageInterval * Time.delta * shieldDamageMultiplier;
     }
 
     @Override

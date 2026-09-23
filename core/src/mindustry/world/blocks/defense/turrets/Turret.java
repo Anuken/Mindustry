@@ -182,8 +182,8 @@ public class Turret extends ReloadTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         stats.add(Stat.reload, 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)) * shoot.shots, StatUnit.perSecond);
@@ -384,18 +384,18 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
-        public void control(LAccess type, double p1, double p2, double p3, double p4){
+        public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
             if(type == LAccess.shoot && !unit.isPlayer()){
                 targetPos.set(World.unconv((float)p1), World.unconv((float)p2));
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p3);
             }
 
-            super.control(type, p1, p2, p3, p4);
+            super.control(executor, type, p1, p2, p3, p4);
         }
 
         @Override
-        public void control(LAccess type, Object p1, double p2, double p3, double p4){
+        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
             if(type == LAccess.shootp && (unit == null || !unit.isPlayer())){
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p2);
@@ -405,7 +405,7 @@ public class Turret extends ReloadTurret{
                 }
             }
 
-            super.control(type, p1, p2, p3, p4);
+            super.control(executor, type, p1, p2, p3, p4);
         }
 
         @Override
@@ -792,7 +792,7 @@ public class Turret extends ReloadTurret{
             bulletX = x + Angles.trnsx(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             bulletY = y + Angles.trnsy(rotation - 90, shootX + xOffset + xSpread, shootY + yOffset),
             shootAngle = rotation + angleOffset + Mathf.range(inaccuracy + type.inaccuracy);
-            
+
             float baseLife = (1f - lifeRnd) + Mathf.random(lifeRnd) + extraLife,
                   lifeScl = type.scaleLife ? Mathf.clamp((baseLife + scaleLifetimeOffset) * Mathf.dst(bulletX, bulletY, targetPos.x, targetPos.y) / type.range, minRange() / type.range, range() / type.range) : baseLife;
 

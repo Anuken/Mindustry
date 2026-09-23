@@ -130,7 +130,7 @@ public class EditorMapsDialog extends MapListDialog{
             if(!map.tags.get("description", "").isEmpty()){
                 t.add("@editor.description").padRight(10).color(Color.gray).top();
                 t.row();
-                t.add(map.description()).growX().wrap().padTop(2);
+                t.add(map.description()).growX().wrap(true).padTop(2);
             }
         }).height(mapsize).width(mapsize);
 

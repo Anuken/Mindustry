@@ -84,11 +84,6 @@ public class ImagePacker{
             }
 
             @Override
-            public PixmapRegion getPixmap(AtlasRegion region){
-                return new PixmapRegion(get(region.name));
-            }
-
-            @Override
             public boolean has(String s){
                 return cache.containsKey(s);
             }
@@ -246,7 +241,6 @@ public class ImagePacker{
 
     static void saveScaled(Pixmap pix, String name, int size){
         Pixmap scaled = new Pixmap(size, size);
-        //TODO bad linear scaling
         scaled.draw(pix, 0, 0, pix.width, pix.height, 0, 0, size, size, true, true);
         save(scaled, name);
     }
@@ -254,7 +248,6 @@ public class ImagePacker{
     static void drawScaledFit(Pixmap base, Pixmap image){
         Vec2 size = Scaling.fit.apply(image.width, image.height, base.width, base.height);
         int wx = (int)size.x, wy = (int)size.y;
-        //TODO bad linear scaling
         base.draw(image, 0, 0, image.width, image.height, base.width/2 - wx/2, base.height/2 - wy/2, wx, wy, true, true);
     }
 

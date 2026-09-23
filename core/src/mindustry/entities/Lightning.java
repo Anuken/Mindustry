@@ -111,6 +111,10 @@ public class Lightning{
                 x = furthestBuild.x();
                 y = furthestBuild.y();
                 hitCount = 0;
+            if(furthest != null && furthest.within(x, y, hitRange * 2f)){
+                hit.add(furthest.id());
+                x = furthest.x();
+                y = furthest.y();
             }else{
                 rotation += random.range(20f);
                 x += Angles.trnsx(rotation, hitRange / 2f);

@@ -29,7 +29,8 @@ public class MapAssetsDialog extends BaseDialog{
         Icon.fileText,
         Icon.image,
         Icon.volumeUp,
-        Icon.music
+        Icon.music,
+        Icon.players
     };
 
     private AssetView[] views = {
@@ -39,6 +40,7 @@ public class MapAssetsDialog extends BaseDialog{
         new MapImagesView(),
         new MapAudioView(DataAssetType.sound),
         new MapAudioView(DataAssetType.music),
+        new MapEmojisView(),
     };
 
     TextField searchField;

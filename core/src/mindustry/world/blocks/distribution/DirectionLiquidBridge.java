@@ -33,7 +33,7 @@ public class DirectionLiquidBridge extends DirectionBridge{
         return new TextureRegion[]{bottomRegion, region, dirRegion};
     }
 
-    public class DuctBridgeBuild extends DirectionBridgeBuild{
+    public class DirectionLiquidBridgeBuild extends DirectionBridgeBuild{
 
         @Override
         public void drawCached(){

@@ -324,11 +324,6 @@ public class Generators{
 
                 TextureRegion[] regions = block.getGeneratedIcons();
 
-                for(TextureRegion region : block.makeIconRegions()){
-                    GenRegion gen = (GenRegion)region;
-                    save(get(region).outline(block.outlineColor, block.outlineRadius), gen.name + "-outline");
-                }
-
                 Pixmap shardTeamTop = null;
 
                 if(block.teamRegion.found()){
@@ -517,37 +512,6 @@ public class Generators{
 
                     delete("team-" + team.name);
                     save(base.outline(Pal.gray, 3), "../ui/team-" + team.name);
-                }
-            }
-        });
-
-        MultiPacker packer = new MultiPacker(){
-            @Override
-            public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
-                String prefix = type == PageType.main ? "" : "../" + type.name() + "/";
-                Log.info("@ | @x@", prefix + name, region.width, region.height);
-                //save(region.pixmap, prefix + name);
-            }
-        };
-
-        //TODO !!!!! currently just an experiment
-
-        if(false)
-        generate("all-icons", () -> {
-            for(Seq<Content> arr : content.getContentMap()){
-                for(Content cont : arr){
-                    if(cont instanceof UnlockableContent && !(cont instanceof Planet)){
-                        UnlockableContent unlock = (UnlockableContent)cont;
-
-                        if(unlock.generateIcons){
-                            try{
-                                unlock.createIcons(packer);
-                            }catch(IllegalArgumentException e){
-                                Log.err(e);
-                                Log.err("Skip: @", unlock.name);
-                            }
-                        }
-                    }
                 }
             }
         });

@@ -8,6 +8,7 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
+import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.ai.*;
@@ -58,15 +59,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         //debug GL information
         Log.info("[GL] Version: @", graphics.getGLVersion());
         Log.info("[GL] Max texture size: @", maxTextureSize);
-        Log.info("[GL] Using @ API.", gl30 != null ? "OpenGL 3" : "OpenGL 2");
-
-        IntelGpuCheck.init(graphics.getGLVersion().vendorString);
-
-        boolean isIntel = IntelGpuCheck.wasIntel();
-
-        if(isIntel && !graphics.isGL30Available()) Log.warn("[GL] Intel GPU detected on previous launch. Due to memory corruption issues, OpenGL 3 support has been disabled for Intel GPUs. See issue #11041.");
-
-        if(gl30 == null && !isIntel) Log.warn("[GL] Your device or video drivers do not support OpenGL 3. This will cause performance issues.");
 
         if(NvGpuInfo.hasMemoryInfo()) Log.info("[GL] Total available VRAM: @", Strings.formatByteCount(NvGpuInfo.getMaxMemoryKB() * 1000L));
 
@@ -144,7 +136,10 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
 
         assets.load("sprites/error.png", Texture.class);
-        atlas = TextureAtlas.blankAtlas();
+        //TODO: this takes 300+ms to load, which means 300ms of black screen
+        atlas = new TextureAtlas(Core.files.internal("sprites/sprites.aatls"));
+        Fonts.loadDefaultFont();
+
         Vars.net = new Net(platform.getNet());
         MapPreviewLoader.setupLoaders();
         mods = new Mods();
@@ -154,10 +149,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.load(new Vars());
 
-        Fonts.loadDefaultFont();
-
-        //load fallback atlas if max texture size is below 4096
-        assets.load(new AssetDescriptor<>(maxTextureSize >= 4096 ? "sprites/sprites.aatls" : "sprites/fallback/sprites.aatls", TextureAtlas.class)).loaded = t -> atlas = t;
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
         Musics.load();
@@ -172,7 +163,6 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
 
         assets.load(mods);
-        assets.loadRun("mergeUI", PixmapPacker.class, () -> {}, () -> Fonts.mergeFontAtlas(atlas));
 
         add(logic = new Logic());
         add(control = new Control());
@@ -183,7 +173,10 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.load(schematics);
 
-        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
+        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> {
+            content.load();
+            Fonts.loadModContentIcons();
+        });
         assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
 
         Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> t.setWrap(TextureWrap.repeat);
@@ -337,6 +330,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
                 }else{
                     SaveMeta meta = SaveIO.getMeta(file);
                     if(!meta.isMap()){ //open save
+                        //not sure if this is a great idea but leaving the editor open would lead to catastrophic bugs
+                        if(ui.editor.isShown()) ui.editor.hide();
+
                         if(meta.rules.sector == null){
                             //not sure if this is a great idea, but leaving the editor open would lead to catastrophic bugs
                             if(ui.editor.isShown()) ui.editor.hide();

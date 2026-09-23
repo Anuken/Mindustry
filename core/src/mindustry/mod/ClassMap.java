@@ -40,6 +40,7 @@ public class ClassMap{
         classes.put("SpawnDeathAbility", mindustry.entities.abilities.SpawnDeathAbility.class);
         classes.put("StatusFieldAbility", mindustry.entities.abilities.StatusFieldAbility.class);
         classes.put("SuppressionFieldAbility", mindustry.entities.abilities.SuppressionFieldAbility.class);
+        classes.put("UnitShieldProvider", mindustry.entities.abilities.UnitShieldProvider.class);
         classes.put("UnitSpawnAbility", mindustry.entities.abilities.UnitSpawnAbility.class);
         classes.put("ArtilleryBulletType", mindustry.entities.bullet.ArtilleryBulletType.class);
         classes.put("BasicBulletType", mindustry.entities.bullet.BasicBulletType.class);
@@ -151,10 +152,10 @@ public class ClassMap{
         classes.put("ConstructBlock", mindustry.world.blocks.ConstructBlock.class);
         classes.put("ConstructBuild", mindustry.world.blocks.ConstructBlock.ConstructBuild.class);
         classes.put("ControlBlock", mindustry.world.blocks.ControlBlock.class);
-        classes.put("ExplosionShield", mindustry.world.blocks.ExplosionShield.class);
         classes.put("ItemSelection", mindustry.world.blocks.ItemSelection.class);
         classes.put("LaunchAnimator", mindustry.world.blocks.LaunchAnimator.class);
         classes.put("RotBlock", mindustry.world.blocks.RotBlock.class);
+        classes.put("ShieldProvider", mindustry.world.blocks.ShieldProvider.class);
         classes.put("TileBitmask", mindustry.world.blocks.TileBitmask.class);
         classes.put("UnitTetherBlock", mindustry.world.blocks.UnitTetherBlock.class);
         classes.put("Accelerator", mindustry.world.blocks.campaign.Accelerator.class);
@@ -230,7 +231,7 @@ public class ClassMap{
         classes.put("DirectionBridge", mindustry.world.blocks.distribution.DirectionBridge.class);
         classes.put("DirectionBridgeBuild", mindustry.world.blocks.distribution.DirectionBridge.DirectionBridgeBuild.class);
         classes.put("DirectionLiquidBridge", mindustry.world.blocks.distribution.DirectionLiquidBridge.class);
-        classes.put("DuctBridgeBuild", mindustry.world.blocks.distribution.DirectionLiquidBridge.DuctBridgeBuild.class);
+        classes.put("DirectionLiquidBridgeBuild", mindustry.world.blocks.distribution.DirectionLiquidBridge.DirectionLiquidBridgeBuild.class);
         classes.put("DirectionalUnloader", mindustry.world.blocks.distribution.DirectionalUnloader.class);
         classes.put("DirectionalUnloaderBuild", mindustry.world.blocks.distribution.DirectionalUnloader.DirectionalUnloaderBuild.class);
         classes.put("Duct", mindustry.world.blocks.distribution.Duct.class);

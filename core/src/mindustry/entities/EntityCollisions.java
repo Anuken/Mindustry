@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -133,7 +134,7 @@ public class EntityCollisions{
 
     public static boolean waterSolid(int x, int y){
         Tile tile = world.tile(x, y);
-        return tile == null || tile.solid() || !tile.floor().isLiquid;
+        return tile == null || tile.solid() || !tile.floor().isLiquid || (tile.block() != Blocks.air && !tile.block().solidifes);
     }
 
     public static boolean solid(int x, int y){

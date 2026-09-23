@@ -13,7 +13,6 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -23,9 +22,6 @@ import static mindustry.Vars.*;
 
 /** Base interface for an unlockable content type. */
 public abstract class UnlockableContent extends MappableContent{
-    /** Stat storage for this content. Initialized on demand. */
-    @NoPatch
-    public Stats stats = new Stats();
     /** Localized, formal name. Never null. Set to internal name if not found in bundle. */
     public String localizedName;
     /** Localized description & details. May be null. */
@@ -120,9 +116,6 @@ public abstract class UnlockableContent extends MappableContent{
     @Override
     public void afterPatch(){
         super.afterPatch();
-
-        //reset stats
-        stats = new Stats();
     }
 
     public boolean isBanned(){
@@ -141,20 +134,13 @@ public abstract class UnlockableContent extends MappableContent{
         return minfo.mod == null || isPatchContent() ? description : description + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
     }
 
-    /** @deprecated just call computeStats() every time, there's no reason to cache it. This will be removed in v9. */
-    @Deprecated
-    public void checkStats(){
-        computeStats();
-    }
-
     /** Initializes stats on demand. Called every time the block stats are shown. */
-    public void setStats(){
-    }
+    public void setStats(Stats stats){}
 
     public Stats computeStats(){
-        this.stats = new Stats();
-        setStats();
-        return this.stats;
+        var stats = new Stats();
+        setStats(stats);
+        return stats;
     }
 
     /** Display any extra info after details. */
@@ -167,15 +153,15 @@ public abstract class UnlockableContent extends MappableContent{
      * No regions are loaded at this point; grab pixmaps from the packer.
      * */
     @CallSuper
-    public void createIcons(MultiPacker packer){
+    public void packSprites(PackContext packer){
 
     }
 
-    protected void makeOutline(PageType page, MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
-        makeOutline(page, packer, region, makeNew, outlineColor, outlineRadius, 0);
+    protected void makeOutline(PackContext packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius){
+        makeOutline(packer, region, makeNew, outlineColor, outlineRadius, 0);
     }
 
-    protected void makeOutline(PageType page, MultiPacker packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius, int padding){
+    protected void makeOutline(PackContext packer, TextureRegion region, boolean makeNew, Color outlineColor, int outlineRadius, int padding){
         if(region instanceof AtlasRegion at && region.found()){
             String name = at.name;
             if(!makeNew || !packer.has(name + "-outline")){
@@ -184,24 +170,24 @@ public abstract class UnlockableContent extends MappableContent{
                     PixmapRegion base = packer.get(region);
                     var result = Pixmaps.outline(base, outlineColor, outlineRadius, padding);
                     Drawf.checkBleed(result);
-                    packer.add(page, regName, result);
+                    packer.add(regName, result);
                     result.dispose();
                 }
             }
         }
     }
 
-    protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
+    protected void makeOutline(PackContext packer, TextureRegion region, String name, Color outlineColor, int outlineRadius){
         if(region.found() && packer.registerOutlined(name)){
             PixmapRegion base = packer.get(region);
             var result = Pixmaps.outline(base, outlineColor, outlineRadius);
             Drawf.checkBleed(result);
-            packer.add(PageType.main, name, result);
+            packer.add(name, result);
             result.dispose();
         }
     }
 
-    protected void makeOutline(MultiPacker packer, TextureRegion region, String name, Color outlineColor){
+    protected void makeOutline(PackContext packer, TextureRegion region, String name, Color outlineColor){
         makeOutline(packer, region, name, outlineColor, 4);
     }
 

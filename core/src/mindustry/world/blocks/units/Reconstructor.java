@@ -89,9 +89,9 @@ public class Reconstructor extends UnitBlock{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = constructTime;
-        super.setStats();
+        super.setStats(stats);
 
         stats.add(Stat.productionTime, constructTime / 60f, StatUnit.seconds);
         stats.add(Stat.output, table -> {

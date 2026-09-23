@@ -8,10 +8,8 @@ import arc.freetype.*;
 import arc.freetype.FreeTypeFontGenerator.*;
 import arc.freetype.FreetypeFontLoader.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
-import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
@@ -20,8 +18,10 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
+import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.mod.Mods.*;
 
 import java.io.*;
 import java.util.*;
@@ -33,6 +33,7 @@ public class Fonts{
     private static IntMap<String> unicodeToName = new IntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
+    private static int lastUsedModCodepoint;
 
     public static Font def, outline, icon, iconLarge, tech, logic, monospace;
 
@@ -134,37 +135,51 @@ public class Fonts{
         });
     }
 
-    public static void registerIcon(String name, String regionName, int ch, TextureRegion region){
-        int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
-
+    public static void registerIcon(String name, int ch, TextureRegion region){
         unicodeIcons.put(name, ch);
         stringIcons.put(name, ((char)ch) + "");
-        unicodeToName.put(ch, regionName);
+        unicodeToName.put(ch, region instanceof AtlasRegion at ? at.name : name);
 
-        Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
+        if(!Vars.headless){
+            int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
-        Glyph glyph = new Glyph();
-        glyph.id = ch;
-        glyph.srcX = 0;
-        glyph.srcY = 0;
-        glyph.width = (int)out.x;
-        glyph.height = (int)out.y;
-        glyph.u = region.u;
-        glyph.v = region.v2;
-        glyph.u2 = region.u2;
-        glyph.v2 = region.v;
-        glyph.xoffset = (size - glyph.width) / 2;
-        glyph.yoffset = (size - glyph.height) / 2 - size;
-        glyph.xadvance = size;
-        glyph.kerning = null;
-        glyph.fixedWidth = true;
-        glyph.page = 0;
-        Fonts.def.getData().setGlyph(ch, glyph);
-        Fonts.outline.getData().setGlyph(ch, glyph);
+            Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
+
+            Glyph glyph = new Glyph();
+            glyph.id = ch;
+            glyph.srcX = 0;
+            glyph.srcY = 0;
+            glyph.width = (int)out.x;
+            glyph.height = (int)out.y;
+            glyph.u = region.u;
+            glyph.v = region.v2;
+            glyph.u2 = region.u2;
+            glyph.v2 = region.v;
+            glyph.texture = region.texture;
+            glyph.xoffset = (size - glyph.width) / 2;
+            glyph.yoffset = (size - glyph.height) / 2 - size;
+            glyph.xadvance = size;
+            glyph.kerning = null;
+            glyph.fixedWidth = true;
+            glyph.page = 0;
+            Fonts.def.getData().setGlyph(ch, glyph);
+            Fonts.outline.getData().setGlyph(ch, glyph);
+        }
+    }
+
+    public static void unregisterIcon(String name){
+        int id = unicodeIcons.remove(name, 0);
+        stringIcons.remove(name);
+        if(id != 0){
+            unicodeToName.remove(id);
+        }
+    }
+
+    public static boolean hasIcon(String name){
+        return unicodeIcons.containsKey(name);
     }
 
     public static void loadContentIcons(){
-        Texture uitex = Core.atlas.find("logo").texture;
 
         try(var reader = Core.files.internal("icons/icons.properties").reader(Vars.bufferSize)){
             String line;
@@ -173,13 +188,8 @@ public class Fonts{
                 String[] nametex = split[1].split("\\|");
                 String character = split[0], texture = nametex[1];
                 int ch = Integer.parseInt(character);
-                TextureRegion region = Core.atlas.find(texture);
 
-                if(region.texture != uitex){
-                    continue;
-                }
-
-                registerIcon(nametex[0], texture, ch, region);
+                registerIcon(nametex[0], ch, Core.atlas.find(texture));
             }
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -187,28 +197,32 @@ public class Fonts{
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
 
-        //TODO: mod emojis can't work because most mod icons are not on the UI page!
-        /*
-        if(Vars.mods.list().contains(m -> m.shouldBeEnabled())){
-            ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit};
-            int startChar = 0xE000 + 1;
+        for(Team team : Team.baseTeams){
+            team.emoji = stringIcons.get(team.name, "");
+        }
+    }
+
+    public static void loadModContentIcons(){
+        if(Vars.mods.list().contains(LoadedMod::shouldBeEnabled)){
+            ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit, ContentType.team, ContentType.weather};
+            lastUsedModCodepoint = 0xE000 + 1;
 
             for(var type : types){
                 for(var cont : Vars.content.getBy(type)){
                     if(!cont.isVanilla() && cont instanceof UnlockableContent u && u.uiIcon.found()){
-                        int id = startChar;
+                        int id = lastUsedModCodepoint;
 
-                        registerIcon(u.name, u.uiIcon instanceof AtlasRegion atlas ? atlas.name : u.name, id, u.uiIcon);
+                        registerIcon(u.name, id, u.uiIcon);
 
-                        startChar ++;
+                        lastUsedModCodepoint ++;
                     }
                 }
             }
-        }*/
-
-        for(Team team : Team.baseTeams){
-            team.emoji = stringIcons.get(team.name, "");
         }
+    }
+
+    public static int getLastUsedModCodepoint(){
+        return lastUsedModCodepoint;
     }
 
     public static void loadContentIconsHeadless(){
@@ -222,6 +236,7 @@ public class Fonts{
 
                 unicodeIcons.put(nametex[0], ch);
                 stringIcons.put(nametex[0], ((char)ch) + "");
+                unicodeToName.put(ch, nametex[0]);
             }
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -236,9 +251,10 @@ public class Fonts{
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
-        int max = Gl.getInt(Gl.maxTextureSize);
+        //TOOD: which size to use?
+        UI.packer = new PixmapPacker(4096, 2048, 2, true);
+        UI.packer.setTargetTexture(Core.atlas.find("ui-page-placeholder").texture);
 
-        UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, 2, true);
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(Core.files::internal));
         Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(Core.files::internal){
             ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
@@ -276,40 +292,6 @@ public class Fonts{
             Fonts.tech = f;
             Fonts.tech.getData().down *= 1.5f;
         };
-    }
-
-    /** Merges the UI and font atlas together for better performance. */
-    public static void mergeFontAtlas(TextureAtlas atlas){
-        //grab all textures from the ui page, remove all the regions assigned to it, then copy them over to UI.packer and replace the texture in this atlas.
-
-        //grab old UI texture and regions...
-        Texture texture = atlas.find("logo").texture;
-
-        Page page = UI.packer.getPages().first();
-
-        Seq<AtlasRegion> regions = atlas.getRegions().select(t -> t.texture == texture);
-        for(AtlasRegion region : regions){
-            //get new pack rect
-            page.setDirty(false);
-            Rect rect = UI.packer.pack(region.name, atlas.getPixmap(region), region.splits, region.pads);
-
-            //set new texture
-            region.texture = UI.packer.getPages().first().getTexture();
-            //set its new position
-            region.set((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
-            //add old texture
-            atlas.getTextures().add(region.texture);
-            //clear it
-            region.pixmapRegion = null;
-        }
-
-        //remove old texture, it will no longer be used
-        atlas.getTextures().remove(texture);
-        texture.dispose();
-        atlas.disposePixmap(texture);
-
-        page.setDirty(true);
-        page.updateTexture(TextureFilter.linear, TextureFilter.linear, false);
     }
 
     public static TextureRegionDrawable getGlyph(Font font, char glyph){

@@ -1,6 +1,5 @@
 package mindustry.world.blocks.logic;
 
-import arc.util.*;
 import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -27,8 +26,8 @@ public class MemoryBlock extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.memoryCapacity, memoryCapacity, StatUnit.none);
     }

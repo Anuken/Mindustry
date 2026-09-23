@@ -55,8 +55,8 @@ public class SolidPump extends Pump{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.remove(Stat.output);
         stats.add(Stat.output, result, 60f * pumpAmount, true);

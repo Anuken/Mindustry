@@ -45,8 +45,8 @@ public class DuctRouter extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.itemsMoved, 60f / speed * itemCapacity, StatUnit.itemsSecond);
     }

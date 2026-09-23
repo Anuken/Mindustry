@@ -15,6 +15,7 @@ public enum LAccess{
     powerNetCapacity,
     powerNetIn,
     powerNetOut,
+    links,
     ammo,
     ammoCapacity,
     currentAmmoType,
