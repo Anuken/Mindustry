@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.gl.*;
 import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
@@ -26,6 +25,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.zip.*;
 
 import static arc.Core.*;
@@ -504,8 +504,7 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
-        Log.info(useDefaultSmaa());
-        graphics.checkPref("smaa", useDefaultSmaa());
+        graphics.checkPref("smaa", enableSmaa());
 
         graphics.checkPref("linear", true, b -> {
             atlas.getTexture().setFilter(b ? TextureFilter.linear : TextureFilter.nearest);
@@ -648,13 +647,12 @@ public class SettingsMenuDialog extends BaseDialog{
         prefs.add(tables.get(index));
     }
 
-    private static boolean useDefaultSmaa(){
-        if(mobile || Gl.getInt(Gl.maxTextureSize) < 16384){
+    private static boolean enableSmaa(){
+        if(mobile || maxTextureSize < 16384 || Core.graphics.getGLVersion().rendererString == null){
             return false;
         }
 
-        GLVersion gl = Core.graphics.getGLVersion();
-        String renderer = gl.rendererString == null ? "" : gl.rendererString.toLowerCase();
+        String renderer = Core.graphics.getGLVersion().rendererString.toLowerCase(Locale.ROOT);
 
         String[] goodRenderers = {
         //nvidia discrete
@@ -671,7 +669,7 @@ public class SettingsMenuDialog extends BaseDialog{
             if(renderer.contains(good)) return true;
         }
 
-        return true;
+        return false;
     }
 
     @Override
