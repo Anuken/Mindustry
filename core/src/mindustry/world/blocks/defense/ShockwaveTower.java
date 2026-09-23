@@ -133,8 +133,6 @@ public class ShockwaveTower extends Block{
             units.clear();
             damageSum = 0f;
 
-            if (Groups.bullet.isEmpty()) return;
-
             Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
                 if(b.team != team && b.type.hittable && b.within(x, y, range + 1f)){
                     bullets.add(b);
