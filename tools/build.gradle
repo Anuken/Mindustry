@@ -23,24 +23,6 @@ static void antialias(File file){
     result.dispose()
 }
 
-tasks.register('antialiasImages'){
-    doLast{
-        for(def img : project.getProperty("images").split(",")){
-            println(project.getProperty("startdir") + "/" + img)
-            antialias(new File(project.getProperty("startdir") + "/" + img))
-        }
-    }
-}
-
-tasks.register('tileImages'){
-    doLast{
-        for(def img : project.getProperty("images").split(",")){
-            println(project.getProperty("startdir") + "/" + img)
-            tileImage(new File(project.getProperty("startdir") + "/" + img))
-        }
-    }
-}
-
 tasks.register('pack'){
     dependsOn = [classes, configurations.runtimeClasspath]
 
@@ -61,11 +43,13 @@ tasks.register('pack'){
         //run generation task; generate all needed sprites
         file(genFolder).mkdirs()
 
+        long ms = System.currentTimeMillis();
         project.services.get(ExecOperations).javaexec{
             mainClass = "mindustry.tools.ImagePacker"
             classpath = sourceSets.main.runtimeClasspath
             workingDir = genFolder
         }
+        println "Image generation: ${(System.currentTimeMillis() - ms) / 1000f} seconds"
 
         copy{
             from "../core/assets-raw/sprites_out/ui/icons"
@@ -78,26 +62,28 @@ tasks.register('pack'){
 
         if(enableAA){
             ExecutorService executor = Executors.newFixedThreadPool(OS.cores)
-            long ms = System.currentTimeMillis()
+            ms = System.currentTimeMillis()
 
             //antialias everything except UI elements
             fileTree(dir: new File(rootDir, 'core/assets-raw/sprites_out/').absolutePath, include: "**/*.png").visit{ file ->
-                if(file.isDirectory() || (file.toString().replace("\\", "/").contains("/ui/") && file.toString().startsWith("icon-")) || file.toString().contains(".9.png") || file.toString().contains("aaaa")) return
+                if(file.isDirectory() || file.toString().contains(".9.png") || file.toString().contains("aaaa")) return
 
-                executor.submit{
+                executor.execute{
                     antialias(file.file)
                 }
             }
 
             Threads.await(executor)
 
-            println "Time taken for AA: ${(System.currentTimeMillis() - ms) / 1000f} seconds"
+            println "Antialias: ${(System.currentTimeMillis() - ms) / 1000f} seconds"
         }
 
-        println("Running sprite packer...")
+        ms = System.currentTimeMillis()
 
         //pack normal sprites
         TexturePacker.process(new File(rootDir, "core/assets-raw/sprites_out/").absolutePath, new File(rootDir, "core/assets/sprites/").absolutePath, "sprites.aatls")
+
+        println "Sprite packing: ${(System.currentTimeMillis() - ms) / 1000f} seconds"
     }
 }
 

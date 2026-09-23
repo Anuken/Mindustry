@@ -31,7 +31,6 @@ public class ShallowLiquid extends Floor{
 
     @Override
     public void packSprites(PackContext packer){
-        super.packSprites(packer);
 
         if(liquidBase != null && floorBase != null){
             var overlay = packer.get(liquidBase.region);
@@ -49,5 +48,7 @@ public class ShallowLiquid extends Floor{
                 res.dispose();
             }
         }
+
+        super.packSprites(packer);
     }
 }

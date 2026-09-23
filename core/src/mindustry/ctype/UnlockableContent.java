@@ -198,7 +198,7 @@ public abstract class UnlockableContent extends MappableContent{
     /** Stretches image into a size x size square; used for -ui icons that are already roughly square, e.g. blocks. */
     protected static void saveScaled(PackContext packer, Pixmap image, String name, int size){
         Pixmap scaled = new Pixmap(size, size);
-        scaled.draw(image, 0, 0, image.width, image.height, 0, 0, size, size, true, true);
+        scaled.drawScaled(image, 0, 0, image.width, image.height, 0, 0, size, size, false);
         packer.add(name, scaled);
         scaled.dispose();
     }
@@ -207,7 +207,7 @@ public abstract class UnlockableContent extends MappableContent{
     protected static void drawScaledFit(Pixmap base, Pixmap image){
         Vec2 size = Scaling.fit.apply(image.width, image.height, base.width, base.height);
         int wx = (int)size.x, wy = (int)size.y;
-        base.draw(image, 0, 0, image.width, image.height, base.width / 2 - wx / 2, base.height / 2 - wy / 2, wx, wy, true, true);
+        base.drawScaled(image, 0, 0, image.width, image.height, base.width / 2 - wx / 2, base.height / 2 - wy / 2, wx, wy, false);
     }
 
     /** @return items needed to research this content */
@@ -222,7 +222,6 @@ public abstract class UnlockableContent extends MappableContent{
     public int emojiChar(){
         return Fonts.getUnicode(name);
     }
-
 
     public boolean hasEmoji(){
         return Fonts.hasUnicodeStr(name);

@@ -35,8 +35,7 @@ public class FilePackContext extends PackContext{
         //splits/pads are unused; nothing in the vanilla path emits 9-patches here
         Pixmap image = region.crop();
         Fi target = new Fi((noCrop ? "../blocks/environment/" : "") + name + ".png");
-        target.writePng(image);
-        target.writePng(image);
+        Core.executor.execute(() -> target.writePng(image));
 
         removeOriginal(name, target);
 
@@ -65,10 +64,6 @@ public class FilePackContext extends PackContext{
         }catch(IOException e){
             Log.err("Failed to remove original sprite '@'", name, e);
         }
-    }
-
-    public void printStats(){
-        Log.debug("[Atlas] Wrote @ generated sprite@ to disk.", written.size, written.size == 1 ? "" : "s");
     }
 
     public void dispose(){

@@ -14,11 +14,7 @@ import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.legacy.*;
-
-import java.util.concurrent.*;
 
 import static mindustry.Vars.*;
 import static mindustry.tools.ImagePacker.*;
@@ -65,48 +61,77 @@ public class Generators{
         ObjectMap<Block, Pixmap> gens = new ObjectMap<>();
         FilePackContext ctx = new FilePackContext();
 
-        generate("autotiles", () -> {
-            for(Block block : content.blocks().select(b -> (b.isFloor() && b.asFloor().autotile) || (b instanceof StaticWall && ((StaticWall)b).autotile))){
-                int variants = block instanceof Floor f && f.autotileVariants > 1 ? f.autotileVariants : 1;
-                for(int v = 0; v < variants; v++){
-                    Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name + "-autotile" + (variants <= 1 ? "" : "" + (v+1)) + ".png"), iconPath = basePath.parent().child(block.name + ".png");
+        //scorches
+        for(int bsize = 0; bsize < 10; bsize++){
+            int size = bsize;
+            Core.executor.execute(() -> {
+                for(int i = 0; i < 3; i++){
+                    Rand rand = new Rand();
+                    ScorchGenerator gen = new ScorchGenerator();
+                    double multiplier = 30;
+                    double ss = size * multiplier / 20.0;
 
-                    if(basePath.exists()){
-                        int variant = v;
-                        //theoretically this might not finish in time, but I doubt that will ever happen
-                        mainExecutor.submit(() -> {
-                            try{
-                                ImageTileGenerator.generate(basePath, block.name + (variants <= 1 ? "" : "-" + (variant+1)), new Fi("../../../assets-raw/sprites_out/blocks/environment"));
-                            }catch(Throwable e){
-                                Log.err("Failed to autotile: " + block.name, e);
-                            }finally{
-                                //the raw autotile source image must never be included, it isn't useful
-                                basePath.delete();
-                            }
-                        });
+                    gen.seed = rand.random(100000);
+                    gen.size += size*multiplier;
+                    gen.scale = gen.size / 80f * 18f;
+                    //gen.nscl -= size * 0.2f;
+                    gen.octaves += ss/3.0;
+                    gen.pers += ss/10.0/5.0;
 
-                        if(v == 0){
-                            //save the bottom right region as the "main" sprite for previews
-                            Pixmap out = new Pixmap(basePath);
-                            Pixmap cropped = out.crop(32, 32, 32, 32);
-                            boolean isFallback = !iconPath.exists();
-                            if(isFallback){
-                                iconPath.writePng(cropped);
-                                //the static atlas cache predates this run, so packSprites() can't see this new file unless we seed it directly
-                                ctx.seed(block.name, cropped);
-                            }
-                            out.dispose();
-                            gens.put(block, cropped);
+                    gen.scale += rand.range(3f);
+                    gen.scale -= ss*2f;
+                    gen.nscl -= rand.random(1f);
+
+                    Pixmap out = gen.generate();
+                    Pixmap median = Pixmaps.median(out, 2, 0.75, new IntSeq());
+                    Fi.get("../rubble/scorch-" + size + "-" + i + ".png").writePng(median);
+                    out.dispose();
+                    median.dispose();
+                }
+            });
+        }
+
+        //autotiles
+        for(Block block : content.blocks().select(b -> (b.isFloor() && b.asFloor().autotile) || (b instanceof StaticWall && ((StaticWall)b).autotile))){
+            int variants = block instanceof Floor f && f.autotileVariants > 1 ? f.autotileVariants : 1;
+            for(int v = 0; v < variants; v++){
+                Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name + "-autotile" + (variants <= 1 ? "" : "" + (v+1)) + ".png"), iconPath = basePath.parent().child(block.name + ".png");
+
+                if(basePath.exists()){
+                    int variant = v;
+                    //theoretically this might not finish in time, but I doubt that will ever happen
+                    mainExecutor.execute(() -> {
+                        try{
+                            ImageTileGenerator.generate(basePath, block.name + (variants <= 1 ? "" : "-" + (variant+1)), new Fi("../../../assets-raw/sprites_out/blocks/environment"));
+                        }catch(Throwable e){
+                            Log.err("Failed to autotile: " + block.name, e);
+                        }finally{
+                            //the raw autotile source image must never be included, it isn't useful
+                            basePath.delete();
                         }
-                    }else{
-                        Log.warn("Autotile block '@' not found: @", block.name, basePath.absolutePath());
+                    });
+
+                    if(v == 0){
+                        //save the bottom right region as the "main" sprite for previews
+                        Pixmap out = new Pixmap(basePath);
+                        Pixmap cropped = out.crop(32, 32, 32, 32);
+                        boolean isFallback = !iconPath.exists();
+                        if(isFallback){
+                            iconPath.writePng(cropped);
+                            //the static atlas cache predates this run, so packSprites() can't see this new file unless we seed it directly
+                            ctx.seed(block.name, cropped);
+                        }
+                        out.dispose();
+                        gens.put(block, cropped);
                     }
+                }else{
+                    Log.warn("Autotile block '@' not found: @", block.name, basePath.absolutePath());
                 }
             }
-        });
+        }
 
-        generate("splashes", () -> {
-
+        //splashes
+        {
             int frames = 12;
             int size = 32;
             for(int i = 0; i < frames; i++){
@@ -130,10 +155,10 @@ public class Generators{
 
                 pixmap.dispose();
             }
-        });
+        }
 
-        generate("bubbles", () -> {
-
+        //bubbles
+        {
             int frames = 16;
             int size = 40;
             for(int i = 0; i < frames; i++){
@@ -157,9 +182,10 @@ public class Generators{
 
                 pixmap.dispose();
             }
-        });
+        }
 
-        generate("gas-frames", () -> {
+        //gas frames
+        {
             int frames = Liquid.animationFrames;
             String[] stencils = {"fluid"};
             String[] types = {"liquid", "gas"};
@@ -185,10 +211,10 @@ public class Generators{
                     }
                 }
             }
-        });
+        }
 
-        generate("cliffs", () -> {
-            ExecutorService exec = Executors.newFixedThreadPool(OS.cores);
+        //cliffs
+        {
             int size = 64;
             int dark = new Color(0.5f, 0.5f, 0.6f, 1f).mul(0.98f).rgba();
             int mid = Color.lightGray.rgba();
@@ -200,7 +226,7 @@ public class Generators{
 
             for(int i = Byte.MIN_VALUE; i <= Byte.MAX_VALUE; i++){
                 int bi = i;
-                exec.execute(() -> {
+                Core.executor.execute(() -> {
                     Color color = new Color();
                     Pixmap result = new Pixmap(size, size);
                     byte[][] mask = new byte[size][size];
@@ -264,11 +290,10 @@ public class Generators{
                     fi.writePng(result);
                 });
             }
+        }
 
-            Threads.await(exec);
-        });
-
-        generate("cracks", () -> {
+        //cracks
+        Core.executor.execute(() -> {
             for(int size = 1; size <= BlockRenderer.maxCrackSize; size++){
                 int dim = size * 32;
                 int steps = BlockRenderer.crackRegions;
@@ -307,127 +332,84 @@ public class Generators{
                         }
                     }
 
-                    Fi.get("../rubble/cracks-" + size + "-" + i + ".png").writePng(output);
+                    new Fi("../rubble/cracks-" + size + "-" + i + ".png").writePng(output);
                 }
             }
         });
 
-        generate("content-sprites", () -> {
-            for(Seq<Content> arr : content.getContentMap()){
-                for(var content: arr){
-                    if(content instanceof UnlockableContent u && u.packSprites){
-                        try{
-                            u.packSprites(ctx);
-                        }catch(Throwable e){
-                            Log.err("Failed to pack sprites for: " + u.name, e);
-                        }
-                    }
-                }
-            }
+        //content sprites
+        Pixmap colors = new Pixmap(content.blocks().size, 1);
 
-            ctx.printStats();
-        });
+        for(Seq<Content> arr : content.getContentMap()){
+            for(var content: arr){
+                if(content instanceof UnlockableContent u && u.packSprites){
+                    try{
+                        u.packSprites(ctx);
 
-        //vanilla blocks more accurate block color scanning based on total pixel average
-        generate("block-colors", () -> {
-            Pixmap colors = new Pixmap(content.blocks().size, 1);
+                        if(u instanceof Block block){
+                            TextureRegion[] regions = block.getGeneratedIcons();
 
-            for(Block block : content.blocks()){
-                if(block.isAir() || block instanceof ConstructBlock || block instanceof OreBlock || block instanceof LegacyBlock) continue;
+                            PixmapRegion image =
+                            ctx.has("block-" + block.name + "-full") ? ctx.get("block-" + block.name + "-full") :
+                            regions.length > 0 && regions[0].found() ? ctx.get(regions[0]) :
+                            ctx.has(block.name + "1") ? ctx.get(block.name + "1") :
+                            gens.containsKey(block) ? new PixmapRegion(gens.get(block)) :
+                            null;
 
-                try{
-                    TextureRegion[] regions = block.getGeneratedIcons();
-
-                    PixmapRegion image =
-                    ctx.has("block-" + block.name + "-full") ? ctx.get("block-" + block.name + "-full") :
-                    regions.length > 0 && regions[0].found() ? ctx.get(regions[0]) :
-                    null;
-
-                    Pixmap fallback = image == null && gens.containsKey(block) ? gens.get(block) : null;
-
-                    if(image == null && fallback == null) continue;
-
-                    int width = image != null ? image.width : fallback.width;
-                    int height = image != null ? image.height : fallback.height;
-
-                    boolean hasEmpty = false;
-                    Color average = new Color(), c = new Color();
-                    float asum = 0f;
-                    for(int x = 0; x < width; x++){
-                        for(int y = 0; y < height; y++){
-                            Color color = c.set(image != null ? image.get(x, y) : fallback.get(x, y));
-                            average.r += color.r*color.a;
-                            average.g += color.g*color.a;
-                            average.b += color.b*color.a;
-                            asum += color.a;
-                            if(color.a < 0.9f){
-                                hasEmpty = true;
+                            if(image == null){
+                                Log.warn("No icon for '@', skipping block color.", block.name);
+                                continue;
                             }
+
+                            int width = image.width;
+                            int height = image.height;
+
+                            boolean hasEmpty = false;
+                            Color average = new Color(), c = new Color();
+                            float asum = 0f;
+                            for(int x = 0; x < width; x++){
+                                for(int y = 0; y < height; y++){
+                                    Color color = c.set(image.get(x, y));
+                                    average.r += color.r*color.a;
+                                    average.g += color.g*color.a;
+                                    average.b += color.b*color.a;
+                                    asum += color.a;
+                                    if(color.a < 0.9f){
+                                        hasEmpty = true;
+                                    }
+                                }
+                            }
+
+                            average.mul(1f / asum);
+
+                            if(block instanceof Floor && !((Floor)block).wallOre){
+                                average.mul(0.77f);
+                            }else{
+                                average.mul(1.1f);
+                            }
+                            //encode square sprite in alpha channel
+                            average.a = hasEmpty ? 0.1f : 1f;
+                            colors.setRaw(block.id, 0, average.rgba());
                         }
+                    }catch(Throwable e){
+                        Log.err("Failed to pack sprites for: " + u.name, e);
                     }
-
-                    average.mul(1f / asum);
-
-                    if(block instanceof Floor && !((Floor)block).wallOre){
-                        average.mul(0.77f);
-                    }else{
-                        average.mul(1.1f);
-                    }
-                    //encode square sprite in alpha channel
-                    average.a = hasEmpty ? 0.1f : 1f;
-                    colors.setRaw(block.id, 0, average.rgba());
-                }catch(NullPointerException e){
-                    Log.err("Block &ly'@'&lr has an null region!", block);
                 }
             }
+        }
 
-            save(colors, "../../../assets/sprites/block_colors");
-        });
-
-        generate("shallows", () -> {
-            content.blocks().<ShallowLiquid>each(b -> b instanceof ShallowLiquid, floor -> {
-                Pixmap overlay = get(floor.liquidBase.region);
-                int index = 0;
-                for(TextureRegion region : floor.floorBase.variantRegions()){
-                    Pixmap res = get(region).copy();
-                    for(int x = 0; x < res.width; x++){
-                        for(int y = 0; y < res.height; y++){
-                            res.set(x, y, Pixmap.blend((overlay.getRaw(x, y) & 0xffffff00) | (int)(floor.liquidOpacity * 255), res.getRaw(x, y)));
-                        }
-                    }
-
-                    String name = floor.name + (++index);
-                    save(res, "../blocks/environment/" + name);
-
-                    gens.put(floor, res);
-                }
-            });
-        });
-
-        generate("team-icons", () -> {
-            for(Team team : Team.all){
-                if(has("team-" + team.name)){
-                    int rgba = team == Team.derelict ? Color.valueOf("b7b8c9").rgba() : team.color.rgba();
-                    Pixmap base = get("team-" + team.name);
-                    base.each((x, y) -> base.setRaw(x, y, Color.muli(base.getRaw(x, y), rgba)));
-
-                    delete("team-" + team.name);
-                    save(base.outline(Pal.gray, 3), "../ui/team-" + team.name);
-                }
-            }
-        });
+        save(colors, "../../../assets/sprites/block_colors");
 
         //vanilla-only: random wreck debris
-        generate("unit-wrecks", () -> content.units().each(type -> {
+        content.units().each(type -> {
             if(!type.packSprites) return;
 
             String fullName = "unit-" + type.name + "-full";
             //fall back to the plain body region for the (currently unused) case of generateFullIcon == false
             if(!ctx.has(fullName) && !ctx.has(type.name)) return;
 
-            Pixmap image = ctx.get(ctx.has(fullName) ? fullName : type.name).crop();
-
-            try{
+            Core.executor.execute(() -> {
+                Pixmap image = ctx.get(ctx.has(fullName) ? fullName : type.name).crop();
                 Rand rand = new Rand();
                 rand.setSeed(type.name.hashCode());
 
@@ -459,39 +441,23 @@ public class Generators{
                 for(int i = 0; i < wrecks.length; i++){
                     save(wrecks[i], "../rubble/" + type.name + "-wreck" + i);
                 }
-            }catch(IllegalArgumentException e){
-                Log.err("WARNING: Skipping wrecks for unit @: @", type.name, e.getMessage());
-            }finally{
                 image.dispose();
-            }
-        }));
-
-        generate("scorches", () -> {
-            for(int size = 0; size < 10; size++){
-                for(int i = 0; i < 3; i++){
-                    ScorchGenerator gen = new ScorchGenerator();
-                    double multiplier = 30;
-                    double ss = size * multiplier / 20.0;
-
-                    gen.seed = Mathf.random(100000);
-                    gen.size += size*multiplier;
-                    gen.scale = gen.size / 80f * 18f;
-                    //gen.nscl -= size * 0.2f;
-                    gen.octaves += ss/3.0;
-                    gen.pers += ss/10.0/5.0;
-
-                    gen.scale += Mathf.range(3f);
-                    gen.scale -= ss*2f;
-                    gen.nscl -= Mathf.random(1f);
-
-                    Pixmap out = gen.generate();
-                    Pixmap median = Pixmaps.median(out, 2, 0.75);
-                    Fi.get("../rubble/scorch-" + size + "-" + i + ".png").writePng(median);
-                    out.dispose();
-                    median.dispose();
-                }
-            }
+            });
         });
+
+        //team icons
+        for(Team team : Team.all){
+            if(has("team-" + team.name)){
+                int rgba = team == Team.derelict ? Color.valueOf("b7b8c9").rgba() : team.color.rgba();
+                Pixmap base = get("team-" + team.name);
+                base.each((x, y) -> base.setRaw(x, y, Color.muli(base.getRaw(x, y), rgba)));
+
+                delete("team-" + team.name);
+                save(base.outline(Pal.gray, 3), "../ui/team-" + team.name);
+            }
+        }
+
+        Threads.await(Core.executor);
 
         ctx.dispose();
     }

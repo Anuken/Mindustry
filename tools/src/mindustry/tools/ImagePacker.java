@@ -90,10 +90,8 @@ public class ImagePacker{
 
         Draw.scl = 1f / Core.atlas.find("scale_marker").width;
 
-        Time.mark();
         Vars.content.load();
         Generators.run();
-        Log.info("&ly[Generator]&lc Total time to generate: &lg@&lcms", Time.elapsed());
 
         //write icons to icons.properties
 
@@ -208,12 +206,6 @@ public class ImagePacker{
 
     static String texname(UnlockableContent c){
         return c.getContentType() + "-" + c.name + "-ui";
-    }
-
-    static void generate(String name, Runnable run){
-        Time.mark();
-        run.run();
-        Log.info("&ly[Generator]&lc Time to generate &lm@&lc: &lg@&lcms", name, Time.elapsed());
     }
 
     static Pixmap get(String name){
