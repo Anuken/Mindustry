@@ -53,15 +53,35 @@ public class AngledCorner{
         return getCache(size).tint(color);
     }
 
+    /** @return a cached filled angled-corner drawable with a top-to-bottom gradient; size is unscaled. */
+    public static NinePatchDrawable fill(int size, Color top, Color bottom){
+        return getCache(size).tint(top, bottom);
+    }
+
     /** @return a cached angled-corner outline drawable tinted with {@code color}; size and stroke are unscaled. */
     public static OutlinedCornerDrawable outline(int size, Color color, float stroke){
         return getCache(size, stroke).tint(color);
+    }
+
+    /** @return a cached angled-corner outline drawable with a top-to-bottom gradient; size and stroke are unscaled. */
+    public static OutlinedCornerDrawable outline(int size, Color top, Color bottom, float stroke){
+        return getCache(size, stroke).tint(top, bottom);
     }
 
     /** Creates a fill in {@code bgColor} with an outline in {@code borderColor} on top; size and stroke are unscaled. */
     public static StackDrawable create(int size, Color bgColor, Color borderColor, float stroke){
         //the fill is 1 smaller than the outline to avoid antialiasing artifacts at the edges
         return new StackDrawable(fill(size + 1, bgColor), outline(size, borderColor, stroke));
+    }
+
+    /** Same as {@link #create(int, Color, Color, float)}, but with a gradient fill. */
+    public static StackDrawable create(int size, Color bgTop, Color bgBottom, Color borderColor, float stroke){
+        return new StackDrawable(fill(size + 1, bgTop, bgBottom), outline(size, borderColor, stroke));
+    }
+
+    /** Same as {@link #create(int, Color, Color, float)}, but with a gradient fill and outline. */
+    public static StackDrawable create(int size, Color bgTop, Color bgBottom, Color borderTop, Color borderBottom, float stroke){
+        return new StackDrawable(fill(size + 1, bgTop, bgBottom), outline(size, borderTop, borderBottom, stroke));
     }
 
     /** @return exact fraction (0-1) of a pixel lying past a 45-degree edge, given the pixel center's diagonal offset v in pixels. */

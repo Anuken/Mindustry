@@ -19,6 +19,8 @@ public class OutlinedCornerDrawable extends BaseDrawable implements TransformDra
     private static final int quads = 8;
 
     private final Color color = new Color(Color.white);
+    /** Bottom tint for a top-to-bottom gradient; equal to {@link #color} unless a gradient is set. */
+    private final Color color2 = new Color(Color.white);
     private final float[] vertices = new float[quads * SpriteBatch.spriteSize];
     private Texture texture;
 
@@ -68,38 +70,47 @@ public class OutlinedCornerDrawable extends BaseDrawable implements TransformDra
         vs[idx + 23] = u2; vs[idx + 24] = v;  vs[idx + 25] = depth;
     }
 
-    /** Sets the position and color of one of the eight quads. */
-    private void setQuad(int quad, float x, float y, float w, float h, float c){
+    /** Sets the position of one of the eight quads, with separate bottom/top edge vertex colors. */
+    private void setQuad(int quad, float x, float y, float w, float h, float colorBottom, float colorTop){
         int idx = quad * SpriteBatch.spriteSize;
         float x2 = x + w, y2 = y + h;
         float[] vs = vertices;
 
-        vs[idx] = x;  vs[idx + 1] = y;  vs[idx + 5] = c;
-        vs[idx + 7] = x;  vs[idx + 8] = y2; vs[idx + 12] = c;
-        vs[idx + 14] = x2; vs[idx + 15] = y2; vs[idx + 19] = c;
-        vs[idx + 21] = x2; vs[idx + 22] = y;  vs[idx + 26] = c;
+        vs[idx] = x;  vs[idx + 1] = y;  vs[idx + 5] = colorBottom;
+        vs[idx + 7] = x;  vs[idx + 8] = y2; vs[idx + 12] = colorTop;
+        vs[idx + 14] = x2; vs[idx + 15] = y2; vs[idx + 19] = colorTop;
+        vs[idx + 21] = x2; vs[idx + 22] = y;  vs[idx + 26] = colorBottom;
+    }
+
+    /** @return the vertex color at absolute height {@code rowY}, lerped from {@link #color2} to {@link #color}. */
+    private float rowColor(float rowY, float baseY, float totalHeight){
+        float t = totalHeight > 0.0001f ? (rowY - baseY) / totalHeight : 1f;
+        return tmpColor.set(color2).lerp(color, t).mul(Draw.getColor()).toFloatBits();
     }
 
     private void prepareVertices(float x, float y, float width, float height){
-        float c = tmpColor.set(color).mul(Draw.getColor()).toFloatBits();
-
         float innerX = x + cornerSize, innerY = y + cornerSize;
         float rightX = x + width - cornerSize, topY = y + height - cornerSize;
 
+        float cBottom = rowColor(y, y, height);
+        float cBottomInner = rowColor(innerY, y, height);
+        float cTopInner = rowColor(topY, y, height);
+        float cTop = rowColor(y + height, y, height);
+
         //corners: full generated tiles, unscaled, sitting exactly in the four corners
-        setQuad(bottomLeft, x, y, cornerSize, cornerSize, c);
-        setQuad(bottomRight, rightX, y, cornerSize, cornerSize, c);
-        setQuad(topLeft, x, topY, cornerSize, cornerSize, c);
-        setQuad(topRight, rightX, topY, cornerSize, cornerSize, c);
+        setQuad(bottomLeft, x, y, cornerSize, cornerSize, cBottom, cBottomInner);
+        setQuad(bottomRight, rightX, y, cornerSize, cornerSize, cBottom, cBottomInner);
+        setQuad(topLeft, x, topY, cornerSize, cornerSize, cTopInner, cTop);
+        setQuad(topRight, rightX, topY, cornerSize, cornerSize, cTopInner, cTop);
 
         //sides: plain white, only as thick as the stroke, spanning the gap between corners - not the corner size
         float sideWidth = Math.max(0f, width - cornerSize * 2f);
         float sideHeight = Math.max(0f, height - cornerSize * 2f);
 
-        setQuad(bottom, innerX, y, sideWidth, strokeWidth, c);
-        setQuad(top, innerX, y + height - strokeWidth, sideWidth, strokeWidth, c);
-        setQuad(left, x, innerY, strokeWidth, sideHeight, c);
-        setQuad(right, x + width - strokeWidth, innerY, strokeWidth, sideHeight, c);
+        setQuad(bottom, innerX, y, sideWidth, strokeWidth, cBottom, rowColor(y + strokeWidth, y, height));
+        setQuad(top, innerX, y + height - strokeWidth, sideWidth, strokeWidth, rowColor(y + height - strokeWidth, y, height), cTop);
+        setQuad(left, x, innerY, strokeWidth, sideHeight, cBottomInner, cTopInner);
+        setQuad(right, x + width - strokeWidth, innerY, strokeWidth, sideHeight, cBottomInner, cTopInner);
     }
 
     @Override
@@ -147,15 +158,36 @@ public class OutlinedCornerDrawable extends BaseDrawable implements TransformDra
         return color;
     }
 
+    /** @return the bottom tint of a top-to-bottom gradient, same as {@link #getColor()} if none is set. */
+    public Color getColor2(){
+        return color2;
+    }
+
     /** Copy given color. Blended with the batch color, then combined with the texture colors at draw time. */
     public void setColor(Color color){
         this.color.set(color);
+        this.color2.set(color);
+    }
+
+    /** Sets a top-to-bottom gradient tint from {@code top} to {@code bottom}. */
+    public void setColor(Color top, Color bottom){
+        this.color.set(top);
+        this.color2.set(bottom);
     }
 
     /** Creates a new drawable that renders the same as this drawable tinted the specified color. */
     public OutlinedCornerDrawable tint(Color tint){
         OutlinedCornerDrawable drawable = new OutlinedCornerDrawable(this);
         drawable.color.set(tint);
+        drawable.color2.set(tint);
+        return drawable;
+    }
+
+    /** Creates a new drawable that renders the same as this drawable with a top-to-bottom gradient tint. */
+    public OutlinedCornerDrawable tint(Color top, Color bottom){
+        OutlinedCornerDrawable drawable = new OutlinedCornerDrawable(this);
+        drawable.color.set(top);
+        drawable.color2.set(bottom);
         return drawable;
     }
 
@@ -166,6 +198,7 @@ public class OutlinedCornerDrawable extends BaseDrawable implements TransformDra
         this.cornerSize = other.cornerSize;
         this.strokeWidth = other.strokeWidth;
         this.color.set(other.color);
+        this.color2.set(other.color2);
         System.arraycopy(other.vertices, 0, this.vertices, 0, other.vertices.length);
     }
 }

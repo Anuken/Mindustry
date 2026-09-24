@@ -142,5 +142,12 @@ class CornerGenerator{
             drawable.setPatch(new NinePatch(drawable.getPatch(), tint));
             return drawable;
         }
+
+        @Override
+        public NinePatchDrawable tint(Color top, Color bottom){
+            CornerPatchDrawable drawable = new CornerPatchDrawable(this);
+            drawable.setPatch(new NinePatch(drawable.getPatch(), top, bottom));
+            return drawable;
+        }
     }
 }
