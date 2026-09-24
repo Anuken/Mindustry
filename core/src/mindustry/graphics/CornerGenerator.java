@@ -6,31 +6,47 @@ import arc.graphics.g2d.*;
 import arc.graphics.g2d.PixmapPacker.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
+import arc.struct.*;
 import mindustry.core.*;
 
 /** Package-private rendering helpers shared by {@link AngledCorner} and {@link RoundCorner}. */
 class CornerGenerator{
+    /** Tiles that have been written to their page's pixmap, but not yet to its texture. */
+    private static final Seq<PendingUpload> pending = new Seq<>(false, 8, PendingUpload.class);
 
     private CornerGenerator(){}
+
+    /** Uploads any tiles generated since the last call to their textures; must be called before drawing a corner tile. */
+    static void uploadPending(){
+        if(pending.isEmpty()) return;
+
+        for(PendingUpload upload : pending){
+            //only the tile's own rect is uploaded; marking the whole page dirty would reupload all of it, and only whenever a font happens to update
+            upload.page.texture.draw(upload.tile, upload.x, upload.y);
+            upload.tile.dispose();
+        }
+        pending.clear();
+    }
 
     /** Packs a size x size tile filled via {@code fn}; returns {topLeft, topRight, bottomLeft, bottomRight}. */
     static TextureRegion[] renderCorner(String name, int size, CoverageFn fn){
         PixmapPacker packer = UI.packer;
         Rect rect = packer.pack(name, size, size);
         Page page = packer.getPage(name);
-        Pixmap pix = page.image;
+        Pixmap tile = new Pixmap(size, size);
 
         int baseX = (int)rect.x, baseY = (int)rect.y;
 
-        //draw the antialiased shape directly into the packer page's pixmap
         for(int y = 0; y < size; y++){
             for(int x = 0; x < size; x++){
                 float coverage = fn.get(x, y);
-                pix.setRaw(baseX + x, baseY + y, Color.rgba8888(1f, 1f, 1f, coverage));
+                tile.setRaw(x, y, Color.rgba8888(1f, 1f, 1f, coverage));
             }
         }
 
-        page.setDirty(true);
+        //keep the page pixmap in sync, as fonts may reupload the whole page from it later
+        page.image.draw(tile, baseX, baseY, false);
+        pending.add(new PendingUpload(page, tile, baseX, baseY));
 
         Texture texture = page.texture;
 
@@ -70,7 +86,7 @@ class CornerGenerator{
         bottomLeft, bottom, bottomRight
         );
 
-        return new NinePatchDrawable(patch);
+        return new CornerPatchDrawable(patch);
     }
 
     /** Builds an {@link OutlinedCornerDrawable} out of the four corner tiles from {@link #renderCorner}. */
@@ -83,5 +99,48 @@ class CornerGenerator{
     /** (x, y) pixel coordinate -> coverage (0-1). */
     interface CoverageFn{
         float get(int x, int y);
+    }
+
+    private static class PendingUpload{
+        final Page page;
+        final Pixmap tile;
+        final int x, y;
+
+        PendingUpload(Page page, Pixmap tile, int x, int y){
+            this.page = page;
+            this.tile = tile;
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    /** Nine-patch drawable that uploads pending corner tiles before drawing. */
+    private static class CornerPatchDrawable extends NinePatchDrawable{
+        CornerPatchDrawable(NinePatch patch){
+            super(patch);
+        }
+
+        CornerPatchDrawable(CornerPatchDrawable drawable){
+            super(drawable);
+        }
+
+        @Override
+        public void draw(float x, float y, float width, float height){
+            uploadPending();
+            super.draw(x, y, width, height);
+        }
+
+        @Override
+        public void draw(float x, float y, float originX, float originY, float width, float height, float scaleX, float scaleY, float rotation){
+            uploadPending();
+            super.draw(x, y, originX, originY, width, height, scaleX, scaleY, rotation);
+        }
+
+        @Override
+        public NinePatchDrawable tint(Color tint){
+            CornerPatchDrawable drawable = new CornerPatchDrawable(this);
+            drawable.setPatch(new NinePatch(drawable.getPatch(), tint));
+            return drawable;
+        }
     }
 }
