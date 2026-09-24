@@ -19,8 +19,7 @@ public class SectorPreset extends UnlockableContent{
 
     public int captureWave = 0;
     public Cons<Rules> rules = rules -> rules.winWave = captureWave;
-    /** Difficulty, 0-10. */
-    public float difficulty;
+    public SectorThreat threat = SectorThreat.low;
     public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
     public boolean noLighting = false;

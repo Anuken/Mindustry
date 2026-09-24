@@ -386,26 +386,6 @@ public class Planet extends UnlockableContent{
         return in;
     }
 
-    /** Updates wave coverage of bases. */
-    public void updateBaseCoverage(){
-        for(Sector sector : sectors){
-            float sum = 1f;
-            for(Sector other : sector.near()){
-                if(other.generateEnemyBase){
-                    sum += 0.9f;
-                }
-            }
-
-            if(sector.hasEnemyBase()){
-                sum += 0.88f;
-            }
-
-            sector.threat = sector.preset == null || (!sector.preset.requireUnlock && sector.preset.difficulty == 0f) ?
-                Math.max(Math.min(sum / 5f, 1.2f), 0.3f) : //low threat sectors are pointless
-                Mathf.clamp(sector.preset.difficulty / 10f);
-        }
-    }
-
     /** @return the supplied matrix with transformation applied. */
     public Mat3D getTransform(Mat3D mat){
         return mat.setToTranslation(position).rotate(Vec3.Y, getRotation());
@@ -466,15 +446,13 @@ public class Planet extends UnlockableContent{
 
         for(Sector sector : sectors){
             sector.loadInfo();
+            if(sector.preset != null) sector.threat = sector.preset.threat;
         }
 
         if(generator != null){
-
             for(Sector sector : sectors){
                 generator.generateSector(sector);
             }
-
-            updateBaseCoverage();
         }
 
         clipRadius = Math.max(clipRadius, radius + atmosphereRadOut + 0.5f);

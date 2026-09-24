@@ -480,7 +480,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         Sector current = Vars.state.getSector() != null && Vars.state.getSector().isBeingPlayed() && Vars.state.getSector().planet == state.planet ? Vars.state.getSector() : null;
 
         if(current != null){
-            planets.fill(current, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.001f);
+            planets.fill(current, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.005f);
         }
 
         //draw hover border
@@ -1072,7 +1072,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
 
             if(sector.isAttacked() || !sector.hasBase()){
-                c.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).left().row();
+                c.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.threat.localized()).left().row();
             }
 
             if(sector.save != null && sector.info.resources.any()){
@@ -1295,7 +1295,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }).row();
         }else if(!sector.hasBase()){
-            stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).row();
+            stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.threat.localized()).row();
         }
 
         if(sector.isAttacked()){

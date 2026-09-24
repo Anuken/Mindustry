@@ -1300,7 +1300,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
     public static class QuadMarker extends ObjectiveMarker{
         public final TextureHolder texture = new TextureHolder();
-        public @Vertices float[] vertices = new float[24];
+        public @Vertices float[] vertices = new float[vertexSize * 4];
         private boolean mapRegion = true;
 
         private transient @Nullable TextureRegion fetchedRegion;

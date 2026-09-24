@@ -6,7 +6,7 @@ import mindustry.content.*;
 import mindustry.type.*;
 
 import static mindustry.content.Planets.*;
-import static mindustry.type.SectorDifficulty.*;
+import static mindustry.type.SectorThreat.*;
 
 /** Class for temporarily (?) storing links to map submissions on Discord. */
 public class SectorSubmissions{
@@ -86,18 +86,18 @@ public class SectorSubmissions{
             requireUnlock = false;
             //showHidden = true;
             captureWave = 70;
-            difficulty = extreme;
+            threat = extreme;
         }};
 
         new SectorPreset("geothermalStronghold", serpulo, 264){{
             requireUnlock = false;
-            difficulty = eradication;
+            threat = eradication;
             //showHidden = true;
         }};
 
         new SectorPreset("cruxscape", serpulo, 54){{
             requireUnlock = false;
-            difficulty = eradication;
+            threat = eradication;
             //showHidden = true;
         }};
 
@@ -113,15 +113,15 @@ public class SectorSubmissions{
         );*/
     }
 
-    static SectorPreset register(int id, String author, String mapFileLink, int difficulty){
-        return registerSector(id, author, mapFileLink, -1, difficulty);
+    static SectorPreset register(int id, String author, String mapFileLink,SectorThreat threat){
+        return registerSector(id, author, mapFileLink, -1, threat);
     }
 
-    static SectorPreset registerSurvival(int id, String author, String mapFileLink, int captureWave, float difficulty){
-        return registerSector(id, author, mapFileLink, captureWave, difficulty);
+    static SectorPreset registerSurvival(int id, String author, String mapFileLink, int captureWave, SectorThreat threat){
+        return registerSector(id, author, mapFileLink, captureWave, threat);
     }
 
-    static SectorPreset registerSector(int id, String author, String mapFileLink, int captureWave, float difficulty){
+    static SectorPreset registerSector(int id, String author, String mapFileLink, int captureWave, SectorThreat threat){
         Planet planet = Planets.serpulo;
         Sector sector = planet.sectors.get(id);
         MapSubmission sub = threadMap.get(sector, MapSubmission::new);
@@ -133,7 +133,7 @@ public class SectorSubmissions{
 
         if(preset.credit == null) preset.credit = author;
         preset.requireUnlock = false;
-        if(difficulty > 0f) preset.difficulty = difficulty;
+        preset.threat = threat;
 
         if(captureWave > 0){
             preset.captureWave = captureWave;
