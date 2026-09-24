@@ -28,6 +28,7 @@ import mindustry.world.blocks.logic.LogicDisplay.*;
 import java.lang.annotation.*;
 import java.util.*;
 
+import static arc.graphics.g2d.SpriteBatch.*;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
 import static mindustry.Vars.*;
@@ -1306,8 +1307,8 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         public QuadMarker(){
             for(int i = 0; i < 4; i++){
-                vertices[i * 6 + 2] = Color.white.toFloatBits();
-                vertices[i * 6 + 5] = Color.clearFloatBits;
+                vertices[i * vertexSize + 5] = Color.whiteFloatBits;
+                vertices[i * vertexSize + 6] = Color.clearFloatBits;
             }
         }
 
@@ -1328,7 +1329,7 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 switch(type){
                     case color -> {
                         float col = Tmp.c1.fromDouble(p1).toFloatBits();
-                        for(int i = 0; i < 4; i++) vertices[i * 6 + 2] = col;
+                        for(int i = 0; i < 4; i++) vertices[i * vertexSize + 5] = col;
                     }
                     case pos -> vertices[0] = (float)p1 * tilesize;
                     case posi -> setPos((int)p1, p2, p3);
@@ -1365,12 +1366,12 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
                 if(mapRegion){
                     mapRegion = false;
                     for(int i = 0; i < 4; i++){
-                        setUv(i, vertices[i * 6 + 3], vertices[i * 6 + 4]);
+                        setUv(i, vertices[i * vertexSize + 2], vertices[i * vertexSize + 3]);
                     }
                 }
             }else{
                 for(int i = 0; i < 4; i++){
-                    setUv(i, unmap(vertices[i * 6 + 3], Tmp.tr1.u, Tmp.tr1.u2), 1 - unmap(vertices[i * 6 + 4], Tmp.tr1.v, Tmp.tr1.v2));
+                    setUv(i, unmap(vertices[i * vertexSize + 2], Tmp.tr1.u, Tmp.tr1.u2), 1 - unmap(vertices[i * vertexSize + 3], Tmp.tr1.v, Tmp.tr1.v2));
                 }
             }
         }
@@ -1382,14 +1383,14 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
         private void setPos(int i, double x, double y){
             if(i >= 0 && i < 4){
-                if(!Double.isNaN(x)) vertices[i * 6] = (float)x * tilesize;
-                if(!Double.isNaN(y)) vertices[i * 6 + 1] = (float)y * tilesize;
+                if(!Double.isNaN(x)) vertices[i * vertexSize] = (float)x * tilesize;
+                if(!Double.isNaN(y)) vertices[i * vertexSize + 1] = (float)y * tilesize;
             }
         }
 
         private void setColor(int i, double c){
             if(i >= 0 && i < 4){
-                vertices[i * 6 + 2] = Tmp.c1.fromDouble(c).toFloatBits();
+                vertices[i * vertexSize + 5] = Tmp.c1.fromDouble(c).toFloatBits();
             }
         }
 
@@ -1401,12 +1402,13 @@ public class MapObjectives implements Iterable<MapObjective>, Eachable<MapObject
 
                 if(!Double.isNaN(u)){
                     boolean clampU = fetchedRegion.texture.getUWrap() != TextureWrap.mirroredRepeat && fetchedRegion.texture.getUWrap() != TextureWrap.repeat;
-                    vertices[i * 6 + 3] = Mathf.map(clampU ? Mathf.clamp((float)u) : (float)u, fetchedRegion.u, fetchedRegion.u2);
+                    vertices[i * vertexSize + 2] = Mathf.map(clampU ? Mathf.clamp((float)u) : (float)u, fetchedRegion.u, fetchedRegion.u2);
                 }
                 if(!Double.isNaN(v)){
                     boolean clampV = fetchedRegion.texture.getVWrap() != TextureWrap.mirroredRepeat && fetchedRegion.texture.getVWrap() != TextureWrap.repeat;
-                    vertices[i * 6 + 4] = Mathf.map(clampV ? 1 - Mathf.clamp((float)v) : 1 - (float)v, fetchedRegion.v, fetchedRegion.v2);
+                    vertices[i * vertexSize + 3] = Mathf.map(clampV ? 1 - Mathf.clamp((float)v) : 1 - (float)v, fetchedRegion.v, fetchedRegion.v2);
                 }
+                vertices[i * vertexSize + 4] = fetchedRegion.getDepth();
             }
         }
     }
