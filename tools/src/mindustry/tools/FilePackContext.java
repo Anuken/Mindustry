@@ -9,6 +9,7 @@ import arc.util.*;
 import mindustry.graphics.*;
 
 import java.io.*;
+import java.util.concurrent.*;
 
 /** Writes to sprites_out instead of an atlas. */
 public class FilePackContext extends PackContext{
@@ -16,6 +17,8 @@ public class FilePackContext extends PackContext{
     private ObjectMap<String, PixmapRegion> written = new ObjectMap<>();
     //versions of written sprites that were since replaced; callers may still hold on to them, so they're only disposed at the end
     private Seq<Pixmap> replaced = new Seq<>();
+    //last pending disk write for each output path
+    private ObjectMap<String, CompletableFuture<Void>> writes = new ObjectMap<>();
 
     @Override
     public @Nullable PixmapRegion getOrNull(String name){
@@ -35,7 +38,16 @@ public class FilePackContext extends PackContext{
         //splits/pads are unused; nothing in the vanilla path emits 9-patches here
         Pixmap image = region.crop();
         Fi target = new Fi((noCrop ? "../blocks/environment/" : "") + name + ".png");
-        Core.executor.execute(() -> target.writePng(image));
+        //the same sprite can be added more than once, so writes to one file are chained to keep them from interleaving
+        Runnable write = () -> {
+            try{
+                target.writePng(image);
+            }catch(Throwable e){
+                Log.err("Failed to write sprite '@'", name, e);
+            }
+        };
+        var pending = writes.get(target.path());
+        writes.put(target.path(), pending == null ? CompletableFuture.runAsync(write, Core.executor) : pending.thenRun(write));
 
         removeOriginal(name, target);
 

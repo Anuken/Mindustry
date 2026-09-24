@@ -1249,7 +1249,6 @@ public class UnitType extends UnlockableContent implements Senseable{
                 outlineSeq.add(legBaseRegion);
             }
 
-            //note that mods with these regions already outlined will have *two* outlines made, which is... undesirable
             for(var outlineTarget : outlineSeq){
                 makeOutline(packer, outlineTarget, needsBodyOutline() && region == outlineTarget, outlineColor, outlineRadius);
             }

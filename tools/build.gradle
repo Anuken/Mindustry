@@ -32,6 +32,10 @@ tasks.register('pack'){
             delete "../core/assets-raw/sprites_out/"
         }
 
+        delete{
+            delete "../core/assets/sprites/fallback"
+        }
+
         //copy in new sprites
         copy{
             from "../core/assets-raw/sprites/"
