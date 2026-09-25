@@ -9,7 +9,7 @@ import arc.scene.style.*;
 import arc.struct.*;
 import mindustry.core.*;
 
-/** Package-private rendering helpers shared by {@link AngledCorner} and {@link RoundCorner}. */
+/** Package-private rendering helpers shared by {@link AngledCorner}, {@link RoundCorner} and {@link GlowCorner}. */
 class CornerGenerator{
     /** Tiles that have been written to their page's pixmap, but not yet to its texture. */
     private static final Seq<PendingUpload> pending = new Seq<>(false, 8, PendingUpload.class);
@@ -28,8 +28,8 @@ class CornerGenerator{
         pending.clear();
     }
 
-    /** Packs a size x size tile filled via {@code fn}; returns {topLeft, topRight, bottomLeft, bottomRight}. */
-    static TextureRegion[] renderCorner(String name, int size, CoverageFn fn){
+    /** Packs a size x size tile filled via {@code fn} and returns the raw, unmirrored region. */
+    static TextureRegion renderTile(String name, int size, CoverageFn fn){
         PixmapPacker packer = UI.packer;
         Rect rect = packer.pack(name, size, size);
         Page page = packer.getPage(name);
@@ -48,10 +48,14 @@ class CornerGenerator{
         page.image.draw(tile, baseX, baseY, false);
         pending.add(new PendingUpload(page, tile, baseX, baseY));
 
-        Texture texture = page.texture;
+        return new TextureRegion(page.texture, baseX, baseY, size, size);
+    }
+
+    /** Packs a size x size tile filled via {@code fn}; returns {topLeft, topRight, bottomLeft, bottomRight}. */
+    static TextureRegion[] renderCorner(String name, int size, CoverageFn fn){
+        TextureRegion topRight = renderTile(name, size, fn);
 
         //top-right corner tile, exactly as generated
-        TextureRegion topRight = new TextureRegion(texture, baseX, baseY, size, size);
         TextureRegion topLeft = new TextureRegion(topRight);
         topLeft.flip(true, false);
         TextureRegion bottomRight = new TextureRegion(topRight);
