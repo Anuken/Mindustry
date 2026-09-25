@@ -100,7 +100,6 @@ public class ClassMap{
         classes.put("ShootSine", mindustry.entities.pattern.ShootSine.class);
         classes.put("ShootSpread", mindustry.entities.pattern.ShootSpread.class);
         classes.put("ShootSummon", mindustry.entities.pattern.ShootSummon.class);
-        classes.put("Objectives", mindustry.game.Objectives.class);
         classes.put("Objective", UnlockCondition.class);
         classes.put("OnPlanet", OnPlanet.class);
         classes.put("OnSector", OnSector.class);

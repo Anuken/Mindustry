@@ -49,6 +49,7 @@ public class CampaignRulesDialog extends BaseDialog{
                 var style = Styles.flatTogglet;
 
                 t.defaults().size(140f, 50f);
+                int i = 0;
 
                 for(Difficulty diff : Difficulty.all){
                     t.button(diff.localized(), style, () -> {
@@ -56,7 +57,7 @@ public class CampaignRulesDialog extends BaseDialog{
                     }).group(group).checked(b -> rules.difficulty == diff)
                     .tooltip(diff.info());
 
-                    if(Core.graphics.isPortrait() && diff.ordinal() % 2 == 1){
+                    if(Core.graphics.isPortrait() && (i ++) % 2 == 1){
                         t.row();
                     }
                 }
