@@ -234,6 +234,9 @@ public class StatValues{
         "[lightgray] ~ [stat]" + Strings.autoFixed(duration / 60f, 1) +
         "[lightgray] " + Core.bundle.get("unit.seconds"));
     }
+    public static String statusText(StatusEffect status, float duration){
+        return statusText(status, duration, 1f);
+    }
 
     /** Displays an item with a specified amount. */
     private static Stack stack(TextureRegion region, int amount, @Nullable UnlockableContent content, boolean tooltip){
@@ -757,7 +760,8 @@ public class StatValues{
                         bt.row();
                     }
 
-                    if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
+                    // delayFrags as a workaround to show railbullettype damage and splash
+                    if(type.damage > 0 && (type.collides || type.delayFrags || type.splashDamage <= 0)){
                         bt.add(Core.bundle.format("bullet.damage", type.damage) + (type.continuousDamage() > 0 ?
                         "[lightgray] ~ [stat]" + Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized() : ""));
                     }
@@ -779,7 +783,7 @@ public class StatValues{
                     }
 
                     if(type.statLiquidConsumed <= 0f && !compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
-                        sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
+                        sep(bt, Core.bundle.format("bullet.multiplier", multStat(type.ammoMultiplier)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
@@ -787,8 +791,8 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.reload", ammoStat(val)));
                     }
 
-                    if(type.knockback > 0){
-                        sep(bt, Core.bundle.format("bullet.knockback", Strings.autoFixed(type.knockback, 2)));
+                    if(type.knockback != 0f){
+                        sep(bt, Core.bundle.format("bullet.knockback", multStat(type.knockback)));
                     }
 
                     if(type.healPercent > 0f){
@@ -807,17 +811,21 @@ public class StatValues{
                         sep(bt, "@bullet.incendiary");
                     }
 
-                    if(type.homingPower > 0.01f){
-                        sep(bt, "@bullet.homing");
+                    if(type.homingPower > 0.0001f){
+                        if(type.homingPower < 0.05f) sep(bt, Core.bundle.format("bullet.weakhoming"));
+                        else if(type.homingPower < 0.15f) sep(bt, Core.bundle.format("bullet.mediumhoming"));
+                        else sep(bt, Core.bundle.format("bullet.stronghoming"));
                     }
 
-                    // Showing the correct value for lightning damage is annoyinh
+                    if(type.maxRicochetAngle > 0f){
+                        if(type.maxRicochetAngle < 30f) sep(bt, Core.bundle.format("bullet.weakricochet"));
+                        else if(type.maxRicochetAngle < 90f) sep(bt, Core.bundle.format("bullet.mediumricochet"));
+                        else sep(bt, Core.bundle.format("bullet.strongricochet"));
+                    }
+
+                    // Showing the correct value for lightning damage is annoying
                     if(type.lightning > 0){
-                        sep(bt, Core.bundle.format(
-                        "bullet.lightning",
-                        type.lightning,
-                        type.lightningDamage < 0 ? type.damage : type.lightningDamage
-                        ));
+                        sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0 ? type.damage : type.lightningDamage));
                     }
 
                     if(type instanceof LaserBulletType b && b.lightningSpacing > 0){
@@ -845,8 +853,7 @@ public class StatValues{
                             sep(bt, Core.bundle.format("bullet.empdamage", Strings.autoFixed(b.powerDamageScl * 100f, 2)));
                         }
                         if(b.hitUnits){
-                            sep(bt, Core.bundle.format("bullet.empunitdamage",
-                            (b.unitDamageScl < 1f ? "[negstat]" : "") + Strings.autoFixed(b.unitDamageScl * 100f, 2)));
+                            sep(bt, Core.bundle.format("bullet.empunitdamage", multStat(b.unitDamageScl,false)));
                         }
                     }
 
@@ -961,7 +968,7 @@ public class StatValues{
     }
 
     /** Adds an info table with an icon and description key from the bundle */
-    private static Cell<?> tableInfo(Table table, String key){
+    public static Cell<?> tableInfo(Table table, String key){
         if(!Core.bundle.has(key)) return null;
         return table.table(t -> {
             if(!Vars.headless) t.image(Icon.info.getRegion()).size(20).color(Color.lightGray).scaling(Scaling.fit).padRight(8).padLeft(12);
@@ -970,7 +977,7 @@ public class StatValues{
     }
 
     /** Adds a note under a value */
-    private static Cell<?> note(Table table, String text){
+    public static Cell<?> note(Table table, String text){
         table.row();
         return table.table(t -> {
             if(!Vars.headless) t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
@@ -985,12 +992,16 @@ public class StatValues{
     }
 
     //for AmmoListValue
-    private static String ammoStat(float val){
+    public static String ammoStat(float val){
         return (val > 0 ? "[stat]+" : "[negstat]") + Strings.autoFixed(val, 1);
     }
 
-    private static String multStat(float val){
-        return (val >= 1 ? "[stat]" : "[negstat]") + Strings.autoFixed(val, 2);
+    public static String multStat(float val){
+        return multStat(val, true);
+    }
+
+    public static String multStat(float val, boolean decimal){
+        return (val >= 1 ? "[stat]" : "[negstat]") + Strings.autoFixed(val * (decimal ? 1f : 100f), 2);
     }
 
     private static TextureRegion icon(UnlockableContent t){

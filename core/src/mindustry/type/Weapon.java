@@ -43,6 +43,8 @@ public class Weapon implements Cloneable{
     public boolean alternate = true;
     /** whether to rotate toward the target independently of unit */
     public boolean rotate = false;
+    /** whether to allow rotating this weapon while the unit is rotating as well */
+    public boolean rotateWhileMoving = true;
     /** Whether to show the sprite of the weapon in the database. */
     public boolean showStatSprite = true;
     /** rotation at which this weapon starts at. */
@@ -358,10 +360,10 @@ public class Weapon implements Cloneable{
             axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
 
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
-            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
+            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * unit.rotateSpeedMultiplier * Time.delta);
             if(rotationLimit < 360){
                 float dst = Angles.angleDist(mount.rotation, baseRotation);
-                if(dst > rotationLimit/2f){
+                if(dst > rotationLimit / 2f){
                     mount.rotation = Angles.moveToward(mount.rotation, baseRotation, dst - rotationLimit/2f);
                 }
             }

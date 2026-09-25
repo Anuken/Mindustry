@@ -92,8 +92,8 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
                 Fx.absorb.at(unit);
                 paramField.pushEffect.at(unit.x, unit.y,paramUnit.team.color);
 
-                // consider missile hp and gamerule to damage the shield
-                paramField.data -= unit.health() * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
+                // consider total missile damage and gamerule to damage the shield
+                paramField.data -= unit.type.damageEstimate * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
                 paramField.alpha = 1f;
 
             }else if(paramField.pushUnits && (paramField.pushDiffLayer || paramUnit.isFlying() == unit.isFlying())){
@@ -139,15 +139,15 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
     public float reflectBuildingDamage = 1f;
     /** Velocity multiplier for reflected bullets on the opposite axis. Negative values = concave, positive values = convex */
     public float reflectVel = 1f;
-    /** Time multiplier for reflected bullets. */
-    public float reflectTime = 1f - 0.5f;
+    /** Time multiplier for reflected bullets. <0.5 equals more distance, >0.5 equals less distance. */
+    public float reflectTime = 0.5f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
     public Sound breakSound = Sounds.shieldBreakSmall;
     public Sound hitSound = Sounds.shieldHit;
     public float hitSoundVolume = 0.12f;
     /** Multiplier for shield damage taken from missile units. */
-    public float missileUnitMultiplier = 2f;
+    public float missileUnitMultiplier = 0.8f;
 
     /** Whether to draw the arc line. */
     public boolean drawArc = true;

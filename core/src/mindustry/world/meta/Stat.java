@@ -43,6 +43,7 @@ public class Stat implements Comparable<Stat>{
     healthMultiplier = new Stat("healthMultiplier"),
     speedMultiplier = new Stat("speedMultiplier"),
     reloadMultiplier = new Stat("reloadMultiplier"),
+    rotateSpeedMultiplier = new Stat("rotateSpeedMultiplier"),
     buildSpeedMultiplier = new Stat("buildSpeedMultiplier"),
     reactive = new Stat("reactive"),
     healing = new Stat("healing"),
@@ -102,6 +103,7 @@ public class Stat implements Comparable<Stat>{
     moduleTier = new Stat("moduletier", StatCat.function),
     unitType = new Stat("unittype", StatCat.function),
     receiveRate = new Stat("receiveRate", StatCat.function),
+    slowdown = new Stat("slowdown", StatCat.function),
 
     booster = new Stat("booster", StatCat.optional),
     boostEffect = new Stat("boostEffect", StatCat.optional),
