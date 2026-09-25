@@ -45,7 +45,10 @@ public abstract class Content implements Comparable<Content>{
      * Called after all content is created, only on non-headless versions.
      * Use for loading regions or other image data.
      */
-    public void load(){}
+    @CallSuper
+    public void load(){
+        loadIcon();
+    }
 
     /** Called right before load(). */
     public void loadIcon(){}

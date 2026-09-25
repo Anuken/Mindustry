@@ -32,7 +32,7 @@ public class FileMapGenerator implements WorldGenerator{
             candidates.add(mapName);
 
             //for modded maps, try loading without the mod prefix
-            if(preset.minfo.mod != null){
+            if(preset.isModded()){
                 String baseName = mapName.substring(1 + preset.minfo.mod.name.length());
 
                 //<planetname>/<mapname>.msav

@@ -238,18 +238,11 @@ public class Mods implements Loadable{
 
         TextureAtlas oldAtlas = Core.atlas;
 
-        //generate new icons
-        for(Seq<Content> arr : content.getContentMap()){
-            arr.each(c -> {
-                if(c instanceof UnlockableContent u && c.minfo.mod != null){
-                    u.load();
-                    u.loadIcon();
-                    if(u.packSprites && !c.minfo.mod.meta.pregenerated){
-                        u.packSprites(packer);
-                    }
-                }
-            });
-        }
+        //pack content async (slow)
+        content.eachModdedUnlockable(u -> {
+            u.load();
+            u.packSprites(packer);
+        });
 
         waitForMain(() -> {
             //replace old atlas data
@@ -337,6 +330,12 @@ public class Mods implements Loadable{
                             textureResize.put(fullName, textureScale);
                         }
                         pix.dispose();
+                        //in order for content regions in load() to resolve to a texture region with a real name (not error), regions that have been newly packed must be registered
+                        if(!Core.atlas.has(fullName)){
+                            AtlasRegion fake = new AtlasRegion();
+                            fake.name = fullName;
+                            Core.atlas.getRegionMap().put(fullName, fake);
+                        }
                     };
                 }catch(Exception e){
                     //rethrow exception with details about the cause of failure
@@ -1326,8 +1325,8 @@ public class Mods implements Loadable{
         /** Minimum game version that this mod requires, e.g. "140.1" */
         public String minGameVersion = "0";
         public @Nullable String displayName, author, description, subtitle, version, main, repo;
-        public Seq<String> dependencies = Seq.with();
-        public Seq<String> softDependencies = Seq.with();
+        public Seq<String> dependencies = arc.struct.Seq.with();
+        public Seq<String> softDependencies = arc.struct.Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */

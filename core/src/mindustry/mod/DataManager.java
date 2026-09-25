@@ -151,7 +151,6 @@ public class DataManager{
             if(!Vars.headless){
                 for(var cont : contentToPack){
                     try{
-                        cont.loadIcon();
                         cont.load();
                     }catch(Exception e){
                         Log.err("Failed to load icons for " + cont, e);

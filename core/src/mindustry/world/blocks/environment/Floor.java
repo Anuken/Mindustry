@@ -226,8 +226,8 @@ public class Floor extends Block{
 
         if(packer.has(name + "-edge") || blendGroup != this || !drawEdgeOut) return;
 
-        var image = packer.get(icons()[0]);
-        var edge = packer.get(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
+        var image = packer.has(name) ? packer.get(name) : packer.get(name + "1");
+        var edge = packer.get(name + "-edge-stencil", "edge-stencil");
         Pixmap result = new Pixmap(edge.width, edge.height);
 
         for(int x = 0; x < edge.width; x++){

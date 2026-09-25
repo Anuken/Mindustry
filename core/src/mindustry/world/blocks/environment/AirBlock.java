@@ -25,7 +25,9 @@ public class AirBlock extends Floor{
 
     @OverrideCallSuper
     @Override
-    public void load(){}
+    public void load(){
+        loadIcon();
+    }
 
     @OverrideCallSuper
     @Override

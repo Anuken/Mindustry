@@ -14,6 +14,10 @@ public abstract class PackContext{
         return get(((AtlasRegion)region).name);
     }
 
+    public PixmapRegion get(String region, String fallback){
+        return has(region) ? get(region) : get(fallback);
+    }
+
     public PixmapRegion get(String region){
         PixmapRegion out = getOrNull(region);
         //this should not happen in normal situations

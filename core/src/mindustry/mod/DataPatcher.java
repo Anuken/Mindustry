@@ -202,7 +202,6 @@ public class DataPatcher{
             if(!Vars.headless){
                 for(var cont : all){
                     try{
-                        cont.loadIcon();
                         cont.load();
                         if(cont.minfo.asset != null && cont instanceof UnlockableContent u){
                             if(!u.uiIcon.found() && u.getContentType() != ContentType.planet && u.getContentType() != ContentType.weather){
