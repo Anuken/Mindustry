@@ -774,7 +774,7 @@ public class LogicBlock extends Block{
 
         @Override
         public byte version(){
-            return 5;
+            return 6;
         }
 
         @Override
@@ -839,6 +839,8 @@ public class LogicBlock extends Block{
             }
 
             write.f(accumulator);
+
+            TypeIO.writeString(write, executor.textBuffer.toString());
         }
 
         public void checkReadCode(){
@@ -921,33 +923,39 @@ public class LogicBlock extends Block{
                 accumulator = read.f();
             }
 
-            loadBlock = () -> updateCode(code, false, asm -> {
-                //load up the variables that were stored
-                for(int i = 0; i < varcount; i++){
-                    LVar var = asm.getVar(names[i]);
-                    if(var != null && (!var.constant || var.name.equals("@unit"))){
-                        var value = values[i];
-                        if(value instanceof Boxed<?> boxed) value = boxed.unbox();
+            String textBuffer = revision >= 6 ? TypeIO.readString(read) : "";
 
-                        if(value instanceof Number num){
-                            var.numval = num.doubleValue();
-                            var.isobj = false;
-                        }else{
-                            var.objval = value;
-                            var.isobj = true;
+            loadBlock = () -> {
+                updateCode(code, false, asm -> {
+                    //load up the variables that were stored
+                    for(int i = 0; i < varcount; i++){
+                        LVar var = asm.getVar(names[i]);
+                        if(var != null && (!var.constant || var.name.equals("@unit"))){
+                            var value = values[i];
+                            if(value instanceof Boxed<?> boxed) value = boxed.unbox();
+
+                            if(value instanceof Number num){
+                                var.numval = num.doubleValue();
+                                var.isobj = false;
+                            }else{
+                                var.objval = value;
+                                var.isobj = true;
+                            }
                         }
                     }
-                }
 
-                //wait times can only be applied once the instructions are loaded and exist
-                for(int i = 0; i < waitIndices.size; i++){
-                    int waitIndex = waitIndices.get(i);
-                    if(waitIndex >= 0 && waitIndex < asm.instructions.length && asm.instructions[waitIndex] instanceof WaitI wait){
-                        wait.curTime = waitValues.get(i);
+                    //wait times can only be applied once the instructions are loaded and exist
+                    for(int i = 0; i < waitIndices.size; i++){
+                        int waitIndex = waitIndices.get(i);
+                        if(waitIndex >= 0 && waitIndex < asm.instructions.length && asm.instructions[waitIndex] instanceof WaitI wait){
+                            wait.curTime = waitValues.get(i);
+                        }
                     }
-                }
-            });
+                });
 
+                executor.textBuffer.setLength(0);
+                executor.textBuffer.append(textBuffer);
+            };
         }
     }
 }
