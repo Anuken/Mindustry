@@ -1,13 +1,11 @@
 package mindustry.mod;
 
 import arc.struct.*;
-import mindustry.game.conditions.*;
-
 /** Generated class. Maps simple class names to concrete classes. For use in JSON mods. */
 @SuppressWarnings("deprecation")
 public class ClassMap{
     public static final ObjectMap<String, Class<?>> classes = new ObjectMap<>();
-
+    
     static{
         classes.put("AssemblerAI", mindustry.ai.types.AssemblerAI.class);
         classes.put("BoostAI", mindustry.ai.types.BoostAI.class);
@@ -100,12 +98,6 @@ public class ClassMap{
         classes.put("ShootSine", mindustry.entities.pattern.ShootSine.class);
         classes.put("ShootSpread", mindustry.entities.pattern.ShootSpread.class);
         classes.put("ShootSummon", mindustry.entities.pattern.ShootSummon.class);
-        classes.put("Objective", UnlockCondition.class);
-        classes.put("OnPlanet", OnPlanet.class);
-        classes.put("OnSector", OnSector.class);
-        classes.put("Produce", Produce.class);
-        classes.put("Research", Research.class);
-        classes.put("SectorComplete", SectorComplete.class);
         classes.put("Category", mindustry.type.Category.class);
         classes.put("CellLiquid", mindustry.type.CellLiquid.class);
         classes.put("Content", mindustry.type.Content.class);
