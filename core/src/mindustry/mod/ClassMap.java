@@ -109,6 +109,9 @@ public class ClassMap{
         classes.put("SectorComplete", SectorComplete.class);
         classes.put("Category", mindustry.type.Category.class);
         classes.put("CellLiquid", mindustry.type.CellLiquid.class);
+        classes.put("Content", mindustry.type.Content.class);
+        classes.put("ModContentInfo", mindustry.type.Content.ModContentInfo.class);
+        classes.put("ContentType", mindustry.type.ContentType.class);
         classes.put("ErrorContent", mindustry.type.ErrorContent.class);
         classes.put("Item", mindustry.type.Item.class);
         classes.put("ItemSeq", mindustry.type.ItemSeq.class);
@@ -116,6 +119,7 @@ public class ClassMap{
         classes.put("Liquid", mindustry.type.Liquid.class);
         classes.put("LiquidStack", mindustry.type.LiquidStack.class);
         classes.put("MapLocales", mindustry.type.MapLocales.class);
+        classes.put("MappableContent", mindustry.type.MappableContent.class);
         classes.put("PayloadSeq", mindustry.type.PayloadSeq.class);
         classes.put("PayloadStack", mindustry.type.PayloadStack.class);
         classes.put("Planet", mindustry.type.Planet.class);
@@ -130,6 +134,7 @@ public class ClassMap{
         classes.put("TeamEntry", mindustry.type.TeamEntry.class);
         classes.put("UnitType", mindustry.type.UnitType.class);
         classes.put("UnitEngine", mindustry.type.UnitType.UnitEngine.class);
+        classes.put("UnlockableContent", mindustry.type.UnlockableContent.class);
         classes.put("Weapon", mindustry.type.Weapon.class);
         classes.put("Weather", mindustry.type.Weather.class);
         classes.put("WeatherEntry", mindustry.type.Weather.WeatherEntry.class);
