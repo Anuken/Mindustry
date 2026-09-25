@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 
 public class Renderer implements ApplicationListener{
     /** These are global variables, for headless access. Cached. */
-    public static float laserOpacity = 0.5f, unitLaserOpacity = 1f, bridgeOpacity = 0.75f;
+    public static float laserOpacity = 0.5f, mineLaserOpacity = 1f, bridgeOpacity = 0.75f;
 
     public final BlockRenderer blocks = new BlockRenderer();
     public final FogRenderer fog = new FogRenderer();
@@ -162,7 +162,7 @@ public class Renderer implements ApplicationListener{
         float dest = Mathf.clamp(baseTarget, minScale(), maxScale());
         camerascale = Mathf.lerpDelta(camerascale, dest, 0.1f);
         if(Mathf.equal(camerascale, dest, 0.001f)) camerascale = dest;
-        unitLaserOpacity = settings.getInt("unitlaseropacity") / 100f;
+        mineLaserOpacity = settings.getInt("minelaseropacity") / 100f;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         animateSurfaces = settings.getBool("animatedwater");
