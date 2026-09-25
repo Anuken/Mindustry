@@ -565,13 +565,13 @@ public class ContentParser{
 
     private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
-            readBundle(ContentType.block, name, value);
-
             String typeName = value.getString("type", null);
             if(typeName == null){
                 throw new IllegalArgumentException("Block " + name + " missing a type!");
             }
             Block block = make(resolve(typeName), mod + "-" + name);
+
+            readBundle(ContentType.block, name, value, block);
 
             currentContent = block;
 
@@ -596,12 +596,12 @@ public class ContentParser{
             return block;
         },
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
-            readBundle(ContentType.unit, name, value);
-
             UnitType unit = make(resolve(value.getString("template", ""), UnitType.class), mod + "-" + name);
             if(value.has("template")){
                 value.remove("template");
             }
+
+            readBundle(ContentType.unit, name, value, unit);
 
             var typeVal = value.get("type");
             if(unit.constructor == null || typeVal != null){
@@ -661,7 +661,7 @@ public class ContentParser{
         },
         ContentType.weather, (TypeParser<Weather>)(mod, name, value) -> {
             Weather item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
-            readBundle(ContentType.weather, name, value);
+            readBundle(ContentType.weather, name, value, item);
             value.remove("type");
             currentContent = item;
             read(() -> readFields(item, value));
@@ -670,7 +670,7 @@ public class ContentParser{
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, (TypeParser<Liquid>)(mod, name, value) -> {
             Liquid liquid = make(resolve(value.getString("type", null), Liquid.class), mod + "-" + name);
-            readBundle(ContentType.liquid, name, value);
+            readBundle(ContentType.liquid, name, value, liquid);
             value.remove("type");
             currentContent = liquid;
             read(() -> readFields(liquid, value));
@@ -678,7 +678,7 @@ public class ContentParser{
         },
         ContentType.status, (TypeParser<StatusEffect>)(mod, name, value) -> {
             StatusEffect status = new StatusEffect(mod + "-" + name);
-            readBundle(ContentType.status, name, value);
+            readBundle(ContentType.status, name, value, status);
             currentContent = status;
             read(() -> readFields(status, value));
 
@@ -699,7 +699,6 @@ public class ContentParser{
             return status;
         },
         ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
-            readBundle(ContentType.sector, name, value);
             if(value.isString()){
                 return locate(ContentType.sector, name);
             }
@@ -707,6 +706,8 @@ public class ContentParser{
             if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
             SectorPreset preset = new SectorPreset(mod + "-" + name, currentMod);
+
+            readBundle(ContentType.sector, name, value, preset);
 
             currentContent = preset;
             read(() -> {
@@ -751,12 +752,13 @@ public class ContentParser{
             return preset;
         },
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
-            readBundle(ContentType.planet, name, value);
             if(value.isString()) return locate(ContentType.planet, name);
 
             Planet parent = locate(ContentType.planet, value.getString("parent", ""));
             //TODO: even if allowPatching is off, this modifies the parent.
             Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
+
+            readBundle(ContentType.planet, name, value, planet);
 
             value.remove("sectorSize");
 
@@ -816,8 +818,8 @@ public class ContentParser{
 
             value.remove("team");
 
-            readBundle(ContentType.team, name, value);
             TeamEntry entry = new TeamEntry(mod + "-" + name, team);
+            readBundle(ContentType.team, name, value, entry);
             currentContent = entry;
             read(() -> readFields(entry, value));
             return entry;
@@ -860,17 +862,17 @@ public class ContentParser{
         return (T)c;
     }
 
-    private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
+    private <T extends UnlockableContent> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
             T item = constructor.get(mod + "-" + name);
-            readBundle(type, name, value);
+            readBundle(type, name, value, item);
             currentContent = item;
             read(() -> readFields(item, value));
             return item;
         };
     }
 
-    private void readBundle(ContentType type, String name, Jval value){
+    private void readBundle(ContentType type, String name, Jval value, UnlockableContent content){
         String entryName = type + "." + currentMod.name + "-" + name + ".";
         I18NBundle bundle = Core.bundle;
         while(bundle.getParent() != null) bundle = bundle.getParent();
@@ -879,6 +881,7 @@ public class ContentParser{
             if(!Core.bundle.has(entryName + "name")){
                 bundle.getProperties().put(entryName + "name", value.getString("name"));
             }
+            content.localizedName = value.getString("name");
             value.remove("name");
         }
 
@@ -886,6 +889,7 @@ public class ContentParser{
             if(!Core.bundle.has(entryName + "description")){
                 bundle.getProperties().put(entryName + "description", value.getString("description"));
             }
+            content.description = value.getString("name");
             value.remove("description");
         }
     }
