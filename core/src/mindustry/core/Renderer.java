@@ -514,6 +514,7 @@ public class Renderer implements ApplicationListener{
                 params.viewH = size;
                 params.alwaysDrawAtmosphere = true;
                 params.drawUi = false;
+                params.disableAA = true;
 
                 planets.render(params);
 
