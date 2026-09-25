@@ -6,7 +6,6 @@ import arc.assets.loaders.*;
 import arc.audio.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
@@ -175,6 +174,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> {
             content.load();
+            mods.loadModPatches();
             Fonts.loadModContentIcons();
         });
         assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());

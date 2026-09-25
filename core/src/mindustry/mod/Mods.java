@@ -361,6 +361,7 @@ public class Mods implements Loadable{
     @Override
     public void loadSync(){
         loadIcons();
+
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -843,6 +844,12 @@ public class Mods implements Loadable{
         //this finishes parsing content fields
         parser.finishParsing();
 
+        UnitStance.loadAfterMods();
+
+        Events.fire(new ModContentLoadEvent());
+    }
+
+    public void loadModPatches(){
         for(LoadedMod mod : orderedMods()){
             if(mod.root.child("patches").exists()){
                 try{
@@ -858,10 +865,6 @@ public class Mods implements Loadable{
                 }
             }
         }
-
-        UnitStance.loadAfterMods();
-
-        Events.fire(new ModContentLoadEvent());
     }
 
     public void handleContentError(Content content, Throwable error){
