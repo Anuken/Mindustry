@@ -152,6 +152,11 @@ public class DirectionalUnloader extends Block{
         }
 
         @Override
+        public byte version(){
+            return 2;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.s(unloadItem == null ? -1 : unloadItem.id);
@@ -162,8 +167,13 @@ public class DirectionalUnloader extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             int id = read.s();
-            unloadItem = id == -1 ? null : content.items().get(id);
-            offset = read.s();
+            if(revision >= 2) {
+                unloadItem = id == -1 ? null : content.item(id);
+                offset = read.s();
+            }else{
+                unloadItem = id == -1 ? null : content.items().get(id);
+                offset = read.s();
+            }
         }
     }
 }
