@@ -61,8 +61,6 @@ public class ContentParser{
 
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
-    /** If false, arbitrary class names cannot be resolved with Class.forName. */
-    boolean allowClassResolution = true;
     /** If false, sound asset loading is disabled. */
     boolean allowAssetLoading = true;
     /** If false, vanilla content cannot be edited. */
@@ -406,14 +404,6 @@ public class ContentParser{
     @Nullable Fi currentFile;
 
     private Json parser = new Json(){
-        @Override
-        protected <T> Class<T> resolveClass(String className){
-            if(allowClassResolution){
-                return super.resolveClass(className);
-            }else{
-                throw new SerializationException("Resolving arbitrary classes (" + className + ") is not allowed. Use short names for classes only (without the package prefix).");
-            }
-        }
 
         @Override
         protected Object newInstance(Class type){
@@ -578,18 +568,11 @@ public class ContentParser{
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
             readBundle(ContentType.block, name, value);
 
-            Block block;
-
-            if(allowPatching && locate(ContentType.block, name) != null){
-                if(value.has("type")){
-                    warn("Warning: '" + currentMod.name + "-" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
-                    block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
-                }else{
-                    block = locate(ContentType.block, name);
-                }
-            }else{
-                block = make(resolve(value.getString("type", "Block"), allowPatching ? Block.class : null), mod + "-" + name);
+            String typeName = value.getString("type", null);
+            if(typeName == null){
+                throw new IllegalArgumentException("Block " + name + " missing a type!");
             }
+            Block block = make(resolve(typeName), mod + "-" + name);
 
             currentContent = block;
 
@@ -616,25 +599,18 @@ public class ContentParser{
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
             readBundle(ContentType.unit, name, value);
 
-            UnitType unit;
-            if(!allowPatching || locate(ContentType.unit, name) == null){
+            UnitType unit = make(resolve(value.getString("template", ""), UnitType.class), mod + "-" + name);
+            if(value.has("template")){
+                value.remove("template");
+            }
 
-                unit = make(resolve(value.getString("template", ""), UnitType.class), mod + "-" + name);
-
-                if(value.has("template")){
-                    value.remove("template");
+            var typeVal = value.get("type");
+            if(unit.constructor == null || typeVal != null){
+                if(typeVal != null && !typeVal.isString()){
+                    throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
                 }
 
-                var typeVal = value.get("type");
-                if(unit.constructor == null || typeVal != null){
-                    if(typeVal != null && !typeVal.isString()){
-                        throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
-                    }
-
-                    unit.constructor = unitType(typeVal);
-                }
-            }else{
-                unit = locate(ContentType.unit, name);
+                unit.constructor = unitType(typeVal);
             }
 
             currentContent = unit;
@@ -685,43 +661,25 @@ public class ContentParser{
             return unit;
         },
         ContentType.weather, (TypeParser<Weather>)(mod, name, value) -> {
-            Weather item;
-            if(allowPatching && locate(ContentType.weather, name) != null){
-                item = locate(ContentType.weather, name);
-                readBundle(ContentType.weather, name, value);
-            }else{
-                readBundle(ContentType.weather, name, value);
-                item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
-                value.remove("type");
-            }
+            Weather item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
+            readBundle(ContentType.weather, name, value);
+            value.remove("type");
             currentContent = item;
             read(() -> readFields(item, value));
             return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, (TypeParser<Liquid>)(mod, name, value) -> {
-            Liquid liquid;
-            if(allowPatching && locate(ContentType.liquid, name) != null){
-                liquid = locate(ContentType.liquid, name);
-                readBundle(ContentType.liquid, name, value);
-            }else{
-                readBundle(ContentType.liquid, name, value);
-                liquid = make(resolve(value.getString("type", null), Liquid.class), mod + "-" + name);
-                value.remove("type");
-            }
+            Liquid liquid = make(resolve(value.getString("type", null), Liquid.class), mod + "-" + name);
+            readBundle(ContentType.liquid, name, value);
+            value.remove("type");
             currentContent = liquid;
             read(() -> readFields(liquid, value));
             return liquid;
         },
         ContentType.status, (TypeParser<StatusEffect>)(mod, name, value) -> {
-            StatusEffect status;
-            if(allowPatching && locate(ContentType.status, name) != null){
-                status = locate(ContentType.status, name);
-                readBundle(ContentType.status, name, value);
-            }else{
-                readBundle(ContentType.status, name, value);
-                status = new StatusEffect(mod + "-" + name);
-            }
+            StatusEffect status = new StatusEffect(mod + "-" + name);
+            readBundle(ContentType.status, name, value);
             currentContent = status;
             read(() -> readFields(status, value));
 
@@ -747,16 +705,9 @@ public class ContentParser{
                 return locate(ContentType.sector, name);
             }
 
-            SectorPreset preset;
-            SectorPreset found = allowPatching ? locate(ContentType.sector, name) : null;
+            if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            if(found != null){
-                preset = found;
-            }else{
-                if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
-
-                preset = new SectorPreset(mod + "-" + name, currentMod);
-            }
+            SectorPreset preset = new SectorPreset(mod + "-" + name, currentMod);
 
             currentContent = preset;
             read(() -> {
@@ -861,22 +812,13 @@ public class ContentParser{
             return planet;
         },
         ContentType.team, (TypeParser<TeamEntry>)(mod, name, value) -> {
-            TeamEntry entry;
-            Team team;
-            if(value.has("team")){
-                team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
-            }else{
-                throw new RuntimeException("Team field missing.");
-            }
+            if(!value.has("team")) throw new RuntimeException("Team field missing.");
+            Team team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
+
             value.remove("team");
 
-            if(allowPatching && locate(ContentType.team, name) != null){
-                entry = locate(ContentType.team, name);
-                readBundle(ContentType.team, name, value);
-            }else{
-                readBundle(ContentType.team, name, value);
-                entry = new TeamEntry(mod + "-" + name, team);
-            }
+            readBundle(ContentType.team, name, value);
+            TeamEntry entry = new TeamEntry(mod + "-" + name, team);
             currentContent = entry;
             read(() -> readFields(entry, value));
             return entry;
@@ -921,14 +863,8 @@ public class ContentParser{
 
     private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
-            T item;
-            if(allowPatching && locate(type, name) != null){
-                item = (T)locate(type, name);
-                readBundle(type, name, value);
-            }else{
-                readBundle(type, name, value);
-                item = constructor.get(mod + "-" + name);
-            }
+            T item = constructor.get(mod + "-" + name);
+            readBundle(type, name, value);
             currentContent = item;
             read(() -> readFields(item, value));
             return item;
@@ -936,16 +872,13 @@ public class ContentParser{
     }
 
     private void readBundle(ContentType type, String name, Jval value){
-        UnlockableContent cont = allowPatching && locate(type, name) instanceof UnlockableContent ? locate(type, name) : null;
-
-        String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
+        String entryName = type + "." + currentMod.name + "-" + name + ".";
         I18NBundle bundle = Core.bundle;
         while(bundle.getParent() != null) bundle = bundle.getParent();
 
         if(value.has("name")){
             if(!Core.bundle.has(entryName + "name")){
                 bundle.getProperties().put(entryName + "name", value.getString("name"));
-                if(cont != null) cont.localizedName = value.getString("name");
             }
             value.remove("name");
         }
@@ -953,7 +886,6 @@ public class ContentParser{
         if(value.has("description")){
             if(!Core.bundle.has(entryName + "description")){
                 bundle.getProperties().put(entryName + "description", value.getString("description"));
-                if(cont != null) cont.description = value.getString("description");
             }
             value.remove("description");
         }
@@ -1033,14 +965,10 @@ public class ContentParser{
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
-        boolean located = allowPatching && locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
         c.minfo.sourceFile = file;
+        c.minfo.mod = mod;
         toBeParsed.add(c);
-
-        if(!located){
-            c.minfo.mod = mod;
-        }
 
         currentMod = null;
         currentFile = null;
@@ -1279,41 +1207,7 @@ public class ContentParser{
             }
             Field field = metadata.field;
             try{
-                if(child.isObject() && child.has("add") && (Seq.class.isAssignableFrom(field.getType()) || ObjectSet.class.isAssignableFrom(field.getType()))){
-                    Object readField = parser.readValue(field.getType(), metadata.elementType, child.get("add"), metadata.keyType);
-                    Object fieldObj = field.get(object);
-
-                    if(fieldObj instanceof ObjectSet set){
-                        set.addAll((ObjectSet)readField);
-                    }else if(fieldObj instanceof Seq seq){
-                        seq.addAll((Seq)readField);
-                    }else{
-                        throw new SerializationException("This should be impossible");
-                    }
-                }else{
-                    boolean isMap = ObjectMap.class.isAssignableFrom(field.getType()) || ObjectIntMap.class.isAssignableFrom(field.getType()) || ObjectFloatMap.class.isAssignableFrom(field.getType());
-                    boolean mergeMap = isMap && child.has("add") && child.get("add").isBoolean() && child.getBool("add", false);
-
-                    if(mergeMap){
-                        child.remove("add");
-                    }
-
-                    Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
-                    Object fieldObj = field.get(object);
-
-                    //if a map has add: true, add its contents to the map instead
-                    if(mergeMap && (fieldObj instanceof ObjectMap<?,?> || fieldObj instanceof ObjectIntMap<?> || fieldObj instanceof ObjectFloatMap<?>)){
-                        if(field.get(object) instanceof ObjectMap<?,?> baseMap){
-                            baseMap.putAll((ObjectMap)readField);
-                        }else if(field.get(object) instanceof ObjectIntMap<?> baseMap){
-                            baseMap.putAll((ObjectIntMap)readField);
-                        }else if(field.get(object) instanceof ObjectFloatMap<?> baseMap){
-                            baseMap.putAll((ObjectFloatMap)readField);
-                        }
-                    }else{
-                        field.set(object, readField);
-                    }
-                }
+                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
@@ -1432,18 +1326,6 @@ public class ContentParser{
         //return mapped class if found in the global map
         var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
         if(out != null) return (Class<T>)out;
-
-        //try to resolve it as a raw class name
-        if(base.indexOf('.') != -1 && allowClassResolution){
-            try{
-                return (Class<T>)Class.forName(base);
-            }catch(Exception ignored){
-                //try to use mod class loader
-                try{
-                    return (Class<T>)Class.forName(base, true, mods.mainLoader());
-                }catch(Exception ignore){}
-            }
-        }
 
         if(def != null){
             if(warn) warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentFile != null ? currentFile : currentMod != null ? currentMod.name : "");

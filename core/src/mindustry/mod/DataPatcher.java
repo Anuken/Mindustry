@@ -73,7 +73,6 @@ public class DataPatcher{
                 }
             }
         };
-        cont.allowClassResolution = false;
         cont.allowAssetLoading = false;
         cont.allowPatching = false;
 
