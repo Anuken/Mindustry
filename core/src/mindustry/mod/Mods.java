@@ -22,6 +22,7 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.ContentParser.*;
+import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -934,6 +935,24 @@ public class Mods implements Loadable{
         UnitStance.loadAfterMods();
 
         Events.fire(new ModContentLoadEvent());
+    }
+
+    public void loadModPatches(){
+        for(LoadedMod mod : orderedMods()){
+            if(mod.root.child("patches").exists()){
+                try{
+                    Seq<Fi> patches = mod.root.child("patches").findAll(f -> f.extEquals("json") || f.extEquals("hjson"));
+                    if(patches.size > 0){
+                        //create a new patcher per mod so the fields don't get reset
+                        DataPatcher patcher = new DataPatcher();
+                        patches.sort();
+                        patcher.apply(patches.map(f -> new PatchAsset(f.readString())), new Seq<>());
+                    }
+                }catch(Exception e){
+                    Log.err("Failed to apply patches from mod " + mod.meta.name, e);
+                }
+            }
+        }
     }
 
     public void handleContentError(Content content, Throwable error){

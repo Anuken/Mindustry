@@ -183,7 +183,10 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
 
         assets.load(schematics);
 
-        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> content.load());
+        assets.loadRun("contentinit", ContentLoader.class, () -> content.init(), () -> {
+            content.load();
+            mods.loadModPatches();
+        });
         assets.loadRun("baseparts", BaseRegistry.class, () -> {}, () -> bases.load());
 
         Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> t.setWrap(TextureWrap.repeat);
