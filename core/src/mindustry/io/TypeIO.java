@@ -11,14 +11,14 @@ import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
+import mindustry.game.markers.*;
+import mindustry.game.objectives.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
@@ -982,7 +982,7 @@ public class TypeIO{
     }
 
     public static void writeObjectiveMarker(Writes write, ObjectiveMarker marker){
-        String string = JsonIO.json.toJson(marker, MapObjectives.ObjectiveMarker.class);
+        String string = JsonIO.json.toJson(marker, ObjectiveMarker.class);
         byte[] bytes = string.getBytes(charset);
         write.i(bytes.length);
         write.b(bytes);
@@ -992,7 +992,7 @@ public class TypeIO{
         int length = read.i();
         if(length > maxByteArraySize) throw new ArcRuntimeException("Objective marker too long");
         String string = new String(read.b(new byte[length]), charset);
-        return JsonIO.read(MapObjectives.ObjectiveMarker.class, string);
+        return JsonIO.read(ObjectiveMarker.class, string);
     }
 
     public static void writeVecNullable(Writes write, @Nullable Vec2 v){

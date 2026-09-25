@@ -13,7 +13,6 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;

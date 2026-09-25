@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.game.Objectives.*;
 import mindustry.type.*;
 

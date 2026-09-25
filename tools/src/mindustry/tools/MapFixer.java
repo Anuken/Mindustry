@@ -7,7 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
+import mindustry.game.markers.*;
 import mindustry.io.*;
 import mindustry.logic.LExecutor.*;
 import mindustry.maps.*;

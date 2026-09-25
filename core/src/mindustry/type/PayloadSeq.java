@@ -5,7 +5,6 @@ import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
 import arc.util.io.*;
 import mindustry.*;
-import mindustry.ctype.*;
 
 public class PayloadSeq{
     private ObjectIntMap<UnlockableContent> payloads = new ObjectIntMap<>();

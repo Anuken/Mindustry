@@ -1,9 +1,8 @@
-package mindustry.ctype;
+package mindustry.type;
 
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.entities.bullet.*;
-import mindustry.type.*;
 import mindustry.world.*;
 
 /** Do not rearrange, ever! */

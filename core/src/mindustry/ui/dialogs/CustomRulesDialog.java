@@ -12,7 +12,6 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.editor.*;
 import mindustry.game.*;
 import mindustry.game.Rules.*;

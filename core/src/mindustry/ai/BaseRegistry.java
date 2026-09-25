@@ -4,7 +4,6 @@ import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.type.*;

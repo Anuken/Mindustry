@@ -15,7 +15,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -400,33 +399,33 @@ public class StatValues{
         return table -> {
             if(table.getCells().size > 0) table.getCells().peek().growX();
             table.row();
-    
+
             table.table(c -> {
                 Runnable[] rebuild = {null};
                 Map[] lastMap = {null};
-    
+
                 rebuild[0] = () -> {
                     c.clearChildren();
                     c.left();
-    
+
                     if(state.isGame()){
                         var blocks = Vars.content.blocks()
                         .select(block -> (!checkFloors || block instanceof Floor) && indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
                         .with(s -> s.sort(f -> f.attributes.get(attr)));
-    
+
                         if(blocks.any()){
                             for(var block : blocks){
                                 c.table(Styles.grayPanel, b -> {
                                     float efficiency = 1f + block.attributes.get(attr) * scaleEff;
-    
+
                                     b.image(block.uiIcon).size(40f).pad(10f).left().scaling(Scaling.fit);
                                     b.table(center -> {
                                         center.left();
-    
+
                                         if(outputs != null && outputs.any()){
                                             for(ItemStack output : outputs){
                                                 float scaled = output.amount * (1f + block.attributes.get(attr) * scaleAmount);
-    
+
                                                 center.table(it -> {
                                                 it.left();
                                                 it.add(displayItem(output.item, scaled, timePeriod / efficiency , true)).left().padLeft(6f);
@@ -437,7 +436,7 @@ public class StatValues{
                                         }
                                     }).left().grow();
                                     b.add((efficiency < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("stat.efficiency", fixValue(efficiency * 100f))).right().pad(10f).padRight(15f);
-    
+
                                 }).growX().pad(5).row();
                             }
                         }else{
@@ -447,13 +446,13 @@ public class StatValues{
                         c.add("@stat.showinmap");
                     }
                 };
-    
+
                 rebuild[0].run();
-    
+
                 //rebuild when map changes.
                 c.update(() -> {
                     Map current = state.isGame() ? state.map : null;
-    
+
                     if(current != lastMap[0]){
                         rebuild[0].run();
                         lastMap[0] = current;

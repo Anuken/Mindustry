@@ -1,4 +1,4 @@
-package mindustry.ctype;
+package mindustry.type;
 
 import arc.files.*;
 import arc.util.*;

@@ -18,10 +18,10 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.mod.Mods.*;
+import mindustry.type.*;
 
 import java.io.*;
 import java.util.*;

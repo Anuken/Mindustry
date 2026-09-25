@@ -1,4 +1,4 @@
-package mindustry.ctype;
+package mindustry.type;
 
 import arc.*;
 import arc.func.*;
@@ -15,7 +15,6 @@ import mindustry.content.TechTree.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
 import mindustry.mod.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 

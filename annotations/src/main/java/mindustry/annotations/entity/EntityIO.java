@@ -234,11 +234,11 @@ public class EntityIO{
 
         if(BaseProcessor.isPrimitive(type)){
             s(type.equals("boolean") ? "bool" : type.charAt(0) + "", field);
-        }else if(instanceOf(type, "mindustry.ctype.Content") && !type.equals("mindustry.ai.UnitStance") && !type.equals("mindustry.ai.UnitCommand")){
+        }else if(instanceOf(type, "mindustry.type.Content") && !type.equals("mindustry.ai.UnitStance") && !type.equals("mindustry.ai.UnitCommand")){
             if(write){
                 s("s", field + " == null ? -1 : " + field + ".id");
             }else{
-                st(field + "mindustry.Vars.content.getByID(mindustry.ctype.ContentType.$L, read.s())", BaseProcessor.simpleName(type).toLowerCase().replace("type", ""));
+                st(field + "mindustry.Vars.content.getByID(mindustry.type.ContentType.$L, read.s())", BaseProcessor.simpleName(type).toLowerCase().replace("type", ""));
             }
         }else if((serializer.writers.containsKey(type) || (network && serializer.netWriters.containsKey(type))) && write){
             st("$L(write, $L)", network ? serializer.getNetWriter(type, null) : serializer.writers.get(type), field);

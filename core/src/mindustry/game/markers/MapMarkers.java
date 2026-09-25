@@ -1,9 +1,8 @@
-package mindustry.game;
+package mindustry.game.markers;
 
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.game.MapObjectives.*;
 import mindustry.io.*;
 
 import java.io.*;

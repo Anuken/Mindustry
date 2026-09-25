@@ -4,7 +4,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.PackContext;
 import mindustry.mod.data.*;

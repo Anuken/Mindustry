@@ -8,7 +8,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;

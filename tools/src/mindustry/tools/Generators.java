@@ -9,7 +9,6 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.graphics.*;
 import mindustry.type.*;

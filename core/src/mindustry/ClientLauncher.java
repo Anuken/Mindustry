@@ -13,7 +13,6 @@ import arc.util.*;
 import mindustry.ai.*;
 import mindustry.audio.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Saves.*;
 import mindustry.game.*;
@@ -23,6 +22,7 @@ import mindustry.io.*;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import static arc.Core.*;

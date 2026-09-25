@@ -8,7 +8,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.type.*;

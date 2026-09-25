@@ -2,7 +2,6 @@ package mindustry.game;
 
 import arc.*;
 import arc.scene.ui.layout.*;
-import mindustry.ctype.*;
 import mindustry.type.*;
 
 /** Holds objective classes. */

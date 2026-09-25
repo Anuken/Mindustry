@@ -1,4 +1,4 @@
-package mindustry.graphics;
+package mindustry.ui.style;
 
 import arc.graphics.*;
 import arc.graphics.g2d.*;

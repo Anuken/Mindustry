@@ -20,7 +20,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.editor.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;

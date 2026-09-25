@@ -19,6 +19,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.game.objectives.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;

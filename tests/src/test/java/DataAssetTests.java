@@ -1,6 +1,5 @@
 import arc.struct.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;

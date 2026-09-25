@@ -1,4 +1,4 @@
-package mindustry.ctype;
+package mindustry.type;
 
 import mindustry.*;
 import mindustry.mod.*;

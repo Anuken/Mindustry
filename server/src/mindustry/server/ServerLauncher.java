@@ -5,12 +5,12 @@ import arc.backend.headless.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.time.*;

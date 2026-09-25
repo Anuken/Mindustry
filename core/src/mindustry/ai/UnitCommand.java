@@ -7,10 +7,10 @@ import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.types.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.type.*;
 
 /** Defines a pattern of behavior that an RTS-controlled unit should follow. Shows up in the command UI. */
 public class UnitCommand extends MappableContent{

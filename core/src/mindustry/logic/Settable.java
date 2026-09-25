@@ -1,6 +1,6 @@
 package mindustry.logic;
 
-import mindustry.ctype.*;
+import mindustry.type.*;
 
 public interface Settable{
     void setProp(LAccess prop, double value);

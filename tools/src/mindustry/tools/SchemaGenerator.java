@@ -12,7 +12,6 @@ import com.github.javaparser.*;
 import com.github.javaparser.ast.body.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;

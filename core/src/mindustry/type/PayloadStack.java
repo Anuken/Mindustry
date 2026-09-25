@@ -2,7 +2,6 @@ package mindustry.type;
 
 import arc.struct.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 
 public class PayloadStack implements Comparable<PayloadStack>{
     public UnlockableContent item = Blocks.router;

@@ -2,7 +2,6 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.struct.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.logic.*;

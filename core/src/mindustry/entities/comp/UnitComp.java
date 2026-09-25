@@ -13,7 +13,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;

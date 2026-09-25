@@ -6,10 +6,10 @@ import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.mod.data.*;
 import mindustry.net.*;
+import mindustry.type.*;
 
 public class DataManager{
     private DataPatcher patcher = new DataPatcher();

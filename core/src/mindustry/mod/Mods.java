@@ -15,7 +15,6 @@ import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
 import mindustry.ai.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
