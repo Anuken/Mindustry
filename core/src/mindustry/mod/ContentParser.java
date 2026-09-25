@@ -29,7 +29,7 @@ import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.pattern.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
-import mindustry.game.Objectives.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
@@ -334,7 +334,7 @@ public class ContentParser{
             }
             return field != null ? field : Vars.tree.loadMusic(data.asString());
         });
-        put(Objectives.Objective.class, (type, data) -> {
+        put(UnlockCondition.class, (type, data) -> {
             if(data.isString()){
                 var cont = locateAny(data.asString());
                 if(cont == null) throw new IllegalArgumentException("Unknown objective content: " + data.asString());
@@ -342,7 +342,7 @@ public class ContentParser{
             }
             var oc = resolve(data.getString("type", ""), SectorComplete.class);
             data.remove("type");
-            Objectives.Objective obj = make(oc);
+            UnlockCondition obj = make(oc);
             readFields(obj, data);
             return obj;
         });
@@ -1258,7 +1258,7 @@ public class ContentParser{
 
                 //add custom objectives
                 if(isObject && research.has("objectives")){
-                    node.objectives.addAll(parser.readValue(Objective[].class, research.get("objectives")));
+                    node.objectives.addAll(parser.readValue(UnlockCondition[].class, research.get("objectives")));
                 }
 
                 //all items have a produce requirement unless already specified

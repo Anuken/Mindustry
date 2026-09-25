@@ -21,9 +21,9 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Objectives.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.game.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -1285,7 +1285,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.table(r -> {
                 r.add("@complete").colspan(2).left();
                 r.row();
-                for(Objective o : sector.preset.techNode.objectives){
+                for(UnlockCondition o : sector.preset.techNode.objectives){
                     if(o.complete()) continue;
 
                     r.add("> " + o.display()).color(Color.lightGray).left();

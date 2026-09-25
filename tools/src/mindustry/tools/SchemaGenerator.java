@@ -15,7 +15,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
-import mindustry.game.Objectives.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -73,8 +73,8 @@ public class SchemaGenerator{
             val.put("superclass", type.getSuperclass().getCanonicalName());
         }
 
-        if(Objective.class.isAssignableFrom(type)){
-            val.put("superclass", Objective.class.getCanonicalName());
+        if(UnlockCondition.class.isAssignableFrom(type)){
+            val.put("superclass", UnlockCondition.class.getCanonicalName());
         }
 
         if(typeDec.getJavadoc().isPresent()){

@@ -5,7 +5,7 @@ import arc.func.*;
 import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.game.Objectives.*;
+import mindustry.game.conditions.*;
 import mindustry.type.*;
 
 /** Class for storing a list of TechNodes with some utility tree builder methods; context dependent. See {@link SerpuloTechTree#load} source for example usage. */
@@ -35,7 +35,7 @@ public class TechTree{
         return node(content, requirements, null, children);
     }
 
-    public static TechNode node(UnlockableContent content, ItemStack[] requirements, Seq<Objective> objectives, Runnable children){
+    public static TechNode node(UnlockableContent content, ItemStack[] requirements, Seq<UnlockCondition> objectives, Runnable children){
         TechNode node = new TechNode(context, content, requirements);
         if(objectives != null){
             node.objectives.addAll(objectives);
@@ -54,7 +54,7 @@ public class TechTree{
         return node;
     }
 
-    public static TechNode node(UnlockableContent content, Seq<Objective> objectives, Runnable children){
+    public static TechNode node(UnlockableContent content, Seq<UnlockCondition> objectives, Runnable children){
         return node(content, content.researchRequirements(), objectives, children);
     }
 
@@ -62,7 +62,7 @@ public class TechTree{
         return node(block, () -> {});
     }
 
-    public static TechNode nodeProduce(UnlockableContent content, Seq<Objective> objectives, Runnable children){
+    public static TechNode nodeProduce(UnlockableContent content, Seq<UnlockCondition> objectives, Runnable children){
         return node(content, content.researchRequirements(), objectives.add(new Produce(content)), children);
     }
 
@@ -94,7 +94,7 @@ public class TechTree{
         /** Requirements that have been fulfilled. Always the same length as the requirement array. */
         public ItemStack[] finishedRequirements;
         /** Extra objectives needed to research this. */
-        public Seq<Objective> objectives = new Seq<>();
+        public Seq<UnlockCondition> objectives = new Seq<>();
         /** Nodes that depend on this node. */
         public final Seq<TechNode> children = new Seq<>();
         /** Planet associated with this tech node. Null to auto-detect, or use Serpulo if no associated planet is found. */

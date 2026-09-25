@@ -1,7 +1,7 @@
 package mindustry.content;
 
 import arc.struct.*;
-import mindustry.game.Objectives.*;
+import mindustry.game.conditions.*;
 import mindustry.type.*;
 
 import static mindustry.content.Blocks.*;
