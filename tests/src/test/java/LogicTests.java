@@ -123,7 +123,7 @@ public class LogicTests{
         Arguments.of("a bare single semicolon is invalid", ";", "invalid"),
         Arguments.of("a bare single space is invalid", " ", "invalid"),
         Arguments.of("a single ordinary character passes through unchanged", "a", "a"),
-        Arguments.of("empty input stays empty", "", ""),
+        Arguments.of("empty input gets converted to null", "", "null"),
         Arguments.of("a plain already-quoted value is untouched", "\"hello\"", "\"hello\""),
         Arguments.of("a unescaped quote at the end gets doubled", "\"hello\\\"", "\"hello\\\\\""),
         Arguments.of(
