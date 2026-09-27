@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.gen.LogicIO;
 import mindustry.logic.LExecutor.*;
 
 /** "Compiles" a sequence of statements into instructions. */
@@ -39,7 +40,7 @@ public class LAssembler{
     public static String write(Seq<LStatement> statements){
         StringBuilder out = new StringBuilder();
         for(LStatement s : statements){
-            s.write(out);
+            LogicIO.write(s, out);
             out.append("\n");
         }
 

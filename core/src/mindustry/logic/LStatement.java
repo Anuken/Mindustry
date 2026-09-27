@@ -56,7 +56,7 @@ public abstract class LStatement{
 
     public LStatement copy(){
         StringBuilder build = new StringBuilder();
-        write(build);
+        LogicIO.write(this, build);
         //assume privileged when copying, because there's no way privileged instructions can appear here anyway, and the instructions get validated on load anyway
         Seq<LStatement> read = LAssembler.read(build.toString(), true);
         return read.size == 0 ? null : read.first();
@@ -349,7 +349,8 @@ public abstract class LStatement{
     public void afterRead(){}
 
     public void write(StringBuilder builder){
-        LogicIO.write(this, builder);
+        // fallback
+        builder.append("noop");
     }
 
     public void setupUI(){

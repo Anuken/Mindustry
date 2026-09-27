@@ -93,6 +93,10 @@ public class LogicStatementProcessor extends BaseProcessor{
             reader.addStatement("return result");
         }
 
+        // fallback
+        writer.nextControlFlow("else if(obj instanceof mindustry.logic.LStatement)");
+        writer.addStatement("((mindustry.logic.LStatement)obj).write(out)");
+
         reader.endControlFlow();
         writer.endControlFlow();
 
