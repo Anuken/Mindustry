@@ -452,7 +452,7 @@ public class Generators{
                 base.each((x, y) -> base.setRaw(x, y, Color.muli(base.getRaw(x, y), rgba)));
 
                 delete("team-" + team.name);
-                save(base.outline(Pal.gray, 3), "../ui/team-" + team.name);
+                save(Pixmaps.outline(base, Pal.gray, 3), "../ui/team-" + team.name);
             }
         }
 
