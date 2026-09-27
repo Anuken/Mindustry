@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -20,62 +21,69 @@ public class ShieldArcAbility extends Ability{
     private static Unit paramUnit;
     private static ShieldArcAbility paramField;
     private static Vec2 paramPos = new Vec2();
+
+    private void deflect(Position pos, Vec2 vel, Cons<Float> reflect){
+        if(Mathf.chance(paramField.chanceDeflect)){
+            //make sound
+            paramField.deflectSound.at(pos, Mathf.random(0.9f, 1.1f));
+
+            //translate position back to where it was upon collision
+            float nx = pos.getX() - paramPos.x, ny = pos.getY() - paramPos.y;
+            float nlen = Mathf.len(nx, ny);
+            if(nlen > 0.0001f){
+                nx /= nlen;
+                ny /= nlen;
+            }
+
+            float dot = vel.x * nx + vel.y * ny;
+            float rx = vel.x - 2f * dot * nx;
+            float ry = vel.y - 2f * dot * ny;
+            float outDot = rx * nx + ry * ny;
+            float normalX = outDot * nx, normalY = outDot * ny;
+            float tangX = rx - normalX, tangY = ry - normalY;
+
+            vel.set(normalX + tangX * paramField.reflectVel, normalY + tangY * paramField.reflectVel);
+            reflect.get(vel.len());
+        }else{
+            paramField.hitSound.at(pos.getX(), pos.getY(), 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
+        }
+    }
+
+    private void hitShield(float damage){
+        if(paramField.data <= damage){
+            paramField.data -= paramField.cooldown * paramField.regen;
+
+            Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramField.color == null ? paramUnit.type.shieldColor(paramUnit) : paramField.color, paramUnit);
+            paramField.breakSound.at(paramPos.x, paramPos.y);
+            paramField.alpha = 1f;
+        }
+        paramField.data -= damage;
+        paramField.alpha = 1f;
+    }
+
     private static final Cons<Bullet> shieldConsumer = b -> {
         if(b.team != paramUnit.team && b.type.absorbable && paramField.data > 0 &&
             !(b.within(paramPos, paramField.radius - paramField.width) && paramPos.within(b.x - b.deltaX, b.y - b.deltaY, paramField.radius - paramField.width)) &&
             (Tmp.v1.set(b).add(b.deltaX, b.deltaY).within(paramPos, paramField.radius + paramField.width) || b.within(paramPos, paramField.radius + paramField.width)) &&
             (Angles.within(paramPos.angleTo(b), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(b.x + b.deltaX, b.y + b.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
 
-            if(paramField.chanceDeflect > 0f && b.vel.len() >= 0.1f && b.type.reflectable && Mathf.chance(paramField.chanceDeflect)){
-
-                //make sound
-                paramField.deflectSound.at(paramPos, Mathf.random(0.9f, 1.1f));
-
-                //translate bullet back to where it was upon collision
+            if(b.vel.len() >= 0.1f && b.type.reflectable && paramField.chanceDeflect >= 0){
                 b.trns(-b.vel.x, -b.vel.y);
 
-                float nx = b.x - paramPos.x, ny = b.y - paramPos.y;
-                float nlen = Mathf.len(nx, ny);
-                if(nlen > 0.0001f){
-                    nx /= nlen;
-                    ny /= nlen;
-                }
-
-                float dot = b.vel.x * nx + b.vel.y * ny;
-                float rx = b.vel.x - 2f * dot * nx;
-                float ry = b.vel.y - 2f * dot * ny;
-                float outDot = rx * nx + ry * ny;
-                float normalX = outDot * nx, normalY = outDot * ny;
-                float tangX = rx - normalX, tangY = ry - normalY;
-
-                b.vel.set(normalX + tangX * paramField.reflectVel, normalY + tangY * paramField.reflectVel);
-
-                b.owner = paramUnit;
-                b.team = paramUnit.team;
-                b.time = b.lifetime * paramField.reflectTime;
-                if(paramField.reflectBuildingDamage > 0f){
-                    b.buildingDamageMultiplier = paramField.reflectBuildingDamage;
-                }
-
+                paramField.deflect(b, b.vel, len -> {
+                    b.owner = paramUnit;
+                    b.team = paramUnit.team;
+                    b.time = b.lifetime * paramField.reflectTime;
+                    if(paramField.reflectBuildingDamage > 0f) b.buildingDamageMultiplier = paramField.reflectBuildingDamage;
+                });
             }else{
                 b.absorb();
                 Fx.absorb.at(b);
 
                 paramField.hitSound.at(b.x, b.y, 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
             }
-
-            // break shield
-            if(paramField.data <= b.damage()){
-                paramField.data -= paramField.cooldown * paramField.regen;
-
-                Fx.arcShieldBreak.at(paramPos.x, paramPos.y, 0, paramField.color == null ? paramUnit.type.shieldColor(paramUnit) : paramField.color, paramUnit);
-
-                paramField.breakSound.at(paramPos.x, paramPos.y);
-            }
-
             // shieldDamage for consistency
-            paramField.data -= b.type.shieldDamage(b);
-            paramField.alpha = 1f;
+            paramField.hitShield(b.type.shieldDamage(b));
         }
     };
 
@@ -87,13 +95,21 @@ public class ShieldArcAbility extends Ability{
             (Angles.within(paramPos.angleTo(unit), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f) || Angles.within(paramPos.angleTo(unit.x + unit.deltaX, unit.y + unit.deltaY), paramUnit.rotation + paramField.angleOffset, paramField.angle / 2f))){
 
             if(unit.isMissile() && paramField.missileUnitMultiplier >= 0f){
-                Call.unitSafeDeath(unit);
-                Fx.absorb.at(unit);
-                paramField.pushEffect.at(unit.x, unit.y,paramUnit.team.color);
+                if(paramField.reflectMissiles && paramField.chanceDeflect >= 0){
+                    paramField.deflect(unit, unit.vel(), len -> {
+                        unit.team(paramUnit.team);
+                        unit.rotation(unit.vel().angle());
 
+                        if(unit.controller() instanceof MissileAI ai) ai.shooter = paramUnit;
+                        if(unit instanceof TimedKillUnit ut) ut.time = Math.min(ut.time, unit.type.lifetime * paramField.reflectTime);
+                    });
+                }else{
+                    Call.unitSafeDeath(unit);
+                    Fx.absorb.at(unit);
+                    paramField.pushEffect.at(unit.x, unit.y, paramUnit.team.color);
+                }
                 // consider total missile damage and gamerule to damage the shield
-                paramField.data -= unit.type.damageEstimate * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team);
-                paramField.alpha = 1f;
+                paramField.hitShield(unit.type.damageEstimate * paramField.missileUnitMultiplier * Vars.state.rules.unitDamage(unit.team));
 
             }else if(paramField.pushUnits && (paramField.pushDiffLayer || paramUnit.isFlying() == unit.isFlying())){
 
@@ -132,13 +148,15 @@ public class ShieldArcAbility extends Ability{
     public boolean whenShooting = true;
     /** Width of shield line. */
     public float width = 6f;
-    /** Bullet deflection chance. -1 to disable */
+    /** Bullet/target deflection chance. -1 to disable */
     public float chanceDeflect = -1f;
-    /** Multiplier for reflected bullet building damage. -1 to disable */
+    /** Whether to reflect missile units. */
+    public boolean reflectMissiles = true;
+    /** Multiplier for reflected bullet/target building damage. -1 to disable */
     public float reflectBuildingDamage = 1f;
-    /** Velocity multiplier for reflected bullets on the opposite axis. Negative values = concave, positive values = convex */
+    /** Velocity multiplier for reflected bullets/targets on the opposite axis. Negative values = concave, positive values = convex */
     public float reflectVel = 1f;
-    /** Time multiplier for reflected bullets. <0.5 equals more distance, >0.5 equals less distance. */
+    /** Time multiplier for reflected bullets/targets. <0.5 equals more distance, >0.5 equals less distance. */
     public float reflectTime = 0.5f;
     /** Deflection sound. */
     public Sound deflectSound = Sounds.none;
