@@ -19,7 +19,7 @@ import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Objectives.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -738,7 +738,7 @@ public class ResearchDialog extends BaseDialog{
                                     t.table(r -> {
                                         r.add("@complete").colspan(2).left();
                                         r.row();
-                                        for(Objective o : node.objectives){
+                                        for(UnlockCondition o : node.objectives){
                                             if(o.complete()) continue;
 
                                             r.add("> " + o.display()).color(Color.lightGray).left();

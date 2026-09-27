@@ -38,6 +38,8 @@
         <true/>
         <key>UIRequiresFullScreen</key>
         <true/>
+        <key>CADisableMinimumFrameDurationOnPhone</key>
+        <true/>
         <key>LSSupportsOpeningDocumentsInPlace</key>
         <true/>
         <key>NSPhotoLibraryAddUsageDescription</key>

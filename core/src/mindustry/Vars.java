@@ -13,7 +13,6 @@ import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.editor.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -28,6 +27,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -50,9 +50,9 @@ public class Vars implements Loadable{
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
     /** Min game version for all mods. */
-    public static final int minModGameVersion = 136;
+    public static final int minModGameVersion = 161;
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
-    public static final int minJavaModGameVersion = 154;
+    public static final int minJavaModGameVersion = 161;
     /** If true, a button to view sector submission threads is shown. */
     public static boolean showSectorSubmissions = false;
     /** If true, the BE server list is always used. */

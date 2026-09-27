@@ -80,9 +80,9 @@ public class ConsumeGenerator extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = itemDuration;
-        super.setStats();
+        super.setStats(stats);
 
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);

@@ -78,7 +78,7 @@ public class LiquidModule extends BlockModule{
 
     /** @return current liquid's flow rate in u/s; any value < 0 means 'not ready'. */
     public float getFlowRate(Liquid liquid){
-        return flow == null ? -1f : displayFlow[liquid.id] * 60;
+        return flow == null ? -1f : displayFlow != null ? displayFlow[liquid.id] * 60 : -1f;
     }
 
     public boolean hasFlowLiquid(Liquid liquid){

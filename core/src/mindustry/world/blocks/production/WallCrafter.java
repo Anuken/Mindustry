@@ -73,8 +73,8 @@ public class WallCrafter extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.output, output);
         stats.add(Stat.tiles, StatValues.blocks(attribute, floating, 1f, true, false));

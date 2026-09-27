@@ -56,8 +56,8 @@ public class LaunchPad extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.launchTime, launchTime / 60f, StatUnit.seconds);
     }

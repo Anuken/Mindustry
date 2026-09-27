@@ -84,7 +84,7 @@ public class Lightning{
 
             Unit furthest = Geometry.findFurthest(x, y, entities);
 
-            if(furthest != null && furthest.dst(x, y) < length * 1.5f){
+            if(furthest != null && furthest.within(x, y, hitRange * 2f)){
                 hit.add(furthest.id());
                 x = furthest.x();
                 y = furthest.y();

@@ -18,6 +18,7 @@ import static mindustry.Vars.*;
 /** Utility class for unit and team interactions.*/
 public class Units{
     private static final Rect hitrect = new Rect();
+    private static final Seq<Unit> shieldReturn = new Seq<>();
     private static Unit result;
     private static float cdist, cpriority;
     private static int intResult;
@@ -439,6 +440,20 @@ public class Units{
                 other.tree().intersect(x, y, width, height, cons);
             }
         }
+    }
+
+    /** @return all enemy units with shield abilities that may reach into a rectangle (bottom left corner origin). The result is reused between calls. */
+    public static Seq<Unit> enemyShields(Team team, float x, float y, float width, float height){
+        shieldReturn.clear();
+        Seq<TeamData> data = state.teams.present;
+        for(int i = 0; i < data.size; i++){
+            var tree = data.items[i].unitShieldTree;
+            if(data.items[i].team != team && tree != null){
+                tree.intersect(x, y, width, height, shieldReturn);
+            }
+        }
+
+        return shieldReturn;
     }
 
     /** Iterates over all units in a circle around this position. */

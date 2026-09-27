@@ -18,7 +18,6 @@ import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -122,8 +121,8 @@ public class CoreBlock extends StorageBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.unitType, table -> {
             table.row();
@@ -611,9 +610,9 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public double sense(Content content){
-            if(content instanceof UnitType type) return team.data().countType(type);
-            return super.sense(content);
+        public double sense(Object object){
+            if(object instanceof UnitType type) return team.data().countType(type);
+            return super.sense(object);
         }
 
         @Override

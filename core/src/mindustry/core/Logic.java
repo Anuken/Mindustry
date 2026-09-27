@@ -8,7 +8,6 @@ import mindustry.ai.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -108,6 +107,7 @@ public class Logic implements ApplicationListener{
                 state.rules.allowEditRules = false;
                 state.rules.allowEditWorldProcessors = false;
                 state.rules.worldProcessorPlayerLink = false;
+                state.rules.logicUnitDeconstruct = true;
 
                 if(state.getPlanet().enemyInfiniteItems){
                     state.rules.waveTeam.rules().infiniteResources = true;

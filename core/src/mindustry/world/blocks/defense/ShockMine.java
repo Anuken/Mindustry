@@ -38,12 +38,12 @@ public class ShockMine extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.add(Stat.damage, table -> {
             table.add((String)(Core.bundle.format("bullet.lightning", tendrils, Strings.autoFixed(damage, 2)).replace("[stat]", "[white]")));
         });
-    } 
+    }
 
     public class ShockMineBuild extends Building{
 

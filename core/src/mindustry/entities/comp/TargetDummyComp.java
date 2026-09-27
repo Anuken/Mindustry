@@ -16,6 +16,7 @@ abstract class TargetDummyComp implements Unitc, Healthc{
         }
     }
 
+    @Replace
     @Override
     public void rawDamage(float amount){
         if(building instanceof TargetDummyBuild td){

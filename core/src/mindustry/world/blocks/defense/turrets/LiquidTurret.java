@@ -3,7 +3,6 @@ package mindustry.world.blocks.defense.turrets;
 import arc.struct.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -34,8 +33,8 @@ public class LiquidTurret extends Turret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
     }

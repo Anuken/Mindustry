@@ -88,9 +88,9 @@ public class RegenProjector extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = optionalUseTime;
-        super.setStats();
+        super.setStats(stats);
 
         stats.add(Stat.repairTime, (int)(1f / (healPercent / 100f) / 60f), StatUnit.seconds);
         stats.add(Stat.range, range, StatUnit.blocks);

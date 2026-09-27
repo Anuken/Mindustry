@@ -3,20 +3,20 @@ package mindustry.mod;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.mod.data.*;
 import mindustry.net.*;
+import mindustry.type.*;
 
 public class DataManager{
     private DataPatcher patcher = new DataPatcher();
     private DataImagePacker packer = new DataImagePacker();
     private DataAudioLoader soundLoader = new DataAudioLoader();
     private DataBundleLoader bundleLoader = new DataBundleLoader();
+    private DataEmojiLoader emojiLoader = new DataEmojiLoader();
 
     private ObjectMap<DataAssetType, Seq<DataAsset>> assets = new ObjectMap<>();
     private Seq<DataAsset> orderedAssets = new Seq<>();
@@ -78,10 +78,16 @@ public class DataManager{
         PixmapRegion error = new PixmapRegion(Pixmaps.blankPixmap());
         UnlockableContent[] currentContent = {null};
         String[] currentHash = {null};
+        Fi serverGeneratedDir = Vars.dataDirectory.child("assets/sprites/generated");
 
-        MultiPacker saver = new MultiPacker(false){
+        PackContext saver = new PackContext(){
             @Override
-            public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
+            public @Nullable PixmapRegion getOrNull(String name){
+                return get(name);
+            }
+
+            @Override
+            public void add(String name, PixmapRegion region, int[] splits, int[] pads, boolean noCrop){
                 try{
                     if(region.pixmap.width > 2000) throw new IllegalArgumentException("Max image size exceeded");
 
@@ -89,10 +95,17 @@ public class DataManager{
                     if(name.startsWith(DataImagePacker.regionPrefix)) name = name.substring(DataImagePacker.regionPrefix.length());
                     String path = "generated/" + currentHash[0] + "/" + name + ".png";
                     ImageAsset newImage = new ImageAsset();
-                    newImage.setPath(path);
-                    //it would be nice to do this async, but the pixmap typically gets disposed right after add() exist
+
+                    //it would be nice to do this async, but the pixmap typically gets disposed right after add()
                     byte[] bytes = PixmapIO.writePngBytes(region.pixmap);
-                    newImage.updateData(bytes);
+                    if(Vars.headless){ //TODO: doesn't actually work on the server yet
+                        Fi file = serverGeneratedDir.child(name + ".png");
+                        file.writeBytes(bytes);
+                        newImage.readOverride(path, file);
+                    }else{
+                        newImage.setPath(path);
+                        newImage.updateData(bytes);
+                    }
 
                     images.add(newImage);
                     packed[0] ++;
@@ -104,16 +117,6 @@ public class DataManager{
             @Override
             public boolean has(String name){
                 return imageMap.containsKey(name);
-            }
-
-            @Override
-            public boolean has(PageType type, String name){
-                return has(name);
-            }
-
-            @Override
-            public @Nullable PixmapRegion get(TextureRegion region){
-                return get(((AtlasRegion)region).name);
             }
 
             @Override
@@ -141,7 +144,7 @@ public class DataManager{
             currentHash[0] = hashes.get(content);
 
             try{
-               content.createIcons(saver);
+                content.packSprites(saver);
             }catch(Throwable e){
                 Log.err(e);
             }
@@ -150,13 +153,12 @@ public class DataManager{
         imagePixmaps.each((key, val) -> val.pixmap.dispose());
         error.pixmap.dispose();
 
-        if(packed[0] > 0 || forcePack){
+        if(!Vars.headless && (packed[0] > 0 || forcePack)){
             reloadImages();
 
             if(!Vars.headless){
                 for(var cont : contentToPack){
                     try{
-                        cont.loadIcon();
                         cont.load();
                     }catch(Exception e){
                         Log.err("Failed to load icons for " + cont, e);
@@ -179,7 +181,7 @@ public class DataManager{
         packer.unload();
         packer.pack(getImages());
 
-        rebuildOrderedAssets();
+        reloadEmojis();
     }
 
     public void reloadImages(Seq<ImageAsset> images){
@@ -207,6 +209,13 @@ public class DataManager{
         rebuildOrderedAssets();
     }
 
+    public void reloadEmojis(){
+        emojiLoader.unload();
+        emojiLoader.load(getEmojis());
+
+        rebuildOrderedAssets();
+    }
+
     public void load(Seq<DataAsset> newAssets){
         unload(); //if already loaded
 
@@ -224,6 +233,7 @@ public class DataManager{
         }
 
         patcher.apply(getPatches(), getContent());
+        emojiLoader.load(getEmojis());
 
         rebuildOrderedAssets();
     }
@@ -235,6 +245,7 @@ public class DataManager{
             packer.unload();
         }
         soundLoader.unload();
+        emojiLoader.unload();
 
         assets.clear();
         orderedAssets.clear();
@@ -320,5 +331,9 @@ public class DataManager{
 
     public Seq<ContentAsset> getContent(){
         return getAssets(DataAssetType.content);
+    }
+
+    public Seq<EmojiAsset> getEmojis(){
+        return getAssets(DataAssetType.emoji);
     }
 }

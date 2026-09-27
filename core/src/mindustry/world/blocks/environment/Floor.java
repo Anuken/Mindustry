@@ -12,7 +12,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -173,9 +172,9 @@ public class Floor extends Block{
                 //edges must be 3x3
                 var error = Core.atlas.find("error");
                 edges = new TextureRegion[][]{
-                    new TextureRegion[]{error, error, error},
-                    new TextureRegion[]{error, error, error},
-                    new TextureRegion[]{error, error, error},
+                new TextureRegion[]{error, error, error},
+                new TextureRegion[]{error, error, error},
+                new TextureRegion[]{error, error, error},
                 };
             }
         }
@@ -222,17 +221,13 @@ public class Floor extends Block{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
-        if(blendGroup != this){
-            return;
-        }
+        if(packer.has(name + "-edge") || blendGroup != this || !drawEdgeOut) return;
 
-        if(Core.atlas.has(name + "-edge")) return;
-
-        var image = packer.get(icons()[0]);
-        var edge = packer.get(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
+        var image = packer.has(name) ? packer.get(name) : packer.get(name + "1");
+        var edge = packer.get(name + "-edge-stencil", "edge-stencil");
         Pixmap result = new Pixmap(edge.width, edge.height);
 
         for(int x = 0; x < edge.width; x++){
@@ -241,7 +236,7 @@ public class Floor extends Block{
             }
         }
 
-        packer.add(PageType.environment, name + "-edge", result);
+        packer.add(name + "-edge", result, true);
         result.dispose();
     }
 

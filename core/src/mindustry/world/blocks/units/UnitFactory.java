@@ -14,7 +14,6 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -143,8 +142,8 @@ public class UnitFactory extends UnitBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.remove(Stat.itemCapacity);
 
@@ -265,7 +264,7 @@ public class UnitFactory extends UnitBlock{
                 if(build != null && build.team == this.team){
                     commandPos.set(build);
                 }
-            } 
+            }
         }
 
         @Override

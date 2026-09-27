@@ -74,9 +74,9 @@ public class NuclearReactor extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = itemDuration;
-        super.setStats();
+        super.setStats(stats);
 
         stats.add(Stat.meltdownTime, table -> {
             float avg = (itemDuration / 60f) / (1f + heatConsumeRate / 2f);

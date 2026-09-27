@@ -24,8 +24,8 @@ public class HeaterGenerator extends ConsumeGenerator{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.output, heatOutput, StatUnit.heatUnits);
     }

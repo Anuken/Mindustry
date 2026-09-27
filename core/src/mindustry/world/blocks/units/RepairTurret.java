@@ -68,8 +68,8 @@ public class RepairTurret extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.add(Stat.range, repairRadius / tilesize, StatUnit.blocks);
         stats.add(Stat.repairSpeed, repairSpeed * 60f, StatUnit.perSecond);
 

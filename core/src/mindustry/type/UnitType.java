@@ -19,7 +19,6 @@ import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.part.*;
@@ -27,7 +26,6 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -239,10 +237,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     canAttack = true,
     /** if true, this unit won't show up in the database or various other UIs. */
     hidden = false,
-    /** if true, this unit is for internal use only and does not have a sprite generated. */
+    /** if true, this unit is for internal use only and should not be spawned. */
     internal = false,
-    /** For certain units, generating sprites is still necessary, despite being internal. */
-    internalGenerateSprites = false,
     /** If false, this unit is not pushed away from map edges. */
     bounded = true,
     /** if true, this unit is detected as naval - do NOT assign this manually! Initialized in init() */
@@ -288,6 +284,8 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** list of "abilities", which are various behaviors that update each frame */
     public Seq<Ability> abilities = new Seq<>();
+    /** Maximum reach of shield abilities from the unit's center; 0 if there are none. Set in init(). */
+    public float shieldBounds;
     /** All weapons that this unit will shoot with. */
     public Seq<Weapon> weapons = new Seq<>();
     /** None of the status effects in this set can be applied to this unit. */
@@ -380,9 +378,6 @@ public class UnitType extends UnlockableContent implements Senseable{
 
     /** amount of items this unit can carry; <0 to determine based on hitSize. */
     public int itemCapacity = -1;
-    /** @deprecated only kept for compatibility with some turrets that query this field! Remove this from your code immediately! */
-    @Deprecated
-    public int ammoCapacity = 1;
 
     /** max hardness of ore that this unit can mine (<0 to disable) */
     public int mineTier = -1;
@@ -504,6 +499,9 @@ public class UnitType extends UnlockableContent implements Senseable{
     crushDamage = 0f,
     /** the fraction of solids under this block necessary for it to reach crawlSlowdown. */
     crawlSlowdownFrac = 0.55f;
+
+    /** for naval units only: crush rectangle half-extents, rotated with the unit */
+    public int crushRadX = 1, crushRadY = 1;
 
     //MISSILE UNITS
 
@@ -789,7 +787,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.add(Stat.health, health);
         stats.add(Stat.armor, armor);
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
@@ -1035,6 +1033,8 @@ public class UnitType extends UnlockableContent implements Senseable{
             ab.init(this);
         }
 
+        updateShieldBounds();
+
         //add mirrored weapon variants
         Seq<Weapon> mapped = new Seq<>();
         for(Weapon w : weapons){
@@ -1225,39 +1225,40 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(constructor == null) throw new IllegalArgumentException("No constructor set up for unit '" + name + "', add this argument to your units field: `constructor = UnitEntity::create`");
 
         sample = constructor.get();
 
+        //outlining below replaces sprites in the packer with their outlined versions, but the full icon needs the plain body to outline and mask with
+        String bodyName = packer.has(name + "-preview") ? name + "-preview" : name;
+        Pixmap plainBody = packer.has(bodyName) ? packer.get(bodyName).crop() : null;
+
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
         for(var region : toOutline){
-            if(region instanceof AtlasRegion atlas && !Core.atlas.has(atlas.name + "-outline")){
+            if(region instanceof AtlasRegion atlas && packer.has(atlas.name) && !packer.has(atlas.name + "-outline")){
                 String regionName = atlas.name;
                 Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
                 Drawf.checkBleed(outlined);
 
-                packer.add(PageType.main, regionName + "-outline", outlined);
+                packer.add(regionName + "-outline", outlined);
                 outlined.dispose();
             }
         }
 
         if(outlines){
             Seq<TextureRegion> outlineSeq = Seq.with(region, jointRegion, footRegion, baseJointRegion, legRegion, treadRegion);
-            if(Core.atlas.has(name + "-leg-base")){
+            if(packer.has(name + "-leg-base")){
                 outlineSeq.add(legBaseRegion);
             }
 
-            //note that mods with these regions already outlined will have *two* outlines made, which is... undesirable
             for(var outlineTarget : outlineSeq){
-                if(!outlineTarget.found()) continue;
-
-                makeOutline(PageType.main, packer, outlineTarget, alwaysCreateOutline && region == outlineTarget, outlineColor, outlineRadius);
+                makeOutline(packer, outlineTarget, needsBodyOutline() && region == outlineTarget, outlineColor, outlineRadius);
             }
 
             if(sample instanceof Crawlc){
@@ -1266,9 +1267,24 @@ public class UnitType extends UnlockableContent implements Senseable{
                 }
             }
 
+            //bake outlines directly into any region part that requests it, e.g. turret barrels drawn under a mount
+            Seq<DrawPart> allParts = new Seq<>();
+            collectParts(parts, allParts);
+            for(Weapon weapon : weapons) collectParts(weapon.parts, allParts);
+
+            for(DrawPart part : allParts){
+                if(part instanceof RegionPart rp && rp.replaceOutline){
+                    for(TextureRegion r : rp.regions){
+                        if(r instanceof AtlasRegion atlas && packer.has(atlas.name)){
+                            makeOutline(packer, atlas, false, outlineColor, outlineRadius);
+                        }
+                    }
+                }
+            }
+
             for(Weapon weapon : weapons){
-                if(!weapon.name.isEmpty() && (minfo.mod == null || weapon.name.startsWith(minfo.mod.name)) && (weapon.top || !packer.isOutlined(weapon.name) || weapon.parts.contains(p -> p.under))){
-                    makeOutline(PageType.main, packer, weapon.region, !weapon.top || weapon.parts.contains(p -> p.under), outlineColor, outlineRadius);
+                if(!weapon.name.isEmpty() && ownsSprite(weapon.name) && (weapon.top || !packer.isOutlined(weapon.name) || weapon.parts.contains(p -> p.under))){
+                    makeOutline(packer, weapon.region, !weapon.top || weapon.parts.contains(p -> p.under), outlineColor, outlineRadius);
                 }
             }
         }
@@ -1295,12 +1311,175 @@ public class UnitType extends UnlockableContent implements Senseable{
                         frame.setRaw(0, y, slice.getRaw(0, idx));
                     }
 
-                    packer.add(PageType.main, name + "-treads" + r + "-" + i, frame);
+                    packer.add(name + "-treads" + r + "-" + i, frame);
                     frame.dispose();
                 }
                 slice.dispose();
             }
         }
+
+        packFullIcon(packer, plainBody);
+    }
+
+    private static void collectParts(Seq<DrawPart> parts, Seq<DrawPart> out){
+        for(DrawPart part : parts){
+            out.add(part);
+            if(part instanceof RegionPart region) collectParts(region.children, out);
+        }
+    }
+
+    /** @return whether this content (rather than vanilla or another mod) is responsible for outlining this sprite. */
+    private boolean ownsSprite(String spriteName){
+        return minfo.mod == null || spriteName.startsWith(minfo.mod.name);
+    }
+
+    /** @return a copy of the named sprite with exactly one outline, whether or not makeOutline() already baked it in place. */
+    private Pixmap outlinedSprite(PackContext packer, String spriteName){
+        PixmapRegion src = packer.get(spriteName);
+        return !outlines || packer.isOutlined(spriteName) ? src.crop() : Pixmaps.outline(src, outlineColor, outlineRadius);
+    }
+
+    /** @return a copy of the weapon sprite (its preview, if any) as drawn at rest, without an outline. */
+    private Pixmap plainWeapon(PackContext packer, Weapon weapon){
+        return packer.get(packer.has(weapon.name + "-preview") ? weapon.name + "-preview" : weapon.name).crop();
+    }
+
+    /** @return a copy of the weapon sprite (its preview, if any) with exactly one outline. */
+    private Pixmap outlinedWeapon(PackContext packer, Weapon weapon){
+        if(!outlines) return plainWeapon(packer, weapon);
+
+        if(packer.has(weapon.name + "-preview")){
+            //previews are never outlined in place
+            return Pixmaps.outline(packer.get(weapon.name + "-preview"), outlineColor, outlineRadius);
+        }
+
+        //weapons that need a separate outline have one, and it is exactly the sprite plus its outline
+        if(packer.has(weapon.name + "-outline")) return packer.get(weapon.name + "-outline").crop();
+
+        //top weapons are outlined in place: by whoever owns the sprite, which is not necessarily this unit (e.g. a vanilla weapon on a mod unit)
+        boolean baked = packer.isOutlined(weapon.name) || (!ownsSprite(weapon.name) && weapon.top);
+        return baked ? packer.get(weapon.name).crop() : Pixmaps.outline(packer.get(weapon.name), outlineColor, outlineRadius);
+    }
+
+    /**
+     * Composites weapons, cell and body parts onto the plain body sprite, mirroring how draw() layers them at rest.
+     * @param plainBody body (or preview) sprite as it was before any outlining; ownership is taken and it is disposed here.
+     */
+    private void packFullIcon(PackContext packer, @Nullable Pixmap plainBody){
+        Pixmap outlinedBody = null;
+
+        try{
+            boolean hasBody = plainBody != null;
+            //computed once, since outlining is the expensive part of this method; always made from the plain sprite so it is outlined exactly once
+            outlinedBody = hasBody ? (outlines ? Pixmaps.outline(new PixmapRegion(plainBody), outlineColor, outlineRadius) : plainBody.copy()) : null;
+
+            Pixmap image =
+                segments > 0 && packer.has(name + "-segment0") ? packer.get(name + "-segment0").crop() :
+                drawBody && hasBody ? outlinedBody.copy() :
+                new Pixmap(1, 1);
+
+            //takes ownership of pixmap, disposing it (and its flipped copy, if any) once drawn
+            Cons2<Weapon, Pixmap> drawWeapon = (weapon, pixmap) -> {
+                Pixmap draw = weapon.flipSprite ? pixmap.flipX() : pixmap;
+                image.draw(draw,
+                    (int)(weapon.x / Draw.scl + image.width / 2f - draw.width / 2f),
+                    (int)(-weapon.y / Draw.scl + image.height / 2f - draw.height / 2f),
+                    true);
+                if(draw != pixmap) draw.dispose();
+                pixmap.dispose();
+            };
+
+            //note that the plain body sprite in the atlas (name) is outlined by packSprites() itself, nothing to do for it here
+            if(sample instanceof Crawlc){
+                for(int i = 0; i < segments; i++){
+                    if(i > 0 && packer.has(name + "-segment" + i)) drawCenter(image, packer.get(name + "-segment" + i).crop());
+                }
+                packer.add(name, image);
+            }
+
+            boolean anyUnder = false;
+            for(Weapon weapon : weapons){
+                if(weapon.layerOffset >= 0 || !packer.has(weapon.name)) continue;
+
+                drawWeapon.get(weapon, outlinedWeapon(packer, weapon));
+                anyUnder = true;
+            }
+
+            //draw the body back over the under-weapons to mask their mount stems
+            if(anyUnder && hasBody) image.draw(outlinedBody, true);
+
+            if(sample instanceof Tankc && packer.has(name + "-treads")){
+                Pixmap treads = outlinedSprite(packer, name + "-treads");
+                image.draw(treads, image.width / 2 - treads.width / 2, image.height / 2 - treads.height / 2, true);
+                treads.dispose();
+                if(hasBody) image.draw(plainBody, true);
+            }
+
+            if(sample instanceof Mechc){
+                if(packer.has(name + "-base")) drawCenter(image, packer.get(name + "-base").crop());
+                if(packer.has(name + "-leg")){
+                    Pixmap leg = packer.get(name + "-leg").crop();
+                    Pixmap legFlipped = leg.flipX();
+                    drawCenter(image, leg);
+                    drawCenter(image, legFlipped);
+                }
+                if(hasBody) image.draw(plainBody, true);
+            }
+
+            //draw weapon outlines onto the base first, as a silhouette
+            for(Weapon weapon : weapons){
+                if(weapon.layerOffset < 0 || !packer.has(weapon.name)) continue;
+
+                drawWeapon.get(weapon, outlinedWeapon(packer, weapon));
+            }
+
+            //draw the plain body back on top to mask the weapon mounts
+            if(drawCell && hasBody) image.draw(plainBody, true);
+
+            if(drawCell){
+                PixmapRegion cellSource = packer.has(name + "-cell") ? packer.get(name + "-cell") : packer.get("power-cell");
+                Pixmap cell = cellSource.crop();
+                cell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
+                image.draw(cell, image.width / 2 - cell.width / 2, image.height / 2 - cell.height / 2, true);
+                cell.dispose();
+            }
+
+            for(Weapon weapon : weapons){
+                if(weapon.layerOffset < 0 || !packer.has(weapon.name)) continue;
+
+                drawWeapon.get(weapon, weapon.top ? outlinedWeapon(packer, weapon) : plainWeapon(packer, weapon));
+
+                if(packer.has(weapon.name + "-cell")){
+                    Pixmap weaponCell = packer.get(weapon.name + "-cell").crop();
+                    weaponCell.replace(in -> in == 0xffffffff ? 0xffa664ff : in == 0xdcc6c6ff || in == 0xdcc5c5ff ? 0xd06b53ff : 0);
+                    drawWeapon.get(weapon, weaponCell);
+                }
+            }
+
+            if(generateFullIcon){
+                packer.add("unit-" + name + "-full", image);
+            }
+
+            if(isVanilla()){
+                int maxd = Math.min(Math.max(image.width, image.height), maxUiIcon);
+                Pixmap fit = new Pixmap(maxd, maxd);
+                drawScaledFit(fit, image);
+                packer.add("unit-" + name + "-ui", fit);
+                fit.dispose();
+            }
+
+            image.dispose();
+        }catch(Exception e){
+            Log.err("Failed to generate full icon for unit '" + name + "'", e);
+        }finally{
+            if(plainBody != null) plainBody.dispose();
+            if(outlinedBody != null) outlinedBody.dispose();
+        }
+    }
+
+    private static void drawCenter(Pixmap pix, Pixmap other){
+        pix.draw(other, pix.width / 2 - other.width / 2, pix.height / 2 - other.height / 2, true);
+        other.dispose();
     }
 
     @Override
@@ -1313,6 +1492,16 @@ public class UnitType extends UnlockableContent implements Senseable{
         pathCost = null;
         pathCostId = -1;
         initPathType();
+        updateShieldBounds();
+    }
+
+    public void updateShieldBounds(){
+        shieldBounds = 0f;
+        for(Ability ab : abilities){
+            if(ab instanceof UnitShieldProvider shield){
+                shieldBounds = Math.max(shieldBounds, shield.shieldBounds());
+            }
+        }
     }
 
     public void beforeParse(){

@@ -55,8 +55,8 @@ public class BeamNode extends PowerBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.powerRange, range, StatUnit.blocks);
     }

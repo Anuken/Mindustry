@@ -12,7 +12,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.editor.MapObjectivesCanvas.ObjectiveTilemap.ObjectiveTile.*;
 import mindustry.editor.MapObjectivesDialog.*;
-import mindustry.game.MapObjectives.*;
+import mindustry.game.objectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;

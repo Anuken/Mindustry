@@ -69,6 +69,24 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
+    public void generateSector(Sector sector){
+        if(sector.preset != null && (sector.preset.requireUnlock || sector.threat == SectorThreat.low)) return;
+
+        float sum = 1f;
+        for(Sector other : sector.near()){
+            if(other.generateEnemyBase){
+                sum += 0.95f;
+            }
+        }
+
+        if(sector.hasEnemyBase()){
+            sum += 0.88f;
+        }
+
+        sector.threat = SectorThreat.all[Mathf.clamp((int)sum, 1, 4)];
+    }
+
+    @Override
     public void onSectorCaptured(Sector sector){
         sector.planet.reloadMeshAsync();
     }
@@ -148,7 +166,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             var sector = (Sector)sectors[i];
 
             if(sector.hasEnemyBase() && !sector.isCaptured()){
-                dst = Math.min(dst, position.dst(sector.tile.v) - (sector.preset != null ? sector.preset.difficulty/10f * 0.03f - 0.03f : 0f));
+                dst = Math.min(dst, position.dst(sector.tile.v) - (sector.preset != null ? (sector.preset.threat.ordinal()+1) / 5f * 0.03f - 0.03f : 0f));
             }else if(sector.hasBase()){
                 float cdst = position.dst(sector.tile.v);
                 if(cdst < captureDst){
@@ -345,7 +363,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
         Room spawn = null;
         Seq<Room> enemies = new Seq<>();
-        int enemySpawns = rand.random(1, Math.max((int)(sector.threat * 4), 1));
+        int enemySpawns = rand.random(1, Math.max((int)((1 + sector.threat.ordinal())/5f * 4), 1));
         int offset = rand.nextInt(360);
         float length = width/2.55f - rand.random(13, 23);
         int angleStep = 5;
@@ -630,7 +648,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        float difficulty = sector.threat;
+        float difficulty = (1 + sector.threat.ordinal())/5f;
         int ruinCount = rand.random(-2, 4);
 
         if(ruinCount > 0){
@@ -748,7 +766,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
             //spawn air enemies
             if(spawner.countGroundSpawns() == 0){
-                state.rules.spawns = Waves.generate(sector.threat, new Rand(sector.id), state.rules.attackMode, true, false);
+                state.rules.spawns = Waves.generate((sector.threat.ordinal() + 1)/5f, new Rand(sector.id), state.rules.attackMode, true, false);
             }
         }
     }

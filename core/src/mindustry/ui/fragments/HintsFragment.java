@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -293,7 +294,7 @@ public class HintsFragment{
 
         presetDifficulty(() -> state.isCampaign()
             && state.getSector().preset == null
-            && state.getSector().threat >= 0.5f
+            && state.getSector().threat.ordinal() >= SectorThreat.high.ordinal()
             && !SectorPresets.tarFields.sector.isCaptured(), //appear only when the player hasn't progressed much in the game yet
             () -> state.isCampaign() && state.getSector().preset != null
         ),

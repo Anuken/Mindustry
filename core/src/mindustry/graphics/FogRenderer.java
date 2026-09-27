@@ -2,9 +2,7 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -34,11 +32,11 @@ public final class FogRenderer{
     }
 
     public Texture getStaticTexture(){
-        return staticFog.getTexture();
+        return staticFog.texture;
     }
 
     public Texture getDynamicTexture(){
-        return dynamicFog.getTexture();
+        return dynamicFog.texture;
     }
 
     public void drawFog(){
@@ -46,7 +44,7 @@ public final class FogRenderer{
         if(fogControl.getDiscovered(player.team()) == null) return;
 
         //resize if world size changes
-        boolean clearStatic = staticFog.resizeCheck(world.width(), world.height());
+        boolean clearStatic = staticFog.resize(world.width(), world.height());
 
         dynamicFog.resize(world.width(), world.height());
 
@@ -58,9 +56,9 @@ public final class FogRenderer{
 
         //draw dynamic fog every frame
         {
-            Draw.proj(0, 0, staticFog.getWidth() * tilesize, staticFog.getHeight() * tilesize);
+            Draw.proj(0, 0, staticFog.width * tilesize, staticFog.height * tilesize);
             dynamicFog.begin(Color.black);
-            ScissorStack.push(rect.set(1, 1, staticFog.getWidth() - 2, staticFog.getHeight() - 2));
+            ScissorStack.push(rect.set(1, 1, staticFog.width - 2, staticFog.height - 2));
 
             Team team = player.team();
 
@@ -80,7 +78,7 @@ public final class FogRenderer{
         //grab static events
         if(state.rules.staticFog && (clearStatic || events.size > 0)){
             //set projection to whole map
-            Draw.proj(0, 0, staticFog.getWidth(), staticFog.getHeight());
+            Draw.proj(0, 0, staticFog.width, staticFog.height);
 
             //if the buffer resized, it contains garbage now, clearStatic it.
             if(clearStatic){
@@ -89,7 +87,7 @@ public final class FogRenderer{
                 staticFog.begin();
             }
 
-            ScissorStack.push(rect.set(1, 1, staticFog.getWidth() - 2, staticFog.getHeight() - 2));
+            ScissorStack.push(rect.set(1, 1, staticFog.width - 2, staticFog.height - 2));
 
             Draw.color(Color.white);
 
@@ -105,18 +103,18 @@ public final class FogRenderer{
         }
 
         if(state.rules.staticFog){
-            staticFog.getTexture().setFilter(TextureFilter.linear);
+            staticFog.texture.setFilter(TextureFilter.linear);
         }
-        dynamicFog.getTexture().setFilter(TextureFilter.linear);
+        dynamicFog.texture.setFilter(TextureFilter.linear);
 
         Draw.shader(Shaders.fog);
         Draw.color(state.rules.dynamicColor, Float.isNaN(state.rules.dynamicColor.a) ? 0.5f : Math.max(0.5f, state.rules.dynamicColor.a));
-        Draw.fbo(dynamicFog.getTexture(), world.width(), world.height(), tilesize);
+        Draw.fbo(dynamicFog.texture, world.width(), world.height(), tilesize);
         //TODO ai check?
         if(state.rules.staticFog){
             //TODO why does this require a half-tile offset while dynamic does not
             Draw.color(state.rules.staticColor, 1f);
-            Draw.fbo(staticFog.getTexture(), world.width(), world.height(), tilesize, tilesize/2f);
+            Draw.fbo(staticFog.texture, world.width(), world.height(), tilesize, tilesize/2f);
         }
         Draw.shader();
     }
@@ -138,7 +136,7 @@ public final class FogRenderer{
     public void copyFromCpu(){
         staticFog.resize(world.width(), world.height());
         staticFog.begin(Color.black);
-        Draw.proj(0, 0, staticFog.getWidth(), staticFog.getHeight());
+        Draw.proj(0, 0, staticFog.width, staticFog.height);
         Draw.color();
         int ww = world.width(), wh = world.height();
 

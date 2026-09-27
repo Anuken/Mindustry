@@ -23,138 +23,138 @@ public class SectorPresets{
             alwaysUnlocked = true;
             addStartingItems = true;
             captureWave = 10;
-            difficulty = 1;
+            threat = SectorThreat.low;
             overrideLaunchDefaults = true;
             noLighting = true;
             startWaveTimeMultiplier = 3f;
         }};
 
         saltFlats = new SectorPreset("saltFlats", serpulo, 101){{
-            difficulty = 5;
+            threat = SectorThreat.high;
         }};
 
         testingGrounds = new SectorPreset("testingGrounds", serpulo, 3){{
-            difficulty = 7;
+            threat = SectorThreat.high;
             captureWave = 33;
         }};
 
         frozenForest = new SectorPreset("frozenForest", serpulo, 86){{
             captureWave = 15;
-            difficulty = 2;
+            threat = SectorThreat.low;
         }};
 
         biomassFacility = new SectorPreset("biomassFacility", serpulo, 81){{
             captureWave = 20;
-            difficulty = 3;
+            threat = SectorThreat.medium;
         }};
 
         taintedWoods = new SectorPreset("taintedWoods", serpulo, 221){{
             captureWave = 33;
-            difficulty = 5;
+            threat = SectorThreat.high;
         }};
 
         crateredBattleground = new SectorPreset("crateredBattleground", serpulo, 18){{
             captureWave = 20;
-            difficulty = 2;
+            threat = SectorThreat.low;
         }};
 
         ruinousShores = new SectorPreset("ruinousShores", serpulo, 213){{
             captureWave = 30;
-            difficulty = 3;
+            threat = SectorThreat.medium;
         }};
 
         perilousHarbor = new SectorPreset("perilousHarbor", serpulo, 47){{
-            difficulty = 4;
+            threat = SectorThreat.medium;
         }};
 
         facility32m = new SectorPreset("facility32m", serpulo, 64){{
             captureWave = 25;
-            difficulty = 4;
+            threat = SectorThreat.medium;
         }};
 
         windsweptIslands = new SectorPreset("windsweptIslands", serpulo, 246){{
             captureWave = 30;
-            difficulty = 4;
+            threat = SectorThreat.medium;
         }};
 
         stainedMountains = new SectorPreset("stainedMountains", serpulo, 20){{
             captureWave = 30;
-            difficulty = 3;
+            threat = SectorThreat.medium;
         }};
 
         extractionOutpost = new SectorPreset("extractionOutpost", serpulo, 165){{
-            difficulty = 5;
+            threat = SectorThreat.high;
         }};
 
         coastline = new SectorPreset("coastline", serpulo, 108){{
             captureWave = 30;
-            difficulty = 5;
+            threat = SectorThreat.high;
         }};
 
         weatheredChannels = new SectorPreset("weatheredChannels", serpulo, 39){{
             captureWave = 40;
-            difficulty = 9;
+            threat = SectorThreat.extreme;
         }};
 
         navalFortress = new SectorPreset("navalFortress", serpulo, 216){{
-            difficulty = 8;
+            threat = SectorThreat.extreme;
         }};
 
         frontier = new SectorPreset("frontier", serpulo, 50){{
-            difficulty = 4;
+            threat = SectorThreat.medium;
         }};
 
         fungalPass = new SectorPreset("fungalPass", serpulo, 21){{
-            difficulty = 2;
+            threat = SectorThreat.low;
         }};
 
         infestedCanyons = new SectorPreset("infestedCanyons", serpulo, 210){{
-            difficulty = 4;
+            threat = SectorThreat.medium;
         }};
 
         atolls = new SectorPreset("atolls", serpulo, 1){{
-            difficulty = 7;
+            threat = SectorThreat.high;
         }};
 
         sunkenPier = new SectorPreset("sunkenPier", serpulo, -1){{
             captureWave = 50;
-            difficulty = 8;
+            threat = SectorThreat.extreme;
         }};
 
         mycelialBastion = new SectorPreset("mycelialBastion", serpulo, 260){{
-            difficulty = 8;
+            threat = SectorThreat.extreme;
         }};
 
         overgrowth = new SectorPreset("overgrowth", serpulo, 134){{
-            difficulty = 5;
+            threat = SectorThreat.high;
         }};
 
         tarFields = new SectorPreset("tarFields", serpulo, 23){{
             captureWave = 40;
-            difficulty = 5;
+            threat = SectorThreat.high;
         }};
 
         impact0078 = new SectorPreset("impact0078", serpulo, 227){{
             captureWave = 45;
-            difficulty = 7;
+            threat = SectorThreat.high;
         }};
 
         desolateRift = new SectorPreset("desolateRift", serpulo, 123){{
             captureWave = 18;
-            difficulty = 8;
+            threat = SectorThreat.extreme;
         }};
 
         nuclearComplex = new SectorPreset("nuclearComplex", serpulo, 130){{
             captureWave = 50;
-            difficulty = 7;
+            threat = SectorThreat.high;
         }};
 
         littoralShipyard = new SectorPreset("littoralShipyard", serpulo, 204){{
-            difficulty = 9;
+            threat = SectorThreat.extreme;
         }};
 
         planetaryTerminal = new SectorPreset("planetaryTerminal", serpulo, 93){{
-            difficulty = 10;
+            threat = SectorThreat.eradication;
             isLastSector = true;
         }};
 
@@ -165,76 +165,76 @@ public class SectorPresets{
 
         onset = new SectorPreset("onset", erekir, 10){{
             alwaysUnlocked = true;
-            difficulty = 1;
+            threat = SectorThreat.low;
         }};
 
         aegis = new SectorPreset("aegis", erekir, 88){{
-            difficulty = 3;
+            threat = SectorThreat.medium;
         }};
 
         lake = new SectorPreset("lake", erekir, 41){{
-            difficulty = 4;
+            threat = SectorThreat.medium;
         }};
 
         intersect = new SectorPreset("intersect", erekir, 36){{
-            difficulty = 5;
+            threat = SectorThreat.high;
             captureWave = 9;
             attackAfterWaves = true;
         }};
 
         atlas = new SectorPreset("atlas", erekir, 14){{
-            difficulty = 5;
+            threat = SectorThreat.high;
         }};
 
         split = new SectorPreset("split", erekir, 19){{
-            difficulty = 2;
+            threat = SectorThreat.low;
         }};
 
         basin = new SectorPreset("basin", erekir, 29){{
-            difficulty = 6;
+            threat = SectorThreat.high;
         }};
 
         marsh = new SectorPreset("marsh", erekir, 25){{
-            difficulty = 4;
+            threat = SectorThreat.medium;
         }};
 
         peaks = new SectorPreset("peaks", erekir, 30){{
-            difficulty = 3;
+            threat = SectorThreat.medium;
         }};
 
         ravine = new SectorPreset("ravine", erekir, 39){{
-            difficulty = 4;
+            threat = SectorThreat.medium;
             captureWave = 24;
         }};
 
         caldera = new SectorPreset("caldera-erekir", erekir, 43){{
-            difficulty = 4;
+            threat = SectorThreat.medium;
         }};
 
         stronghold = new SectorPreset("stronghold", erekir, 18){{
-            difficulty = 7;
+            threat = SectorThreat.high;
         }};
 
         crevice = new SectorPreset("crevice", erekir, 3){{
-            difficulty = 6;
+            threat = SectorThreat.high;
             captureWave = 46;
         }};
 
         siege = new SectorPreset("siege", erekir, 58){{
-            difficulty = 8;
+            threat = SectorThreat.extreme;
         }};
 
         crossroads = new SectorPreset("crossroads", erekir, 37){{
-            difficulty = 7;
+            threat = SectorThreat.high;
         }};
 
         karst = new SectorPreset("karst", erekir, 5){{
-            difficulty = 9;
+            threat = SectorThreat.extreme;
             captureWave = 10;
         }};
 
         origin = new SectorPreset("origin", erekir, 12){{
-            difficulty = 10;
+            threat = SectorThreat.eradication;
             isLastSector = true;
         }};
 

@@ -468,7 +468,7 @@ public class GameService{
             }
         });
 
-        Events.on(PlayerJoin.class, e -> {
+        Events.on(PlayerJoinEvent.class, e -> {
             if(Vars.net.server()){
                 SStat.maxPlayersServer.max(Groups.player.size());
             }

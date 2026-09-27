@@ -20,7 +20,7 @@ public class LoadRegionProcessor extends BaseProcessor{
             .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"deprecation\"").build())
             .addModifiers(Modifier.PUBLIC);
         MethodSpec.Builder method = MethodSpec.methodBuilder("loadRegions")
-            .addParameter(tname("mindustry.ctype.MappableContent"), "content")
+            .addParameter(tname("mindustry.type.MappableContent"), "content")
             .addModifiers(Modifier.STATIC, Modifier.PUBLIC);
 
         ObjectMap<Stype, Seq<Svar>> fieldMap = new ObjectMap<>();

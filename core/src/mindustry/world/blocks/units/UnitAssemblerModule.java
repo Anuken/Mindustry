@@ -29,8 +29,8 @@ public class UnitAssemblerModule extends PayloadBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.moduleTier, tier);
     }

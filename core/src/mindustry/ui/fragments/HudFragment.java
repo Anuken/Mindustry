@@ -20,7 +20,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;

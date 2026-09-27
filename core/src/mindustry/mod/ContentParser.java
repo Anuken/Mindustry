@@ -19,7 +19,6 @@ import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
@@ -30,7 +29,7 @@ import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.pattern.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
-import mindustry.game.Objectives.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.*;
@@ -61,8 +60,6 @@ public class ContentParser{
 
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
     Seq<ParseListener> listeners = new Seq<>();
-    /** If false, arbitrary class names cannot be resolved with Class.forName. */
-    boolean allowClassResolution = true;
     /** If false, sound asset loading is disabled. */
     boolean allowAssetLoading = true;
     /** If false, vanilla content cannot be edited. */
@@ -92,13 +89,13 @@ public class ContentParser{
             return Attribute.add(attr);
         });
         put(Attributes.class, (type, data) -> {
-            if(!data.isObject()){
+            if(!(data instanceof JsonMap map)){
                 throw new IllegalArgumentException("Attribute definitions must be objects, e.g. {heat: 10}");
             }
             Attributes attr = new Attributes();
-            for(var child : data){
-                Attribute value = Attribute.exists(child.name) ? Attribute.get(child.name) : Attribute.add(child.name);
-                attr.set(value, child.asFloat());
+            for(var entry : map){
+                Attribute value = Attribute.exists(entry.key) ? Attribute.get(entry.key) : Attribute.add(entry.key);
+                attr.set(value, entry.value.asFloat());
             }
             return attr;
         });
@@ -127,7 +124,7 @@ public class ContentParser{
                 }
             }
             TextureRegion result = Core.atlas.find(str);
-            if(!result.found()){
+            if(!result.found() && !str.equalsIgnoreCase("error")){
                 warn("Sprite not found: '" + str + "'");
             }
             return result;
@@ -235,27 +232,24 @@ public class ContentParser{
 
             PartProgress base = (PartProgress)field(PartProgress.class, data.getString("type"));
 
-            JsonValue opval =
+            Jval opval =
                 data.has("operation") ? data.get("operation") :
                 data.has("op") ? data.get("op") : null;
 
             //no singular operation, check for multi-operation
             if(opval == null){
-                JsonValue opsVal =
-                    data.has("operations") ? data.get("operations") :
-                    data.has("ops") ? data.get("ops") : null;
+                var opsVal =
+                    data.has("operations") ? data.get("operations").asArray() :
+                    data.has("ops") ? data.get("ops").asArray() : null;
 
                 if(opsVal != null){
-                    if(!opsVal.isArray()) throw new RuntimeException("Chained PartProgress operations must be an array.");
-                    int i = 0;
-                    while(true){
-                        JsonValue val = opsVal.get(i);
+                    for(int i = 0; i < opsVal.size; i ++){
+                        Jval val = opsVal.get(i);
                         if(val == null) break;
-                        JsonValue op = val.has("operation") ? val.get("operation") :
+                        Jval op = val.has("operation") ? val.get("operation") :
                             val.has("op") ? val.get("op") : null;
 
                         base = parseProgressOp(base, op.asString(), val);
-                        i++;
                     }
                 }
 
@@ -283,21 +277,21 @@ public class ContentParser{
             }
 
             //transform array format
-            if(data.isArray() && data.size == 3){
+            if(data.isArray() && data.asArray().size == 3){
                 return new Mat3D().setToTranslation(new Vec3(data.asFloatArray()));
             }
 
             Mat3D mat = new Mat3D();
 
             //TODO this is kinda bad
-            for(var val : data){
-                switch(val.name){
+            for(var entry : data.asObject()){
+                switch(entry.key){
                     case "translate", "trans" -> mat.translate(parser.readValue(Vec3.class, data));
                     case "scale", "scl" -> mat.scale(parser.readValue(Vec3.class, data));
                     case "rotate", "rot" -> mat.rotate(parser.readValue(Vec3.class, data), data.getFloat("degrees", 0f));
                     case "multiply", "mul" -> mat.mul(parser.readValue(Mat3D.class, data));
                     case "x", "y", "z" -> {}
-                    default -> throw new RuntimeException("Unknown matrix transformation: '" + val.name + "'");
+                    default -> throw new RuntimeException("Unknown matrix transformation: '" + entry.key + "'");
                 }
             }
 
@@ -340,7 +334,7 @@ public class ContentParser{
             }
             return field != null ? field : Vars.tree.loadMusic(data.asString());
         });
-        put(Objectives.Objective.class, (type, data) -> {
+        put(UnlockCondition.class, (type, data) -> {
             if(data.isString()){
                 var cont = locateAny(data.asString());
                 if(cont == null) throw new IllegalArgumentException("Unknown objective content: " + data.asString());
@@ -348,7 +342,7 @@ public class ContentParser{
             }
             var oc = resolve(data.getString("type", ""), SectorComplete.class);
             data.remove("type");
-            Objectives.Objective obj = make(oc);
+            UnlockCondition obj = make(oc);
             readFields(obj, data);
             return obj;
         });
@@ -409,14 +403,6 @@ public class ContentParser{
     @Nullable Fi currentFile;
 
     private Json parser = new Json(){
-        @Override
-        protected <T> Class<T> resolveClass(String className){
-            if(allowClassResolution){
-                return super.resolveClass(className);
-            }else{
-                throw new SerializationException("Resolving arbitrary classes (" + className + ") is not allowed. Use short names for classes only (without the package prefix).");
-            }
-        }
 
         @Override
         protected Object newInstance(Class type){
@@ -426,7 +412,7 @@ public class ContentParser{
         }
 
         @Override
-        public <T> T readValue(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
+        public <T> T readValue(Class<T> type, Class elementType, Jval jsonData, Class keyType){
             T t = internalRead(type, elementType, jsonData, keyType);
             if(t != null && !Reflect.isWrapper(t.getClass()) && (type == null || !type.isPrimitive())){
                 checkNullFields(t);
@@ -437,7 +423,7 @@ public class ContentParser{
             return t;
         }
 
-        private <T> T internalRead(Class<T> type, Class elementType, JsonValue jsonData, Class keyType){
+        private <T> T internalRead(Class<T> type, Class elementType, Jval jsonData, Class keyType){
             if(type != null){
                 if(classParsers.containsKey(type)){
                     try{
@@ -451,9 +437,9 @@ public class ContentParser{
                 }
 
                 //try to parse env bits
-                if((type == int.class || type == Integer.class) && jsonData.isArray()){
+                if((type == int.class || type == Integer.class) && jsonData instanceof JsonArray arr){
                     int value = 0;
-                    for(var str : jsonData){
+                    for(var str : arr){
                         if(!str.isString()) throw new SerializationException("Integer bitfield values must all be strings. Found: " + str);
                         String field = str.asString();
                         value |= Reflect.<Integer>get(Env.class, field);
@@ -466,7 +452,7 @@ public class ContentParser{
                 if(type == ItemStack.class && jsonData.isString() && jsonData.asString().contains("/")){
                     String[] split = jsonData.asString().split("/");
 
-                    return (T)fromJson(ItemStack.class, "{item: " + split[0] + ", amount: " + split[1] + "}");
+                    return (T)new ItemStack(fromJson(Item.class, split[0]), Integer.parseInt(split[1]));
                 }
 
                 //try to parse "payloaditem/amount" syntax
@@ -489,8 +475,8 @@ public class ContentParser{
                 }
 
                 //try to parse Rect as array
-                if(type == Rect.class && jsonData.isArray() && jsonData.size == 4){
-                    return (T)new Rect(jsonData.get(0).asFloat(), jsonData.get(1).asFloat(), jsonData.get(2).asFloat(), jsonData.get(3).asFloat());
+                if(type == Rect.class && jsonData instanceof JsonArray arr && arr.size == 4){
+                    return (T)new Rect(arr.get(0).asFloat(), arr.get(1).asFloat(), arr.get(2).asFloat(), arr.get(3).asFloat());
                 }
 
                 //search across different content types to find one by name
@@ -501,7 +487,7 @@ public class ContentParser{
                             return found;
                         }
                     }
-                    throw new IllegalArgumentException("\"" + jsonData.name + "\": No content found with name '" + jsonData.asString() + "'.");
+                    throw new IllegalArgumentException("No content found with name '" + jsonData.asString() + "'.");
                 }
 
                 if(Content.class.isAssignableFrom(type)){
@@ -512,7 +498,7 @@ public class ContentParser{
                     T two = (T)Vars.content.getByName(ctype, jsonData.asString());
 
                     if(two != null) return two;
-                    throw new IllegalArgumentException((jsonData.name == null ? "" : "\"" + jsonData.name + "\": ") + "No " + ctype + " found with name '" + jsonData.asString() + "'.\nMake sure '" + jsonData.asString() + "' is spelled correctly, and that it really exists!\nThis may also occur because its file failed to parse.");
+                    throw new IllegalArgumentException("No " + ctype + " found with name '" + jsonData.asString() + "'.\nMake sure '" + jsonData.asString() + "' is spelled correctly, and that it really exists!\nThis may also occur because its file failed to parse.");
                 }
             }
 
@@ -520,9 +506,12 @@ public class ContentParser{
         }
     };
 
-    public void readBlockConsumers(Block block, JsonValue value){
-        for(JsonValue child : value){
-            switch(child.name){
+    public void readBlockConsumers(Block block, Jval value){
+        for(var entry : value.asObject()){
+            String name = entry.key;
+            Jval child = entry.value;
+
+            switch(name){
                 case "remove" -> {
                     String[] values = child.isString() ? new String[]{child.asString()} : child.asStringArray();
                     for(String type : values){
@@ -568,7 +557,7 @@ public class ContentParser{
                     }
                 }
                 case "powerBuffered" -> block.consumePowerBuffered(child.asFloat());
-                default -> throw new IllegalArgumentException("Unknown consumption type: '" + child.name + "' for block '" + block.name + "'.");
+                default -> throw new IllegalArgumentException("Unknown consumption type: '" + name + "' for block '" + block.name + "'.");
             }
         }
         value.remove("consumes");
@@ -576,20 +565,13 @@ public class ContentParser{
 
     private ObjectMap<ContentType, TypeParser<?>> parsers = ObjectMap.of(
         ContentType.block, (TypeParser<Block>)(mod, name, value) -> {
-            readBundle(ContentType.block, name, value);
-
-            Block block;
-
-            if(allowPatching && locate(ContentType.block, name) != null){
-                if(value.has("type")){
-                    warn("Warning: '" + currentMod.name + "-" + name + "' re-declares a type. This will be interpreted as a new block. If you wish to override a vanilla block, omit the 'type' section, as vanilla block `type`s cannot be changed.");
-                    block = make(resolve(value.getString("type", ""), Block.class), mod + "-" + name);
-                }else{
-                    block = locate(ContentType.block, name);
-                }
-            }else{
-                block = make(resolve(value.getString("type", "Block"), allowPatching ? Block.class : null), mod + "-" + name);
+            String typeName = value.getString("type", null);
+            if(typeName == null){
+                throw new IllegalArgumentException("Block " + name + " missing a type!");
             }
+            Block block = make(resolve(typeName), mod + "-" + name);
+
+            readBundle(ContentType.block, name, value, block);
 
             currentContent = block;
 
@@ -614,27 +596,20 @@ public class ContentParser{
             return block;
         },
         ContentType.unit, (TypeParser<UnitType>)(mod, name, value) -> {
-            readBundle(ContentType.unit, name, value);
+            UnitType unit = make(resolve(value.getString("template", ""), UnitType.class), mod + "-" + name);
+            if(value.has("template")){
+                value.remove("template");
+            }
 
-            UnitType unit;
-            if(!allowPatching || locate(ContentType.unit, name) == null){
+            readBundle(ContentType.unit, name, value, unit);
 
-                unit = make(resolve(value.getString("template", ""), UnitType.class), mod + "-" + name);
-
-                if(value.has("template")){
-                    value.remove("template");
+            var typeVal = value.get("type");
+            if(unit.constructor == null || typeVal != null){
+                if(typeVal != null && !typeVal.isString()){
+                    throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
                 }
 
-                var typeVal = value.get("type");
-                if(unit.constructor == null || typeVal != null){
-                    if(typeVal != null && !typeVal.isString()){
-                        throw new RuntimeException("Unit '" + name + "' has an incorrect type. Types must be strings.");
-                    }
-
-                    unit.constructor = unitType(typeVal);
-                }
-            }else{
-                unit = locate(ContentType.unit, name);
+                unit.constructor = unitType(typeVal);
             }
 
             currentContent = unit;
@@ -642,7 +617,7 @@ public class ContentParser{
                 unit.beforeParse();
                 //add reconstructor type
                 if(value.has("requirements")){
-                    JsonValue rec = value.remove("requirements");
+                    Jval rec = value.remove("requirements");
 
                     UnitReq req = parser.readValue(UnitReq.class, rec);
 
@@ -670,7 +645,7 @@ public class ContentParser{
 
                 //read extra default waves
                 if(value.has("waves")){
-                    JsonValue waves = value.remove("waves");
+                    Jval waves = value.remove("waves");
                     SpawnGroup[] groups = parser.readValue(SpawnGroup[].class, waves);
                     for(SpawnGroup group : groups){
                         group.type = unit;
@@ -685,43 +660,25 @@ public class ContentParser{
             return unit;
         },
         ContentType.weather, (TypeParser<Weather>)(mod, name, value) -> {
-            Weather item;
-            if(allowPatching && locate(ContentType.weather, name) != null){
-                item = locate(ContentType.weather, name);
-                readBundle(ContentType.weather, name, value);
-            }else{
-                readBundle(ContentType.weather, name, value);
-                item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
-                value.remove("type");
-            }
+            Weather item = make(resolve(getType(value), ParticleWeather.class), mod + "-" + name);
+            readBundle(ContentType.weather, name, value, item);
+            value.remove("type");
             currentContent = item;
             read(() -> readFields(item, value));
             return item;
         },
         ContentType.item, parser(ContentType.item, Item::new),
         ContentType.liquid, (TypeParser<Liquid>)(mod, name, value) -> {
-            Liquid liquid;
-            if(allowPatching && locate(ContentType.liquid, name) != null){
-                liquid = locate(ContentType.liquid, name);
-                readBundle(ContentType.liquid, name, value);
-            }else{
-                readBundle(ContentType.liquid, name, value);
-                liquid = make(resolve(value.getString("type", null), Liquid.class), mod + "-" + name);
-                value.remove("type");
-            }
+            Liquid liquid = make(resolve(value.getString("type", null), Liquid.class), mod + "-" + name);
+            readBundle(ContentType.liquid, name, value, liquid);
+            value.remove("type");
             currentContent = liquid;
             read(() -> readFields(liquid, value));
             return liquid;
         },
         ContentType.status, (TypeParser<StatusEffect>)(mod, name, value) -> {
-            StatusEffect status;
-            if(allowPatching && locate(ContentType.status, name) != null){
-                status = locate(ContentType.status, name);
-                readBundle(ContentType.status, name, value);
-            }else{
-                readBundle(ContentType.status, name, value);
-                status = new StatusEffect(mod + "-" + name);
-            }
+            StatusEffect status = new StatusEffect(mod + "-" + name);
+            readBundle(ContentType.status, name, value, status);
             currentContent = status;
             read(() -> readFields(status, value));
 
@@ -742,21 +699,15 @@ public class ContentParser{
             return status;
         },
         ContentType.sector, (TypeParser<SectorPreset>)(mod, name, value) -> {
-            readBundle(ContentType.sector, name, value);
             if(value.isString()){
                 return locate(ContentType.sector, name);
             }
 
-            SectorPreset preset;
-            SectorPreset found = allowPatching ? locate(ContentType.sector, name) : null;
+            if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
 
-            if(found != null){
-                preset = found;
-            }else{
-                if(!value.has("sector") || !value.get("sector").isNumber()) throw new RuntimeException("SectorPresets must have a sector number.");
+            SectorPreset preset = new SectorPreset(mod + "-" + name, currentMod);
 
-                preset = new SectorPreset(mod + "-" + name, currentMod);
-            }
+            readBundle(ContentType.sector, name, value, preset);
 
             currentContent = preset;
             read(() -> {
@@ -784,7 +735,7 @@ public class ContentParser{
                 value.remove("planet");
 
                 if(value.has("rules")){
-                    JsonValue r = value.remove("rules");
+                    Jval r = value.remove("rules");
                     if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
                     preset.rules = rules -> {
                         try{
@@ -801,12 +752,13 @@ public class ContentParser{
             return preset;
         },
         ContentType.planet, (TypeParser<Planet>)(mod, name, value) -> {
-            readBundle(ContentType.planet, name, value);
             if(value.isString()) return locate(ContentType.planet, name);
 
             Planet parent = locate(ContentType.planet, value.getString("parent", ""));
             //TODO: even if allowPatching is off, this modifies the parent.
             Planet planet = new Planet(mod + "-" + name, parent, value.getFloat("radius", 1f), value.getInt("sectorSize", 0));
+
+            readBundle(ContentType.planet, name, value, planet);
 
             value.remove("sectorSize");
 
@@ -841,7 +793,7 @@ public class ContentParser{
             }
 
             if(value.has("rules")){
-                JsonValue r = value.remove("rules");
+                Jval r = value.remove("rules");
                 if(!r.isObject()) throw new RuntimeException("Rules must be an object!");
                 planet.ruleSetter = rules -> {
                     try{
@@ -861,29 +813,20 @@ public class ContentParser{
             return planet;
         },
         ContentType.team, (TypeParser<TeamEntry>)(mod, name, value) -> {
-            TeamEntry entry;
-            Team team;
-            if(value.has("team")){
-                team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
-            }else{
-                throw new RuntimeException("Team field missing.");
-            }
+            if(!value.has("team")) throw new RuntimeException("Team field missing.");
+            Team team = (Team)classParsers.get(Team.class).parse(Team.class, value.get("team"));
+
             value.remove("team");
 
-            if(allowPatching && locate(ContentType.team, name) != null){
-                entry = locate(ContentType.team, name);
-                readBundle(ContentType.team, name, value);
-            }else{
-                readBundle(ContentType.team, name, value);
-                entry = new TeamEntry(mod + "-" + name, team);
-            }
+            TeamEntry entry = new TeamEntry(mod + "-" + name, team);
+            readBundle(ContentType.team, name, value, entry);
             currentContent = entry;
             read(() -> readFields(entry, value));
             return entry;
         }
     );
 
-    Prov<Unit> unitType(JsonValue value){
+    Prov<Unit> unitType(Jval value){
         if(value == null) return UnitEntity::create;
         return switch(value.asString()){
             case "flying" -> UnitEntity::create;
@@ -900,7 +843,7 @@ public class ContentParser{
         };
     }
 
-    private String getString(JsonValue value, String key){
+    private String getString(Jval value, String key){
         if(value.has(key)){
             return value.getString(key);
         }else{
@@ -908,7 +851,7 @@ public class ContentParser{
         }
     }
 
-    private String getType(JsonValue value){
+    private String getType(Jval value){
         return getString(value, "type");
     }
 
@@ -919,42 +862,34 @@ public class ContentParser{
         return (T)c;
     }
 
-    private <T extends Content> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
+    private <T extends UnlockableContent> TypeParser<T> parser(ContentType type, Func<String, T> constructor){
         return (mod, name, value) -> {
-            T item;
-            if(allowPatching && locate(type, name) != null){
-                item = (T)locate(type, name);
-                readBundle(type, name, value);
-            }else{
-                readBundle(type, name, value);
-                item = constructor.get(mod + "-" + name);
-            }
+            T item = constructor.get(mod + "-" + name);
+            readBundle(type, name, value, item);
             currentContent = item;
             read(() -> readFields(item, value));
             return item;
         };
     }
 
-    private void readBundle(ContentType type, String name, JsonValue value){
-        UnlockableContent cont = allowPatching && locate(type, name) instanceof UnlockableContent ? locate(type, name) : null;
-
-        String entryName = cont == null ? type + "." + currentMod.name + "-" + name + "." : type + "." + cont.name + ".";
+    private void readBundle(ContentType type, String name, Jval value, UnlockableContent content){
+        String entryName = type + "." + currentMod.name + "-" + name + ".";
         I18NBundle bundle = Core.bundle;
         while(bundle.getParent() != null) bundle = bundle.getParent();
 
         if(value.has("name")){
             if(!Core.bundle.has(entryName + "name")){
                 bundle.getProperties().put(entryName + "name", value.getString("name"));
-                if(cont != null) cont.localizedName = value.getString("name");
             }
+            content.localizedName = value.getString("name");
             value.remove("name");
         }
 
         if(value.has("description")){
             if(!Core.bundle.has(entryName + "description")){
                 bundle.getProperties().put(entryName + "description", value.getString("description"));
-                if(cont != null) cont.description = value.getString("description");
             }
+            content.description = value.getString("name");
             value.remove("description");
         }
     }
@@ -1023,29 +958,20 @@ public class ContentParser{
     public Content parse(LoadedMod mod, String name, String json, Fi file, ContentType type) throws Exception{
         checkInit();
 
-        //remove extra # characters to make it valid json... apparently some people have *unquoted* # characters in their json
-        if(file.extension().equals("json")){
-            json = json.replace("#", "\\#");
-        }
-
         currentFile = file;
         currentMod = mod;
 
-        var rawValue = parser.fromJson(null, Jval.read(json).toString(Jformat.plain));
-        if(!(rawValue instanceof JsonValue value)) throw new SerializationException("Content JSON must be an object, not a single value.");
+        var rawValue = parser.fromJson(null, json);
+        if(!(rawValue instanceof Jval value)) throw new SerializationException("Content JSON must be an object, not a single value.");
 
         if(!parsers.containsKey(type)){
             throw new SerializationException("No parsers for content type '" + type + "'");
         }
 
-        boolean located = allowPatching && locate(type, name) != null;
         Content c = parsers.get(type).parse(mod.name, name, value);
         c.minfo.sourceFile = file;
+        c.minfo.mod = mod;
         toBeParsed.add(c);
-
-        if(!located){
-            c.minfo.mod = mod;
-        }
 
         currentMod = null;
         currentFile = null;
@@ -1111,16 +1037,11 @@ public class ContentParser{
         return null;
     }
 
-    private GenericMesh[] parseMeshes(Planet planet, JsonValue array){
-        var res = new GenericMesh[array.size];
-        for(int i = 0; i < array.size; i++){
-            //yes get is O(n) but it's practically irrelevant here
-            res[i] = parseMesh(planet, array.get(i));
-        }
-        return res;
+    private GenericMesh[] parseMeshes(Planet planet, Jval array){
+        return array.asArray().map(value -> parseMesh(planet, value)).toArray(GenericMesh.class);
     }
 
-    private GenericMesh parseMesh(Planet planet, JsonValue data){
+    private GenericMesh parseMesh(Planet planet, Jval data){
         if(data.isArray()){
             return new MultiMesh(parseMeshes(planet, data));
         }
@@ -1156,7 +1077,7 @@ public class ContentParser{
         };
     }
 
-    private PartProgress parseProgressOp(PartProgress base, String op, JsonValue data){
+    private PartProgress parseProgressOp(PartProgress base, String op, Jval data){
         //I have to hard-code this, no easy way of getting parameter names, unfortunately
         return switch(op){
             case "inv" -> base.inv();
@@ -1220,7 +1141,7 @@ public class ContentParser{
         return controller::get;
     }
 
-    Object field(Class<?> type, JsonValue value){
+    Object field(Class<?> type, Jval value){
         return field(type, value.asString());
     }
 
@@ -1234,7 +1155,7 @@ public class ContentParser{
             throw new RuntimeException(e);
         }
     }
-    Object fieldOpt(Class<?> type, JsonValue value){
+    Object fieldOpt(Class<?> type, Jval value){
         try{
             return type.getField(value.asString()).get(null);
         }catch(Exception e){
@@ -1260,67 +1181,36 @@ public class ContentParser{
         });
     }
 
-    private void readFields(Object object, JsonValue jsonMap, boolean stripType){
+    private void readFields(Object object, Jval jsonMap, boolean stripType){
         if(stripType) jsonMap.remove("type");
         readFields(object, jsonMap);
     }
 
-    void readFields(Object object, JsonValue jsonMap){
+    void readFields(Object object, Jval jsonMap){
         if(!jsonMap.isObject()) throw new SerializationException("Expecting an object, but found: '" + jsonMap + "'");
-        JsonValue research = jsonMap.remove("research");
+        Jval research = jsonMap.remove("research");
 
         toBeParsed.remove(object);
         var type = object.getClass();
         var fields = parser.getFields(type);
-        for(JsonValue child = jsonMap.child; child != null; child = child.next){
-            FieldMetadata metadata = fields.get(child.name().replace(" ", "_"));
+        for(var entry : jsonMap.asObject()){
+            String name = entry.key;
+            Jval child = entry.value;
+
+            FieldMetadata metadata = fields.get(name.replace(" ", "_"));
             if(metadata == null){
                 if(ignoreUnknownFields){
-                    warn("@Unknown field '@' for class '@'", currentContent == null ? "" : "[" + currentContent.minfo.sourceFile.name() + "]: ", child.name, type.getSimpleName());
+                    warn("@Unknown field '@' for class '@'", currentContent == null ? "" : "[" + currentContent.minfo.sourceFile.name() + "]: ", name, type.getSimpleName());
                     continue;
                 }else{
-                    SerializationException ex = new SerializationException("Field not found: " + child.name + " (" + type.getName() + ")");
-                    ex.addTrace(child.trace());
+                    SerializationException ex = new SerializationException("Field not found: " + name + " (" + type.getName() + ")");
+                    ex.addTrace(child.toString());
                     throw ex;
                 }
             }
             Field field = metadata.field;
             try{
-                if(child.isObject() && child.has("add") && (Seq.class.isAssignableFrom(field.getType()) || ObjectSet.class.isAssignableFrom(field.getType()))){
-                    Object readField = parser.readValue(field.getType(), metadata.elementType, child.get("add"), metadata.keyType);
-                    Object fieldObj = field.get(object);
-
-                    if(fieldObj instanceof ObjectSet set){
-                        set.addAll((ObjectSet)readField);
-                    }else if(fieldObj instanceof Seq seq){
-                        seq.addAll((Seq)readField);
-                    }else{
-                        throw new SerializationException("This should be impossible");
-                    }
-                }else{
-                    boolean isMap = ObjectMap.class.isAssignableFrom(field.getType()) || ObjectIntMap.class.isAssignableFrom(field.getType()) || ObjectFloatMap.class.isAssignableFrom(field.getType());
-                    boolean mergeMap = isMap && child.has("add") && child.get("add").isBoolean() && child.getBoolean("add", false);
-
-                    if(mergeMap){
-                        child.remove("add");
-                    }
-
-                    Object readField = parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType);
-                    Object fieldObj = field.get(object);
-
-                    //if a map has add: true, add its contents to the map instead
-                    if(mergeMap && (fieldObj instanceof ObjectMap<?,?> || fieldObj instanceof ObjectIntMap<?> || fieldObj instanceof ObjectFloatMap<?>)){
-                        if(field.get(object) instanceof ObjectMap<?,?> baseMap){
-                            baseMap.putAll((ObjectMap)readField);
-                        }else if(field.get(object) instanceof ObjectIntMap<?> baseMap){
-                            baseMap.putAll((ObjectIntMap)readField);
-                        }else if(field.get(object) instanceof ObjectFloatMap<?> baseMap){
-                            baseMap.putAll((ObjectFloatMap)readField);
-                        }
-                    }else{
-                        field.set(object, readField);
-                    }
-                }
+                field.set(object, parser.readValue(field.getType(), metadata.elementType, child, metadata.keyType));
             }catch(IllegalAccessException ex){
                 throw new SerializationException("Error accessing field: " + field.getName() + " (" + type.getName() + ")", ex);
             }catch(SerializationException ex){
@@ -1328,7 +1218,7 @@ public class ContentParser{
                 throw ex;
             }catch(RuntimeException runtimeEx){
                 SerializationException ex = new SerializationException(runtimeEx);
-                ex.addTrace(child.trace());
+                ex.addTrace(child.toString());
                 ex.addTrace(field.getName() + " (" + type.getName() + ")");
                 throw ex;
             }
@@ -1368,9 +1258,11 @@ public class ContentParser{
                 currentMod = cur;
                 currentFile = file;
 
+                boolean isObject = research.isObject();
+
                 //add custom objectives
-                if(research.has("objectives")){
-                    node.objectives.addAll(parser.readValue(Objective[].class, research.get("objectives")));
+                if(isObject && research.has("objectives")){
+                    node.objectives.addAll(parser.readValue(UnlockCondition[].class, research.get("objectives")));
                 }
 
                 //all items have a produce requirement unless already specified
@@ -1387,13 +1279,13 @@ public class ContentParser{
                     node.setupRequirements(unlock.researchRequirements());
                 }
 
-                if(research.has("planet")){
+                if(isObject && research.has("planet")){
                     node.planet = find(ContentType.planet, research.getString("planet"));
                 }
 
-                if(research.getBoolean("root", false)){
+                if(isObject && research.getBool("root", false)){
                     node.name = research.getString("name", unlock.name);
-                    node.requiresUnlock = research.getBoolean("requiresUnlock", false);
+                    node.requiresUnlock = research.getBool("requiresUnlock", false);
                     TechTree.roots.add(node);
                 }else{
                     if(researchName != null){
@@ -1438,18 +1330,6 @@ public class ContentParser{
         var out = ClassMap.classes.get(!base.isEmpty() && Character.isLowerCase(base.charAt(0)) ? Strings.capitalize(base) : base);
         if(out != null) return (Class<T>)out;
 
-        //try to resolve it as a raw class name
-        if(base.indexOf('.') != -1 && allowClassResolution){
-            try{
-                return (Class<T>)Class.forName(base);
-            }catch(Exception ignored){
-                //try to use mod class loader
-                try{
-                    return (Class<T>)Class.forName(base, true, mods.mainLoader());
-                }catch(Exception ignore){}
-            }
-        }
-
         if(def != null){
             if(warn) warn("[@] No type '" + base + "' found, defaulting to type '" + def.getSimpleName() + "'", currentFile != null ? currentFile : currentMod != null ? currentMod.name : "");
             return def;
@@ -1473,11 +1353,11 @@ public class ContentParser{
     }
 
     private interface FieldParser{
-        Object parse(Class<?> type, JsonValue value) throws Exception;
+        Object parse(Class<?> type, Jval value) throws Exception;
     }
 
     private interface TypeParser<T extends Content>{
-        T parse(String mod, String name, JsonValue value) throws Exception;
+        T parse(String mod, String name, Jval value) throws Exception;
     }
 
     //intermediate class for parsing
@@ -1490,7 +1370,7 @@ public class ContentParser{
     }
 
     public interface ParseListener{
-        void parsed(Class<?> type, JsonValue jsonData, Object result);
+        void parsed(Class<?> type, Jval jsonData, Object result);
     }
 
 }

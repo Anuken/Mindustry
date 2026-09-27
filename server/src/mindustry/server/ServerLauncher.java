@@ -5,12 +5,12 @@ import arc.backend.headless.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.time.*;
@@ -54,6 +54,7 @@ public class ServerLauncher implements ApplicationListener{
         mods.loadScripts();
         content.createModContent();
         content.init();
+        mods.loadModPatches();
 
         if(mods.hasContentErrors()){
             err("Error occurred loading mod content:");

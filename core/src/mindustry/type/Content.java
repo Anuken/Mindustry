@@ -1,0 +1,98 @@
+package mindustry.type;
+
+import arc.files.*;
+import arc.util.*;
+import mindustry.*;
+import mindustry.annotations.Annotations.*;
+import mindustry.mod.Mods.*;
+import mindustry.mod.*;
+import mindustry.mod.data.*;
+
+/** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */
+@NoPatch
+public abstract class Content implements Comparable<Content>{
+    public short id;
+    /** Info on which mod this content was loaded from. */
+    public ModContentInfo minfo = new ModContentInfo();
+    /** If true, this content is invalid (added in a data patch and then removed). */
+    public boolean removed;
+
+    public Content(){
+        this.id = (short)Vars.content.getBy(getContentType()).size;
+        Vars.content.handleContent(this);
+    }
+
+    /**
+     * Returns the type name of this piece of content.
+     * This should return the same value for all instances of this content type.
+     */
+    public abstract ContentType getContentType();
+
+    /** Called when this content is removed in a data patch. */
+    @CallSuper
+    public void removeContent(){}
+
+    /** Called after all content and modules are created. Do not use to load regions or texture data! */
+    public void init(){}
+
+    /** Called after init(). */
+    public void postInit(){}
+
+    /** Called after being patched. */
+    public void afterPatch(){}
+
+    /**
+     * Called after all content is created, only on non-headless versions.
+     * Use for loading regions or other image data.
+     */
+    @CallSuper
+    public void load(){
+        loadIcon();
+    }
+
+    /** Called right before load(). */
+    public void loadIcon(){}
+
+    /** @return whether an error occurred during mod loading. */
+    public boolean hasErrored(){
+        return minfo.error != null;
+    }
+
+    /** @return whether this is content from the base game. */
+    public boolean isVanilla(){
+        return minfo.mod == null;
+    }
+
+    /** @return whether this content is from a mod. */
+    public boolean isModded(){
+        return !isVanilla();
+    }
+
+    /** @return whether this content is from a map data patch. */
+    public boolean isPatchContent(){
+        return minfo.mod == DataPatcher.dpMod;
+    }
+
+    @Override
+    public int compareTo(Content c){
+        return Integer.compare(id, c.id);
+    }
+
+    @Override
+    public String toString(){
+        return getContentType().name() + "#" + id;
+    }
+
+    public static class ModContentInfo{
+        /** The mod that loaded this piece of content. */
+        public @Nullable LoadedMod mod;
+        /** File that this content was loaded from. */
+        public @Nullable Fi sourceFile;
+        /** The error that occurred during loading, if applicable. Null if no error occurred. */
+        public @Nullable String error;
+        /** Base throwable that caused the error. */
+        public @Nullable Throwable baseError;
+        /** If this was loaded as part of a save, this is the associated content asset. Null for mods. */
+        public @Nullable ContentAsset asset;
+    }
+}

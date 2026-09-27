@@ -56,6 +56,7 @@ public class BuildTurret extends BaseTurret{
         unitType = new UnitType("turret-unit-" + name){{
             hidden = true;
             internal = true;
+            packSprites = false;
             speed = 0f;
             hitSize = 0f;
             health = 1;
@@ -78,8 +79,8 @@ public class BuildTurret extends BaseTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.addPercent(Stat.buildSpeed, buildSpeed);
     }

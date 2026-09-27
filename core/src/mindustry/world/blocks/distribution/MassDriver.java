@@ -66,8 +66,8 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
         stats.add(Stat.reload, table -> {
@@ -125,6 +125,21 @@ public class MassDriver extends Block{
         public DriverState state = DriverState.idle;
         //TODO use queue? this array usually holds about 3 shooters max anyway
         public OrderedSet<Building> waitingShooters = new OrderedSet<>();
+
+        @Override
+        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LAccess.config){
+                configured(null, p1 instanceof Building b ? b.pos() : -1);
+            }
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config){
+                return linkValid() ? world.build(link) : null;
+            }
+            return super.senseObject(sensor);
+        }
 
         @Override
         public float buildRotation(){

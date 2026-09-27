@@ -7,10 +7,8 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
-import arc.scene.utils.*;
 import arc.struct.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -620,7 +618,7 @@ public class MapLocalesDialog extends BaseDialog{
         BaseDialog dialog = new BaseDialog("@locales.addicon");
 
         Table icons = new Table();
-        TextField search = Elem.newField("", v -> iconsTable(icons, v.replace(" ", "").toLowerCase(), dialog, cons));
+        TextField search = new TextField("", v -> iconsTable(icons, v.replace(" ", "").toLowerCase(), dialog, cons));
         search.setMessageText("@search");
 
         dialog.cont.table(t -> {

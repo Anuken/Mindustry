@@ -8,7 +8,6 @@ import arc.struct.ObjectIntMap.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.g3d.*;
@@ -125,7 +124,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         }
 
         //sort counts in descending order
-        Seq<Entry<Block>> entries = floorc.entries().toArray();
+        Seq<Entry<Block>> entries = floorc.entries().toSeq();
         entries.sort(e -> -e.value);
         //remove all blocks occurring < 30 times - unimportant
         entries.removeAll(e -> e.value < 30);

@@ -24,10 +24,6 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
     @Nullable Rand rand;
     int seed;
 
-    {
-        defaultLoadout = Loadouts.basicNucleus;
-    }
-
     void asteroid(int ax, int ay, int radius){
         Floor floor = (
             rand.chance(iceChance) ? Blocks.ice :

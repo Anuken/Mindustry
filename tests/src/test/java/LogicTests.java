@@ -1,3 +1,4 @@
+import arc.graphics.*;
 import mindustry.logic.*;
 import mindustry.logic.LExecutor.*;
 import org.junit.jupiter.api.*;
@@ -241,6 +242,123 @@ public class LogicTests{
         "end\\"
         )
         );
+    }
+
+    /** Values that must resolve to a numeric constant (isobj == false) or an object constant. */
+    static Stream<Arguments> parseValCases(){
+        return Stream.of(
+        // name, symbol, expected (Double => numeric, anything else => object)
+        Arguments.of("parse null", "null", null),
+
+        //decimal
+        Arguments.of("decimal: zero", "0", 0.0),
+        Arguments.of("decimal: positive integer", "42", 42.0),
+        Arguments.of("decimal: negative integer", "-42", -42.0),
+        Arguments.of("decimal: explicit plus sign", "+42", 42.0),
+        Arguments.of("decimal: fraction", "3.14", 3.14),
+        Arguments.of("decimal: negative fraction", "-3.14", -3.14),
+        Arguments.of("decimal: leading dot", ".5", 0.5),
+        Arguments.of("decimal: large integer", "123456789012", 123456789012.0),
+        Arguments.of("decimal: scientific", "1e3", 1000.0),
+        Arguments.of("decimal: scientific negative exponent", "1.5e-2", 0.015),
+
+        //hex
+        Arguments.of("hex: zero", "0x0", 0.0),
+        Arguments.of("hex: uppercase digits", "0xFF", 255.0),
+        Arguments.of("hex: lowercase digits", "0xff", 255.0),
+        Arguments.of("hex: mixed case", "0xDeadBeef", 3735928559.0),
+        Arguments.of("hex: explicit plus", "+0xFF", 255.0),
+        Arguments.of("hex: negative", "-0xFF", -255.0),
+        Arguments.of("hex: many leading zeros aren't overflow", "0x0000000000000000000000FF", 255.0),
+        Arguments.of("hex: only zeros", "0x" + "0".repeat(100), 0.0),
+        Arguments.of("hex: Long.MAX_VALUE", "0x7FFFFFFFFFFFFFFF", (double)Long.MAX_VALUE),
+        Arguments.of("hex: Long.MIN_VALUE (0x8000...)", "0x8000000000000000", (double)Long.MIN_VALUE),
+        Arguments.of("hex: unsigned long max wraps to -1", "0xFFFFFFFFFFFFFFFF", -1.0),
+        Arguments.of("hex: unsigned long max - 1 wraps to -2", "0xFFFFFFFFFFFFFFFE", -2.0),
+        Arguments.of("hex: negated -1 wrap gives 1", "-0xFFFFFFFFFFFFFFFF", 1.0),
+        Arguments.of("hex: negative Long.MAX_VALUE", "-0x7FFFFFFFFFFFFFFF", -(double)Long.MAX_VALUE),
+
+        //binary
+        Arguments.of("bin: zero", "0b0", 0.0),
+        Arguments.of("bin: one", "0b1", 1.0),
+        Arguments.of("bin: ten", "0b1010", 10.0),
+        Arguments.of("bin: explicit plus", "+0b1010", 10.0),
+        Arguments.of("bin: negative", "-0b1010", -10.0),
+        Arguments.of("bin: many leading zeros aren't overflow", "0b" + "0".repeat(70) + "1", 1.0),
+        Arguments.of("bin: 63 ones is Long.MAX_VALUE", "0b0" + "1".repeat(63), (double)Long.MAX_VALUE),
+        Arguments.of("bin: 1 followed by 63 zeros is Long.MIN_VALUE", "0b1" + "0".repeat(63), (double)Long.MIN_VALUE),
+        Arguments.of("bin: 64 ones wraps to -1", "0b" + "1".repeat(64), -1.0)
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("parseValCases")
+    void parseVarValues(String name, String symbol, Object expected){
+        LAssembler asm = new LAssembler();
+        LVar v = asm.var(symbol);
+        if(expected instanceof Double d){
+            assertFalse(v.isobj, "should be numeric: " + symbol);
+            assertEquals(d, v.numval, 0.00001f);
+        }else{
+            assertTrue(v.isobj);
+            assertEquals(expected, v.objval);
+        }
+    }
+
+    /** Colors are packed into the bits of a (tiny, denormal) double, so they need an exact comparison. */
+    static Stream<Arguments> parseColorCases(){
+        return Stream.of(
+        Arguments.of("color: rgb white", "%ffffff", Color.toDoubleBits(255, 255, 255, 255)),
+        Arguments.of("color: rgba", "%ff000080", Color.toDoubleBits(255, 0, 0, 128)),
+        Arguments.of("color: named", "%[red]", Colors.get("red").toDoubleBits())
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("parseColorCases")
+    void parseColorValues(String name, String symbol, double expected){
+        LAssembler asm = new LAssembler();
+        LVar v = asm.var(symbol);
+        assertFalse(v.isobj);
+        assertEquals(expected, v.numval, 0.0);
+    }
+
+    /** Anything here must NOT be parsed as a number (i.e. it becomes a plain variable name). */
+    static Stream<String> invalidNumberCases(){
+        return Stream.of(
+        //fail-fast: first char can't start a number
+        "",
+        "abc",
+        "e10",
+        "NaN",
+        "Infinity",
+
+        //prefix with no digits
+        "0x", "0b", "+0x", "-0b",
+
+        //invalid digits
+        "0xG", "0x12G4", "0b2", "0b102", "0x-1", "0x1.5",
+
+        //overflow: more than 64 significant bits
+        "0x1" + "0".repeat(16),        //17 hex digits
+        "-0x1" + "0".repeat(16),
+        "0x" + "F".repeat(17),
+        "0b1" + "0".repeat(64),        //65 binary digits
+        "0b" + "1".repeat(65),
+
+        //malformed colors
+        "%fff",
+        "%[nosuchcolor]"
+        );
+    }
+
+    @ParameterizedTest(name = "invalid: [{0}]")
+    @MethodSource("invalidNumberCases")
+    void parseInvalidNumbers(String symbol){
+        LAssembler asm = new LAssembler();
+        LVar v = asm.var(symbol);
+        assertTrue(v.isobj, "should not parse as a number: " + symbol);
+        assertNull(v.objval);
     }
 
     //unterminated / malformed string literals: these must fail loudly, never silently misparse

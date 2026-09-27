@@ -4,7 +4,6 @@ import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.input.*;
@@ -21,11 +20,10 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Objectives.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.game.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -49,7 +47,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
     public static boolean debugSelect = false, debugSectorAttackEdit, debugShowNumbers = false;
     public static float sectorShowDuration = 60f * 2.4f;
 
-    public final FrameBuffer buffer = new FrameBuffer(2, 2, true);
+    public final FrameBuffer buffer = new FrameBuffer(2, 2, Format.defaultColorDepth);
     public final LaunchLoadoutDialog loadouts = new LaunchLoadoutDialog();
     public final PlanetRenderer planets = renderer.planets;
 
@@ -481,7 +479,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         Sector current = Vars.state.getSector() != null && Vars.state.getSector().isBeingPlayed() && Vars.state.getSector().planet == state.planet ? Vars.state.getSector() : null;
 
         if(current != null){
-            planets.fill(current, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.001f);
+            planets.fill(current, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.005f);
         }
 
         //draw hover border
@@ -873,7 +871,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             Ray r = planets.cam.getPickRay(mouseX, mouseY);
 
             // get planet we're hovering over
-            Vec3 intersect = planet.intersect(r, outlineRad * planet.radius);
+            Vec3 intersect = planet.intersect(r, planet.outlineScale * planet.radius);
 
             if(intersect != null && selectable(planet) && intersect.dst(r.origin) < nearest){
                 nearest = intersect.dst(r.origin);
@@ -918,7 +916,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             buffer.end();
 
             Draw.color(color);
-            Draw.rect(Draw.wrap(buffer.getTexture()), width/2f, height/2f, width, -height);
+            Draw.rect(Draw.wrap(buffer.texture), width/2f, height/2f, width, -height);
             Draw.color();
         }
     }
@@ -1004,7 +1002,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         }
 
         if(state.planet.hasGrid()){
-            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), PlanetRenderer.outlineRad * state.planet.radius) : null;
+            hovered = Core.scene.getDialog() == this ? state.planet.getSector(planets.cam.getMouseRay(), state.planet.outlineScale * state.planet.radius) : null;
         }else if(state.planet.isLandable()){
             boolean wasNull = selected == null;
             //always have the first sector selected.
@@ -1073,7 +1071,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
 
             if(sector.isAttacked() || !sector.hasBase()){
-                c.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).left().row();
+                c.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.threat.localized()).left().row();
             }
 
             if(sector.save != null && sector.info.resources.any()){
@@ -1287,7 +1285,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.table(r -> {
                 r.add("@complete").colspan(2).left();
                 r.row();
-                for(Objective o : sector.preset.techNode.objectives){
+                for(UnlockCondition o : sector.preset.techNode.objectives){
                     if(o.complete()) continue;
 
                     r.add("> " + o.display()).color(Color.lightGray).left();
@@ -1296,7 +1294,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }).row();
         }else if(!sector.hasBase()){
-            stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).row();
+            stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.threat.localized()).row();
         }
 
         if(sector.isAttacked()){

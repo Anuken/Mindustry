@@ -34,9 +34,9 @@ public class Separator extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = craftTime;
-        super.setStats();
+        super.setStats(stats);
 
         int[] sum = {0};
         for(var r : results) sum[0] += r.amount;

@@ -5,10 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
-import mindustry.game.EventType.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.logic.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
@@ -47,6 +44,7 @@ public class Item extends UnlockableContent implements Senseable{
     /** If true, this material is used by buildings. If false, this material will be incinerated in certain cores. */
     public boolean buildable = true;
     public boolean hidden = false;
+    public @Nullable TextureRegion[] animationFrames;
 
     public Item(String name, Color color){
         super(name);
@@ -74,35 +72,37 @@ public class Item extends UnlockableContent implements Senseable{
 
         //animation code ""borrowed"" from Project Unity - original implementation by GlennFolker and sk7725
         if(frames > 0){
-            TextureRegion[] regions = new TextureRegion[frames * (transitionFrames + 1)];
+            animationFrames = new TextureRegion[frames * (transitionFrames + 1)];
 
             if(transitionFrames <= 0){
                 for(int i = 1; i <= frames; i++){
-                    regions[i - 1] = Core.atlas.find(name + i);
+                    animationFrames[i - 1] = Core.atlas.find(name + i);
                 }
             }else{
                 for(int i = 0; i < frames; i++){
-                    regions[i * (transitionFrames + 1)] = Core.atlas.find(name + (i + 1));
+                    animationFrames[i * (transitionFrames + 1)] = Core.atlas.find(name + (i + 1));
                     for(int j = 1; j <= transitionFrames; j++){
                         int index = i * (transitionFrames + 1) + j;
-                        regions[index] = Core.atlas.find(name + "-t" + index);
+                        animationFrames[index] = Core.atlas.find(name + "-t" + index);
                     }
                 }
             }
 
             fullIcon = new TextureRegion(fullIcon);
             uiIcon = new TextureRegion(uiIcon);
-
-            Events.run(Trigger.update, () -> {
-                int frame = (int)(Time.globalTime / frameTime) % regions.length;
-                fullIcon.set(regions[frame]);
-                uiIcon.set(regions[frame]);
-            });
         }
     }
 
+    public void updateAnimation(){
+        if(frames == 0 || animationFrames == null || animationFrames.length == 0) return;
+
+        int frame = (int)(Time.globalTime / frameTime) % animationFrames.length;
+        fullIcon.set(animationFrames[frame]);
+        uiIcon.set(animationFrames[frame]);
+    }
+
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.addPercent(Stat.explosiveness, explosiveness);
         stats.addPercent(Stat.flammability, flammability);
         stats.addPercent(Stat.radioactivity, radioactivity);
@@ -120,8 +120,8 @@ public class Item extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         //create transitions
         if(frames > 0 && transitionFrames > 0){
@@ -137,7 +137,7 @@ public class Item extends UnlockableContent implements Senseable{
                     int index = i * (transitionFrames + 1) + j;
 
                     Pixmap res = Pixmaps.blend(pixmaps[i], pixmaps[(i + 1) % frames], f);
-                    packer.add(PageType.main, name + "-t" + index, res);
+                    packer.add(name + "-t" + index, res);
                     res.dispose();
                 }
             }

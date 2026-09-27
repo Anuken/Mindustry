@@ -78,8 +78,8 @@ public class PayloadMassDriver extends PayloadBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.payloadCapacity, StatValues.squared(maxPayloadSize, StatUnit.blocksSquared));
         stats.add(Stat.reload, 60f / (chargeTime + reload), StatUnit.perSecond);
@@ -149,6 +149,21 @@ public class PayloadMassDriver extends PayloadBlock{
         @Override
         public boolean acceptUnitPayload(Unit unit){
             return unit != null && unit.hitSize <= maxPayloadSize * tilesize;
+        }
+
+        @Override
+        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LAccess.config){
+                configured(null, p1 instanceof Building b ? b.pos() : -1);
+            }
+        }
+
+        @Override
+        public Object senseObject(LAccess sensor){
+            if(sensor == LAccess.config){
+                return linkValid() ? world.build(link) : null;
+            }
+            return super.senseObject(sensor);
         }
 
         @Override

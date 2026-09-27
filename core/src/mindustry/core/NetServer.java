@@ -321,7 +321,7 @@ public class NetServer implements ApplicationListener{
 
             platform.updateRPC();
 
-            Events.fire(new PlayerConnect(player));
+            Events.fire(new PlayerConnectEvent(player));
         });
 
         registerCommands();
@@ -615,7 +615,7 @@ public class NetServer implements ApplicationListener{
 
         if(!player.con.hasDisconnected){
             if(player.con.hasConnected){
-                Events.fire(new PlayerLeave(player));
+                Events.fire(new PlayerLeaveEvent(player));
                 if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
                 Call.playerDisconnect(player.id());
             }
@@ -972,8 +972,10 @@ public class NetServer implements ApplicationListener{
         }else{
             Seq<DataAsset> res = new Seq<>();
             Seq<DataAsset> allAssets = state.data.getAllExternalAssets();
+            Bits requestedIds = new Bits(allAssets.size);
             for(short id : ids){
-                if(id >= allAssets.size || id < 0) continue;
+                if(id >= allAssets.size || id < 0 || requestedIds.get(id)) continue;
+                requestedIds.set(id);
                 res.add(allAssets.get(id));
             }
 
@@ -1015,7 +1017,7 @@ public class NetServer implements ApplicationListener{
             player.sendMessage(Config.motd.string());
         }
 
-        Events.fire(new PlayerJoin(player));
+        Events.fire(new PlayerJoinEvent(player));
 
         //plugins may have kicked the player immediately in PlayerJoinEvent, so don't respawn if that happens
         if(!player.con.kicked){

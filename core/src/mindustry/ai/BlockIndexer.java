@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
@@ -17,6 +16,7 @@ import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.meta.*;
 
@@ -31,22 +31,22 @@ public class BlockIndexer{
 
     private int quadWidth, quadHeight;
 
+    //TODO: refactor to be field of state, and also refactor such that data is stored in teams when appropriate
     /** Stores all ore quadrants on the map. Maps ID to qX to qY to a list of tiles with that ore. */
     private IntSeq[][][] ores, wallOres;
-    /** Stores all damaged tile entities by team. */
-    private Seq<Building>[] damagedTiles = new Seq[Team.all.length];
     /** All ores present on the map - can be wall or floor. */
     private Seq<Item> allPresentOres = new Seq<>();
     /** All ores available on this map. */
     private ObjectIntMap<Item> allOres = new ObjectIntMap<>(), allWallOres = new ObjectIntMap<>();
     /** Stores teams that are present here as tiles. */
     private Seq<Team> activeTeams = new Seq<>(Team.class);
+    //TODO: move to TeamData
     /** Maps teams to a map of flagged tiles by flag. */
     private Seq<Building>[][] flagMap = new Seq[Team.all.length][BlockFlag.all.length];
     /** Counts whether a certain floor is present in the world upon load. */
     private boolean[] blocksPresent;
     /** Array used for returning and reusing. */
-    private Seq<Building> breturnArray = new Seq<>(Building.class);
+    private Seq<Building> breturn = new Seq<>(Building.class);
     /** Maps block flag to a list of floor tiles that have it. */
     private Seq<Tile>[] floorMap;
 
@@ -67,7 +67,6 @@ public class BlockIndexer{
         });
 
         Events.on(WorldLoadEvent.class, event -> {
-            damagedTiles = new Seq[Team.all.length];
             flagMap = new Seq[Team.all.length][BlockFlag.all.length];
             floorMap = new Seq[BlockFlag.all.length];
             activeTeams = new Seq<>(Team.class);
@@ -116,14 +115,6 @@ public class BlockIndexer{
             }
 
             updatePresentOres();
-
-            for(Team team : Team.all){
-                var data = state.teams.get(team);
-
-                if(team.rules().prebuildAi && data.hasCore()){
-                    PrebuildAI.sortPlans(data.plans);
-                }
-            }
         });
     }
 
@@ -223,9 +214,13 @@ public class BlockIndexer{
                 data.turretTree.remove(build);
             }
 
+            if(data.shieldTree != null && build instanceof ShieldProvider){
+                data.shieldTree.remove(build);
+            }
+
             //unregister damaged buildings if applicable
-            if(build.wasDamaged && damagedTiles[team.id] != null){
-                damagedTiles[team.id].remove(build);
+            if(build.wasDamaged){
+                data.damagedBuildings.remove(build);
             }
 
             build.wasDamaged = false;
@@ -301,14 +296,9 @@ public class BlockIndexer{
 
     /** Returns all damaged tiles by team. */
     public Seq<Building> getDamaged(Team team){
-        if(damagedTiles[team.id] == null){
-            return damagedTiles[team.id] = new Seq<>(false);
-        }
-
-        var tiles = damagedTiles[team.id];
-        tiles.removeAll(b -> !b.damaged());
-
-        return tiles;
+        var buildings = team.data().damagedBuildings;
+        buildings.removeAll(b -> !b.damaged());
+        return buildings;
     }
 
     /** Get all allied blocks with a flag. */
@@ -338,24 +328,24 @@ public class BlockIndexer{
             });
             return returnBool;
         }else{
-            breturnArray.clear();
+            breturn.clear();
 
             var buildings = team.data().buildingTree;
             if(buildings == null) return false;
             buildings.intersect(wx - range, wy - range, range*2f, range*2f, b -> {
                 if(b.within(wx, wy, range + b.hitSize() / 2f) && pred.get(b) && !b.block.privileged){
-                    breturnArray.add(b);
+                    breturn.add(b);
                 }
             });
         }
 
-        int size = breturnArray.size;
-        var items = breturnArray.items;
+        int size = breturn.size;
+        var items = breturn.items;
         for(int i = 0; i < size; i++){
             cons.get(items[i]);
             items[i] = null;
         }
-        breturnArray.size = 0;
+        breturn.size = 0;
 
         return size > 0;
     }
@@ -364,30 +354,59 @@ public class BlockIndexer{
     public boolean eachBlock(Team team, Rect rect, Boolf<Building> pred, Cons<Building> cons){
         if(team == null) return false;
 
-        breturnArray.clear();
+        breturn.clear();
 
         var buildings = team.data().buildingTree;
         if(buildings == null) return false;
         buildings.intersect(rect, b -> {
             if(pred.get(b) && !b.block.privileged){
-                breturnArray.add(b);
+                breturn.add(b);
             }
         });
 
-        int size = breturnArray.size;
-        var items = breturnArray.items;
+        int size = breturn.size;
+        var items = breturn.items;
         for(int i = 0; i < size; i++){
             cons.get(items[i]);
             items[i] = null;
         }
-        breturnArray.size = 0;
+        breturn.size = 0;
 
         return size > 0;
     }
 
+    /** @return all enemy shield blocks in a rectangle (bottom left corner origin). */
+    public Seq<Building> getEnemyShields(Team team, float x, float y, float width, float height){
+        breturn.clear();
+        var all = state.teams.present;
+        for(int i = 0; i < all.size; i++){
+            Team enemy = all.items[i].team;
+            if(enemy == team) continue;
+
+            var data = enemy.data();
+            if(data.shieldTree != null){
+                data.shieldTree.intersect(x, y, width, height, breturn);
+            }
+        }
+
+        return breturn;
+    }
+
+    public boolean anyShields(Rect r){
+        var all = state.teams.present;
+        for(int i = 0; i < all.size; i++){
+            Team enemy = all.items[i].team;
+
+            var data = enemy.data();
+            if(data.shieldTree != null && data.shieldTree.any(r.x, r.y, r.width, r.height)) return true;
+            if(data.unitShieldTree != null && data.unitShieldTree.any(r.x, r.y, r.width, r.height)) return true;
+        }
+        return false;
+    }
+
     /** Get all enemy blocks with a flag. */
     public Seq<Building> getEnemy(Team team, BlockFlag type){
-        breturnArray.clear();
+        breturn.clear();
         Seq<TeamData> data = state.teams.present;
         //when team data is not initialized, scan through every team. this is terrible
         if(data.isEmpty()){
@@ -395,7 +414,7 @@ public class BlockIndexer{
                 if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
                 var set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
-                    breturnArray.addAll(set);
+                    breturn.addAll(set);
                 }
             }
         }else{
@@ -404,28 +423,26 @@ public class BlockIndexer{
                 if(enemy == team || (enemy == Team.derelict && !state.rules.coreCapture)) continue;
                 var set = getFlagged(enemy)[type.ordinal()];
                 if(set != null){
-                    breturnArray.addAll(set);
+                    breturn.addAll(set);
                 }
             }
         }
 
-        return breturnArray;
+        return breturn;
     }
 
     public void notifyHealthChanged(Building build){
         boolean damaged = build.damaged();
 
         if(build.wasDamaged != damaged){
-            if(damagedTiles[build.team.id] == null){
-                damagedTiles[build.team.id] = new Seq<>(false);
-            }
+            var list = build.team.data().damagedBuildings;
 
             if(damaged){
                 //is now damaged, add to array
-                damagedTiles[build.team.id].add(build);
+                list.add(build);
             }else{
                 //no longer damaged, remove
-                damagedTiles[build.team.id].remove(build);
+                list.remove(build);
             }
 
             build.wasDamaged = damaged;
@@ -433,16 +450,16 @@ public class BlockIndexer{
     }
 
     public void allBuildings(float x, float y, float range, Cons<Building> cons){
-        breturnArray.clear();
+        breturn.clear();
         for(int i = 0; i < activeTeams.size; i++){
             Team team = activeTeams.items[i];
             var buildings = team.data().buildingTree;
             if(buildings == null) continue;
-            buildings.intersect(x - range, y - range, range*2f, range*2f, breturnArray);
+            buildings.intersect(x - range, y - range, range*2f, range*2f, breturn);
         }
 
-        var items = breturnArray.items;
-        int size = breturnArray.size;
+        var items = breturn.items;
+        int size = breturn.size;
         for(int i = 0; i < size; i++){
             var b = items[i];
             if(b != null && b.within(x, y, range + b.hitSize()/2f)){
@@ -450,7 +467,7 @@ public class BlockIndexer{
             }
             items[i] = null;
         }
-        breturnArray.size = 0;
+        breturn.size = 0;
     }
 
     public Building findEnemyTile(Team team, float x, float y, float range, BuildingPriorityf priority, Boolf<Building> pred){
@@ -501,11 +518,11 @@ public class BlockIndexer{
         var buildings = team.data().buildingTree;
         if(buildings == null) return null;
 
-        breturnArray.clear();
-        buildings.intersect(rect.setCentered(x, y, range * 2f), breturnArray);
+        breturn.clear();
+        buildings.intersect(rect.setCentered(x, y, range * 2f), breturn);
 
-        for(int i = 0; i < breturnArray.size; i++){
-            var next = breturnArray.items[i];
+        for(int i = 0; i < breturn.size; i++){
+            var next = breturn.items[i];
 
             if(!pred.get(next) || (next.team != source && !next.block.targetable)) continue;
 
@@ -631,6 +648,14 @@ public class BlockIndexer{
                 data.turretTree.insert(tile.build);
             }
 
+            if(tile.build instanceof ShieldProvider){
+                if(data.shieldTree == null){
+                    data.shieldTree = new ShieldQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                }
+
+                data.shieldTree.insert(tile.build);
+            }
+
             notifyHealthChanged(tile.build);
         }
 
@@ -659,6 +684,23 @@ public class BlockIndexer{
         @Override
         protected QuadTree<Building> newChild(Rect rect){
             return new TurretQuadtree(rect);
+        }
+    }
+
+    static class ShieldQuadtree<T extends Building & ShieldProvider> extends QuadTree<T>{
+
+        public ShieldQuadtree(Rect bounds){
+            super(bounds);
+        }
+
+        @Override
+        public void hitbox(T build){
+            tmp.setCentered(build.x, build.y, build.getShieldBounds() * 2f);
+        }
+
+        @Override
+        protected QuadTree<T> newChild(Rect rect){
+            return new ShieldQuadtree<>(rect);
         }
     }
 }
