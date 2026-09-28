@@ -67,6 +67,10 @@ public class StatusEffect extends UnlockableContent{
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
     public boolean outline = true;
+    /** Padding applied when outline is generated. */
+    public int outlinePadding = 0;
+    /** Color of generated outline. */
+    public Color outlineColor = Pal.gray;
     /** True to tint the sprite by the color. Always applied in vanilla. */
     public boolean applyTint = false;
     /** Transition handler map. */
@@ -250,7 +254,8 @@ public class StatusEffect extends UnlockableContent{
         }
 
         if(outline){
-            makeOutline(packer, uiIcon, false, Pal.gray, 3);
+            //vanilla needs extra padding and I don't want to fix every sprite or set every outline padding value
+            makeOutline(packer, uiIcon, false, outlineColor, 3, isVanilla() ? 2 : outlinePadding);
         }
     }
 
