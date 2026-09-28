@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
@@ -866,6 +867,9 @@ public class BulletType extends Content implements Cloneable{
         drawSize = Math.max(drawSize, trailLength * speed * 2f);
         range = calculateRange();
     }
+
+    /** For mods to add custom stat values */
+    public void addStats(Table table){};
 
     @Override
     public ContentType getContentType(){
