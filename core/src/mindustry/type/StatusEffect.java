@@ -1,7 +1,6 @@
 package mindustry.type;
 
 import arc.graphics.*;
-import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.struct.*;
@@ -242,13 +241,7 @@ public class StatusEffect extends UnlockableContent{
         super.packSprites(packer);
 
         if((isVanilla() || applyTint) && uiIcon instanceof AtlasRegion at && packer.has(at.name)){
-            PixmapRegion base = packer.get(uiIcon);
-            Pixmap tinted = new Pixmap(base.width, base.height);
-            for(int x = 0; x < base.width; x++){
-                for(int y = 0; y < base.height; y++){
-                    tinted.setRaw(x, y, Color.muli(base.getRaw(x, y), color.rgba()));
-                }
-            }
+            Pixmap tinted = Pixmaps.tint(packer.get(uiIcon), color);
             packer.add(at.name, tinted);
             tinted.dispose();
         }
