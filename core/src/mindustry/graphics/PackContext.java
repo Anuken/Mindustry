@@ -38,6 +38,9 @@ public abstract class PackContext{
 
     public abstract boolean has(String name);
 
+    /** Removes an image from packing. Used for source images of autotiles. Does nothing in mods. */
+    public void discard(String name){}
+
     public void add(String name, Pixmap pix){
         add(name, new PixmapRegion(pix));
     }

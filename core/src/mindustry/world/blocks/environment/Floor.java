@@ -222,6 +222,33 @@ public class Floor extends Block{
 
     @Override
     public void packSprites(PackContext packer){
+        if(autotile){
+            for(int v = 0; v < Math.max(autotileVariants, 1); v++){
+                String suffix = autotileVariants <= 1 ? "" : "" + (v + 1);
+                String sourceName = name + "-autotile" + suffix;
+
+                if(!packer.has(sourceName)) continue;
+
+                var source = packer.get(sourceName);
+                try{
+                    String prefix = name + (autotileVariants <= 1 ? "" : "-" + (v + 1));
+                    if(TileBitmask.generate(packer, source, prefix) && v == 0 && !packer.has(name)){
+                        //one of the generated cells doubles as this floor's "main" sprite, used for icons/previews/edges
+                        int cell = source.width / 4;
+                        Pixmap cropped = source.crop(cell, cell, cell, cell);
+                        packer.add(name, cropped, true);
+                        cropped.dispose();
+                    }
+                }catch(Throwable e){
+                    Log.err("Failed to autotile: " + name, e);
+                }finally{
+                    //the raw source is only useful for generation, and must not end up in the packed output
+                    packer.discard(sourceName);
+                    source.pixmap.dispose();
+                }
+            }
+        }
+
         super.packSprites(packer);
 
         if(packer.has(name + "-edge") || blendGroup != this || !drawEdgeOut) return;
