@@ -35,7 +35,7 @@ public class Fonts{
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
     private static int lastUsedModCodepoint;
 
-    public static Font def, outline, icon, iconLarge, tech, logic, monospace;
+    public static Font def, outline, icon, iconSmall, iconLarge, tech, logic, monospace;
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -76,6 +76,16 @@ public class Fonts{
             fallback.add(() -> Fonts.def);
         }})).loaded = f -> Fonts.monospace = f;
 
+        //used in the default font (same size as text)
+        Core.assets.load("iconSmall", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+            size = param.size;
+            incremental = true;
+            characters = "\0";
+        }})).loaded = f -> {
+            Fonts.iconSmall = f;
+            Fonts.def.addFallback(f);
+        };
+
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
@@ -84,8 +94,8 @@ public class Fonts{
 
         Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 48;
-            incremental = false;
-            characters = "\0" + Iconc.all;
+            incremental = true;
+            characters = "\0";
             borderWidth = 5f;
             borderColor = Color.darkGray;
         }})).loaded = f -> Fonts.iconLarge = f;
