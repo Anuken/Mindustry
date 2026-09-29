@@ -200,6 +200,12 @@ platforms.each{ platform ->
             archiveFileName = "${generateDeployName(platform.toString())}.zip"
             destinationDirectory = (file("../deploy"))
 
+            eachFile{ f ->
+                if(f.file.canExecute()){
+                    f.permissions{ unix("rwxr-xr-x") }
+                }
+            }
+
             doLast{
                 delete{
                     delete "build/packr/"
