@@ -35,6 +35,8 @@ public class BaseRegistry{
         cores.clear();
         parts.clear();
         reqParts.clear();
+        ores.clear();
+        oreFloors.clear();
 
         //load ore types and corresponding items
         for(Block block : content.blocks()){

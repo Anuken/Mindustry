@@ -103,13 +103,13 @@ public class SectorInfo{
 
     /** Handles core item changes. */
     public void handleCoreItem(Item item, int amount){
-        if(coreDeltas == null) coreDeltas = new int[content.items().size];
+        if(coreDeltas == null || coreDeltas.length != content.items().size) coreDeltas = new int[content.items().size];
         coreDeltas[item.id] += amount;
     }
 
     /** Handles raw production stats. */
     public void handleProduction(Item item, int amount){
-        if(productionDeltas == null) productionDeltas = new int[content.items().size];
+        if(productionDeltas == null || productionDeltas.length != content.items().size) productionDeltas = new int[content.items().size];
         productionDeltas[item.id] += amount;
     }
 
@@ -266,8 +266,9 @@ public class SectorInfo{
             updateStats(export);
             updateStats(imports);
 
-            if(coreDeltas == null) coreDeltas = new int[content.items().size];
-            if(productionDeltas == null) productionDeltas = new int[content.items().size];
+            int totalItems = content.items().size;
+            if(coreDeltas == null || coreDeltas.length != totalItems) coreDeltas = new int[totalItems];
+            if(productionDeltas == null || productionDeltas.length != totalItems) productionDeltas = new int[totalItems];
 
             //refresh core items
             for(Item item : content.items()){

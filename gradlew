@@ -22,6 +22,7 @@
 ##
 ##############################################################################
 
+export GRADLE_OPTS="$GRADLE_OPTS --enable-native-access=ALL-UNNAMED"
 # Attempt to set APP_HOME
 # Resolve links: $0 may be a link
 PRG="$0"

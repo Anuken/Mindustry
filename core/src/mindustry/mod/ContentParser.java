@@ -56,10 +56,10 @@ import static mindustry.Vars.*;
 public class ContentParser{
     private static final boolean ignoreUnknownFields = true;
     private static final ContentType[] typesToSearch = {ContentType.block, ContentType.item, ContentType.unit, ContentType.liquid, ContentType.planet};
-    static final ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
+    public static final ObjectSet<Class<?>> implicitNullable = ObjectSet.with(TextureRegion.class, TextureRegion[].class, TextureRegion[][].class, TextureRegion[][][].class);
 
     ObjectMap<Class<?>, ContentType> contentTypes = new ObjectMap<>();
-    Seq<ParseListener> listeners = new Seq<>();
+    public Seq<ParseListener> listeners = new Seq<>();
     /** If false, sound asset loading is disabled. */
     boolean allowAssetLoading = true;
     /** If false, vanilla content cannot be edited. */
@@ -826,7 +826,7 @@ public class ContentParser{
         }
     );
 
-    Prov<Unit> unitType(Jval value){
+    public Prov<Unit> unitType(Jval value){
         if(value == null) return UnitEntity::create;
         return switch(value.asString()){
             case "flying" -> UnitEntity::create;
@@ -1135,7 +1135,7 @@ public class ContentParser{
         }
     }
 
-    Prov<UnitController> resolveController(String type){
+    public Prov<UnitController> resolveController(String type){
         //this is used as a captured value to avoid parsing it multiple times
         var controller = supply(resolve(type, FlyingAI.class));
         return controller::get;

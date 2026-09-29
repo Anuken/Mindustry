@@ -95,6 +95,18 @@ public class StatusEffect extends UnlockableContent{
     }
 
     @Override
+    public void removeContent(){
+        super.removeContent();
+
+        //opposite() and affinity() also modify the other effect
+        for(var other : Vars.content.statusEffects()){
+            other.opposites.remove(this);
+            other.affinities.remove(this);
+            other.transitions.remove(this);
+        }
+    }
+
+    @Override
     public boolean isHidden(){
         return localizedName.equals(name) || !show;
     }

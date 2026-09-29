@@ -27,8 +27,9 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "2.3.20"
-    id "org.jetbrains.kotlin.kapt" version "2.3.20"
+    id "org.jetbrains.kotlin.jvm" version "2.3.20" apply false
+    id "org.jetbrains.kotlin.kapt" version "2.3.20" apply false
+    id "com.android.application" version "9.4.1" apply false
 }
 
 allprojects{
@@ -293,30 +294,6 @@ project(":core"){
         writePlugins()
     }
 
-    task copyChangelog{
-        doLast{
-            def props = loadVersionProps()
-            def androidVersion = props['androidBuildCode'].toInteger() - 2
-            def loglines = file("../changelog").text.split("\n")
-            def notice = "[This is a truncated changelog, see Github for full notes]"
-            def maxLength = 460
-
-            def androidLogList = [notice] + loglines.findAll{ line -> !line.endsWith("]") || line.endsWith("[Mobile]") || line.endsWith("[Android]")}
-            def result = ""
-            androidLogList.forEach{line ->
-                if(result.length() + line.length() + 1 < maxLength){
-                    result += line + "\n"
-                }
-            }
-            def changelogs = file("../fastlane/metadata/android/en-US/changelogs/")
-            changelogs.mkdirs()
-            try{
-                new File(changelogs, androidVersion + ".txt").text = (result)
-            }catch(Exception ignored){
-            }
-        }
-    }
-
     task depsJar(type: Jar, dependsOn: [classes, ":server:dist"]){
         archiveClassifier = 'deps'
         from files(sourceSets.main.output.classesDirs)
@@ -450,6 +427,9 @@ project(":tests"){
     test{
         //fork every test so mods don't interact with each other
         forkEvery = 1
+        //always run tests; cached or up-to-date results can be stale when tests depend on files outside the inputs
+        outputs.upToDateWhen{ false }
+        outputs.cacheIf{ false }
         jvmArgs = ["-XX:+HeapDumpOnOutOfMemoryError"]
         useJUnitPlatform()
         workingDir = new File("../core/assets")

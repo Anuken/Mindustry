@@ -533,6 +533,29 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
+    public void removeContent(){
+        super.removeContent();
+
+        //otherwise, a unit re-created with the same name would inherit this constructor
+        if(EntityMapping.nameMap.get(name) == constructor){
+            EntityMapping.nameMap.remove(name);
+        }
+
+        //mod JSON can register units in vanilla factories and default waves
+        for(var block : Vars.content.blocks()){
+            if(block instanceof UnitFactory f){
+                f.plans.removeAll(p -> p.unit == this);
+            }else if(block instanceof Reconstructor r){
+                r.upgrades.removeAll(u -> u[0] == this || u[1] == this);
+            }
+        }
+
+        if(Vars.waves != null && Vars.waves.get() != null){
+            Vars.waves.get().removeAll(g -> g.type == this);
+        }
+    }
+
+    @Override
     public void postInit(){
         if(databaseTag == null || databaseTag.isEmpty()){
             if(flying){
@@ -1476,7 +1499,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     @Override
     public void afterPatch(){
         super.afterPatch();
-        totalRequirements = cachedRequirements = firstRequirements = null;
+        clearRequirementsCache();
 
         //this will technically reset any assigned values, but in vanilla, they're not reassigned anyway
         flowfieldPathType = -1;
@@ -1484,6 +1507,11 @@ public class UnitType extends UnlockableContent implements Senseable{
         pathCostId = -1;
         initPathType();
         updateShieldBounds();
+    }
+
+    /** Clears requirements derived from unit factories and reconstructors. */
+    public void clearRequirementsCache(){
+        totalRequirements = cachedRequirements = firstRequirements = null;
     }
 
     public void updateShieldBounds(){
