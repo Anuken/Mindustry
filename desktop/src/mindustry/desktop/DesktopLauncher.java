@@ -60,7 +60,7 @@ public class DesktopLauncher extends ClientLauncher{
 
                 if(OS.isMac){
                     //MacOS supports 4.1 at most
-                    glVersions = new int[][]{{4, 1}, {3, 2}};
+                    glVersions = new int[][]{{4, 1}, {3, 3}};
                 }else{
                     //try essentially every OpenGL version
                     glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};

@@ -1,13 +1,5 @@
-buildscript{
-    repositories{
-        mavenLocal()
-        mavenCentral()
-        google()
-    }
-
-    dependencies{
-        classpath 'com.android.tools.build:gradle:8.2.2'
-    }
+plugins{
+    id "com.android.application"
 }
 
 apply plugin: "com.android.application"
@@ -29,8 +21,7 @@ task deploy(type: Copy){
 
 android{
     namespace = "io.anuke.mindustry"
-    buildToolsVersion = '36.0.0'
-    compileSdk = 36
+    compileSdk = 37
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'
@@ -130,15 +121,6 @@ dependencies{
         natives "com.github.Anuken.Arc:natives-android:$arcHash"
         natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
     }
-
-    def version, highestVersion
-    new File((String)findSdkDir(), "/platforms").eachFileMatch ~/android-\d+/, {
-        version = it.name.find(/\d+/).toInteger()
-        highestVersion = version > highestVersion ? version : highestVersion
-    }
-
-    def sdkFile = new File((String)findSdkDir(), "/platforms/android-${highestVersion}/android.jar")
-    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 
 task copyAndroidNatives(){

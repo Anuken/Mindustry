@@ -1,3 +1,11 @@
+pluginManagement{
+    repositories{
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+
 if(JavaVersion.current().ordinal() < JavaVersion.VERSION_17.ordinal()){
     throw new Exception("!!! YOU MUST USE JAVA 17 OR ABOVE TO COMPILE AND RUN MINDUSTRY !!! Read the README. Your version: ${System.properties["java.version"]}")
 }
