@@ -450,6 +450,9 @@ project(":tests"){
     test{
         //fork every test so mods don't interact with each other
         forkEvery = 1
+        //always run tests; cached or up-to-date results can be stale when tests depend on files outside the inputs
+        outputs.upToDateWhen{ false }
+        outputs.cacheIf{ false }
         jvmArgs = ["-XX:+HeapDumpOnOutOfMemoryError"]
         useJUnitPlatform()
         workingDir = new File("../core/assets")
