@@ -13,6 +13,7 @@ import mindustry.content.*;
 import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.mod.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
@@ -23,6 +24,7 @@ public class Effect{
 
     public static final Seq<Effect> all = new Seq<>();
 
+    @NoPatch
     private transient boolean initialized;
 
     public final int id;
