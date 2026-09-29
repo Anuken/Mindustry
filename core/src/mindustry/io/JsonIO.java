@@ -79,6 +79,18 @@ public class JsonIO{
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
 
+        json.setSerializer(Difficulty.class, new JsonSerializer<>(){
+            @Override
+            public void write(Json json, JsonWriter writer, Difficulty object, Class knownType){
+                json.writeValue(writer, object.name);
+            }
+
+            @Override
+            public Difficulty read(Json json, Jval jsonData, Class type){
+                return Difficulty.get(jsonData.asString());
+            }
+        });
+
         json.setSerializer(MusicContainer.class, new JsonSerializer<>(){
             @Override
             public void write(Json json, JsonWriter writer, MusicContainer object, Class knownType){
