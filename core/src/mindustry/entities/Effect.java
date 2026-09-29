@@ -23,7 +23,7 @@ public class Effect{
 
     public static final Seq<Effect> all = new Seq<>();
 
-    private boolean initialized;
+    private transient boolean initialized;
 
     public final int id;
 
