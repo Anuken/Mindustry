@@ -35,7 +35,7 @@ public class Fonts{
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
     private static int lastUsedModCodepoint;
 
-    public static Font def, outline, icon, iconSmall, iconLarge, tech, logic, monospace;
+    public static Font def, outline, icon, iconLarge, tech, logic, monospace;
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -64,9 +64,13 @@ public class Fonts{
 
     public static void loadFonts(){
         largeIcons.clear();
-        FreeTypeFontParameter param = fontParameter();
 
-        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = f;
+        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
+            size = 18;
+            shadowColor = Color.darkGray;
+            shadowOffsetY = 2;
+            incremental = true;
+        }})).loaded = f -> Fonts.def = f;
 
         Core.assets.load("monospace", Font.class, new FreeTypeFontLoaderParameter("fonts/monospace.woff", new FreeTypeFontParameter(){{
             size = 16;
@@ -76,15 +80,18 @@ public class Fonts{
             fallback.add(() -> Fonts.def);
         }})).loaded = f -> Fonts.monospace = f;
 
-        //used in the default font (same size as text)
+        //used in the default font (same size as text); not assigned to anything
         Core.assets.load("iconSmall", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
-            size = param.size;
+            size = 18;
             incremental = true;
             characters = "\0";
-        }})).loaded = f -> {
-            Fonts.iconSmall = f;
-            Fonts.def.addFallback(f);
-        };
+        }})).loaded = f -> Fonts.def.addFallback(f);
+
+        Core.assets.load("runes", Font.class, new FreeTypeFontLoaderParameter("fonts/runes.woff", new FreeTypeFontParameter(){{
+            size = 18;
+            incremental = true;
+            characters = "\0";
+        }})).loaded = f -> Fonts.def.addFallback(f);
 
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
@@ -261,7 +268,7 @@ public class Fonts{
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
-        //TOOD: which size to use?
+        //TOOD: which size to use? 2k height is lighter on RAM
         UI.packer = new PixmapPacker(4096, 2048, 2, true);
         UI.packer.setTargetTexture(Core.atlas.find("ui-page-placeholder").texture);
 
@@ -288,13 +295,11 @@ public class Fonts{
             }
         });
 
-        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
             borderColor = Color.darkGray;
             incremental = true;
             size = 18;
-        }};
-
-        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = t -> Fonts.outline = t;
+        }})).loaded = t -> Fonts.outline = t;
 
         Core.assets.load("tech", Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
             size = 18;
@@ -347,12 +352,4 @@ public class Fonts{
         return draw;
     }
 
-    static FreeTypeFontParameter fontParameter(){
-        return new FreeTypeFontParameter(){{
-            size = 18;
-            shadowColor = Color.darkGray;
-            shadowOffsetY = 2;
-            incremental = true;
-        }};
-    }
 }
