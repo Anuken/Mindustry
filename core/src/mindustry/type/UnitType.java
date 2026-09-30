@@ -1869,7 +1869,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     public void drawShadow(Unit unit){
         float e = Mathf.clamp(unit.elevation, shadowElevation, 1f) * shadowElevationScl * (1f - unit.drownTime);
         float x = unit.x + shadowTX * e, y = unit.y + shadowTY * e;
-        Floor floor = world.floorWorld(x, y);
+        Floor floor = state.world.floorWorld(x, y);
 
         float dest = floor.canShadow ? 1f : 0f;
         //yes, this updates state in draw()... which isn't a problem, because I don't want it to be obvious anyway

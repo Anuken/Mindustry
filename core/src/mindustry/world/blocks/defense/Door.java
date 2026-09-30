@@ -36,7 +36,7 @@ public class Door extends Wall{
         consumesTap = true;
 
         config(Boolean.class, (DoorBuild base, Boolean open) -> {
-            if(!world.isGenerating()){
+            if(!state.generating){
                 doorSound.at(base);
                 base.effect();
             }
@@ -53,7 +53,7 @@ public class Door extends Wall{
                 if(chainEffect) entity.effect();
                 entity.open = open;
                 entity.recache();
-                if(!world.isGenerating()) pathfinder.updateTile(entity.tile);
+                if(!state.generating) pathfinder.updateTile(entity.tile);
             }
         });
     }

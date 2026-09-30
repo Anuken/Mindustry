@@ -10,6 +10,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -40,9 +41,9 @@ public class MenuRenderer implements Disposable{
 
     private void generate(){
         //suppress tile change events.
-        world.setGenerating(true);
+        state.generating = true;
 
-        World tiles = world.resize(width, height);
+        World tiles = state.resizeWorld(width, height);
         //only uses base game ores now, mod ones usually contrast too much with the floor
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreScrap, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium);
         shadows = new FrameBuffer(width, height);
@@ -163,7 +164,7 @@ public class MenuRenderer implements Disposable{
         }
 
         //don't fire a world load event, it just causes lag and confusion
-        world.setGenerating(false);
+        state.generating = false;
     }
 
     private void cache(){

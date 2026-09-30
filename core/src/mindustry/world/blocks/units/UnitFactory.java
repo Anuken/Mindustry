@@ -260,7 +260,7 @@ public class UnitFactory extends UnitBlock{
         public void onCommand(Vec2 target){
             commandPos = target;
             if(command != null && command.snapToBuilding){
-                var build = world.buildWorld(target.x, target.y);
+                var build = state.world.buildWorld(target.x, target.y);
                 if(build != null && build.team == this.team){
                     commandPos.set(build);
                 }

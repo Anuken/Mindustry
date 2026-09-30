@@ -121,7 +121,7 @@ public class EntityCollisions{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Hitboxc> void updatePhysics(EntityGroup<T> group){
+    public static <T extends Hitboxc> void updatePhysics(EntityGroup<T> group){
         group.tree().fill(group.rawSeq());
 
         group.each(Hitboxc::updateLastPosition);

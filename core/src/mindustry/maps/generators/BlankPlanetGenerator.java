@@ -1,5 +1,6 @@
 package mindustry.maps.generators;
 
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;

@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
@@ -139,8 +140,8 @@ public abstract class SaveVersion extends SaveFileReader{
             "locales", JsonIO.write(state.mapLocales),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "controlGroups", headless || control == null ? "null" : JsonIO.write(control.input.controlGroups),
-            "width", world.width,
-            "height", world.height,
+            "width", state.world.width,
+            "height", state.world.height,
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
@@ -196,8 +197,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
         if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
 
-        if(saveState.context.getSector() != null){
-            state.rules.sector = saveState.context.getSector();
+        if(saveState.getSector() != null){
+            state.rules.sector = saveState.getSector();
             if(state.rules.sector != null){
                 state.rules.sector.planet.applyRules(state.rules);
             }
@@ -210,6 +211,7 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeMap(DataOutput stream) throws IOException{
+        var world = state.world;
         //write world size
         stream.writeShort(world.width);
         stream.writeShort(world.height);
@@ -289,16 +291,15 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void readMap(DataInput stream, SaveLoadContext state) throws IOException{
-        var context = state.context;
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
-        boolean generating = context.isGenerating();
+        boolean generating = state.isGenerating();
 
-        if(!generating) context.begin();
+        if(!generating) state.begin();
         try{
 
-            context.resize(width, height);
+            state.resize(width, height);
 
             //read floor and create tiles first
             for(int i = 0; i < width * height; i++){
@@ -308,11 +309,11 @@ public abstract class SaveVersion extends SaveFileReader{
                 int consecutives = stream.readUnsignedByte();
                 if(content.block(floorid) == Blocks.air) floorid = Blocks.stone.id;
 
-                context.create(x, y, floorid, oreid, (short)0);
+                state.create(x, y, floorid, oreid, (short)0);
 
                 for(int j = i + 1; j < i + 1 + consecutives; j++){
                     int newx = j % width, newy = j / width;
-                    context.create(newx, newy, floorid, oreid, (short)0);
+                    state.create(newx, newy, floorid, oreid, (short)0);
                 }
 
                 i += consecutives;
@@ -321,7 +322,7 @@ public abstract class SaveVersion extends SaveFileReader{
             //read blocks
             for(int i = 0; i < width * height; i++){
                 Block block = content.block(stream.readShort());
-                Tile tile = context.tile(i);
+                Tile tile = state.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
                 byte packedCheck = stream.readByte();
@@ -358,7 +359,7 @@ public abstract class SaveVersion extends SaveFileReader{
                     tile.floorData = floorData;
                     tile.overlayData = overlayData;
                     tile.extraData = extraData;
-                    context.onReadTileData();
+                    state.onReadTileData();
                 }
 
                 if(hadEntity){
@@ -377,20 +378,20 @@ public abstract class SaveVersion extends SaveFileReader{
                             skipChunk(stream);
                         }
 
-                        context.onReadBuilding();
+                        state.onReadBuilding();
                     }
                 }else if(!hadData){ //never read consecutive blocks if there's data
                     int consecutives = stream.readUnsignedByte();
 
                     for(int j = i + 1; j < i + 1 + consecutives; j++){
-                        context.tile(j).setBlock(block);
+                        state.tile(j).setBlock(block);
                     }
 
                     i += consecutives;
                 }
             }
         }finally{
-            if(!generating) context.end();
+            if(!generating) state.end();
         }
     }
 

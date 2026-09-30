@@ -139,12 +139,14 @@ public class GameState{
 
 
     /** Resizes the tile array to the specified size. Only use for loading saves! */
-    public void resizeWorld(int width, int height){
+    public World resizeWorld(int width, int height){
         world.clearBuildings();
 
         if(world.width != width || world.height != height){
             world = new World(width, height);
         }
+
+        return world;
     }
 
     /**
@@ -182,6 +184,8 @@ public class GameState{
         generating = false;
         world.tileChanges = -1;
         world.floorChanges = -1;
+        spawner.load();
+        indexer.load();
         Events.fire(new WorldLoadEvent());
         for(var build : Groups.build){
             build.checkAllowUpdate();
@@ -195,10 +199,6 @@ public class GameState{
         generator.get(world);
 
         endMapLoad();
-    }
-
-    public void loadSector(Sector sector){
-        loadSector(sector, new WorldParams());
     }
 
     public void loadSector(Sector sector, WorldParams params){

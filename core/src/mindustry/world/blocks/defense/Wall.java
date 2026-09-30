@@ -129,7 +129,7 @@ public class Wall extends Block{
         public void onProximityAdded(){
             super.onProximityAdded();
 
-            if(autotile && !world.isGenerating()) updateOtherBits();
+            if(autotile && !state.generating) updateOtherBits();
         }
 
         @Override

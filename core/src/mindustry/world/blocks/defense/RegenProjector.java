@@ -167,7 +167,7 @@ public class RegenProjector extends Block{
                 lastUpdateFrame = state.updateId;
 
                 for(var entry : mendMap.entries()){
-                    var build = world.build(entry.key);
+                    var build = state.world.build(entry.key);
                     if(build != null){
                         build.heal(entry.value);
                         build.recentlyHealed();

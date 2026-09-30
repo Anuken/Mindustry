@@ -246,6 +246,24 @@ public class Logic implements ApplicationListener{
                 state.getPlanet().stats().sectorsLost ++;
             }
         });
+
+        Events.on(TileOverlayChangeEvent.class, e -> {
+            if(e.previous == Blocks.spawn) state.spawner.removeSpawn(e.tile);
+            if(e.overlay == Blocks.spawn) state.spawner.addSpawn(e.tile);
+        });
+
+        Events.on(TilePreChangeEvent.class, event -> {
+            state.indexer.removeIndex(event.tile);
+        });
+
+        Events.on(TileChangeEvent.class, event -> {
+            state.indexer.addIndex(event.tile);
+        });
+
+        Events.on(TileFloorChangeEvent.class, event -> {
+            state.indexer.removeFloorIndex(event.tile, event.previous);
+            state.indexer.addFloorIndex(event.tile, event.floor);
+        });
     }
 
     private boolean checkCampaignStats(){

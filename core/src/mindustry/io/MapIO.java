@@ -61,7 +61,7 @@ public class MapIO{
     }
 
     public static void loadMap(Map map) throws SaveLoadException{
-        SaveIO.load(map.file);
+        SaveIO.load(map.file, new DefaultWorldContext());
     }
 
     public static void loadMap(Map map, SaveLoadContext cons) throws SaveLoadException{

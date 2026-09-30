@@ -3,6 +3,7 @@ package mindustry.world.blocks.environment;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -52,7 +53,7 @@ public class TiledWall extends StaticWall{
     public void blockChanged(Tile tile){
         if(headless) return;
 
-        if(!world.isGenerating() && TiledState.changes(state(tile)) != state.world.tileChanges){
+        if(!state.generating && TiledState.changes(state(tile)) != state.world.tileChanges){
             scan(tile);
         }
     }
@@ -102,7 +103,7 @@ public class TiledWall extends StaticWall{
     public void drawBase(Tile tile){
         long state = state(tile);
         //stale state, start scanning.
-        if(TiledState.changes(state) != state.world.tileChanges){
+        if(TiledState.changes(state) != Vars.state.world.tileChanges){
             scan(tile);
             //state has most likely updated
             state = state(tile);

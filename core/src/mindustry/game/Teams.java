@@ -397,8 +397,8 @@ public class Teams{
                     }
                 }
                 if(any){
-                    Geometry.circle(World.toTile(x), World.toTile(y), world.width, world.height, Mathf.round(range / tilesize), (tx, ty) -> {
-                        Tile t = world.rawTile(tx, ty);
+                    Geometry.circle(World.toTile(x), World.toTile(y), state.world.width, state.world.height, Mathf.round(range / tilesize), (tx, ty) -> {
+                        Tile t = state.world.rawTile(tx, ty);
                         Block result = sector.planet.sectorCaptureReplacements.get(t.floor());
                         if(result != null && !cores.contains(c -> c.within(t, range))){
                             t.setFloor(result.asFloor());

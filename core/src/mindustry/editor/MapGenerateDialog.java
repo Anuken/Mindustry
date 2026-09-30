@@ -169,8 +169,8 @@ public class MapGenerateDialog extends BaseDialog{
                 for(int y = 0; y < state.world.height; y++){
                     input.set(editor.tile(x, y));
                     filter.apply(input);
-                    writeTiles[x + y*world.width] = PackTile.get(input.block.id, input.floor.id, input.overlay.id);
-                    writeData[x + y*world.width] = input.packedData;
+                    writeTiles[x + y*state.world.width] = PackTile.get(input.block.id, input.floor.id, input.overlay.id);
+                    writeData[x + y*state.world.width] = input.packedData;
                 }
             }
 
@@ -513,7 +513,7 @@ public class MapGenerateDialog extends BaseDialog{
         result = mainExecutor.submit(() -> {
             try{
                 int w = pixmap.width;
-                world.setGenerating(true);
+                state.generating = true;
 
                 if(!copy.isEmpty()){
                     //write to buffer1 for reading
@@ -575,7 +575,7 @@ public class MapGenerateDialog extends BaseDialog{
                     }
                 });
             }
-            world.setGenerating(false);
+            state.generating = false;
         });
     }
 }

@@ -140,7 +140,7 @@ public class StaticWall extends Prop{
     }
 
     boolean eq(int rx, int ry){
-        return rx < world.width - 1 && ry < world.height - 1
+        return rx < state.world.width - 1 && ry < state.world.height - 1
         && state.world.tile(rx + 1, ry).block() == this
         && state.world.tile(rx, ry + 1).block() == this
         && state.world.tile(rx, ry).block() == this

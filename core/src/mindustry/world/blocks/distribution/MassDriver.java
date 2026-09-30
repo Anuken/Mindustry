@@ -9,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -136,7 +137,7 @@ public class MassDriver extends Block{
         @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config){
-                return linkValid() ? world.build(link) : null;
+                return linkValid() ? Vars.state.world.build(link) : null;
             }
             return super.senseObject(sensor);
         }
@@ -152,7 +153,7 @@ public class MassDriver extends Block{
 
         @Override
         public void updateTile(){
-            Building link = world.build(this.link);
+            Building link = Vars.state.world.build(this.link);
             boolean hasLink = linkValid();
 
             if(hasLink){
@@ -275,7 +276,7 @@ public class MassDriver extends Block{
             }
 
             if(linkValid()){
-                Building target = world.build(link);
+                Building target = Vars.state.world.build(link);
                 Drawf.circles(target.x, target.y, (target.block.size / 2f + 1) * tilesize + sin - 2f, Pal.place);
                 Drawf.arrow(x, y, target.x, target.y, size * tilesize + sin, 4f + sin);
             }
@@ -366,7 +367,7 @@ public class MassDriver extends Block{
 
         protected boolean linkValid(){
             if(link == -1) return false;
-            return world.build(this.link) instanceof MassDriverBuild other && other.block == block && other.team == team && within(other, range);
+            return Vars.state.world.build(this.link) instanceof MassDriverBuild other && other.block == block && other.team == team && within(other, range);
         }
 
         @Override

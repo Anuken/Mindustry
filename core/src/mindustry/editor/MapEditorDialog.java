@@ -127,7 +127,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 (Runnable)() -> FileChooser.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
             "@editor.exportimage", "@editor.exportimage.description", Icon.fileImage,
                 (Runnable)() -> FileChooser.export(editor.tags.get("name", "unknown"), "png", file -> {
-                    Pixmap out = MapIO.writeImage(editor.tiles());
+                    Pixmap out = MapIO.writeImage(state.world);
                     file.writePng(out);
                     out.dispose();
                 })));
@@ -270,7 +270,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         loadDialog = new MapLoadDialog(map -> ui.loadAnd(() -> {
             try{
                 editor.beginEdit(map);
-            }catch(Exception e){
+            }catch(Throwable e){
                 ui.showException("@editor.errorload", e);
                 Log.err(e);
             }
@@ -341,7 +341,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 "height", state.world.height
             ));
             state.set(State.playing);
-            state.world.endMapLoad();
+            state.endMapLoad();
             player.clearUnit();
 
             for(var unit : Groups.unit){
@@ -511,7 +511,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 shownWithMap = true;
                 editor.beginEdit(MapIO.createMap(file, true));
                 show();
-            }catch(Exception e){
+            }catch(Throwable e){
                 Log.err(e);
                 ui.showException("@editor.errorload", e);
             }

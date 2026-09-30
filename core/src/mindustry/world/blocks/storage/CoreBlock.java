@@ -771,7 +771,7 @@ public class CoreBlock extends StorageBlock{
                 storageCapacity += other.block.itemCapacity + other.proximity.sum(e -> owns(other, e) ? e.block.itemCapacity : 0);
             }
 
-            if(!world.isGenerating()){
+            if(!state.generating){
                 for(Item item : content.items()){
                     items.set(item, Math.min(items.get(item), storageCapacity));
                 }

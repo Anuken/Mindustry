@@ -1,6 +1,5 @@
 package mindustry.ai.types;
 
-import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
@@ -155,7 +154,7 @@ public class BuilderAI extends AIController{
                     if(u.canBuild() && u != unit && u.activelyBuilding()){
                         BuildPlan plan = u.buildPlan();
 
-                        Building build = world.build(plan.x, plan.y);
+                        Building build = state.world.build(plan.x, plan.y);
                         if(build instanceof ConstructBuild cons){
                             float dist = Math.min(cons.dst(unit) - unit.type.buildRange, 0);
 

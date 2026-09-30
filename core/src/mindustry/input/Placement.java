@@ -138,7 +138,7 @@ public class Placement{
         closed.clear();
         Pools.freeAll(points);
         points.clear();
-        var build = world.build(startX, startY);
+        var build = state.world.build(startX, startY);
         points.add(Pools.obtain(Point2.class, Point2::new).set(startX, startY));
         while(build instanceof ChainedBuilding chain && (build.tile.x != endX || build.tile.y != endY) && closed.add(build.id)){
             if(chain.next() == null) return pathfindLine(true, startX, startY, endX, endY);

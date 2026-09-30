@@ -116,6 +116,7 @@ public class Pathfinder implements Runnable{
 
         Events.on(WorldLoadEvent.class, event -> {
             stop();
+            var world = state.world;
 
             //reset and update internal tile array
             tiles = new int[world.width * world.height];
@@ -600,7 +601,7 @@ public class Pathfinder implements Runnable{
 
         @Override
         public void getPositions(IntSeq out){
-            out.add(world.packArray(World.toTile(position.getX()), World.toTile(position.getY())));
+            out.add(state.world.packArray(World.toTile(position.getX()), World.toTile(position.getY())));
         }
     }
 

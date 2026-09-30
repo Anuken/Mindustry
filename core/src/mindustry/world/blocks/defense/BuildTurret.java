@@ -180,7 +180,7 @@ public class BuildTurret extends BaseTurret{
                             if(u.canBuild() && u.activelyBuilding()){
                                 BuildPlan plan = u.buildPlan();
 
-                                Building build = world.build(plan.x, plan.y);
+                                Building build = state.world.build(plan.x, plan.y);
                                 if(build instanceof ConstructBuild && within(build, range)){
                                     following = u;
                                 }

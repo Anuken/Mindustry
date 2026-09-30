@@ -28,7 +28,7 @@ public class TextureHolder implements JsonSerializable{
         }else if(jsonData.has("content")){
             value = content.byName(jsonData.get("content").asString());
         }else if(jsonData.has("building")){
-            value = world.build(jsonData.get("building").asInt());
+            value = state.world.build(jsonData.get("building").asInt());
         }else{
             value = "white";
         }

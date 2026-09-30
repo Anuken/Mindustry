@@ -77,7 +77,7 @@ public class BeamNode extends PowerBlock{
             int dx = dir.x, dy = dir.y;
             int offset = size/2;
             for(int j = 1 + offset; j <= range + offset; j++){
-                var other = world.build(x + j * dir.x, y + j * dir.y);
+                var other = state.world.build(x + j * dir.x, y + j * dir.y);
 
                 //hit insulated wall
                 if(other != null && other.isInsulated()){
@@ -247,7 +247,7 @@ public class BeamNode extends PowerBlock{
                 int offset = size/2;
                 //find first block with power in range
                 for(int j = 1 + offset; j <= range + offset; j++){
-                    var other = world.build(tile.x + j * dir.x, tile.y + j * dir.y);
+                    var other = state.world.build(tile.x + j * dir.x, tile.y + j * dir.y);
 
                     //hit insulated wall
                     if(other != null && other.isInsulated()){

@@ -347,8 +347,8 @@ public class MapObjectivesDialog extends BaseDialog{
 
                 if(remover != null) t.button(Icon.trash, Styles.emptyi, remover).fill().padRight(4f);
                 if(indexer != null){
-                    t.button(Icon.upOpen, Styles.emptyi, () -> state.indexer.get(true)).fill().padRight(4f);
-                    t.button(Icon.downOpen, Styles.emptyi, () -> state.indexer.get(false)).fill().padRight(4f);
+                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(true)).fill().padRight(4f);
+                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill().padRight(4f);
                 }
 
                 if(!field.isAnnotationPresent(Immutable.class)) {
@@ -429,8 +429,8 @@ public class MapObjectivesDialog extends BaseDialog{
                 if(remover != null) remove = t.button(Icon.trash, Styles.emptyi, remover).fill();
                 if(indexer != null){
                     if(remove != null) remove.padRight(4f);
-                    t.button(Icon.upOpen, Styles.emptyi, () -> state.indexer.get(true)).fill().padRight(4f);
-                    t.button(Icon.downOpen, Styles.emptyi, () -> state.indexer.get(false)).fill();
+                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(true)).fill().padRight(4f);
+                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill();
                 }
             }).growX().height(46f).pad(0f, -10f, -0f, -10f).get();
 
@@ -473,8 +473,8 @@ public class MapObjectivesDialog extends BaseDialog{
             cont.table(t -> {
                 if(remover != null) t.button(Icon.trash, Styles.emptyi, remover).fill().padRight(4f);
                 if(indexer != null){
-                    t.button(Icon.upOpen, Styles.emptyi, () -> state.indexer.get(true)).fill().padRight(4f);
-                    t.button(Icon.downOpen, Styles.emptyi, () -> state.indexer.get(false)).fill().padRight(4f);
+                    t.button(Icon.upOpen, Styles.emptyi, () -> indexer.get(true)).fill().padRight(4f);
+                    t.button(Icon.downOpen, Styles.emptyi, () -> indexer.get(false)).fill().padRight(4f);
                 }
             }).fill();
         }else{

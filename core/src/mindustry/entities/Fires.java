@@ -38,7 +38,7 @@ public class Fires{
     }
 
     public static @Nullable Fire get(int x, int y){
-        return Structs.inBounds(x, y, world.width, world.height) ? state.world.getFire(world.packArray(x, y)) : null;
+        return Structs.inBounds(x, y, state.world.width, state.world.height) ? state.world.getFire(state.world.packArray(x, y)) : null;
     }
 
     private static void set(Tile tile, Fire fire){
@@ -46,7 +46,7 @@ public class Fires{
     }
 
     public static boolean has(int x, int y){
-        if(!Structs.inBounds(x, y, world.width, world.height)){
+        if(!Structs.inBounds(x, y, state.world.width, state.world.height)){
             return false;
         }
         Fire fire = get(x, y);

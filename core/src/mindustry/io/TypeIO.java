@@ -253,7 +253,7 @@ public class TypeIO{
             case techNodeType -> content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
             case booleanType -> read.bool();
             case doubleType -> read.d();
-            case buildingType -> !box ? world.build(read.i()) : new BuildingBox(read.i());
+            case buildingType -> !box ? state.world.build(read.i()) : new BuildingBox(read.i());
             case lAccessType -> LAccess.all[read.s()];
             case byteArrayType -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
@@ -518,7 +518,7 @@ public class TypeIO{
         if(type == 2){ //standard unit
             return Groups.unit.getByID(id);
         }else if(type == 1){ //block
-            Building tile = world.build(id);
+            Building tile = state.world.build(id);
             return tile instanceof ControlBlock cont ? cont.unit() : null;
         }
         return null;
@@ -564,7 +564,7 @@ public class TypeIO{
     }
 
     public static Building readBuilding(Reads read){
-        return world.build(read.i());
+        return state.world.build(read.i());
     }
 
     public static void writeTile(Writes write, Tile tile){
@@ -849,14 +849,14 @@ public class TypeIO{
         }else if(type == 3){
             int pos = read.i();
             if(prev instanceof LogicAI pai){
-                pai.controller = world.build(pos);
+                pai.controller = state.world.build(pos);
                 return pai;
             }else{
                 //create new AI for assignment
                 LogicAI out = new LogicAI();
                 //instantly time out when updated.
                 out.controlTimer = LogicAI.logicControlTimeout;
-                out.controller = world.build(pos);
+                out.controller = state.world.build(pos);
                 return out;
             }
             //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte, type 7 is the one with the command queue, 8 adds a stance, 9 adds multiple stances
@@ -876,7 +876,7 @@ public class TypeIO{
             if(hasAttack){
                 byte entityType = read.b();
                 if(entityType == 1){
-                    ai.attackTarget = world.build(read.i());
+                    ai.attackTarget = state.world.build(read.i());
                 }else{
                     ai.attackTarget = Groups.unit.getByID(ai.readAttackTarget = read.i());
                 }
@@ -898,7 +898,7 @@ public class TypeIO{
                     int commandType = read.b();
                     switch(commandType){
                         case 0 -> {
-                            var build = world.build(read.i());
+                            var build = state.world.build(read.i());
                             if(build != null) ai.commandQueue.add(build);
                         }
                         case 1 -> {
@@ -1435,7 +1435,7 @@ public class TypeIO{
 
         @Override
         public Building unbox(){
-            return world.build(pos);
+            return state.world.build(pos);
         }
 
         @Override

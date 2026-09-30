@@ -48,7 +48,7 @@ public class MapEditor{
         loading = false;
     }
 
-    public void beginEdit(Map map){
+    public void beginEdit(Map map) throws Throwable{
         reset();
 
         loading = true;
@@ -56,9 +56,13 @@ public class MapEditor{
         if(map.file.parent().parent().name().equals("1127400") && steam){
             tags.put("steamid",  map.file.parent().name());
         }
-        load(() -> MapIO.loadMap(map, context));
+        loading = true;
+        try{
+            MapIO.loadMap(map, context);
+        }finally{
+            loading = false;
+        }
         if(!headless) renderer.resize(state.world.width, state.world.height);
-        loading = false;
     }
 
     public void beginEdit(Pixmap pixmap){
@@ -101,7 +105,7 @@ public class MapEditor{
 
     /** Creates a 2-D array of EditorTiles with stone as the floor block. */
     private void createTiles(int width, int height){
-        World tiles = state.world.resize(width, height);
+        World tiles = state.resizeWorld(width, height);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -402,7 +406,7 @@ public class MapEditor{
         currentOp.remove(amount);
     }
 
-    class Context implements WorldContext{
+    class Context extends SaveLoadContext{
         @Override
         public Tile tile(int index){
             return state.world.geti(index);
@@ -410,29 +414,29 @@ public class MapEditor{
 
         @Override
         public void resize(int width, int height){
-            world.resize(width, height);
+            state.resizeWorld(width, height);
         }
 
         @Override
         public Tile create(int x, int y, int floorID, int overlayID, int wallID){
             Tile tile = new EditorTile(x, y, floorID, overlayID, wallID);
-            tiles().set(x, y, tile);
+            state.world.set(x, y, tile);
             return tile;
         }
 
         @Override
         public boolean isGenerating(){
-            return world.isGenerating();
+            return state.generating;
         }
 
         @Override
         public void begin(){
-            world.beginMapLoad();
+            state.generating = true;
         }
 
         @Override
         public void end(){
-            world.endMapLoad();
+            state.generating = false;
         }
     }
 }

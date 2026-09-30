@@ -79,7 +79,7 @@ public class BaseBuilderAI{
         }
 
         //didn't find tile in time
-        if(calculating && calcCount >= world.width * world.height){
+        if(calculating && calcCount >= state.world.width * state.world.height){
             calculating = false;
             calcCount = 0;
             calcPath.clear();
@@ -103,7 +103,7 @@ public class BaseBuilderAI{
                         int cx = calcTile.x, cy = calcTile.y;
                         boolean foundAny = false;
                         for(Point2 p : Geometry.d4){
-                            int nx = cx + p.x, ny = cy + p.y, packed = world.packArray(nx, ny);
+                            int nx = cx + p.x, ny = cy + p.y, packed = state.world.packArray(nx, ny);
 
                             Tile other = state.world.tile(nx, ny);
                             if(other != null && weights[packed] < minCost && weights[packed] != -1){
@@ -216,7 +216,7 @@ public class BaseBuilderAI{
             if(tile.block instanceof PayloadConveyor || tile.block instanceof PayloadBlock){
                 //near a building
                 for(Point2 point : Edges.getEdges(tile.block.size)){
-                    var t = world.build(tile.x + point.x, tile.y + point.y);
+                    var t = state.world.build(tile.x + point.x, tile.y + point.y);
                     if(t != null){
                         return false;
                     }
@@ -240,7 +240,7 @@ public class BaseBuilderAI{
                     anyDrills = true;
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
-                        Tile res = world.rawTile(ex, ey);
+                        Tile res = state.world.rawTile(ex, ey);
                         if(res.drop() == part.required){
                             correct ++;
                         }else if(res.drop() != null){

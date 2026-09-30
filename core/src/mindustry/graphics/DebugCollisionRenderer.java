@@ -35,8 +35,8 @@ public class DebugCollisionRenderer{
             //tile hitboxes for units
             Lines.stroke(0.4f, Color.magenta);
 
-            int rx = Mathf.clamp((int)(Core.camera.width / tilesize / 2) + 1, 0, world.width/2);
-            int ry = Mathf.clamp((int)(Core.camera.height / tilesize / 2) + 1, 0, world.height/2);
+            int rx = Mathf.clamp((int)(Core.camera.width / tilesize / 2) + 1, 0, state.world.width/2);
+            int ry = Mathf.clamp((int)(Core.camera.height / tilesize / 2) + 1, 0, state.world.height/2);
 
             for(int x = -rx; x <= rx; x++){
                 for(int y = -ry; y <= ry; y++){

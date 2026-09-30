@@ -40,7 +40,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Unitc{
 
             int sign = i == 0 ? -1 : 1;
             float cx = Angles.trnsx(rotation - 90, type.waveTrailX * sign, type.waveTrailY) + x, cy = Angles.trnsy(rotation - 90, type.waveTrailX * sign, type.waveTrailY) + y;
-            t.update(cx, cy, world.floorWorld(cx, cy).isLiquid && !flying ? 1 : 0);
+            t.update(cx, cy, state.world.floorWorld(cx, cy).isLiquid && !flying ? 1 : 0);
         }
 
         if(type.crushDamage > 0 && !disarmed){

@@ -8,6 +8,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.io.versions.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.util.*;
@@ -133,15 +134,13 @@ public class SaveIO{
         }
     }
 
-    //TODO: add this back after reviewing callsites
-    //public static void load(String saveName) throws SaveLoadException{
-    //    load(saveDirectory.child(saveName + ".msav"));
-   // }
+    public static void load(String saveName) throws SaveLoadException{
+        load(saveDirectory.child(saveName + ".msav"));
+    }
 
-    //TODO: add this back after reviewing callsites (make sure context is correct)
-    //public static void load(Fi file) throws SaveLoadException{
-    //    load(file, new DefaultWorldContext(Vars.state));
-    //}
+    public static void load(Fi file) throws SaveLoadException{
+        load(file, new DefaultWorldContext());
+    }
 
     public static void load(Fi file, SaveLoadContext context) throws SaveLoadException{
         try{

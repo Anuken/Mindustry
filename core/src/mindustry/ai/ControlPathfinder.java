@@ -111,7 +111,7 @@ public class ControlPathfinder implements Runnable{
     //maps team -> pathCost -> flattened array of clusters in 2D
     //(what about teams? different path costs?)
     final Cluster[][][] clusters = new Cluster[256][][];
-    final int cwidth = Mathf.ceil((float)world.width / clusterSize), cheight = Mathf.ceil((float)world.height / clusterSize);
+    final int cwidth = state == null ? 1 : Mathf.ceil((float)state.world.width / clusterSize), cheight = state == null ? 1 : Mathf.ceil((float)state.world.height / clusterSize);
 
     //temporarily used for resolving connections for intra-edges
     final IntSet usedEdges = new IntSet();
@@ -1126,7 +1126,7 @@ public class ControlPathfinder implements Runnable{
         team = unit.team.id,
         tileX = unit.tileX(),
         tileY = unit.tileY(),
-        packedPos = world.packArray(tileX, tileY),
+        packedPos = state.world.packArray(tileX, tileY),
         destX = World.toTile(mainDestination.x),
         destY = World.toTile(mainDestination.y),
         actualDestX = World.toTile(destination.x),
@@ -1136,7 +1136,7 @@ public class ControlPathfinder implements Runnable{
         destPos = destX + destY * wwidth;
 
         //do not allow commanding into areas outside the map bounds
-        if(!world.isInMapArea(World.toTile(destination.x), World.toTile(destination.y))){
+        if(!state.world.isInMapArea(World.toTile(destination.x), World.toTile(destination.y))){
             pathResult.move = false;
             pathResult.unreachable = true;
             return pathResult;
@@ -1225,7 +1225,7 @@ public class ControlPathfinder implements Runnable{
 
                             if(other == null) continue;
 
-                            int packed = world.packArray(dx, dy);
+                            int packed = state.world.packArray(dx, dy);
                             int otherCost = getCost(targetCache, dx, dy, requeue), relCost = otherCost - value;
 
                             if(relCost > 2 || otherCost <= 0){
@@ -1366,7 +1366,7 @@ public class ControlPathfinder implements Runnable{
 
     /** @return 0 if nothing was hit, otherwise the packed coordinates. This is an internal function and will likely be moved - do not use!*/
     public static int raycastFastAvoid(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = world.width, wh = world.height;
+        int ww = state.world.width, wh = state.world.height;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int err = dx - dy;

@@ -163,7 +163,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     }
 
     public @Nullable Building build(){
-        return world.build(x, y);
+        return state.world.build(x, y);
     }
 
     @Override

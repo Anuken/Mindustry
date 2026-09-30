@@ -223,8 +223,8 @@ public class SectorInfo{
         storageCapacity = entity != null ? entity.storageCapacity : 0;
         hasSpawns = state.spawner.countSpawns() > 0;
         lastPresetName = sector.preset == null ? null : sector.preset.name;
-        lastWidth = world.width;
-        lastHeight = world.height;
+        lastWidth = state.world.width;
+        lastHeight = state.world.height;
 
         lightCoverage = 0f;
         for(var build : state.rules.defaultTeam.data().buildings){

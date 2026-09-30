@@ -1,17 +1,23 @@
 package mindustry.world;
 
 import arc.struct.*;
-import mindustry.core.*;
 import mindustry.maps.*;
 import mindustry.maps.filters.*;
 import mindustry.maps.filters.GenerateFilter.*;
+import mindustry.type.*;
+
+import static mindustry.Vars.*;
 
 /** World context that applies filters after generation end. */
 public class FilterContext extends DefaultWorldContext{
     final Map map;
 
-    public FilterContext(GameState state, Map map){
-        super(state);
+    public FilterContext(Map map){
+        this.map = map;
+    }
+
+    public FilterContext(Map map, Sector sector){
+        super(sector);
         this.map = map;
     }
 

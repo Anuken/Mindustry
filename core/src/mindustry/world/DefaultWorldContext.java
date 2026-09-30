@@ -1,20 +1,19 @@
 package mindustry.world;
 
 import arc.util.*;
-import mindustry.core.*;
 import mindustry.io.*;
 import mindustry.type.*;
 
+import static mindustry.Vars.*;
+
 public class DefaultWorldContext extends SaveLoadContext{
     protected final @Nullable Sector sector;
-    protected final GameState state;
 
-    public DefaultWorldContext(GameState state){
-        this(state, null);
+    public DefaultWorldContext(){
+        this(null);
     }
 
-    public DefaultWorldContext(GameState state, @Nullable Sector sector){
-        this.state = state;
+    public DefaultWorldContext(@Nullable Sector sector){
         this.sector = sector;
     }
 

@@ -267,16 +267,16 @@ public class FloorRenderer{
     private void cacheChunk(int cx, int cy, boolean ignoreWalls){
         used.clear();
 
-        for(int tilex = Math.max(cx * chunksize - 1, 0); tilex < (cx + 1) * chunksize + 1 && tilex < world.width; tilex++){
-            for(int tiley = Math.max(cy * chunksize - 1, 0); tiley < (cy + 1) * chunksize + 1 && tiley < world.height; tiley++){
-                Tile tile = world.rawTile(tilex, tiley);
+        for(int tilex = Math.max(cx * chunksize - 1, 0); tilex < (cx + 1) * chunksize + 1 && tilex < state.world.width; tilex++){
+            for(int tiley = Math.max(cy * chunksize - 1, 0); tiley < (cy + 1) * chunksize + 1 && tiley < state.world.height; tiley++){
+                Tile tile = state.world.rawTile(tilex, tiley);
                 boolean wall = !ignoreWalls && tile.block().cacheLayer != CacheLayer.normal;
 
                 if(wall){
                     used.add(tile.block().cacheLayer);
                 }
 
-                if(!wall || world.isAccessible(tilex, tiley)){
+                if(!wall || state.world.isAccessible(tilex, tiley)){
                     used.add(tile.floor().cacheLayer);
                 }
             }
@@ -322,7 +322,7 @@ public class FloorRenderer{
 
                     if(tile.block().cacheLayer == layer && layer == CacheLayer.walls && !(tile.isDarkened() && tile.data >= 5)){
                         tile.block().drawBase(tile);
-                    }else if(floor.cacheLayer == layer && (ignoreWalls || world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
+                    }else if(floor.cacheLayer == layer && (ignoreWalls || state.world.isAccessible(tile.x, tile.y) || tile.block().cacheLayer != CacheLayer.walls || !tile.block().fillsTile)){
                         floor.drawBase(tile);
                     }else if(floor.cacheLayer != layer && layer != CacheLayer.walls){
                         floor.drawNonLayer(tile, layer);
@@ -364,14 +364,14 @@ public class FloorRenderer{
             }
         }
 
-        int chunksx = Mathf.ceil((float)(world.width) / chunksize), chunksy = Mathf.ceil((float)(world.height) / chunksize);
+        int chunksx = Mathf.ceil((float)(state.world.width) / chunksize), chunksy = Mathf.ceil((float)(state.world.height) / chunksize);
         cache = new ChunkMesh[chunksx][chunksy][dynamic ? 0 : CacheLayer.all.length];
         dirty = new boolean[chunksx][chunksy];
 
         texture = Core.atlas.find("grass1").texture;
 
-        packWidth = world.unitWidth + packPad *2f;
-        packHeight = world.unitHeight + packPad *2f;
+        packWidth = state.world.unitWidth + packPad *2f;
+        packHeight = state.world.unitHeight + packPad *2f;
 
         //pre-cache chunks
         if(!dynamic){

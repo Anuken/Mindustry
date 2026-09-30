@@ -312,7 +312,7 @@ public class Saves{
         }
 
         public void load() throws SaveLoadException{
-            load(new DefaultWorldContext(state));
+            load(new DefaultWorldContext());
         }
 
         public void load(SaveLoadContext context) throws SaveLoadException{

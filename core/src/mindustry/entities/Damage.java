@@ -178,7 +178,7 @@ public class Damage{
         tmpBuilding = null;
 
         boolean found = World.raycast(World.toTile(x1), World.toTile(y1), World.toTile(x2), World.toTile(y2),
-        (x, y) -> (tmpBuilding = world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.block.absorbLasers);
+        (x, y) -> (tmpBuilding = state.world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.block.absorbLasers);
 
         return found ? tmpBuilding : null;
     }
@@ -235,7 +235,7 @@ public class Damage{
         if(b.type.collidesGround && b.type.collidesTiles){
             World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
                 //add distance to list so it can be processed
-                var build = world.build(x, y);
+                var build = state.world.build(x, y);
 
                 if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
                     distances.add(b.dst(build));
@@ -410,7 +410,7 @@ public class Damage{
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
             World.raycastEachNoDiagonalWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
-                Building tile = world.build(cx, cy);
+                Building tile = state.world.build(cx, cy);
                 boolean collide = tile != null && tile.collide(hitter) && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
                 && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
                 if(collide){
@@ -483,7 +483,7 @@ public class Damage{
     public static void collidePoint(Bullet hitter, Team team, Effect effect, float x, float y){
 
         if(hitter.type.collidesGround){
-            Building build = world.build(World.toTile(x), World.toTile(y));
+            Building build = state.world.build(World.toTile(x), World.toTile(y));
 
             if(build != null && hitter.damage > 0){
                 float health = build.health;
@@ -519,7 +519,7 @@ public class Damage{
 
         if(hitter.type.collidesGround){
             World.raycastEachWorld(x, y, x + vec.x, y + vec.y, (cx, cy) -> {
-                Building tile = world.build(cx, cy);
+                Building tile = state.world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
                     tmpBuilding = tile;
                     return true;
@@ -705,6 +705,7 @@ public class Damage{
     }
 
     public static void tileDamage(Team team, int tx, int ty, float baseRadius, float damage, @Nullable Bullet source){
+        var world = state.world;
         Time.run(0f, () -> {
             int x = Mathf.clamp(tx, -100, world.width + 100), y = Mathf.clamp(ty, -100, world.height + 100);
 

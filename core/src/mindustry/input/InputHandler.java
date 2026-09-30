@@ -150,8 +150,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void initQuadtrees(){
-        playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth, world.unitHeight));
-        selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth, world.unitHeight));
+        playerPlanTree = new QuadTree<>(new Rect(0f, 0f, state.world.unitWidth, state.world.unitHeight));
+        selectPlanTree = new QuadTree<>(new Rect(0f, 0f, state.world.unitWidth, state.world.unitHeight));
         createPlanLists();
     }
 
@@ -200,7 +200,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(called = Loc.server, unreliable = true)
     public static void setTileItems(Item item, int amount, int[] positions){
         for(int pos : positions){
-            Building build = world.build(pos);
+            Building build = state.world.build(pos);
             if(build != null && build.items != null){
                 build.items.set(item, amount);
             }
@@ -231,7 +231,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     @Remote(called = Loc.server, unreliable = true)
     public static void setTileLiquids(Liquid liquid, float amount, int[] positions){
         for(int pos : positions){
-            Building build = world.build(pos);
+            Building build = state.world.build(pos);
             if(build != null && build.liquids != null){
                 build.liquids.set(liquid, amount);
             }
@@ -477,7 +477,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         for(int pos : buildings){
-            var build = world.build(pos);
+            var build = state.world.build(pos);
 
             if(build == null || build.team() != player.team() || !build.isCommandable()) continue;
 
@@ -1023,7 +1023,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(controlledType != null && controlledType.playerControllable){
             Unit unit = Units.closest(player.team(), player.x, player.y, u -> !u.isPlayer() && u.type == controlledType && !u.dead);
             if(unit == null && controlledType == UnitTypes.block){
-                unit = world.buildWorld(player.x, player.y) instanceof ControlBlock cont && cont.canControl() ? cont.unit() : null;
+                unit = state.world.buildWorld(player.x, player.y) instanceof ControlBlock cont && cont.canControl() ? cont.unit() : null;
             }
 
             if(unit != null){
@@ -1044,7 +1044,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(target != null){
             Call.requestUnitPayload(player, target);
         }else{
-            Building build = world.buildWorld(pay.x(), pay.y());
+            Building build = state.world.buildWorld(pay.x(), pay.y());
             if(build == null) return;
             Payload current = build.getPayload();
 
@@ -1131,7 +1131,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(commandMode){
 
             Unit unit = selectedCommandUnit(input.mouseWorldX(), input.mouseWorldY());
-            Building build = world.buildWorld(input.mouseWorldX(), input.mouseWorldY());
+            Building build = state.world.buildWorld(input.mouseWorldX(), input.mouseWorldY());
             if(unit != null){
                 if(!selectedUnits.contains(unit)){
                     selectedUnits.add(unit);
@@ -1171,7 +1171,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
             if(selectedUnits.size > 0){
 
-                Teamc attack = world.buildWorld(target.x, target.y);
+                Teamc attack = state.world.buildWorld(target.x, target.y);
 
                 if(attack == null || attack.team() == player.team()){
                     attack = selectedEnemyUnit(target.x, target.y);
@@ -1266,7 +1266,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                             Drawf.square(lineDest.getX(), lineDest.getY(), 3.5f, color.write(Tmp.c1).a(alpha));
 
                             if(cmd == UnitCommand.enterPayloadCommand){
-                                var build = world.buildWorld(lineDest.getX(), lineDest.getY());
+                                var build = state.world.buildWorld(lineDest.getX(), lineDest.getY());
                                 if(build != null && build.block.acceptsUnitPayloads && build.team == unit.team){
                                     Drawf.selected(build, color);
                                 }else{
@@ -2155,7 +2155,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
             }
         }
 
-        Building build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Building build = state.world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(build instanceof ControlBlock cont && cont.canControl() && build.team == player.team() && cont.unit() != player.unit() && cont.unit().isAI()){
             return cont.unit();
         }
@@ -2164,7 +2164,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public @Nullable Building selectedControlBuild(){
-        Building build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Building build = state.world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(build != null && !player.dead() && build.canControlSelect(player.unit()) && build.team == player.team()){
             return build;
         }
@@ -2440,8 +2440,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         int endRotation = -1;
-        var start = world.build(startX, startY);
-        var end = world.build(endX, endY);
+        var start = state.world.build(startX, startY);
+        var end = state.world.build(endX, endY);
         if(diagonal && (block == null || block.allowDiagonal)){
             if(block != null && start instanceof ChainedBuilding && end instanceof ChainedBuilding
             && block.canReplace(end.block) && block.canReplace(start.block)){
@@ -2456,7 +2456,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
         if(points.size > 1 && end instanceof ChainedBuilding){
             Point2 secondToLast = points.get(points.size - 2);
-            if(!(world.build(secondToLast.x, secondToLast.y) instanceof ChainedBuilding)){
+            if(!(state.world.build(secondToLast.x, secondToLast.y) instanceof ChainedBuilding)){
                 endRotation = end.rotation;
             }
         }

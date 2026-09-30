@@ -726,7 +726,7 @@ public class NetServer implements ApplicationListener{
 
     @Remote(targets = Loc.client, priority = PacketPriority.low, unreliable = true)
     public static void requestBlockSnapshot(Player player, int pos){
-        Building build = world.build(pos);
+        Building build = state.world.build(pos);
         if(build != null && build.team == player.team()){
             netServer.syncStream.reset();
             netServer.dataStreamWrites.i(build.pos());
@@ -1354,7 +1354,7 @@ public class NetServer implements ApplicationListener{
                 var iter = buildHealthChanged.iterator();
                 while(iter.hasNext){
                     int next = iter.next();
-                    var build = world.build(next);
+                    var build = state.world.build(next);
 
                     //pack pos + health into update list
                     if(build != null){

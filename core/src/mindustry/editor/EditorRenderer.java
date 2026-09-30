@@ -98,7 +98,7 @@ public class EditorRenderer implements Disposable{
         Draw.trans().idt();
 
         Tmp.v3.set(Core.camera.position);
-        Core.camera.position.set(world.width/2f * tilesize, world.height/2f * tilesize);
+        Core.camera.position.set(state.world.width/2f * tilesize, state.world.height/2f * tilesize);
         Core.camera.width = 999999f;
         Core.camera.height = 999999f;
         Core.camera.mat.set(Draw.proj()).mul(Tmp.m3.setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize)).translate(4f, 4f));
@@ -119,7 +119,7 @@ public class EditorRenderer implements Disposable{
 
         Draw.shader(Shaders.darkness);
         FrameBuffer frameBuffer = renderer.blocks.getShadowBuffer();
-        Draw.rect(Draw.wrap(frameBuffer.texture), world.width * tilesize/2f - tilesize/2f, world.height * tilesize/2f - tilesize/2f, world.width * tilesize, -world.height * tilesize);
+        Draw.rect(Draw.wrap(frameBuffer.texture), state.world.width * tilesize/2f - tilesize/2f, state.world.height * tilesize/2f - tilesize/2f, state.world.width * tilesize, -state.world.height * tilesize);
         Draw.shader();
 
         Draw.proj(Tmp.m2);
@@ -161,8 +161,8 @@ public class EditorRenderer implements Disposable{
         renderer.blocks.floor.recacheTile(x, y);
         if(x > 0) renderer.blocks.floor.recacheTile(x - 1, y);
         if(y > 0) renderer.blocks.floor.recacheTile(x, y - 1);
-        if(x < world.width - 1) renderer.blocks.floor.recacheTile(x + 1, y);
-        if(y < world.height - 1) renderer.blocks.floor.recacheTile(x, y + 1);
+        if(x < state.world.width - 1) renderer.blocks.floor.recacheTile(x + 1, y);
+        if(y < state.world.height - 1) renderer.blocks.floor.recacheTile(x, y + 1);
     }
 
     void updateBlock(Tile tile){

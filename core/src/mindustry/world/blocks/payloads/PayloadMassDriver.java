@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -161,7 +162,7 @@ public class PayloadMassDriver extends PayloadBlock{
         @Override
         public Object senseObject(LAccess sensor){
             if(sensor == LAccess.config){
-                return linkValid() ? world.build(link) : null;
+                return linkValid() ? Vars.state.world.build(link) : null;
             }
             return super.senseObject(sensor);
         }
@@ -174,7 +175,7 @@ public class PayloadMassDriver extends PayloadBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            Building link = world.build(this.link);
+            Building link = Vars.state.world.build(this.link);
             boolean hasLink = linkValid();
 
             //discharge when charging isn't happening
@@ -416,7 +417,7 @@ public class PayloadMassDriver extends PayloadBlock{
             Draw.z(Layer.effect);
 
             if(charge > 0 && linkValid()){
-                Building link = world.build(this.link);
+                Building link = Vars.state.world.build(this.link);
 
                 float fin = Interp.pow2Out.apply(charge / chargeTime), fout = 1f-fin, len = length*1.8f, w = curSize/2f + 7f*fout;
                 Vec2 right = Tmp.v1.trns(turretRotation, len, w);
@@ -451,7 +452,7 @@ public class PayloadMassDriver extends PayloadBlock{
             }
 
             if(linkValid()){
-                Building target = world.build(link);
+                Building target = Vars.state.world.build(link);
                 Drawf.circles(target.x, target.y, (target.block.size / 2f + 1) * tilesize + sin - 2f, Pal.place);
                 Drawf.arrow(x, y, target.x, target.y, size * tilesize + sin, 4f + sin);
             }
@@ -484,7 +485,7 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         protected boolean linkValid(){
-            return link != -1 && world.build(this.link) instanceof PayloadDriverBuild other && other.block == block && other.team == team && within(other, range);
+            return link != -1 && Vars.state.world.build(this.link) instanceof PayloadDriverBuild other && other.block == block && other.team == team && within(other, range);
         }
 
         @Override

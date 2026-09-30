@@ -60,7 +60,7 @@ public class PowerNode extends PowerBlock{
 
         config(Integer.class, (entity, value) -> {
             PowerModule power = entity.power;
-            Building other = world.build(value);
+            Building other = state.world.build(value);
             boolean contains = power.links.contains(value), valid = other != null && other.power != null;
 
             if(contains){
@@ -382,7 +382,7 @@ public class PowerNode extends PowerBlock{
 
     public static boolean insulated(int x, int y, int x2, int y2){
         return World.raycast(x, y, x2, y2, (wx, wy) -> {
-            Building tile = world.build(wx, wy);
+            Building tile = state.world.build(wx, wy);
             return tile != null && tile.isInsulated();
         });
     }
@@ -411,7 +411,7 @@ public class PowerNode extends PowerBlock{
             //return link index by number
             int i = (int)value;
             if(i >= 0 && i < power.links.size){
-                return world.build(power.links.get(i));
+                return state.world.build(power.links.get(i));
             }
 
             return super.senseObject(value);
@@ -498,7 +498,7 @@ public class PowerNode extends PowerBlock{
 
                 for(int x = (int)(tile.x - laserRange - 2); x <= tile.x + laserRange + 2; x++){
                     for(int y = (int)(tile.y - laserRange - 2); y <= tile.y + laserRange + 2; y++){
-                        Building link = world.build(x, y);
+                        Building link = state.world.build(x, y);
 
                         if(link != this && linkValid(this, link, false)){
                             boolean linked = linked(link);
@@ -513,7 +513,7 @@ public class PowerNode extends PowerBlock{
                 Draw.reset();
             }else{
                 power.links.each(i -> {
-                    var link = world.build(i);
+                    var link = state.world.build(i);
                     if(link != null && linkValid(this, link, false)){
                         Drawf.square(link.x, link.y, link.block.size * tilesize / 2f + 1f, Pal.place);
                     }
@@ -534,7 +534,7 @@ public class PowerNode extends PowerBlock{
             setupColor(power.graph.getSatisfaction());
 
             for(int i = 0; i < power.links.size; i++){
-                Building link = world.build(power.links.get(i));
+                Building link = state.world.build(power.links.get(i));
 
                 if(!linkValid(this, link)) continue;
 

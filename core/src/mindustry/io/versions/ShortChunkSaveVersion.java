@@ -45,8 +45,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
     }
 
     @Override
-    public void readMap(DataInput stream, SaveLoadContext state) throws IOException{
-        var context = state.context;
+    public void readMap(DataInput stream, SaveLoadContext context) throws IOException{
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
@@ -105,7 +104,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
                 if(isCenter){
                     tile.setBlock(block);
                     if(tile.build != null){
-                        if(!state.preview) state.allBuildings.add(tile.build);
+                        if(!context.preview) context.allBuildings.add(tile.build);
                         tile.build.enabled = true;
                     }
                 }

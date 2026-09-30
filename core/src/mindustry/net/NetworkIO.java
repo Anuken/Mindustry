@@ -16,6 +16,7 @@ import mindustry.mod.*;
 import mindustry.mod.data.*;
 import mindustry.net.Administration.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.nio.*;
@@ -78,7 +79,7 @@ public class NetworkIO{
         try(DataInputStream stream = new DataInputStream(is)){
             var writer = SaveIO.getSaveWriter();
             Time.clear();
-            writer.readDataPatches(stream, new SaveLoadContext(world.context));
+            writer.readDataPatches(stream, new DefaultWorldContext());
 
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
@@ -99,11 +100,11 @@ public class NetworkIO{
             player.id = id;
             player.add();
 
-            var state = new SaveLoadContext(world.context);
+            var context = new DefaultWorldContext();
 
             writer.readContentHeader(stream);
-            writer.readMap(stream, state);
-            writer.readEntities(stream, state);
+            writer.readMap(stream, context);
+            writer.readEntities(stream, context);
             writer.readMarkers(stream);
             writer.readCustomChunks(stream);
 

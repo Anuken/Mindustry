@@ -160,7 +160,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public boolean inMapArea(){
-        return world.isInMapArea(x, y);
+        return state.world.isInMapArea(x, y);
     }
 
     public float worldx(){
@@ -307,7 +307,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         var prev = this.floor;
         this.floor = type;
 
-        if(!headless && !world.isGenerating() && !isEditorTile()){
+        if(!headless && !state.generating && !isEditorTile()){
             renderer.blocks.removeFloorIndex(this);
         }
 
@@ -315,12 +315,12 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(build != null){
             build.onProximityUpdate();
         }
-        if(!world.isGenerating() && pathfinder != null && !state.isEditor()){
+        if(!state.generating && pathfinder != null && !state.isEditor()){
             pathfinder.updateTile(this);
         }
 
-        if(!world.isGenerating()){
-            world.floorChanges ++;
+        if(!state.generating){
+            state.world.floorChanges ++;
             Events.fire(floorChange.set(this, prev, type));
         }
 
@@ -339,11 +339,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public void circle(int radius, Intc2 cons){
-        Geometry.circle(x, y, world.width, world.height, radius, cons);
+        Geometry.circle(x, y, state.world.width, state.world.height, radius, cons);
     }
 
     public void circle(int radius, Cons<Tile> cons){
-        circle(radius, (x, y) -> cons.get(world.rawTile(x, y)));
+        circle(radius, (x, y) -> cons.get(state.world.rawTile(x, y)));
     }
 
     public Color getFloorColor(){
@@ -351,13 +351,13 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public void recacheWall(){
-        if(!headless && !world.isGenerating()){
+        if(!headless && !state.generating){
             renderer.blocks.recacheWall(this);
         }
     }
 
     public void recache(){
-        if(!headless && !world.isGenerating()){
+        if(!headless && !state.generating){
             renderer.blocks.floor.recacheTile(this);
             renderer.minimap.update(this);
             renderer.blocks.invalidateTile(this);
@@ -428,11 +428,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         recache();
 
-        if(!world.isGenerating()){
+        if(!state.generating){
             Events.fire(overlayChange.set(this, prev, this.overlay));
         }
 
-        if(!world.isGenerating() && build != null){
+        if(!state.generating && build != null){
             build.onProximityUpdate();
         }
     }
@@ -561,10 +561,10 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     public @Nullable Building nearbyBuild(int rotation){
         return switch(rotation){
-            case 0 -> world.build(x + 1, y);
-            case 1 -> world.build(x, y + 1);
-            case 2 -> world.build(x - 1, y);
-            case 3 -> world.build(x, y - 1);
+            case 0 -> state.world.build(x + 1, y);
+            case 1 -> state.world.build(x, y + 1);
+            case 2 -> state.world.build(x - 1, y);
+            case 3 -> state.world.build(x, y - 1);
             default -> null;
         };
     }
@@ -648,7 +648,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             tileSet.clear();
 
             for(Point2 edge : Edges.getEdges(size)){
-                Building other = world.build(x + edge.x, y + edge.y);
+                Building other = state.world.build(x + edge.x, y + edge.y);
                 if(other != null){
                     tileSet.add(other);
                 }
@@ -666,13 +666,13 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     protected void changed(){
-        if(!world.isGenerating()){
+        if(!state.generating){
             if(build != null){
                 build.updateProximity();
             }else{
                 //since the entity won't update proximity for us, update proximity for all nearby tiles manually
                 for(Point2 p : Geometry.d4){
-                    Building tile = world.build(x + p.x, y + p.y);
+                    Building tile = state.world.build(x + p.x, y + p.y);
                     if(tile != null && !tile.tile.changing){
                         tile.onProximityUpdate();
                     }
@@ -689,14 +689,14 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     protected void fireChanged(){
-        if(!world.isGenerating()){
+        if(!state.generating){
             state.world.tileChanges ++;
             Events.fire(tileChange.set(this));
         }
     }
 
     protected void firePreChanged(){
-        if(!world.isGenerating()){
+        if(!state.generating){
             Events.fire(preChange.set(this));
         }
     }
@@ -862,14 +862,14 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         tileSet.clear();
 
         for(int pos : positions){
-            var build = world.build(pos);
+            var build = state.world.build(pos);
             if(build != null){
                 var power = build.power;
                 if(build.power != null){
                     staleGraphs.add(build.power.graph.getID());
 
                     for(int i = 0; i < power.links.size; i++){
-                        var other = world.build(power.links.items[i]);
+                        var other = state.world.build(power.links.items[i]);
                         if(other != null && other.power != null){
                             tileSet.add(other);
                             staleGraphs.add(other.power.graph.getID());
@@ -886,7 +886,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
         //update power graphs in a second pass
         for(int pos : positions){
-            var build = world.build(pos);
+            var build = state.world.build(pos);
             reflowPower(team, build);
         }
     }
@@ -894,7 +894,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     private static void reflowPower(Team team, Building build){
         if(build != null && build.power != null && staleGraphs.contains(build.power.graph.getID())){
             for(int i = 0; i < build.power.links.size; i++){
-                var other = world.build(build.power.links.items[i]);
+                var other = state.world.build(build.power.links.items[i]);
 
                 //only reflow links that were connected to the old power graph; ones that have a new one were already covered.
                 if(other != null && other.team != team && other.power != null && staleGraphs.contains(other.power.graph.getID())){
@@ -923,7 +923,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         for(int i = 0; i < buildings.size; i += 2){
             int pos = buildings.items[i];
             float health = Float.intBitsToFloat(buildings.items[i + 1]);
-            var build = world.build(pos);
+            var build = state.world.build(pos);
             if(build != null && build.health != health){
                 build.health = health;
                 state.indexer.notifyHealthChanged(build);

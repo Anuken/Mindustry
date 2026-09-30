@@ -213,7 +213,7 @@ public class CommandAI extends AIController{
 
             //try to pick up a block
             if(command == UnitCommand.loadBlocksCommand && (targetPos == null || unit.within(targetPos, 1f))){
-                Building build = world.buildWorld(unit.x, unit.y);
+                Building build = state.world.buildWorld(unit.x, unit.y);
 
                 if(build != null && state.teams.canInteract(unit.team, build.team)){
                     //pick up block's payload
@@ -279,7 +279,7 @@ public class CommandAI extends AIController{
             boolean move = true, isFinalPoint = commandQueue.size == 0;
             //actual final point that it needs to go to
             currentDestination.set(targetPos);
-            targetBuild = world.buildWorld(targetPos.x, targetPos.y);
+            targetBuild = state.world.buildWorld(targetPos.x, targetPos.y);
             if(unit.isGrounded() && targetBuild != null && targetBuild.tile.solid() && targetBuild.block.acceptsUnitPayloads && unit.type.pathCostId != ControlPathfinder.costIdLegs && !ramming){
                 Tile best = targetBuild.findClosestEdge(unit, Tile::solid);
                 if(best != null){
@@ -296,7 +296,7 @@ public class CommandAI extends AIController{
                 offsetedDestination.add(group.positions[groupIndex * 2], group.positions[groupIndex * 2 + 1]);
             }
 
-            Building targetBuild = world.buildWorld(targetPos.x, targetPos.y);
+            Building targetBuild = state.world.buildWorld(targetPos.x, targetPos.y);
 
             if(
                 (hasStance(UnitStance.patrol) && !hasStance(UnitStance.pursueTarget) && target != null && unit.within(target, unit.type.range - 2f) && !unit.type.circleTarget) ||
@@ -424,7 +424,7 @@ public class CommandAI extends AIController{
 
     void finishPath(){
         //the enter payload command never finishes until they are actually accepted
-        if(command == UnitCommand.enterPayloadCommand && commandQueue.size == 0 && targetPos != null && world.buildWorld(targetPos.x, targetPos.y) != null && world.buildWorld(targetPos.x, targetPos.y).block.acceptsUnitPayloads){
+        if(command == UnitCommand.enterPayloadCommand && commandQueue.size == 0 && targetPos != null && state.world.buildWorld(targetPos.x, targetPos.y) != null && state.world.buildWorld(targetPos.x, targetPos.y).block.acceptsUnitPayloads){
             return;
         }
 
@@ -583,7 +583,7 @@ public class CommandAI extends AIController{
         //this is an allocation, but it's relatively rarely called anyway, and outside mutations must be prevented
         targetPos = lastTargetPos = pos.cpy();
         if(command != null && command.snapToBuilding){
-            var build = world.buildWorld(targetPos.x, targetPos.y);
+            var build = state.world.buildWorld(targetPos.x, targetPos.y);
             if(build != null && build.team == unit.team){
                 targetPos.set(build);
             }

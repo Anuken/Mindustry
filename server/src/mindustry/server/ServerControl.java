@@ -121,7 +121,7 @@ public class ServerControl implements ApplicationListener{
 
             info("Selected next map to be @.", map.plainName());
 
-            play(() -> world.loadMap(map, map.applyRules(lastMode)));
+            play(() -> state.loadMap(map, map.applyRules(lastMode)));
         }else{
             netServer.kickAll(KickReason.gameover);
             state.set(State.menu);
@@ -547,7 +547,7 @@ public class ServerControl implements ApplicationListener{
                 lastMode = preset;
                 Core.settings.put("lastServerMode", lastMode.name());
                 try{
-                    world.loadMap(result, result.applyRules(lastMode));
+                    state.loadMap(result, result.applyRules(lastMode));
                     state.rules = result.applyRules(preset);
                     Events.fire(new RulesLoadEvent(state.rules));
                     logic.play();

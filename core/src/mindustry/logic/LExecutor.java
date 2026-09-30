@@ -422,7 +422,7 @@ public class LExecutor{
                                     Call.pickedUnitPayload(unit, result);
                                 }
                             }else{ //buildings
-                                Building build = world.buildWorld(unit.x, unit.y);
+                                Building build = state.world.buildWorld(unit.x, unit.y);
 
                                 //TODO copy pasted code
                                 if(build != null && build.team == unit.team){
@@ -439,7 +439,7 @@ public class LExecutor{
                         }
                     }
                     case payEnter -> {
-                        Building build = world.buildWorld(unit.x, unit.y);
+                        Building build = state.world.buildWorld(unit.x, unit.y);
                         if(build != null && unit.team() == build.team && build.canControlSelect(unit)){
                             Call.unitBuildingControlSelect(unit, build);
                         }
@@ -1869,9 +1869,9 @@ public class LExecutor{
     static boolean checkMapArea(int x, int y, int w, int h, boolean set){
         x = Math.max(x, 0);
         y = Math.max(y, 0);
-        w = Math.min(world.width, w);
-        h = Math.min(world.height, h);
-        boolean full = x == 0 && y == 0 && w == world.width && h == world.height;
+        w = Math.min(state.world.width, w);
+        h = Math.min(state.world.height, h);
+        boolean full = x == 0 && y == 0 && w == state.world.width && h == state.world.height;
 
         if(state.rules.limitMapArea){
             if(state.rules.limitX == x && state.rules.limitY == y && state.rules.limitWidth == w && state.rules.limitHeight == h){
@@ -1884,7 +1884,7 @@ public class LExecutor{
                     if(!headless){
                         renderer.updateAllDarkness();
                     }
-                    world.checkMapArea(prevX, prevY, prevW, prevH);
+                    state.world.checkMapArea(prevX, prevY, prevW, prevH);
                     return false;
                 }
             }
@@ -1906,7 +1906,7 @@ public class LExecutor{
             state.rules.limitY = y;
             state.rules.limitWidth = w;
             state.rules.limitHeight = h;
-            world.checkMapArea(prevX, prevY, prevW, prevH);
+            state.world.checkMapArea(prevX, prevY, prevW, prevH);
 
             if(!headless){
                 renderer.updateAllDarkness();
