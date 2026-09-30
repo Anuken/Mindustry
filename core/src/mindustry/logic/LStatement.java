@@ -13,7 +13,6 @@ import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LCanvas.*;
-import mindustry.logic.LExecutor.*;
 import mindustry.ui.*;
 
 import java.util.*;
@@ -183,7 +182,7 @@ public abstract class LStatement{
         };
     }
 
-    protected Cell<TextField> field(Table table, String value, Cons<String> setter){
+    public Cell<TextField> field(Table table, String value, Cons<String> setter){
         return table.field(value, Styles.nodeField, s -> setter.get(sanitize(s)))
             .size(180f, 40f).pad(2f).color(table.color);
     }
@@ -230,7 +229,7 @@ public abstract class LStatement{
         }, Styles.logict, () -> {}).size(40f).padLeft(-11).color(table.color);
     }
 
-    protected <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
+    public <T> void showSelect(Button b, T[] values, T current, Cons<T> getter, int cols, Cons<Cell> sizer){
         showSelectTable(b, (t, hide) -> {
             ButtonGroup<Button> group = new ButtonGroup<>();
             int i = 0;

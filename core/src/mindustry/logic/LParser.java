@@ -4,7 +4,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
-import mindustry.logic.LStatements.*;
+import mindustry.logic.statements.*;
 
 public class LParser{
     private static final String[] tokens = new String[16];

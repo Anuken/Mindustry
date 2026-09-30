@@ -13,8 +13,8 @@ import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LExecutor.*;
-import mindustry.logic.LStatements.*;
+import mindustry.logic.instructions.*;
+import mindustry.logic.statements.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -70,6 +70,10 @@ public class LogicDialog extends BaseDialog{
         row();
 
         add(buttons).growX().name("canvas");
+    }
+
+    public boolean isPrivileged(){
+        return privileged;
     }
 
     public static Color typeColor(LVar s, Color color){

@@ -16,7 +16,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LStatements.*;
+import mindustry.logic.statements.*;
 import mindustry.ui.*;
 
 public class LCanvas extends Table{
