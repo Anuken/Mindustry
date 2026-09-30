@@ -28,7 +28,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ForceProjector extends Block{
-    public final int timerUse = timers++;
     public float phaseUseTime = 350f;
 
     public float phaseRadiusBoost = 80f;
@@ -165,7 +164,7 @@ public class ForceProjector extends Block{
 
     public class ForceBuild extends Building implements Ranged, ShieldProvider{
         public boolean broken = true;
-        public float buildup, radscl, hit, warmup, phaseHeat;
+        public float buildup, radscl, hit, warmup, phaseHeat, useTimer;
         //1 = inactive, booting up, 0 = activated
         public float activationTimer;
 
@@ -220,8 +219,11 @@ public class ForceProjector extends Block{
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, Mathf.num(phaseValid), 0.1f);
 
-            if(phaseValid && !broken && timer(timerUse, phaseUseTime / timeScale) && efficiency > 0){
-                consume();
+            if(phaseValid && !broken && (useTimer += timeScale * Time.delta) >= phaseUseTime){
+                if(efficiency > 0){
+                    consume();
+                }
+                useTimer %= phaseUseTime;
             }
 
             radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.05f);

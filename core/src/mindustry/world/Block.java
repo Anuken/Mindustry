@@ -225,8 +225,6 @@ public class Block extends UnlockableContent implements Senseable{
     public float crushDamageMultiplier = 1f;
     /** If true, this block is instantly destroyed by tanks with crushFragile set to true. */
     public boolean crushFragile = false;
-    /** Max of timers used. */
-    public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering of blocks (not buildings). */
     public CacheLayer cacheLayer = CacheLayer.normal;
     /** If true, draw() will be called on the building. */
@@ -434,8 +432,6 @@ public class Block extends UnlockableContent implements Senseable{
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempBuilds = new Seq<>();
 
-    /** Dump timer ID.*/
-    protected final int timerDump = timers++;
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
     public int dumpTime = 5;
 

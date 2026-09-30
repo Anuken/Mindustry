@@ -21,8 +21,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class NuclearReactor extends PowerGenerator{
-    public final int timerFuel = timers++;
-
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);
     public Color hotColor = Color.valueOf("ff9575a3");
@@ -109,6 +107,7 @@ public class NuclearReactor extends PowerGenerator{
         public float heatProgress;
         public float flash;
         public float smoothLight;
+        public float fuelTimer;
 
         @Override
         public void updateTile(){
@@ -119,8 +118,9 @@ public class NuclearReactor extends PowerGenerator{
             if(fuel > 0 && enabled){
                 heat += heatLastFrame = fullness * heating * Math.min(delta(), 4f);
 
-                if(timer(timerFuel, itemDuration / (timeScale + (heat > heatLastFrame ? 1f * heat * heatConsumeRate : 0f)))){
+                if((fuelTimer += Time.delta * (timeScale + (heat > heatLastFrame ? 1f * heat * heatConsumeRate : 0f))) >= itemDuration){
                     consume();
+                    fuelTimer %= itemDuration;
                 }
             }else{
                 productionEfficiency = 0f;

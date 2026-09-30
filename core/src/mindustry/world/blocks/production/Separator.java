@@ -73,6 +73,7 @@ public class Separator extends Block{
     }
 
     public class SeparatorBuild extends Building{
+        public float dumpTimer;
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -162,8 +163,9 @@ public class Separator extends Block{
                 }
             }
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump();
+                dumpTimer %= dumpTime;
             }
         }
 

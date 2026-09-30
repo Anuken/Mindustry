@@ -20,8 +20,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ShockwaveTower extends Block{
-    public int timerCheck = timers ++;
-
     public float range = 110f;
     public float reload = 60f * 1.5f;
     public float bulletDamage = 160;
@@ -66,11 +64,13 @@ public class ShockwaveTower extends Block{
     public class ShockwaveTowerBuild extends Building{
         public float reloadCounter = Mathf.random(reload);
         public float heat = 0f;
+        public float checkTimer;
         public Seq<Bullet> targets = new Seq<>();
 
         @Override
         public void updateTile(){
-            if(potentialEfficiency > 0 && (reloadCounter += edelta()) >= reload && timer(timerCheck, checkInterval)){
+            if(potentialEfficiency > 0 && (reloadCounter += edelta()) >= reload && (checkTimer += Time.delta) >= checkInterval){
+                checkTimer %= checkInterval;
                 targets.clear();
                 state.entities.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
                     if(b.team != team && b.type.hittable && b.within(x, y, range + 1f)){

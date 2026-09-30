@@ -23,8 +23,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemBridge extends Block{
-    public final int timerCheckMoved = timers ++;
-
     public int range;
     public float transportTime;
     public @Load("@-end") TextureRegion endRegion;
@@ -215,6 +213,7 @@ public class ItemBridge extends Block{
         public float time = -8f, timeSpeed;
         public boolean wasMoved, moved, hadValidLink;
         public float transportCounter;
+        public float checkMovedTimer;
 
         @Override
         public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
@@ -357,7 +356,8 @@ public class ItemBridge extends Block{
 
         @Override
         public void updateTile(){
-            if(timer(timerCheckMoved, 30f)){
+            if((checkMovedTimer += Time.delta) >= 30f){
+                checkMovedTimer %= 30f;
                 wasMoved = moved;
                 moved = false;
             }

@@ -183,6 +183,7 @@ public class GenericCrafter extends Block{
     }
 
     public class GenericCrafterBuild extends Building{
+        public float dumpTimer;
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -331,13 +332,14 @@ public class GenericCrafter extends Block{
         }
 
         public void dumpOutputs(){
-            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
+            if(outputItems != null && (dumpTimer += timeScale * Time.delta) >= dumpTime){
                 for(ItemStack output : outputItems){
                     int amount = Math.max(1, Mathf.round(scaleOutput(output.amount)));
                     for(int i = 0; i < amount; i++){
                         if(!dump(output.item)) break;
                     }
                 }
+                dumpTimer %= dumpTime;
             }
 
             if(outputLiquids != null){

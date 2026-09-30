@@ -19,7 +19,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class MendProjector extends Block{
-    public final int timerUse = timers++;
     public Color baseColor = Color.valueOf("84f491");
     public Color phaseColor = baseColor;
     public @Load("@-top") TextureRegion topRegion;
@@ -83,6 +82,7 @@ public class MendProjector extends Block{
 
     public class MendBuild extends Building implements Ranged{
         public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency;
+        public float useTimer;
 
         @Override
         public float range(){
@@ -99,8 +99,11 @@ public class MendProjector extends Block{
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
 
-            if(optionalEfficiency > 0 && timer(timerUse, useTime / timeScale) && canHeal){
-                consume();
+            if(optionalEfficiency > 0 && (useTimer += timeScale * Time.delta) >= useTime){
+                if(canHeal){
+                    consume();
+                }
+                useTimer %= useTime;
             }
 
             if(charge >= reload && canHeal){

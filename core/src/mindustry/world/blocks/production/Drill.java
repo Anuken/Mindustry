@@ -251,6 +251,7 @@ public class Drill extends Block{
         public float progress;
         public float totalProgress;
         public float consTimer;
+        public float dumpTimer;
         public float warmup;
         public float lastDrillSpeed;
 
@@ -305,8 +306,9 @@ public class Drill extends Block{
                 consTimer %= consumeTime;
             }
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
+                dumpTimer %= dumpTime;
             }
 
             if(dominantItem == null){

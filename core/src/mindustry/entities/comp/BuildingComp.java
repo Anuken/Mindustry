@@ -50,7 +50,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, excludeGroups = {"all"}, isFinal = false, genio = false, serialize = false)
 @Component(base = true, genInterface = false)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable, AmbientSource{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable, AmbientSource{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -145,7 +145,6 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         health = block.health;
         maxHealth(block.health);
-        timer(new Interval(block.timers));
 
         if(block.hasItems) items = new ItemModule();
         if(block.hasLiquids) liquids = new LiquidModule();

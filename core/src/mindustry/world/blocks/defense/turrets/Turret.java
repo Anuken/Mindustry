@@ -36,7 +36,6 @@ public class Turret extends ReloadTurret{
     //after being logic-controlled and this amount of time passes, the turret will resume normal AI
     public final static float logicControlCooldown = 60 * 2;
 
-    public final int timerTarget = timers++;
     /** Ticks between attempt at finding a target. */
     public float targetInterval = 20;
     /** Target interval for when this turret already has a valid target. -1 = targetInterval */
@@ -286,7 +285,7 @@ public class Turret extends ReloadTurret{
 
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
-        public float curRecoil, heat, logicControlTime = -1;
+        public float curRecoil, heat, logicControlTime = -1, targetTimer;
         public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots, barrelCounter;
@@ -567,7 +566,9 @@ public class Turret extends ReloadTurret{
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
 
-                if(timer(timerTarget, target != null ? newTargetInterval : targetInterval)){
+                float retargetInterval = target != null ? newTargetInterval : targetInterval;
+                if((targetTimer += Time.delta) >= retargetInterval){
+                    targetTimer %= retargetInterval;
                     findTarget();
                 }
 

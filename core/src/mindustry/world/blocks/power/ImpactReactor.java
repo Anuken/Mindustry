@@ -15,7 +15,6 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class ImpactReactor extends PowerGenerator{
-    public final int timerUse = timers++;
     public float warmupSpeed = 0.001f;
     public float itemDuration = 60f;
 
@@ -80,7 +79,7 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     public class ImpactReactorBuild extends GeneratorBuild{
-        public float warmup, totalProgress;
+        public float warmup, totalProgress, useTimer;
 
         @Override
         public void updateTile(){
@@ -96,8 +95,9 @@ public class ImpactReactor extends PowerGenerator{
                     Events.fire(Trigger.impactPower);
                 }
 
-                if(timer(timerUse, itemDuration / timeScale)){
+                if((useTimer += timeScale * Time.delta) >= itemDuration){
                     consume();
+                    useTimer %= itemDuration;
                 }
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.01f);
