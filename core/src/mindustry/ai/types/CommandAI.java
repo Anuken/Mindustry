@@ -319,7 +319,7 @@ public class CommandAI extends AIController{
                         //don't stop if they're facing the same way
                         !Angles.within(unit.rotation, u.rotation, 15f) &&
                         //must be near an obstacle, stopping in open ground is pointless
-                        ControlPathfinder.isNearObstacle(unit, unit.tileX(), unit.tileY(), u.tileX(), u.tileY()));
+                        state.controlPath.isNearObstacle(unit, unit.tileX(), unit.tileY(), u.tileX(), u.tileY()));
                 }
 
                 float maxBlockTime = 60f * 5f;
@@ -342,7 +342,7 @@ public class CommandAI extends AIController{
                     move = true;
                     moveTarget.set(offsetedDestination);
                 }else{
-                    var result = controlPath.getPathPosition(unit, offsetedDestination, currentDestination);
+                    var result = state.controlPath.getPathPosition(unit, offsetedDestination, currentDestination);
 
                     unreachable = result.unreachable;
                     move &= result.move && (!blockingUnit || timeSpentBlocked > maxBlockTime);

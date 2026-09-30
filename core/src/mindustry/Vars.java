@@ -285,8 +285,6 @@ public class Vars implements Loadable{
     public static Universe universe;
     public static Maps maps;
     //TODO: move these to state
-    public static Pathfinder pathfinder;
-    public static ControlPathfinder controlPath;
     public static FogControl fogControl;
 
     public static Control control;
@@ -352,8 +350,6 @@ public class Vars implements Loadable{
         if(!headless) editor = new MapEditor();
 
         maps = new Maps();
-        pathfinder = new Pathfinder();
-        controlPath = new ControlPathfinder();
         fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();

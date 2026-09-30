@@ -161,7 +161,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public boolean isPathImpassable(int tileX, int tileY){
-        return !type.flying && state.world.in(tileX, tileY) && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+        return !type.flying && state.world.in(tileX, tileY) && type.pathCost.getCost(team.id, state.pathfinder.get(tileX, tileY)) == -1;
     }
 
     /** @return approx. square size of the physical hitbox for physics */

@@ -254,10 +254,13 @@ public class Logic implements ApplicationListener{
 
         Events.on(TilePreChangeEvent.class, event -> {
             state.indexer.removeIndex(event.tile);
+            if(!state.isEditor()) state.pathfinder.preUpdateTile(event.tile);
         });
 
         Events.on(TileChangeEvent.class, event -> {
             state.indexer.addIndex(event.tile);
+            if(!state.isEditor()) state.pathfinder.updateTile(event.tile);
+            state.controlPath.updateTile(event.tile);
         });
 
         Events.on(TileFloorChangeEvent.class, event -> {
@@ -316,12 +319,14 @@ public class Logic implements ApplicationListener{
 
     public void reset(){
         state.entities.clear();
-        Time.clear();
+        state.pathfinder.stop();
+        state.controlPath.stop();
         Events.fire(new ResetEvent());
         state.data.unload();
         State prev = state.getState();
         //recreate gamestate - sets state to menu
         state = new GameState();
+        Time.clear();
         //fire change event, since it was technically changed
         Events.fire(new StateChangeEvent(prev, State.menu));
 
@@ -523,6 +528,7 @@ public class Logic implements ApplicationListener{
         PerfCounter.stateUpdate.begin();
 
         Events.fire(Trigger.update);
+        state.controlPath.update();
         universe.updateGlobal();
 
         if(Core.settings.modified() && !state.isPlaying()){
@@ -623,6 +629,7 @@ public class Logic implements ApplicationListener{
 
                 updateEntities();
 
+                state.pathfinder.update();
                 Events.fire(Trigger.afterGameUpdate);
             }
 

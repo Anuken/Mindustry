@@ -61,6 +61,10 @@ public class GameState{
     public WaveSpawner spawner = new WaveSpawner();
     /** All entity groups. */
     public Entities entities = new Entities();
+    /** Flowfield pathfinding. */
+    public Pathfinder pathfinder = new Pathfinder(this);
+    /** Cluster-based pathfinding for player-controlled units and RTS AI. */
+    public ControlPathfinder controlPath = new ControlPathfinder(this);
     /** Indexes block info for faster access. */
     public BlockIndexer indexer = new BlockIndexer();
     /** If true, the world is currently being generated/loaded; tile change events do not fire. */
@@ -186,6 +190,11 @@ public class GameState{
         world.floorChanges = -1;
         spawner.load();
         indexer.load();
+        pathfinder.load();
+        //new instance, so a still-running old thread can't touch the new world's data
+        controlPath.stop();
+        controlPath = new ControlPathfinder(this);
+        controlPath.start();
         Events.fire(new WorldLoadEvent());
         for(var build : entities.build){
             build.checkAllowUpdate();

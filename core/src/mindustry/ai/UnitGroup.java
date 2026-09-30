@@ -168,7 +168,7 @@ public class UnitGroup{
             Unit unit = units.get(index);
 
             PathCost cost = unit.type.pathCost;
-            int res = ControlPathfinder.raycastFastAvoid(unit.team.id, cost, World.toTile(dest.x), World.toTile(dest.y), World.toTile(x), World.toTile(y));
+            int res = Vars.state.controlPath.raycastFastAvoid(unit.team.id, cost, World.toTile(dest.x), World.toTile(dest.y), World.toTile(x), World.toTile(y));
 
             //collision found, make the destination the point right before the collision
             if(res != 0){

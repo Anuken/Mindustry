@@ -1834,7 +1834,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         if(was){
             state.indexer.addIndex(tile);
             Events.fire(teamChangeEvent.set(last, self()));
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
             updateProximity();
         }
 

@@ -94,7 +94,7 @@ public class BaseBuilderAI{
                     calculating = false;
                 }
             }else{
-                var field = pathfinder.getField(data.team, Pathfinder.costGround, Pathfinder.fieldCore);
+                var field = state.pathfinder.getField(data.team, Pathfinder.costGround, Pathfinder.fieldCore);
 
                 if(field.hasCompleteWeights()){
                     int[] weights = field.completeWeights;

@@ -12,6 +12,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -330,6 +331,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.sort(true);
 
+        if(ControlPathfinder.showDebug) state.controlPath.drawDebug();
         Events.fire(Trigger.draw);
         MapPreviewLoader.checkPreviews();
 

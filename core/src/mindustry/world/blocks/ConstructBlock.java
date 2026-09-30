@@ -457,7 +457,7 @@ public class ConstructBlock extends Block{
             for(int i = 0; i < requirements.length; i++){
                 this.itemsLeft[i] = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier);
             }
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
         }
 
         public void setDeconstruct(Block previous){
@@ -472,7 +472,7 @@ public class ConstructBlock extends Block{
             this.itemsLeft = new int[previous.requirements.length];
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
         }
 
         @Override
