@@ -30,10 +30,10 @@ abstract class UnitTetherComp implements Unitc{
 
     @Override
     public void update(){
-        if(spawner == null || !state.spawner.isValid() || state.spawner.team != team){
+        if(spawner == null || !spawner.isValid() || spawner.team != team){
             Call.unitDespawn(self());
         }else{
-            spawnerUnitId = state.spawner.id;
+            spawnerUnitId = spawner.id;
         }
     }
 }

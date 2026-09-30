@@ -670,7 +670,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //update bounds
 
         if(type.bounded){
-            float bot = 0f, left = 0f, top = world.unitHeight, right = world.unitWidth;
+            float bot = 0f, left = 0f, top = state.world.unitHeight, right = state.world.unitWidth;
 
             //TODO hidden map rules only apply to player teams? should they?
             if(state.rules.limitMapArea && !team.isAI()){
