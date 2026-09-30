@@ -3322,15 +3322,8 @@ public class Fx{
         if(!(e.data instanceof Float size)) return;
         float sizeL = size / 13f;
 
-        Draw.color(Color.white, e.color, e.fin());
-        Draw.alpha(0.6f);
-        for(int i : Mathf.signs){
-            float angle = e.rotation + 90f * i;
-            float offX = Angles.trnsx(angle, sizeL), offY = Angles.trnsy(angle, sizeL);
-            Drawf.tri(e.x + offX, e.y + offY, 2.5f * e.fout(), 2f + 0.4f * e.fout() * size, e.rotation + 160f * i);
-        }
-
         //squished hexagon
+        Draw.z(Layer.effect + 1);
         Tmp.c1.set(e.color);
         Draw.color(e.color, Tmp.c1.add(Color.white), e.fout());
         if(Mathf.absin(e.fin() * 40f, 1f, 1f) > e.fin() * 0.7f){
@@ -3347,6 +3340,14 @@ public class Fx{
 
                 Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
             }
+        }
+
+        Draw.color(Color.white, e.color, e.fin());
+        Draw.alpha(0.6f);
+        for(int i : Mathf.signs){
+            float angle = e.rotation + 90f * i;
+            float offX = Angles.trnsx(angle, sizeL), offY = Angles.trnsy(angle, sizeL);
+            Drawf.tri(e.x + offX, e.y + offY, 2.5f * e.fout(), 2f + 0.4f * e.fout() * size, e.rotation + 160f * i);
         }
     }),
 

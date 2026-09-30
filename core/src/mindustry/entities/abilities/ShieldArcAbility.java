@@ -32,10 +32,10 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
             boolean reflected = false;
             if(b.vel.len() >= 0.1f && b.type.reflectable){
                 reflected = true;
-                paramField.reflect(b, b.vel, b.clipSize(), len -> {
+                paramField.reflect(b, b.vel, b.type.clipSize() * 4f + b.type.speed * 2f, len -> {
                     b.owner = paramUnit;
                     b.team = paramUnit.team;
-                    b.time = b.lifetime * paramField.reflectBulletTime;
+                    b.time = b.lifetime * (1 - paramField.reflectBulletTime);
                     if(paramField.reflectBuildingDamage > 0f) b.buildingDamageMultiplier = paramField.reflectBuildingDamage;
                 });
             }else{
@@ -64,7 +64,7 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
                             unit.rotation, paramField.getColor(), unit.type.clipSize); //units are heavy I guess
 
                         if(unit.controller() instanceof MissileAI ai) ai.shooter = paramUnit;
-                        if(unit instanceof TimedKillUnit ut) ut.time = Math.min(ut.time, unit.type.lifetime * paramField.reflectMissileTime);
+                        if(unit instanceof TimedKillUnit ut) ut.time = unit.type.lifetime * (1 - paramField.reflectMissileTime);
                     });
                 }else{
                     Call.unitSafeDeath(unit);
@@ -118,7 +118,7 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
     public float reflectBuildingDamage = 1f;
     /** Velocity multiplier for reflected bullets/targets on the opposite axis. Negative values = concave, positive values = convex */
     public float reflectVel = 1f;
-    /** Time multiplier for reflected targets. <0.5 equals more distance, >0.5 equals less distance. */
+    /** Time multiplier for reflected targets. 1 = full distance, 0 = no distance. */
     public float reflectBulletTime = 0.5f, reflectMissileTime = 0.5f;
     /** Reflection sound. */
     public Sound reflectSound = Sounds.none;

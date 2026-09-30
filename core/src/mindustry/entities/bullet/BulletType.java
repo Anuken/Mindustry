@@ -462,6 +462,11 @@ public class BulletType extends Content implements Cloneable{
         return Math.max(Mathf.zero(drag) ? speed * lifetime : speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
     }
 
+    /** @return visual {@link #hitSize} */
+    public float clipSize(){
+        return this instanceof BasicBulletType b ? Math.max(hitSize, Math.min(b.width, b.height) - 1) : hitSize;
+    }
+
     /** @return continuous damage in damage/sec, or -1 if not continuous. */
     public float continuousDamage(){
         return -1f;
