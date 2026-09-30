@@ -604,7 +604,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             team.data().updateCount(type, -1);
         }
 
-        Vars.unitPhysics.add(self());
+        Vars.state.unitPhysics.add(self());
 
     }
 

@@ -56,7 +56,7 @@ public class BlockIndexer{
         }
     }
 
-    public void load(){
+    public void init(){
         ores = new IntSeq[content.items().size][][];
         wallOres = new IntSeq[content.items().size][][];
         quadWidth = Mathf.ceil(state.world.width / (float)quadrantSize);

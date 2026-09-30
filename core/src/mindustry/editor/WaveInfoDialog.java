@@ -301,7 +301,7 @@ public class WaveInfoDialog extends BaseDialog{
                             a.button("", () -> {
                                 if(!checkedSpawns){
                                     //recalculate waves when changed
-                                    Vars.state.spawner.load();
+                                    Vars.state.spawner.init();
                                     checkedSpawns = true;
                                 }
 

@@ -204,7 +204,7 @@ public class WaveSpawner{
         return spawning && !net.client();
     }
 
-    public void load(){
+    public void init(){
         spawning = false;
         spawns.clear();
 

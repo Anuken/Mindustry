@@ -58,7 +58,7 @@ public class DebugCollisionRenderer{
                     }
 
                     if(debugDrawAvoidance && tile != null){
-                        int[] avoid = avoidance.getAvoidance();
+                        int[] avoid = state.avoidance.getAvoidance();
                         if(avoid != null && avoid[tile.array()] != 0){
                             Draw.color(0f, 1f, 1f, 0.25f);
                             Fill.square(tile.worldx(), tile.worldy(), 4f);

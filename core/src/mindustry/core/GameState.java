@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.async.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -67,6 +68,10 @@ public class GameState{
     public Pathfinder pathfinder = new Pathfinder(this);
     /** Cluster-based pathfinding for player-controlled units and RTS AI. */
     public ControlPathfinder controlPath = new ControlPathfinder(this);
+    /** Async unit physics. Initialized when the world loads; run by AsyncCore. */
+    public PhysicsProcess unitPhysics = new PhysicsProcess();
+    /** Async unit avoidance field. Initialized when the world loads; run by AsyncCore. */
+    public AvoidanceProcess avoidance = new AvoidanceProcess();
     /** Indexes block info for faster access. */
     public BlockIndexer indexer = new BlockIndexer();
     /** If true, the world is currently being generated/loaded; tile change events do not fire. */
@@ -190,14 +195,16 @@ public class GameState{
         generating = false;
         world.tileChanges = -1;
         world.floorChanges = -1;
-        spawner.load();
-        indexer.load();
-        pathfinder.load();
-        fog.load();
+        spawner.init();
+        indexer.init();
+        pathfinder.init();
+        fog.init();
         //new instance, so a still-running old thread can't touch the new world's data
         controlPath.stop();
         controlPath = new ControlPathfinder(this);
         controlPath.start();
+        unitPhysics.init();
+        avoidance.init();
         Events.fire(new WorldLoadEvent());
         for(var build : entities.build){
             build.checkAllowUpdate();

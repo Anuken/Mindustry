@@ -277,10 +277,6 @@ public class Vars implements Loadable{
     public static BaseRegistry bases;
     public static GlobalVars logicVars;
     public static MapEditor editor;
-    //TODO: move to state
-    public static AvoidanceProcess avoidance;
-    //TODO: move to state
-    public static PhysicsProcess unitPhysics = new PhysicsProcess();
     public static DataAssetCache assetCache;
     public static GameService service = new GameService();
 

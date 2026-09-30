@@ -44,7 +44,7 @@ public final class FogControl implements CustomChunk{
     }
 
     /** Resets fog for a freshly loaded world. Must be called after the world is loaded. */
-    public void load(){
+    public void init(){
         stop();
 
         loadedStatic = false;

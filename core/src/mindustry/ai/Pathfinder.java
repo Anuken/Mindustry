@@ -119,7 +119,7 @@ public class Pathfinder implements Runnable{
     }
 
     /** Rebuilds the tile grid and restarts the pathfinding thread. Must be called after the world is loaded. */
-    public void load(){
+    public void init(){
         stop();
         var world = state.world;
 
@@ -407,7 +407,7 @@ public class Pathfinder implements Runnable{
         int value = values[apos];
 
         var points = diagonals ? Geometry.d8 : Geometry.d4;
-        int[] avoid = avoidanceId <= 0 ? null : avoidance.getAvoidance();
+        int[] avoid = avoidanceId <= 0 ? null : state.avoidance.getAvoidance();
 
         Tile current = null;
         int tl = 0;
