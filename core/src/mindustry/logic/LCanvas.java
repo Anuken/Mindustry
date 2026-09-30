@@ -1,7 +1,5 @@
 package mindustry.logic;
 
-import static mindustry.Vars.ui;
-
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -20,6 +18,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.LStatements.*;
 import mindustry.ui.*;
+
+import static mindustry.Vars.*;
 
 public class LCanvas extends Table{
     private static final Seq<JumpCurve> tmpOccupiers1 = new Seq<>();
