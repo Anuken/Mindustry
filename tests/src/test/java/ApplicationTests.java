@@ -221,12 +221,12 @@ public class ApplicationTests{
 
     @Test
     void playMap() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
     }
 
     @Test
     void spawnWaves() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         assertTrue(state.spawner.countSpawns() > 0, "No spawns present.");
         logic.runWave();
         //force trigger delayed spawns
@@ -239,10 +239,9 @@ public class ApplicationTests{
 
     @Test
     void createMap(){
-        World tiles = state.resizeWorld(8, 8);
-
+        state.rules.borderDarkness = false;
         state.beginMapLoad();
-        tiles.fill();
+        state.resizeWorld(20, 20).fill();
         state.endMapLoad();
     }
 
@@ -317,14 +316,14 @@ public class ApplicationTests{
 
     @Test
     void save() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         assertTrue(state.teams.playerCores().size > 0);
         SaveIO.save(saveDirectory.child("0.msav"));
     }
 
     @Test
     void saveLoad() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         Map map = state.map;
 
         float hp = 30f;
@@ -364,7 +363,7 @@ public class ApplicationTests{
 
     @Test
     void liquidOutput() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
 
@@ -381,7 +380,7 @@ public class ApplicationTests{
 
     @Test
     void liquidJunctionOutput() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
 
@@ -404,7 +403,7 @@ public class ApplicationTests{
 
     @Test
     void liquidRouterOutputAll() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
         Tile source = state.world.rawTile(4,0), router = state.world.rawTile(4, 2), conduitUp1 = state.world.rawTile(4,1),
@@ -430,7 +429,7 @@ public class ApplicationTests{
 
     @Test
     void sorterOutputCorrect() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
         Tile source1 = state.world.rawTile(4, 0), source2 = state.world.rawTile(6, 0), s1conveyor = state.world.rawTile(4, 1),
@@ -463,7 +462,7 @@ public class ApplicationTests{
 
     @Test
     void routerOutputAll() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
         Tile source1 = state.world.rawTile(5, 0),  conveyor = state.world.rawTile(5, 1),
@@ -491,7 +490,7 @@ public class ApplicationTests{
 
     @Test
     void junctionOutputCorrect() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
         Tile source1 = state.world.rawTile(5,0),source2 = state.world.rawTile(7, 2),  conveyor1 = state.world.rawTile(5, 1),
@@ -517,7 +516,7 @@ public class ApplicationTests{
 
     @Test
     void blockOverlapRemoved() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
 
         //edge block
@@ -531,7 +530,7 @@ public class ApplicationTests{
 
     @Test
     void conveyorCrash() throws Throwable{
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
 
         state.world.tile(0, 0).setBlock(Blocks.conveyor);
@@ -542,7 +541,7 @@ public class ApplicationTests{
     void conveyorBench() throws Throwable{
         int[] itemsa = {0};
 
-        state.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
         int length = 128;
@@ -867,7 +866,6 @@ public class ApplicationTests{
     @TestFactory
     DynamicTest[] testSectorValidity(){
         Seq<DynamicTest> out = new Seq<>();
-        if(state.world == null) state.world = new World();
 
         for(SectorPreset sector : content.sectors()){
 
@@ -878,7 +876,7 @@ public class ApplicationTests{
                 //pathfinder pollutes queue with garbage, causing OOM
                 Reflect.<TaskQueue>get(HeadlessApplication.class, Core.app, "runnables").clear();
                 state.rules.sector = sector.sector;
-                state.loadGenerator(sector.generator.map.width, sector.generator.map.height, tiles -> sector.generator.generate(tiles, new WorldParams()));
+                GameState.loadGenerator(sector.generator.map.width, sector.generator.map.height, tiles -> sector.generator.generate(tiles, new WorldParams()));
                 sector.rules.get(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
@@ -972,6 +970,7 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
+        createMap();
         Unit unit = UnitTypes.mono.create(Team.sharded);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
         tile.setTeam(Team.sharded);

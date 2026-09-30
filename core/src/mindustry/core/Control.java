@@ -429,7 +429,7 @@ public class Control implements ApplicationListener, Loadable{
         ui.loadAnd(() -> {
             logic.reset();
             try{
-                state.loadMap(map, rules);
+                GameState.loadMap(map, rules);
             }catch(SaveLoadException error){
                 //TODO: might break playtests
                 logic.reset();

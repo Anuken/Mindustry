@@ -83,7 +83,6 @@ public class FileMapGenerator implements WorldGenerator{
             //failing to load a sector map is not a recoverable error; this will crash the game, and I don't see another good alternative
             throw new RuntimeException(e);
         }
-        state.generating = false;
 
         //make sure sector is maintained - don't reset it after map load.
         if(sector != null){
@@ -144,5 +143,6 @@ public class FileMapGenerator implements WorldGenerator{
         }
 
         state.map = map;
+        state.generating = false;
     }
 }

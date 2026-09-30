@@ -27,13 +27,6 @@ public class WaveSpawner{
     private boolean spawning = false;
     private boolean any = false;
 
-    public WaveSpawner(){
-        Events.on(TileOverlayChangeEvent.class, e -> {
-            if(e.previous == Blocks.spawn) spawns.remove(e.tile);
-            if(e.overlay == Blocks.spawn) spawns.add(e.tile);
-        });
-    }
-
     public void removeSpawn(Tile tile){
         spawns.remove(tile);
     }

@@ -4,6 +4,7 @@ import arc.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -192,46 +193,46 @@ public class GameState{
         }
     }
 
-    public void loadGenerator(int width, int height, Cons<World> generator){
-        beginMapLoad();
+    public static void loadGenerator(int width, int height, Cons<World> generator){
+        Vars.state.beginMapLoad();
 
-        resizeWorld(width, height);
-        generator.get(world);
+        Vars.state.resizeWorld(width, height);
+        generator.get(Vars.state.world);
 
-        endMapLoad();
+        Vars.state.endMapLoad();
     }
 
-    public void loadSector(Sector sector, WorldParams params){
-        setSectorRules(sector, params.saveInfo);
+    public static void loadSector(Sector sector, WorldParams params){
+        Vars.state.setSectorRules(sector, params.saveInfo);
 
         int size = sector.getSize();
         loadGenerator(size, size, tiles -> {
             if(sector.preset != null){
                 sector.preset.generator.generate(tiles, params);
-                sector.preset.rules.get(rules); //apply extra rules
+                sector.preset.rules.get(Vars.state.rules); //apply extra rules
             }else if(sector.planet.generator != null){
                 sector.planet.generator.generate(tiles, sector, params);
             }else{
                 throw new RuntimeException("Sector " + sector.id + " on planet " + sector.planet.name + " has no generator or preset defined. Provide a planet generator or preset map.");
             }
             //just in case
-            rules.sector = sector;
+            Vars.state.rules.sector = sector;
         });
 
-        if(params.saveInfo && rules.waves){
-            sector.info.waves = rules.waves;
+        if(params.saveInfo && Vars.state.rules.waves){
+            sector.info.waves = Vars.state.rules.waves;
         }
 
         //postgenerate for bases
         if(sector.preset == null && sector.planet.generator != null){
-            sector.planet.generator.postGenerate(world);
+            sector.planet.generator.postGenerate(Vars.state.world);
         }
 
         //reset rules
-        setSectorRules(sector, params.saveInfo);
+        Vars.state.setSectorRules(sector, params.saveInfo);
 
-        if(rules.defaultTeam.core() != null){
-            sector.info.spawnPosition = rules.defaultTeam.core().pos();
+        if(Vars.state.rules.defaultTeam.core() != null){
+            sector.info.spawnPosition = Vars.state.rules.defaultTeam.core().pos();
         }
     }
 
@@ -272,7 +273,7 @@ public class GameState{
         }
     }
 
-    public void loadMap(Map map) throws SaveLoadException{
+    public static void loadMap(Map map) throws SaveLoadException{
         loadMap(map, new Rules());
     }
 
@@ -280,8 +281,7 @@ public class GameState{
      * Loads a map file, throwing an exception if it is unplayable or cannot be loaded.
      * @param checkRules Rules to check map validity against (should set values like pvp, attack mode, etc)
      * */
-    public void loadMap(Map map, Rules checkRules) throws SaveLoadException{
-        this.map = map;
+    public static void loadMap(Map map, Rules checkRules) throws SaveLoadException{
 
         //load using custom loader if possible
         if(map.loadCustom()){
@@ -290,6 +290,7 @@ public class GameState{
 
         try{
             SaveIO.load(map.file, new FilterContext(map));
+            Vars.state.map = map; //SaveIO resets gamestate which resets the map
         }catch(Throwable error){
             if(error instanceof SaveLoadException se){
                 throw se;
@@ -297,20 +298,20 @@ public class GameState{
                 throw new SaveLoadException(error);
             }
         }finally{
-            generating = false;
+            Vars.state.generating = false;
         }
 
-        if(teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
+        if(Vars.state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
             //non-pvp: needs a core for the player team
             throw new SaveLoadException(Core.bundle.format("map.nospawn", checkRules.defaultTeam.coloredName()));
         }else if(checkRules.pvp){
             //pvp: needs 2 active teams with cores
-            if(teams.getActive().count(TeamData::hasCore) < 2){
+            if(Vars.state.teams.getActive().count(TeamData::hasCore) < 2){
                 throw new SaveLoadException(Core.bundle.get("map.nospawn.pvp"));
             }
         }else if(checkRules.attackMode){
             //attack maps: need 2 cores to be valid
-            if(rules.waveTeam.data().noCores()){
+            if(Vars.state.rules.waveTeam.data().noCores()){
                 throw new SaveLoadException(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.coloredName()));
             }
         }

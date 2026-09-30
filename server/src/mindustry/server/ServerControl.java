@@ -121,7 +121,7 @@ public class ServerControl implements ApplicationListener{
 
             info("Selected next map to be @.", map.plainName());
 
-            play(() -> state.loadMap(map, map.applyRules(lastMode)));
+            play(() -> GameState.loadMap(map, map.applyRules(lastMode)));
         }else{
             netServer.kickAll(KickReason.gameover);
             state.set(State.menu);
