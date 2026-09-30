@@ -3541,7 +3541,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 30f;
-            health = 6500;
+            health = 6000;
             armor = 5f;
 
             lockLegBase = true;
@@ -3566,7 +3566,8 @@ public class UnitTypes{
                 y = -20f;
                 width = 8f;
                 whenShooting = false;
-                chanceDeflect = 1f;
+                chanceReflect = 1f;
+                reflectMissileTime = 0f;
             }});
 
             rotateSpeed = 2.1f;

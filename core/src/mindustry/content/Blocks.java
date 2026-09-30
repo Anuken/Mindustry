@@ -5200,6 +5200,8 @@ public class Blocks{
                 damage = 210f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
+                shieldAbsorb = false;
+                absorbable = false;
             }};
 
             drawer = new DrawTurret("reinforced-"){{

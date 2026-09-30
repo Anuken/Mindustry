@@ -924,6 +924,17 @@ public class Fx{
         }
     }).layer(Layer.bullet - 1f),
 
+    missileReflect = new Effect(15f, 80f, e -> {
+        if(!(e.data instanceof Float size)) return;
+
+        Draw.color(Color.white, e.color, e.fin());
+        Lines.stroke(e.fout() * 1.5f);
+        Angles.randLenVectors(e.id, Math.min(6, Math.max(Math.round(size / 30), 1)),
+        6f + e.finpow() * 26f, e.rotation + 180f, Math.min(15f, 5f + size * 0.5f), (x, y) -> { //moves to the oposite side
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 5f + 1f);
+        });
+    }),
+
     neoplasmSplat = new Effect(400f, 300f, b -> {
         float intensity = 3f;
 
@@ -2415,12 +2426,11 @@ public class Fx{
         rand.setSeed(e.id + 2);
         for(int i = 0; i < 5; i++){
             float angle = e.rotation + 180f + rand.range(35f);
-            float dist = rand.random(15f, 45f) * e.finpow();
+            float dst = rand.random(15f, 45f) * e.finpow();
             float size = rand.random(1.5f, 3.5f);
             float spin = rand.range(180f) * e.fin();
 
-            float dx = e.x + Mathf.cosDeg(angle) * dist;
-            float dy = e.y + Mathf.sinDeg(angle) * dist;
+            float dx = e.x + Mathf.cosDeg(angle) * dst, dy = e.y + Mathf.sinDeg(angle) * dst;
 
             e.scaled(e.lifetime * rand.random(0.4f, 0.85f), b -> {
                 color(Pal.lightOrange, Pal.lightishGray, b.fin());
@@ -3307,6 +3317,38 @@ public class Fx{
             }
         }
     }).followParent(true),
+
+    shieldReflect = new Effect(16f, 80f, e -> {
+        if(!(e.data instanceof Float size)) return;
+        float sizeL = size / 13f;
+
+        Draw.color(Color.white, e.color, e.fin());
+        Draw.alpha(0.6f);
+        for(int i : Mathf.signs){
+            float angle = e.rotation + 90f * i;
+            float offX = Angles.trnsx(angle, sizeL), offY = Angles.trnsy(angle, sizeL);
+            Drawf.tri(e.x + offX, e.y + offY, 2.5f * e.fout(), 2f + 0.4f * e.fout() * size, e.rotation + 160f * i);
+        }
+
+        //squished hexagon
+        Tmp.c1.set(e.color);
+        Draw.color(e.color, Tmp.c1.add(Color.white), e.fout());
+        if(Mathf.absin(e.fin() * 40f, 1f, 1f) > e.fin() * 0.7f){
+            Lines.stroke(1f + e.fout() * 1.2f);
+            float hexSize = size * 0.25f * e.finpow() + 2f;
+            float radX = hexSize * 0.4f, radY = hexSize;
+
+            for(int i = 0; i < 6; i++){
+                float a1 = i * 60f * Mathf.degRad;
+                float a2 = (i + 1) * 60f * Mathf.degRad;
+
+                Tmp.v1.set(Mathf.cos(a1) * radX, Mathf.sin(a1) * radY).rotate(e.rotation).add(e.x, e.y);
+                Tmp.v2.set(Mathf.cos(a2) * radX, Mathf.sin(a2) * radY).rotate(e.rotation).add(e.x, e.y);
+
+                Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+            }
+        }
+    }),
 
     coreLandDust = new Effect(100f, e -> {
         color(e.color, e.fout(0.1f));
