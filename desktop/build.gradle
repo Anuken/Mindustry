@@ -21,7 +21,8 @@ tasks.register('run', JavaExec){
 
     jvmArgs += "-XX:+ShowCodeDetailsInExceptionMessages"
     jvmArgs += "--enable-native-access=ALL-UNNAMED"
-    jvmArgs += "--sun-misc-unsafe-memory-access=allow"
+    //fails on java 17
+    //jvmArgs += "--sun-misc-unsafe-memory-access=allow"
 
     if(project.hasProperty("args")){
         args Eval.me(project.getProperties()["args"])
