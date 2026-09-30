@@ -190,10 +190,8 @@ public class Damage{
     private static float findLength(Bullet b, float length, boolean laser, int pierceCap, boolean absorb){
         if(pierceCap > 0){
             length = findPierceLength(b, pierceCap, laser, length, absorb);
-        }else if(laser){
-            length = findLaserLength(b, length, absorb);
         }else{
-            length = findShieldLength(b, length, false, absorb);
+            length = findLaserLength(b, length, absorb);
         }
 
         return length;
@@ -213,7 +211,7 @@ public class Damage{
 
         float result = found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
 
-        return findShieldLength(b, result, true, absorb);
+        return findShieldLength(b, result, absorb);
     }
 
     public static float findPierceLength(Bullet b, int pierceCap, float length){
@@ -264,7 +262,7 @@ public class Damage{
         //or the last pierced object if there were enough blockages
         float result = Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
 
-        return findShieldLength(b, result, laser, absorb);
+        return findShieldLength(b, result, absorb);
     }
 
     /** @return the first point where a segment enters a regular polygon, stored in a shared vector, or null if it doesn't. */
@@ -298,9 +296,9 @@ public class Damage{
      * If the shields only absorb part of the damage, the bullet's damage is reduced accordingly.
      * @return the length of the laser, cut short if a shield absorbed it.
      */
-    public static float findShieldLength(Bullet b, float length, boolean laser, boolean absorb){
+    public static float findShieldLength(Bullet b, float length, boolean absorb){
         float damage = b.type.shieldDamage(b);
-        if(!(laser || b.type.shieldAbsorb) || length <= 0f || damage <= 0f) return length;
+        if(!b.type.absorbable || length <= 0f || damage <= 0f) return length;
 
         seg1.set(b.x, b.y);
         seg2.trnsExact(b.rotation(), length).add(seg1);
