@@ -1,5 +1,7 @@
 package mindustry.logic;
 
+import static mindustry.Vars.ui;
+
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
@@ -441,11 +443,23 @@ public class LCanvas extends Table{
                 addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
                 //taken from foo's client
-                t.button(Icon.add, Styles.logici, () -> Vars.ui.logic.showAddDialog(index + 1))
+                t.button(Icon.add, Styles.logici, () -> ui.logic.showAddDialog(index + 1))
                 .disabled(b -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).size(24f).padRight(6);
 
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).get().tapped(this::copy);
+                tooltip(t.getCells().peek(), "logic.addhere");
+
+                //taken from foo's client (again)
+                t.button(Icon.paste, Styles.logici, () -> {
+                }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).get().tapped(() -> {
+                    try{
+                        this.paste(LAssembler.read(Core.app.getClipboardText().replace("\r\n", "\n"), privileged));
+                    }catch(Throwable e){
+                        ui.showException(e);
+                    }
+                });
+                tooltip(t.getCells().peek(), "logic.pastehere");
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
@@ -533,6 +547,23 @@ public class LCanvas extends Table{
                 copy.setupUI();
                 statements.updateJumpHeights = true;
             }
+        }
+
+        public void paste(Seq<LStatement> states){
+            var idx = statements.getChildren().indexOf(this) + 1;
+            var maxAdd = LExecutor.maxInstructions - statements.getChildren().size;
+            Seq<LStatement> pasted = states.copy();
+            if(pasted.size > maxAdd) ui.announce(Core.bundle.format("logic.pastelimit", maxAdd, pasted.size), 5);
+            pasted.truncate(maxAdd);
+            pasted.reverse();
+
+            for(var state : pasted){
+                if(state instanceof JumpStatement jump && jump.destIndex != -1) jump.destIndex += idx;
+                addAt(idx, state);
+            }
+            for(var state : pasted) state.setupUI();
+            statements.layout();
+            statements.setJumpHeights();
         }
 
         @Override
