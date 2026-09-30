@@ -14,8 +14,6 @@ import java.util.*;
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entityc> implements Iterable<T>{
-    private static int lastId = 0;
-
     private final Seq<T> array;
     private final Seq<T> intersectArray = new Seq<>();
     private final Rect viewport = new Rect();
@@ -30,16 +28,6 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     private double fixedCounter, timeCounter;
     private long lastTimeAccess = -1;
     private Seq<DelayRun> timeRuns = new Seq<>();
-
-    public static int nextId(){
-        if(lastId >= Integer.MAX_VALUE - 2) lastId = 0;
-        return lastId++;
-    }
-
-    /** Makes sure the next ID counter is higher than this number, so future entities cannot possibly use this ID. */
-    public static void checkNextId(int id){
-        lastId = Math.max(lastId, id + 1);
-    }
 
     public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
         this(type, spatial, mapping, null);

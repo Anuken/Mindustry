@@ -344,6 +344,134 @@ public class ApplicationTests{
         assertTrue(state.teams.playerCores().size > 0);
     }
 
+    IntSet savedEntityIds(){
+        IntSet ids = new IntSet();
+        state.entities.unit.each(u -> ids.add(u.id));
+        state.entities.all.each(e -> {
+            if(e.serialize()) ids.add(e.id());
+        });
+        return ids;
+    }
+
+    int maxId(IntSet ids){
+        int max = -1;
+        for(var it = ids.iterator(); it.hasNext;){
+            max = Math.max(max, it.next());
+        }
+        return max;
+    }
+
+    void assertNoIdCollisions(){
+        assertTrue(state.entities.unit.checkIDCollisions().isEmpty(), "Unit IDs must be unique.");
+        assertTrue(state.entities.sync.checkIDCollisions().isEmpty(), "Sync IDs must be unique.");
+    }
+
+    void assertNewUnitsDoNotCollide(IntSet existing, int maxExisting){
+        UnitType[] types = {UnitTypes.dagger, UnitTypes.flare, UnitTypes.mono};
+        Seq<Unit> created = new Seq<>();
+
+        for(int i = 0; i < 10; i++){
+            Unit unit = types[i % types.length].spawn(Team.sharded, 20f + i * 8f, 60f);
+            created.add(unit);
+
+            assertFalse(existing.contains(unit.id), "New unit reused a loaded ID: " + unit.id);
+            assertTrue(unit.id > maxExisting, "New unit ID " + unit.id + " must be above every loaded ID (" + maxExisting + ")");
+        }
+
+        for(Unit unit : created){
+            assertSame(unit, state.entities.unit.getByID(unit.id), "ID must resolve to the unit that owns it.");
+        }
+
+        assertNoIdCollisions();
+    }
+
+    @Test
+    void unitIdsPersistAcrossSave() throws Throwable{
+        GameState.loadMap(testMap);
+
+        UnitType[] types = {UnitTypes.dagger, UnitTypes.flare, UnitTypes.mono, UnitTypes.crawler};
+        IntMap<UnitType> savedTypes = new IntMap<>();
+        IntMap<Team> savedTeams = new IntMap<>();
+
+        for(int i = 0; i < 20; i++){
+            Team team = i % 2 == 0 ? Team.sharded : Team.crux;
+            Unit unit = types[i % types.length].spawn(team, 20f + i * 8f, 30f);
+            savedTypes.put(unit.id, unit.type);
+            savedTeams.put(unit.id, team);
+        }
+
+        int count = state.entities.unit.size();
+
+        SaveIO.save(saveDirectory.child("0.msav"));
+        resetWorld();
+        SaveIO.load(saveDirectory.child("0.msav"));
+
+        assertEquals(count, state.entities.unit.size(), "Unit count must survive a save.");
+
+        for(var entry : savedTypes){
+            Unit loaded = state.entities.unit.getByID(entry.key);
+            assertNotNull(loaded, "No unit with saved ID " + entry.key + " after load.");
+            assertEquals(entry.value, loaded.type, "Unit type must match for ID " + entry.key);
+            assertEquals(savedTeams.get(entry.key), loaded.team, "Unit team must match for ID " + entry.key);
+        }
+
+        assertNoIdCollisions();
+    }
+
+    @Test
+    void newUnitIdsDoNotCollideAfterLoad() throws Throwable{
+        GameState.loadMap(testMap);
+
+        for(int i = 0; i < 10; i++){
+            UnitTypes.dagger.spawn(Team.sharded, 20f + i * 8f, 30f);
+        }
+
+        IntSet saved = savedEntityIds();
+        int max = maxId(saved);
+
+        SaveIO.save(saveDirectory.child("0.msav"));
+        resetWorld();
+        SaveIO.load(saveDirectory.child("0.msav"));
+
+        assertNewUnitsDoNotCollide(saved, max);
+    }
+
+    @Test
+    void newUnitIdsDontCollideAfterLoadingOldSaves() throws Throwable{
+        //114 goes through the legacy short-chunk loader, 152 through the current one
+        for(String name : new String[]{"114.msav", "152.msav"}){
+            resetWorld();
+            SaveIO.load(Core.files.internal(name));
+
+            IntSet loaded = savedEntityIds();
+            assertTrue(loaded.size > 0, "Expected entities in " + name);
+
+            assertNewUnitsDoNotCollide(loaded, maxId(loaded));
+        }
+    }
+
+    @Test
+    void duplicateSavedIdsAreReassigned() throws Throwable{
+        GameState.loadMap(testMap);
+
+        Unit a = UnitTypes.dagger.create(Team.sharded);
+        Unit b = UnitTypes.dagger.create(Team.sharded);
+        b.id(a.id);
+        a.set(20f, 30f);
+        b.set(40f, 30f);
+        a.add();
+        b.add();
+
+        int count = state.entities.unit.size();
+
+        SaveIO.save(saveDirectory.child("0.msav"));
+        resetWorld();
+        SaveIO.load(saveDirectory.child("0.msav"));
+
+        assertEquals(count, state.entities.unit.size(), "Both units must load despite sharing an ID.");
+        assertNoIdCollisions();
+    }
+
     void updateBlocks(int times){
         for(Tile tile : state.world){
             if(tile.build != null && tile.isCenter()){

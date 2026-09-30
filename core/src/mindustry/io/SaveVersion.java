@@ -11,7 +11,6 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
-import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -527,7 +526,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 int id = in.i();
 
                 Entityc entity = (Entityc)mapping[typeid].get();
-                EntityGroup.checkNextId(id);
+                Vars.state.checkNextEntityId(id);
                 entity.id(id);
                 entity.read(in);
                 if(used.add(id)){
@@ -540,7 +539,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         for(var ent : reassign){
-            ent.id(EntityGroup.nextId());
+            ent.id(Vars.state.nextEntityId());
             ent.add();
         }
 

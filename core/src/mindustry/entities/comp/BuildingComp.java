@@ -708,10 +708,10 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
 
         //needs new ID as it is now a payload
         if(net.client()){
-            unit.id = EntityGroup.nextId();
+            unit.id = state.nextEntityId();
         }else{
             //server-side, this needs to be delayed until next frame because otherwise the packets sent out right after this event would have the wrong unit ID, leading to ghosts
-            Core.app.post(() -> unit.id = EntityGroup.nextId());
+            Core.app.post(() -> unit.id = state.nextEntityId());
         }
 
         grabber.get(new UnitPayload(unit));

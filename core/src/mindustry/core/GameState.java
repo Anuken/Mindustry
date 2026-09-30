@@ -82,6 +82,24 @@ public class GameState{
     public @Nullable Map playtestingMap;
     /** Current game state. */
     private State state = State.menu;
+    /** EntityID allocation state. */
+    private int lastId = 0, lastLocalId = -2;
+
+    /** Clients allocate negative IDs (-1 is null in TypeIO) so local entities never collide with server IDs. */
+    public int nextEntityId(){
+        if(net != null && net.client()){
+            if(lastLocalId <= Integer.MIN_VALUE + 2) lastLocalId = -2;
+            return lastLocalId--;
+        }
+
+        if(lastId >= Integer.MAX_VALUE - 2) lastId = 0;
+        return lastId++;
+    }
+
+    /** Makes sure the next ID is higher than this one, so future entities cannot possibly use it. */
+    public void checkNextEntityId(int id){
+        lastId = Math.max(lastId, id + 1);
+    }
 
     @Nullable
     public Unit boss(){
