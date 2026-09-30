@@ -11,6 +11,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -81,17 +82,22 @@ public class Fonts{
         }})).loaded = f -> Fonts.monospace = f;
 
         //used in the default font (same size as text); not assigned to anything
-        Core.assets.load("iconSmall", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
-            size = 18;
-            incremental = true;
-            characters = "\0";
-        }})).loaded = f -> Fonts.def.addFallback(f);
+        for(boolean outlined : Mathf.booleans){
+            String suffix = outlined ? "-outline" : "";
+            Core.assets.load("iconSmall" + suffix, Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+                size = 18;
+                incremental = true;
+                characters = "\0";
+                borderColor = Color.darkGray;
+            }})).loaded = f -> (outlined ? Fonts.outline : Fonts.def).addFallback(f);
 
-        Core.assets.load("runes", Font.class, new FreeTypeFontLoaderParameter("fonts/runes.woff", new FreeTypeFontParameter(){{
-            size = 18;
-            incremental = true;
-            characters = "\0";
-        }})).loaded = f -> Fonts.def.addFallback(f);
+            Core.assets.load("runes" + suffix, Font.class, new FreeTypeFontLoaderParameter("fonts/runes.woff", new FreeTypeFontParameter(){{
+                size = 18;
+                incremental = true;
+                characters = "\0";
+                borderColor = Color.darkGray;
+            }})).loaded = f -> (outlined ? Fonts.outline : Fonts.def).addFallback(f);
+        }
 
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
