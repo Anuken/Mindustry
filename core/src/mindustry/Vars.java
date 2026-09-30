@@ -279,7 +279,6 @@ public class Vars implements Loadable{
     public static MapEditor editor;
     public static DataAssetCache assetCache;
     public static GameService service = new GameService();
-
     public static Universe universe;
     public static Maps maps;
 
@@ -339,7 +338,6 @@ public class Vars implements Loadable{
         if(mods == null) mods = new Mods();
 
         content = new ContentLoader();
-        waves = new Waves();
         universe = new Universe();
         becontrol = new BeControl();
         asyncCore = new AsyncCore();

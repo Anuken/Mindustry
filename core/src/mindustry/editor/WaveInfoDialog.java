@@ -81,7 +81,7 @@ public class WaveInfoDialog extends BaseDialog{
                 })).marginLeft(12f).row();
 
                 t.button("@settings.reset", Icon.refresh, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
-                    groups = JsonIO.copy(waves.get());
+                    groups = JsonIO.copy(waves.defaults());
                     buildGroups();
                     dialog.hide();
                 })).marginLeft(12f);
@@ -98,7 +98,7 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     void setup(){
-        groups = JsonIO.copy(state.rules.spawns.isEmpty() ? waves.get() : state.rules.spawns);
+        groups = JsonIO.copy(state.rules.spawns.isEmpty() ? waves.defaults() : state.rules.spawns);
         if(groups == null) groups = new Seq<>();
 
         cont.clear();

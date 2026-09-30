@@ -214,7 +214,7 @@ public abstract class SaveVersion extends SaveFileReader{
         if(saveState.ruleString == null) return; //in NetworkIO, rules are null, not read here
         state.rules = JsonIO.read(Rules.class, saveState.ruleString);
 
-        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = Waves.defaults();
 
         if(saveState.getSector() != null){
             state.rules.sector = saveState.getSector();

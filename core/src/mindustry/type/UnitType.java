@@ -550,8 +550,8 @@ public class UnitType extends UnlockableContent implements Senseable{
             }
         }
 
-        if(Vars.waves != null && Vars.waves.get() != null){
-            Vars.waves.get().removeAll(g -> g.type == this);
+        if(Vars.waves != null && Waves.defaults() != null){
+            Waves.defaults().removeAll(g -> g.type == this);
         }
     }
 
