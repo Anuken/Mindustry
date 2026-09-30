@@ -134,7 +134,11 @@ tasks.register('generateIcons'){
 
         outDir.mkdirs()
         def cmd = [System.getProperty("os.name").toLowerCase().contains("win") ? "npx.cmd" : "npx", "--yes", "fantasticon", "--config", config.absolutePath]
-        if(new ProcessBuilder(cmd).inheritIO().start().waitFor() != 0) throw new GradleException("fantasticon failed!")
+        def pb = new ProcessBuilder(cmd).redirectErrorStream(true)
+        def proc = pb.start()
+        proc.outputStream.close()
+        proc.inputStream.eachLine{ println it }
+        if(proc.waitFor() != 0) throw new GradleException("fantasticon failed!")
     }
 }
 
