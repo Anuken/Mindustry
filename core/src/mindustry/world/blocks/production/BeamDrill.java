@@ -218,6 +218,7 @@ public class BeamDrill extends Block{
     }
 
     public class BeamDrillBuild extends Building{
+        public float dumpTimer;
         public Tile[] facing = new Tile[size];
         public Point2[] lasers = new Point2[size];
         public @Nullable Item lastItem;
@@ -261,8 +262,9 @@ public class BeamDrill extends Block{
                 time %= drillTime;
             }
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump();
+                dumpTimer %= dumpTime;
             }
         }
 

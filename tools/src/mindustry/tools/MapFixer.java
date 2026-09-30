@@ -9,7 +9,7 @@ import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.game.markers.*;
 import mindustry.io.*;
-import mindustry.logic.LExecutor.*;
+import mindustry.logic.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.logic.LogicBlock.*;

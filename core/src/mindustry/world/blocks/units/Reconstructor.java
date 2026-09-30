@@ -317,8 +317,8 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.config) return unit();
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.config) return unit();
             return super.senseObject(sensor);
         }
 
@@ -367,9 +367,9 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
-            if(sensor == LAccess.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(fraction());
+            if(sensor == LogicProp.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));
             return super.sense(sensor);
         }
 

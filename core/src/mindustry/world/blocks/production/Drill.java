@@ -251,6 +251,7 @@ public class Drill extends Block{
         public float progress;
         public float totalProgress;
         public float consTimer;
+        public float dumpTimer;
         public float warmup;
         public float lastDrillSpeed;
 
@@ -292,8 +293,8 @@ public class Drill extends Block{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem) return dominantItem;
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.firstItem) return dominantItem;
             return super.senseObject(sensor);
         }
 
@@ -305,8 +306,9 @@ public class Drill extends Block{
                 consTimer %= consumeTime;
             }
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
+                dumpTimer %= dumpTime;
             }
 
             if(dominantItem == null){
@@ -345,8 +347,8 @@ public class Drill extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress && dominantItem != null) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress && dominantItem != null) return progress;
             return super.sense(sensor);
         }
 

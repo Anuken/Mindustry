@@ -33,7 +33,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
                 int id = in.i();
 
                 Entityc entity = (Entityc)mapping[typeid].get();
-                EntityGroup.checkNextId(id);
+                Vars.state.checkNextEntityId(id);
                 entity.id(id);
                 entity.read(in);
                 entity.add();

@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true, serialize = false)
 @Component(base = true)
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Bulletc, Timerc, Senseable, Settable{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Bulletc, Timerc, LogicSenseable, LogicSettable{
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage, lastX, lastY, time, lifetime;
@@ -351,7 +351,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case rotation -> rotation;
             case health -> damage;
@@ -375,7 +375,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     }
 
     @Override
-    public void setProp(LAccess prop, double value){
+    public void setProp(LogicProp prop, double value){
         switch(prop){
             case health -> damage = (float)value;
             case x -> x = World.unconv((float)value);
@@ -396,7 +396,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     }
 
     @Override
-    public void setProp(LAccess prop, Object value){
+    public void setProp(LogicProp prop, Object value){
         switch(prop){
             case team -> {
                 if(value instanceof Team t){

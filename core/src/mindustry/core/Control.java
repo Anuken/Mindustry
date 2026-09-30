@@ -166,6 +166,7 @@ public class Control implements ApplicationListener, Loadable{
 
         //add player when world loads regardless
         Events.on(WorldLoadEvent.class, e -> {
+            if(!net.client() && !player.isAdded()) player.id = state.nextEntityId();
             player.add();
             //make player admin on any load when hosting
             if(net.active() && net.server()){

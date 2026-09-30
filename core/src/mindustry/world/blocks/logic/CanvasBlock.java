@@ -148,7 +148,7 @@ public class CanvasBlock extends Block{
         return result;
     }
 
-    public class CanvasBuild extends Building implements LReadable, LWritable{
+    public class CanvasBuild extends Building implements LogicReadable, LogicWritable{
         public @Nullable Texture texture;
         public byte[] data = new byte[Mathf.ceil(canvasSize * canvasSize * bitsPerPixel / 8f)];
         public int blending;
@@ -229,22 +229,22 @@ public class CanvasBlock extends Block{
         }
 
         @Override
-        public boolean readable(LExecutor exec){
+        public boolean readable(LogicExecutor exec){
             return isValid() && (exec.privileged || this.team == exec.team);
         }
 
         @Override
-        public void read(LVar position, LVar output){
+        public void read(LogicVar position, LogicVar output){
             output.setnum(getPixel(position.numi()));
         }
 
         @Override
-        public boolean writable(LExecutor exec){
+        public boolean writable(LogicExecutor exec){
             return readable(exec);
         }
 
         @Override
-        public void write(LVar position, LVar value){
+        public void write(LogicVar position, LogicVar value){
             setPixel(position.numi(), value.numi());
         }
 
@@ -290,7 +290,7 @@ public class CanvasBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> canvasSize;
                 default -> super.sense(sensor);

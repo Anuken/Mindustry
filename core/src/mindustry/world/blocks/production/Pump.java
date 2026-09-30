@@ -130,9 +130,9 @@ public class Pump extends LiquidBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.efficiency) return shouldConsume() ? efficiency : 0f;
-            if(sensor == LAccess.totalLiquids) return liquidDrop == null ? 0f : liquids.get(liquidDrop);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.efficiency) return shouldConsume() ? efficiency : 0f;
+            if(sensor == LogicProp.totalLiquids) return liquidDrop == null ? 0f : liquids.get(liquidDrop);
             return super.sense(sensor);
         }
 

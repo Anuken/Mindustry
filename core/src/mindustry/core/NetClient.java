@@ -19,6 +19,7 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.game.markers.*;
 import mindustry.game.objectives.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -442,6 +443,42 @@ public class NetClient implements ApplicationListener{
         logic.reset();
         ui.showText("@disconnect", reason, Align.left);
         ui.loadfrag.hide();
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void createMarker(int id, ObjectiveMarker marker){
+        state.markers.add(id, marker);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void removeMarker(int id){
+        state.markers.remove(id);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarker(int id, LogicMarkerControl control, double p1, double p2, double p3){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.control(control, p1, p2, p3);
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerText(int id, LogicMarkerControl type, boolean fetch, String text){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            if(type == LogicMarkerControl.flushText){
+                marker.setText(text, fetch);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerTexture(int id, Object texture){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.setTexture(texture);
+        }
     }
 
     @Remote(variants = Variant.both)

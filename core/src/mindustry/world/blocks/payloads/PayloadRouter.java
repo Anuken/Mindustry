@@ -102,9 +102,9 @@ public class PayloadRouter extends PayloadConveyor{
         }
 
         @Override
-        public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
+        public void control(LogicExecutor executor, LogicProp type, double p1, double p2, double p3, double p4){
             super.control(executor, type, p1, p2, p3, p4);
-            if(type == LAccess.config){
+            if(type == LogicProp.config){
                 int prev = rotation;
                 rotation = Mathf.mod((int)p1, 4);
                 //when manually controlled, routers do not turn automatically for a while, same as turrets

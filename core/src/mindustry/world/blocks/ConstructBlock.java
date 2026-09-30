@@ -211,7 +211,7 @@ public class ConstructBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case progress -> Mathf.clamp(progress);
                 case breaking -> activeDeconstruct ? 1 : 0;
@@ -220,7 +220,7 @@ public class ConstructBlock extends Block{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case building -> current;
                 default -> super.senseObject(sensor);

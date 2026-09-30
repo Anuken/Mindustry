@@ -38,7 +38,7 @@ public class DataPatcher{
     private Seq<Content> addedContent = new Seq<>();
     private @Nullable PatchAsset currentlyApplyingPatch;
     private @Nullable ContentAsset currentlyApplyingContent;
-    private Seq<LVar> addedVars = new Seq<>();
+    private Seq<LogicVar> addedVars = new Seq<>();
 
     static ContentParser createParser(){
         ContentParser cont = new ContentParser(){
