@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -56,7 +57,7 @@ public class MapEditor{
             tags.put("steamid",  map.file.parent().name());
         }
         load(() -> MapIO.loadMap(map, context));
-        if(!headless) renderer.resize(width(), height());
+        if(!headless) renderer.resize(state.world.width, state.world.height);
         loading = false;
     }
 
@@ -64,12 +65,12 @@ public class MapEditor{
         reset();
 
         createTiles(pixmap.width, pixmap.height);
-        load(() -> MapIO.readImage(pixmap, tiles()));
-        if(!headless) renderer.resize(width(), height());
+        load(() -> MapIO.readImage(pixmap, state.world));
+        if(!headless) renderer.resize(state.world.width, state.world.height);
     }
 
     public void updateRenderer(){
-        Tiles tiles = world.tiles;
+        World tiles = state.world;
         Seq<Building> builds = new Seq<>();
 
         for(int i = 0; i < tiles.width * tiles.height; i++){
@@ -86,10 +87,10 @@ public class MapEditor{
         }
 
         for(var build : builds){
-            tiles.get(build.tileX(), build.tileY()).setBlock(build.block, build.team, build.rotation, () -> build);
+            tiles.tile(build.tileX(), build.tileY()).setBlock(build.block, build.team, build.rotation, () -> build);
         }
 
-        renderer.resize(width(), height());
+        renderer.resize(state.world.width, state.world.height);
     }
 
     public void load(Runnable r){
@@ -100,7 +101,7 @@ public class MapEditor{
 
     /** Creates a 2-D array of EditorTiles with stone as the floor block. */
     private void createTiles(int width, int height){
-        Tiles tiles = world.resize(width, height);
+        World tiles = state.world.resize(width, height);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -110,7 +111,7 @@ public class MapEditor{
     }
 
     public Map createMap(Fi file){
-        return new Map(file, width(), height(), new StringMap(tags), true);
+        return new Map(file, state.world.width, state.world.height, new StringMap(tags), true);
     }
 
     private void reset(){
@@ -120,20 +121,8 @@ public class MapEditor{
         tags = new StringMap();
     }
 
-    public Tiles tiles(){
-        return world.tiles;
-    }
-
     public Tile tile(int x, int y){
-        return world.rawTile(x, y);
-    }
-
-    public int width(){
-        return world.width();
-    }
-
-    public int height(){
-        return world.height();
+        return state.world.rawTile(x, y);
     }
 
     public void drawBlocksReplace(int x, int y){
@@ -150,8 +139,8 @@ public class MapEditor{
 
     public void drawBlocks(int x, int y, boolean square, boolean forceOverlay, Boolf<Tile> tester){
         if(drawBlock.isMultiblock()){
-            x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
-            y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
+            x = Mathf.clamp(x, (drawBlock.size - 1) / 2, state.world.width - drawBlock.size / 2 - 1);
+            y = Mathf.clamp(y, (drawBlock.size - 1) / 2, state.world.height - drawBlock.size / 2 - 1);
             if(!hasOverlap(x, y)){
                 tile(x, y).setBlock(drawBlock, drawTeam, rotation);
                 addTileOp(TileOp.get((short)x, (short)y, DrawOperation.opTeam, (byte)drawTeam.id));
@@ -222,7 +211,7 @@ public class MapEditor{
     }
 
     boolean hasOverlap(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         //allow direct replacement of blocks of the same size
         if(tile != null && tile.isCenter() && tile.block() != drawBlock && tile.block().size == drawBlock.size && tile.x == x && tile.y == y){
             return false;
@@ -235,7 +224,7 @@ public class MapEditor{
             for(int dy = 0; dy < drawBlock.size; dy++){
                 int worldx = dx + offsetx + x;
                 int worldy = dy + offsety + y;
-                Tile other = world.tile(worldx, worldy);
+                Tile other = state.world.tile(worldx, worldy);
 
                 if(other != null && other.block().isMultiblock()){
                     return true;
@@ -247,12 +236,12 @@ public class MapEditor{
     }
 
     public void addCliffs(){
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
 
             int rotation = 0;
             for(int i = 0; i < 8; i++){
-                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                Tile other = state.world.tile(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
                 if(other != null && !other.block().isStatic()){
                     rotation |= (1 << i);
                 }
@@ -265,7 +254,7 @@ public class MapEditor{
             tile.data = (byte)rotation;
         }
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(tile.block() != Blocks.cliff && tile.block().isStatic()){
                 tile.setBlock(Blocks.air);
             }
@@ -280,7 +269,7 @@ public class MapEditor{
                 if(Mathf.within(rx, ry, brushSize - 0.5f + 0.0001f)){
                     int wx = x + rx, wy = y + ry;
 
-                    if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
+                    if(wx < 0 || wy < 0 || wx >= state.world.width || wy >= state.world.height){
                         continue;
                     }
 
@@ -296,7 +285,7 @@ public class MapEditor{
             for(int ry = -clamped; ry <= clamped; ry++){
                 int wx = x + rx, wy = y + ry;
 
-                if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
+                if(wx < 0 || wy < 0 || wx >= state.world.width || wy >= state.world.height){
                     continue;
                 }
 
@@ -308,13 +297,13 @@ public class MapEditor{
     public void resize(int width, int height, int shiftX, int shiftY){
         clearOp();
 
-        Tiles previous = world.tiles;
-        int offsetX = (width() - width) / 2 - shiftX, offsetY = (height() - height) / 2 - shiftY;
+        World previous = state.world;
+        int offsetX = (state.world.width - width) / 2 - shiftX, offsetY = (state.world.height - height) / 2 - shiftY;
         loading = true;
 
-        world.clearBuildings();
+        previous.clearBuildings();
 
-        Tiles tiles = world.tiles = new Tiles(width, height);
+        World tiles = state.world = new World(width, height);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -416,7 +405,7 @@ public class MapEditor{
     class Context implements WorldContext{
         @Override
         public Tile tile(int index){
-            return world.tiles.geti(index);
+            return state.world.geti(index);
         }
 
         @Override

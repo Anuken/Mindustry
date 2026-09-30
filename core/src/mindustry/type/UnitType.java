@@ -676,8 +676,8 @@ public class UnitType extends UnlockableContent implements Senseable{
         //return mining stances based on present items
         if(current == UnitCommand.mineCommand){
             out.add(UnitStance.mineAuto);
-            for(Item item : indexer.getAllPresentOres()){
-                if(unit.canMine(item) && ((mineFloor && indexer.hasOre(item)) || (mineWalls && indexer.hasWallOre(item)))){
+            for(Item item : state.indexer.getAllPresentOres()){
+                if(unit.canMine(item) && ((mineFloor && state.indexer.hasOre(item)) || (mineWalls && state.indexer.hasWallOre(item)))){
                     var itemStance = ItemUnitStance.getByItem(item);
                     if(itemStance != null){
                         out.add(itemStance);

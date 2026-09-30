@@ -46,7 +46,7 @@ public class TiledFloor extends Floor{
     }
 
     long state(Tile tile){
-        return world.tiles.getTmpFloorState(tile.array());
+        return state.world.getTmpFloorState(tile.array());
     }
 
     @Override
@@ -93,7 +93,7 @@ public class TiledFloor extends Floor{
                     }
 
                     //mark as updated
-                    world.tiles.setTmpFloorState(other.array(), TiledState.get(cx, cy, size, changes));
+                    state.world.setTmpFloorState(other.array(), TiledState.get(cx, cy, size, changes));
                     if(!headless && otherState != 0){
                         Core.app.post(() -> renderer.blocks.floor.recacheTile(other));
                     }

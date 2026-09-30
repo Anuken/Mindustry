@@ -62,7 +62,7 @@ public class FileMapGenerator implements WorldGenerator{
     }
 
     @Override
-    public void generate(Tiles tiles, WorldParams params){
+    public void generate(World tiles, WorldParams params){
         if(map == null) throw new RuntimeException("Generator has null map, cannot be used.");
 
         Sector sector = state.rules.sector;
@@ -87,7 +87,7 @@ public class FileMapGenerator implements WorldGenerator{
             state.rules.sector = sector;
         }
 
-        tiles = world.tiles;
+        tiles = state.world;
 
         boolean anyCores = false;
 

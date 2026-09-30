@@ -301,7 +301,7 @@ public class WaveInfoDialog extends BaseDialog{
                             a.button("", () -> {
                                 if(!checkedSpawns){
                                     //recalculate waves when changed
-                                    Vars.spawner.reset();
+                                    Vars.state.spawner.reset();
                                     checkedSpawns = true;
                                 }
 
@@ -312,11 +312,11 @@ public class WaveInfoDialog extends BaseDialog{
                                     int cols = 4;
                                     int max = 20;
 
-                                    if(spawner.getSpawns().size >= max){
+                                    if(state.spawner.getSpawns().size >= max){
                                         p.add(Core.bundle.format("waves.spawn.first", max)).colspan(cols).padBottom(4).row();
                                     }
 
-                                    for(var spawn : spawner.getSpawns()){
+                                    for(var spawn : state.spawner.getSpawns()){
                                         p.button(spawn.x + ", " + spawn.y, Styles.flatTogglet, () -> {
                                             group.spawn = Point2.pack(spawn.x, spawn.y);
                                             dialog.hide();
@@ -332,7 +332,7 @@ public class WaveInfoDialog extends BaseDialog{
                                         }
                                     }
 
-                                    if(spawner.getSpawns().isEmpty()){
+                                    if(state.spawner.getSpawns().isEmpty()){
                                         p.add("@waves.spawn.none");
                                     }else{
                                         p.button("@waves.spawn.all", Styles.flatTogglet, () -> {

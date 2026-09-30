@@ -55,8 +55,8 @@ public class EnvRenderers{
                 int pos = (int)time;
                 float life = time % 1f;
                 float opacity = rand.random(0.2f, 0.7f) * Mathf.slope(life) * 0.7f;
-                float x = (rand.random(0f, world.unitWidth()) + (pos % 100)*753) % world.unitWidth();
-                float y = (rand.random(0f, world.unitHeight()) + (pos % 120)*453) % world.unitHeight();
+                float x = (rand.random(0f, world.unitWidth) + (pos % 100)*753) % world.unitWidth;
+                float y = (rand.random(0f, world.unitHeight) + (pos % 120)*453) % world.unitHeight;
                 float rot = rand.range(7f);
                 float sizeScale = 1f + rand.range(0.3f);
 

@@ -78,7 +78,7 @@ public class NetworkIO{
         try(DataInputStream stream = new DataInputStream(is)){
             var writer = SaveIO.getSaveWriter();
             Time.clear();
-            writer.readDataPatches(stream, new SaveReadState(world.context));
+            writer.readDataPatches(stream, new SaveLoadContext(world.context));
 
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
@@ -99,7 +99,7 @@ public class NetworkIO{
             player.id = id;
             player.add();
 
-            var state = new SaveReadState(world.context);
+            var state = new SaveLoadContext(world.context);
 
             writer.readContentHeader(stream);
             writer.readMap(stream, state);

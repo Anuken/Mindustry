@@ -63,6 +63,18 @@ public class Map implements Comparable<Map>, Publishable{
         this(Vars.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
     }
 
+    public Map(){
+        this(new StringMap());
+    }
+
+    /**
+     * Runs custom code when this map is loaded. Used for plugins.
+     * @return whether this map ran its own loading logic; false for vanilla map file loading.
+     * */
+    public boolean loadCustom(){
+        return false;
+    }
+
     public int getHighScore(){
         return Core.settings.getInt("hiscore" + file.nameWithoutExtension() + tags.get("steamid", ""), 0);
     }

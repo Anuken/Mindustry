@@ -118,15 +118,15 @@ public class Pathfinder implements Runnable{
             stop();
 
             //reset and update internal tile array
-            tiles = new int[world.width() * world.height()];
-            wwidth = world.width();
-            wheight = world.height();
+            tiles = new int[world.width * world.height];
+            wwidth = world.width;
+            wheight = world.height;
             threadList = new Seq<>();
             mainList = new Seq<>();
             clearCache();
 
             for(int i = 0; i < tiles.length; i++){
-                Tile tile = world.tiles.geti(i);
+                Tile tile = state.world.geti(i);
                 tiles[i] = packTile(tile);
             }
 
@@ -136,7 +136,7 @@ public class Pathfinder implements Runnable{
                 Log.debug("Preloading ground enemy flowfield.");
 
                 //preload water on naval maps
-                if(spawner.getSpawns().contains(t -> t.floor().isLiquid)){
+                if(state.spawner.getSpawns().contains(t -> t.floor().isLiquid)){
                     preloadPath(getField(state.rules.waveTeam, costNaval, fieldCore));
                     Log.debug("Preloading naval enemy flowfield.");
                 }
@@ -419,7 +419,7 @@ public class Pathfinder implements Runnable{
         for(Point2 point : points){
             int dx = tile.x + point.x * res, dy = tile.y + point.y * res;
 
-            Tile other = world.tile(dx, dy);
+            Tile other = state.world.tile(dx, dy);
             if(other == null) continue;
 
             int packed = dx/res + dy/res * ww;
@@ -561,7 +561,7 @@ public class Pathfinder implements Runnable{
                 int max = 1;
 
                 for(int attempt = 0; attempt < 5 && max > 0; attempt++){
-                    var targets = indexer.getEnemy(team, randomTargets[rand.random(randomTargets.length - 1)]);
+                    var targets = state.indexer.getEnemy(team, randomTargets[rand.random(randomTargets.length - 1)]);
                     if(!targets.isEmpty()){
                         boolean any = false;
                         for(Building other : targets){
@@ -577,13 +577,13 @@ public class Pathfinder implements Runnable{
                 }
             }
 
-            for(Building other : indexer.getEnemy(team, BlockFlag.core)){
+            for(Building other : state.indexer.getEnemy(team, BlockFlag.core)){
                 out.add(other.tile.array());
             }
 
             //spawn points are also enemies.
             if(state.rules.waves && team == state.rules.defaultTeam){
-                for(Tile other : spawner.getSpawns()){
+                for(Tile other : state.spawner.getSpawns()){
                     out.add(other.array());
                 }
             }

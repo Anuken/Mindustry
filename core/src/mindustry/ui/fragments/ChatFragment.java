@@ -211,7 +211,7 @@ public class ChatFragment extends Table{
             }
             if(space != -1){
                 int x = Strings.parseInt(message, 10, -1, 0, comma), y = Strings.parseInt(message, 10, -1, comma + 1 + (extra ? 1 : 0), space);
-                if(world.tiles.in(x, y)){
+                if(state.world.in(x, y)){
                     Call.pingLocation(player, x * tilesize, y * tilesize, message.substring(space).trim());
                 }
             }

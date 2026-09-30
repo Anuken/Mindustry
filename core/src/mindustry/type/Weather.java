@@ -214,7 +214,7 @@ public class Weather extends UnlockableContent{
             y += Tmp.r1.y;
 
             if(Tmp.r3.setCentered(x, y, life * 4f).overlaps(Tmp.r2)){
-                Tile tile = world.tileWorld(x, y);
+                Tile tile = state.world.tileWorld(x, y);
 
                 //only create splashes on specific liquid.
                 if(tile != null && tile.floor().liquidDrop == splasher){

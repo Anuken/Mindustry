@@ -814,7 +814,7 @@ public class NetServer implements ApplicationListener{
             if(plans != null){
                 for(BuildPlan req : plans){
                     if(req == null) continue;
-                    Tile tile = world.tile(req.x, req.y);
+                    Tile tile = state.world.tile(req.x, req.y);
                     if(tile == null || (!req.breaking && req.block == null)) continue;
                     //auto-skip done requests
                     if(req.breaking && tile.block() == Blocks.air){
@@ -1105,7 +1105,7 @@ public class NetServer implements ApplicationListener{
 
         short sent = 0;
         for(var team : state.teams.present){
-            for(var build : indexer.getFlagged(team.team, BlockFlag.synced)){
+            for(var build : state.indexer.getFlagged(team.team, BlockFlag.synced)){
                 sent++;
 
                 dataStream.writeInt(build.pos());

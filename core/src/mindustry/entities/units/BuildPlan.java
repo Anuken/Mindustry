@@ -56,7 +56,7 @@ public class BuildPlan implements Position, QuadTreeObject{
         this.x = x;
         this.y = y;
         this.rotation = -1;
-        this.block = world.tile(x, y).block();
+        this.block = state.world.tile(x, y).block();
         this.breaking = true;
     }
 
@@ -148,7 +148,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     }
 
     public boolean isDone(){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return true;
         Block tblock = tile.block();
         if(breaking){
@@ -159,7 +159,7 @@ public class BuildPlan implements Position, QuadTreeObject{
     }
 
     public @Nullable Tile tile(){
-        return world.tile(x, y);
+        return state.world.tile(x, y);
     }
 
     public @Nullable Building build(){

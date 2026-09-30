@@ -482,7 +482,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            Tile selected = world.tileWorld(input.mouseWorldX(), input.mouseWorldY());
+            Tile selected = state.world.tileWorld(input.mouseWorldX(), input.mouseWorldY());
             if(selected != null){
                 Call.tileTap(player, selected);
             }

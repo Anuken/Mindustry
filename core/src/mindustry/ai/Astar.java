@@ -27,7 +27,7 @@ public class Astar{
     }
 
     public static Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHeuristic th, DistanceHeuristic dh, Boolf<Tile> passable){
-        Tiles tiles = world.tiles;
+        World tiles = state.world;
 
         Tile start = tiles.getn(startX, startY);
         Tile end = tiles.getn(endX, endY);
@@ -43,8 +43,8 @@ public class Astar{
         queue.clear();
         queue.comparator = Structs.comparingFloat(a -> costs[a.array()] + dh.cost(a.x, a.y, end.x, end.y));
         queue.add(start);
-        if(rotations == null || rotations.length != world.width() || rotations[0].length != world.height()){
-            rotations = new byte[world.width()][world.height()];
+        if(rotations == null || rotations.length != world.width || rotations[0].length != world.height){
+            rotations = new byte[world.width][world.height];
         }
 
         boolean found = false;

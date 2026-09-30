@@ -102,7 +102,7 @@ public class ConstructBlock extends Block{
             }
 
             //make sure block indexer knows it's damaged
-            indexer.notifyHealthChanged(tile.build);
+            state.indexer.notifyHealthChanged(tile.build);
 
             //last builder was this local client player, call placed()
             if(!headless && builder == player.unit()){

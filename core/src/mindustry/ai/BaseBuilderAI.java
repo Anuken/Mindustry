@@ -79,7 +79,7 @@ public class BaseBuilderAI{
         }
 
         //didn't find tile in time
-        if(calculating && calcCount >= world.width() * world.height()){
+        if(calculating && calcCount >= world.width * world.height){
             calculating = false;
             calcCount = 0;
             calcPath.clear();
@@ -89,7 +89,7 @@ public class BaseBuilderAI{
         //calculate path for units so schematics are not placed on it
         if(calculating){
             if(calcTile == null){
-                Vars.spawner.eachGroundSpawn((x, y) -> calcTile = world.tile(x, y));
+                Vars.state.spawner.eachGroundSpawn((x, y) -> calcTile = state.world.tile(x, y));
                 if(calcTile == null){
                     calculating = false;
                 }
@@ -105,7 +105,7 @@ public class BaseBuilderAI{
                         for(Point2 p : Geometry.d4){
                             int nx = cx + p.x, ny = cy + p.y, packed = world.packArray(nx, ny);
 
-                            Tile other = world.tile(nx, ny);
+                            Tile other = state.world.tile(nx, ny);
                             if(other != null && weights[packed] < minCost && weights[packed] != -1){
                                 minCost = weights[packed];
                                 calcTile = other;
@@ -158,10 +158,10 @@ public class BaseBuilderAI{
 
                 Tmp.v1.rnd(Mathf.random(range));
                 int wx = (int)(World.toTile(pos.getX()) + Tmp.v1.x), wy = (int)(World.toTile(pos.getY()) + Tmp.v1.y);
-                Tile tile = world.tiles.getc(wx, wy);
+                Tile tile = state.world.getc(wx, wy);
 
                 //try not to block the spawn point
-                if(spawner.getSpawns().contains(t -> t.within(tile, tilesize * 40f))){
+                if(state.spawner.getSpawns().contains(t -> t.within(tile, tilesize * 40f))){
                     continue;
                 }
 
@@ -190,7 +190,7 @@ public class BaseBuilderAI{
         if(data.hasCore()){
             return data.cores.random();
         }else if(data.team == state.rules.waveTeam){
-            return spawner.getSpawns().random();
+            return state.spawner.getSpawns().random();
         }
         return null;
     }
@@ -211,7 +211,7 @@ public class BaseBuilderAI{
             if(!Build.validPlace(tile.block, data.team, realX, realY, tile.rotation)){
                 return false;
             }
-            Tile wtile = world.tile(realX, realY);
+            Tile wtile = state.world.tile(realX, realY);
 
             if(tile.block instanceof PayloadConveyor || tile.block instanceof PayloadBlock){
                 //near a building

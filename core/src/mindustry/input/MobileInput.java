@@ -130,7 +130,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(!player.dead()){
             for(var plan : player.unit().plans()){
-                Tile other = world.tile(plan.x, plan.y);
+                Tile other = state.world.tile(plan.x, plan.y);
 
                 if(other == null || plan.breaking) continue;
 
@@ -980,7 +980,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             spectating = null;
         }
 
-        camera.position.clamp(-camera.width/4f, -camera.height/4f, world.unitWidth() + camera.width/4f, world.unitHeight() + camera.height/4f);
+        camera.position.clamp(-camera.width/4f, -camera.height/4f, world.unitWidth + camera.width/4f, world.unitHeight + camera.height/4f);
 
         return false;
     }
@@ -1093,7 +1093,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
 
                     if(allowHealing && target == null){
-                        target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(player.team()));
+                        target = Geometry.findClosest(unit.x, unit.y, state.indexer.getDamaged(player.team()));
                         if(target != null && !unit.within(target, range)){
                             target = null;
                         }

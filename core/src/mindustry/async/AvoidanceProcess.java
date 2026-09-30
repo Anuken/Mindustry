@@ -35,8 +35,8 @@ public class AvoidanceProcess implements AsyncProcess{
 
     @Override
     public void init(){
-        wwidth = Vars.world.width();
-        wheight = Vars.world.height();
+        wwidth = Vars.state.world.width;
+        wheight = Vars.state.world.height;
     }
 
     @Override

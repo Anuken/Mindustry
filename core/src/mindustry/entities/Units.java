@@ -211,19 +211,19 @@ public class Units{
 
     /** Returns the nearest damaged tile. */
     public static Building findDamagedTile(Team team, float x, float y){
-        return indexer.getDamaged(team).min(b -> b.dst2(x, y));
+        return state.indexer.getDamaged(team).min(b -> b.dst2(x, y));
     }
 
     /** Returns the nearest ally tile in a range. */
     public static Building findAllyTile(Team team, float x, float y, float range, Boolf<Building> pred){
-        return indexer.findTile(team, x, y, range, pred);
+        return state.indexer.findTile(team, x, y, range, pred);
     }
 
     /** Returns the nearest enemy tile in a range. */
     public static Building findEnemyTile(Team team, float x, float y, float range, Boolf<Building> pred){
         if(team == Team.derelict) return null;
 
-        return indexer.findEnemyTile(team, x, y, range, pred);
+        return state.indexer.findEnemyTile(team, x, y, range, pred);
     }
 
     /** @return the closest building of the provided team that matches the predicate. */
@@ -251,7 +251,7 @@ public class Units{
 
     /** Iterates through all buildings in a range. */
     public static void nearbyBuildings(float x, float y, float range, Cons<Building> cons){
-        indexer.allBuildings(x, y, range, cons);
+        state.indexer.allBuildings(x, y, range, cons);
     }
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
@@ -277,7 +277,7 @@ public class Units{
         if(unit != null){
             return unit;
         }else{
-            return indexer.findEnemyTile(team, x, y, range, UnitSorts.buildingDefault, tilePred, sourceTeam);
+            return state.indexer.findEnemyTile(team, x, y, range, UnitSorts.buildingDefault, tilePred, sourceTeam);
         }
     }
 

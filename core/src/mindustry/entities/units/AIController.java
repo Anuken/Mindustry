@@ -270,12 +270,12 @@ public class AIController implements UnitController{
 
     public Teamc targetFlag(float x, float y, BlockFlag flag, boolean enemy){
         if(unit.team == Team.derelict) return null;
-        return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
+        return Geometry.findClosest(x, y, enemy ? state.indexer.getEnemy(unit.team, flag) : state.indexer.getFlagged(unit.team, flag));
     }
 
     public Teamc targetFlagActive(float x, float y, BlockFlag flag, boolean enemy){
         if(unit.team == Team.derelict) return null;
-        return Geometry.findClosest(x, y, enemy ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag), t -> ((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput) && t.block.targetable);
+        return Geometry.findClosest(x, y, enemy ? state.indexer.getEnemy(unit.team, flag) : state.indexer.getFlagged(unit.team, flag), t -> ((t.items != null && t.items.any()) || t.status() != BlockStatus.noInput) && t.block.targetable);
     }
 
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
@@ -304,7 +304,7 @@ public class AIController implements UnitController{
     }
 
     public @Nullable Tile getClosestSpawner(){
-        return Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
+        return Geometry.findClosest(unit.x, unit.y, Vars.state.spawner.getSpawns());
     }
 
     public void unloadPayloads(){

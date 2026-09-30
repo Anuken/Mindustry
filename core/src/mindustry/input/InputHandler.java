@@ -150,8 +150,8 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     protected void initQuadtrees(){
-        playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
-        selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth(), world.unitHeight()));
+        playerPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth, world.unitHeight));
+        selectPlanTree = new QuadTree<>(new Rect(0f, 0f, world.unitWidth, world.unitHeight));
         createPlanLists();
     }
 
@@ -1513,12 +1513,12 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public boolean planMatches(BuildPlan plan){
-        Tile tile = world.tile(plan.x, plan.y);
+        Tile tile = state.world.tile(plan.x, plan.y);
         return tile != null && tile.build instanceof ConstructBuild cons && cons.current == plan.block;
     }
 
     public void drawBreaking(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return;
         Block block = tile.block();
 
@@ -1678,7 +1678,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
-                Tile tile = world.tileBuilding(x, y);
+                Tile tile = state.world.tileBuilding(x, y);
                 if(tile == null || !validBreak(tile.x, tile.y)) continue;
 
                 drawBreaking(tile.x, tile.y);
@@ -1741,7 +1741,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int x = dresult.x; x <= dresult.x2; x++){
             for(int y = dresult.y; y <= dresult.y2; y++){
 
-                Tile tile = world.tileBuilding(x, y);
+                Tile tile = state.world.tileBuilding(x, y);
 
                 if(tile != null && intSet.add(tile.pos()) && canRepairDerelict(tile)){
                     drawSelected(tile.x, tile.y, tile.block(), Pal.sapBullet);
@@ -1884,7 +1884,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 int wx = x1 + x * Mathf.sign(x2 - x1);
                 int wy = y1 + y * Mathf.sign(y2 - y1);
 
-                Tile tile = world.tileBuilding(wx, wy);
+                Tile tile = state.world.tileBuilding(wx, wy);
 
                 if(tile == null) continue;
 
@@ -2091,7 +2091,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Returns the tile at the specified MOUSE coordinates. */
     Tile tileAt(float x, float y){
-        return world.tile(tileX(x), tileY(y));
+        return state.world.tile(tileX(x), tileY(y));
     }
 
     int rawTileX(){
@@ -2332,7 +2332,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         for(int x = result.x; x <= result.x2; x++){
             for(int y = result.y; y <= result.y2; y++){
 
-                Tile tile = world.tileBuilding(x, y);
+                Tile tile = state.world.tileBuilding(x, y);
 
                 if(tile != null && tile.build != null && intSet.add(tile.pos())){
                     tryRepairDerelict(tile);
@@ -2393,7 +2393,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public void breakBlock(int x, int y){
         if(!player.isBuilder()) return;
 
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile != null && tile.build != null) tile = tile.build.tile;
         player.unit().addBuild(new BuildPlan(tile.x, tile.y));
     }

@@ -349,7 +349,7 @@ public class CommandAI extends AIController{
                     if(result.move) moveTarget.set(result.dest);
 
                     //do not wiggle in place
-                    if(unit.type.naval && result.next != null && !unit.canPass(result.next.x, result.next.y) && move && unit.tileOn() == world.tileWorld(moveTarget.x, moveTarget.y)){
+                    if(unit.type.naval && result.next != null && !unit.canPass(result.next.x, result.next.y) && move && unit.tileOn() == state.world.tileWorld(moveTarget.x, moveTarget.y)){
                         move = false;
                     }
                 }

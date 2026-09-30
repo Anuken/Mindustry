@@ -239,9 +239,9 @@ public class CoreBlock extends StorageBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        if(world.tile(x, y) == null) return;
+        if(state.world.tile(x, y) == null) return;
 
-        if(!canPlaceOn(world.tile(x, y), player.team(), rotation)){
+        if(!canPlaceOn(state.world.tile(x, y), player.team(), rotation)){
 
             drawPlaceText(Core.bundle.get(
                 isFirstTier ?
@@ -692,12 +692,12 @@ public class CoreBlock extends StorageBlock{
             Fx.coreExplosion.at(x, y, team.color);
 
             //add a spawn to the map for future reference - waves should be disabled, so it shouldn't matter
-            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && spawner.getSpawns().size == 0 && state.rules.sector.planet.enemyCoreSpawnReplace){
+            if(state.isCampaign() && team == state.rules.waveTeam && team.cores().size <= 1 && state.spawner.getSpawns().size == 0 && state.rules.sector.planet.enemyCoreSpawnReplace){
                 //do not recache
                 tile.setOverlayQuiet(Blocks.spawn);
 
-                if(!spawner.getSpawns().contains(tile)){
-                    spawner.getSpawns().add(tile);
+                if(!state.spawner.getSpawns().contains(tile)){
+                    state.spawner.getSpawns().add(tile);
                 }
             }
 

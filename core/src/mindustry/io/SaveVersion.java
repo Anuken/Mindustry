@@ -60,7 +60,7 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     @Override
-    public void read(DataInputStream stream, CounterInputStream counter, SaveReadState saveState) throws IOException{
+    public void read(DataInputStream stream, CounterInputStream counter, SaveLoadContext saveState) throws IOException{
         readRegion("meta", stream, counter, in -> readMeta(in, saveState));
         if(version >= 12) readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
 
@@ -139,8 +139,8 @@ public abstract class SaveVersion extends SaveFileReader{
             "locales", JsonIO.write(state.mapLocales),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "controlGroups", headless || control == null ? "null" : JsonIO.write(control.input.controlGroups),
-            "width", world.width(),
-            "height", world.height(),
+            "width", world.width,
+            "height", world.height,
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
@@ -149,7 +149,7 @@ public abstract class SaveVersion extends SaveFileReader{
         )));
     }
 
-    public void readMeta(DataInput stream, SaveReadState saveState) throws IOException{
+    public void readMeta(DataInput stream, SaveLoadContext saveState) throws IOException{
         StringMap map = readStringMap(stream);
 
         state.wave = map.getInt("wave");
@@ -190,7 +190,7 @@ public abstract class SaveVersion extends SaveFileReader{
         )) : worldmap;
     }
 
-    public void readRules(SaveReadState saveState){
+    public void readRules(SaveLoadContext saveState){
         if(saveState.ruleString == null) return; //in NetworkIO, rules are null, not read here
         state.rules = JsonIO.read(Rules.class, saveState.ruleString);
 
@@ -211,18 +211,18 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void writeMap(DataOutput stream) throws IOException{
         //write world size
-        stream.writeShort(world.width());
-        stream.writeShort(world.height());
+        stream.writeShort(world.width);
+        stream.writeShort(world.height);
 
         //floor + overlay
-        for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tiles.geti(i);
+        for(int i = 0; i < world.width * world.height; i++){
+            Tile tile = state.world.geti(i);
             stream.writeShort(tile.floorID());
             stream.writeShort(tile.overlayID());
             int consecutives = 0;
 
-            for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                Tile nextTile = world.rawTile(j % world.width(), j / world.width());
+            for(int j = i + 1; j < world.width * world.height && consecutives < 255; j++){
+                Tile nextTile = world.rawTile(j % world.width, j / world.width);
 
                 if(nextTile.floorID() != tile.floorID() || nextTile.overlayID() != tile.overlayID()){
                     break;
@@ -236,8 +236,8 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         //blocks
-        for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tiles.geti(i);
+        for(int i = 0; i < world.width * world.height; i++){
+            Tile tile = state.world.geti(i);
             stream.writeShort(tile.blockID());
 
             boolean savedata = tile.shouldSaveData();
@@ -272,8 +272,8 @@ public abstract class SaveVersion extends SaveFileReader{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
 
-                for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                    Tile nextTile = world.rawTile(j % world.width(), j / world.width());
+                for(int j = i + 1; j < world.width * world.height && consecutives < 255; j++){
+                    Tile nextTile = world.rawTile(j % world.width, j / world.width);
 
                     if(nextTile.blockID() != tile.blockID() || savedata != nextTile.shouldSaveData()){
                         break;
@@ -288,7 +288,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readMap(DataInput stream, SaveReadState state) throws IOException{
+    public void readMap(DataInput stream, SaveLoadContext state) throws IOException{
         var context = state.context;
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
@@ -491,7 +491,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveReadState state) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveLoadContext state) throws IOException{
         IntSet used = new IntSet();
         Seq<Entityc> reassign = new Seq<>();
 
@@ -545,13 +545,13 @@ public abstract class SaveVersion extends SaveFileReader{
         return entityMapping;
     }
 
-    public void readEntities(DataInput stream, SaveReadState state) throws IOException{
+    public void readEntities(DataInput stream, SaveLoadContext state) throws IOException{
         var mapping = readEntityMapping(stream);
         readTeamBlocks(stream);
         readWorldEntities(stream, mapping, state);
     }
 
-    public void readDataPatches(DataInput stream, SaveReadState saveState) throws IOException{
+    public void readDataPatches(DataInput stream, SaveLoadContext saveState) throws IOException{
         stream.readInt(); //version - ignored for now
 
         //the requiredPlanets filter needs this, since the rules aren't read yet

@@ -211,7 +211,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         Seq<Building> builds = new Seq<>();
                         Time.clear();
 
-                        world.tiles.eachTile(t -> {
+                        state.world.eachTile(t -> {
                             if(t.build != null && t.isCenter() && t.block().update && t.build.allowUpdate()){
                                 builds.add(t.build);
                                 t.build.updateProximity();
@@ -260,7 +260,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }).padTop(1).size(swidth * 2f + 10, 60f);
 
         resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
-            if(!(editor.width() == width && editor.height() == height && shiftX == 0 && shiftY == 0)){
+            if(!(state.world.width == width && state.world.height == height && shiftX == 0 && shiftY == 0)){
                 ui.loadAnd(() -> {
                     editor.resize(width, height, shiftX, shiftY);
                 });
@@ -337,11 +337,11 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.rules.fog = false;
             state.map = new Map(StringMap.of(
                 "name", "Editor Playtesting",
-                "width", editor.width(),
-                "height", editor.height()
+                "width", state.world.width,
+                "height", state.world.height
             ));
             state.set(State.playing);
-            world.endMapLoad();
+            state.world.endMapLoad();
             player.clearUnit();
 
             for(var unit : Groups.unit){

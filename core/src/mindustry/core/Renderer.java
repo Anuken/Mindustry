@@ -597,7 +597,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
-        int w = world.width() * tilesize, h = world.height() * tilesize;
+        int w = world.width * tilesize, h = world.height * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
         if(Vars.checkScreenshotMemory && memory >= (mobile ? 65 : 120)){

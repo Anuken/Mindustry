@@ -17,8 +17,8 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
-import mindustry.maps.*;
 import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
 import mindustry.mod.data.*;
@@ -555,8 +555,8 @@ public class ServerControl implements ApplicationListener{
                     info("Map loaded.");
 
                     netServer.openServer();
-                }catch(MapException e){
-                    err("@: @", e.map.plainName(), e.getMessage());
+                }catch(SaveLoadException e){
+                    err("@: @", state.map.plainName(), e.getMessage());
                 }
             }
         });
@@ -1358,7 +1358,7 @@ public class ServerControl implements ApplicationListener{
      * Resets the world state, starts a new game.
      * @param run What task to run to load a new world.
      */
-    public void play(Runnable run){
+    public void play(UnsafeRunnable run){
         play(true, run);
     }
 
@@ -1367,7 +1367,7 @@ public class ServerControl implements ApplicationListener{
      * @param wait Whether to wait for {@link Config#roundExtraTime} seconds before starting a new game.
      * @param run What task to run to load a new world.
      */
-    public void play(boolean wait, Runnable run){
+    public void play(boolean wait, UnsafeRunnable run){
         inGameOverWait = true;
         cancelPlayTask();
 
@@ -1384,8 +1384,9 @@ public class ServerControl implements ApplicationListener{
 
                 reloader.end();
                 inGameOverWait = false;
-            }catch(MapException e){
-                err("@: @", e.map.plainName(), e.getMessage());
+            }catch(Throwable e){
+                err("Error loading map @: @", state.map.plainName(), e.getMessage());
+                state.set(State.menu);
                 net.closeServer();
             }
         };

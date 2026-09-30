@@ -210,7 +210,7 @@ public class BuilderAI extends AIController{
                     BlockPlan block = blocks.first();
 
                     //check if it's already been placed
-                    if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block() == block.block){
+                    if(state.world.tile(block.x, block.y) != null && state.world.tile(block.x, block.y).block() == block.block){
                         blocks.removeFirst();
                     }else if(Build.validPlace(block.block, unit.team(), block.x, block.y, block.rotation)
                     && (!alwaysFlee || !nearEnemy(block.x, block.y))){ //check if it's valid

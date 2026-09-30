@@ -58,7 +58,7 @@ abstract class PosComp implements Position{
 
     @Nullable
     Tile tileOn(){
-        return world.tileWorld(x, y);
+        return state.world.tileWorld(x, y);
     }
 
     boolean onSolid(){

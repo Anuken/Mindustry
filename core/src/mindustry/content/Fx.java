@@ -124,7 +124,7 @@ public class Fx{
         //small ripples drifting over the debris, so the water still reads as moving on top of it
         if(!state.isPaused() && Mathf.chanceDelta(0.0002f * (reg.width * reg.height) / (50f * 50f))){
             float x = e.x + Mathf.range(reg.width * reg.scale / 4f / 3f), y = e.y + Mathf.range(reg.height * reg.scale / 4f / 3f);
-            Tile tile = world.tileWorld(x, y);
+            Tile tile = state.world.tileWorld(x, y);
             if(tile != null && tile.floor().isLiquid && tile.block() == Blocks.air){
                 Fx.rippleSlow.at(x, y, Mathf.random(0.4f, 1f), tile.floor().mapColor);
             }

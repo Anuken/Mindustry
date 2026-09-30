@@ -66,7 +66,7 @@ public class OverlayRenderer{
         }
 
         //if this is laggy, it could be shoved in another thread.
-        var result = Voronoi.generate(pos.toArray(Vec2.class), 0, world.unitWidth(), 0, world.unitHeight());
+        var result = Voronoi.generate(pos.toArray(Vec2.class), 0, state.world.unitWidth, 0, state.world.unitHeight);
         for(var edge : result){
             cedges.add(new CoreEdge(edge.x1, edge.y1, edge.x2, edge.y2, teams.get(edge.site1).team, teams.get(edge.site2).team));
         }
@@ -201,7 +201,7 @@ public class OverlayRenderer{
         Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time, 8f, 1f));
 
         if(state.hasSpawns()){
-            for(Tile tile : spawner.getSpawns()){
+            for(Tile tile : state.spawner.getSpawns()){
                 if(tile.within(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
                     Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
                     Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
@@ -214,7 +214,7 @@ public class OverlayRenderer{
         //draw selected block
         if(input.block == null && !Core.scene.hasMouse()){
             Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
-            Building build = world.buildWorld(vec.x, vec.y);
+            Building build = state.world.buildWorld(vec.x, vec.y);
 
             if(build != null && build.team == player.team()){
                 build.drawSelect();
@@ -250,7 +250,7 @@ public class OverlayRenderer{
             Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time, 5f, 1f));
             Draw.reset();
 
-            Building build = world.buildWorld(v.x, v.y);
+            Building build = state.world.buildWorld(v.x, v.y);
             if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange) &&
                 input.canDepositItem(build)){
 

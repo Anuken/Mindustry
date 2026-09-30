@@ -323,7 +323,7 @@ public class Placement{
             return 20;
         }else{
             if(parents.containsKey(tile.pos())){
-                Tile prev = world.tile(parents.get(tile.pos(), 0));
+                Tile prev = state.world.tile(parents.get(tile.pos(), 0));
                 if(tile.relativeTo(prev) != other.relativeTo(tile)){
                     return 8;
                 }
@@ -346,8 +346,8 @@ public class Placement{
     }
 
     private static boolean astar(int startX, int startY, int endX, int endY){
-        Tile start = world.tile(startX, startY);
-        Tile end = world.tile(endX, endY);
+        Tile start = state.world.tile(startX, startY);
+        Tile end = state.world.tile(endX, endY);
         if(start == end || start == null || end == null) return false;
 
         costs.clear();
@@ -370,7 +370,7 @@ public class Placement{
             closed.add(Point2.pack(next.x, next.y));
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
-                Tile child = world.tile(newx, newy);
+                Tile child = state.world.tile(newx, newy);
                 if(child != null && validNode(next, child)){
                     if(closed.add(child.pos())){
                         parents.put(child.pos(), next.pos());
@@ -394,7 +394,7 @@ public class Placement{
             if(newPos == -1) return false;
 
             points.add(Pools.obtain(Point2.class, Point2::new).set(Point2.x(newPos), Point2.y(newPos)));
-            current = world.tile(newPos);
+            current = state.world.tile(newPos);
         }
 
         points.reverse();

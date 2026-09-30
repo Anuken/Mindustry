@@ -77,8 +77,8 @@ public class BlockIndexer{
             allWallOres.clear();
             ores = new IntSeq[content.items().size][][];
             wallOres = new IntSeq[content.items().size][][];
-            quadWidth = Mathf.ceil(world.width() / (float)quadrantSize);
-            quadHeight = Mathf.ceil(world.height() / (float)quadrantSize);
+            quadWidth = Mathf.ceil(world.width / (float)quadrantSize);
+            quadHeight = Mathf.ceil(world.height / (float)quadrantSize);
             blocksPresent = new boolean[content.blocks().size];
 
             //so WorldLoadEvent gets called twice sometimes... ugh
@@ -90,7 +90,7 @@ public class BlockIndexer{
                 }
             }
 
-            for(Tile tile : world.tiles){
+            for(Tile tile : state.world){
                 process(tile);
 
                 addFloorIndex(tile, tile.floor());
@@ -549,7 +549,7 @@ public class BlockIndexer{
                 for(int qy = 0; qy < quadHeight; qy++){
                     var arr = ores[item.id][qx][qy];
                     if(arr != null && arr.size > 0){
-                        Tile tile = world.tile(arr.first());
+                        Tile tile = state.world.tile(arr.first());
                         if(tile.block() == Blocks.air){
                             float dst = Mathf.dst2(xp, yp, tile.worldx(), tile.worldy());
                             if(closest == null || dst < minDst){
@@ -576,7 +576,7 @@ public class BlockIndexer{
                 for(int qy = 0; qy < quadHeight; qy++){
                     var arr = wallOres[item.id][qx][qy];
                     if(arr != null && arr.size > 0){
-                        Tile tile = world.tile(arr.first());
+                        Tile tile = state.world.tile(arr.first());
                         if(tile.block() != Blocks.air){
                             float dst = Mathf.dst2(xp, yp, tile.worldx(), tile.worldy());
                             if(closest == null || dst < minDst){
@@ -636,13 +636,13 @@ public class BlockIndexer{
 
             //insert the new tile into the quadtree for targeting
             if(data.buildingTree == null){
-                data.buildingTree = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                data.buildingTree = new QuadTree<>(new Rect(0, 0, world.unitWidth, world.unitHeight));
             }
             data.buildingTree.insert(tile.build);
 
             if(tile.block().attacks && tile.build instanceof Ranged){
                 if(data.turretTree == null){
-                    data.turretTree = new TurretQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                    data.turretTree = new TurretQuadtree(new Rect(0, 0, world.unitWidth, world.unitHeight));
                 }
 
                 data.turretTree.insert(tile.build);
@@ -650,7 +650,7 @@ public class BlockIndexer{
 
             if(tile.build instanceof ShieldProvider){
                 if(data.shieldTree == null){
-                    data.shieldTree = new ShieldQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                    data.shieldTree = new ShieldQuadtree(new Rect(0, 0, world.unitWidth, world.unitHeight));
                 }
 
                 data.shieldTree.insert(tile.build);

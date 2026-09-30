@@ -42,7 +42,7 @@ public class MenuRenderer implements Disposable{
         //suppress tile change events.
         world.setGenerating(true);
 
-        Tiles tiles = world.resize(width, height);
+        World tiles = world.resize(width, height);
         //only uses base game ores now, mod ones usually contrast too much with the floor
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreScrap, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium);
         shadows = new FrameBuffer(width, height);
@@ -173,7 +173,7 @@ public class MenuRenderer implements Disposable{
         shadows.begin(Color.clear);
         Draw.color(Color.black);
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(tile.block() != Blocks.air){
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
@@ -187,18 +187,18 @@ public class MenuRenderer implements Disposable{
         Core.batch = batch = new CacheBatch(new SpriteCache(width * height * 6, false));
         batch.beginCache();
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             tile.floor().drawBase(tile);
         }
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             tile.overlay().drawBase(tile);
         }
 
         cacheFloor = batch.endCache();
         batch.beginCache();
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             tile.block().drawBase(tile);
         }
 

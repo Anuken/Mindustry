@@ -311,11 +311,11 @@ public class Saves{
             this.file = file;
         }
 
-        public void load() throws SaveException{
-            load(world.context);
+        public void load() throws SaveLoadException{
+            load(new DefaultWorldContext(state));
         }
 
-        public void load(WorldContext context) throws SaveException{
+        public void load(SaveLoadContext context) throws SaveLoadException{
             try{
                 SaveIO.load(file, context);
                 meta = SaveIO.getMeta(file);
@@ -323,7 +323,7 @@ public class Saves{
                 totalPlaytime = meta.timePlayed;
                 savePreview();
             }catch(Throwable e){
-                throw new SaveException(e);
+                throw new SaveLoadException(e);
             }
         }
 
@@ -470,17 +470,13 @@ public class Saves{
             }
         }
 
-        public void exportFile(Fi to) throws IOException{
-            try{
-                if(isBeingPlayed() && hasExternalAssets()){
-                    SaveIO.write(to, new SaveOptions(){{
-                        embedAssets = true;
-                    }});
-                }else{
-                    file.copyTo(to);
-                }
-            }catch(Exception e){
-                throw new IOException(e);
+        public void exportFile(Fi to) throws Throwable{
+            if(isBeingPlayed() && hasExternalAssets()){
+                SaveIO.write(to, new SaveOptions(){{
+                    embedAssets = true;
+                }});
+            }else{
+                file.copyTo(to);
             }
         }
 

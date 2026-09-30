@@ -88,7 +88,7 @@ public class EditorTile extends Tile{
             build.wasVisible = true;
         }
 
-        world.tileChanges ++;
+        state.world.tileChanges ++;
 
         type.blockChanged(this);
     }

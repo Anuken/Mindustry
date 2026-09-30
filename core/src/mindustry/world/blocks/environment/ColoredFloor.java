@@ -125,10 +125,10 @@ public class ColoredFloor extends Floor{
     static float sample(Block target, int tx1, int ty1, int tx2, int ty2, int tx3, int ty3, int tx4, int ty4){
         int total = 0;
         float r = 0f, g = 0f, b = 0f;
-        Tile t1 = Vars.world.tile(tx1, ty1);
-        Tile t2 = Vars.world.tile(tx2, ty2);
-        Tile t3 = Vars.world.tile(tx3, ty3);
-        Tile t4 = Vars.world.tile(tx4, ty4);
+        Tile t1 = Vars.state.world.tile(tx1, ty1);
+        Tile t2 = Vars.state.world.tile(tx2, ty2);
+        Tile t3 = Vars.state.world.tile(tx3, ty3);
+        Tile t4 = Vars.state.world.tile(tx4, ty4);
 
         //manually unrolled loops, hooray
         if(t1 != null && t1.floor() == target){

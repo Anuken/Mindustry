@@ -572,7 +572,7 @@ public class TypeIO{
     }
 
     public static Tile readTile(Reads read){
-        return world.tile(read.i());
+        return state.world.tile(read.i());
     }
 
     public static void writeBlock(Writes write, Block block){
@@ -664,7 +664,7 @@ public class TypeIO{
         byte type = read.b();
         int position = read.i();
 
-        if(world.tile(position) == null){
+        if(state.world.tile(position) == null){
             return null;
         }
 

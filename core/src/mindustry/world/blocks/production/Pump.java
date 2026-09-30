@@ -40,7 +40,7 @@ public class Pump extends LiquidBlock{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
 
         if(valid && tile != null){
             float amount = 0f;

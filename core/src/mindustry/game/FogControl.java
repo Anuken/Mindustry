@@ -48,8 +48,8 @@ public final class FogControl implements CustomChunk{
 
             loadedStatic = false;
             justLoaded = true;
-            ww = world.width();
-            wh = world.height();
+            ww = state.world.width;
+            wh = state.world.height;
 
             //all old buildings have static light scheduled around them
             if(state.rules.fog && state.rules.staticFog){
@@ -276,7 +276,7 @@ public final class FogControl implements CustomChunk{
                     data.lastDynamicMs = Time.millis();
 
                     //add building updates
-                    for(var build : indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
+                    for(var build : state.indexer.getFlagged(team.team, BlockFlag.hasFogRadius)){
                         dynamicEventQueue.add(FogEvent.get(build.tile.x, build.tile.y, Mathf.round(build.fogRadius()), build.team.id));
                     }
 
@@ -444,8 +444,8 @@ public final class FogControl implements CustomChunk{
         }
 
         stream.writeByte(used);
-        stream.writeShort(world.width());
-        stream.writeShort(world.height());
+        stream.writeShort(state.world.width);
+        stream.writeShort(state.world.height);
 
         for(int i = 0; i < 256; i++){
             if(fog[i] != null){

@@ -147,7 +147,7 @@ public class BeamDrill extends Block{
             Item found = null;
             for(; j < range; j++){
                 int rx = Tmp.p1.x + Geometry.d4x(rotation)*j, ry = Tmp.p1.y + Geometry.d4y(rotation)*j;
-                Tile other = world.tile(rx, ry);
+                Tile other = state.world.tile(rx, ry);
                 if(other != null && other.solid()){
                     Item drop = other.wallDrop();
                     if(drop != null){
@@ -199,7 +199,7 @@ public class BeamDrill extends Block{
         for(int i = 0; i < size; i++){
             nearbySide(tile.x, tile.y, rotation, i, Tmp.p1);
             for(int j = 0; j < range; j++){
-                Tile other = world.tile(Tmp.p1.x + Geometry.d4x(rotation)*j, Tmp.p1.y + Geometry.d4y(rotation)*j);
+                Tile other = state.world.tile(Tmp.p1.x + Geometry.d4x(rotation)*j, Tmp.p1.y + Geometry.d4y(rotation)*j);
                 if(other != null && other.solid()){
                     Item drop = other.wallDrop();
                     if(drop != null && drop.hardness <= tier && (blockedItems == null || !blockedItems.contains(drop))){
@@ -384,7 +384,7 @@ public class BeamDrill extends Block{
                 Tile dest = null;
                 for(int i = 0; i < range; i++){
                     int rx = l.x + dx*i, ry = l.y + dy*i;
-                    Tile other = world.tile(rx, ry);
+                    Tile other = state.world.tile(rx, ry);
                     if(other != null){
                         if(other.solid()){
                             Item drop = other.wallDrop();

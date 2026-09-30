@@ -221,10 +221,10 @@ public class SectorInfo{
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
-        hasSpawns = spawner.countSpawns() > 0;
+        hasSpawns = state.spawner.countSpawns() > 0;
         lastPresetName = sector.preset == null ? null : sector.preset.name;
-        lastWidth = world.width();
-        lastHeight = world.height();
+        lastWidth = world.width;
+        lastHeight = world.height;
 
         lightCoverage = 0f;
         for(var build : state.rules.defaultTeam.data().buildings){
@@ -240,7 +240,7 @@ public class SectorInfo{
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
         });
 
-        var pads = indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
+        var pads = state.indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
 
         //disable export when launch pads are disabled, or there aren't any active ones
         if(pads.size == 0 || !pads.contains(t -> t.efficiency > 0)){

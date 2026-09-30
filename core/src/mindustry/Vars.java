@@ -14,7 +14,6 @@ import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
 import mindustry.editor.*;
-import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -269,7 +268,6 @@ public class Vars implements Loadable{
     public static Net net;
     public static ContentLoader content;
     public static GameState state;
-    public static EntityCollisions collisions;
     public static Waves waves;
     public static Platform platform = new Platform(){};
     public static Mods mods;
@@ -285,10 +283,8 @@ public class Vars implements Loadable{
     public static GameService service = new GameService();
 
     public static Universe universe;
-    public static World world;
     public static Maps maps;
-    public static WaveSpawner spawner;
-    public static BlockIndexer indexer;
+    //TODO: move these to state
     public static Pathfinder pathfinder;
     public static ControlPathfinder controlPath;
     public static FogControl fogControl;
@@ -352,16 +348,12 @@ public class Vars implements Loadable{
 
         content = new ContentLoader();
         waves = new Waves();
-        collisions = new EntityCollisions();
-        world = new World();
         universe = new Universe();
         becontrol = new BeControl();
         asyncCore = new AsyncCore();
         if(!headless) editor = new MapEditor();
 
         maps = new Maps();
-        spawner = new WaveSpawner();
-        indexer = new BlockIndexer();
         pathfinder = new Pathfinder();
         controlPath = new ControlPathfinder();
         fogControl = new FogControl();

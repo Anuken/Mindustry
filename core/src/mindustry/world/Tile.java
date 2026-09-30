@@ -76,7 +76,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     /** @return this tile's position, packed to the world width - for use in width*height arrays. */
     public int array(){
-        return x + y * world.tiles.width;
+        return x + y * state.world.width;
     }
 
     public byte relativeTo(Tile tile){
@@ -264,7 +264,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                         int worldx = dx + offset + x;
                         int worldy = dy + offset + y;
                         if(!(worldx == x && worldy == y)){
-                            Tile other = world.tile(worldx, worldy);
+                            Tile other = state.world.tile(worldx, worldy);
 
                             if(other != null){
                                 if(pass == 0){
@@ -320,6 +320,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         }
 
         if(!world.isGenerating()){
+            world.floorChanges ++;
             Events.fire(floorChange.set(this, prev, type));
         }
 
@@ -338,7 +339,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public void circle(int radius, Intc2 cons){
-        Geometry.circle(x, y, world.width(), world.height(), radius, cons);
+        Geometry.circle(x, y, world.width, world.height, radius, cons);
     }
 
     public void circle(int radius, Cons<Tile> cons){
@@ -363,7 +364,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             renderer.blocks.addFloorIndex(this);
             //update neighbor tiles as well
             for(int i = 0; i < 8; i++){
-                Tile other = world.tile(x + Geometry.d8[i].x, y + Geometry.d8[i].y);
+                Tile other = state.world.tile(x + Geometry.d8[i].x, y + Geometry.d8[i].y);
                 if(other != null){
                     renderer.blocks.floor.recacheTile(other);
                 }
@@ -480,7 +481,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             int size = block.size, o = block.sizeOffset;
             for(int dx = 0; dx < size; dx++){
                 for(int dy = 0; dy < size; dy++){
-                    Tile other = world.tile(x + dx + o, y + dy + o);
+                    Tile other = state.world.tile(x + dx + o, y + dy + o);
                     if(other != null) cons.get(other);
                 }
             }
@@ -518,7 +519,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             int size = block.size, o = block.sizeOffset;
             for(int dx = 0; dx < size; dx++){
                 for(int dy = 0; dy < size; dy++){
-                    Tile other = world.tile(x + dx + o, y + dy + o);
+                    Tile other = state.world.tile(x + dx + o, y + dy + o);
                     if(other != null) tmpArray.get(other);
                 }
             }
@@ -541,19 +542,19 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public @Nullable Tile nearby(Point2 relative){
-        return world.tile(x + relative.x, y + relative.y);
+        return state.world.tile(x + relative.x, y + relative.y);
     }
 
     public @Nullable Tile nearby(int dx, int dy){
-        return world.tile(x + dx, y + dy);
+        return state.world.tile(x + dx, y + dy);
     }
 
     public @Nullable Tile nearby(int rotation){
         return switch(rotation){
-            case 0 -> world.tile(x + 1, y);
-            case 1 -> world.tile(x, y + 1);
-            case 2 -> world.tile(x - 1, y);
-            case 3 -> world.tile(x, y - 1);
+            case 0 -> state.world.tile(x + 1, y);
+            case 1 -> state.world.tile(x, y + 1);
+            case 2 -> state.world.tile(x - 1, y);
+            case 3 -> state.world.tile(x, y - 1);
             default -> null;
         };
     }
@@ -617,7 +618,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
                 int offsety = -(size - 1) / 2;
                 for(int dx = 0; dx < size; dx++){
                     for(int dy = 0; dy < size; dy++){
-                        Tile other = world.tile(cx + dx + offsetx, cy + dy + offsety);
+                        Tile other = state.world.tile(cx + dx + offsetx, cy + dy + offsety);
                         if(other != null){
                             //reset entity and block *manually* - thus, preChanged() will not be called anywhere else, for multiblocks
                             if(other != this){ //do not remove own entity so it can be processed in changed()
@@ -689,6 +690,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
 
     protected void fireChanged(){
         if(!world.isGenerating()){
+            state.world.tileChanges ++;
             Events.fire(tileChange.set(this));
         }
     }
@@ -754,7 +756,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public static void setTileBlocks(Block block, Team team, int[] positions){
         if(block == null || positions == null) return;
         for(int pos : positions){
-            Tile tile = world.tile(pos);
+            Tile tile = state.world.tile(pos);
             if(tile != null){
                 tile.setBlock(block, team, 0);
             }
@@ -766,7 +768,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public static void setTileFloors(Block block, int[] positions){
         if(positions == null || !(block instanceof Floor floor)) return;
         for(int pos : positions){
-            Tile tile = world.tile(pos);
+            Tile tile = state.world.tile(pos);
             if(tile != null){
                 tile.setFloor(floor);
             }
@@ -778,7 +780,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public static void setTileOverlays(Block block, int[] positions){
         if(positions == null || !(block instanceof OverlayFloor floor)) return;
         for(int pos : positions){
-            Tile tile = world.tile(pos);
+            Tile tile = state.world.tile(pos);
             if(tile != null){
                 tile.setOverlay(floor);
             }
@@ -790,7 +792,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     public static void fillTileBlocks(int x, int y, int x2, int y2, Block block, Team team){
         for(int tx = x; tx <= x2; tx++){
             for(int ty = y; ty <= y2; ty++){
-                Tile tile = world.tile(tx, ty);
+                Tile tile = state.world.tile(tx, ty);
                 if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
                 tile.setBlock(block, team, 0);
             }
@@ -803,7 +805,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(!(block instanceof Floor floor)) return;
         for(int tx = x; tx <= x2; tx++){
             for(int ty = y; ty <= y2; ty++){
-                Tile tile = world.tile(tx, ty);
+                Tile tile = state.world.tile(tx, ty);
                 if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
                 tile.setFloor(floor);
             }
@@ -816,7 +818,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
         if(!(block instanceof OverlayFloor floor)) return;
         for(int tx = x; tx <= x2; tx++){
             for(int ty = y; ty <= y2; ty++){
-                Tile tile = world.tile(tx, ty);
+                Tile tile = state.world.tile(tx, ty);
                 if(tile == null) return; //out of bounds; return instead of breaking since it's a rectangle
                 tile.setOverlay(floor);
             }
@@ -924,7 +926,7 @@ public class Tile implements Position, QuadTreeObject, Displayable{
             var build = world.build(pos);
             if(build != null && build.health != health){
                 build.health = health;
-                indexer.notifyHealthChanged(build);
+                state.indexer.notifyHealthChanged(build);
             }
         }
     }

@@ -13,7 +13,7 @@ public class Save4 extends LegacySaveVersion2{
     }
 
     @Override
-    public void readEntities(DataInput stream, SaveReadState state) throws IOException{
+    public void readEntities(DataInput stream, SaveLoadContext state) throws IOException{
         readTeamBlocks(stream);
         readWorldEntities(stream, EntityMapping.idMap, state);
     }

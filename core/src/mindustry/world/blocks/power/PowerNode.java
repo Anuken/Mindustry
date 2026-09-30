@@ -158,7 +158,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
 
         if(tile == null || !autolink) return;
 
@@ -178,7 +178,7 @@ public class PowerNode extends PowerBlock{
 
     @Override
     public void changePlacementPath(Seq<Point2> points, int rotation){
-        Placement.calculateNodes(points, this, rotation, (point, other) -> overlaps(world.tile(point.x, point.y), world.tile(other.x, other.y)));
+        Placement.calculateNodes(points, this, rotation, (point, other) -> overlaps(state.world.tile(point.x, point.y), state.world.tile(other.x, other.y)));
     }
 
     protected void setupColor(float satisfaction){
@@ -229,7 +229,7 @@ public class PowerNode extends PowerBlock{
             !PowerNode.insulated(tile, other.tile) &&
             !(other instanceof PowerNodeBuild obuild && obuild.power.links.size >= ((PowerNode)obuild.block).maxNodes) &&
             !Structs.contains(Edges.getEdges(size), p -> { //do not link to adjacent buildings
-                var t = world.tile(tile.x + p.x, tile.y + p.y);
+                var t = state.world.tile(tile.x + p.x, tile.y + p.y);
                 return t != null && t.build == other;
             });
 
@@ -284,7 +284,7 @@ public class PowerNode extends PowerBlock{
         && !graphs.contains(other.power.graph) &&
         !PowerNode.insulated(tile, other.tile) &&
         !Structs.contains(Edges.getEdges(block.size), p -> { //do not link to adjacent buildings
-            var t = world.tile(tile.x + p.x, tile.y + p.y);
+            var t = state.world.tile(tile.x + p.x, tile.y + p.y);
             return t != null && t.build == other;
         });
 

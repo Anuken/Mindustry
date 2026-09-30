@@ -45,14 +45,14 @@ public class TiledWall extends StaticWall{
     }
 
     long state(Tile tile){
-        return world.tiles.getTmpBlockState(tile.array());
+        return state.world.getTmpBlockState(tile.array());
     }
 
     @Override
     public void blockChanged(Tile tile){
         if(headless) return;
 
-        if(!world.isGenerating() && TiledState.changes(state(tile)) != world.tileChanges){
+        if(!world.isGenerating() && TiledState.changes(state(tile)) != state.world.tileChanges){
             scan(tile);
         }
     }
@@ -60,7 +60,7 @@ public class TiledWall extends StaticWall{
     void scan(Tile tile){
         //max size possible
         int size = maxSize;
-        int changes = world.tileChanges;
+        int changes = state.world.tileChanges;
 
         //scan to the top right for the biggest size possible
         for(int cx = 0; cx < size; cx++){
@@ -89,7 +89,7 @@ public class TiledWall extends StaticWall{
                     }
 
                     //mark as updated
-                    world.tiles.setTmpBlockState(other.array(), TiledState.get(cx, cy, size, changes));
+                    state.world.setTmpBlockState(other.array(), TiledState.get(cx, cy, size, changes));
                     if(!headless && otherState != 0){
                         Core.app.post(() -> renderer.blocks.floor.recacheTile(other));
                     }
@@ -102,7 +102,7 @@ public class TiledWall extends StaticWall{
     public void drawBase(Tile tile){
         long state = state(tile);
         //stale state, start scanning.
-        if(TiledState.changes(state) != world.tileChanges){
+        if(TiledState.changes(state) != state.world.tileChanges){
             scan(tile);
             //state has most likely updated
             state = state(tile);

@@ -17,7 +17,7 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
     }
 
     @Override
-    public void readMap(DataInput stream, SaveReadState state) throws IOException{
+    public void readMap(DataInput stream, SaveLoadContext state) throws IOException{
         var context = state.context;
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();

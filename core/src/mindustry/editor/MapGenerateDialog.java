@@ -158,26 +158,26 @@ public class MapGenerateDialog extends BaseDialog{
     /** Applies the specified filters to the editor. */
     public void applyToEditor(Seq<GenerateFilter> filters){
         //writeback buffer
-        long[] writeTiles = new long[editor.width() * editor.height()];
+        long[] writeTiles = new long[state.world.width * state.world.height];
         long[] writeData = new long[writeTiles.length];
 
         for(GenerateFilter filter : filters){
-            input.begin(editor.width(), editor.height(), editor::tile);
+            input.begin(state.world.width, state.world.height, editor::tile);
 
             //write to buffer
-            for(int x = 0; x < editor.width(); x++){
-                for(int y = 0; y < editor.height(); y++){
+            for(int x = 0; x < state.world.width; x++){
+                for(int y = 0; y < state.world.height; y++){
                     input.set(editor.tile(x, y));
                     filter.apply(input);
-                    writeTiles[x + y*world.width()] = PackTile.get(input.block.id, input.floor.id, input.overlay.id);
-                    writeData[x + y*world.width()] = input.packedData;
+                    writeTiles[x + y*world.width] = PackTile.get(input.block.id, input.floor.id, input.overlay.id);
+                    writeData[x + y*world.width] = input.packedData;
                 }
             }
 
             editor.load(() -> {
                 //read from buffer back into tiles
-                for(int i = 0; i < editor.width() * editor.height(); i++){
-                    Tile tile = world.tiles.geti(i);
+                for(int i = 0; i < state.world.width * state.world.height; i++){
+                    Tile tile = state.world.geti(i);
                     long write = writeTiles[i];
 
                     Block block = content.block(PackTile.block(write)), floor = content.block(PackTile.floor(write)), overlay = content.block(PackTile.overlay(write));
@@ -259,7 +259,7 @@ public class MapGenerateDialog extends BaseDialog{
             texture = null;
         }
 
-        pixmap = new Pixmap(editor.width() / scaling, editor.height() / scaling);
+        pixmap = new Pixmap(state.world.width / scaling, state.world.height / scaling);
         texture = new Texture(pixmap);
 
         cont.clear();
@@ -334,7 +334,7 @@ public class MapGenerateDialog extends BaseDialog{
     }
 
     long[] create(){
-        return new long[(editor.width() / scaling) * (editor.height() / scaling)];
+        return new long[(state.world.width / scaling) * (state.world.height / scaling)];
     }
 
     void rebuildFilters(){
@@ -525,7 +525,7 @@ public class MapGenerateDialog extends BaseDialog{
                 }
 
                 for(var filter : copy){
-                    input.begin(editor.width(), editor.height(), (x, y) -> unpack(buffer1[Mathf.clamp(x / scaling, 0, pixmap.width -1) + w* Mathf.clamp(y / scaling, 0, pixmap.height -1)]));
+                    input.begin(state.world.width, state.world.height, (x, y) -> unpack(buffer1[Mathf.clamp(x / scaling, 0, pixmap.width -1) + w* Mathf.clamp(y / scaling, 0, pixmap.height -1)]));
 
                     //read from buffer1 and write to buffer2
                     pixmap.each((px, py) -> {

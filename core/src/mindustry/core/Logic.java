@@ -141,13 +141,13 @@ public class Logic implements ApplicationListener{
                 //faster mapping, avoids objectmap per-tile
                 Floor[] map = new Floor[content.blocks().size];
                 for(var entry : e.sector.planet.sectorCaptureReplacements){
-                    if(indexer.isBlockPresent(entry.key)){
+                    if(state.indexer.isBlockPresent(entry.key)){
                         map[entry.key.id] = entry.value.asFloor();
                         any = true;
                     }
                 }
                 if(any){
-                    world.tiles.eachTile(t -> {
+                    state.world.eachTile(t -> {
                         Floor result = map[t.floor().id];
                         if(result != null){
                             t.setFloor(result);
@@ -300,8 +300,6 @@ public class Logic implements ApplicationListener{
         Groups.clear();
         Time.clear();
         Events.fire(new ResetEvent());
-        world.tiles = new Tiles(0, 0);
-
         state.data.unload();
         State prev = state.getState();
         //recreate gamestate - sets state to menu
@@ -317,7 +315,7 @@ public class Logic implements ApplicationListener{
     }
 
     public void runWave(){
-        spawner.spawnEnemies();
+        state.spawner.spawnEnemies();
         state.wave++;
         state.wavetime = state.rules.waveSpacing * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);
 
@@ -334,13 +332,13 @@ public class Logic implements ApplicationListener{
             }
 
             //check if there are no enemy spawns
-            if(state.rules.waves && spawner.countSpawns() + state.teams.cores(state.rules.waveTeam).size <= 0){
+            if(state.rules.waves && state.spawner.countSpawns() + state.teams.cores(state.rules.waveTeam).size <= 0){
                 //if yes, waves get disabled
                 state.rules.waves = false;
             }
 
             //if there's a "win" wave and no enemies are present, win automatically
-            if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
+            if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !state.spawner.isSpawning()) ||
                 (state.rules.attackMode && !state.rules.waveTeam.isAlive())){
 
                 if(state.rules.sector.preset != null && state.rules.sector.preset.attackAfterWaves && !state.rules.attackMode){
@@ -366,7 +364,7 @@ public class Logic implements ApplicationListener{
                     Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
-            }else if(!state.gameOver && state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning())){
+            }else if(!state.gameOver && state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !state.spawner.isSpawning())){
                 state.gameOver = true;
                 Events.fire(new GameOverEvent(state.rules.defaultTeam));
             }
@@ -514,7 +512,7 @@ public class Logic implements ApplicationListener{
             Core.settings.forceSave();
         }
 
-        boolean runStateCheck = !net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver;
+        boolean runStateCheck = !net.client() && !state.isEditor() && state.rules.canGameOver;
 
         if(state.isGame()){
             if(!net.client()){

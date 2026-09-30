@@ -221,7 +221,7 @@ public class Maps{
             }
 
             //create map, write it, etc etc etc
-            Map map = new Map(file, world.width(), world.height(), tags, true);
+            Map map = new Map(file, world.width, world.height, tags, true);
             fogControl.resetFog();
             MapIO.writeMap(file, map, embedAssets);
 
@@ -248,7 +248,7 @@ public class Maps{
                     Core.assets.unload(map.previewFile().path() + "." + mapExtension);
                 }
 
-                Pixmap pix = MapIO.generatePreview(world.tiles);
+                Pixmap pix = MapIO.generatePreview(state.world);
                 writeCache(map);
 
                 map.texture = new Texture(pix);

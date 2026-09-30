@@ -251,7 +251,7 @@ public class HintsFragment{
 
         waveFire(
             () -> ui.hints.events.contains("fire") && Blocks.wave.unlockedNow(),
-            () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
+            () -> state.indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
         ),
 
         rebuildSelect(
@@ -282,7 +282,7 @@ public class HintsFragment{
         ),
 
         serpuloCoreZone(
-            () -> state.isCampaign() && state.getPlanet() == Planets.serpulo && Vars.indexer.isBlockPresent(Blocks.coreZone) &&
+            () -> state.isCampaign() && state.getPlanet() == Planets.serpulo && Vars.state.indexer.isBlockPresent(Blocks.coreZone) &&
                 (!state.rules.attackMode || state.stats.getDestroyed(Blocks.coreShard) + state.stats.getDestroyed(Blocks.coreFoundation) + state.stats.getDestroyed(Blocks.coreNucleus) > 0),
             () -> state.rules.defaultTeam.cores().size > 1
         ),

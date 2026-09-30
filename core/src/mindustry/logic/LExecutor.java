@@ -248,16 +248,16 @@ public class LExecutor{
                     switch(locate){
                         case ore -> {
                             if(ore.obj() instanceof Item item){
-                                res = indexer.findClosestOre(unit, item);
+                                res = state.indexer.findClosestOre(unit, item);
                             }
                         }
                         case building -> {
-                            Building b = Geometry.findClosest(unit.x, unit.y, enemy.bool() ? indexer.getEnemy(unit.team, flag) : indexer.getFlagged(unit.team, flag));
+                            Building b = Geometry.findClosest(unit.x, unit.y, enemy.bool() ? state.indexer.getEnemy(unit.team, flag) : state.indexer.getFlagged(unit.team, flag));
                             res = b == null ? null : b.tile;
                             build = true;
                         }
                         case spawn -> {
-                            res = Geometry.findClosest(unit.x, unit.y, Vars.spawner.getSpawns());
+                            res = Geometry.findClosest(unit.x, unit.y, Vars.state.spawner.getSpawns());
                         }
                         case damaged -> {
                             Building b = Units.findDamagedTile(unit.team, unit.x, unit.y);
@@ -397,7 +397,7 @@ public class LExecutor{
                         unit.flag = p1.num();
                     }
                     case mine -> {
-                        Tile tile = world.tileWorld(x1, y1);
+                        Tile tile = state.world.tileWorld(x1, y1);
                         if(unit.canMine()){
                             unit.mineTile = unit.validMine(tile) ? tile : null;
                         }
@@ -498,7 +498,7 @@ public class LExecutor{
                             p4.setobj(null);
                             p5.setobj(null);
                         }else{
-                            Tile tile = world.tileWorld(x1, y1);
+                            Tile tile = state.world.tileWorld(x1, y1);
                             if(tile == null){
                                 p3.setobj(null);
                                 p4.setobj(null);
@@ -1556,7 +1556,7 @@ public class LExecutor{
 
         @Override
         public void run(LExecutor exec){
-            Tile tile = world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
+            Tile tile = state.world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
             if(tile == null){
                 dest.setobj(null);
             }else{
@@ -1592,7 +1592,7 @@ public class LExecutor{
         public void run(LExecutor exec){
             if(net.client()) return;
 
-            Tile tile = world.tile(x.numi(), y.numi());
+            Tile tile = state.world.tile(x.numi(), y.numi());
             if(tile != null && block.obj() instanceof Block b){
                 switch(layer){
                     case ore -> {
@@ -1645,7 +1645,7 @@ public class LExecutor{
                 //random offset to prevent stacking
                 var unit = type.spawn(t, World.unconv(x.numf()) + Mathf.range(0.01f), World.unconv(y.numf()) + Mathf.range(0.01f), rotation.numf());
                 if(effect.bool()){
-                    spawner.spawnEffect(unit);
+                    state.spawner.spawnEffect(unit);
                 }else{
                     //manually call events
                     unit.unloaded();
@@ -1869,9 +1869,9 @@ public class LExecutor{
     static boolean checkMapArea(int x, int y, int w, int h, boolean set){
         x = Math.max(x, 0);
         y = Math.max(y, 0);
-        w = Math.min(world.width(), w);
-        h = Math.min(world.height(), h);
-        boolean full = x == 0 && y == 0 && w == world.width() && h == world.height();
+        w = Math.min(world.width, w);
+        h = Math.min(world.height, h);
+        boolean full = x == 0 && y == 0 && w == world.width && h == world.height;
 
         if(state.rules.limitMapArea){
             if(state.rules.limitX == x && state.rules.limitY == y && state.rules.limitWidth == w && state.rules.limitHeight == h){
@@ -2199,7 +2199,7 @@ public class LExecutor{
                 for(int i = 0; i < spawned; i++){
                     Tmp.v1.rnd(spread);
 
-                    spawner.spawnUnit(group, spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
+                    state.spawner.spawnUnit(group, spawnX + Tmp.v1.x, spawnY + Tmp.v1.y);
                 }
             }
         }

@@ -161,7 +161,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public boolean isPathImpassable(int tileX, int tileY){
-        return !type.flying && world.tiles.in(tileX, tileY) && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+        return !type.flying && state.world.in(tileX, tileY) && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
     }
 
     /** @return approx. square size of the physical hitbox for physics */
@@ -670,7 +670,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //update bounds
 
         if(type.bounded){
-            float bot = 0f, left = 0f, top = world.unitHeight(), right = world.unitWidth();
+            float bot = 0f, left = 0f, top = world.unitHeight, right = world.unitWidth;
 
             //TODO hidden map rules only apply to player teams? should they?
             if(state.rules.limitMapArea && !team.isAI()){
@@ -789,7 +789,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //apply knockback based on spawns
         if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal()) && hittable()){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
-            for(Tile spawn : spawner.getSpawns()){
+            for(Tile spawn : state.spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     velAddNet(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
                 }
@@ -927,7 +927,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         if(!headless && type.createScorch){
-            Tile deathTile = world.tileWorld(x, y);
+            Tile deathTile = state.world.tileWorld(x, y);
             //decals don't render on liquids, so wreckage sinks instead of leaving a mark on top
             boolean sinks = deathTile != null && !deathTile.floor().hasSurface();
             Color sinkColor = sinks ? deathTile.floor().mapColor : null;

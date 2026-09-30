@@ -9,6 +9,7 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.Astar.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -20,14 +21,14 @@ public abstract class BasicGenerator implements WorldGenerator{
     protected Rand rand = new Rand();
 
     protected int width, height;
-    protected @Nullable Tiles tiles;
+    protected @Nullable World world;
 
     //for drawing
     protected @Nullable Block floor, block, ore;
 
     @Override
-    public void generate(Tiles tiles, WorldParams params){
-        this.tiles = tiles;
+    public void generate(World tiles, WorldParams params){
+        this.world = tiles;
         this.width = tiles.width;
         this.height = tiles.height;
 
@@ -47,17 +48,17 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void median(int radius, double percentile, @Nullable Block targetFloor){
-        short[] blocks = new short[tiles.width * tiles.height];
+        short[] blocks = new short[world.width * world.height];
         short[] floors = new short[blocks.length];
 
-        tiles.each((x, y) -> {
-            if(targetFloor != null && tiles.getn(x, y).floor() != targetFloor) return;
+        world.each((x, y) -> {
+            if(targetFloor != null && world.getn(x, y).floor() != targetFloor) return;
 
             ints1.clear();
             ints2.clear();
             Geometry.circle(x, y, width, height, radius, (cx, cy) -> {
-                ints1.add(tiles.getn(cx, cy).floorID());
-                ints2.add(tiles.getn(cx, cy).blockID());
+                ints1.add(world.getn(cx, cy).floorID());
+                ints2.add(world.getn(cx, cy).blockID());
             });
             ints1.sort();
             ints2.sort();
@@ -102,7 +103,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void oreAround(Block ore, Block wall, int radius, float scl, float thresh){
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             int x = tile.x, y = tile.y;
 
             if(tile.block() == Blocks.air && tile.floor().hasSurface() && noise(x, y + ore.id*999, scl, 1f) > thresh){
@@ -111,7 +112,7 @@ public abstract class BasicGenerator implements WorldGenerator{
                 outer:
                 for(int dx = x-radius; dx <= x+radius; dx++){
                     for(int dy = y-radius; dy <= y+radius; dy++){
-                        if(Mathf.within(dx, dy, x, y, radius + 0.001f) && tiles.in(dx, dy) && tiles.get(dx, dy).block() == wall){
+                        if(Mathf.within(dx, dy, x, y, radius + 0.001f) && world.in(dx, dy) && world.tile(dx, dy).block() == wall){
                             found = true;
                             break outer;
                         }
@@ -131,7 +132,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             if(block != Blocks.air){
                 boolean empty = false;
                 for(Point2 p : Geometry.d8){
-                    Tile other = tiles.get(x + p.x, y + p.y);
+                    Tile other = world.tile(x + p.x, y + p.y);
                     if(other != null && other.block() == Blocks.air){
                         empty = true;
                         break;
@@ -150,12 +151,12 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void cliffs(){
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
 
             int rotation = 0;
             for(int i = 0; i < 8; i++){
-                Tile other = tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                Tile other = world.tile(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
                 if(other != null && !other.block().isStatic()){
                     rotation |= (1 << i);
                 }
@@ -168,7 +169,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             tile.data = (byte)rotation;
         }
 
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(tile.block() != Blocks.cliff && tile.block().isStatic()){
                 tile.setBlock(Blocks.air);
             }
@@ -195,7 +196,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     public void noise(Block floor, Block block, int octaves, float falloff, float scl, float threshold){
         pass((x, y) -> {
             if(noise(octaves, falloff, scl, x, y) > threshold){
-                Tile tile = tiles.getn(x, y);
+                Tile tile = world.getn(x, y);
                 this.floor = floor;
                 if(tile.block().solid){
                     this.block = block;
@@ -206,7 +207,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     public void overlay(Block floor, Block block, float chance, int octaves, float falloff, float scl, float threshold){
         pass((x, y) -> {
-            if(noise(x, y, octaves, falloff, scl) > threshold && rand.chance(chance) && tiles.getn(x, y).floor() == floor){
+            if(noise(x, y, octaves, falloff, scl) > threshold && rand.chance(chance) && world.getn(x, y).floor() == floor){
                 ore = block;
             }
         });
@@ -239,19 +240,19 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void distort(float scl, float mag){
-        short[] blocks = new short[tiles.width * tiles.height];
+        short[] blocks = new short[world.width * world.height];
         short[] floors = new short[blocks.length];
 
-        tiles.each((x, y) -> {
-            int idx = y*tiles.width + x;
+        world.each((x, y) -> {
+            int idx = y* world.width + x;
             float cx = x + noise(x - 155f, y - 200f, scl, mag) - mag / 2f, cy = y + noise(x + 155f, y + 155f, scl, mag) - mag / 2f;
-            Tile other = tiles.getn(Mathf.clamp((int)cx, 0, tiles.width-1), Mathf.clamp((int)cy, 0, tiles.height-1));
+            Tile other = world.getn(Mathf.clamp((int)cx, 0, world.width-1), Mathf.clamp((int)cy, 0, world.height-1));
             blocks[idx] = other.block().id;
             floors[idx] = other.floor().id;
         });
 
         for(int i = 0; i < blocks.length; i++){
-            Tile tile = tiles.geti(i);
+            Tile tile = world.geti(i);
             tile.setFloor(Vars.content.block(floors[i]).asFloor());
             tile.setBlock(Vars.content.block(blocks[i]));
         }
@@ -281,19 +282,19 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void cells(int iterations, int birthLimit, int deathLimit, int cradius){
-        GridBits write = new GridBits(tiles.width, tiles.height);
-        GridBits read = new GridBits(tiles.width, tiles.height);
+        GridBits write = new GridBits(world.width, world.height);
+        GridBits read = new GridBits(world.width, world.height);
 
-        tiles.each((x, y) -> read.set(x, y, !tiles.get(x, y).block().isAir()));
+        world.each((x, y) -> read.set(x, y, !world.tile(x, y).block().isAir()));
 
         for(int i = 0; i < iterations; i++){
-            tiles.each((x, y) -> {
+            world.each((x, y) -> {
                 int alive = 0;
 
                 for(int cx = -cradius; cx <= cradius; cx++){
                     for(int cy = -cradius; cy <= cradius; cy++){
                         if((cx == 0 && cy == 0) || !Mathf.within(cx, cy, cradius)) continue;
-                        if(!Structs.inBounds(x + cx, y + cy, tiles.width, tiles.height) || read.get(x + cx, y + cy)){
+                        if(!Structs.inBounds(x + cx, y + cy, world.width, world.height) || read.get(x + cx, y + cy)){
                             alive++;
                         }
                     }
@@ -310,7 +311,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             read.set(write);
         }
 
-        for(var t : tiles){
+        for(var t : world){
             t.setBlock(!read.get(t.x, t.y) ? Blocks.air : t.floor().wall);
         }
     }
@@ -326,7 +327,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void pass(Intc2 r){
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             floor = tile.floor();
             block = tile.block();
             ore = tile.overlay();
@@ -339,7 +340,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     public boolean nearWall(int x, int y){
         for(Point2 p : Geometry.d8){
-            Tile other = tiles.get(x + p.x, y + p.y);
+            Tile other = world.tile(x + p.x, y + p.y);
             if(other != null && other.block() != Blocks.air){
                 return true;
             }
@@ -349,7 +350,7 @@ public abstract class BasicGenerator implements WorldGenerator{
 
     public boolean nearAir(int x, int y){
         for(Point2 p : Geometry.d4){
-            Tile other = tiles.get(x + p.x, y + p.y);
+            Tile other = world.tile(x + p.x, y + p.y);
             if(other != null && other.block() == Blocks.air){
                 return true;
             }
@@ -362,7 +363,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             for(int y = -rad; y <= rad; y++){
                 int wx = cx + x, wy = cy + y;
                 if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
-                    Tile other = tiles.getn(wx, wy);
+                    Tile other = world.getn(wx, wy);
                     if(pred.get(other.block())){
                         other.setBlock(Blocks.air);
                     }
@@ -376,7 +377,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             for(int y = -rad; y <= rad; y++){
                 int wx = cx + x, wy = cy + y;
                 if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
-                    Tile other = tiles.getn(wx, wy);
+                    Tile other = world.getn(wx, wy);
                     if(other.block() == block){
                         return true;
                     }
@@ -389,7 +390,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     public void decoration(float chance){
         pass((x, y) -> {
             for(int i = 0; i < 4; i++){
-                Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
+                Tile near = state.world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
                 if(near != null && near.block() != Blocks.air){
                     return;
                 }
@@ -404,16 +405,16 @@ public abstract class BasicGenerator implements WorldGenerator{
     public void blend(Block floor, Block around, float radius){
         float r2 = radius*radius;
         int cap = Mathf.ceil(radius);
-        int max = tiles.width * tiles.height;
+        int max = world.width * world.height;
         Floor dest = around.asFloor();
 
         for(int i = 0; i < max; i++){
-            Tile tile = tiles.geti(i);
+            Tile tile = world.geti(i);
             if(tile.floor() == floor || tile.block() == floor){
                 for(int cx = -cap; cx <= cap; cx++){
                     for(int cy = -cap; cy <= cap; cy++){
                         if(cx*cx + cy*cy <= r2){
-                            Tile other = tiles.get(tile.x + cx, tile.y + cy);
+                            Tile other = world.tile(tile.x + cx, tile.y + cy);
 
                             if(other != null && other.floor() != floor){
                                 other.setFloor(dest);
@@ -434,7 +435,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             for(int y = -rad; y <= rad; y++){
                 int wx = cx + x, wy = cy + y;
                 if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
-                    Tile other = tiles.getn(wx, wy);
+                    Tile other = world.getn(wx, wy);
                     other.setBlock(Blocks.air);
                 }
             }
@@ -446,7 +447,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void trimDark(){
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             boolean any = world.getDarkness(tile.x, tile.y) > 0;
             for(int i = 0; i < 4 && !any; i++){
                 any = world.getDarkness(tile.x + Geometry.d4[i].x, tile.y + Geometry.d4[i].y) > 0;
@@ -459,7 +460,7 @@ public abstract class BasicGenerator implements WorldGenerator{
     }
 
     public void inverseFloodFill(Tile start){
-        GridBits used = new GridBits(tiles.width, tiles.height);
+        GridBits used = new GridBits(world.width, world.height);
 
         IntSeq arr = new IntSeq();
         arr.add(start.pos());
@@ -469,8 +470,8 @@ public abstract class BasicGenerator implements WorldGenerator{
             used.set(x, y);
             for(Point2 point : Geometry.d4){
                 int newx = x + point.x, newy = y + point.y;
-                if(tiles.in(newx, newy)){
-                    Tile child = tiles.getn(newx, newy);
+                if(world.in(newx, newy)){
+                    Tile child = world.getn(newx, newy);
                     if(child.block() == Blocks.air && !used.get(child.x, child.y)){
                         used.set(child.x, child.y);
                         arr.add(child.pos());
@@ -479,7 +480,7 @@ public abstract class BasicGenerator implements WorldGenerator{
             }
         }
 
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(!used.get(tile.x, tile.y) && tile.block() == Blocks.air){
                 tile.setBlock(tile.floor().wall);
             }

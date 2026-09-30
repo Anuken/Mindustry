@@ -594,7 +594,7 @@ public class NetClient implements ApplicationListener{
             for(int i = 0; i < amount; i++){
                 int pos = input.readInt();
                 short block = input.readShort();
-                Tile tile = world.tile(pos);
+                Tile tile = state.world.tile(pos);
                 if(tile == null || tile.build == null){
                     Log.warn("Missing entity at @. Skipping block snapshot.", tile);
                     break;

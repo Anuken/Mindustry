@@ -41,7 +41,7 @@ public class WaveSpawner{
     public Tile getFirstSpawn(){
         firstSpawn = null;
         eachGroundSpawn((cx, cy) -> {
-            firstSpawn = world.tile(cx, cy);
+            firstSpawn = state.world.tile(cx, cy);
         });
         return firstSpawn;
     }
@@ -110,7 +110,7 @@ public class WaveSpawner{
 
     public void spawnUnit(SpawnGroup group, float x, float y){
         group.createUnit(group.team == null ? state.rules.waveTeam : group.team, x, y,
-            Angles.angle(x, y, world.width()/2f * tilesize, world.height()/2f * tilesize), state.wave - 1, this::spawnEffect);
+            Angles.angle(x, y, world.width/2f * tilesize, world.height/2f * tilesize), state.wave - 1, this::spawnEffect);
     }
 
     public void doShockwave(float x, float y){
@@ -149,7 +149,7 @@ public class WaveSpawner{
                     while(steps++ < maxSteps){
                         int tx = World.toTile(core.x + Tmp.v1.x), ty = World.toTile(core.y + Tmp.v1.y);
                         any = false;
-                        Geometry.circle(tx, ty, world.width(), world.height(), 3, (x, y) -> {
+                        Geometry.circle(tx, ty, world.width, world.height, 3, (x, y) -> {
                             if(world.solid(x, y)){
                                 any = true;
                             }
@@ -179,10 +179,10 @@ public class WaveSpawner{
             if(filterPos != -1 && filterPos != tile.pos()) continue;
 
             if(!state.rules.airUseSpawns){
-                float angle = Angles.angle(world.width() / 2f, world.height() / 2f, tile.x, tile.y);
-                float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
-                float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
-                float spawnY = Mathf.clamp(world.height() * tilesize / 2f + Angles.trnsy(angle, trns), -margin, world.height() * tilesize + margin);
+                float angle = Angles.angle(world.width / 2f, world.height / 2f, tile.x, tile.y);
+                float trns = Math.max(world.width, world.height) * Mathf.sqrt2 * tilesize;
+                float spawnX = Mathf.clamp(world.width * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width * tilesize + margin);
+                float spawnY = Mathf.clamp(world.height * tilesize / 2f + Angles.trnsy(angle, trns), -margin, world.height * tilesize + margin);
                 cons.get(spawnX, spawnY);
             }else{
                 cons.get(tile.worldx(), tile.worldy());
@@ -218,7 +218,7 @@ public class WaveSpawner{
         spawning = false;
         spawns.clear();
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(tile.overlay() == Blocks.spawn){
                 spawns.add(tile);
             }

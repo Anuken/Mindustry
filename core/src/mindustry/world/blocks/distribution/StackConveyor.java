@@ -151,7 +151,7 @@ public class StackConveyor extends Block implements Autotiler{
         public void draw(){
             Draw.z(Layer.block - 0.1f);
 
-            Tile from = world.tile(link);
+            Tile from = state.world.tile(link);
 
             if(glowRegion.found() && power != null && power.status > 0f){
                 Draw.z(Layer.blockAdditive);
