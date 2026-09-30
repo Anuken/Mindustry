@@ -314,16 +314,16 @@ public class GameState{
 
         if(Vars.state.teams.cores(checkRules.defaultTeam).size == 0 && !checkRules.pvp){
             //non-pvp: needs a core for the player team
-            throw new SaveLoadException(Core.bundle.format("map.nospawn", checkRules.defaultTeam.coloredName()));
+            throw new SaveLoadException(headless ? "The player team does not have a core" : Core.bundle.format("map.nospawn", checkRules.defaultTeam.coloredName()));
         }else if(checkRules.pvp){
             //pvp: needs 2 active teams with cores
             if(Vars.state.teams.getActive().count(TeamData::hasCore) < 2){
-                throw new SaveLoadException(Core.bundle.get("map.nospawn.pvp"));
+                throw new SaveLoadException(headless ? "PvP is on, but there are fewer than 2 teams with a core" : Core.bundle.get("map.nospawn.pvp"));
             }
         }else if(checkRules.attackMode){
             //attack maps: need 2 cores to be valid
             if(Vars.state.rules.waveTeam.data().noCores()){
-                throw new SaveLoadException(Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.coloredName()));
+                throw new SaveLoadException(headless ? "Attack mode is on, but there is no enemy core" : Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.coloredName()));
             }
         }
     }

@@ -13,8 +13,6 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
-import mindustry.io.*;
-import mindustry.io.SaveFileReader.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
@@ -23,7 +21,6 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
-import java.io.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -39,23 +36,6 @@ import static mindustry.Vars.*;
 public class Logic implements ApplicationListener{
 
     public Logic(){
-
-        SaveVersion.addCustomChunk("static-fog-data", new CustomChunk(){
-            @Override
-            public void write(DataOutput stream) throws IOException{
-                state.fog.write(stream);
-            }
-
-            @Override
-            public void read(DataInput stream) throws IOException{
-                state.fog.read(stream);
-            }
-
-            @Override
-            public boolean shouldWrite(){
-                return state.fog.shouldWrite();
-            }
-        });
 
         Events.on(BlockDestroyEvent.class, event -> {
             //skip if rule is off
@@ -347,6 +327,7 @@ public class Logic implements ApplicationListener{
         state.controlPath.stop();
         state.fog.stop();
         Events.fire(new ResetEvent());
+
         state.data.unload();
         State prev = state.getState();
         //recreate gamestate - sets state to menu

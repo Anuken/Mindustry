@@ -33,6 +33,25 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public final int version;
 
+    static{
+        addCustomChunk("static-fog-data", new CustomChunk(){
+            @Override
+            public void write(DataOutput stream) throws IOException{
+                state.fog.write(stream);
+            }
+
+            @Override
+            public void read(DataInput stream) throws IOException{
+                state.fog.read(stream);
+            }
+
+            @Override
+            public boolean shouldWrite(){
+                return state.fog.shouldWrite();
+            }
+        });
+    }
+
     /**
      * Registers a custom save chunk reader/writer by name. This is mostly used for mods that need to save extra data.
      * @param name a mod-specific, unique name for identifying this chunk. Prefixing is recommended.

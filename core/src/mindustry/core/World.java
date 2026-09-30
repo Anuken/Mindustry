@@ -16,6 +16,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
+/** Container for tile data. */
 public class World implements Iterable<Tile>{
     public final int width, height;
     public final float unitWidth, unitHeight;
@@ -154,20 +155,9 @@ public class World implements Iterable<Tile>{
         return tile == null || tile.solid();
     }
 
-    public boolean passable(int x, int y){
-        Tile tile = tile(x, y);
-
-        return tile != null && tile.passable();
-    }
-
     public boolean wallSolid(int x, int y){
         Tile tile = tile(x, y);
         return tile == null || tile.block().solid;
-    }
-
-    public boolean wallSolidFull(int x, int y){
-        Tile tile = tile(x, y);
-        return tile == null || (tile.block().solid && tile.block().fillsTile);
     }
 
     public boolean isAccessible(int x, int y){
