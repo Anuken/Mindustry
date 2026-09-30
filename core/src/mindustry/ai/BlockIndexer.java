@@ -33,35 +33,30 @@ public class BlockIndexer{
 
     //TODO: refactor to be field of state, and also refactor such that data is stored in teams when appropriate
     /** Stores all ore quadrants on the map. Maps ID to qX to qY to a list of tiles with that ore. */
-    private IntSeq[][][] ores, wallOres;
+    private IntSeq[][][] ores = {}, wallOres = {};
     /** All ores present on the map - can be wall or floor. */
-    private Seq<Item> allPresentOres;
+    private Seq<Item> allPresentOres = new Seq<>();
     /** All ores available on this map. */
-    private ObjectIntMap<Item> allOres, allWallOres;
+    private ObjectIntMap<Item> allOres = new ObjectIntMap<>(), allWallOres = new ObjectIntMap<>();
     /** Stores teams that are present here as tiles. */
-    private Seq<Team> activeTeams;
+    private Seq<Team> activeTeams = new Seq<>(Team.class);
     //TODO: move to TeamData
     /** Maps teams to a map of flagged tiles by flag. */
-    private Seq<Building>[][] flagMap;
+    private Seq<Building>[][] flagMap = new Seq[Team.all.length][BlockFlag.all.length];
     /** Counts whether a certain floor is present in the world upon load. */
-    private boolean[] blocksPresent;
+    private boolean[] blocksPresent = {};
     /** Maps block flag to a list of floor tiles that have it. */
-    private Seq<Tile>[] floorMap;
+    private Seq<Tile>[] floorMap = new Seq[BlockFlag.all.length];
 
-    public void load(){
-        flagMap = new Seq[Team.all.length][BlockFlag.all.length];
-        floorMap = new Seq[BlockFlag.all.length];
-        activeTeams = new Seq<>(Team.class);
-        allPresentOres = new Seq<>();
-
+    {
         for(int i = 0; i < flagMap.length; i++){
             for(int j = 0; j < BlockFlag.all.length; j++){
                 flagMap[i][j] = new Seq();
             }
         }
+    }
 
-        allOres = new ObjectIntMap<>();
-        allWallOres = new ObjectIntMap<>();
+    public void load(){
         ores = new IntSeq[content.items().size][][];
         wallOres = new IntSeq[content.items().size][][];
         quadWidth = Mathf.ceil(state.world.width / (float)quadrantSize);

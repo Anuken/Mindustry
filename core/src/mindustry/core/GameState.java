@@ -142,10 +142,7 @@ public class GameState{
     /** Resizes the tile array to the specified size. Only use for loading saves! */
     public World resizeWorld(int width, int height){
         world.clearBuildings();
-
-        if(world.width != width || world.height != height){
-            world = new World(width, height);
-        }
+        world = new World(width, height);
 
         return world;
     }

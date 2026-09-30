@@ -93,7 +93,6 @@ public class FileMapGenerator implements WorldGenerator{
 
         boolean anyCores = false;
 
-        //TODO: unsure if indexer even works at this stage
         Block coreTypeToUse = state.rules.defaultTeam.cores().isEmpty() ? sector.planet.defaultCore : state.rules.defaultTeam.core().block;
 
         for(Tile tile : world){
