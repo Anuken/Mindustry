@@ -64,8 +64,6 @@ public class BulletType extends Content implements Cloneable{
     public boolean removeAfterPierce = true;
     /** For piercing lasers, setting this to true makes it get absorbed by plastanium walls. */
     public boolean laserAbsorb = true;
-    /** Whether force shields absorb this bullet when it hits as a line, even if it isn't a laser. Used by rails. */
-    public boolean shieldAbsorb = true;
     /** Whether this bullet is considered a laser bullet and thus absorbed by plastanium walls. */
     public boolean laserBullet = false;
     /** Life fraction at which this bullet has the best range/damage/etc. Used for lasers and continuous turrets. */
@@ -152,7 +150,7 @@ public class BulletType extends Content implements Cloneable{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
-    /** Whether this projectile can be absorbed by shields. */
+    /** Whether this projectile/rail/laser can be absorbed by shields. */
     public boolean absorbable = true;
     /** If true, the angle param in create is ignored. */
     public boolean ignoreSpawnAngle = false;
