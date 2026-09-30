@@ -41,7 +41,7 @@ public final class FogRenderer{
 
     public void drawFog(){
         //there is no fog.
-        if(fogControl.getDiscovered(player.team()) == null) return;
+        if(state.fog.getDiscovered(player.team()) == null) return;
 
         //resize if world size changes
         boolean clearStatic = staticFog.resize(state.world.width, state.world.height);
@@ -140,7 +140,7 @@ public final class FogRenderer{
         Draw.color();
         int ww = state.world.width, wh = state.world.height;
 
-        var data = fogControl.getDiscovered(player.team());
+        var data = state.fog.getDiscovered(player.team());
         int len = state.world.width * state.world.height;
         if(data != null){
             for(int i = 0; i < len; i++){

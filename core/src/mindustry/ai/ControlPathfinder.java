@@ -112,8 +112,7 @@ public class ControlPathfinder implements Runnable{
     /** State this pathfinder belongs to; captured so the thread never touches a newer state. */
     final GameState state;
     //cached world size
-    final int wwidth, wheight;
-    final int cwidth, cheight;
+    final int ww, wh, cwidth, cheight;
 
     //temporarily used for resolving connections for intra-edges
     final IntSet usedEdges = new IntSet();
@@ -334,10 +333,10 @@ public class ControlPathfinder implements Runnable{
 
     public ControlPathfinder(GameState state){
         this.state = state;
-        wwidth = state.world.width;
-        wheight = state.world.height;
-        cwidth = Mathf.ceil((float)wwidth / clusterSize);
-        cheight = Mathf.ceil((float)wheight / clusterSize);
+        ww = state.world.width;
+        wh = state.world.height;
+        cwidth = Mathf.ceil((float)ww / clusterSize);
+        cheight = Mathf.ceil((float)wh / clusterSize);
     }
 
     public void updateTile(Tile tile){
@@ -543,7 +542,7 @@ public class ControlPathfinder implements Runnable{
     }
 
     void updateInnerEdges(int team, PathCost cost, int cx, int cy, Cluster cluster){
-        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
+        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, ww - 1), maxY = Math.min(minY + clusterSize - 1, wh - 1);
 
         usedEdges.clear();
 
@@ -591,8 +590,8 @@ public class ControlPathfinder implements Runnable{
                             float connectionCost = innerAstar(
                                 team, cost,
                                 minX, minY, maxX, maxY,
-                                x + y * wwidth,
-                                otherX + otherY * wwidth,
+                                x + y * ww,
+                                otherX + otherY * ww,
                                 (moveDirs[otherDir * 2] * otherFrom + ox),
                                 (moveDirs[otherDir * 2 + 1] * otherFrom + oy),
                                 (moveDirs[otherDir * 2] * otherTo + ox),
@@ -618,7 +617,7 @@ public class ControlPathfinder implements Runnable{
 
     //distance heuristic: manhattan
     private float heuristic(int a, int b){
-        int x = a % wwidth, x2 = b % wwidth, y = a / wwidth, y2 = b / wwidth;
+        int x = a % ww, x2 = b % ww, y = a / ww, y2 = b / ww;
         return Math.abs(x - x2) + Math.abs(y - y2);
     }
 
@@ -658,7 +657,7 @@ public class ControlPathfinder implements Runnable{
         while(frontier.size > 0){
             int current = frontier.poll();
 
-            int cx = current % wwidth, cy = current / wwidth;
+            int cx = current % ww, cy = current / ww;
 
             //found the goal (it's in the portal rectangle)
             if((cx >= goalX1 && cy >= goalY1 && cx <= goalX2 && cy <= goalY2) || current == goalPos){
@@ -667,7 +666,7 @@ public class ControlPathfinder implements Runnable{
 
             for(Point2 point : Geometry.d4){
                 int newx = cx + point.x, newy = cy + point.y;
-                int next = newx + wwidth * newy;
+                int next = newx + ww * newy;
 
                 if(newx > maxX || newy > maxY || newx < minX || newy < minY || tcost(team, cost, next) == impassable) continue;
 
@@ -718,7 +717,7 @@ public class ControlPathfinder implements Runnable{
 
         PathCost cost = idToCost(pathCost);
         Cluster cluster = getCreateCluster(team, pathCost, cx, cy);
-        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
+        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, ww - 1), maxY = Math.min(minY + clusterSize - 1, wh - 1);
 
         int bestPortalPair = Integer.MAX_VALUE;
         float bestCost = Float.MAX_VALUE;
@@ -742,8 +741,8 @@ public class ControlPathfinder implements Runnable{
                 float connectionCost = innerAstar(
                 team, cost,
                 minX, minY, maxX, maxY,
-                tileX + tileY * wwidth,
-                otherX + otherY * wwidth,
+                tileX + tileY * ww,
+                otherX + otherY * ww,
                 (moveDirs[dir * 2] * otherFrom + ox),
                 (moveDirs[dir * 2 + 1] * otherFrom + oy),
                 (moveDirs[dir * 2] * otherTo + ox),
@@ -904,7 +903,7 @@ public class ControlPathfinder implements Runnable{
         //actually do the flow field part
         while(frontier.size > 0){
             int tile = frontier.removeLast();
-            int baseX = tile % wwidth, baseY = tile / wwidth;
+            int baseX = tile % ww, baseY = tile / ww;
             int curWeightIndex = (baseX / clusterSize) + (baseY / clusterSize) * cwidth;
 
             //TODO: how can this be null??? serious problem!
@@ -920,7 +919,7 @@ public class ControlPathfinder implements Runnable{
                     dx = baseX + point.x, dy = baseY + point.y,
                     clx = dx / clusterSize, cly = dy / clusterSize;
 
-                    if(clx < 0 || cly < 0 || dx >= wwidth || dy >= wheight) continue;
+                    if(clx < 0 || cly < 0 || dx >= ww || dy >= wh) continue;
 
                     int nextWeightIndex = clx + cly * cwidth;
 
@@ -929,7 +928,7 @@ public class ControlPathfinder implements Runnable{
                     //out of bounds; not allowed to move this way because no weights were registered here
                     if(weights == null) continue;
 
-                    int newPos = tile + point.x + point.y * wwidth;
+                    int newPos = tile + point.x + point.y * ww;
 
                     //can't move back to the goal
                     if(newPos == goalPos) continue;
@@ -999,7 +998,7 @@ public class ControlPathfinder implements Runnable{
                             int worldX = x + ox * clusterSize, worldY = y + oy * clusterSize;
 
                             //add the world-relative position to the frontier, so it recalculates
-                            cache.frontier.addFirst(worldX + worldY * wwidth);
+                            cache.frontier.addFirst(worldX + worldY * ww);
 
                             if(showDebug){
                                 Core.app.post(() -> Fx.placeBlock.at(worldX *tilesize, worldY * tilesize, 1f));
@@ -1014,7 +1013,7 @@ public class ControlPathfinder implements Runnable{
     private void initializePathRequest(PathRequest request, int team, int costId, int unitX, int unitY, int goalX, int goalY){
         PathCost pcost = idToCost(costId);
 
-        int goalPos = (goalX + goalY * wwidth);
+        int goalPos = (goalX + goalY * ww);
 
         int node = findClosestNode(team, costId, unitX, unitY);
         int dest = findClosestNode(team, costId, goalX, goalY);
@@ -1119,9 +1118,9 @@ public class ControlPathfinder implements Runnable{
         destY = World.toTile(mainDestination.y),
         actualDestX = World.toTile(destination.x),
         actualDestY = World.toTile(destination.y),
-        actualDestPos = actualDestX + actualDestY * wwidth,
+        actualDestPos = actualDestX + actualDestY * ww,
         initialCost = tileOn == null ? 0 : cost.getCost(team, state.pathfinder.tiles[tileOn.array()]),
-        destPos = destX + destY * wwidth;
+        destPos = destX + destY * ww;
 
         //do not allow commanding into areas outside the map bounds
         if(!state.world.isInMapArea(World.toTile(destination.x), World.toTile(destination.y))){
@@ -1167,7 +1166,7 @@ public class ControlPathfinder implements Runnable{
         //use existing request if it exists.
         if(request != null && (request.destination == destPos ||
             //can only recompute path only twice a second, unless it's far away
-            (Time.timeSinceMillis(request.lastRecomputeTime) < 1000 && Mathf.dst(destX, destY, request.destination % wwidth, request.destination / wwidth) <= 4f))){
+            (Time.timeSinceMillis(request.lastRecomputeTime) < 1000 && Mathf.dst(destX, destY, request.destination % ww, request.destination / ww) <= 4f))){
             request.lastUpdateId = state.updateId;
 
             Tile initialTileOn = tileOn;
@@ -1306,7 +1305,7 @@ public class ControlPathfinder implements Runnable{
     }
 
     private void recalculatePath(ControlPathfinder.PathRequest request){
-        initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % wwidth, request.destination / wwidth);
+        initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % ww, request.destination / ww);
     }
 
     private int getCost(FieldCache cache, int x, int y, boolean requeue){
@@ -1327,13 +1326,13 @@ public class ControlPathfinder implements Runnable{
     }
 
     private boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = wwidth, wh = wheight;
+        int ww = this.ww, wh = this.wh;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(avoid(team, type, x + y * wwidth)) return true;
+            if(avoid(team, type, x + y * this.ww)) return true;
             if(x == x2 && y == y2) return false;
 
             //diagonal ver
@@ -1360,7 +1359,7 @@ public class ControlPathfinder implements Runnable{
         int err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(avoid(team, type, x + y * wwidth)) return Point2.pack(x, y);
+            if(avoid(team, type, x + y * this.ww)) return Point2.pack(x, y);
             if(x == x2 && y == y2) return 0;
 
             //no diagonals
@@ -1377,22 +1376,22 @@ public class ControlPathfinder implements Runnable{
     }
 
     private boolean overlap(int initialCost, int team, PathCost type, int x, int y, float startX, float startY, float endX, float endY, float rectSize){
-        if(x < 0 || y < 0 || x >= wwidth || y >= wheight) return false;
-        if(!nearPassable(initialCost, team, type, x + y * wwidth)){
+        if(x < 0 || y < 0 || x >= ww || y >= wh) return false;
+        if(!nearPassable(initialCost, team, type, x + y * ww)){
             return Intersector.intersectSegmentRectangleFast(startX, startY, endX, endY, x * tilesize - rectSize/2f, y * tilesize - rectSize/2f, rectSize, rectSize);
         }
         return false;
     }
 
     private boolean raycastRect(int initialCost, float startX, float startY, float endX, float endY, int team, PathCost type, int x1, int y1, int x2, int y2, float rectSize){
-        int ww = wwidth, wh = wheight;
+        int ww = this.ww, wh = this.wh;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             if(
-            !nearPassable(initialCost, team, type, x + y * wwidth) ||
+            !nearPassable(initialCost, team, type, x + y * this.ww) ||
             overlap(initialCost,team, type, x + 1, y, startX, startY, endX, endY, rectSize) ||
             overlap(initialCost,team, type, x - 1, y, startX, startY, endX, endY, rectSize) ||
             overlap(initialCost,team, type, x, y + 1, startX, startY, endX, endY, rectSize) ||
@@ -1433,7 +1432,7 @@ public class ControlPathfinder implements Runnable{
     }
 
     private boolean solid(int team, PathCost type, int x, int y){
-        return x < 0 || y < 0 || x >= wwidth || y >= wheight || solid(team, type, x + y * wwidth, true);
+        return x < 0 || y < 0 || x >= ww || y >= wh || solid(team, type, x + y * ww, true);
     }
 
     private boolean solid(int team, PathCost type, int tilePos, boolean checkWall){
@@ -1443,7 +1442,7 @@ public class ControlPathfinder implements Runnable{
 
     private int cost(int team, PathCost cost, int tilePos){
         if(state.rules.limitMapArea && !Team.get(team).isAI()){
-            int x = tilePos % wwidth, y = tilePos / wwidth;
+            int x = tilePos % ww, y = tilePos / ww;
             if(x < state.rules.limitX || y < state.rules.limitY || x > state.rules.limitX + state.rules.limitWidth || y > state.rules.limitY + state.rules.limitHeight){
                 return impassable;
             }

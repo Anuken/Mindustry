@@ -13,6 +13,8 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
+import mindustry.io.*;
+import mindustry.io.SaveFileReader.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
@@ -21,6 +23,7 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
+import java.io.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -36,6 +39,23 @@ import static mindustry.Vars.*;
 public class Logic implements ApplicationListener{
 
     public Logic(){
+
+        SaveVersion.addCustomChunk("static-fog-data", new CustomChunk(){
+            @Override
+            public void write(DataOutput stream) throws IOException{
+                state.fog.write(stream);
+            }
+
+            @Override
+            public void read(DataInput stream) throws IOException{
+                state.fog.read(stream);
+            }
+
+            @Override
+            public boolean shouldWrite(){
+                return state.fog.shouldWrite();
+            }
+        });
 
         Events.on(BlockDestroyEvent.class, event -> {
             //skip if rule is off
@@ -216,6 +236,8 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
+            state.fog.unitDestroyed(e.unit);
+
             if(e.unit.team != state.rules.defaultTeam){
                 state.stats.enemyUnitsDestroyed ++;
             }
@@ -254,11 +276,13 @@ public class Logic implements ApplicationListener{
 
         Events.on(TilePreChangeEvent.class, event -> {
             state.indexer.removeIndex(event.tile);
+            state.fog.preTileChange(event.tile);
             if(!state.isEditor()) state.pathfinder.preUpdateTile(event.tile);
         });
 
         Events.on(TileChangeEvent.class, event -> {
             state.indexer.addIndex(event.tile);
+            state.fog.tileChanged(event.tile);
             if(!state.isEditor()) state.pathfinder.updateTile(event.tile);
             state.controlPath.updateTile(event.tile);
         });
@@ -321,6 +345,7 @@ public class Logic implements ApplicationListener{
         state.entities.clear();
         state.pathfinder.stop();
         state.controlPath.stop();
+        state.fog.stop();
         Events.fire(new ResetEvent());
         state.data.unload();
         State prev = state.getState();
@@ -553,7 +578,7 @@ public class Logic implements ApplicationListener{
                 MapPreviewLoader.checkPreviews();
 
                 if(state.rules.fog){
-                    fogControl.update();
+                    state.fog.update();
                 }
 
                 if(state.isCampaign()){

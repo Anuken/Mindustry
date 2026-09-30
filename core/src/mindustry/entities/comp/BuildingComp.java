@@ -320,14 +320,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return true;
         }
         if(block.size <= 2){
-            return fogControl.isDiscovered(viewer, tile.x, tile.y);
+            return state.fog.isDiscovered(viewer, tile.x, tile.y);
         }else{
             int s = block.size / 2;
-            return fogControl.isDiscovered(viewer, tile.x, tile.y) ||
-                fogControl.isDiscovered(viewer, tile.x - s, tile.y - s) ||
-                fogControl.isDiscovered(viewer, tile.x - s, tile.y + s) ||
-                fogControl.isDiscovered(viewer, tile.x + s, tile.y + s) ||
-                fogControl.isDiscovered(viewer, tile.x + s, tile.y - s);
+            return state.fog.isDiscovered(viewer, tile.x, tile.y) ||
+                state.fog.isDiscovered(viewer, tile.x - s, tile.y - s) ||
+                state.fog.isDiscovered(viewer, tile.x - s, tile.y + s) ||
+                state.fog.isDiscovered(viewer, tile.x + s, tile.y + s) ||
+                state.fog.isDiscovered(viewer, tile.x + s, tile.y - s);
         }
     }
 
@@ -575,7 +575,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return nearby(Geometry.d4(rotation + 3).x * trns, Geometry.d4(rotation + 3).y * trns);
     }
 
-    /** Any class that overrides this method and changes the value must call Vars.fogControl.forceUpdate(team). */
+    /** Any class that overrides this method and changes the value must call Vars.state.fogControl.forceUpdate(team). */
     public float fogRadius(){
         return block.fogRadius;
     }
@@ -1374,7 +1374,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void onRepaired(){
         placed();
         if(block.flags.contains(BlockFlag.hasFogRadius)){
-            fogControl.forceUpdate(team, self());
+            state.fog.forceUpdate(team, self());
         }
     }
 
@@ -2236,7 +2236,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
-                if(fogControl.isVisibleTile(viewer, tx + x + of, ty + y + of)){
+                if(state.fog.isVisibleTile(viewer, tx + x + of, ty + y + of)){
                     return false;
                 }
             }

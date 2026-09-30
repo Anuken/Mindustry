@@ -222,7 +222,7 @@ public class Maps{
 
             //create map, write it, etc etc etc
             Map map = new Map(file, state.world.width, state.world.height, tags, true);
-            fogControl.resetFog();
+            state.fog.resetFog();
             MapIO.writeMap(file, map, embedAssets);
 
             if(!headless){

@@ -284,8 +284,6 @@ public class Vars implements Loadable{
 
     public static Universe universe;
     public static Maps maps;
-    //TODO: move these to state
-    public static FogControl fogControl;
 
     public static Control control;
     public static Logic logic;
@@ -350,7 +348,6 @@ public class Vars implements Loadable{
         if(!headless) editor = new MapEditor();
 
         maps = new Maps();
-        fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();
         assetCache = new DataAssetCache();

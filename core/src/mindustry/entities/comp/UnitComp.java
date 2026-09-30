@@ -230,12 +230,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(this.team == viewer || !state.rules.fog) return false;
 
         if(hitSize <= 16f){
-            return !fogControl.isVisible(viewer, x, y);
+            return !state.fog.isVisible(viewer, x, y);
         }else{
             //for large hitsizes, check around the unit instead
             float trns = hitSize / 2f;
             for(var p : Geometry.d8){
-                if(fogControl.isVisible(viewer, x + p.x * trns, y + p.y * trns)){
+                if(state.fog.isVisible(viewer, x + p.x * trns, y + p.y * trns)){
                     return false;
                 }
             }

@@ -61,6 +61,8 @@ public class GameState{
     public WaveSpawner spawner = new WaveSpawner();
     /** All entity groups. */
     public Entities entities = new Entities();
+    /** Updates and stores fog of war state. */
+    public FogControl fog = new FogControl(this);
     /** Flowfield pathfinding. */
     public Pathfinder pathfinder = new Pathfinder(this);
     /** Cluster-based pathfinding for player-controlled units and RTS AI. */
@@ -191,6 +193,7 @@ public class GameState{
         spawner.load();
         indexer.load();
         pathfinder.load();
+        fog.load();
         //new instance, so a still-running old thread can't touch the new world's data
         controlPath.stop();
         controlPath = new ControlPathfinder(this);

@@ -29,7 +29,7 @@ public class Pathfinder implements Runnable{
     private static final int updateInterval = 1000 / updateFPS;
 
     /** cached world size */
-    int wwidth, wheight;
+    int ww, wh;
 
     static final int impassable = -1;
 
@@ -125,8 +125,8 @@ public class Pathfinder implements Runnable{
 
         //reset and update internal tile array
         tiles = new int[world.width * world.height];
-        wwidth = world.width;
-        wheight = world.height;
+        ww = world.width;
+        wh = world.height;
         threadList = new Seq<>();
         mainList = new Seq<>();
         clearCache();
@@ -272,7 +272,7 @@ public class Pathfinder implements Runnable{
     }
 
     public int get(int x, int y){
-        return tiles[x + y * wwidth];
+        return tiles[x + y * ww];
     }
 
     /** Starts or restarts the pathfinding thread. */
@@ -650,8 +650,8 @@ public class Pathfinder implements Runnable{
         }
 
         void setup(){
-            this.width = Mathf.ceil((float)pathfinder.wwidth / resolution);
-            this.height = Mathf.ceil((float)pathfinder.wheight / resolution);
+            this.width = Mathf.ceil((float)pathfinder.ww / resolution);
+            this.height = Mathf.ceil((float)pathfinder.wh / resolution);
             int length = width * height;
 
             this.weights = new int[length];
