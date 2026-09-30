@@ -7,7 +7,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
-import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
