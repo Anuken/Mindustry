@@ -518,7 +518,7 @@ public class CommandAI extends AIController{
     @Override
     public void afterRead(Unit unit){
         if(readAttackTarget != -1){
-            attackTarget = Groups.unit.getByID(readAttackTarget);
+            attackTarget = state.entities.unit.getByID(readAttackTarget);
             readAttackTarget = -1;
         }
     }

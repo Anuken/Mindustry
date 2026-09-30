@@ -92,7 +92,7 @@ public class OverlayRenderer{
 
         if(!player.dead() && ui.hudfrag.shown()){
             if(Core.settings.getBool("playerindicators")){
-                for(Player player : Groups.player){
+                for(Player player : state.entities.player){
                     if(Vars.player != player && Vars.player.team() == player.team()){
                         if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                         .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
@@ -108,7 +108,7 @@ public class OverlayRenderer{
             }
 
             if(Core.settings.getBool("indicators") && !state.rules.fog){
-                Groups.unit.each(unit -> {
+                state.entities.unit.each(unit -> {
                     if(!unit.isLocal() && unit.team != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
                         Tmp.v1.set(unit.x, unit.y).sub(player).setLength(indicatorLength);

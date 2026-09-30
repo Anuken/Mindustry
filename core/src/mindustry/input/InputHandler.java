@@ -328,7 +328,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         for(int id : unitIds){
-            Unit unit = Groups.unit.getByID(id);
+            Unit unit = state.entities.unit.getByID(id);
             if(unit != null && unit.team == player.team()){
 
                 if(unit.controller() instanceof CommandAI ai){
@@ -419,7 +419,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         for(int id : unitIds){
-            Unit unit = Groups.unit.getByID(id);
+            Unit unit = state.entities.unit.getByID(id);
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai && unit.type.allowCommand(unit, command)){
                 boolean reset = command.resetTarget || ai.currentCommand().resetTarget;
                 ai.command(command);
@@ -453,7 +453,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
 
         for(int id : unitIds){
-            Unit unit = Groups.unit.getByID(id);
+            Unit unit = state.entities.unit.getByID(id);
             if(unit != null && unit.team == player.team() && unit.controller() instanceof CommandAI ai){
                 if(stance == UnitStance.stop){ //not a real stance, just cancels orders
                     ai.clearCommands();
@@ -1387,7 +1387,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         overlappingPlan = null;
         overlappingPlayer = null;
 
-        Groups.player.each(player -> {
+        state.entities.player.each(player -> {
             var plans = player.getPreviewPlans();
             if(player == Vars.player || player.team() != Vars.player.team()){
                 plans.clear(); //don't keep irrelevant plans around

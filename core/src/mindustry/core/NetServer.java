@@ -202,7 +202,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(admins.getPlayerLimit() > 0 && Groups.player.size() >= admins.getPlayerLimit() && !netServer.admins.isAdmin(uuid, packet.usid)){
+            if(admins.getPlayerLimit() > 0 && state.entities.player.size() >= admins.getPlayerLimit() && !netServer.admins.isAdmin(uuid, packet.usid)){
                 con.kick(KickReason.playerLimit);
                 return;
             }
@@ -244,12 +244,12 @@ public class NetServer implements ApplicationListener{
             boolean preventDuplicates = headless && netServer.admins.isStrict();
 
             if(preventDuplicates){
-                if(Groups.player.contains(p -> Strings.stripColors(p.name).trim().equalsIgnoreCase(Strings.stripColors(packet.name).trim()))){
+                if(state.entities.player.contains(p -> Strings.stripColors(p.name).trim().equalsIgnoreCase(Strings.stripColors(packet.name).trim()))){
                     con.kick(KickReason.nameInUse);
                     return;
                 }
 
-                if(Groups.player.contains(player -> player.uuid().equals(packet.uuid) || player.usid().equals(packet.usid))){
+                if(state.entities.player.contains(player -> player.uuid().equals(packet.uuid) || player.usid().equals(packet.usid))){
                     con.uuid = packet.uuid;
                     con.kick(KickReason.idInUse);
                     return;
@@ -374,7 +374,7 @@ public class NetServer implements ApplicationListener{
             String message = admins.filterMessage(player, args[0]);
             if(message != null){
                 String raw = "[#" + player.team().color.toString() + "]<T> " + chatFormatter.format(player, message);
-                Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
+                state.entities.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
             }
         });
 
@@ -385,7 +385,7 @@ public class NetServer implements ApplicationListener{
             }
 
             String raw = "[#" + Pal.adminChat.toString() + "]<A> " + chatFormatter.format(player, args[0]);
-            Groups.player.each(Player::admin, a -> a.sendMessage(raw, player, args[0]));
+            state.entities.player.each(Player::admin, a -> a.sendMessage(raw, player, args[0]));
         });
 
         //cooldowns per player
@@ -397,7 +397,7 @@ public class NetServer implements ApplicationListener{
                 return;
             }
 
-            if(Groups.player.size() < 3){
+            if(state.entities.player.size() < 3){
                 player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
                 return;
             }
@@ -416,7 +416,7 @@ public class NetServer implements ApplicationListener{
                 StringBuilder builder = new StringBuilder();
                 builder.append("[orange]Players to kick: \n");
 
-                Groups.player.each(p -> !p.admin && p.con != null && p != player, p -> {
+                state.entities.player.each(p -> !p.admin && p.con != null && p != player, p -> {
                     builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n");
                 });
                 player.sendMessage(builder.toString());
@@ -426,9 +426,9 @@ public class NetServer implements ApplicationListener{
                 Player found;
                 if(args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))){
                     int id = Strings.parseInt(args[0].substring(1));
-                    found = Groups.player.find(p -> p.id() == id);
+                    found = state.entities.player.find(p -> p.id() == id);
                 }else{
-                    found = Groups.player.find(p -> p.name.equalsIgnoreCase(args[0]));
+                    found = state.entities.player.find(p -> p.name.equalsIgnoreCase(args[0]));
                 }
 
                 if(found != null){
@@ -524,11 +524,11 @@ public class NetServer implements ApplicationListener{
     }
 
     public int votesRequired(){
-        return 2 + (Groups.player.size() > 4 ? 1 : 0);
+        return 2 + (state.entities.player.size() > 4 ? 1 : 0);
     }
 
     public Team assignTeam(Player current){
-        return assigner.assign(current, Groups.player);
+        return assigner.assign(current, state.entities.player);
     }
 
     public Team assignTeam(Player current, Iterable<Player> players){
@@ -1032,7 +1032,7 @@ public class NetServer implements ApplicationListener{
         if(state.rules.pvp && !state.gameOver){
             int used = 0;
             for(TeamData t : state.teams.getActive()){
-                if(Groups.player.count(p -> p.team() == t.team) > 0){
+                if(state.entities.player.count(p -> p.team() == t.team) > 0){
                     used++;
                 }
             }
@@ -1155,7 +1155,7 @@ public class NetServer implements ApplicationListener{
 
         int sent = 0;
 
-        for(Syncc entity : Groups.sync){
+        for(Syncc entity : state.entities.sync){
             writeEntity(entity, dataStream);
 
             sent++;
@@ -1188,7 +1188,7 @@ public class NetServer implements ApplicationListener{
             tempConnections.add(player.con);
         }
 
-        for(Syncc entity : Groups.sync){
+        for(Syncc entity : state.entities.sync){
             if(entity.isSyncHidden(team)){
                 hiddenIds.add(entity.id());
                 continue;
@@ -1310,7 +1310,7 @@ public class NetServer implements ApplicationListener{
     void sync(){
         try{
             int interval = Config.snapshotInterval.num();
-            Groups.player.each(p -> !p.isLocal(), player -> {
+            state.entities.player.each(p -> !p.isLocal(), player -> {
                 if(player.con == null || !player.con.isConnected()){
                     onDisconnect(player, "disappeared");
                 }
@@ -1336,7 +1336,7 @@ public class NetServer implements ApplicationListener{
                 }
 
                 //write custom player-specific entities (usually labels)
-                for(Player player : Groups.player){
+                for(Player player : state.entities.player){
                     if(player.con != null && player.con.hasConnected && player.con.localEntities.size > 0){
                         writeCustomEntitySnapshot(player, player.con.localEntities);
                     }
@@ -1344,11 +1344,11 @@ public class NetServer implements ApplicationListener{
             }
 
 
-            if(Groups.player.size() > 0 && Core.settings.getBool("blocksync") && blockSyncTime.poll()){
+            if(state.entities.player.size() > 0 && Core.settings.getBool("blocksync") && blockSyncTime.poll()){
                 writeBlockSnapshots();
             }
 
-            if(Groups.player.size() > 0 && buildHealthChanged.size > 0 && healthSyncTime.poll()){
+            if(state.entities.player.size() > 0 && buildHealthChanged.size > 0 && healthSyncTime.poll()){
                 healthSeq.clear();
 
                 var iter = buildHealthChanged.iterator();
@@ -1377,7 +1377,7 @@ public class NetServer implements ApplicationListener{
             }
 
             //TODO: this system is a big bandwidth waster, it would be nicer to have a diff system instead
-            if(Groups.player.size() > 0 && planPreviewSyncTime.poll()){
+            if(state.entities.player.size() > 0 && planPreviewSyncTime.poll()){
 
                 if(!headless){ //update local player's plans so that clients see it
                     player.previewPlansCurrent.clear();
@@ -1385,7 +1385,7 @@ public class NetServer implements ApplicationListener{
                     player.previewPlansCurrent.truncate(maxPlayerPreviewPlans);
                 }
 
-                Groups.player.each(player -> {
+                state.entities.player.each(player -> {
                     int id = ++player.lastPreviewPlanGroupServer;
                     plansOut.clear();
 
@@ -1466,7 +1466,7 @@ public class NetServer implements ApplicationListener{
         boolean checkPass(){
             if(votes >= votesRequired()){
                 Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60)));
-                Groups.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, kickDuration * 1000));
+                state.entities.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, kickDuration * 1000));
                 currentlyKicking = null;
                 task.cancel();
                 return true;

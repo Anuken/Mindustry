@@ -9,6 +9,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.effect.*;
@@ -67,7 +68,7 @@ public class Weather extends UnlockableContent{
 
     @Nullable
     public WeatherState instance(){
-        return Groups.weather.find(w -> w.weather() == this);
+        return Vars.state.entities.weather.find(w -> w.weather() == this);
     }
 
     public boolean isActive(){
@@ -88,7 +89,7 @@ public class Weather extends UnlockableContent{
             if(state.effectTimer <= 0){
                 state.effectTimer = statusDuration - 5f;
 
-                Groups.unit.each(u -> {
+                Vars.state.entities.unit.each(u -> {
                     if(u.checkTarget(statusAir, statusGround)){
                         u.apply(status, statusDuration);
                     }

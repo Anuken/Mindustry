@@ -1509,9 +1509,9 @@ public class LExecutor{
                     if(team != null){
                         paramTeam = team;
                         paramSeq = results;
-                        ((QuadTree<Bullet>)Groups.bullet.tree()).intersect(x, y, w, h, bulletCons);
+                        ((QuadTree<Bullet>)state.entities.bullet.tree()).intersect(x, y, w, h, bulletCons);
                     }else{
-                        Groups.bullet.tree().intersect(x, y, w, h, results.as());
+                        state.entities.bullet.tree().intersect(x, y, w, h, results.as());
                     }
                 }
                 case building -> {

@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
@@ -420,16 +421,16 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeWorldEntities(DataOutput stream, @Nullable Boolf<Unit> unitFilter) throws IOException{
-        //units are not included in Groups.all
-        stream.writeInt(Groups.all.count(Entityc::serialize) + (unitFilter == null ? Groups.unit.size() : Groups.unit.count(unitFilter)));
+        //units are not included in Vars.state.entities.all
+        stream.writeInt(Vars.state.entities.all.count(Entityc::serialize) + (unitFilter == null ? Vars.state.entities.unit.size() : Vars.state.entities.unit.count(unitFilter)));
 
-        for(Entityc entity : Groups.all){
+        for(Entityc entity : Vars.state.entities.all){
             if(!entity.serialize()) continue;
 
             writeEntity(entity, stream);
         }
 
-        for(Unit entity : Groups.unit){
+        for(Unit entity : Vars.state.entities.unit){
             if(unitFilter != null && !unitFilter.get(entity)) continue;
 
             writeEntity(entity, stream);
@@ -524,8 +525,8 @@ public abstract class SaveVersion extends SaveFileReader{
             ent.add();
         }
 
-        Groups.all.each(Entityc::afterReadAll);
-        Groups.unit.each(Entityc::afterReadAll);
+        Vars.state.entities.all.each(Entityc::afterReadAll);
+        Vars.state.entities.unit.each(Entityc::afterReadAll);
         state.allBuildings.each(Buildingc::afterReadAll);
     }
 

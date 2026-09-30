@@ -273,7 +273,7 @@ public class ForceProjector extends Block{
             if(realRadius > 0 && !broken){
                 paramBlock = ForceProjector.this;
                 paramEntity = this;
-                Groups.bullet.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, shieldConsumer);
+                state.entities.bullet.intersect(x - realRadius, y - realRadius, realRadius * 2f, realRadius * 2f, shieldConsumer);
             }
         }
 

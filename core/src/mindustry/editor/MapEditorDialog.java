@@ -233,12 +233,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             for(var build : builds){
                                 build.update();
                             }
-                            Groups.powerGraph.update();
-                            Groups.bullet.update(); //needed for mass drivers...
+                            state.entities.powerGraph.update();
+                            state.entities.bullet.update(); //needed for mass drivers...
                         }
 
                         //spawned units will cause havoc, so clear them
-                        Groups.unit.clear();
+                        state.entities.unit.clear();
 
                         Time.clear();
                         Time.delta = oldDelta;
@@ -344,13 +344,13 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.endMapLoad();
             player.clearUnit();
 
-            for(var unit : Groups.unit){
+            for(var unit : state.entities.unit){
                 if(unit.spawnedByCore){
                     unit.remove();
                 }
             }
 
-            Groups.weather.clear();
+            state.entities.weather.clear();
             logic.play();
 
             Point2 center = view.project(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f);
@@ -407,7 +407,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         player.clearUnit();
 
         //remove player unit
-        Unit unit = Groups.unit.find(u -> u.spawnedByCore);
+        Unit unit = state.entities.unit.find(u -> u.spawnedByCore);
         if(unit != null){
             unit.remove();
         }

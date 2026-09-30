@@ -233,8 +233,8 @@ public class ApplicationTests{
         Time.setDeltaProvider(() -> 1000f);
         Time.update();
         Time.update();
-        Groups.unit.update();
-        assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
+        state.entities.unit.update();
+        assertFalse(state.entities.unit.isEmpty(), "No enemies spawned.");
     }
 
     @Test
@@ -335,7 +335,7 @@ public class ApplicationTests{
         resetWorld();
         SaveIO.load(saveDirectory.child("0.msav"));
 
-        Unit spawned = Groups.unit.find(u -> u.type == UnitTypes.dagger);
+        Unit spawned = state.entities.unit.find(u -> u.type == UnitTypes.dagger);
         assertNotNull(spawned, "Saved daggers must persist");
         assertEquals(hp, spawned.health, "Spawned dagger health must save.");
 
@@ -639,7 +639,7 @@ public class ApplicationTests{
         resetWorld();
         SaveIO.load(Core.files.internal("152.msav"));
 
-        assertTrue(Groups.unit.contains(u -> u.type == UnitTypes.scepter));
+        assertTrue(state.entities.unit.contains(u -> u.type == UnitTypes.scepter));
 
         assertEquals(2000, state.world.width);
         assertEquals(195, state.world.height);

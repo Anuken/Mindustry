@@ -59,6 +59,8 @@ public class GameState{
     public World world = new World();
     /** Indexes spawn positions. */
     public WaveSpawner spawner = new WaveSpawner();
+    /** All entity groups. */
+    public Entities entities = new Entities();
     /** Indexes block info for faster access. */
     public BlockIndexer indexer = new BlockIndexer();
     /** If true, the world is currently being generated/loaded; tile change events do not fire. */
@@ -177,7 +179,7 @@ public class GameState{
 
         world.applyDarkness();
 
-        Groups.resize(-finalWorldBounds, -finalWorldBounds, world.width * tilesize + finalWorldBounds * 2, world.height * tilesize + finalWorldBounds * 2);
+        entities.resize(-finalWorldBounds, -finalWorldBounds, world.width * tilesize + finalWorldBounds * 2, world.height * tilesize + finalWorldBounds * 2);
 
         generating = false;
         world.tileChanges = -1;
@@ -185,7 +187,7 @@ public class GameState{
         spawner.load();
         indexer.load();
         Events.fire(new WorldLoadEvent());
-        for(var build : Groups.build){
+        for(var build : entities.build){
             build.checkAllowUpdate();
         }
     }

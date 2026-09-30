@@ -152,7 +152,7 @@ public final class FogControl implements CustomChunk{
         if(fog == null) fog = new FogData[256];
 
         synchronized(staticEvents){
-            for(var build : Groups.build){
+            for(var build : state.entities.build){
                 if(build.block.flags.contains(BlockFlag.hasFogRadius)){
                     if(fog[build.team.id] == null){
                         fog[build.team.id] = new FogData();
@@ -216,9 +216,9 @@ public final class FogControl implements CustomChunk{
         dynamicEventQueue.clear();
 
         //update fog visibility manually
-        if(state.rules.fog && !headless && Groups.build.size() > 0){
+        if(state.rules.fog && !headless && state.entities.build.size() > 0){
 
-            int size = Groups.build.size();
+            int size = state.entities.build.size();
             int chunkSize = 5; //fraction of entity list to iterate each frame
             int chunks = Math.min(chunkSize, size);
 
@@ -227,7 +227,7 @@ public final class FogControl implements CustomChunk{
             int i = lastEntityUpdateIndex % size;
 
             while(steps < iterated){
-                Groups.build.index(i).updateFogVisibility();
+                state.entities.build.index(i).updateFogVisibility();
 
                 steps ++;
                 i ++;

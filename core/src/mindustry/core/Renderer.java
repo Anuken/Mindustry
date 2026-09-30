@@ -440,7 +440,7 @@ public class Renderer implements ApplicationListener{
         Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
 
-        Groups.draw.draw(Drawc::draw);
+        state.entities.draw.draw(Drawc::draw);
 
         if(settings.getBool("drawhitboxes")){
             DebugCollisionRenderer.draw();

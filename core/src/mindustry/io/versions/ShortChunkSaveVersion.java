@@ -1,6 +1,7 @@
 package mindustry.io.versions;
 
 import arc.func.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -39,9 +40,9 @@ public class ShortChunkSaveVersion extends SaveVersion{
             });
         }
 
-        Groups.all.each(Entityc::afterReadAll);
-        Groups.unit.each(Entityc::afterReadAll);
-        Groups.build.each(Entityc::afterReadAll);
+        Vars.state.entities.all.each(Entityc::afterReadAll);
+        Vars.state.entities.unit.each(Entityc::afterReadAll);
+        Vars.state.entities.build.each(Entityc::afterReadAll);
     }
 
     @Override

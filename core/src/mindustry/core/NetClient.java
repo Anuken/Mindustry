@@ -482,7 +482,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void worldDataBegin(){
-        Groups.clear();
+        state.entities.clear();
         netClient.removed.clear();
         logic.reset();
         netClient.connecting = true;
@@ -517,14 +517,14 @@ public class NetClient implements ApplicationListener{
         if(netClient != null){
             netClient.addRemovedEntity(playerid);
         }
-        Groups.player.removeByID(playerid);
+        state.entities.player.removeByID(playerid);
     }
 
     public static void readSyncEntity(DataInputStream input, Reads read) throws IOException{
         int id = input.readInt();
         byte typeID = input.readByte();
 
-        Syncc entity = Groups.sync.getByID(id);
+        Syncc entity = state.entities.sync.getByID(id);
         boolean add = false, created = false;
 
         if(entity == null && id == player.id()){
@@ -577,7 +577,7 @@ public class NetClient implements ApplicationListener{
     public static void hiddenSnapshot(IntSeq ids){
         for(int i = 0; i < ids.size; i++){
             int id = ids.items[i];
-            var entity = Groups.sync.getByID(id);
+            var entity = state.entities.sync.getByID(id);
             if(entity != null){
                 entity.handleSyncHidden();
             }
@@ -720,7 +720,7 @@ public class NetClient implements ApplicationListener{
         lastSent = 0;
         lastSnapshotTimestamp = 0;
 
-        Groups.clear();
+        state.entities.clear();
         ui.chatfrag.clearMessages();
     }
 

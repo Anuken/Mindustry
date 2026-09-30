@@ -96,7 +96,7 @@ public class BaseShield extends Block{
             if(rad > 1){
                 paramBuild = this;
                 //paramEffect = absorbEffect;
-                Groups.bullet.intersect(x - rad, y - rad, rad * 2f, rad * 2f, bulletConsumer);
+                state.entities.bullet.intersect(x - rad, y - rad, rad * 2f, rad * 2f, bulletConsumer);
                 Units.nearbyEnemies(team, x, y, rad + 10f, unitConsumer);
             }
         }

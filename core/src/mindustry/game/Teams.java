@@ -214,7 +214,7 @@ public class Teams{
         }
 
         //TODO this is slow and dumb
-        for(Unit unit : Groups.unit){
+        for(Unit unit : state.entities.unit){
             if(unit.type == null) continue;
             TeamData data = unit.team.data();
             data.tree().insert(unit);
@@ -241,7 +241,7 @@ public class Teams{
             count(unit);
         }
 
-        for(var player : Groups.player){
+        for(var player : state.entities.player){
             player.team().data().players.add(player);
         }
 

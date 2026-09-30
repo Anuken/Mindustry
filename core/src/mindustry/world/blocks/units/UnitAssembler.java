@@ -433,7 +433,7 @@ public class UnitAssembler extends PayloadBlock{
             if(!readUnits.isEmpty()){
                 units.clear();
                 readUnits.each(i -> {
-                    var unit = Groups.unit.getByID(i);
+                    var unit = state.entities.unit.getByID(i);
                     if(unit != null){
                         units.add(unit);
                     }
@@ -453,7 +453,7 @@ public class UnitAssembler extends PayloadBlock{
             //read newly synced drones on client end
             if(units.size < dronesCreated && whenSyncedUnits.size > 0){
                 whenSyncedUnits.each(id -> {
-                    var unit = Groups.unit.getByID(id);
+                    var unit = state.entities.unit.getByID(id);
                     if(unit != null){
                         units.addUnique(unit);
                     }

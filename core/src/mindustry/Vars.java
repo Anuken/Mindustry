@@ -305,8 +305,6 @@ public class Vars implements Loadable{
     }
 
     public static void init(){
-        Groups.init();
-
         if(loadLocales){
             String[] stra = Core.files.internal("locales").readString().split("\n");
             locales = new Locale[stra.length];

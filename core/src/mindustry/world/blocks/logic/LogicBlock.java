@@ -685,7 +685,7 @@ public class LogicBlock extends Block{
         public void drawSelect(){
             if(!accessible()) return;
 
-            Groups.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
+            state.entities.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
                 Drawf.square(unit.x, unit.y, unit.hitSize, unit.rotation + 45);
             });
 

@@ -126,7 +126,7 @@ public class MinimapRenderer{
             updateUnitArray();
         }else{
             units.clear();
-            Groups.unit.copy(units);
+            state.entities.unit.copy(units);
         }
 
         float sz = baseSize * zoom;
@@ -165,7 +165,7 @@ public class MinimapRenderer{
         }
 
         if(fullView){
-            for(Player player : Groups.player){
+            for(Player player : state.entities.player){
                 if(!player.dead() && net.active()){
                     drawLabel(player.x, player.y, player.name, player.color, scaleFactor);
                 }

@@ -315,7 +315,7 @@ public class Logic implements ApplicationListener{
     }
 
     public void reset(){
-        Groups.clear();
+        state.entities.clear();
         Time.clear();
         Events.fire(new ResetEvent());
         state.data.unload();
@@ -483,33 +483,33 @@ public class Logic implements ApplicationListener{
         PerfCounter.entityUpdate.begin();
 
         PerfCounter.entityMisc.begin();
-        Groups.updatePooling();
-        Groups.bullet.updatePhysics();
-        Groups.unit.updatePhysics();
-        Groups.player.update();
-        Groups.effect.update();
-        if(!editor) Groups.all.update();
+        state.entities.updatePooling();
+        state.entities.bullet.updatePhysics();
+        state.entities.unit.updatePhysics();
+        state.entities.player.update();
+        state.entities.effect.update();
+        if(!editor) state.entities.all.update();
         PerfCounter.entityMisc.end();
 
         PerfCounter.unitUpdate.begin();
         if(editor){
-            Groups.unit.update(u -> u.isPlayer() || u.spawnedByCore);
+            state.entities.unit.update(u -> u.isPlayer() || u.spawnedByCore);
         }else{
-            Groups.unit.update();
+            state.entities.unit.update();
         }
         PerfCounter.unitUpdate.end();
 
         PerfCounter.powerUpdate.begin();
-        if(!editor) Groups.powerGraph.update();
+        if(!editor) state.entities.powerGraph.update();
         PerfCounter.powerUpdate.end();
 
         PerfCounter.buildingUpdate.begin();
-        if(!editor) Groups.build.update();
+        if(!editor) state.entities.build.update();
         PerfCounter.buildingUpdate.end();
 
         PerfCounter.bulletUpdate.begin();
-        if(!editor) Groups.bullet.update();
-        if(!editor) Groups.bullet.collide();
+        if(!editor) state.entities.bullet.update();
+        if(!editor) state.entities.bullet.collide();
         PerfCounter.bulletUpdate.end();
 
         PerfCounter.entityUpdate.end();
@@ -534,7 +534,7 @@ public class Logic implements ApplicationListener{
 
         if(state.isGame()){
             if(!net.client()){
-                state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.isEnemy());
+                state.enemies = state.entities.unit.count(u -> u.team() == state.rules.waveTeam && u.isEnemy());
             }
 
             if(!state.isPaused()){
@@ -619,7 +619,7 @@ public class Logic implements ApplicationListener{
                 //apply weather attributes
                 state.envAttrs.clear();
                 state.envAttrs.add(state.rules.attributes);
-                Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
+                state.entities.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
                 updateEntities();
 
