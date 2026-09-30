@@ -14,7 +14,7 @@ public class LegacySaveVersion2 extends LegacyRegionSaveVersion{
     }
 
     @Override
-    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveReadState state) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveLoadContext state) throws IOException{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){

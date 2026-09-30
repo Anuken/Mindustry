@@ -142,7 +142,7 @@ public class ForceFieldAbility extends Ability implements UnitShieldProvider{
             paramField = this;
             checkRadius(unit);
 
-            Groups.bullet.intersect(unit.x - realRad, unit.y - realRad, realRad * 2f, realRad * 2f, shieldConsumer);
+            state.entities.bullet.intersect(unit.x - realRad, unit.y - realRad, realRad * 2f, realRad * 2f, shieldConsumer);
         }else{
             radiusScale = 0f;
         }

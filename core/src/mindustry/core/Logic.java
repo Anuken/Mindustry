@@ -141,13 +141,13 @@ public class Logic implements ApplicationListener{
                 //faster mapping, avoids objectmap per-tile
                 Floor[] map = new Floor[content.blocks().size];
                 for(var entry : e.sector.planet.sectorCaptureReplacements){
-                    if(indexer.isBlockPresent(entry.key)){
+                    if(state.indexer.isBlockPresent(entry.key)){
                         map[entry.key.id] = entry.value.asFloor();
                         any = true;
                     }
                 }
                 if(any){
-                    world.tiles.eachTile(t -> {
+                    state.world.eachTile(t -> {
                         Floor result = map[t.floor().id];
                         if(result != null){
                             t.setFloor(result);
@@ -216,6 +216,8 @@ public class Logic implements ApplicationListener{
         });
 
         Events.on(UnitDestroyEvent.class, e -> {
+            state.fog.unitDestroyed(e.unit);
+
             if(e.unit.team != state.rules.defaultTeam){
                 state.stats.enemyUnitsDestroyed ++;
             }
@@ -245,6 +247,29 @@ public class Logic implements ApplicationListener{
             if(checkCampaignStats()){
                 state.getPlanet().stats().sectorsLost ++;
             }
+        });
+
+        Events.on(TileOverlayChangeEvent.class, e -> {
+            if(e.previous == Blocks.spawn) state.spawner.removeSpawn(e.tile);
+            if(e.overlay == Blocks.spawn) state.spawner.addSpawn(e.tile);
+        });
+
+        Events.on(TilePreChangeEvent.class, event -> {
+            state.indexer.removeIndex(event.tile);
+            state.fog.preTileChange(event.tile);
+            if(!state.isEditor()) state.pathfinder.preUpdateTile(event.tile);
+        });
+
+        Events.on(TileChangeEvent.class, event -> {
+            state.indexer.addIndex(event.tile);
+            state.fog.tileChanged(event.tile);
+            if(!state.isEditor()) state.pathfinder.updateTile(event.tile);
+            state.controlPath.updateTile(event.tile);
+        });
+
+        Events.on(TileFloorChangeEvent.class, event -> {
+            state.indexer.removeFloorIndex(event.tile, event.previous);
+            state.indexer.addFloorIndex(event.tile, event.floor);
         });
     }
 
@@ -297,15 +322,17 @@ public class Logic implements ApplicationListener{
     }
 
     public void reset(){
-        Groups.clear();
-        Time.clear();
+        state.entities.clear();
+        state.pathfinder.stop();
+        state.controlPath.stop();
+        state.fog.stop();
         Events.fire(new ResetEvent());
-        world.tiles = new Tiles(0, 0);
 
         state.data.unload();
         State prev = state.getState();
         //recreate gamestate - sets state to menu
         state = new GameState();
+        Time.clear();
         //fire change event, since it was technically changed
         Events.fire(new StateChangeEvent(prev, State.menu));
 
@@ -317,7 +344,7 @@ public class Logic implements ApplicationListener{
     }
 
     public void runWave(){
-        spawner.spawnEnemies();
+        state.spawner.spawnEnemies();
         state.wave++;
         state.wavetime = state.rules.waveSpacing * (state.isCampaign() ? state.getPlanet().campaignRules.difficulty.waveTimeMultiplier : 1f);
 
@@ -334,13 +361,13 @@ public class Logic implements ApplicationListener{
             }
 
             //check if there are no enemy spawns
-            if(state.rules.waves && spawner.countSpawns() + state.teams.cores(state.rules.waveTeam).size <= 0){
+            if(state.rules.waves && state.spawner.countSpawns() + state.teams.cores(state.rules.waveTeam).size <= 0){
                 //if yes, waves get disabled
                 state.rules.waves = false;
             }
 
             //if there's a "win" wave and no enemies are present, win automatically
-            if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning()) ||
+            if(state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !state.spawner.isSpawning()) ||
                 (state.rules.attackMode && !state.rules.waveTeam.isAlive())){
 
                 if(state.rules.sector.preset != null && state.rules.sector.preset.attackAfterWaves && !state.rules.attackMode){
@@ -366,7 +393,7 @@ public class Logic implements ApplicationListener{
                     Events.fire(new GameOverEvent(left == null ? Team.derelict : left.team));
                     state.gameOver = true;
                 }
-            }else if(!state.gameOver && state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !spawner.isSpawning())){
+            }else if(!state.gameOver && state.rules.waves && (state.enemies == 0 && state.rules.winWave > 0 && state.wave >= state.rules.winWave && !state.spawner.isSpawning())){
                 state.gameOver = true;
                 Events.fire(new GameOverEvent(state.rules.defaultTeam));
             }
@@ -467,33 +494,33 @@ public class Logic implements ApplicationListener{
         PerfCounter.entityUpdate.begin();
 
         PerfCounter.entityMisc.begin();
-        Groups.updatePooling();
-        Groups.bullet.updatePhysics();
-        Groups.unit.updatePhysics();
-        Groups.player.update();
-        Groups.effect.update();
-        if(!editor) Groups.all.update();
+        state.entities.updatePooling();
+        state.entities.bullet.updatePhysics();
+        state.entities.unit.updatePhysics();
+        state.entities.player.update();
+        state.entities.effect.update();
+        if(!editor) state.entities.all.update();
         PerfCounter.entityMisc.end();
 
         PerfCounter.unitUpdate.begin();
         if(editor){
-            Groups.unit.update(u -> u.isPlayer() || u.spawnedByCore);
+            state.entities.unit.update(u -> u.isPlayer() || u.spawnedByCore);
         }else{
-            Groups.unit.update();
+            state.entities.unit.update();
         }
         PerfCounter.unitUpdate.end();
 
         PerfCounter.powerUpdate.begin();
-        if(!editor) Groups.powerGraph.update();
+        if(!editor) state.entities.powerGraph.update();
         PerfCounter.powerUpdate.end();
 
         PerfCounter.buildingUpdate.begin();
-        if(!editor) Groups.build.update();
+        if(!editor) state.entities.build.update();
         PerfCounter.buildingUpdate.end();
 
         PerfCounter.bulletUpdate.begin();
-        if(!editor) Groups.bullet.update();
-        if(!editor) Groups.bullet.collide();
+        if(!editor) state.entities.bullet.update();
+        if(!editor) state.entities.bullet.collide();
         PerfCounter.bulletUpdate.end();
 
         PerfCounter.entityUpdate.end();
@@ -507,6 +534,7 @@ public class Logic implements ApplicationListener{
         PerfCounter.stateUpdate.begin();
 
         Events.fire(Trigger.update);
+        state.controlPath.update();
         universe.updateGlobal();
 
         if(Core.settings.modified() && !state.isPlaying()){
@@ -514,11 +542,11 @@ public class Logic implements ApplicationListener{
             Core.settings.forceSave();
         }
 
-        boolean runStateCheck = !net.client() && !world.isInvalidMap() && !state.isEditor() && state.rules.canGameOver;
+        boolean runStateCheck = !net.client() && !state.isEditor() && state.rules.canGameOver;
 
         if(state.isGame()){
             if(!net.client()){
-                state.enemies = Groups.unit.count(u -> u.team() == state.rules.waveTeam && u.isEnemy());
+                state.enemies = state.entities.unit.count(u -> u.team() == state.rules.waveTeam && u.isEnemy());
             }
 
             if(!state.isPaused()){
@@ -531,7 +559,7 @@ public class Logic implements ApplicationListener{
                 MapPreviewLoader.checkPreviews();
 
                 if(state.rules.fog){
-                    fogControl.update();
+                    state.fog.update();
                 }
 
                 if(state.isCampaign()){
@@ -603,10 +631,11 @@ public class Logic implements ApplicationListener{
                 //apply weather attributes
                 state.envAttrs.clear();
                 state.envAttrs.add(state.rules.attributes);
-                Groups.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
+                state.entities.weather.each(w -> state.envAttrs.add(w.weather.attrs, w.opacity));
 
                 updateEntities();
 
+                state.pathfinder.update();
                 Events.fire(Trigger.afterGameUpdate);
             }
 

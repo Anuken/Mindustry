@@ -11,7 +11,7 @@ public class Save1 extends LegacySaveVersion{
     }
 
     @Override
-    public void readEntities(DataInput stream, SaveReadState state) throws IOException{
+    public void readEntities(DataInput stream, SaveLoadContext state) throws IOException{
         readLegacyEntities(stream);
     }
 }

@@ -1,6 +1,7 @@
 package mindustry.maps.filters;
 
 import arc.struct.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
@@ -24,9 +25,9 @@ public class CoreSpawnFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(Tiles tiles, GenerateInput in){
+    public void apply(World world, GenerateInput in){
         IntSeq spawns = new IntSeq();
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(tile.team() == state.rules.defaultTeam && tile.block() instanceof CoreBlock && tile.isCenter()){
                 spawns.add(tile.pos());
             }
@@ -36,7 +37,7 @@ public class CoreSpawnFilter extends GenerateFilter{
 
         int used = Math.min(spawns.size, amount);
         for(int i = used; i < spawns.size; i++){
-            tiles.getp(spawns.get(i)).remove();
+            world.getp(spawns.get(i)).remove();
         }
     }
 

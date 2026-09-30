@@ -67,13 +67,6 @@ public class ApplicationTests{
                     net = new Net(null);
                     tree = new FileTree();
                     Vars.init();
-                    world = new World(){
-                        @Override
-                        public float getDarkness(int x, int y){
-                            //for world borders
-                            return 0;
-                        }
-                    };
                     content.createBaseContent();
                     mods.loadScripts();
                     content.createModContent();
@@ -222,35 +215,34 @@ public class ApplicationTests{
     @Test
     void initialization(){
         assertNotNull(logic);
-        assertNotNull(world);
+        assertNotNull(state);
         assertTrue(content.getContentMap().length > 0);
     }
 
     @Test
-    void playMap(){
-        world.loadMap(testMap);
+    void playMap() throws Throwable{
+        GameState.loadMap(testMap);
     }
 
     @Test
-    void spawnWaves(){
-        world.loadMap(testMap);
-        assertTrue(spawner.countSpawns() > 0, "No spawns present.");
+    void spawnWaves() throws Throwable{
+        GameState.loadMap(testMap);
+        assertTrue(state.spawner.countSpawns() > 0, "No spawns present.");
         logic.runWave();
         //force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);
         Time.update();
         Time.update();
-        Groups.unit.update();
-        assertFalse(Groups.unit.isEmpty(), "No enemies spawned.");
+        state.entities.unit.update();
+        assertFalse(state.entities.unit.isEmpty(), "No enemies spawned.");
     }
 
     @Test
     void createMap(){
-        Tiles tiles = world.resize(8, 8);
-
-        world.beginMapLoad();
-        tiles.fill();
-        world.endMapLoad();
+        state.rules.borderDarkness = false;
+        state.beginMapLoad();
+        state.resizeWorld(20, 20).fill();
+        state.endMapLoad();
     }
 
     @Test
@@ -258,12 +250,12 @@ public class ApplicationTests{
         createMap();
         int bx = 4;
         int by = 4;
-        world.tile(bx, by).setBlock(Blocks.coreShard, Team.sharded, 0);
-        assertEquals(world.tile(bx, by).team(), Team.sharded);
+        state.world.tile(bx, by).setBlock(Blocks.coreShard, Team.sharded, 0);
+        assertEquals(state.world.tile(bx, by).team(), Team.sharded);
         for(int x = bx - 1; x <= bx + 1; x++){
             for(int y = by - 1; y <= by + 1; y++){
-                assertEquals(world.tile(x, y).block(), Blocks.coreShard);
-                assertEquals(world.tile(x, y).build, world.tile(bx, by).build);
+                assertEquals(state.world.tile(x, y).block(), Blocks.coreShard);
+                assertEquals(state.world.tile(x, y).build, state.world.tile(bx, by).build);
             }
         }
     }
@@ -271,7 +263,7 @@ public class ApplicationTests{
     @Test
     void blockInventories(){
         multiblock();
-        Tile tile = world.tile(4, 4);
+        Tile tile = state.world.tile(4, 4);
         tile.build.items.add(Items.coal, 5);
         tile.build.items.add(Items.titanium, 50);
         assertEquals(tile.build.items.total(), 55);
@@ -323,15 +315,15 @@ public class ApplicationTests{
     }
 
     @Test
-    void save(){
-        world.loadMap(testMap);
+    void save() throws Throwable{
+        GameState.loadMap(testMap);
         assertTrue(state.teams.playerCores().size > 0);
         SaveIO.save(saveDirectory.child("0.msav"));
     }
 
     @Test
-    void saveLoad(){
-        world.loadMap(testMap);
+    void saveLoad() throws Throwable{
+        GameState.loadMap(testMap);
         Map map = state.map;
 
         float hp = 30f;
@@ -343,17 +335,17 @@ public class ApplicationTests{
         resetWorld();
         SaveIO.load(saveDirectory.child("0.msav"));
 
-        Unit spawned = Groups.unit.find(u -> u.type == UnitTypes.dagger);
+        Unit spawned = state.entities.unit.find(u -> u.type == UnitTypes.dagger);
         assertNotNull(spawned, "Saved daggers must persist");
         assertEquals(hp, spawned.health, "Spawned dagger health must save.");
 
-        assertEquals(world.width(), map.width);
-        assertEquals(world.height(), map.height);
+        assertEquals(state.world.width, map.width);
+        assertEquals(state.world.height, map.height);
         assertTrue(state.teams.playerCores().size > 0);
     }
 
     void updateBlocks(int times){
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(tile.build != null && tile.isCenter()){
                 tile.build.updateProximity();
             }
@@ -361,7 +353,7 @@ public class ApplicationTests{
 
         for(int i = 0; i < times; i++){
             Time.update();
-            for(Tile tile : world.tiles){
+            for(Tile tile : state.world){
                 if(tile.build != null && tile.isCenter()){
                     tile.build.update();
                 }
@@ -370,29 +362,29 @@ public class ApplicationTests{
     }
 
     @Test
-    void liquidOutput(){
-        world.loadMap(testMap);
+    void liquidOutput() throws Throwable{
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
 
-        world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
-        world.tile(0, 0).build.configureAny(Liquids.water);
+        state.world.tile(0, 0).setBlock(Blocks.liquidSource, Team.sharded);
+        state.world.tile(0, 0).build.configureAny(Liquids.water);
 
-        world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
+        state.world.tile(2, 1).setBlock(Blocks.liquidTank, Team.sharded);
 
         updateBlocks(10);
 
-        assertTrue(world.tile(2, 1).build.liquids.currentAmount() >= 1);
-        assertTrue(world.tile(2, 1).build.liquids.current() == Liquids.water);
+        assertTrue(state.world.tile(2, 1).build.liquids.currentAmount() >= 1);
+        assertTrue(state.world.tile(2, 1).build.liquids.current() == Liquids.water);
     }
 
     @Test
-    void liquidJunctionOutput(){
-        world.loadMap(testMap);
+    void liquidJunctionOutput() throws Throwable{
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
 
-        Tile source = world.rawTile(0, 0), tank = world.rawTile(1, 4), junction = world.rawTile(0, 1), conduit = world.rawTile(0, 2);
+        Tile source = state.world.rawTile(0, 0), tank = state.world.rawTile(1, 4), junction = state.world.rawTile(0, 1), conduit = state.world.rawTile(0, 2);
 
         source.setBlock(Blocks.liquidSource, Team.sharded);
         source.build.configureAny(Liquids.water);
@@ -410,13 +402,13 @@ public class ApplicationTests{
     }
 
     @Test
-    void liquidRouterOutputAll() {
-        world.loadMap(testMap);
+    void liquidRouterOutputAll() throws Throwable{
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
-        Tile source = world.rawTile(4,0), router = world.rawTile(4, 2), conduitUp1 = world.rawTile(4,1),
-        conduitLeft = world.rawTile(3,2), conduitUp2 = world.rawTile(4, 3), conduitRight = world.rawTile(5, 2),
-        leftTank = world.rawTile(1, 2), topTank = world.rawTile(4,5), rightTank = world.rawTile(7, 2);
+        Tile source = state.world.rawTile(4,0), router = state.world.rawTile(4, 2), conduitUp1 = state.world.rawTile(4,1),
+        conduitLeft = state.world.rawTile(3,2), conduitUp2 = state.world.rawTile(4, 3), conduitRight = state.world.rawTile(5, 2),
+        leftTank = state.world.rawTile(1, 2), topTank = state.world.rawTile(4,5), rightTank = state.world.rawTile(7, 2);
 
         source.setBlock(Blocks.liquidSource, Team.sharded);
         source.build.configureAny(Liquids.water);
@@ -436,14 +428,14 @@ public class ApplicationTests{
     }
 
     @Test
-    void sorterOutputCorrect() {
-        world.loadMap(testMap);
+    void sorterOutputCorrect() throws Throwable{
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
-        Tile source1 = world.rawTile(4, 0), source2 = world.rawTile(6, 0), s1conveyor = world.rawTile(4, 1),
-        s2conveyor = world.rawTile(6, 1), s1s2conveyor = world.rawTile(5, 1), sorter = world.rawTile(5, 2),
-        leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2), sortedconveyor = world.rawTile(5, 3),
-        leftVault = world.rawTile(2, 2), rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
+        Tile source1 = state.world.rawTile(4, 0), source2 = state.world.rawTile(6, 0), s1conveyor = state.world.rawTile(4, 1),
+        s2conveyor = state.world.rawTile(6, 1), s1s2conveyor = state.world.rawTile(5, 1), sorter = state.world.rawTile(5, 2),
+        leftconveyor = state.world.rawTile(4, 2), rightconveyor = state.world.rawTile(6, 2), sortedconveyor = state.world.rawTile(5, 3),
+        leftVault = state.world.rawTile(2, 2), rightVault = state.world.rawTile(8, 2), topVault = state.world.rawTile(5, 5);
 
         source1.setBlock(Blocks.itemSource, Team.sharded);
         source1.build.configureAny(Items.coal);
@@ -469,14 +461,14 @@ public class ApplicationTests{
     }
 
     @Test
-    void routerOutputAll() {
-        world.loadMap(testMap);
+    void routerOutputAll() throws Throwable{
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
-        Tile source1 = world.rawTile(5, 0),  conveyor = world.rawTile(5, 1),
-        router = world.rawTile(5, 2), leftconveyor = world.rawTile(4, 2), rightconveyor = world.rawTile(6, 2),
-        middleconveyor = world.rawTile(5, 3), leftVault = world.rawTile(2, 2),
-        rightVault = world.rawTile(8, 2), topVault = world.rawTile(5, 5);
+        Tile source1 = state.world.rawTile(5, 0),  conveyor = state.world.rawTile(5, 1),
+        router = state.world.rawTile(5, 2), leftconveyor = state.world.rawTile(4, 2), rightconveyor = state.world.rawTile(6, 2),
+        middleconveyor = state.world.rawTile(5, 3), leftVault = state.world.rawTile(2, 2),
+        rightVault = state.world.rawTile(8, 2), topVault = state.world.rawTile(5, 5);
 
         source1.setBlock(Blocks.itemSource, Team.sharded);
         source1.build.configureAny(Items.coal);
@@ -497,13 +489,13 @@ public class ApplicationTests{
     }
 
     @Test
-    void junctionOutputCorrect() {
-        world.loadMap(testMap);
+    void junctionOutputCorrect() throws Throwable{
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
-        Tile source1 = world.rawTile(5,0),source2 = world.rawTile(7, 2),  conveyor1 = world.rawTile(5, 1),
-        conveyor2 = world.rawTile(6,2), junction = world.rawTile(5, 2), conveyor3 = world.rawTile(5,3),
-        conveyor4 = world.rawTile(4,2), vault2 = world.rawTile(3, 1), vault1 = world.rawTile(5,5);
+        Tile source1 = state.world.rawTile(5,0),source2 = state.world.rawTile(7, 2),  conveyor1 = state.world.rawTile(5, 1),
+        conveyor2 = state.world.rawTile(6,2), junction = state.world.rawTile(5, 2), conveyor3 = state.world.rawTile(5,3),
+        conveyor4 = state.world.rawTile(4,2), vault2 = state.world.rawTile(3, 1), vault1 = state.world.rawTile(5,5);
         source1.setBlock(Blocks.itemSource, Team.sharded);
         source1.build.configureAny(Items.coal);
         source2.setBlock(Blocks.itemSource, Team.sharded);
@@ -523,47 +515,47 @@ public class ApplicationTests{
     }
 
     @Test
-    void blockOverlapRemoved(){
-        world.loadMap(testMap);
+    void blockOverlapRemoved() throws Throwable{
+        GameState.loadMap(testMap);
         state.set(State.playing);
 
         //edge block
-        world.tile(1, 1).setBlock(Blocks.coreShard);
-        assertEquals(Blocks.coreShard, world.tile(0, 0).block());
+        state.world.tile(1, 1).setBlock(Blocks.coreShard);
+        assertEquals(Blocks.coreShard, state.world.tile(0, 0).block());
 
         //this should overwrite the block
-        world.tile(2, 2).setBlock(Blocks.coreShard);
-        assertEquals(Blocks.air, world.tile(0, 0).block());
+        state.world.tile(2, 2).setBlock(Blocks.coreShard);
+        assertEquals(Blocks.air, state.world.tile(0, 0).block());
     }
 
     @Test
-    void conveyorCrash(){
-        world.loadMap(testMap);
+    void conveyorCrash() throws Throwable{
+        GameState.loadMap(testMap);
         state.set(State.playing);
 
-        world.tile(0, 0).setBlock(Blocks.conveyor);
-        world.tile(0, 0).build.acceptStack(Items.copper, 1000, null);
+        state.world.tile(0, 0).setBlock(Blocks.conveyor);
+        state.world.tile(0, 0).build.acceptStack(Items.copper, 1000, null);
     }
 
     @Test
-    void conveyorBench(){
+    void conveyorBench() throws Throwable{
         int[] itemsa = {0};
 
-        world.loadMap(testMap);
+        GameState.loadMap(testMap);
         state.set(State.playing);
         state.rules.limitMapArea = false;
         int length = 128;
-        world.tile(0, 0).setBlock(Blocks.itemSource, Team.sharded);
-        world.tile(0, 0).build.configureAny(Items.copper);
+        state.world.tile(0, 0).setBlock(Blocks.itemSource, Team.sharded);
+        state.world.tile(0, 0).build.configureAny(Items.copper);
 
-        Seq<Building> entities = Seq.with(world.tile(0, 0).build);
+        Seq<Building> entities = Seq.with(state.world.tile(0, 0).build);
 
         for(int i = 0; i < length; i++){
-            world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.sharded, 0);
-            entities.add(world.tile(i + 1, 0).build);
+            state.world.tile(i + 1, 0).setBlock(Blocks.conveyor, Team.sharded, 0);
+            entities.add(state.world.tile(i + 1, 0).build);
         }
 
-        world.tile(length + 1, 0).setBlock(new Block("___"){{
+        state.world.tile(length + 1, 0).setBlock(new Block("___"){{
             hasItems = true;
             destructible = true;
             buildType = () -> new Building(){
@@ -597,60 +589,60 @@ public class ApplicationTests{
     }
 
     @Test
-    void load77Save(){
+    void load77Save() throws Throwable{
         resetWorld();
         SaveIO.load(Core.files.internal("77.msav"));
 
         //just tests if the map was loaded properly and didn't crash, no validity checks currently
-        assertEquals(276, world.width());
-        assertEquals(10, world.height());
+        assertEquals(276, state.world.width);
+        assertEquals(10, state.world.height);
     }
 
     @Test
-    void load85Save(){
+    void load85Save() throws Throwable{
         resetWorld();
         SaveIO.load(Core.files.internal("85.msav"));
 
-        assertEquals(250, world.width());
-        assertEquals(300, world.height());
+        assertEquals(250, state.world.width);
+        assertEquals(300, state.world.height);
     }
 
     @Test
-    void load108Save(){
+    void load108Save() throws Throwable{
         resetWorld();
         SaveIO.load(Core.files.internal("108.msav"));
 
-        assertEquals(256, world.width());
-        assertEquals(256, world.height());
+        assertEquals(256, state.world.width);
+        assertEquals(256, state.world.height);
     }
 
     @Test
-    void load114Save(){
+    void load114Save() throws Throwable{
         resetWorld();
         SaveIO.load(Core.files.internal("114.msav"));
 
-        assertEquals(500, world.width());
-        assertEquals(500, world.height());
+        assertEquals(500, state.world.width);
+        assertEquals(500, state.world.height);
     }
 
     @Test
-    void load152BESave(){
+    void load152BESave() throws Throwable{
         resetWorld();
         SaveIO.load(Core.files.internal("152_be.msav"));
 
-        assertEquals(414, world.width());
-        assertEquals(414, world.height());
+        assertEquals(414, state.world.width);
+        assertEquals(414, state.world.height);
     }
 
     @Test
-    void load152Save(){
+    void load152Save() throws Throwable{
         resetWorld();
         SaveIO.load(Core.files.internal("152.msav"));
 
-        assertTrue(Groups.unit.contains(u -> u.type == UnitTypes.scepter));
+        assertTrue(state.entities.unit.contains(u -> u.type == UnitTypes.scepter));
 
-        assertEquals(2000, world.width());
-        assertEquals(195, world.height());
+        assertEquals(2000, state.world.width);
+        assertEquals(195, state.world.height);
     }
 
     @Test
@@ -724,10 +716,10 @@ public class ApplicationTests{
         d1.update();
         d2.update();
 
-        assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
-        assertEquals(Blocks.air, world.tile(2, 2).block());
-        assertEquals(Blocks.copperWallLarge, world.tile(1, 1).block());
-        assertEquals(world.tile(1, 1).build, world.tile(0, 0).build);
+        assertEquals(Blocks.copperWallLarge, state.world.tile(0, 0).block());
+        assertEquals(Blocks.air, state.world.tile(2, 2).block());
+        assertEquals(Blocks.copperWallLarge, state.world.tile(1, 1).block());
+        assertEquals(state.world.tile(1, 1).build, state.world.tile(0, 0).build);
     }
 
     @Test
@@ -748,7 +740,7 @@ public class ApplicationTests{
         Time.setDeltaProvider(() -> 1f);
         d2.update();
 
-        assertEquals(content.getByName(ContentType.block, "build2"), world.tile(0, 0).block());
+        assertEquals(content.getByName(ContentType.block, "build2"), state.world.tile(0, 0).block());
 
         Time.setDeltaProvider(() -> 9999f);
 
@@ -757,8 +749,8 @@ public class ApplicationTests{
 
         d1.update();
 
-        assertEquals(Blocks.copperWallLarge, world.tile(0, 0).block());
-        assertEquals(Blocks.copperWallLarge, world.tile(1, 1).block());
+        assertEquals(Blocks.copperWallLarge, state.world.tile(0, 0).block());
+        assertEquals(Blocks.copperWallLarge, state.world.tile(1, 1).block());
 
         d2.clearBuilding();
         d2.addBuild(new BuildPlan(1, 1));
@@ -767,16 +759,16 @@ public class ApplicationTests{
             d2.update();
         }
 
-        assertEquals(Blocks.air, world.tile(0, 0).block());
-        assertEquals(Blocks.air, world.tile(2, 2).block());
-        assertEquals(Blocks.air, world.tile(1, 1).block());
+        assertEquals(Blocks.air, state.world.tile(0, 0).block());
+        assertEquals(Blocks.air, state.world.tile(2, 2).block());
+        assertEquals(Blocks.air, state.world.tile(1, 1).block());
     }
 
     @Test
-    void allBlockTest(){
-        Tiles tiles = world.resize(80, 80);
+    void allBlockTest() throws Throwable{
+        World tiles = state.resizeWorld(80, 80);
 
-        world.beginMapLoad();
+        state.beginMapLoad();
         for(int x = 0; x < tiles.width; x++){
             for(int y = 0; y < tiles.height; y++){
                 tiles.set(x, y, new Tile(x, y, Blocks.stone, Blocks.air, Blocks.air));
@@ -791,22 +783,22 @@ public class ApplicationTests{
             if(block.canBeBuilt()){
                 int offset = Math.max(block.size % 2 == 0 ? block.size/2 - 1 : block.size/2, 0);
 
-                if(x + block.size + 1 >= world.width()){
+                if(x + block.size + 1 >= state.world.width){
                     y += maxHeight;
                     maxHeight = 0;
                     x = 0;
                 }
 
-                tiles.get(x + offset, y + offset).setBlock(block);
+                tiles.tile(x + offset, y + offset).setBlock(block);
                 x += block.size;
                 maxHeight = Math.max(maxHeight, block.size);
             }
         }
-        world.endMapLoad();
+        state.endMapLoad();
 
         for(int x = 0; x < tiles.width; x++){
             for(int y = 0; y < tiles.height; y++){
-                Tile tile = world.rawTile(x, y);
+                Tile tile = state.world.rawTile(x, y);
                 if(tile.build != null){
                     try{
                         tile.build.update();
@@ -821,9 +813,9 @@ public class ApplicationTests{
     }
 
     void checkPayloads(){
-        for(int x = 0; x < world.tiles.width; x++){
-            for(int y = 0; y < world.tiles.height; y++){
-                Tile tile = world.rawTile(x, y);
+        for(int x = 0; x < state.world.width; x++){
+            for(int y = 0; y < state.world.height; y++){
+                Tile tile = state.world.rawTile(x, y);
                 if(tile.build != null && tile.isCenter() && !(tile.block() instanceof CoreBlock)){
                     try{
                         tile.build.update();
@@ -838,11 +830,11 @@ public class ApplicationTests{
     }
 
     @Test
-    void allPayloadBlockTest(){
+    void allPayloadBlockTest() throws Throwable{
         int ts = 20;
-        Tiles tiles = world.resize(ts * 3, ts * 3);
+        World tiles = state.resizeWorld(ts * 3, ts * 3);
 
-        world.beginMapLoad();
+        state.beginMapLoad();
         for(int x = 0; x < tiles.width; x++){
             for(int y = 0; y < tiles.height; y++){
                 tiles.set(x, y, new Tile(x, y, Blocks.stone, Blocks.air, Blocks.air));
@@ -855,12 +847,12 @@ public class ApplicationTests{
         for(int i = 0; i < blocks.size; i++){
             int x = (i % ts) * 3 + 1;
             int y = (i / ts) * 3 + 1;
-            Tile tile = tiles.get(x, y);
+            Tile tile = tiles.tile(x, y);
             tile.setBlock(Blocks.payloadConveyor, Team.sharded);
             Building build = tile.build;
             build.handlePayload(build, new BuildPayload(blocks.get(i), Team.sharded));
         }
-        world.endMapLoad();
+        state.endMapLoad();
 
         checkPayloads();
 
@@ -874,7 +866,6 @@ public class ApplicationTests{
     @TestFactory
     DynamicTest[] testSectorValidity(){
         Seq<DynamicTest> out = new Seq<>();
-        if(world == null) world = new World();
 
         for(SectorPreset sector : content.sectors()){
 
@@ -885,7 +876,7 @@ public class ApplicationTests{
                 //pathfinder pollutes queue with garbage, causing OOM
                 Reflect.<TaskQueue>get(HeadlessApplication.class, Core.app, "runnables").clear();
                 state.rules.sector = sector.sector;
-                world.loadGenerator(sector.generator.map.width, sector.generator.map.height, tiles -> sector.generator.generate(tiles, new WorldParams()));
+                GameState.loadGenerator(sector.generator.map.width, sector.generator.map.height, tiles -> sector.generator.generate(tiles, new WorldParams()));
                 sector.rules.get(state.rules);
                 ObjectSet<Item> resources = new ObjectSet<>();
                 boolean hasSpawnPoint = false;
@@ -906,7 +897,7 @@ public class ApplicationTests{
                 //TODO: some Erekir sectors (origin, caldera) modify the cap, why?
                 //assertEquals(0, state.rules.unitCap, "Sector " + sector.name + " must not modify the unit cap.");
 
-                for(Tile tile : world.tiles){
+                for(Tile tile : state.world){
                     if(tile.drop() != null){
                         resources.add(tile.drop());
                     }
@@ -951,15 +942,15 @@ public class ApplicationTests{
                     }
                 }
 
-                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerSource), "Sector '" + sector + "' must not have power sources.");
-                assertFalse(Vars.indexer.isBlockPresent(Blocks.powerVoid), "Sector '" + sector + "' must not have power voids.");
-                assertFalse(Vars.indexer.isBlockPresent(Blocks.itemSource), "Sector '" + sector + "' must not have item sources.");
-                assertFalse(Vars.indexer.isBlockPresent(Blocks.liquidSource), "Sector '" + sector + "' must not have liquid sources.");
+                assertFalse(state.indexer.isBlockPresent(Blocks.powerSource), "Sector '" + sector + "' must not have power sources.");
+                assertFalse(state.indexer.isBlockPresent(Blocks.powerVoid), "Sector '" + sector + "' must not have power voids.");
+                assertFalse(state.indexer.isBlockPresent(Blocks.itemSource), "Sector '" + sector + "' must not have item sources.");
+                assertFalse(state.indexer.isBlockPresent(Blocks.liquidSource), "Sector '" + sector + "' must not have liquid sources.");
 
                 assertEquals(1, Team.sharded.cores().size, "Sector must have one core: " + sector + " (" + Team.sharded.cores() + ")");
 
                 assertTrue(hasSpawnPoint, "Sector \"" + sector.name + "\" has no spawn points.");
-                assertTrue(spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + sector.name + "\" has no enemy spawn points: " + spawner.countSpawns());
+                assertTrue(state.spawner.countSpawns() > 0 || (state.rules.attackMode && state.rules.waveTeam.data().hasCore()), "Sector \"" + sector.name + "\" has no enemy spawn points: " + state.spawner.countSpawns());
             }));
         }
 
@@ -969,7 +960,7 @@ public class ApplicationTests{
     void initBuilding(){
         createMap();
 
-        Tile core = world.tile(5, 5);
+        Tile core = state.world.tile(5, 5);
         core.setBlock(Blocks.coreShard, Team.sharded, 0);
         for(Item item : content.items()){
             core.build.items.set(item, 3000);
@@ -979,6 +970,7 @@ public class ApplicationTests{
     }
 
     void depositTest(Block block, Item item){
+        createMap();
         Unit unit = UnitTypes.mono.create(Team.sharded);
         Tile tile = new Tile(0, 0, Blocks.air, Blocks.air, block);
         tile.setTeam(Team.sharded);

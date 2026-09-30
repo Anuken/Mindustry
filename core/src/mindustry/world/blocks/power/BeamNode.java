@@ -77,7 +77,7 @@ public class BeamNode extends PowerBlock{
             int dx = dir.x, dy = dir.y;
             int offset = size/2;
             for(int j = 1 + offset; j <= range + offset; j++){
-                var other = world.build(x + j * dir.x, y + j * dir.y);
+                var other = state.world.build(x + j * dir.x, y + j * dir.y);
 
                 //hit insulated wall
                 if(other != null && other.isInsulated()){
@@ -168,7 +168,7 @@ public class BeamNode extends PowerBlock{
 
             //find first block with power in range
             for(int j = 1 + rangeOffset; j <= range + rangeOffset; j++){
-                var other = world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
+                var other = state.world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
 
                 if(other == null) return false;
 
@@ -189,8 +189,8 @@ public class BeamNode extends PowerBlock{
         @Override
         public void updateTile(){
             //TODO this block technically does not need to update every frame, perhaps put it in a special list.
-            if(lastChange != world.tileChanges){
-                lastChange = world.tileChanges;
+            if(lastChange != state.world.tileChanges){
+                lastChange = state.world.tileChanges;
                 updateDirections();
             }
         }
@@ -247,7 +247,7 @@ public class BeamNode extends PowerBlock{
                 int offset = size/2;
                 //find first block with power in range
                 for(int j = 1 + offset; j <= range + offset; j++){
-                    var other = world.build(tile.x + j * dir.x, tile.y + j * dir.y);
+                    var other = state.world.build(tile.x + j * dir.x, tile.y + j * dir.y);
 
                     //hit insulated wall
                     if(other != null && other.isInsulated()){
@@ -257,7 +257,7 @@ public class BeamNode extends PowerBlock{
                     //power nodes do NOT play nice with beam nodes, do not touch them as that forcefully modifies their links
                     if(other != null && other.block.hasPower && other.block.connectedPower && other.team == team && !(other.block instanceof PowerNode)){
                         links[i] = other;
-                        dests[i] = world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
+                        dests[i] = state.world.tile(tile.x + j * dir.x, tile.y + j * dir.y);
                         break;
                     }
                 }

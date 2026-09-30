@@ -302,7 +302,7 @@ public class ShieldArcAbility extends Ability implements UnitShieldProvider{
             paramPos.set(x, y).rotate(unit.rotation - 90f).add(unit);
 
             float reach = radius + width;
-            Groups.bullet.intersect(paramPos.x - reach, paramPos.y - reach, reach * 2f, reach * 2f, shieldConsumer);
+            Vars.state.entities.bullet.intersect(paramPos.x - reach, paramPos.y - reach, reach * 2f, reach * 2f, shieldConsumer);
             Units.nearbyEnemies(paramUnit.team, paramPos.x - reach, paramPos.y - reach, reach * 2f, reach * 2f, unitConsumer);
         }else{
             widthScale = Mathf.lerpDelta(widthScale, 0f, 0.11f);

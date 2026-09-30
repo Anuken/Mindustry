@@ -165,7 +165,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(payload instanceof BuildPayload b){
             Building tile = b.build;
             int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
-            on = Vars.world.tile(tx, ty);
+            on = Vars.state.world.tile(tx, ty);
             return on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false);
         }else if(payload instanceof UnitPayload p){
             var u = p.unit;
@@ -209,7 +209,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     boolean dropBlock(BuildPayload payload){
         Building tile = payload.build;
         int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
-        Tile on = Vars.world.tile(tx, ty);
+        Tile on = Vars.state.world.tile(tx, ty);
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
             payload.place(on, tile.rotation);
             Events.fire(new PayloadDropEvent(self(), tile));

@@ -146,7 +146,7 @@ public class PowerGenerator extends PowerDistributor{
 
             if(explosionIgnitionChance > 0 || explosionBreaksProps){
                 Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
-                    Tile t = Vars.world.tile(tx, ty);
+                    Tile t = Vars.state.world.tile(tx, ty);
                     float dst = Mathf.dst(tileX(), tileY(), tx, ty);
 
                     //Create fires
@@ -179,7 +179,7 @@ public class PowerGenerator extends PowerDistributor{
             if(explosionPuddleLiquid != null){
                 for(int i = 0; i < explosionPuddles; i++){
                     Tmp.v1.trns(Mathf.random(360f), Mathf.random(explosionPuddleRange));
-                    Tile tile = world.tileWorld(x + Tmp.v1.x, y + Tmp.v1.y);
+                    Tile tile = state.world.tileWorld(x + Tmp.v1.x, y + Tmp.v1.y);
                     Puddles.deposit(tile, explosionPuddleLiquid, explosionPuddleAmount);
                 }
             }

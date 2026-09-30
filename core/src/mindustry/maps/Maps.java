@@ -221,8 +221,8 @@ public class Maps{
             }
 
             //create map, write it, etc etc etc
-            Map map = new Map(file, world.width(), world.height(), tags, true);
-            fogControl.resetFog();
+            Map map = new Map(file, state.world.width, state.world.height, tags, true);
+            state.fog.resetFog();
             MapIO.writeMap(file, map, embedAssets);
 
             if(!headless){
@@ -232,7 +232,7 @@ public class Maps{
 
                 for(int x = 0; x < map.width; x++){
                     for(int y = 0; y < map.height; y++){
-                        Tile tile = world.rawTile(x, y);
+                        Tile tile = state.world.rawTile(x, y);
 
                         if(tile.block() instanceof CoreBlock){
                             map.teams.add(tile.getTeamID());
@@ -248,7 +248,7 @@ public class Maps{
                     Core.assets.unload(map.previewFile().path() + "." + mapExtension);
                 }
 
-                Pixmap pix = MapIO.generatePreview(world.tiles);
+                Pixmap pix = MapIO.generatePreview(state.world);
                 writeCache(map);
 
                 map.texture = new Texture(pix);
@@ -262,7 +262,7 @@ public class Maps{
 
             return map;
 
-        }catch(IOException e){
+        }catch(Throwable e){
             throw new RuntimeException(e);
         }
     }

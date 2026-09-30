@@ -11,8 +11,6 @@ import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.*;
-
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entityc> implements Iterable<T>{
@@ -78,11 +76,11 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     }
 
     public void collide(){
-        collisions.collide((EntityGroup<? extends Hitboxc>)this);
+        EntityCollisions.collide((EntityGroup<? extends Hitboxc>)this);
     }
 
     public void updatePhysics(){
-        collisions.updatePhysics((EntityGroup<? extends Hitboxc>)this);
+        EntityCollisions.updatePhysics((EntityGroup<? extends Hitboxc>)this);
     }
 
     public void update(){

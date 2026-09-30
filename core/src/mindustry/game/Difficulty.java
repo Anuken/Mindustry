@@ -1,9 +1,11 @@
 package mindustry.game;
 
 import arc.*;
+import arc.struct.*;
 
 public class Difficulty{
     public static Difficulty[] all = {};
+    public static ObjectMap<String, Difficulty> byName = new ObjectMap<>();
 
     public static final Difficulty
     casual = new Difficulty("casual", 0.5f, 0.5f, 2f).add(),
@@ -12,15 +14,18 @@ public class Difficulty{
     hard = new Difficulty("hard", 1.25f, 1.5f, 0.8f).add(),
     eradication = new Difficulty("eradication", 1.5f, 2f, 0.6f).add();
 
-    //TODO add more fields
     public final String name;
     public float enemyHealthMultiplier, enemySpawnMultiplier, waveTimeMultiplier;
 
-    Difficulty(String name, float enemyHealthMultiplier, float enemySpawnMultiplier, float waveTimeMultiplier){
+    public Difficulty(String name, float enemyHealthMultiplier, float enemySpawnMultiplier, float waveTimeMultiplier){
         this.name = name;
         this.enemySpawnMultiplier = enemySpawnMultiplier;
         this.waveTimeMultiplier = waveTimeMultiplier;
         this.enemyHealthMultiplier = enemyHealthMultiplier;
+    }
+
+    public Difficulty(String name){
+        this.name = name;
     }
 
     public String info(){
@@ -61,5 +66,10 @@ public class Difficulty{
         System.arraycopy(prev, 0, all, 0, prev.length);
 
         all[prev.length] = diff;
+        byName.put(diff.name, diff);
+    }
+
+    public static Difficulty get(String name){
+        return byName.get(name, Difficulty.normal);
     }
 }

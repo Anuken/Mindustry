@@ -168,7 +168,7 @@ public class WallCrafter extends Block{
                 cpos.get(rx, ry);
             }
 
-            Tile other = world.tile(rx, ry);
+            Tile other = state.world.tile(rx, ry);
             if(other != null && other.solid()){
                 float at = other.block().attributes.get(attribute);
                 eff += at;

@@ -555,7 +555,7 @@ public class Turret extends ReloadTurret{
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
                 if(newRange != lastRangeChange){
                     lastRangeChange = newRange;
-                    fogControl.forceUpdate(team, this);
+                    state.fog.forceUpdate(team, this);
                 }
             }
 

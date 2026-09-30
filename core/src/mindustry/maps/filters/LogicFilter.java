@@ -1,10 +1,10 @@
 package mindustry.maps.filters;
 
 import arc.scene.ui.layout.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.maps.filters.FilterOption.*;
-import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
@@ -32,7 +32,7 @@ public class LogicFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(Tiles tiles, GenerateInput in){
+    public void apply(World world, GenerateInput in){
         //this updates map width/height global variables
         logicVars.update();
 

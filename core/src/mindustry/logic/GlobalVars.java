@@ -202,8 +202,8 @@ public class GlobalVars{
         varWave.numval = state.wave;
         varWaveTime.numval = state.wavetime / 60f;
 
-        varMapW.numval = world.width();
-        varMapH.numval = world.height();
+        varMapW.numval = state.world.width;
+        varMapH.numval = state.world.height;
 
         //network
         varServer.numval = (net.server() || !net.active()) ? 1 : 0;

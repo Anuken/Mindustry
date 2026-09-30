@@ -15,7 +15,7 @@ public class Save3 extends LegacySaveVersion{
     }
 
     @Override
-    public void readEntities(DataInput stream, SaveReadState state) throws IOException{
+    public void readEntities(DataInput stream, SaveLoadContext state) throws IOException{
         int teamc = stream.readInt();
         for(int i = 0; i < teamc; i++){
             Team team = Team.get(stream.readInt());

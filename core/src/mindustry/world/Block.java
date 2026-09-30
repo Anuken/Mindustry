@@ -301,7 +301,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean hasColor = false;
     /** Whether units target this block. */
     public boolean targetable = true;
-    /** If true, this block attacks and is considered a turret in the indexer. Building must implement Ranged. */
+    /** If true, this block attacks and is considered a turret in the state.indexer. Building must implement Ranged. */
     public boolean attacks = false;
     /** If true, this block is mending-related and can be suppressed with special units/missiles. */
     public boolean suppressable = false;
@@ -479,7 +479,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float percentSolid(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
             .sumf(other -> !other.floor().isLiquid ? 1f : 0f) / size / size;
@@ -509,7 +509,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     public void drawPotentialLinks(int x, int y){
         if((consumesPower || outputsPower) && hasPower && connectedPower){
-            Tile tile = world.tile(x, y);
+            Tile tile = state.world.tile(x, y);
             if(tile != null){
                 PowerNode.getNodeLinks(tile, this, player.team(), other -> {
                     PowerNode node = (PowerNode)other.block;
@@ -576,7 +576,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     public float sumAttribute(@Nullable Attribute attr, int x, int y){
         if(attr == null) return 0;
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
             .sumf(other -> !floating && !placeableLiquid && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));

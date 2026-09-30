@@ -5,8 +5,10 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.io.*;
+import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -62,43 +64,42 @@ public class FileMapGenerator implements WorldGenerator{
     }
 
     @Override
-    public void generate(Tiles tiles, WorldParams params){
+    public void generate(World world, WorldParams params){
         if(map == null) throw new RuntimeException("Generator has null map, cannot be used.");
 
         Sector sector = state.rules.sector;
 
-        world.setGenerating(false);
-        SaveIO.load(map.file, world.new FilterContext(map){
-            @Override
-            public Sector getSector(){
-                return sector;
-            }
+        state.generating = true;
+        try{
+            SaveIO.load(map.file, new FilterContext(map, sector){
 
-            @Override
-            public void end(){
-                applyFilters();
-                //no super.end(), don't call world load event twice
-            }
-        });
-        world.setGenerating(true);
+                @Override
+                public void end(){
+                    applyFilters();
+                    //no super.end(), don't call world load event twice
+                }
+            });
+        }catch(SaveLoadException e){
+            //failing to load a sector map is not a recoverable error; this will crash the game, and I don't see another good alternative
+            throw new RuntimeException(e);
+        }
 
         //make sure sector is maintained - don't reset it after map load.
         if(sector != null){
             state.rules.sector = sector;
         }
 
-        tiles = world.tiles;
+        world = state.world;
 
         boolean anyCores = false;
 
-        //TODO: unsure if indexer even works at this stage
         Block coreTypeToUse = state.rules.defaultTeam.cores().isEmpty() ? sector.planet.defaultCore : state.rules.defaultTeam.core().block;
 
-        for(Tile tile : tiles){
+        for(Tile tile : world){
 
             if(tile.overlay() == Blocks.spawn){
                 int rad = 10;
-                Geometry.circle(tile.x, tile.y, tiles.width, tiles.height, rad, (wx, wy) -> {
+                Geometry.circle(tile.x, tile.y, world.width, world.height, rad, (wx, wy) -> {
                     if(tile.overlay().itemDrop != null){
                         tile.clearOverlay();
                     }
@@ -141,5 +142,6 @@ public class FileMapGenerator implements WorldGenerator{
         }
 
         state.map = map;
+        state.generating = false;
     }
 }

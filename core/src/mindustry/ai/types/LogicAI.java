@@ -74,7 +74,7 @@ public class LogicAI extends AIController{
                 if(unit.isFlying()){
                     moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
                 }else{
-                    var result = controlPath.getPathPosition(unit, Tmp.v2.set(moveX, moveY));
+                    var result = state.controlPath.getPathPosition(unit, Tmp.v2.set(moveX, moveY));
                     if(result.move){
                         moveTo(result.dest, 1f, Tmp.v2.epsilonEquals(result.dest, 4.1f) ? 30f : 0f);
                     }

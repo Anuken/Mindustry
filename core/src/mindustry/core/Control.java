@@ -428,7 +428,28 @@ public class Control implements ApplicationListener, Loadable{
     public void playMap(Map map, Rules rules, boolean playtest){
         ui.loadAnd(() -> {
             logic.reset();
-            world.loadMap(map, rules);
+            try{
+                GameState.loadMap(map, rules);
+            }catch(SaveLoadException error){
+                //TODO: might break playtests
+                logic.reset();
+
+                if(error.getMessage() != null){
+                    ui.showErrorMessage(error.getMessage());
+                }
+
+                //booted out of map, resume editing
+                if(playtest){
+                    Dialog current = scene.getDialog();
+                    ui.editor.resumeAfterPlaytest(map);
+                    if(current != null){
+                        current.update(current::toFront);
+                    }
+                }
+
+                return;
+            }
+
             var oldRules = state.rules;
             rules.retainContentFields(oldRules);
             state.rules = rules;
@@ -437,22 +458,15 @@ public class Control implements ApplicationListener, Loadable{
             state.rules.editor = false;
             Events.fire(new RulesLoadEvent(state.rules));
             logic.play();
-            if(settings.getBool("savecreate") && !world.isInvalidMap() && !playtest){
+
+            if(settings.getBool("savecreate") && !playtest){
                 control.saves.addSave(map.name() + " " + new SimpleDateFormat("MMM dd h:mm", Locale.getDefault()).format(new Date()));
             }
-            if(!world.isInvalidMap() && !playtest){
+
+            if(!playtest){
                 map.setLastPlayed();
             }
             Events.fire(Trigger.newGame);
-
-            //booted out of map, resume editing
-            if(world.isInvalidMap() && playtest){
-                Dialog current = scene.getDialog();
-                ui.editor.resumeAfterPlaytest(map);
-                if(current != null){
-                    current.update(current::toFront);
-                }
-            }
         });
     }
 
@@ -487,7 +501,7 @@ public class Control implements ApplicationListener, Loadable{
                     boolean hadNoCore = !sector.info.hasCore;
                     reloader.begin();
                     //pass in a sector context to make absolutely sure the correct sector is written; it may differ from what's in the meta due to remapping.
-                    slot.load(world.makeSectorContext(sector));
+                    slot.load(new DefaultWorldContext(sector));
                     slot.setAutosave(true);
                     state.rules.sector = sector;
                     state.rules.cloudColor = sector.planet.landCloudColor;
@@ -502,7 +516,7 @@ public class Control implements ApplicationListener, Loadable{
                             int spawnPos = sector.info.spawnPosition;
 
                             //set spawn for sector damage to use
-                            Tile spawn = world.tile(spawnPos);
+                            Tile spawn = state.world.tile(spawnPos);
                             if(spawn == null){
                                 playNewSector(origin, sector, reloader);
                                 return;
@@ -532,7 +546,7 @@ public class Control implements ApplicationListener, Loadable{
 
                                 //retain old derelicts from the previous save.
                                 for(var build : previousDerelicts){
-                                    Tile tile = world.tile(build.tileX(), build.tileY());
+                                    Tile tile = state.world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, Team.derelict, build.tileX(), build.tileY(), build.rotation, false, false)){
                                         tile.setBlock(build.block, Team.derelict, build.rotation, () -> build);
                                     }
@@ -548,7 +562,7 @@ public class Control implements ApplicationListener, Loadable{
 
                                 //copy over all buildings from the previous save, retaining config and health, and making them derelict
                                 for(var build : previousBuildings){
-                                    Tile tile = world.tile(build.tileX(), build.tileY());
+                                    Tile tile = state.world.tile(build.tileX(), build.tileY());
                                     if(tile != null && tile.build == null && Build.validPlace(build.block, state.rules.defaultTeam, build.tileX(), build.tileY(), build.rotation, false, false)){
                                         build.addPlan(false, true);
                                         tile.setBlock(build.block, state.rules.defaultTeam, build.rotation, () -> build);
@@ -565,7 +579,7 @@ public class Control implements ApplicationListener, Loadable{
 
                                 //carry over all previous plans that don't already have the corresponding block at their position
                                 for(var plan : previousPlans){
-                                    var build = world.build(plan.x, plan.y);
+                                    var build = state.world.build(plan.x, plan.y);
                                     if(!(build != null && build.block == plan.block && build.tileX() == plan.x && build.tileY() == plan.y && build.team != state.rules.waveTeam)){
                                         teamData.plans.add(plan);
                                     }
@@ -583,7 +597,7 @@ public class Control implements ApplicationListener, Loadable{
                         reloader.end();
                     }
 
-                }catch(SaveException e){
+                }catch(SaveLoadException e){
                     Log.err(e);
                     sector.save = null;
                     Time.runTask(10f, () -> ui.showErrorMessage("@save.corrupted"));
@@ -603,7 +617,7 @@ public class Control implements ApplicationListener, Loadable{
 
     public void playNewSector(@Nullable Sector origin, Sector sector, WorldReloader reloader, WorldParams params, @Nullable Runnable beforePlay){
         reloader.begin();
-        world.loadSector(sector, params);
+        state.loadSector(sector, params);
         state.rules.sector = sector;
         sector.info.origin = origin;
         sector.info.destination = origin;
@@ -728,8 +742,8 @@ public class Control implements ApplicationListener, Loadable{
             player.set(0, 0);
             if(!player.dead()) player.unit().kill();
         }
-        if(Float.isNaN(camera.position.x)) camera.position.x = world.unitWidth()/2f;
-        if(Float.isNaN(camera.position.y)) camera.position.y = world.unitHeight()/2f;
+        if(Float.isNaN(camera.position.x)) camera.position.x = state.world.unitWidth /2f;
+        if(Float.isNaN(camera.position.y)) camera.position.y = state.world.unitHeight /2f;
 
         if(!scene.hasKeyboard()){
             if(Core.input.keyTap(Binding.performanceMetrics)) Core.settings.toggle("showperformance");

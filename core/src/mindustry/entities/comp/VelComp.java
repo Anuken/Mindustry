@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.entities.*;
 import mindustry.entities.EntityCollisions.*;
 import mindustry.gen.*;
 
@@ -66,7 +67,7 @@ abstract class VelComp implements Posc{
         SolidPred check = solidity();
 
         if(check != null){
-            collisions.move(self(), cx, cy, check);
+            EntityCollisions.move(self(), cx, cy, check);
         }else{
             x += cx;
             y += cy;

@@ -7,6 +7,7 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.*;
+import mindustry.io.SaveIO.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -47,27 +48,23 @@ public class MapIO{
         }
     }
 
-    public static void writeMap(Fi file, Map map) throws IOException{
+    public static void writeMap(Fi file, Map map) throws Throwable{
         writeMap(file, map, true);
     }
 
     /** @param embed if true, assets will be embedded in the map - this is needed for external export. */
-    public static void writeMap(Fi file, Map map, boolean embed) throws IOException{
-        try{
-            SaveIO.write(file, new SaveOptions(){{
-                extraTags = map.tags;
-                embedAssets = embed;
-            }});
-        }catch(Exception e){
-            throw new IOException(e);
-        }
+    public static void writeMap(Fi file, Map map, boolean embed) throws Throwable{
+        SaveIO.write(file, new SaveOptions(){{
+            extraTags = map.tags;
+            embedAssets = embed;
+        }});
     }
 
-    public static void loadMap(Map map){
-        SaveIO.load(map.file);
+    public static void loadMap(Map map) throws SaveLoadException{
+        SaveIO.load(map.file, new DefaultWorldContext());
     }
 
-    public static void loadMap(Map map, WorldContext cons){
+    public static void loadMap(Map map, SaveLoadContext cons) throws SaveLoadException{
         SaveIO.load(map.file, cons);
     }
 
@@ -110,14 +107,18 @@ public class MapIO{
             if(ver.version >= 12) ver.skipChunk(stream);
             ver.readRegion("content", stream, counter, MapIO::readPreviewContentHeader);
             if(ver.version == 11) ver.skipChunk(stream);
-            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new SaveReadState(new WorldContext(){
+            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new SaveLoadContext(){
+                {
+                    preview = true;
+                }
+
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
                 @Override public void begin(){
-                    world.setGenerating(true);
+                    state.generating = true;
                 }
                 @Override public void end(){
-                    world.setGenerating(false);
+                    state.generating = false;
                 }
 
                 @Override
@@ -177,9 +178,7 @@ public class MapIO{
                         }
                     }
                 }
-            }){{
-                preview = true;
-            }}));
+            }));
 
             floors.draw(walls, true);
             walls.dispose();
@@ -210,7 +209,7 @@ public class MapIO{
         content.setTemporaryMapper(map);
     }
 
-    public static Pixmap generatePreview(Tiles tiles){
+    public static Pixmap generatePreview(World tiles){
         Pixmap pixmap = new Pixmap(tiles.width, tiles.height);
         for(int x = 0; x < pixmap.width; x++){
             for(int y = 0; y < pixmap.height; y++){
@@ -236,7 +235,7 @@ public class MapIO{
             (!(overlay instanceof OverlayFloor) ? Pixmap.blend((overlay.mapColor.rgba() & ~0xff) | 128, floor.mapColor.rgba()) : overlay.mapColor.rgba()));
     }
 
-    public static Pixmap writeImage(Tiles tiles){
+    public static Pixmap writeImage(World tiles){
         Pixmap pix = new Pixmap(tiles.width, tiles.height);
         for(Tile tile : tiles){
             //while synthetic blocks are possible, most of their data is lost, so in order to avoid questions like
@@ -247,7 +246,7 @@ public class MapIO{
         return pix;
     }
 
-    public static void readImage(Pixmap pixmap, Tiles tiles){
+    public static void readImage(Pixmap pixmap, World tiles){
         for(Tile tile : tiles){
             int color = pixmap.get(tile.x, pixmap.height - 1 - tile.y);
             Block block = ColorMapper.get(color);

@@ -401,7 +401,7 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Building linked = world.build(cx, cy);
+                Building linked = state.world.build(cx, cy);
                 if(linked != null && (!linked.isDiscovered(team) || !linked.wasVisible)) continue;
 
                 Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.current : linked.block;
@@ -432,7 +432,7 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Building tile = world.build(cx, cy);
+                Building tile = state.world.build(cx, cy);
                 if(tile != null && (!tile.isDiscovered(team) || !tile.wasVisible)) continue;
                 Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.current : tile.block;
 
@@ -463,8 +463,8 @@ public class Schematics implements Loadable{
     /** Places the last launch loadout at the coordinates and fills it with the launch resources. */
     public static void placeLaunchLoadout(int x, int y){
         placeLoadout(universe.getLastLoadout(), x, y, state.rules.defaultTeam);
-        if(world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
-        world.tile(x, y).build.items.add(universe.getLaunchResources());
+        if(state.world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
+        state.world.tile(x, y).build.items.add(universe.getLaunchResources());
     }
 
     public static void placeLoadout(Schematic schem, int x, int y){
@@ -481,7 +481,7 @@ public class Schematics implements Loadable{
         if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.copy().sort(s -> -s.block.schematicPriority).each(st -> {
-            Tile tile = world.tile(st.x + ox, st.y + oy);
+            Tile tile = state.world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
             //check for blocks that are in the way.
@@ -519,7 +519,7 @@ public class Schematics implements Loadable{
     public static void place(Schematic schem, int x, int y, Team team, boolean overwrite){
         int ox = x - schem.width/2, oy = y - schem.height/2;
         schem.tiles.each(st -> {
-            Tile tile = world.tile(st.x + ox, st.y + oy);
+            Tile tile = state.world.tile(st.x + ox, st.y + oy);
             if(tile == null || (!overwrite && !Build.validPlace(st.block, team, tile.x, tile.y, st.rotation))) return;
 
             tile.setBlock(st.block, team, st.rotation);

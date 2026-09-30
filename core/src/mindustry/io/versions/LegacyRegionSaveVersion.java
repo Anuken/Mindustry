@@ -15,7 +15,7 @@ public class LegacyRegionSaveVersion extends ShortChunkSaveVersion{
     }
 
     @Override
-    public void read(DataInputStream stream, CounterInputStream counter, SaveReadState saveState) throws IOException{
+    public void read(DataInputStream stream, CounterInputStream counter, SaveLoadContext saveState) throws IOException{
         readRegion("meta", stream, counter, in -> readMeta(in, saveState));
         readRegion("content", stream, counter, this::readContentHeader);
 

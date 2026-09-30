@@ -253,7 +253,7 @@ public class TypeIO{
             case techNodeType -> content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
             case booleanType -> read.bool();
             case doubleType -> read.d();
-            case buildingType -> !box ? world.build(read.i()) : new BuildingBox(read.i());
+            case buildingType -> !box ? state.world.build(read.i()) : new BuildingBox(read.i());
             case lAccessType -> LAccess.all[read.s()];
             case byteArrayType -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
@@ -278,7 +278,7 @@ public class TypeIO{
                 for(int i = 0; i < len; i ++) bools[i] = read.bool();
                 yield bools;
             }
-            case unitType -> !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
+            case unitType -> !box ? state.entities.unit.getByID(read.i()) : new UnitBox(read.i());
             case vec2ArrayType -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.s();
@@ -468,7 +468,7 @@ public class TypeIO{
         int id = read.i();
         int typeID = read.ub();
 
-        Unit entity = Groups.unit.getByID(id);
+        Unit entity = state.entities.unit.getByID(id);
         boolean add = false, created = false;
 
         if(entity == null){
@@ -516,9 +516,9 @@ public class TypeIO{
         //nothing
         if(type == 0) return null;
         if(type == 2){ //standard unit
-            return Groups.unit.getByID(id);
+            return state.entities.unit.getByID(id);
         }else if(type == 1){ //block
-            Building tile = world.build(id);
+            Building tile = state.world.build(id);
             return tile instanceof ControlBlock cont ? cont.unit() : null;
         }
         return null;
@@ -548,7 +548,7 @@ public class TypeIO{
     }
 
     public static Posc readPosEntity(Reads read){
-        return (Posc)Groups.sync.getByID(read.i());
+        return (Posc)state.entities.sync.getByID(read.i());
     }
 
     public static void writeEntity(Writes write, Entityc entity){
@@ -556,7 +556,7 @@ public class TypeIO{
     }
 
     public static <T extends Entityc> T readEntity(Reads read){
-        return (T)Groups.sync.getByID(read.i());
+        return (T)state.entities.sync.getByID(read.i());
     }
 
     public static void writeBuilding(Writes write, Building tile){
@@ -564,7 +564,7 @@ public class TypeIO{
     }
 
     public static Building readBuilding(Reads read){
-        return world.build(read.i());
+        return state.world.build(read.i());
     }
 
     public static void writeTile(Writes write, Tile tile){
@@ -572,7 +572,7 @@ public class TypeIO{
     }
 
     public static Tile readTile(Reads read){
-        return world.tile(read.i());
+        return state.world.tile(read.i());
     }
 
     public static void writeBlock(Writes write, Block block){
@@ -664,7 +664,7 @@ public class TypeIO{
         byte type = read.b();
         int position = read.i();
 
-        if(world.tile(position) == null){
+        if(state.world.tile(position) == null){
             return null;
         }
 
@@ -839,7 +839,7 @@ public class TypeIO{
         byte type = read.b();
         if(type == 0){ //is player
             int id = read.i();
-            Player player = Groups.player.getByID(id);
+            Player player = state.entities.player.getByID(id);
             //make sure player exists
             if(player == null) return prev;
             return player;
@@ -849,14 +849,14 @@ public class TypeIO{
         }else if(type == 3){
             int pos = read.i();
             if(prev instanceof LogicAI pai){
-                pai.controller = world.build(pos);
+                pai.controller = state.world.build(pos);
                 return pai;
             }else{
                 //create new AI for assignment
                 LogicAI out = new LogicAI();
                 //instantly time out when updated.
                 out.controlTimer = LogicAI.logicControlTimeout;
-                out.controller = world.build(pos);
+                out.controller = state.world.build(pos);
                 return out;
             }
             //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte, type 7 is the one with the command queue, 8 adds a stance, 9 adds multiple stances
@@ -876,9 +876,9 @@ public class TypeIO{
             if(hasAttack){
                 byte entityType = read.b();
                 if(entityType == 1){
-                    ai.attackTarget = world.build(read.i());
+                    ai.attackTarget = state.world.build(read.i());
                 }else{
-                    ai.attackTarget = Groups.unit.getByID(ai.readAttackTarget = read.i());
+                    ai.attackTarget = state.entities.unit.getByID(ai.readAttackTarget = read.i());
                 }
             }else{
                 ai.attackTarget = null;
@@ -898,11 +898,11 @@ public class TypeIO{
                     int commandType = read.b();
                     switch(commandType){
                         case 0 -> {
-                            var build = world.build(read.i());
+                            var build = state.world.build(read.i());
                             if(build != null) ai.commandQueue.add(build);
                         }
                         case 1 -> {
-                            var unit = Groups.unit.getByID(read.i());
+                            var unit = state.entities.unit.getByID(read.i());
                             if(unit != null) ai.commandQueue.add(unit);
                         }
                         case 2 -> {
@@ -1435,7 +1435,7 @@ public class TypeIO{
 
         @Override
         public Building unbox(){
-            return world.build(pos);
+            return state.world.build(pos);
         }
 
         @Override
@@ -1456,7 +1456,7 @@ public class TypeIO{
 
         @Override
         public Unit unbox(){
-            return Groups.unit.getByID(id);
+            return state.entities.unit.getByID(id);
         }
 
         @Override

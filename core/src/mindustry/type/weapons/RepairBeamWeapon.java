@@ -129,7 +129,7 @@ public class RepairBeamWeapon extends Weapon{
             if(targetBuildings){
                 //snap to closest building
                 World.raycastEachWorld(wx, wy, heal.lastEnd.x, heal.lastEnd.y, (x, y) -> {
-                    var build = Vars.world.build(x, y);
+                    var build = Vars.state.world.build(x, y);
                     if(build != null && build.team == unit.team && build.damaged()){
                         heal.target = build;
                         heal.lastEnd.set(x * tilesize, y * tilesize);

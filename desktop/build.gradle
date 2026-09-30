@@ -20,6 +20,9 @@ tasks.register('run', JavaExec){
     }
 
     jvmArgs += "-XX:+ShowCodeDetailsInExceptionMessages"
+    jvmArgs += "--enable-native-access=ALL-UNNAMED"
+    //fails on java 17
+    //jvmArgs += "--sun-misc-unsafe-memory-access=allow"
 
     if(project.hasProperty("args")){
         args Eval.me(project.getProperties()["args"])
@@ -135,8 +138,8 @@ platforms.each{ platform ->
 
             args += "Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"
             args += "XX:+ShowCodeDetailsInExceptionMessages"
-            args += "XX:+UseCompactObjectHeaders"
             args += "enable-native-access=ALL-UNNAMED"
+            args += "sun-misc-unsafe-memory-access=allow"
 
             project.services.get(ExecOperations).exec{
                 commandLine args.toList()
@@ -168,7 +171,7 @@ platforms.each{ platform ->
             }
 
             //packr is broken and won't let me add one hyphen, so I have to do that myself later
-            outputJsonFile.text = outputJsonFile.text.replace("-enable-native-access=ALL-UNNAMED", "--enable-native-access=ALL-UNNAMED")
+            outputJsonFile.text = outputJsonFile.text.replace("-enable-native-access=ALL-UNNAMED", "--enable-native-access=ALL-UNNAMED").replace("-sun-misc-unsafe-memory-access=allow", "--sun-misc-unsafe-memory-access=allow")
 
             if((platform == "Windows64")){
                 copy{

@@ -60,7 +60,7 @@ public class ConstructBlock extends Block{
         if(tile == null) return;
 
         Team team = tile.team();
-        if(!headless && fogControl.isVisibleTile(Vars.player.team(), tile.x, tile.y)){
+        if(!headless && state.fog.isVisibleTile(Vars.player.team(), tile.x, tile.y)){
             block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
             if(shouldPlay()) block.breakSound.at(tile, block.breakPitchChange ? calcPitch(false) : 1f);
         }
@@ -102,7 +102,7 @@ public class ConstructBlock extends Block{
             }
 
             //make sure block indexer knows it's damaged
-            indexer.notifyHealthChanged(tile.build);
+            state.indexer.notifyHealthChanged(tile.build);
 
             //last builder was this local client player, call placed()
             if(!headless && builder == player.unit()){
@@ -110,7 +110,7 @@ public class ConstructBlock extends Block{
             }
         }
 
-        if(fogControl.isVisibleTile(team, tile.x, tile.y)){
+        if(state.fog.isVisibleTile(team, tile.x, tile.y)){
             block.placeEffect.at(tile.drawx(), tile.drawy(), block.size);
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }
@@ -145,7 +145,7 @@ public class ConstructBlock extends Block{
     }
 
     public static void playRepairSound(Team team, Tile tile){
-        if(!headless && shouldPlay() && fogControl.isVisibleTile(team, tile.x, tile.y)) Sounds.blockRepair.at(tile, calcPitch(true));
+        if(!headless && shouldPlay() && state.fog.isVisibleTile(team, tile.x, tile.y)) Sounds.blockRepair.at(tile, calcPitch(true));
     }
 
     public static void constructed(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
@@ -457,7 +457,7 @@ public class ConstructBlock extends Block{
             for(int i = 0; i < requirements.length; i++){
                 this.itemsLeft[i] = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier);
             }
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
         }
 
         public void setDeconstruct(Block previous){
@@ -472,7 +472,7 @@ public class ConstructBlock extends Block{
             this.itemsLeft = new int[previous.requirements.length];
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
         }
 
         @Override

@@ -211,7 +211,7 @@ public class CanvasBlock extends Block{
 
             blending = 0;
             for(int i = 0; i < 4; i++){
-                if(blends(world.tile(tile.x + Geometry.d4[i].x * size, tile.y + Geometry.d4[i].y * size))) blending |= (1 << i);
+                if(blends(state.world.tile(tile.x + Geometry.d4[i].x * size, tile.y + Geometry.d4[i].y * size))) blending |= (1 << i);
             }
         }
 

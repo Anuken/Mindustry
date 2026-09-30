@@ -95,7 +95,7 @@ public class LiquidTurret extends Turret{
                 int tr = (int)(range / tilesize);
                 for(int x = -tr; x <= tr; x++){
                     for(int y = -tr; y <= tr; y++){
-                        Tile other = world.tile(x + tx, y + ty);
+                        Tile other = state.world.tile(x + tx, y + ty);
                         var fire = Fires.get(x + tx, y + ty);
                         float dst = fire == null ? 0 : dst2(fire);
                         //do not extinguish fires on other team blocks

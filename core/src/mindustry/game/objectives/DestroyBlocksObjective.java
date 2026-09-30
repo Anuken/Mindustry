@@ -28,7 +28,7 @@ public class DestroyBlocksObjective extends MapObjective{
     public int progress(){
         int count = 0;
         for(var pos : positions){
-            var build = world.build(pos.x, pos.y);
+            var build = state.world.build(pos.x, pos.y);
             if(build == null || build.team != team || build.block != block){
                 count++;
             }

@@ -252,7 +252,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             timeScaleDuration = read.f();
         }
         if((moduleBits & (1 << 5)) != 0){
-            lastDisabler = world.build(read.i());
+            lastDisabler = state.world.build(read.i());
         }
 
         //unnecessary consume module read in version 2 and below
@@ -312,7 +312,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     //region utility methods
 
     public boolean isDiscovered(Team viewer){
-        if(state.rules.limitMapArea && world.getDarkness(tile.x, tile.y) >= 3){
+        if(state.rules.limitMapArea && state.world.getDarkness(tile.x, tile.y) >= 3){
             return false;
         }
 
@@ -320,14 +320,14 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             return true;
         }
         if(block.size <= 2){
-            return fogControl.isDiscovered(viewer, tile.x, tile.y);
+            return state.fog.isDiscovered(viewer, tile.x, tile.y);
         }else{
             int s = block.size / 2;
-            return fogControl.isDiscovered(viewer, tile.x, tile.y) ||
-                fogControl.isDiscovered(viewer, tile.x - s, tile.y - s) ||
-                fogControl.isDiscovered(viewer, tile.x - s, tile.y + s) ||
-                fogControl.isDiscovered(viewer, tile.x + s, tile.y + s) ||
-                fogControl.isDiscovered(viewer, tile.x + s, tile.y - s);
+            return state.fog.isDiscovered(viewer, tile.x, tile.y) ||
+                state.fog.isDiscovered(viewer, tile.x - s, tile.y - s) ||
+                state.fog.isDiscovered(viewer, tile.x - s, tile.y + s) ||
+                state.fog.isDiscovered(viewer, tile.x + s, tile.y + s) ||
+                state.fog.isDiscovered(viewer, tile.x + s, tile.y - s);
         }
     }
 
@@ -374,7 +374,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         Tile best = null;
         float mindst = 0f;
         for(var point : Edges.getEdges(block.size)){
-            Tile other = Vars.world.tile(tile.x + point.x, tile.y + point.y);
+            Tile other = Vars.state.world.tile(tile.x + point.x, tile.y + point.y);
             if(other != null && !solid.get(other) && (best == null || to.dst2(other) < mindst)){
                 best = other;
                 mindst = other.dst2(to);
@@ -507,7 +507,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     public void eachEdge(Cons<Tile> cons){
         for(var edge : block.getEdges()){
-            Tile other = world.tile(tile.x + edge.x, tile.y + edge.y);
+            Tile other = state.world.tile(tile.x + edge.x, tile.y + edge.y);
             if(other != null){
                 cons.get(other);
             }
@@ -515,15 +515,15 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     }
 
     public Building nearby(int dx, int dy){
-        return world.build(tile.x + dx, tile.y + dy);
+        return state.world.build(tile.x + dx, tile.y + dy);
     }
 
     public Building nearby(int rotation){
         return switch(rotation){
-            case 0 -> world.build(tile.x + 1, tile.y);
-            case 1 -> world.build(tile.x, tile.y + 1);
-            case 2 -> world.build(tile.x - 1, tile.y);
-            case 3 -> world.build(tile.x, tile.y - 1);
+            case 0 -> state.world.build(tile.x + 1, tile.y);
+            case 1 -> state.world.build(tile.x, tile.y + 1);
+            case 2 -> state.world.build(tile.x - 1, tile.y);
+            case 3 -> state.world.build(tile.x, tile.y - 1);
             default -> null;
         };
     }
@@ -575,7 +575,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         return nearby(Geometry.d4(rotation + 3).x * trns, Geometry.d4(rotation + 3).y * trns);
     }
 
-    /** Any class that overrides this method and changes the value must call Vars.fogControl.forceUpdate(team). */
+    /** Any class that overrides this method and changes the value must call Vars.state.fogControl.forceUpdate(team). */
     public float fogRadius(){
         return block.fogRadius;
     }
@@ -1172,7 +1172,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         power.graph.remove(self());
         for(int i = 0; i < power.links.size; i++){
-            Tile other = world.tile(power.links.get(i));
+            Tile other = state.world.tile(power.links.get(i));
             if(other != null && other.build != null && other.build.power != null){
                 other.build.power.links.removeValue(pos());
             }
@@ -1198,7 +1198,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         for(int i = 0; i < power.links.size; i++){
-            Tile link = world.tile(power.links.get(i));
+            Tile link = state.world.tile(power.links.get(i));
             if(link != null && link.build != null && link.build.power != null && link.build.team == team) out.add(link.build);
         }
         return out;
@@ -1374,7 +1374,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
     public void onRepaired(){
         placed();
         if(block.flags.contains(BlockFlag.hasFogRadius)){
-            fogControl.forceUpdate(team, self());
+            state.fog.forceUpdate(team, self());
         }
     }
 
@@ -1468,7 +1468,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
             Time.run(i / 2f, () -> {
-                Tile other = world.tileWorld(x + Mathf.range(block.size * tilesize / 2), y + Mathf.range(block.size * tilesize / 2));
+                Tile other = state.world.tileWorld(x + Mathf.range(block.size * tilesize / 2), y + Mathf.range(block.size * tilesize / 2));
                 if(other != null){
                     Puddles.deposit(other, liquid, splash);
                 }
@@ -1802,7 +1802,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         boolean was = isValid();
 
-        if(was) indexer.removeIndex(tile);
+        if(was) state.indexer.removeIndex(tile);
 
         this.team = next;
 
@@ -1814,7 +1814,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
                 }
             }
             for(int i = 0; i < power.links.size; i++){
-                var other = world.build(power.links.items[i]);
+                var other = state.world.build(power.links.items[i]);
 
                 //only reflow links that were connected to the old power graph; ones that have a new one were already covered.
                 if(other != null && other.team != team && other.power != null && other.power.graph == oldGraph){
@@ -1832,9 +1832,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
         }
 
         if(was){
-            indexer.addIndex(tile);
+            state.indexer.addIndex(tile);
             Events.fire(teamChangeEvent.set(last, self()));
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
             updateProximity();
         }
 
@@ -1868,7 +1868,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
-            Building other = world.build(tile.x + point.x, tile.y + point.y);
+            Building other = state.world.build(tile.x + point.x, tile.y + point.y);
             //remove this tile from all nearby tile's proximities
             if(other != null){
                 tmpTiles.add(other);
@@ -1888,7 +1888,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         Point2[] nearby = Edges.getEdges(block.size);
         for(Point2 point : nearby){
-            Building other = world.build(tile.x + point.x, tile.y + point.y);
+            Building other = state.world.build(tile.x + point.x, tile.y + point.y);
 
             if(other == null || other.team != team) continue;
 
@@ -2092,7 +2092,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
             netServer.buildHealthUpdate(self());
         }
 
-        indexer.notifyHealthChanged(self());
+        state.indexer.notifyHealthChanged(self());
     }
 
     @Override
@@ -2236,7 +2236,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
-                if(fogControl.isVisibleTile(viewer, tx + x + of, ty + y + of)){
+                if(state.fog.isVisibleTile(viewer, tx + x + of, ty + y + of)){
                     return false;
                 }
             }
