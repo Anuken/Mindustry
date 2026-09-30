@@ -90,7 +90,7 @@ public abstract class LStatement{
     /** Sanitizes variable input strings from text fields into values that will not break logic parsing. */
     public static String sanitize(String value){
         if(value.length() == 0){
-            return "";
+            return "null";
         }else if(value.length() == 1){
             if(value.charAt(0) == '"' || value.charAt(0) == ';' || value.charAt(0) == ' ' ||
             value.charAt(0) == '\n' || value.charAt(0) == '\t' || value.charAt(0) == '#'){
