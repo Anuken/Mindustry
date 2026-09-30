@@ -5,7 +5,7 @@ import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 
-public class LVar{
+public class LogicVar{
     public final String name;
     public int id;
 
@@ -17,15 +17,15 @@ public class LVar{
     //ms timestamp for when this was last synced; used in the sync instruction
     public long syncTime;
 
-    public LVar(String name){
+    public LogicVar(String name){
         this(name, -1);
     }
 
-    public LVar(String name, int id){
+    public LogicVar(String name, int id){
         this(name, id, false);
     }
 
-    public LVar(String name, int id, boolean constant){
+    public LogicVar(String name, int id, boolean constant){
         this.name = name;
         this.id = id;
         this.constant = constant;
@@ -118,7 +118,7 @@ public class LVar{
         }
     }
 
-    public void set(LVar other){
+    public void set(LogicVar other){
         isobj = other.isobj;
         // Setting a non-numeric value to @counter must preserve its numeric field
         if(isobj){

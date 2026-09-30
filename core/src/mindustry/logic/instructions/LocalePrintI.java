@@ -4,10 +4,10 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class LocalePrintI implements LInstruction{
-    public LVar name;
+public class LocalePrintI implements LogicInstruction{
+    public LogicVar name;
 
-    public LocalePrintI(LVar name){
+    public LocalePrintI(LogicVar name){
         this.name = name;
     }
 
@@ -15,8 +15,8 @@ public class LocalePrintI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
-        if(exec.textBuffer.length() >= LExecutor.maxTextBuffer) return;
+    public void run(LogicExecutor exec){
+        if(exec.textBuffer.length() >= LogicExecutor.maxTextBuffer) return;
 
         //this should avoid any garbage allocation
         if(name.isobj){

@@ -45,7 +45,7 @@ public class TextMarker extends PosMarker{
     }
 
     @Override
-    public void control(LMarkerControl type, double p1, double p2, double p3){
+    public void control(LogicMarkerControl type, double p1, double p2, double p3){
         super.control(type, p1, p2, p3);
 
         if(!Double.isNaN(p1)){

@@ -432,8 +432,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress){
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress){
                 if(len == 0) return 0;
                 return ys[len - 1];
             }
@@ -441,8 +441,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem && len > 0) return ids[len - 1];
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.firstItem && len > 0) return ids[len - 1];
             return super.senseObject(sensor);
         }
 

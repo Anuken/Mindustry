@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("write")
-public class WriteStatement extends LStatement{
+public class WriteStatement extends LogicStatement{
     public String input = "result", target = "cell1", address = "0";
 
     @Override
@@ -25,12 +25,12 @@ public class WriteStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new WriteI(builder.var(target), builder.var(address), builder.var(input));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.io;
+    public LogicCategory category(){
+        return LogicCategory.io;
     }
 }

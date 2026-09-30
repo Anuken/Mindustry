@@ -6,19 +6,19 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class PlayMusicI implements LInstruction{
-    public LVar name, interrupt;
+public class PlayMusicI implements LogicInstruction{
+    public LogicVar name, interrupt;
 
     public PlayMusicI(){
     }
 
-    public PlayMusicI(LVar name, LVar interrupt){
+    public PlayMusicI(LogicVar name, LogicVar interrupt){
         this.name = name;
         this.interrupt = interrupt;
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(headless) return;
 
         //null music = stop

@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("packcolor")
-public class PackColorStatement extends LStatement{
+public class PackColorStatement extends LogicStatement{
     public String result = "result", r = "1", g = "0", b = "0", a = "1";
 
     @Override
@@ -23,12 +23,12 @@ public class PackColorStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new PackColorI(builder.var(result), builder.var(r), builder.var(g), builder.var(b), builder.var(a));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.operation;
+    public LogicCategory category(){
+        return LogicCategory.operation;
     }
 }

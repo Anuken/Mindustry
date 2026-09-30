@@ -11,7 +11,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 @RegisterStatement("weatherset")
-public class WeatherSetStatement extends LStatement{
+public class WeatherSetStatement extends LogicStatement{
     public String weather = "@rain", state = "true";
 
     private transient TextField tfield;
@@ -51,12 +51,12 @@ public class WeatherSetStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SetWeatherI(builder.var(weather), builder.var(state));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

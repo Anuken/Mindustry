@@ -9,11 +9,11 @@ import mindustry.ui.*;
 import mindustry.world.blocks.logic.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 
-public class DrawI implements LInstruction{
+public class DrawI implements LogicInstruction{
     public byte type;
-    public LVar x, y, p1, p2, p3, p4;
+    public LogicVar x, y, p1, p2, p3, p4;
 
-    public DrawI(byte type, LVar x, LVar y, LVar p1, LVar p2, LVar p3, LVar p4){
+    public DrawI(byte type, LogicVar x, LogicVar y, LogicVar p1, LogicVar p2, LogicVar p3, LogicVar p4){
         this.type = type;
         this.x = x;
         this.y = y;
@@ -27,9 +27,9 @@ public class DrawI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         //graphics on headless servers are useless.
-        if(Vars.headless || exec.graphicsBuffer.size >= LExecutor.maxGraphicsBuffer) return;
+        if(Vars.headless || exec.graphicsBuffer.size >= LogicExecutor.maxGraphicsBuffer) return;
 
         //explicitly unpack colorPack, it's pre-processed here
         if(type == LogicDisplay.commandColorPack){
@@ -89,7 +89,7 @@ public class DrawI implements LInstruction{
                     }
                     curX += advance;
 
-                    if(exec.graphicsBuffer.size >= LExecutor.maxGraphicsBuffer) break;
+                    if(exec.graphicsBuffer.size >= LogicExecutor.maxGraphicsBuffer) break;
                 }
 
                 exec.textBuffer.setLength(0);

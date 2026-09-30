@@ -8,7 +8,7 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 @RegisterStatement("fetch")
-public class FetchStatement extends LStatement{
+public class FetchStatement extends LogicStatement{
     public FetchType type = FetchType.unit;
     public String result = "result", team = "@sharded", index = "0", extra = "@conveyor";
 
@@ -54,12 +54,12 @@ public class FetchStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new FetchI(type, builder.var(result), builder.var(team), builder.var(extra), builder.var(index));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

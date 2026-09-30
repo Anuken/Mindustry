@@ -15,7 +15,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 @RegisterStatement("status")
-public class ApplyStatusStatement extends LStatement{
+public class ApplyStatusStatement extends LogicStatement{
     public boolean clear;
     public String effect = "@status-wet", unit = "unit", duration = "10";
 
@@ -69,12 +69,12 @@ public class ApplyStatusStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new ApplyEffectI(clear, builder.var(effect), builder.var(unit), builder.var(duration));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

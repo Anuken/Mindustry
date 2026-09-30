@@ -6,12 +6,12 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("getflag")
-public class GetFlagStatement extends LStatement{
+public class GetFlagStatement extends LogicStatement{
     public String result = "result", flag = "\"flag\"";
 
     @Override
     public void build(Table table){
-        float width = LCanvas.isCompact() ? 100f : 190f;
+        float width = LogicCanvas.isCompact() ? 100f : 190f;
 
         fields(table, result, str -> result = str).width(width);
 
@@ -27,12 +27,12 @@ public class GetFlagStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new GetFlagI(builder.var(result), builder.var(flag));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

@@ -5,16 +5,16 @@ import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 
-public class SetWeatherI implements LInstruction{
-    public LVar type, state;
+public class SetWeatherI implements LogicInstruction{
+    public LogicVar type, state;
 
-    public SetWeatherI(LVar type, LVar state){
+    public SetWeatherI(LogicVar type, LogicVar state){
         this.type = type;
         this.state = state;
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(type.obj() instanceof Weather weather){
             if(state.bool()){
                 if(!weather.isActive()){ //Create is not already active

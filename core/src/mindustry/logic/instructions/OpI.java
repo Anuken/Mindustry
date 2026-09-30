@@ -3,11 +3,11 @@ package mindustry.logic.instructions;
 import arc.util.*;
 import mindustry.logic.*;
 
-public class OpI implements LInstruction{
+public class OpI implements LogicInstruction{
     public LogicOp op = LogicOp.add;
-    public LVar a, b, dest;
+    public LogicVar a, b, dest;
 
-    public OpI(LogicOp op, LVar a, LVar b, LVar dest){
+    public OpI(LogicOp op, LogicVar a, LogicVar b, LogicVar dest){
         this.op = op;
         this.a = a;
         this.b = b;
@@ -18,7 +18,7 @@ public class OpI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(op == LogicOp.strictEqual){
             dest.setnum(a.isobj == b.isobj && ((a.isobj && Structs.eq(a.objval, b.objval)) || (!a.isobj && a.numval == b.numval)) ? 1 : 0);
         }else if(op.unary){

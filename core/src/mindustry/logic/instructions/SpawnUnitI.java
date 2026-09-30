@@ -11,10 +11,10 @@ import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
-public class SpawnUnitI implements LInstruction{
-    public LVar type, x, y, rotation, team, result, effect;
+public class SpawnUnitI implements LogicInstruction{
+    public LogicVar type, x, y, rotation, team, result, effect;
 
-    public SpawnUnitI(LVar type, LVar x, LVar y, LVar rotation, LVar team, LVar result, LVar effect){
+    public SpawnUnitI(LogicVar type, LogicVar x, LogicVar y, LogicVar rotation, LogicVar team, LogicVar result, LogicVar effect){
         this.type = type;
         this.x = x;
         this.y = y;
@@ -28,7 +28,7 @@ public class SpawnUnitI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(net.client()) return;
 
         Team t = team.team();

@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("spawnwave")
-public class SpawnWaveStatement extends LStatement{
+public class SpawnWaveStatement extends LogicStatement{
     public String x = "10", y = "10", natural = "false";
 
     @Override
@@ -22,12 +22,12 @@ public class SpawnWaveStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SpawnWaveI(builder.var(natural), builder.var(x), builder.var(y));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

@@ -8,7 +8,7 @@ import mindustry.logic.instructions.*;
 import static mindustry.Vars.*;
 
 @RegisterStatement("clientdata")
-public class ClientDataStatement extends LStatement{
+public class ClientDataStatement extends LogicStatement{
     public String channel = "\"frog\"", value = "\"bar\"", reliable = "0";
 
     @Override
@@ -32,13 +32,13 @@ public class ClientDataStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         if(!state.rules.allowLogicData) return null;
         return new ClientDataI(builder.var(channel), builder.var(value), builder.var(reliable));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

@@ -7,7 +7,7 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 @RegisterStatement("op")
-public class OperationStatement extends LStatement{
+public class OperationStatement extends LogicStatement{
     public LogicOp op = LogicOp.add;
     public String dest = "result", a = "a", b = "b";
 
@@ -61,12 +61,12 @@ public class OperationStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new OpI(op, builder.var(a), builder.var(b), builder.var(dest));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.operation;
+    public LogicCategory category(){
+        return LogicCategory.operation;
     }
 }

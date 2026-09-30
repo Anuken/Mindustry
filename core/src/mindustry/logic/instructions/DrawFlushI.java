@@ -2,10 +2,10 @@ package mindustry.logic.instructions;
 
 import mindustry.logic.*;
 
-public class DrawFlushI implements LInstruction{
-    public LVar target;
+public class DrawFlushI implements LogicInstruction{
+    public LogicVar target;
 
-    public DrawFlushI(LVar target){
+    public DrawFlushI(LogicVar target){
         this.target = target;
     }
 
@@ -13,8 +13,8 @@ public class DrawFlushI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
-        if(target.building() instanceof LDrawable d && d.drawable(exec)){
+    public void run(LogicExecutor exec){
+        if(target.building() instanceof LogicDrawable d && d.drawable(exec)){
             d.draw(exec.graphicsBuffer);
         }
         exec.graphicsBuffer.clear();

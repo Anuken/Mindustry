@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("spawn")
-public class SpawnUnitStatement extends LStatement{
+public class SpawnUnitStatement extends LogicStatement{
     public String type = "@dagger", x = "10", y = "10", rotation = "90", team = "@sharded", result = "result", effect = "true";
 
     @Override
@@ -26,12 +26,12 @@ public class SpawnUnitStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SpawnUnitI(builder.var(type), builder.var(x), builder.var(y), builder.var(rotation), builder.var(team), builder.var(result), builder.var(effect));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

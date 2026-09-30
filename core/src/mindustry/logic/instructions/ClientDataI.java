@@ -3,10 +3,10 @@ package mindustry.logic.instructions;
 import mindustry.gen.*;
 import mindustry.logic.*;
 
-public class ClientDataI implements LInstruction{
-    public LVar channel, value, reliable;
+public class ClientDataI implements LogicInstruction{
+    public LogicVar channel, value, reliable;
 
-    public ClientDataI(LVar channel, LVar value, LVar reliable){
+    public ClientDataI(LogicVar channel, LogicVar value, LogicVar reliable){
         this.channel = channel;
         this.value = value;
         this.reliable = reliable;
@@ -16,7 +16,7 @@ public class ClientDataI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(channel.obj() instanceof String c){
             Object v = value.isobj ? value.objval : value.numval;
             if(reliable.bool()){

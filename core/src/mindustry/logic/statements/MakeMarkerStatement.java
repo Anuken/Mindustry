@@ -8,7 +8,7 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 @RegisterStatement("makemarker")
-public class MakeMarkerStatement extends LStatement{
+public class MakeMarkerStatement extends LogicStatement{
     public String type = "shape", id = "0", x = "0", y = "0", replace = "true";
 
     @Override
@@ -41,12 +41,12 @@ public class MakeMarkerStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new MakeMarkerI(type, builder.var(id), builder.var(x), builder.var(y), builder.var(replace));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

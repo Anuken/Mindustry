@@ -456,7 +456,7 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
-    public static void updateMarker(int id, LMarkerControl control, double p1, double p2, double p3){
+    public static void updateMarker(int id, LogicMarkerControl control, double p1, double p2, double p3){
         var marker = state.markers.get(id);
         if(marker != null){
             marker.control(control, p1, p2, p3);
@@ -464,10 +464,10 @@ public class NetClient implements ApplicationListener{
     }
 
     @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
-    public static void updateMarkerText(int id, LMarkerControl type, boolean fetch, String text){
+    public static void updateMarkerText(int id, LogicMarkerControl type, boolean fetch, String text){
         var marker = state.markers.get(id);
         if(marker != null){
-            if(type == LMarkerControl.flushText){
+            if(type == LogicMarkerControl.flushText){
                 marker.setText(text, fetch);
             }
         }

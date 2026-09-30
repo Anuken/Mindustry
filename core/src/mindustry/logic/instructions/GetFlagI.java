@@ -4,10 +4,10 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class GetFlagI implements LInstruction{
-    public LVar result, flag;
+public class GetFlagI implements LogicInstruction{
+    public LogicVar result, flag;
 
-    public GetFlagI(LVar result, LVar flag){
+    public GetFlagI(LogicVar result, LogicVar flag){
         this.result = result;
         this.flag = flag;
     }
@@ -16,7 +16,7 @@ public class GetFlagI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(flag.obj() instanceof String str){
             result.setbool(state.rules.objectiveFlags.contains(str));
         }else{

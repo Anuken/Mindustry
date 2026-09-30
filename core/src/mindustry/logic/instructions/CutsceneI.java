@@ -6,11 +6,11 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class CutsceneI implements LInstruction{
+public class CutsceneI implements LogicInstruction{
     public CutsceneAction action = CutsceneAction.stop;
-    public LVar p1, p2, p3, p4;
+    public LogicVar p1, p2, p3, p4;
 
-    public CutsceneI(CutsceneAction action, LVar p1, LVar p2, LVar p3, LVar p4){
+    public CutsceneI(CutsceneAction action, LogicVar p1, LogicVar p2, LogicVar p3, LogicVar p4){
         this.action = action;
         this.p1 = p1;
         this.p2 = p2;
@@ -22,7 +22,7 @@ public class CutsceneI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(headless) return;
 
         switch(action){

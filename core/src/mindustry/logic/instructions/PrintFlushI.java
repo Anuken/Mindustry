@@ -2,10 +2,10 @@ package mindustry.logic.instructions;
 
 import mindustry.logic.*;
 
-public class PrintFlushI implements LInstruction{
-    public LVar target;
+public class PrintFlushI implements LogicInstruction{
+    public LogicVar target;
 
-    public PrintFlushI(LVar target){
+    public PrintFlushI(LogicVar target){
         this.target = target;
     }
 
@@ -13,9 +13,9 @@ public class PrintFlushI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
 
-        if(target.building() instanceof LPrintable d && d.printable(exec)){
+        if(target.building() instanceof LogicPrintable d && d.printable(exec)){
             d.print(exec.textBuffer);
         }
         exec.textBuffer.setLength(0);

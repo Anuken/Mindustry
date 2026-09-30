@@ -3,10 +3,10 @@ package mindustry.logic.instructions;
 import arc.struct.*;
 import mindustry.logic.*;
 
-public class ReadI implements LInstruction{
-    public LVar target, position, output;
+public class ReadI implements LogicInstruction{
+    public LogicVar target, position, output;
 
-    public ReadI(LVar target, LVar position, LVar output){
+    public ReadI(LogicVar target, LogicVar position, LogicVar output){
         this.target = target;
         this.position = position;
         this.output = output;
@@ -16,9 +16,9 @@ public class ReadI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         Object targetObj = target.obj();
-        if(targetObj instanceof LReadable read){
+        if(targetObj instanceof LogicReadable read){
             if(!read.readable(exec)){
                 output.setobj(null);
                 return;

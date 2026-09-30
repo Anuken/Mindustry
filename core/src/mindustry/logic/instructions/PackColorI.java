@@ -4,10 +4,10 @@ import arc.graphics.*;
 import arc.math.*;
 import mindustry.logic.*;
 
-public class PackColorI implements LInstruction{
-    public LVar result, r, g, b, a;
+public class PackColorI implements LogicInstruction{
+    public LogicVar result, r, g, b, a;
 
-    public PackColorI(LVar result, LVar r, LVar g, LVar b, LVar a){
+    public PackColorI(LogicVar result, LogicVar r, LogicVar g, LogicVar b, LogicVar a){
         this.result = result;
         this.r = r;
         this.g = g;
@@ -19,7 +19,7 @@ public class PackColorI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         result.setnum(Color.toDoubleBits(Mathf.clamp(r.numf()), Mathf.clamp(g.numf()), Mathf.clamp(b.numf()), Mathf.clamp(a.numf())));
     }
 }

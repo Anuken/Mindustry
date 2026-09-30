@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("getlink")
-public class GetLinkStatement extends LStatement{
+public class GetLinkStatement extends LogicStatement{
     public String output = "result", address = "0";
 
     @Override
@@ -21,12 +21,12 @@ public class GetLinkStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new GetLinkI(builder.var(output), builder.var(address));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.block;
+    public LogicCategory category(){
+        return LogicCategory.block;
     }
 }

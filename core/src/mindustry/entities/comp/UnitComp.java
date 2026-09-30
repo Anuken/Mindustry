@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, LogicSenseable, LogicSettable{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
     static final float warpDst = 8f;
 
@@ -261,7 +261,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case totalItems -> stack().amount;
             case itemCapacity -> type.itemCapacity;
@@ -311,7 +311,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
+    public Object senseObject(LogicProp sensor){
         return switch(sensor){
             case type -> type;
             case name -> controller instanceof Player p ? p.name : null;
@@ -349,7 +349,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public void setProp(LAccess prop, double value){
+    public void setProp(LogicProp prop, double value){
         switch(prop){
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
@@ -385,7 +385,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public void setProp(LAccess prop, Object value){
+    public void setProp(LogicProp prop, Object value){
         switch(prop){
             case team -> {
                 if(value instanceof Team t && !net.client()){

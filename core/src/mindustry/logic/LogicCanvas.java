@@ -19,14 +19,14 @@ import mindustry.graphics.*;
 import mindustry.logic.statements.*;
 import mindustry.ui.*;
 
-public class LCanvas extends Table{
+public class LogicCanvas extends Table{
     private static final Seq<JumpCurve> tmpOccupiers1 = new Seq<>();
     private static final Seq<JumpCurve> tmpOccupiers2 = new Seq<>();
     private static final Bits tmpBits1 = new Bits();
     private static final Bits tmpBits2 = new Bits();
     private static final int invalidJump = Integer.MAX_VALUE; // terrible hack
     //ew static variables
-    static LCanvas canvas;
+    static LogicCanvas canvas;
     private static final boolean dynamicJumpHeights = true;
 
     public DragLayout statements;
@@ -38,7 +38,7 @@ public class LCanvas extends Table{
     boolean privileged;
     Seq<Tooltip> tooltips = new Seq<>();
 
-    public LCanvas(){
+    public LogicCanvas(){
         canvas = this;
 
         Core.scene.addListener(new InputListener(){
@@ -130,32 +130,32 @@ public class LCanvas extends Table{
         }
     }
 
-    public void add(LStatement statement){
+    public void add(LogicStatement statement){
         statements.addChild(new StatementElem(statement));
     }
 
-    public void addAt(int at, LStatement statement){
+    public void addAt(int at, LogicStatement statement){
         statements.addChildAt(at, new StatementElem(statement));
     }
 
     public String save(){
-        Seq<LStatement> st = statements.getChildren().<StatementElem>as().map(s -> s.st);
-        st.each(LStatement::saveUI);
+        Seq<LogicStatement> st = statements.getChildren().<StatementElem>as().map(s -> s.st);
+        st.each(LogicStatement::saveUI);
 
-        return LAssembler.write(st);
+        return LogicAssembler.write(st);
     }
 
     public void load(String asm){
         statements.jumps.clear();
 
-        Seq<LStatement> statements = LAssembler.read(asm, privileged);
-        statements.truncate(LExecutor.maxInstructions);
+        Seq<LogicStatement> statements = LogicAssembler.read(asm, privileged);
+        statements.truncate(LogicExecutor.maxInstructions);
         this.statements.clearChildren();
-        for(LStatement st : statements){
+        for(LogicStatement st : statements){
             add(st);
         }
 
-        for(LStatement st : statements){
+        for(LogicStatement st : statements){
             st.setupUI();
         }
 
@@ -415,11 +415,11 @@ public class LCanvas extends Table{
     }
 
     public class StatementElem extends Table{
-        public LStatement st;
+        public LogicStatement st;
         public int index;
         Label addressLabel;
 
-        public StatementElem(LStatement st){
+        public StatementElem(LogicStatement st){
             this.st = st;
             st.elem = this;
 
@@ -442,10 +442,10 @@ public class LCanvas extends Table{
 
                 //taken from foo's client
                 t.button(Icon.add, Styles.logici, () -> Vars.ui.logic.showAddDialog(index + 1))
-                .disabled(b -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).size(24f).padRight(6);
+                .disabled(b -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions).size(24f).padRight(6);
 
                 t.button(Icon.copy, Styles.logici, () -> {
-                }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).get().tapped(this::copy);
+                }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions).get().tapped(this::copy);
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
@@ -516,7 +516,7 @@ public class LCanvas extends Table{
 
         public void copy(){
             st.saveUI();
-            LStatement copy = st.copy();
+            LogicStatement copy = st.copy();
 
             if(copy instanceof JumpStatement st && st.destIndex != -1){
                 int index = statements.getChildren().indexOf(this);

@@ -50,7 +50,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Buildingc.class}, excludeGroups = {"all"}, isFinal = false, genio = false, serialize = false)
 @Component(base = true, genInterface = false)
-abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTreeObject, Displayable, Sized, Senseable, Controllable, Settable, AmbientSource{
+abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTreeObject, Displayable, Sized, LogicSenseable, LogicControllable, LogicSettable, AmbientSource{
     //region vars and initialization
     static final float timeToSleep = 60f * 1, recentDamageTime = 60f * 5f;
     static final ObjectSet<Building> tmpTiles = new ObjectSet<>();
@@ -2095,7 +2095,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case x -> World.conv(x);
             case y -> World.conv(y);
@@ -2131,7 +2131,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
+    public Object senseObject(LogicProp sensor){
         return switch(sensor){
             case type -> block;
             case firstItem -> items == null ? null : items.first();
@@ -2153,23 +2153,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
     }
 
     @Override
-    public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
-        if(type == LAccess.enabled){
+    public void control(LogicExecutor executor, LogicProp type, double p1, double p2, double p3, double p4){
+        if(type == LogicProp.enabled){
             enabled = !Mathf.zero((float)p1);
         }
     }
 
     @Override
-    public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
+    public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
         //don't execute configure instructions that copy logic building configures; this can cause extreme lag
-        if(type == LAccess.config && block.logicConfigurable && !(p1 instanceof LogicBuild)){
+        if(type == LogicProp.config && block.logicConfigurable && !(p1 instanceof LogicBuild)){
             //change config only if it's new
             configured(null, p1);
         }
     }
 
     @Override
-    public void setProp(LAccess prop, double value){
+    public void setProp(LogicProp prop, double value){
         switch(prop){
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
@@ -2194,7 +2194,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
     }
 
     @Override
-    public void setProp(LAccess prop, Object value){
+    public void setProp(LogicProp prop, Object value){
         switch(prop){
             case team -> {
                 if(value instanceof Team team && this.team != team){

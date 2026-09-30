@@ -2,8 +2,8 @@ package mindustry.logic.instructions;
 
 import mindustry.logic.*;
 
-public class NoopI implements LInstruction{
+public class NoopI implements LogicInstruction{
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
     }
 }

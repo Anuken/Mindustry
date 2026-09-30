@@ -11,7 +11,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 @RegisterStatement("weathersense")
-public class WeatherSenseStatement extends LStatement{
+public class WeatherSenseStatement extends LogicStatement{
     public String to = "result";
     public String weather = "@rain";
 
@@ -55,12 +55,12 @@ public class WeatherSenseStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SenseWeatherI(builder.var(weather), builder.var(to));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

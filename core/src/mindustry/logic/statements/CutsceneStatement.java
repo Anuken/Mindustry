@@ -7,10 +7,10 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("cutscene")
-public class CutsceneStatement extends LStatement{
+public class CutsceneStatement extends LogicStatement{
     public CutsceneAction action = CutsceneAction.pan;
     public String p1 = "100", p2 = "100", p3 = "0.06", p4 = "0";
 
@@ -61,12 +61,12 @@ public class CutsceneStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new CutsceneI(action, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

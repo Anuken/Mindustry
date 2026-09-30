@@ -352,10 +352,10 @@ public class GenericCrafter extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress();
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress();
             //attempt to prevent wild total liquid fluctuation, at least for crafters
-            if(sensor == LAccess.totalLiquids && outputLiquid != null) return liquids.get(outputLiquid.liquid);
+            if(sensor == LogicProp.totalLiquids && outputLiquid != null) return liquids.get(outputLiquid.liquid);
             return super.sense(sensor);
         }
 

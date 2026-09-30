@@ -2,10 +2,10 @@ package mindustry.logic.instructions;
 
 import mindustry.logic.*;
 
-public class GetLinkI implements LInstruction{
-    public LVar output, index;
+public class GetLinkI implements LogicInstruction{
+    public LogicVar output, index;
 
-    public GetLinkI(LVar output, LVar index){
+    public GetLinkI(LogicVar output, LogicVar index){
         this.index = index;
         this.output = output;
     }
@@ -14,7 +14,7 @@ public class GetLinkI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         int address = index.numi();
 
         output.setobj(address >= 0 && address < exec.links.length ? exec.links[address] : null);

@@ -3,16 +3,16 @@ package mindustry.logic.instructions;
 import mindustry.logic.*;
 import mindustry.type.*;
 
-public class SenseWeatherI implements LInstruction{
-    public LVar type, to;
+public class SenseWeatherI implements LogicInstruction{
+    public LogicVar type, to;
 
-    public SenseWeatherI(LVar type, LVar to){
+    public SenseWeatherI(LogicVar type, LogicVar to){
         this.type = type;
         this.to = to;
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         to.setbool(type.obj() instanceof Weather weather && weather.isActive());
     }
 }

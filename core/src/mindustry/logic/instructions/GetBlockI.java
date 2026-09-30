@@ -6,12 +6,12 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class GetBlockI implements LInstruction{
-    public LVar x, y;
-    public LVar dest;
-    public TileLayer layer = TileLayer.block;
+public class GetBlockI implements LogicInstruction{
+    public LogicVar x, y;
+    public LogicVar dest;
+    public LogicTileLayer layer = LogicTileLayer.block;
 
-    public GetBlockI(LVar x, LVar y, LVar dest, TileLayer layer){
+    public GetBlockI(LogicVar x, LogicVar y, LogicVar dest, LogicTileLayer layer){
         this.x = x;
         this.y = y;
         this.dest = dest;
@@ -22,7 +22,7 @@ public class GetBlockI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         Tile tile = state.world.tile(Mathf.round(x.numf()), Mathf.round(y.numf()));
         if(tile == null){
             dest.setobj(null);

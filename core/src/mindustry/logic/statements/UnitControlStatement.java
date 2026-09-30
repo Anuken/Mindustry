@@ -8,11 +8,11 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("ucontrol")
-public class UnitControlStatement extends LStatement{
-    public LUnitControl type = LUnitControl.move;
+public class UnitControlStatement extends LogicStatement{
+    public LogicUnitControl type = LogicUnitControl.move;
     public String p1 = "0", p2 = "0", p3 = "0", p4 = "0", p5 = "0";
 
     @Override
@@ -21,9 +21,9 @@ public class UnitControlStatement extends LStatement{
 
         table.button(b -> {
             b.label(() -> bundle(type));
-            b.clicked(() -> showSelect(b, Structs.filter(LUnitControl.class, LUnitControl.all, t ->
-            t == LUnitControl.build ? state.rules.logicUnitBuild :
-            t == LUnitControl.deconstruct ? state.rules.logicUnitDeconstruct :
+            b.clicked(() -> showSelect(b, Structs.filter(LogicUnitControl.class, LogicUnitControl.all, t ->
+            t == LogicUnitControl.build ? state.rules.logicUnitBuild :
+            t == LogicUnitControl.deconstruct ? state.rules.logicUnitDeconstruct :
             true
             ), type, t -> {
                 type = t;
@@ -42,12 +42,12 @@ public class UnitControlStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new UnitControlI(type, builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4), builder.var(p5));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.unit;
+    public LogicCategory category(){
+        return LogicCategory.unit;
     }
 }

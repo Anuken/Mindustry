@@ -3,10 +3,10 @@ package mindustry.logic.instructions;
 import mindustry.logic.*;
 import mindustry.type.*;
 
-public class PrintCharI implements LInstruction{
-    public LVar value;
+public class PrintCharI implements LogicInstruction{
+    public LogicVar value;
 
-    public PrintCharI(LVar value){
+    public PrintCharI(LogicVar value){
         this.value = value;
     }
 
@@ -14,9 +14,9 @@ public class PrintCharI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
 
-        if(exec.textBuffer.length() >= LExecutor.maxTextBuffer) return;
+        if(exec.textBuffer.length() >= LogicExecutor.maxTextBuffer) return;
         if(value.isobj){
             if(!(value.objval instanceof UnlockableContent cont)) return;
             exec.textBuffer.append((char)cont.emojiChar());

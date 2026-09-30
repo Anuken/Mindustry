@@ -6,14 +6,14 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("noop")
-public class InvalidStatement extends LStatement{
+public class InvalidStatement extends LogicStatement{
 
     @Override
     public void build(Table table){
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new NoopI();
     }
 }

@@ -6,7 +6,7 @@ import mindustry.ui.*;
 
 //TODO broken
 //@RegisterStatement("#")
-public class CommentStatement extends LStatement{
+public class CommentStatement extends LogicStatement{
     public String comment = "";
 
     @Override
@@ -15,7 +15,7 @@ public class CommentStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return null;
     }
 }

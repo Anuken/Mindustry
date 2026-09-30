@@ -382,8 +382,8 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
-        public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
-            if(type == LAccess.shoot && !unit.isPlayer()){
+        public void control(LogicExecutor executor, LogicProp type, double p1, double p2, double p3, double p4){
+            if(type == LogicProp.shoot && !unit.isPlayer()){
                 targetPos.set(World.unconv((float)p1), World.unconv((float)p2));
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p3);
@@ -393,8 +393,8 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
-        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
-            if(type == LAccess.shootp && (unit == null || !unit.isPlayer())){
+        public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
+            if(type == LogicProp.shootp && (unit == null || !unit.isPlayer())){
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p2);
 
@@ -407,7 +407,7 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case ammo -> totalAmmo;
                 case ammoCapacity -> maxAmmo;

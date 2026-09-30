@@ -8,7 +8,7 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 @RegisterStatement("setrule")
-public class SetRuleStatement extends LStatement{
+public class SetRuleStatement extends LogicStatement{
     public LogicRule rule = LogicRule.waveSpacing;
     public String value = "10", p1 = "0", p2 = "0", p3 = "100", p4 = "100";
 
@@ -66,12 +66,12 @@ public class SetRuleStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SetRuleI(rule, builder.var(value), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

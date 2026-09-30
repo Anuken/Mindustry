@@ -9,13 +9,13 @@ import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.*;
 
-public class SetBlockI implements LInstruction{
-    public LVar x, y;
-    public LVar block;
-    public LVar team, rotation;
-    public TileLayer layer = TileLayer.block;
+public class SetBlockI implements LogicInstruction{
+    public LogicVar x, y;
+    public LogicVar block;
+    public LogicVar team, rotation;
+    public LogicTileLayer layer = LogicTileLayer.block;
 
-    public SetBlockI(LVar x, LVar y, LVar block, LVar team, LVar rotation, TileLayer layer){
+    public SetBlockI(LogicVar x, LogicVar y, LogicVar block, LogicVar team, LogicVar rotation, LogicTileLayer layer){
         this.x = x;
         this.y = y;
         this.block = block;
@@ -28,7 +28,7 @@ public class SetBlockI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(net.client()) return;
 
         Tile tile = state.world.tile(x.numi(), y.numi());

@@ -85,14 +85,14 @@ public class Door extends Wall{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.enabled) return open ? 1 : 0;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.enabled) return open ? 1 : 0;
             return super.sense(sensor);
         }
 
         @Override
-        public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
-            if(type == LAccess.enabled){
+        public void control(LogicExecutor executor, LogicProp type, double p1, double p2, double p3, double p4){
+            if(type == LogicProp.enabled){
                 boolean shouldOpen = !Mathf.zero(p1);
 
                 if(net.client() || open == shouldOpen || (Units.anyEntities(tile) && !shouldOpen) || !origin().toggleReady(80f)){

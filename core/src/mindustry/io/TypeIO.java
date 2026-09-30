@@ -122,7 +122,7 @@ public class TypeIO{
         }else if(object instanceof BuildingBox b){
             write.b(buildingType);
             write.i(b.pos);
-        }else if(object instanceof LAccess l){
+        }else if(object instanceof LogicProp l){
             write.b(lAccessType);
             write.s(l.ordinal());
         }else if(object instanceof byte[] b){
@@ -254,7 +254,7 @@ public class TypeIO{
             case booleanType -> read.bool();
             case doubleType -> read.d();
             case buildingType -> !box ? state.world.build(read.i()) : new BuildingBox(read.i());
-            case lAccessType -> LAccess.all[read.s()];
+            case lAccessType -> LogicProp.all[read.s()];
             case byteArrayType -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.i();
@@ -944,12 +944,12 @@ public class TypeIO{
         return KickReason.all[read.b()];
     }
 
-    public static void writeMarkerControl(Writes write, LMarkerControl reason){
+    public static void writeMarkerControl(Writes write, LogicMarkerControl reason){
         write.b((byte)reason.ordinal());
     }
 
-    public static LMarkerControl readMarkerControl(Reads read){
-        return LMarkerControl.all[read.ub()];
+    public static LogicMarkerControl readMarkerControl(Reads read){
+        return LogicMarkerControl.all[read.ub()];
     }
 
     public static void writeRules(Writes write, Rules rules){

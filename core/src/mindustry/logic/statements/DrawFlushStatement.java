@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("drawflush")
-public class DrawFlushStatement extends LStatement{
+public class DrawFlushStatement extends LogicStatement{
     public String target = "display1";
 
     @Override
@@ -16,12 +16,12 @@ public class DrawFlushStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new DrawFlushI(builder.var(target));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.block;
+    public LogicCategory category(){
+        return LogicCategory.block;
     }
 }

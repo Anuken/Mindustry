@@ -128,15 +128,15 @@ public class MassDriver extends Block{
         public OrderedSet<Building> waitingShooters = new OrderedSet<>();
 
         @Override
-        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
-            if(executor.privileged && type == LAccess.config){
+        public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LogicProp.config){
                 configured(null, p1 instanceof Building b ? b.pos() : -1);
             }
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.config){
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.config){
                 return linkValid() ? Vars.state.world.build(link) : null;
             }
             return super.senseObject(sensor);
@@ -243,8 +243,8 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(1f - reloadCounter);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(1f - reloadCounter);
             return super.sense(sensor);
         }
 

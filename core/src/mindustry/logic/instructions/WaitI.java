@@ -3,12 +3,12 @@ package mindustry.logic.instructions;
 import arc.util.*;
 import mindustry.logic.*;
 
-public class WaitI implements LInstruction{
-    public LVar value;
+public class WaitI implements LogicInstruction{
+    public LogicVar value;
 
     public float curTime;
 
-    public WaitI(LVar value){
+    public WaitI(LogicVar value){
         this.value = value;
     }
 
@@ -16,7 +16,7 @@ public class WaitI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(value.num() <= 0){
             // Just yield without executing the wait again
             exec.yield = true;

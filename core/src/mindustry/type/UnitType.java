@@ -38,7 +38,7 @@ import mindustry.world.meta.*;
 import static arc.graphics.g2d.Draw.*;
 import static mindustry.Vars.*;
 
-public class UnitType extends UnlockableContent implements Senseable{
+public class UnitType extends UnlockableContent implements LogicSenseable{
     public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
     private static final Seq<UnitStance> tmpStances = new Seq<>();
@@ -1644,7 +1644,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case health, maxHealth -> health;
             case armor -> armor;
@@ -1660,8 +1660,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
         return noSensed;
     }
 

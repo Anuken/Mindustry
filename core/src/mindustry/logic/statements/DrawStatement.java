@@ -7,10 +7,10 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.logic.LogicDisplay.*;
 
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("draw")
-public class DrawStatement extends LStatement{
+public class DrawStatement extends LogicStatement{
 
     public GraphicsType type = GraphicsType.clear;
     public String x = "0", y = "0", p1 = "0", p2 = "0", p3 = "0", p4 = "0";
@@ -140,12 +140,12 @@ public class DrawStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new DrawI((byte)type.ordinal(), builder.var(x), builder.var(y), builder.var(p1), builder.var(p2), builder.var(p3), builder.var(p4));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.io;
+    public LogicCategory category(){
+        return LogicCategory.io;
     }
 }

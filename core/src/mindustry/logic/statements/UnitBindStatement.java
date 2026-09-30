@@ -14,7 +14,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 @RegisterStatement("ubind")
-public class UnitBindStatement extends LStatement{
+public class UnitBindStatement extends LogicStatement{
     public String type = "@poly";
 
     @Override
@@ -47,12 +47,12 @@ public class UnitBindStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new UnitBindI(builder.var(type));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.unit;
+    public LogicCategory category(){
+        return LogicCategory.unit;
     }
 }

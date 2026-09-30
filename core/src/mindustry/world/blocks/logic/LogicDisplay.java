@@ -81,7 +81,7 @@ public class LogicDisplay extends Block{
         clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
     }
 
-    public class LogicDisplayBuild extends Building implements LDrawable{
+    public class LogicDisplayBuild extends Building implements LogicDrawable{
         //The root display (bottom left corner of display for tileable displays)
         public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
@@ -113,7 +113,7 @@ public class LogicDisplay extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> displaySize;
                 case bufferSize -> rootDisplay.commands.size;
@@ -123,13 +123,13 @@ public class LogicDisplay extends Block{
         }
 
         @Override
-        public boolean drawable(LExecutor exec){
+        public boolean drawable(LogicExecutor exec){
             return isValid() && (exec.privileged || (team == exec.team && !privileged));
         }
 
         @Override
         public void draw(LongSeq graphicsBuffer){
-            int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
+            int added = Math.min(graphicsBuffer.size, LogicExecutor.maxDisplayBuffer - commands.size);
 
             for(int i = 0; i < added; i++){
                 commands.addLast(graphicsBuffer.items[i]);

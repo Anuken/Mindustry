@@ -7,10 +7,10 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("radar")
-public class RadarStatement extends LStatement{
+public class RadarStatement extends LogicStatement{
     public RadarTarget target1 = RadarTarget.enemy, target2 = RadarTarget.any, target3 = RadarTarget.any;
     public RadarSort sort = RadarSort.distance;
     public String radar = "turret1", sortOrder = "1", output = "result";
@@ -67,12 +67,12 @@ public class RadarStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new RadarI(target1, target2, target3, sort, builder.var(radar), builder.var(sortOrder), builder.var(output));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.block;
+    public LogicCategory category(){
+        return LogicCategory.block;
     }
 }

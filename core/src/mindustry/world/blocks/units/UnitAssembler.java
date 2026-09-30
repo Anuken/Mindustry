@@ -704,8 +704,8 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress;
             return super.sense(sensor);
         }
 

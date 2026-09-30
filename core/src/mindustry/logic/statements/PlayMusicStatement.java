@@ -6,12 +6,12 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("playmusic")
-public class PlayMusicStatement extends LStatement{
+public class PlayMusicStatement extends LogicStatement{
     public String name = "\"game1\"", interrupt = "true";
 
     @Override
     public void build(Table table){
-        float width = LCanvas.isCompact() ? 100f : 190f;
+        float width = LogicCanvas.isCompact() ? 100f : 190f;
 
         fields(table, "music", name, str -> name = str).width(width);
 
@@ -24,12 +24,12 @@ public class PlayMusicStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new PlayMusicI(builder.var(name), builder.var(interrupt));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

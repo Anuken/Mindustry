@@ -72,8 +72,8 @@ public class AutoDoor extends Wall{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.enabled) return open ? 1 : 0;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.enabled) return open ? 1 : 0;
             return super.sense(sensor);
         }
 

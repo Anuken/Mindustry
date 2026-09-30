@@ -6,19 +6,19 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("stop")
-public class StopStatement extends LStatement{
+public class StopStatement extends LogicStatement{
 
     @Override
     public void build(Table table){
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new StopI();
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.control;
+    public LogicCategory category(){
+        return LogicCategory.control;
     }
 }

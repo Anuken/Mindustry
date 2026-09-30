@@ -12,18 +12,18 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LCanvas.*;
+import mindustry.logic.LogicCanvas.*;
 import mindustry.ui.*;
 
 import java.util.*;
 
 import static mindustry.Vars.*;
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 /**
  * A statement is an intermediate representation of an instruction, to be used mostly in UI.
  * Contains all relevant variable information. */
-public abstract class LStatement{
+public abstract class LogicStatement{
 
     private static final String[] aligns = {"topLeft", "top", "topRight", "left", "center", "right", "bottomLeft", "bottom", "bottomRight"};
     public static final ObjectMap<String, Integer> nameToAlign = ObjectMap.of(
@@ -47,17 +47,17 @@ public abstract class LStatement{
 
     public abstract void build(Table table);
 
-    public abstract LInstruction build(LAssembler builder);
+    public abstract LogicInstruction build(LogicAssembler builder);
 
-    public LCategory category(){
-        return LCategory.unknown;
+    public LogicCategory category(){
+        return LogicCategory.unknown;
     }
 
-    public LStatement copy(){
+    public LogicStatement copy(){
         StringBuilder build = new StringBuilder();
         write(build);
         //assume privileged when copying, because there's no way privileged instructions can appear here anyway, and the instructions get validated on load anyway
-        Seq<LStatement> read = LAssembler.read(build.toString(), true);
+        Seq<LogicStatement> read = LogicAssembler.read(build.toString(), true);
         return read.size == 0 ? null : read.first();
     }
 
@@ -188,7 +188,7 @@ public abstract class LStatement{
     }
 
     protected Cell<TextField> fields(Table table, String desc, String value, Cons<String> setter){
-        return fields(table, desc, LCanvas.isCompact(), value, setter);
+        return fields(table, desc, LogicCanvas.isCompact(), value, setter);
     }
 
     protected Cell<TextField> fields(Table table, String value, Cons<String> setter){

@@ -11,8 +11,8 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 @RegisterStatement("setmarker")
-public class SetMarkerStatement extends LStatement{
-    public LMarkerControl type = LMarkerControl.pos;
+public class SetMarkerStatement extends LogicStatement{
+    public LogicMarkerControl type = LogicMarkerControl.pos;
     public String id = "0", p1 = "0", p2 = "0", p3 = "0";
 
     @Override
@@ -27,7 +27,7 @@ public class SetMarkerStatement extends LStatement{
 
         table.button(b -> {
             b.label(() -> bundle(type));
-            b.clicked(() -> showSelect(b, LMarkerControl.all, type, t -> {
+            b.clicked(() -> showSelect(b, LogicMarkerControl.all, type, t -> {
                 type = t;
                 rebuild(table);
             }, 3, cell -> cell.size(140, 50)));
@@ -46,12 +46,12 @@ public class SetMarkerStatement extends LStatement{
 
             fields(table, type.params[f], value, setter);
 
-            if(type == LMarkerControl.color || (type == LMarkerControl.colori && f == 1)){
+            if(type == LogicMarkerControl.color || (type == LogicMarkerControl.colori && f == 1)){
                 col(table, value, res -> {
                     setter.get("%" + res.toString().substring(0, res.a >= 1f ? 6 : 8));
                     build(table);
                 });
-            }else if(type == LMarkerControl.drawLayer){
+            }else if(type == LogicMarkerControl.drawLayer){
                 table.button(b -> {
                     b.image(Icon.pencilSmall);
                     b.clicked(() -> showSelectTable(b, (o, hide) -> {
@@ -70,11 +70,11 @@ public class SetMarkerStatement extends LStatement{
                     }));
                 }, Styles.logict, () -> {
                 }).size(40f).padLeft(-11).color(table.color);
-            }else if(type == LMarkerControl.textAlign || type == LMarkerControl.lineAlign){
+            }else if(type == LogicMarkerControl.textAlign || type == LogicMarkerControl.lineAlign){
                 fieldAlignSelect(table, () -> p1, v -> {
                     p1 = v;
                     rebuild(table);
-                }, true, type != LMarkerControl.lineAlign);
+                }, true, type != LogicMarkerControl.lineAlign);
             }
         }
     }
@@ -85,12 +85,12 @@ public class SetMarkerStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SetMarkerI(type, builder.var(id), builder.var(p1), builder.var(p2), builder.var(p3));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

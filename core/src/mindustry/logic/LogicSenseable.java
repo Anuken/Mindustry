@@ -1,15 +1,15 @@
 package mindustry.logic;
 
-public interface Senseable{
+public interface LogicSenseable{
     Object noSensed = new Object();
 
-    double sense(LAccess sensor);
+    double sense(LogicProp sensor);
 
     default double sense(Object object){
         return 0;
     }
 
-    default Object senseObject(LAccess sensor){
+    default Object senseObject(LogicProp sensor){
         return noSensed;
     }
 

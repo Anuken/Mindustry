@@ -7,10 +7,10 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("message")
-public class FlushMessageStatement extends LStatement{
+public class FlushMessageStatement extends LogicStatement{
     public MessageType type = MessageType.announce;
     public String duration = "3", outSuccess = "@wait";
 
@@ -43,12 +43,12 @@ public class FlushMessageStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new FlushMessageI(type, builder.var(duration), builder.var(outSuccess));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

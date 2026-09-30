@@ -8,10 +8,10 @@ import mindustry.type.*;
 import static mindustry.Vars.*;
 
 /** Binds the processor to a unit based on some filters. */
-public class UnitBindI implements LInstruction{
-    public LVar type;
+public class UnitBindI implements LogicInstruction{
+    public LogicVar type;
 
-    public UnitBindI(LVar type){
+    public UnitBindI(LogicVar type){
         this.type = type;
     }
 
@@ -19,7 +19,7 @@ public class UnitBindI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(!exec.privileged && !state.rules.logicUnitControl) return;
 
         if(exec.binds == null || exec.binds.length != content.units().size){

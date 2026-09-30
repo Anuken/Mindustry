@@ -38,7 +38,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class Block extends UnlockableContent implements Senseable{
+public class Block extends UnlockableContent implements LogicSenseable{
     /** If true, buildings have an ItemModule. */
     public @NoPatch boolean hasItems;
     /** If true, buildings have a LiquidModule. */
@@ -1685,7 +1685,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
@@ -1716,8 +1716,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
         return noSensed;
     }
 }

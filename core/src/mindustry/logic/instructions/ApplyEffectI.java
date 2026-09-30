@@ -6,11 +6,11 @@ import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
-public class ApplyEffectI implements LInstruction{
+public class ApplyEffectI implements LogicInstruction{
     public boolean clear;
-    public LVar effect, unit, duration;
+    public LogicVar effect, unit, duration;
 
-    public ApplyEffectI(boolean clear, LVar effect, LVar unit, LVar duration){
+    public ApplyEffectI(boolean clear, LogicVar effect, LogicVar unit, LogicVar duration){
         this.clear = clear;
         this.effect = effect;
         this.unit = unit;
@@ -21,7 +21,7 @@ public class ApplyEffectI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(net.client()) return;
 
         if(unit.obj() instanceof Unit unit && effect.obj() instanceof StatusEffect effect){

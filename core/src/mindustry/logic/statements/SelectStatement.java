@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("select")
-public class SelectStatement extends LStatement{
+public class SelectStatement extends LogicStatement{
     public String result = "result";
     public ConditionOp op = ConditionOp.notEqual;
     public String comp0 = "x", comp1 = "false", a = "a", b = "b";
@@ -38,12 +38,12 @@ public class SelectStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SelectI(op, builder.var(result), builder.var(comp0), builder.var(comp1), builder.var(a), builder.var(b));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.operation;
+    public LogicCategory category(){
+        return LogicCategory.operation;
     }
 }

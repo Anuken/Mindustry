@@ -9,7 +9,7 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class QueryI implements LInstruction{
+public class QueryI implements LogicInstruction{
     private static Seq<Object> paramSeq;
     private static Team paramTeam;
     private static final Cons<Bullet> bulletCons = o -> {
@@ -20,9 +20,9 @@ public class QueryI implements LInstruction{
 
     public QueryShape shape = QueryShape.rect;
     public QueryType type = QueryType.unit;
-    public LVar team, x, y, width, height;
+    public LogicVar team, x, y, width, height;
 
-    public QueryI(QueryShape shape, QueryType type, LVar team, LVar x, LVar y, LVar width, LVar height){
+    public QueryI(QueryShape shape, QueryType type, LogicVar team, LogicVar x, LogicVar y, LogicVar width, LogicVar height){
         this.shape = shape;
         this.type = type;
         this.team = team;
@@ -36,7 +36,7 @@ public class QueryI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(exec.queryResult == null) return;
         Seq<Object> results = exec.queryResult.obj() instanceof Seq s ? s : null;
         if(results == null){

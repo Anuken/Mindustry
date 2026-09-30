@@ -7,14 +7,14 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.logic.*;
-import mindustry.logic.LCanvas.*;
+import mindustry.logic.LogicCanvas.*;
 import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("jump")
-public class JumpStatement extends LStatement{
+public class JumpStatement extends LogicStatement{
     private static Color last = new Color();
 
     public transient StatementElem dest;
@@ -64,7 +64,7 @@ public class JumpStatement extends LStatement{
         }, value, str -> value = str, compare, str -> compare = str);
     }
 
-    public static void addOp(LStatement st, Table t, ConditionOp op, Cons<ConditionOp> getter, String comp0, Cons<String> set0, String comp1, Cons<String> set2){
+    public static void addOp(LogicStatement st, Table t, ConditionOp op, Cons<ConditionOp> getter, String comp0, Cons<String> set0, String comp1, Cons<String> set2){
         float w = !isCompact() ? 180f : 140f;
 
         if(op != ConditionOp.always) st.field(t, comp0, set0).width(w);
@@ -94,12 +94,12 @@ public class JumpStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new JumpI(op, builder.var(value), builder.var(compare), destIndex);
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.control;
+    public LogicCategory category(){
+        return LogicCategory.control;
     }
 }

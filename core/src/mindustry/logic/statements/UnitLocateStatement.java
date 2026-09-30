@@ -14,8 +14,8 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 @RegisterStatement("ulocate")
-public class UnitLocateStatement extends LStatement{
-    public LLocate locate = LLocate.building;
+public class UnitLocateStatement extends LogicStatement{
+    public LogicLocate locate = LogicLocate.building;
     public BlockFlag flag = BlockFlag.core;
     public String enemy = "true", ore = "@copper";
     public String outX = "outx", outY = "outy", outFound = "found", outBuild = "building";
@@ -28,7 +28,7 @@ public class UnitLocateStatement extends LStatement{
 
         table.button(b -> {
             b.label(() -> bundle(locate));
-            b.clicked(() -> showSelect(b, LLocate.all, locate, t -> {
+            b.clicked(() -> showSelect(b, LogicLocate.all, locate, t -> {
                 locate = t;
                 build(table);
             }, 2, cell -> cell.size(110, 50)));
@@ -89,19 +89,19 @@ public class UnitLocateStatement extends LStatement{
 
         fields(table, "found", outFound, str -> outFound = str);
 
-        if(locate != LLocate.ore){
+        if(locate != LogicLocate.ore){
             fields(table, "building", outBuild, str -> outBuild = str);
         }
 
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new UnitLocateI(locate, flag, builder.var(enemy), builder.var(ore), builder.var(outX), builder.var(outY), builder.var(outFound), builder.var(outBuild));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.unit;
+    public LogicCategory category(){
+        return LogicCategory.unit;
     }
 }

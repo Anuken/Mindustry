@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("setrate")
-public class SetRateStatement extends LStatement{
+public class SetRateStatement extends LogicStatement{
     public String amount = "10";
 
     @Override
@@ -15,12 +15,12 @@ public class SetRateStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SetRateI(builder.var(amount));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.control;
+    public LogicCategory category(){
+        return LogicCategory.control;
     }
 }

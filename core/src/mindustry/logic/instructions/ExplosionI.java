@@ -10,10 +10,10 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class ExplosionI implements LInstruction{
-    public LVar team, x, y, radius, damage, air, ground, pierce, effect;
+public class ExplosionI implements LogicInstruction{
+    public LogicVar team, x, y, radius, damage, air, ground, pierce, effect;
 
-    public ExplosionI(LVar team, LVar x, LVar y, LVar radius, LVar damage, LVar air, LVar ground, LVar pierce, LVar effect){
+    public ExplosionI(LogicVar team, LogicVar x, LogicVar y, LogicVar radius, LogicVar damage, LogicVar air, LogicVar ground, LogicVar pierce, LogicVar effect){
         this.team = team;
         this.x = x;
         this.y = y;
@@ -29,7 +29,7 @@ public class ExplosionI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(net.client()) return;
 
         Team t = team.team();

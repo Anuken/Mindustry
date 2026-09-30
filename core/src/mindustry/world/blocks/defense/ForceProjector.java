@@ -175,8 +175,8 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public void setProp(LAccess prop, double value){
-            if(prop == LAccess.shield){
+        public void setProp(LogicProp prop, double value){
+            if(prop == LogicProp.shield){
                 buildup = Math.max(shieldHealth + phaseShieldBoost * phaseHeat - (float)value, 0f);
             }else{
                 super.setProp(prop, value);
@@ -318,9 +318,9 @@ public class ForceProjector extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.heat) return buildup;
-            if(sensor == LAccess.shield) return broken ? 0f : Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return buildup;
+            if(sensor == LogicProp.shield) return broken ? 0f : Math.max(shieldHealth + phaseShieldBoost * phaseHeat - buildup, 0);
             return super.sense(sensor);
         }
 

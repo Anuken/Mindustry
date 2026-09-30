@@ -9,7 +9,7 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 @RegisterStatement("printchar")
-public class PrintCharStatement extends LStatement{
+public class PrintCharStatement extends LogicStatement{
     public String value = "65";
 
     @Override
@@ -39,12 +39,12 @@ public class PrintCharStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new PrintCharI(builder.var(value));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.io;
+    public LogicCategory category(){
+        return LogicCategory.io;
     }
 }

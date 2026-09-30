@@ -126,8 +126,8 @@ public class MendProjector extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(charge / reload);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(charge / reload);
             return super.sense(sensor);
         }
 

@@ -603,9 +603,9 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.itemCapacity) return storageCapacity;
-            if(sensor == LAccess.maxUnits) return Units.getCap(team);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.itemCapacity) return storageCapacity;
+            if(sensor == LogicProp.maxUnits) return Units.getCap(team);
             return super.sense(sensor);
         }
 

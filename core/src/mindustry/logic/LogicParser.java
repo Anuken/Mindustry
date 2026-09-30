@@ -6,7 +6,7 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.statements.*;
 
-public class LParser{
+public class LogicParser{
     private static final String[] tokens = new String[16];
     private static final int maxJumps = 500;
     private static final StringMap opNameChanges = StringMap.of(
@@ -17,12 +17,12 @@ public class LParser{
     private static final Seq<JumpIndex> jumps = new Seq<>();
     private static final ObjectIntMap<String> jumpLocations = new ObjectIntMap<>();
 
-    Seq<LStatement> statements = new Seq<>();
+    Seq<LogicStatement> statements = new Seq<>();
     char[] chars;
     int pos, line, tok;
     boolean privileged;
 
-    LParser(String text, boolean privileged){
+    LogicParser(String text, boolean privileged){
         this.privileged = privileged;
         this.chars = text.toCharArray();
 
@@ -177,7 +177,7 @@ public class LParser{
                     if(tokens[i].equals("configure")) tokens[i] = "config";
                 }
 
-                LStatement st;
+                LogicStatement st;
 
                 try{
                     st = LogicIO.read(tokens, tok);
@@ -200,8 +200,8 @@ public class LParser{
                     statements.add(st);
                 }else{
                     //attempt parsing using custom parser if a match is found; this is for mods
-                    if(LAssembler.customParsers.containsKey(tokens[0])){
-                        var parsed = LAssembler.customParsers.get(tokens[0]).get(tokens);
+                    if(LogicAssembler.customParsers.containsKey(tokens[0])){
+                        var parsed = LogicAssembler.customParsers.get(tokens[0]).get(tokens);
 
                         if(!privileged && parsed != null && parsed.privileged()){
                             statements.add(new InvalidStatement());
@@ -218,11 +218,11 @@ public class LParser{
         }
     }
 
-    Seq<LStatement> parse(){
+    Seq<LogicStatement> parse(){
         jumps.clear();
         jumpLocations.clear();
 
-        while(pos < chars.length && line < LExecutor.maxInstructions){
+        while(pos < chars.length && line < LogicExecutor.maxInstructions){
             switch(chars[pos]){
                 case '\n', ';', ' ' -> pos ++; //skip newlines and spaces
                 default -> statement();

@@ -124,8 +124,8 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.heat) return warmup;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return warmup;
             return super.sense(sensor);
         }
 

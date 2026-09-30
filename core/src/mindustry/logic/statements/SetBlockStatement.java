@@ -6,11 +6,11 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("setblock")
-public class SetBlockStatement extends LStatement{
-    public TileLayer layer = TileLayer.block;
+public class SetBlockStatement extends LogicStatement{
+    public LogicTileLayer layer = LogicTileLayer.block;
     public String block = "@air", x = "0", y = "0", team = "@derelict", rotation = "0";
 
     @Override
@@ -25,7 +25,7 @@ public class SetBlockStatement extends LStatement{
 
         table.button(b -> {
             b.label(() -> bundle(layer));
-            b.clicked(() -> showSelect(b, TileLayer.settable, layer, o -> {
+            b.clicked(() -> showSelect(b, LogicTileLayer.settable, layer, o -> {
                 layer = o;
                 rebuild(table);
             }));
@@ -38,7 +38,7 @@ public class SetBlockStatement extends LStatement{
         fields(table, "y", y, str -> y = str);
         fields(table, "block", block, str -> block = str);
 
-        if(layer == TileLayer.block){
+        if(layer == LogicTileLayer.block){
             fields(table, "team", team, str -> team = str);
             fields(table, "rotation", rotation, str -> rotation = str);
         }
@@ -50,12 +50,12 @@ public class SetBlockStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SetBlockI(builder.var(x), builder.var(y), builder.var(block), builder.var(team), builder.var(rotation), layer);
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

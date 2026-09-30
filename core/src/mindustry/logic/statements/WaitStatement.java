@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("wait")
-public class WaitStatement extends LStatement{
+public class WaitStatement extends LogicStatement{
     public String value = "0.5";
 
     @Override
@@ -16,12 +16,12 @@ public class WaitStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new WaitI(builder.var(value));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.control;
+    public LogicCategory category(){
+        return LogicCategory.control;
     }
 }

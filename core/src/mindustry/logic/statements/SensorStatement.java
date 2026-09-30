@@ -13,10 +13,10 @@ import mindustry.ui.*;
 import mindustry.world.*;
 
 import static mindustry.Vars.*;
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("sensor")
-public class SensorStatement extends LStatement{
+public class SensorStatement extends LogicStatement{
     public String to = "result";
     public String from = "block1", type = "@copper";
 
@@ -29,7 +29,7 @@ public class SensorStatement extends LStatement{
 
         table.add(" = ");
 
-        tfield = field(table, type, str -> type = str).width(LCanvas.isCompact() ? 140f : 180f).padRight(0f).get();
+        tfield = field(table, type, str -> type = str).width(LogicCanvas.isCompact() ? 140f : 180f).padRight(0f).get();
 
         table.button(b -> {
             b.image(Icon.pencilSmall);
@@ -90,7 +90,7 @@ public class SensorStatement extends LStatement{
                 //sensors
                 new Table(i -> {
                     boolean currentPrivileged = ui.logic.isShown() && ui.logic.isPrivileged();
-                    for(LAccess sensor : (currentPrivileged ? LAccess.senseablePrivileged : LAccess.senseable)){
+                    for(LogicProp sensor : (currentPrivileged ? LogicProp.senseablePrivileged : LogicProp.senseable)){
                         i.button(bundle(sensor), Styles.flatt, () -> {
                             stype("@" + sensor.name());
                             hide.run();
@@ -133,12 +133,12 @@ public class SensorStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SenseI(builder.var(from), builder.var(to), builder.var(type));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.block;
+    public LogicCategory category(){
+        return LogicCategory.block;
     }
 }

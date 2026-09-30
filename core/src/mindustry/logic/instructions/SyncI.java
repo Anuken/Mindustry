@@ -6,13 +6,13 @@ import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 
-public class SyncI implements LInstruction{
+public class SyncI implements LogicInstruction{
     //20 syncs per second
     public static long syncInterval = 1000 / 20;
 
-    public LVar variable;
+    public LogicVar variable;
 
-    public SyncI(LVar variable){
+    public SyncI(LogicVar variable){
         this.variable = variable;
     }
 
@@ -20,7 +20,7 @@ public class SyncI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(!variable.constant && Time.timeSinceMillis(variable.syncTime) > syncInterval && exec.build != null){
             variable.syncTime = Time.millis();
             Call.syncVariable(exec.build, variable.id, variable.isobj ? variable.objval : variable.numval);
@@ -30,7 +30,7 @@ public class SyncI implements LInstruction{
     @Remote(unreliable = true)
     public static void syncVariable(Building building, int variable, Object value){
         if(building instanceof LogicBuild build){
-            LVar v = build.executor.optionalVar(variable);
+            LogicVar v = build.executor.optionalVar(variable);
             if(v != null && !v.constant){
                 if(value instanceof Number n){
                     v.isobj = false;

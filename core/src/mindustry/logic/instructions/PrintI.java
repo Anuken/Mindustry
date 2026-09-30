@@ -5,10 +5,10 @@ import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 
-public class PrintI implements LInstruction{
-    public LVar value;
+public class PrintI implements LogicInstruction{
+    public LogicVar value;
 
-    public PrintI(LVar value){
+    public PrintI(LogicVar value){
         this.value = value;
     }
 
@@ -16,15 +16,15 @@ public class PrintI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
 
-        if(exec.textBuffer.length() >= LExecutor.maxTextBuffer) return;
+        if(exec.textBuffer.length() >= LogicExecutor.maxTextBuffer) return;
 
         //this should avoid any garbage allocation
         if(value.isobj){
             String strValue = toString(value.objval);
 
-            exec.textBuffer.append(strValue, 0, Math.min(strValue.length(), LExecutor.maxTextBuffer - exec.textBuffer.length()));
+            exec.textBuffer.append(strValue, 0, Math.min(strValue.length(), LogicExecutor.maxTextBuffer - exec.textBuffer.length()));
         }else{
             //display integer version when possible
             if(Math.abs(value.numval - Math.round(value.numval)) < 0.00001){

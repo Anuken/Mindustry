@@ -18,12 +18,12 @@ public class UnitRadarStatement extends RadarStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new RadarI(target1, target2, target3, sort, builder.var("@unit"), builder.var(sortOrder), builder.var(output));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.unit;
+    public LogicCategory category(){
+        return LogicCategory.unit;
     }
 }

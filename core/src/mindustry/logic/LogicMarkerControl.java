@@ -1,6 +1,6 @@
 package mindustry.logic;
 
-public enum LMarkerControl{
+public enum LogicMarkerControl{
     remove,
     world("truefalse"),
     minimap("truefalse"),
@@ -30,9 +30,9 @@ public enum LMarkerControl{
 
     public final String[] params;
 
-    public static final LMarkerControl[] all = values();
+    public static final LogicMarkerControl[] all = values();
 
-    LMarkerControl(String... params){
+    LogicMarkerControl(String... params){
         this.params = params;
     }
 }

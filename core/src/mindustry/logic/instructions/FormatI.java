@@ -2,10 +2,10 @@ package mindustry.logic.instructions;
 
 import mindustry.logic.*;
 
-public class FormatI implements LInstruction{
-    public LVar value;
+public class FormatI implements LogicInstruction{
+    public LogicVar value;
 
-    public FormatI(LVar value){
+    public FormatI(LogicVar value){
         this.value = value;
     }
 
@@ -13,7 +13,7 @@ public class FormatI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
 
         int placeholderIndex = -1;
         int placeholderNumber = 10;
@@ -47,8 +47,8 @@ public class FormatI implements LInstruction{
             }
         }
 
-        if(exec.textBuffer.length() > LExecutor.maxTextBuffer){
-            exec.textBuffer.setLength(LExecutor.maxTextBuffer);
+        if(exec.textBuffer.length() > LogicExecutor.maxTextBuffer){
+            exec.textBuffer.setLength(LogicExecutor.maxTextBuffer);
         }
     }
 }

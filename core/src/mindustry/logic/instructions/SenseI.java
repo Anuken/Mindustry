@@ -3,10 +3,10 @@ package mindustry.logic.instructions;
 import arc.struct.*;
 import mindustry.logic.*;
 
-public class SenseI implements LInstruction{
-    public LVar from, to, type;
+public class SenseI implements LogicInstruction{
+    public LogicVar from, to, type;
 
-    public SenseI(LVar from, LVar to, LVar type){
+    public SenseI(LogicVar from, LogicVar to, LogicVar type){
         this.from = from;
         this.to = to;
         this.type = type;
@@ -16,22 +16,22 @@ public class SenseI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         Object target = from.obj();
         Object sense = type.obj();
 
-        if(target == null && sense == LAccess.dead){
+        if(target == null && sense == LogicProp.dead){
             to.setnum(1);
             return;
         }
 
         //note that remote units/buildings can be sensed as well
-        if(target instanceof Senseable se){
-            if(sense instanceof LAccess la){
+        if(target instanceof LogicSenseable se){
+            if(sense instanceof LogicProp la){
                 if(exec.privileged || !la.privileged){
                     Object objOut = se.senseObject(la);
 
-                    if(objOut == Senseable.noSensed){
+                    if(objOut == LogicSenseable.noSensed){
                         //numeric output
                         to.setnum(se.sense(la));
                     }else{
@@ -46,11 +46,11 @@ public class SenseI implements LInstruction{
             }else if(!type.isobj){ //sense number
                 Object sensed = se.senseObject(type.numval);
                 //technically there's no need for noSensed sentinel values here, but there's no harm in keeping it
-                to.setobj(sensed == Senseable.noSensed ? null : sensed);
+                to.setobj(sensed == LogicSenseable.noSensed ? null : sensed);
                 return;
             }
         }else{
-            if(sense == LAccess.size || sense == LAccess.bufferSize){
+            if(sense == LogicProp.size || sense == LogicProp.bufferSize){
                 if(target instanceof CharSequence seq){
                     to.setnum(seq.length());
                     return;

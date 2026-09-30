@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("bullet")
-public class SpawnBulletStatement extends LStatement{
+public class SpawnBulletStatement extends LogicStatement{
     public String result = "result", from = "@dagger", index = "0", x = "x", y = "y", rotation = "angle", team = "null", owner = "null", damage = "-1", velocityScl = "1", lifeScl = "1", aimX = "-1", aimY = "-1";
 
     @Override
@@ -33,7 +33,7 @@ public class SpawnBulletStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SpawnBulletI(
         builder.var(result), builder.var(from), builder.var(index), builder.var(x), builder.var(y), builder.var(rotation),
         builder.var(team), builder.var(owner), builder.var(damage), builder.var(velocityScl), builder.var(lifeScl),
@@ -42,7 +42,7 @@ public class SpawnBulletStatement extends LStatement{
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

@@ -36,7 +36,7 @@ public class LogicFilter extends GenerateFilter{
         //this updates map width/height global variables
         logicVars.update();
 
-        LExecutor.runLogicScript(code, maxInstructionsExecution, loop);
+        LogicExecutor.runLogicScript(code, maxInstructionsExecution, loop);
     }
 
     @Override

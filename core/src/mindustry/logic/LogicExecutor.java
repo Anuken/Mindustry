@@ -3,16 +3,12 @@ package mindustry.logic;
 import arc.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.annotations.Annotations.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
-import mindustry.game.markers.*;
 import mindustry.gen.*;
 import mindustry.world.blocks.logic.LogicBlock.*;
 
-import static mindustry.Vars.*;
-
-public class LExecutor{
+public class LogicExecutor{
     public static int maxInstructions = 1000;
 
     public static final int
@@ -20,11 +16,11 @@ public class LExecutor{
     maxDisplayBuffer = 1024,
     maxTextBuffer = 400;
 
-    public LInstruction[] instructions = {};
+    public LogicInstruction[] instructions = {};
     /** Non-constant variables used for network sync */
-    public LVar[] vars = {};
+    public LogicVar[] vars = {};
 
-    public LVar counter, unit, thisv, ipt, queryResult;
+    public LogicVar counter, unit, thisv, ipt, queryResult;
 
     public int[] binds;
     public boolean yield, stop;
@@ -53,12 +49,12 @@ public class LExecutor{
     public static void runLogicScript(@Nullable String code, int maxInstructions, boolean loop){
         if(code == null || code.isEmpty()) return;
 
-        LExecutor executor = new LExecutor();
+        LogicExecutor executor = new LogicExecutor();
         executor.privileged = true;
 
         try{
             //assembler has no variables, all the standard ones are null
-            executor.load(LAssembler.assemble(code, true));
+            executor.load(LogicAssembler.assemble(code, true));
         }catch(Throwable ignored){
             return;
         }
@@ -96,13 +92,13 @@ public class LExecutor{
     }
 
     /** Loads with a specified assembler. Resets all variables. */
-    public void load(LAssembler builder){
+    public void load(LogicAssembler builder){
         stop = false;
         textBuffer.setLength(0);
         graphicsBuffer.clear();
         nameMap = null;
         //retain constants that are links, which, by convention, don't start with @ (builtin) or _ (numeric constant)
-        vars = builder.vars.values().toSeq().retainAll(var -> !var.constant || var.name.charAt(0) != '_' && var.name.charAt(0) != '@').toArray(LVar.class);
+        vars = builder.vars.values().toSeq().retainAll(var -> !var.constant || var.name.charAt(0) != '_' && var.name.charAt(0) != '@').toArray(LogicVar.class);
         for(int i = 0; i < vars.length; i++){
             vars[i].id = i;
         }
@@ -115,7 +111,7 @@ public class LExecutor{
         if(builder.privileged) queryResult = builder.putConst("@queries", null);
     }
 
-    public @Nullable LVar optionalVar(String name){
+    public @Nullable LogicVar optionalVar(String name){
         if(nameMap == null){
             nameMap = new ObjectIntMap<>();
             for(int i = 0; i < vars.length; i++){
@@ -126,7 +122,7 @@ public class LExecutor{
     }
 
     /** @return a Var from this processor. May be null if out of bounds. */
-    public @Nullable LVar optionalVar(int index){
+    public @Nullable LogicVar optionalVar(int index){
         return index < 0 || index >= vars.length ? null : vars[index];
     }
 }

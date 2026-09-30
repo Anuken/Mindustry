@@ -16,11 +16,11 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 /** Controls the unit based on some parameters. */
-public class UnitControlI implements LInstruction{
-    public LUnitControl type = LUnitControl.move;
-    public LVar p1, p2, p3, p4, p5;
+public class UnitControlI implements LogicInstruction{
+    public LogicUnitControl type = LogicUnitControl.move;
+    public LogicVar p1, p2, p3, p4, p5;
 
-    public UnitControlI(LUnitControl type, LVar p1, LVar p2, LVar p3, LVar p4, LVar p5){
+    public UnitControlI(LogicUnitControl type, LogicVar p1, LogicVar p2, LogicVar p3, LogicVar p4, LogicVar p5){
         this.type = type;
         this.p1 = p1;
         this.p2 = p2;
@@ -33,7 +33,7 @@ public class UnitControlI implements LInstruction{
     }
 
     /** Checks is a unit is valid for logic AI control, and returns the controller. */
-    public static @Nullable LogicAI checkLogicAI(LExecutor exec, Object unitObj, boolean control){
+    public static @Nullable LogicAI checkLogicAI(LogicExecutor exec, Object unitObj, boolean control){
         if(unitObj instanceof Unit unit && unit.isValid() && exec.unit.obj() == unit && (unit.team == exec.team || exec.privileged) && unit.controller().isLogicControllable()){
             if(unit.controller() instanceof LogicAI la){
                 la.controller = exec.thisv.building();
@@ -54,11 +54,11 @@ public class UnitControlI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(!exec.privileged && !state.rules.logicUnitControl) return;
 
         Object unitObj = exec.unit.obj();
-        boolean control = type != LUnitControl.unbind && type != LUnitControl.within;
+        boolean control = type != LogicUnitControl.unbind && type != LogicUnitControl.within;
         LogicAI ai = checkLogicAI(exec, unitObj, control);
 
         //only control standard AI units
@@ -74,12 +74,12 @@ public class UnitControlI implements LInstruction{
                     ai.control = type;
                     ai.moveX = x1;
                     ai.moveY = y1;
-                    if(type == LUnitControl.approach){
+                    if(type == LogicUnitControl.approach){
                         ai.moveRad = d1;
                     }
 
                     //stop mining/building
-                    if(type == LUnitControl.stop){
+                    if(type == LogicUnitControl.stop){
                         unit.mineTile = null;
                         unit.clearBuilding();
                     }

@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("explosion")
-public class ExplosionStatement extends LStatement{
+public class ExplosionStatement extends LogicStatement{
     public String team = "@crux", x = "0", y = "0", radius = "5", damage = "50", air = "true", ground = "true", pierce = "false", effect = "true";
 
     @Override
@@ -28,12 +28,12 @@ public class ExplosionStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler b){
+    public LogicInstruction build(LogicAssembler b){
         return new ExplosionI(b.var(team), b.var(x), b.var(y), b.var(radius), b.var(damage), b.var(air), b.var(ground), b.var(pierce), b.var(effect));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

@@ -6,14 +6,14 @@ import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 
-public class PlaySoundI implements LInstruction{
+public class PlaySoundI implements LogicInstruction{
     public boolean positional;
-    public LVar id, volume, pitch, pan, x, y, limit;
+    public LogicVar id, volume, pitch, pan, x, y, limit;
 
     public PlaySoundI(){
     }
 
-    public PlaySoundI(boolean positional, LVar id, LVar volume, LVar pitch, LVar pan, LVar x, LVar y, LVar limit){
+    public PlaySoundI(boolean positional, LogicVar id, LogicVar volume, LogicVar pitch, LogicVar pan, LogicVar x, LogicVar y, LogicVar limit){
         this.positional = positional;
         this.id = id;
         this.volume = volume;
@@ -25,7 +25,7 @@ public class PlaySoundI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         Sound sound = Sounds.getSound(id.numi());
         if(sound == null) sound = Sounds.none;
 

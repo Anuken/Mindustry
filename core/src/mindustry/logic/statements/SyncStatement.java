@@ -7,7 +7,7 @@ import mindustry.logic.instructions.*;
 
 //TODO: test this first
 @RegisterStatement("sync")
-public class SyncStatement extends LStatement{
+public class SyncStatement extends LogicStatement{
     public String variable = "var";
 
     @Override
@@ -21,12 +21,12 @@ public class SyncStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SyncI(builder.var(variable));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

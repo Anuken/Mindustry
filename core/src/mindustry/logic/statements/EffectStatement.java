@@ -9,10 +9,10 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("effect")
-public class EffectStatement extends LStatement{
+public class EffectStatement extends LogicStatement{
     public String type = "warn", x = "0", y = "0", sizerot = "2", color = "%ffaaff", data = "";
 
     @Override
@@ -63,12 +63,12 @@ public class EffectStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler b){
+    public LogicInstruction build(LogicAssembler b){
         return new EffectI(LogicFx.get(type), b.var(x), b.var(y), b.var(sizerot), b.var(color), b.var(data));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

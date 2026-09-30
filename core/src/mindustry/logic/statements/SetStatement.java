@@ -6,7 +6,7 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("set")
-public class SetStatement extends LStatement{
+public class SetStatement extends LogicStatement{
     public String to = "result";
     public String from = "0";
 
@@ -20,12 +20,12 @@ public class SetStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SetI(builder.var(from), builder.var(to));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.operation;
+    public LogicCategory category(){
+        return LogicCategory.operation;
     }
 }

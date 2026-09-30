@@ -216,8 +216,8 @@ public class ItemBridge extends Block{
         public float checkMovedTimer;
 
         @Override
-        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
-            if(executor.privileged && type == LAccess.config){
+        public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LogicProp.config){
                 //if it's a building, link it, if it's null (or something else), unlink it
                 configured(null, p1 instanceof Building b ? b.pos() : -1);
             }
@@ -233,8 +233,8 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.config){
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.config){
                 Tile other = state.world.tile(link);
                 return linkValid(tile, other) ? other.build : null;
             }

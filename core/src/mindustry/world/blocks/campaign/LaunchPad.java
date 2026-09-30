@@ -95,8 +95,8 @@ public class LaunchPad extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(launchCounter / launchTime);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(launchCounter / launchTime);
             return super.sense(sensor);
         }
 

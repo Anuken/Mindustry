@@ -6,10 +6,10 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class SetFlagI implements LInstruction{
-    public LVar flag, value;
+public class SetFlagI implements LogicInstruction{
+    public LogicVar flag, value;
 
-    public SetFlagI(LVar flag, LVar value){
+    public SetFlagI(LogicVar flag, LogicVar value){
         this.flag = flag;
         this.value = value;
     }
@@ -18,7 +18,7 @@ public class SetFlagI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         //don't invoke unless the flag state actually changes
         if(flag.obj() instanceof String str && state.rules.objectiveFlags.contains(str) != value.bool()){
             Call.setFlag(str, value.bool());

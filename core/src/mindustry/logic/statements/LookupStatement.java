@@ -8,7 +8,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 @RegisterStatement("lookup")
-public class LookupStatement extends LStatement{
+public class LookupStatement extends LogicStatement{
     public ContentType type = ContentType.item;
     public String result = "result", id = "0";
 
@@ -32,12 +32,12 @@ public class LookupStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new LookupI(builder.var(result), builder.var(id), type);
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.operation;
+    public LogicCategory category(){
+        return LogicCategory.operation;
     }
 }

@@ -14,13 +14,13 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 /** Uses a unit to find something that may not be in its range. */
-public class UnitLocateI implements LInstruction{
-    public LLocate locate = LLocate.building;
+public class UnitLocateI implements LogicInstruction{
+    public LogicLocate locate = LogicLocate.building;
     public BlockFlag flag = BlockFlag.core;
-    public LVar enemy, ore;
-    public LVar outX, outY, outFound, outBuild;
+    public LogicVar enemy, ore;
+    public LogicVar outX, outY, outFound, outBuild;
 
-    public UnitLocateI(LLocate locate, BlockFlag flag, LVar enemy, LVar ore, LVar outX, LVar outY, LVar outFound, LVar outBuild){
+    public UnitLocateI(LogicLocate locate, BlockFlag flag, LogicVar enemy, LogicVar ore, LogicVar outX, LogicVar outY, LogicVar outFound, LogicVar outBuild){
         this.locate = locate;
         this.flag = flag;
         this.enemy = enemy;
@@ -35,7 +35,7 @@ public class UnitLocateI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(!exec.privileged && !state.rules.logicUnitControl) return;
 
         Object unitObj = exec.unit.obj();

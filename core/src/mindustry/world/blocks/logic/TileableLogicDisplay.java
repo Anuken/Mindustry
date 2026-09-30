@@ -134,7 +134,7 @@ public class TileableLogicDisplay extends LogicDisplay{
         private final Runnable drawTile = this::drawTile;
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case displayWidth -> tilesWidth * 32f - frameSize * 2;    // accounts for display frame (2 * 6 pixels)
                 case displayHeight -> tilesHeight * 32f - frameSize * 2;

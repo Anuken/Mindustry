@@ -10,13 +10,12 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.logic.instructions.*;
-import mindustry.logic.statements.PlaySoundStatement.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
 @RegisterStatement("playsound")
-public class PlaySoundStatement extends LStatement{
+public class PlaySoundStatement extends LogicStatement{
     public boolean positional;
     public String id = "@sfx-shoot", volume = "1", pitch = "1", pan = "0", x = "@thisx", y = "@thisy", limit = "true";
 
@@ -64,13 +63,13 @@ public class PlaySoundStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new PlaySoundI(positional, builder.var(id), builder.var(volume), builder.var(pitch), builder.var(pan), builder.var(x), builder.var(y), builder.var(limit));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 
     private static @Nullable Sound lastPreview;

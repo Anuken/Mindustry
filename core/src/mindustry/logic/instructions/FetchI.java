@@ -7,11 +7,11 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-public class FetchI implements LInstruction{
+public class FetchI implements LogicInstruction{
     public FetchType type = FetchType.unit;
-    public LVar result, team, extra, index;
+    public LogicVar result, team, extra, index;
 
-    public FetchI(FetchType type, LVar result, LVar team, LVar extra, LVar index){
+    public FetchI(FetchType type, LogicVar result, LogicVar team, LogicVar extra, LogicVar index){
         this.type = type;
         this.result = result;
         this.team = team;
@@ -23,7 +23,7 @@ public class FetchI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         int i = index.numi();
         Team t = team.team();
         if(t == null) return;

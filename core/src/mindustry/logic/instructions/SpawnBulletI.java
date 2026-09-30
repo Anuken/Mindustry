@@ -8,10 +8,10 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.*;
 
-public class SpawnBulletI implements LInstruction{
-    public LVar result, from, weapon, x, y, rotation, team, owner, damage, velocityScl, lifeScl, aimX, aimY;
+public class SpawnBulletI implements LogicInstruction{
+    public LogicVar result, from, weapon, x, y, rotation, team, owner, damage, velocityScl, lifeScl, aimX, aimY;
 
-    public SpawnBulletI(LVar result, LVar from, LVar index, LVar x, LVar y, LVar rotation, LVar team, LVar owner, LVar damage, LVar velocityScl, LVar lifeScl, LVar aimX, LVar aimY){
+    public SpawnBulletI(LogicVar result, LogicVar from, LogicVar index, LogicVar x, LogicVar y, LogicVar rotation, LogicVar team, LogicVar owner, LogicVar damage, LogicVar velocityScl, LogicVar lifeScl, LogicVar aimX, LogicVar aimY){
         this.result = result;
         this.from = from;
         this.weapon = index;
@@ -31,7 +31,7 @@ public class SpawnBulletI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         Team teamVal = team.team();
 
         Object fromVal = from.obj();

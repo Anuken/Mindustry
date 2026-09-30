@@ -5,12 +5,12 @@ import mindustry.type.*;
 
 import static mindustry.Vars.*;
 
-public class LookupI implements LInstruction{
-    public LVar dest;
-    public LVar from;
+public class LookupI implements LogicInstruction{
+    public LogicVar dest;
+    public LogicVar from;
     public ContentType type;
 
-    public LookupI(LVar dest, LVar from, ContentType type){
+    public LookupI(LogicVar dest, LogicVar from, ContentType type){
         this.dest = dest;
         this.from = from;
         this.type = type;
@@ -20,7 +20,7 @@ public class LookupI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         dest.setobj(logicVars.lookupContent(type, from.numi()));
     }
 }

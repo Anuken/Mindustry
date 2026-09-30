@@ -7,7 +7,7 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 @RegisterStatement("query")
-public class QueryStatement extends LStatement{
+public class QueryStatement extends LogicStatement{
     public QueryShape shape = QueryShape.circle;
     public QueryType type = QueryType.unit;
     public String team = "null", x = "0", y = "0", w = "10", h = "10";
@@ -49,12 +49,12 @@ public class QueryStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new QueryI(shape, type, builder.var(team), builder.var(x), builder.var(y), builder.var(w), builder.var(h));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

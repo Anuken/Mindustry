@@ -390,8 +390,8 @@ public class PowerNode extends PowerBlock{
     public class PowerNodeBuild extends Building{
 
         @Override
-        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
-            if(executor.privileged && type == LAccess.config && p1 instanceof Building b){
+        public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LogicProp.config && p1 instanceof Building b){
                 //toggles linking for the building
                 configured(null, b.pos());
             }
@@ -418,8 +418,8 @@ public class PowerNode extends PowerBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.links) return power.links.size;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.links) return power.links.size;
             return super.sense(sensor);
         }
 

@@ -3,10 +3,10 @@ package mindustry.logic.instructions;
 import mindustry.logic.*;
 import mindustry.type.*;
 
-public class SetPropI implements LInstruction{
-    public LVar type, of, value;
+public class SetPropI implements LogicInstruction{
+    public LogicVar type, of, value;
 
-    public SetPropI(LVar type, LVar of, LVar value){
+    public SetPropI(LogicVar type, LogicVar of, LogicVar value){
         this.type = type;
         this.of = of;
         this.value = value;
@@ -16,10 +16,10 @@ public class SetPropI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
-        if(of.obj() instanceof Settable sp){
+    public void run(LogicExecutor exec){
+        if(of.obj() instanceof LogicSettable sp){
             Object key = type.obj();
-            if(key instanceof LAccess property){
+            if(key instanceof LogicProp property){
                 if(value.isobj){
                     sp.setProp(property, value.objval);
                 }else{

@@ -10,11 +10,11 @@ import mindustry.world.*;
 
 import static mindustry.Vars.*;
 
-public class SetRuleI implements LInstruction{
+public class SetRuleI implements LogicInstruction{
     public LogicRule rule = LogicRule.waveSpacing;
-    public LVar value, p1, p2, p3, p4;
+    public LogicVar value, p1, p2, p3, p4;
 
-    public SetRuleI(LogicRule rule, LVar value, LVar p1, LVar p2, LVar p3, LVar p4){
+    public SetRuleI(LogicRule rule, LogicVar value, LogicVar p1, LogicVar p2, LogicVar p3, LogicVar p4){
         this.rule = rule;
         this.value = value;
         this.p1 = p1;
@@ -27,7 +27,7 @@ public class SetRuleI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         switch(rule){
             case waveTimer -> state.rules.waveTimer = value.bool();
             case wave -> state.wave = Math.max(value.numi(), 1);

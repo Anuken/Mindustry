@@ -293,8 +293,8 @@ public class Drill extends Block{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem) return dominantItem;
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.firstItem) return dominantItem;
             return super.senseObject(sensor);
         }
 
@@ -347,8 +347,8 @@ public class Drill extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress && dominantItem != null) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress && dominantItem != null) return progress;
             return super.sense(sensor);
         }
 

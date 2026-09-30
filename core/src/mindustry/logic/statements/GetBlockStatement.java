@@ -7,8 +7,8 @@ import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
 @RegisterStatement("getblock")
-public class GetBlockStatement extends LStatement{
-    public TileLayer layer = TileLayer.block;
+public class GetBlockStatement extends LogicStatement{
+    public LogicTileLayer layer = LogicTileLayer.block;
     public String result = "result", x = "0", y = "0";
 
     @Override
@@ -18,7 +18,7 @@ public class GetBlockStatement extends LStatement{
         table.table(t -> {
             t.button(b -> {
                 b.label(() -> bundle(layer));
-                b.clicked(() -> showSelect(b, TileLayer.all, layer, o -> layer = o));
+                b.clicked(() -> showSelect(b, LogicTileLayer.all, layer, o -> layer = o));
             }, Styles.logict, () -> {
             }).size(120f, 40f).pad(4f).color(table.color);
         });
@@ -33,12 +33,12 @@ public class GetBlockStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new GetBlockI(builder.var(x), builder.var(y), builder.var(result), layer);
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

@@ -7,11 +7,11 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class FlushMessageI implements LInstruction{
+public class FlushMessageI implements LogicInstruction{
     public MessageType type = MessageType.announce;
-    public LVar duration, outSuccess;
+    public LogicVar duration, outSuccess;
 
-    public FlushMessageI(MessageType type, LVar duration, LVar outSuccess){
+    public FlushMessageI(MessageType type, LogicVar duration, LogicVar outSuccess){
         this.type = type;
         this.duration = duration;
         this.outSuccess = outSuccess;
@@ -21,7 +21,7 @@ public class FlushMessageI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         //set default to success
         outSuccess.setnum(1);
         if(headless && type != MessageType.mission){

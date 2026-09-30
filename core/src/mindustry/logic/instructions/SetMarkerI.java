@@ -4,11 +4,11 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class SetMarkerI implements LInstruction{
-    public LMarkerControl type = LMarkerControl.pos;
-    public LVar id, p1, p2, p3;
+public class SetMarkerI implements LogicInstruction{
+    public LogicMarkerControl type = LogicMarkerControl.pos;
+    public LogicVar id, p1, p2, p3;
 
-    public SetMarkerI(LMarkerControl type, LVar id, LVar p1, LVar p2, LVar p3){
+    public SetMarkerI(LogicMarkerControl type, LogicVar id, LogicVar p1, LogicVar p2, LogicVar p3){
         this.type = type;
         this.id = id;
         this.p1 = p1;
@@ -20,17 +20,17 @@ public class SetMarkerI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
-        if(type == LMarkerControl.remove){
+    public void run(LogicExecutor exec){
+        if(type == LogicMarkerControl.remove){
             state.markers.remove(id.numi());
         }else{
             var marker = state.markers.get(id.numi());
             if(marker == null) return;
 
-            if(type == LMarkerControl.flushText){
+            if(type == LogicMarkerControl.flushText){
                 marker.setText(exec.textBuffer.toString(), p1.bool());
                 exec.textBuffer.setLength(0);
-            }else if(type == LMarkerControl.texture){
+            }else if(type == LogicMarkerControl.texture){
                 if(p1.bool()){
                     marker.setTexture(exec.textBuffer.toString());
                     exec.textBuffer.setLength(0);

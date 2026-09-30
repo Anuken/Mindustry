@@ -13,7 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LAccess;
+import mindustry.logic.LogicProp;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -106,7 +106,7 @@ public class ShockwaveTower extends Block{
 
 
         @Override
-        public double sense(LAccess sensor) {
+        public double sense(LogicProp sensor) {
             return switch(sensor){
                 case progress -> reloadCounter / reload;
                 case heat -> heat;

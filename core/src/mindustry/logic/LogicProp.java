@@ -3,7 +3,7 @@ package mindustry.logic;
 import arc.struct.*;
 
 /** Setter/getter enum for logic-controlled objects. */
-public enum LAccess{
+public enum LogicProp{
     totalItems,
     firstItem,
     totalLiquids,
@@ -89,25 +89,25 @@ public enum LAccess{
     public final boolean isObj;
     public boolean privileged;
 
-    private static final ObjectSet<LAccess> privilegedAccess = ObjectSet.with(cameraX, cameraY, cameraWidth, cameraHeight);
+    private static final ObjectSet<LogicProp> privilegedAccess = ObjectSet.with(cameraX, cameraY, cameraWidth, cameraHeight);
 
-    public static final LAccess[]
+    public static final LogicProp[]
         all = values(),
-        senseable = Seq.select(all, t -> t.params.length <= 1 && !privilegedAccess.contains(t)).toArray(LAccess.class),
-        senseablePrivileged = Seq.select(all, t -> t.params.length <= 1).toArray(LAccess.class),
-        controls = Seq.select(all, t -> t.params.length > 0).toArray(LAccess.class),
+        senseable = Seq.select(all, t -> t.params.length <= 1 && !privilegedAccess.contains(t)).toArray(LogicProp.class),
+        senseablePrivileged = Seq.select(all, t -> t.params.length <= 1).toArray(LogicProp.class),
+        controls = Seq.select(all, t -> t.params.length > 0).toArray(LogicProp.class),
         settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType, bulletTime, bulletLifetime};
 
     static{
         privilegedAccess.each(l -> l.privileged = privilegedAccess.contains(l));
     }
 
-    LAccess(String... params){
+    LogicProp(String... params){
         this.params = params;
         isObj = false;
     }
 
-    LAccess(boolean obj, String... params){
+    LogicProp(boolean obj, String... params){
         this.params = params;
         isObj = obj;
     }

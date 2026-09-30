@@ -1,6 +1,6 @@
 package mindustry.logic;
 
-public enum LUnitControl{
+public enum LogicUnitControl{
     idle,
     stop,
     move("x", "y"),
@@ -24,9 +24,9 @@ public enum LUnitControl{
     unbind;
 
     public final String[] params;
-    public static final LUnitControl[] all = values();
+    public static final LogicUnitControl[] all = values();
 
-    LUnitControl(String... params){
+    LogicUnitControl(String... params){
         this.params = params;
     }
 }

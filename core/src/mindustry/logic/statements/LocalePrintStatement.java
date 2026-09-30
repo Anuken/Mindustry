@@ -6,12 +6,12 @@ import mindustry.logic.*;
 import mindustry.logic.instructions.*;
 
 @RegisterStatement("localeprint")
-public class LocalePrintStatement extends LStatement{
+public class LocalePrintStatement extends LogicStatement{
     public String value = "\"name\"";
 
     @Override
     public void build(Table table){
-        field(table, value, str -> value = str).width(LCanvas.getTargetWidth() - Scl.scl(20f)).padRight(3);
+        field(table, value, str -> value = str).width(LogicCanvas.getTargetWidth() - Scl.scl(20f)).padRight(3);
     }
 
     @Override
@@ -20,12 +20,12 @@ public class LocalePrintStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new LocalePrintI(builder.var(value));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

@@ -8,21 +8,21 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class SpawnWaveI implements LInstruction{
-    public LVar natural;
-    public LVar x, y;
+public class SpawnWaveI implements LogicInstruction{
+    public LogicVar natural;
+    public LogicVar x, y;
 
     public SpawnWaveI(){
     }
 
-    public SpawnWaveI(LVar natural, LVar x, LVar y){
+    public SpawnWaveI(LogicVar natural, LogicVar x, LogicVar y){
         this.natural = natural;
         this.x = x;
         this.y = y;
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         if(net.client()) return;
 
         if(natural.bool()){

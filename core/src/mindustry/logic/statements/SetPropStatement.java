@@ -14,10 +14,10 @@ import mindustry.type.*;
 import mindustry.ui.*;
 
 import static mindustry.Vars.*;
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 @RegisterStatement("setprop")
-public class SetPropStatement extends LStatement{
+public class SetPropStatement extends LogicStatement{
     public String type = "@copper", of = "block1", value = "0";
 
     private transient int selected = 0;
@@ -75,7 +75,7 @@ public class SetPropStatement extends LStatement{
                 }),
                 //sensors
                 new Table(i -> {
-                    for(LAccess property : LAccess.settable){
+                    for(LogicProp property : LogicProp.settable){
                         i.button(bundle(property), Styles.flatt, () -> {
                             stype("@" + property.name());
                             hide.run();
@@ -127,12 +127,12 @@ public class SetPropStatement extends LStatement{
     }
 
     @Override
-    public LInstruction build(LAssembler builder){
+    public LogicInstruction build(LogicAssembler builder){
         return new SetPropI(builder.var(type), builder.var(of), builder.var(value));
     }
 
     @Override
-    public LCategory category(){
-        return LCategory.world;
+    public LogicCategory category(){
+        return LogicCategory.world;
     }
 }

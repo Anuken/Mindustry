@@ -11,10 +11,10 @@ import mindustry.logic.*;
 
 import static mindustry.Vars.*;
 
-public class RadarI implements LInstruction{
+public class RadarI implements LogicInstruction{
     public RadarTarget target1 = RadarTarget.enemy, target2 = RadarTarget.any, target3 = RadarTarget.any;
     public RadarSort sort = RadarSort.distance;
-    public LVar radar, sortOrder, output;
+    public LogicVar radar, sortOrder, output;
 
     //radar instructions are special in that they cache their output and only change it at fixed intervals.
     //this prevents lag from spam of radar instructions
@@ -25,7 +25,7 @@ public class RadarI implements LInstruction{
     static float bestValue = 0f;
     static Unit best = null;
 
-    public RadarI(RadarTarget target1, RadarTarget target2, RadarTarget target3, RadarSort sort, LVar radar, LVar sortOrder, LVar output){
+    public RadarI(RadarTarget target1, RadarTarget target2, RadarTarget target3, RadarSort sort, LogicVar radar, LogicVar sortOrder, LogicVar output){
         this.target1 = target1;
         this.target2 = target2;
         this.target3 = target3;
@@ -39,7 +39,7 @@ public class RadarI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         Object base = radar.obj();
 
         int sortDir = sortOrder.bool() ? 1 : -1;

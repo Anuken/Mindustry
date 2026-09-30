@@ -7,16 +7,16 @@ import arc.util.*;
 import mindustry.*;
 
 /** "Compiles" a sequence of statements into instructions. */
-public class LAssembler{
-    public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
+public class LogicAssembler{
+    public static ObjectMap<String, Func<String[], LogicStatement>> customParsers = new ObjectMap<>();
 
     public boolean privileged;
     /** Maps names to variable. */
-    public OrderedMap<String, LVar> vars = new OrderedMap<>();
+    public OrderedMap<String, LogicVar> vars = new OrderedMap<>();
     /** All instructions to be executed. */
-    public LInstruction[] instructions;
+    public LogicInstruction[] instructions;
 
-    public LAssembler(){
+    public LogicAssembler(){
         //instruction counter
         putVar("@counter").isobj = false;
         //currently controlled unit
@@ -25,19 +25,19 @@ public class LAssembler{
         putConst("@this", null);
     }
 
-    public static LAssembler assemble(String data, boolean privileged){
-        LAssembler asm = new LAssembler();
-        Seq<LStatement> st = read(data, privileged);
+    public static LogicAssembler assemble(String data, boolean privileged){
+        LogicAssembler asm = new LogicAssembler();
+        Seq<LogicStatement> st = read(data, privileged);
 
         asm.privileged = privileged;
 
-        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LInstruction.class);
+        asm.instructions = st.map(l -> l.build(asm)).retainAll(l -> l != null).toArray(LogicInstruction.class);
         return asm;
     }
 
-    public static String write(Seq<LStatement> statements){
+    public static String write(Seq<LogicStatement> statements){
         StringBuilder out = new StringBuilder();
-        for(LStatement s : statements){
+        for(LogicStatement s : statements){
             s.write(out);
             out.append("\n");
         }
@@ -46,18 +46,18 @@ public class LAssembler{
     }
 
     /** Parses a sequence of statements from a string. */
-    public static Seq<LStatement> read(String text, boolean privileged){
+    public static Seq<LogicStatement> read(String text, boolean privileged){
         //don't waste time parsing null/empty text
         if(text == null || text.isEmpty()) return new Seq<>();
-        return new LParser(text, privileged).parse();
+        return new LogicParser(text, privileged).parse();
     }
 
     /**
      * @return a variable by name. This may be a constant variable referring to a number or object.
      * @param symbol the string literal, numeric literal, or variable name. Leading or trailing spaces are not allowed.
      * */
-    public LVar var(String symbol){
-        LVar constVar = Vars.logicVars.get(symbol, privileged);
+    public LogicVar var(String symbol){
+        LogicVar constVar = Vars.logicVars.get(symbol, privileged);
         if(constVar != null) return constVar;
 
         //string case
@@ -167,8 +167,8 @@ public class LAssembler{
     }
 
     /** Adds a constant value by name. */
-    public LVar putConst(String name, Object value){
-        LVar var = putVar(name);
+    public LogicVar putConst(String name, Object value){
+        LogicVar var = putVar(name);
         if(value instanceof Number number){
             var.isobj = false;
             var.numval = number.doubleValue();
@@ -182,12 +182,12 @@ public class LAssembler{
     }
 
     /** Registers a variable name mapping. */
-    public LVar putVar(String name){
+    public LogicVar putVar(String name){
         if(vars.containsKey(name)){
             return vars.get(name);
         }else{
             //variables are null objects by default
-            LVar var = new LVar(name);
+            LogicVar var = new LogicVar(name);
             var.isobj = true;
             vars.put(name, var);
             return var;
@@ -195,7 +195,7 @@ public class LAssembler{
     }
 
     @Nullable
-    public LVar getVar(String name){
+    public LogicVar getVar(String name){
         return vars.get(name);
     }
 

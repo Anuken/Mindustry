@@ -4,12 +4,12 @@ import mindustry.gen.*;
 import mindustry.logic.*;
 
 /** Controls a building's state. */
-public class ControlI implements LInstruction{
-    public LVar target;
-    public LAccess type = LAccess.enabled;
-    public LVar p1, p2, p3, p4;
+public class ControlI implements LogicInstruction{
+    public LogicVar target;
+    public LogicProp type = LogicProp.enabled;
+    public LogicVar p1, p2, p3, p4;
 
-    public ControlI(LAccess type, LVar target, LVar p1, LVar p2, LVar p3, LVar p4){
+    public ControlI(LogicProp type, LogicVar target, LogicVar p1, LogicVar p2, LogicVar p3, LogicVar p4){
         this.type = type;
         this.target = target;
         this.p1 = p1;
@@ -22,11 +22,11 @@ public class ControlI implements LInstruction{
     }
 
     @Override
-    public void run(LExecutor exec){
+    public void run(LogicExecutor exec){
         Object obj = target.obj();
         if(obj instanceof Building b && (exec.privileged || (exec.build != null && exec.build.validLink(b)))){
 
-            if(type == LAccess.enabled){
+            if(type == LogicProp.enabled){
                 if(p1.bool()){
                     b.noSleep();
                 }else{
