@@ -32,6 +32,7 @@ public class ImagePacker{
 
         Core.settings = new MockSettings();
         Log.logger = new NoopLogHandler();
+        Vars.state = new GameState();
         Vars.content = new ContentLoader();
         Vars.content.createBaseContent();
         Vars.content.init();
