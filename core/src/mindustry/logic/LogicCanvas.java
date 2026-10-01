@@ -445,10 +445,10 @@ public class LogicCanvas extends Table{
                 //taken from foo's client
                 t.button(Icon.add, Styles.logici, () -> ui.logic.showAddDialog(index + 1))
                 .disabled(b -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions).size(24f).padRight(6);
+                tooltip(t.getCells().peek(), "logic.addhere");
 
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions).get().tapped(this::copy);
-                tooltip(t.getCells().peek(), "logic.addhere");
 
                 //taken from foo's client (again)
                 t.button(Icon.paste, Styles.logici, () -> {
