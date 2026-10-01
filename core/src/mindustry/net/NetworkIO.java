@@ -16,6 +16,7 @@ import mindustry.mod.*;
 import mindustry.mod.data.*;
 import mindustry.net.Administration.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.nio.*;
@@ -78,7 +79,7 @@ public class NetworkIO{
         try(DataInputStream stream = new DataInputStream(is)){
             var writer = SaveIO.getSaveWriter();
             Time.clear();
-            writer.readDataPatches(stream, new SaveReadState(world.context));
+            writer.readDataPatches(stream, new DefaultWorldContext());
 
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
@@ -92,23 +93,23 @@ public class NetworkIO{
 
             Reads read = new Reads(stream);
 
-            Groups.clear();
+            state.entities.clear();
             int id = stream.readInt();
             player.reset();
             player.read(read);
             player.id = id;
             player.add();
 
-            var state = new SaveReadState(world.context);
+            var context = new DefaultWorldContext();
 
             writer.readContentHeader(stream);
-            writer.readMap(stream, state);
-            writer.readEntities(stream, state);
+            writer.readMap(stream, context);
+            writer.readEntities(stream, context);
             writer.readMarkers(stream);
             writer.readCustomChunks(stream);
 
-            Groups.all.each(e -> netClient.addRemovedEntity(e.id()));
-            Groups.unit.each(e -> netClient.addRemovedEntity(e.id()));
+            state.entities.all.each(e -> netClient.addRemovedEntity(e.id()));
+            state.entities.unit.each(e -> netClient.addRemovedEntity(e.id()));
         }catch(IOException e){
             throw new RuntimeException(e);
         }finally{
@@ -194,7 +195,7 @@ public class NetworkIO{
         writeString(buffer, name, 100);
         writeString(buffer, map, 64);
 
-        buffer.putInt(Core.settings.getInt("totalPlayers", Groups.player.size()));
+        buffer.putInt(Core.settings.getInt("totalPlayers", state.entities.player.size()));
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);

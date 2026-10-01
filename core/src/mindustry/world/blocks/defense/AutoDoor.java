@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -20,8 +21,6 @@ public class AutoDoor extends Wall{
     protected final static Rect rect = new Rect();
     protected final static Seq<Unit> units = new Seq<>();
     protected final static Boolf<Unit> groundCheck = u -> u.isGrounded() && !u.type.allowLegStep;
-
-    public final int timerToggle = timers++;
 
     public float checkInterval = 20f;
     public Effect openfx = Fx.dooropen;
@@ -49,15 +48,19 @@ public class AutoDoor extends Wall{
 
     public class AutoDoorBuild extends Building{
         public boolean open = false;
+        public float checkTimer;
 
         public AutoDoorBuild(){
             //make sure it is staggered
-            timer.reset(timerToggle, Mathf.random(checkInterval));
+            checkTimer = Mathf.random(checkInterval);
         }
 
         @Override
         public void updateTile(){
-            if(timer(timerToggle, checkInterval) && !net.client()){
+            if((checkTimer += Time.delta) >= checkInterval){
+                checkTimer %= checkInterval;
+                if(net.client()) return;
+
                 units.clear();
                 team.data().tree().intersect(rect.setSize(size * tilesize + triggerMargin * 2f).setCenter(x, y), units);
                 boolean shouldOpen = units.contains(groundCheck);
@@ -69,14 +72,14 @@ public class AutoDoor extends Wall{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.enabled) return open ? 1 : 0;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.enabled) return open ? 1 : 0;
             return super.sense(sensor);
         }
 
         public void setOpen(boolean open){
             this.open = open;
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
             if(wasVisible){
                 (!open ? closefx : openfx).at(this, size);
                 doorSound.at(this);

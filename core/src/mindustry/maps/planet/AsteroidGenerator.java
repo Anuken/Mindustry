@@ -35,8 +35,8 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         for(int x = ax - radius; x <= ax + radius; x++){
             for(int y = ay - radius; y <= ay + radius; y++){
-                if(tiles.in(x, y) &&  Mathf.dst(x, y, ax, ay) / radius + Simplex.noise2d(seed, octaves, persistence, 1f / scale, x, y) * mag < thresh){
-                    tiles.getn(x, y).setFloor(floor);
+                if(world.in(x, y) &&  Mathf.dst(x, y, ax, ay) / radius + Simplex.noise2d(seed, octaves, persistence, 1f / scale, x, y) * mag < thresh){
+                    world.getn(x, y).setFloor(floor);
                 }
             }
         }
@@ -50,7 +50,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         Floor background = Blocks.empty.asFloor();
 
-        tiles.eachTile(t -> t.setFloor(background));
+        world.eachTile(t -> t.setFloor(background));
 
         //spawn asteroids
         asteroid(sx, sy, rand.random(30, 50));
@@ -86,7 +86,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
             int radius = 6;
             for(int dx = x - radius; dx <= x + radius; dx++){
                 for(int dy = y - radius; dy <= y + radius; dy++){
-                    if(Mathf.within(dx, dy, x, y, radius + 0.0001f) && tiles.in(dx, dy) && tiles.getn(dx, dy).floor() == background){
+                    if(Mathf.within(dx, dy, x, y, radius + 0.0001f) && world.in(dx, dy) && world.getn(dx, dy).floor() == background){
                         return;
                     }
                 }
@@ -129,7 +129,7 @@ public class AsteroidGenerator extends BlankPlanetGenerator{
 
         int spawnSide = rand.random(3);
         int sizeOffset = width / 2 - 1;
-        tiles.getn(sizeOffset * Geometry.d8edge[spawnSide].x + width/2, sizeOffset * Geometry.d8edge[spawnSide].y + height/2).setOverlay(Blocks.spawn);
+        world.getn(sizeOffset * Geometry.d8edge[spawnSide].x + width/2, sizeOffset * Geometry.d8edge[spawnSide].y + height/2).setOverlay(Blocks.spawn);
 
         Schematics.placeLaunchLoadout(sx, sy);
 

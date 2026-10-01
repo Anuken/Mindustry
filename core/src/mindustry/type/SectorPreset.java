@@ -104,12 +104,20 @@ public class SectorPreset extends UnlockableContent{
         if(sector != null && sector.preset == this){
             sector.preset = null;
         }
+        for(var other : shieldSectors){
+            if(other.shieldTarget == sector){
+                other.shieldTarget = null;
+            }
+        }
     }
 
     @Override
     public void init(){
         super.init();
+        assignShieldTargets();
+    }
 
+    public void assignShieldTargets(){
         //note that sectors can only have one visual shield target
         for(var other : shieldSectors){
             other.shieldTarget = sector;

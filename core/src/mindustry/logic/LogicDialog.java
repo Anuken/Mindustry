@@ -13,8 +13,8 @@ import mindustry.core.GameState.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LExecutor.*;
-import mindustry.logic.LStatements.*;
+import mindustry.logic.instructions.*;
+import mindustry.logic.statements.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -23,13 +23,13 @@ import mindustry.world.blocks.logic.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
-import static mindustry.logic.LCanvas.*;
+import static mindustry.logic.LogicCanvas.*;
 
 public class LogicDialog extends BaseDialog{
-    public LCanvas canvas;
+    public LogicCanvas canvas;
     Cons<String> consumer = s -> {};
     boolean privileged;
-    @Nullable LExecutor executor;
+    @Nullable LogicExecutor executor;
     GlobalVarsDialog globalsDialog = new GlobalVarsDialog();
     boolean wasRows, wasPortrait, forceRestart;
 
@@ -38,23 +38,23 @@ public class LogicDialog extends BaseDialog{
 
         clearChildren();
 
-        canvas = new LCanvas();
+        canvas = new LogicCanvas();
         shouldPause = true;
 
         addCloseListener();
 
         shown(this::setup);
         shown(() -> {
-            wasRows = LCanvas.isCompact();
+            wasRows = LogicCanvas.isCompact();
             wasPortrait = Core.graphics.isPortrait();
         });
         hidden(() -> consumer.get(canvas.save()));
         onResize(() -> {
-            if(wasRows != LCanvas.isCompact() || wasPortrait != Core.graphics.isPortrait()){
+            if(wasRows != LogicCanvas.isCompact() || wasPortrait != Core.graphics.isPortrait()){
                 setup();
                 canvas.rebuild();
                 wasPortrait = Core.graphics.isPortrait();
-                wasRows = LCanvas.isCompact();
+                wasRows = LogicCanvas.isCompact();
             }
         });
 
@@ -72,7 +72,11 @@ public class LogicDialog extends BaseDialog{
         add(buttons).growX().name("canvas");
     }
 
-    public static Color typeColor(LVar s, Color color){
+    public boolean isPrivileged(){
+        return privileged;
+    }
+
+    public static Color typeColor(LogicVar s, Color color){
         return color.set(
             !s.isobj ? Pal.place :
             s.objval == null ? Color.darkGray :
@@ -86,7 +90,7 @@ public class LogicDialog extends BaseDialog{
         );
     }
 
-    public static String typeName(LVar s){
+    public static String typeName(LogicVar s){
         return
             !s.isobj ? "number" :
             s.objval == null ? "null" :
@@ -244,7 +248,7 @@ public class LogicDialog extends BaseDialog{
 
         buttons.button("@add", Icon.add, () -> {
             showAddDialog();
-        }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+        }).disabled(t -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions);
 
         Core.app.post(canvas::rebuild);
     }
@@ -282,7 +286,7 @@ public class LogicDialog extends BaseDialog{
 
                     search.keyDown(KeyCode.enter, () -> {
                         if(!searchText[0].isEmpty() && matched[0] != null){
-                            canvas.addAt(position == -1 ? canvas.statements.getChildren().size : position, (LStatement)matched[0].get());
+                            canvas.addAt(position == -1 ? canvas.statements.getChildren().size : position, (LogicStatement)matched[0].get());
                             dialog.hide();
                         }
                     });
@@ -297,17 +301,17 @@ public class LogicDialog extends BaseDialog{
 
                     matched[0] = null;
 
-                    for(Prov<LStatement> prov : LogicIO.allStatements){
-                        LStatement example = prov.get();
+                    for(Prov<LogicStatement> prov : LogicIO.allStatements){
+                        LogicStatement example = prov.get();
                         if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged) ||
                             (!text.isEmpty() && !example.localizedName().toLowerCase(Locale.ROOT).contains(text) && !example.typeName().toLowerCase(Locale.ROOT).contains(text)) ||
-                            (!privileged && !state.rules.logicUnitControl && example.category() == LCategory.unit)) continue;
+                            (!privileged && !state.rules.logicUnitControl && example.category() == LogicCategory.unit)) continue;
 
                         if(matched[0] == null){
                             matched[0] = prov;
                         }
 
-                        LCategory category = example.category();
+                        LogicCategory category = example.category();
                         Table cat = t.find(category.name);
                         if(cat == null){
                             t.table(s -> {
@@ -346,7 +350,7 @@ public class LogicDialog extends BaseDialog{
         dialog.show();
     }
 
-    public void show(String code, LExecutor executor, boolean privileged, Cons<String> modified){
+    public void show(String code, LogicExecutor executor, boolean privileged, Cons<String> modified){
         this.executor = executor;
         this.privileged = privileged;
         this.forceRestart = false;

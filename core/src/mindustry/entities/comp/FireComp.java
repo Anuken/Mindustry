@@ -75,7 +75,7 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
         if(flammability > 1f && (spreadTimer += Time.delta * Mathf.clamp(flammability / 5f, 0.3f, 2f)) >= spreadDelay){
             spreadTimer = 0f;
             Point2 p = Geometry.d4[Mathf.random(3)];
-            Tile other = world.tile(tile.x + p.x, tile.y + p.y);
+            Tile other = state.world.tile(tile.x + p.x, tile.y + p.y);
             Fires.create(other);
         }
 

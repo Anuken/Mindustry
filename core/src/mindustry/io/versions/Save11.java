@@ -22,7 +22,7 @@ public class Save11 extends SaveVersion{
     }
 
     @Override
-    public void read(DataInputStream stream, CounterInputStream counter, SaveReadState saveState) throws IOException{
+    public void read(DataInputStream stream, CounterInputStream counter, SaveLoadContext saveState) throws IOException{
         readRegion("meta", stream, counter, in -> readMeta(in, saveState));
         readRegion("content", stream, counter, this::readContentHeader);
 
@@ -39,7 +39,7 @@ public class Save11 extends SaveVersion{
 
     //old, simplified string-only data patches
     @Override
-    public void readDataPatches(DataInput stream, SaveReadState saveState) throws IOException{
+    public void readDataPatches(DataInput stream, SaveLoadContext saveState) throws IOException{
         Seq<DataAsset> assets = new Seq<>();
 
         int amount = stream.readUnsignedByte();

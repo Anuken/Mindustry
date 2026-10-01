@@ -38,7 +38,7 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class Block extends UnlockableContent implements Senseable{
+public class Block extends UnlockableContent implements LogicSenseable{
     /** If true, buildings have an ItemModule. */
     public @NoPatch boolean hasItems;
     /** If true, buildings have a LiquidModule. */
@@ -225,8 +225,6 @@ public class Block extends UnlockableContent implements Senseable{
     public float crushDamageMultiplier = 1f;
     /** If true, this block is instantly destroyed by tanks with crushFragile set to true. */
     public boolean crushFragile = false;
-    /** Max of timers used. */
-    public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering of blocks (not buildings). */
     public CacheLayer cacheLayer = CacheLayer.normal;
     /** If true, draw() will be called on the building. */
@@ -301,7 +299,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean hasColor = false;
     /** Whether units target this block. */
     public boolean targetable = true;
-    /** If true, this block attacks and is considered a turret in the indexer. Building must implement Ranged. */
+    /** If true, this block attacks and is considered a turret in the state.indexer. Building must implement Ranged. */
     public boolean attacks = false;
     /** If true, this block is mending-related and can be suppressed with special units/missiles. */
     public boolean suppressable = false;
@@ -434,8 +432,6 @@ public class Block extends UnlockableContent implements Senseable{
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempBuilds = new Seq<>();
 
-    /** Dump timer ID.*/
-    protected final int timerDump = timers++;
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
     public int dumpTime = 5;
 
@@ -479,7 +475,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float percentSolid(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
             .sumf(other -> !other.floor().isLiquid ? 1f : 0f) / size / size;
@@ -509,7 +505,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     public void drawPotentialLinks(int x, int y){
         if((consumesPower || outputsPower) && hasPower && connectedPower){
-            Tile tile = world.tile(x, y);
+            Tile tile = state.world.tile(x, y);
             if(tile != null){
                 PowerNode.getNodeLinks(tile, this, player.team(), other -> {
                     PowerNode node = (PowerNode)other.block;
@@ -576,7 +572,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     public float sumAttribute(@Nullable Attribute attr, int x, int y){
         if(attr == null) return 0;
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
             .sumf(other -> !floating && !placeableLiquid && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
@@ -1689,7 +1685,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
@@ -1720,8 +1716,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
         return noSensed;
     }
 }

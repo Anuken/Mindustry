@@ -37,7 +37,7 @@ public class PointLaserBulletType extends BulletType{
         collides = false;
         pierce = true;
         hittable = false;
-        absorbable = false;
+        absorbable = true;
         optimalLifeFract = 0.5f;
         shootEffect = smokeEffect = Fx.none;
 
@@ -80,7 +80,7 @@ public class PointLaserBulletType extends BulletType{
         updateBulletInterval(b);
 
         float dst = b.dst(b.aimX, b.aimY);
-        float length = Damage.findShieldLength(b, dst, true, laserAbsorb);
+        float length = Damage.findShieldLength(b, dst, laserAbsorb);
         if(length < dst){
             Tmp.v1.set(b.aimX - b.x, b.aimY - b.y).setLength(length);
             b.aimX = Tmp.v1.x + b.x;

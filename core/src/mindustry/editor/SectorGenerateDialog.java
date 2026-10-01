@@ -98,7 +98,7 @@ public class SectorGenerateDialog extends BaseDialog{
                 var params = new WorldParams();
                 params.seedOffset = seed;
                 params.saveInfo = false;
-                world.loadSector(sectorobj, params);
+                state.loadSector(sectorobj, params);
 
                 sectorobj.preset = preset;
 

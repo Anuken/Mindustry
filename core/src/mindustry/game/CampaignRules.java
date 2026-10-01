@@ -29,7 +29,7 @@ public class CampaignRules{
             rules.teams.get(rules.waveTeam).rtsMaxSquad = 15;
 
             if(swapped && Vars.state.isGame()){
-                Groups.unit.each(u -> {
+                Vars.state.entities.unit.each(u -> {
                     if(u.team == rules.waveTeam && !u.isPlayer()){
                         u.resetController();
                     }

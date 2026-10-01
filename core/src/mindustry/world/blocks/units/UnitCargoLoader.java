@@ -96,7 +96,7 @@ public class UnitCargoLoader extends Block{
             }
 
             if(readUnitId != -1){
-                unit = Groups.unit.getByID(readUnitId);
+                unit = state.entities.unit.getByID(readUnitId);
                 if(unit != null || !net.client()){
                     readUnitId = -1;
                 }

@@ -56,10 +56,12 @@ public class FilePackContext extends PackContext{
         written.put(name, new PixmapRegion(image));
     }
 
-    /** Registers a pixmap that was written to disk outside of add() (e.g. an autotile fallback icon), so has()/get() can see it this run. */
-    public void seed(String name, Pixmap pixmap){
-        var previous = written.put(name, new PixmapRegion(pixmap));
-        if(previous != null && previous.pixmap != pixmap) replaced.add(previous.pixmap);
+    @Override
+    public void discard(String name){
+        var index = ImagePacker.cache.get(name);
+        if(index != null){
+            index.file.delete();
+        }
     }
 
     private void removeOriginal(String name, Fi target){

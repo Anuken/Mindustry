@@ -376,7 +376,7 @@ public class Accelerator extends Block{
                             if(Mathf.chance(0.7f - fi  * 0.02f)){
                                 float angle = r * 360f / (float)rays;
                                 float ox = Angles.trnsx(angle, radius), oy = Angles.trnsy(angle, radius);
-                                Tile t = world.tileWorld(x + ox, y + oy);
+                                Tile t = state.world.tileWorld(x + ox, y + oy);
                                 if(t != null){
                                     Fx.coreLandDust.at(t.worldx(), t.worldy(), angle + Mathf.range(30f), Tmp.c1.set(t.floor().mapColor).mul(1.7f + Mathf.range(0.15f)));
                                 }

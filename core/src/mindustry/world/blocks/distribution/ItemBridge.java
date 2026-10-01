@@ -23,8 +23,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class ItemBridge extends Block{
-    public final int timerCheckMoved = timers ++;
-
     public int range;
     public float transportTime;
     public @Load("@-end") TextureRegion endRegion;
@@ -179,7 +177,7 @@ public class ItemBridge extends Block{
     }
 
     public Tile findLink(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile != null && lastBuild != null && linkValid(tile, lastBuild.tile) && lastBuild.tile != tile && lastBuild.link == -1){
             return lastBuild.tile;
         }
@@ -215,10 +213,11 @@ public class ItemBridge extends Block{
         public float time = -8f, timeSpeed;
         public boolean wasMoved, moved, hadValidLink;
         public float transportCounter;
+        public float checkMovedTimer;
 
         @Override
-        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
-            if(executor.privileged && type == LAccess.config){
+        public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LogicProp.config){
                 //if it's a building, link it, if it's null (or something else), unlink it
                 configured(null, p1 instanceof Building b ? b.pos() : -1);
             }
@@ -234,9 +233,9 @@ public class ItemBridge extends Block{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.config){
-                Tile other = world.tile(link);
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.config){
+                Tile other = state.world.tile(link);
                 return linkValid(tile, other) ? other.build : null;
             }
             return super.senseObject(sensor);
@@ -261,11 +260,11 @@ public class ItemBridge extends Block{
 
         @Override
         public void drawSelect(){
-            if(linkValid(tile, world.tile(link))){
-                drawInput(world.tile(link));
+            if(linkValid(tile, state.world.tile(link))){
+                drawInput(state.world.tile(link));
             }
 
-            incoming.each(pos -> drawInput(world.tile(pos)));
+            incoming.each(pos -> drawInput(state.world.tile(pos)));
 
             Draw.reset();
         }
@@ -346,7 +345,7 @@ public class ItemBridge extends Block{
             int idx = 0;
             while(idx < incoming.size){
                 int i = incoming.items[idx];
-                Tile other = world.tile(i);
+                Tile other = state.world.tile(i);
                 if(!linkValid(tile, other, false) || ((ItemBridgeBuild)other.build).link != tile.pos()){
                     incoming.removeIndex(idx);
                     idx --;
@@ -357,7 +356,8 @@ public class ItemBridge extends Block{
 
         @Override
         public void updateTile(){
-            if(timer(timerCheckMoved, 30f)){
+            if((checkMovedTimer += Time.delta) >= 30f){
+                checkMovedTimer %= 30f;
                 wasMoved = moved;
                 moved = false;
             }
@@ -369,7 +369,7 @@ public class ItemBridge extends Block{
 
             checkIncoming();
 
-            Tile other = world.tile(link);
+            Tile other = state.world.tile(link);
             hadValidLink = linkValid(tile, other);
 
             if(!hadValidLink){
@@ -413,7 +413,7 @@ public class ItemBridge extends Block{
 
             Draw.z(Layer.power);
 
-            Tile other = world.tile(link);
+            Tile other = state.world.tile(link);
             if(!linkValid(tile, other)) return;
 
             if(Mathf.zero(Renderer.bridgeOpacity)) return;
@@ -462,7 +462,7 @@ public class ItemBridge extends Block{
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, world.tile(link)) && (!noAcceptDisabled || enabled);
+            return hasItems && team == source.team && items.total() < itemCapacity && checkAccept(source, state.world.tile(link)) && (!noAcceptDisabled || enabled);
         }
 
         @Override
@@ -475,7 +475,7 @@ public class ItemBridge extends Block{
             return
                 hasLiquids && team == source.team && (!noAcceptDisabled || enabled) &&
                 (liquids.current() == liquid || liquids.get(liquids.current()) < 0.2f) &&
-                checkAccept(source, world.tile(link));
+                checkAccept(source, state.world.tile(link));
         }
 
         protected boolean checkAccept(Building source, Tile link){
@@ -511,7 +511,7 @@ public class ItemBridge extends Block{
         }
 
         protected boolean checkDump(Building to){
-            Tile other = world.tile(link);
+            Tile other = state.world.tile(link);
             if(!linkValid(tile, other)){
                 Tile edge = Edges.getFacingEdge(to.tile, tile);
                 int i = relativeTo(edge.x, edge.y);

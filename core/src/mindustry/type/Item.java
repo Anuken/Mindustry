@@ -12,7 +12,7 @@ import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
-public class Item extends UnlockableContent implements Senseable{
+public class Item extends UnlockableContent implements LogicSenseable{
     public Color color;
 
     /** how explosive this item is. */
@@ -145,15 +145,15 @@ public class Item extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
-        if(sensor == LAccess.color) return color.toDoubleBits();
-        if(sensor == LAccess.id) return getLogicId();
+    public double sense(LogicProp sensor){
+        if(sensor == LogicProp.color) return color.toDoubleBits();
+        if(sensor == LogicProp.id) return getLogicId();
         return Float.NaN;
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
         return noSensed;
     }
 

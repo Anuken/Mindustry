@@ -57,7 +57,6 @@ public class Generators{
     }
 
     public static void run(){
-        ObjectMap<Block, Pixmap> gens = new ObjectMap<>();
         FilePackContext ctx = new FilePackContext();
 
         //scorches
@@ -88,45 +87,6 @@ public class Generators{
                     median.dispose();
                 }
             });
-        }
-
-        //autotiles
-        for(Block block : content.blocks().select(b -> (b.isFloor() && b.asFloor().autotile) || (b instanceof StaticWall && ((StaticWall)b).autotile))){
-            int variants = block instanceof Floor f && f.autotileVariants > 1 ? f.autotileVariants : 1;
-            for(int v = 0; v < variants; v++){
-                Fi basePath = new Fi("../../../assets-raw/sprites_out/blocks/environment/" + block.name + "-autotile" + (variants <= 1 ? "" : "" + (v+1)) + ".png"), iconPath = basePath.parent().child(block.name + ".png");
-
-                if(basePath.exists()){
-                    int variant = v;
-                    //theoretically this might not finish in time, but I doubt that will ever happen
-                    mainExecutor.execute(() -> {
-                        try{
-                            ImageTileGenerator.generate(basePath, block.name + (variants <= 1 ? "" : "-" + (variant+1)), new Fi("../../../assets-raw/sprites_out/blocks/environment"));
-                        }catch(Throwable e){
-                            Log.err("Failed to autotile: " + block.name, e);
-                        }finally{
-                            //the raw autotile source image must never be included, it isn't useful
-                            basePath.delete();
-                        }
-                    });
-
-                    if(v == 0){
-                        //save the bottom right region as the "main" sprite for previews
-                        Pixmap out = new Pixmap(basePath);
-                        Pixmap cropped = out.crop(32, 32, 32, 32);
-                        boolean isFallback = !iconPath.exists();
-                        if(isFallback){
-                            iconPath.writePng(cropped);
-                            //the static atlas cache predates this run, so packSprites() can't see this new file unless we seed it directly
-                            ctx.seed(block.name, cropped);
-                        }
-                        out.dispose();
-                        gens.put(block, cropped);
-                    }
-                }else{
-                    Log.warn("Autotile block '@' not found: @", block.name, basePath.absolutePath());
-                }
-            }
         }
 
         //splashes
@@ -352,7 +312,8 @@ public class Generators{
                             ctx.has("block-" + block.name + "-full") ? ctx.get("block-" + block.name + "-full") :
                             regions.length > 0 && regions[0].found() ? ctx.get(regions[0]) :
                             ctx.has(block.name + "1") ? ctx.get(block.name + "1") :
-                            gens.containsKey(block) ? new PixmapRegion(gens.get(block)) :
+                            //autotiled floors/walls only have a bare-name region, added by their own packSprites()
+                            ctx.has(block.name) ? ctx.get(block.name) :
                             null;
 
                             if(image == null){

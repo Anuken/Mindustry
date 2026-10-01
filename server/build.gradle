@@ -45,6 +45,7 @@ tasks.register('dist', Jar){
     exclude("fonts/**")
     exclude("bundles/**")
     exclude("cubemaps/**")
+    exclude("vfxshaders/**")
     exclude("config/**")
     exclude("cursors/**")
     exclude("shaders/**")

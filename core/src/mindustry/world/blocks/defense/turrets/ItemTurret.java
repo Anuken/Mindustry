@@ -111,7 +111,7 @@ public class ItemTurret extends Turret{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case currentAmmoType -> ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
                 default -> super.senseObject(sensor);

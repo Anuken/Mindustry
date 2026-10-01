@@ -17,8 +17,7 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
     }
 
     @Override
-    public void readMap(DataInput stream, SaveReadState state) throws IOException{
-        var context = state.context;
+    public void readMap(DataInput stream, SaveLoadContext context) throws IOException{
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
@@ -59,7 +58,7 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
                 if(!occupied){
                     tile.setBlock(block);
                     if(tile.build != null){
-                        if(!state.preview) state.allBuildings.add(tile.build);
+                        if(!context.preview) context.allBuildings.add(tile.build);
                         tile.build.enabled = true;
                     }
                 }

@@ -21,7 +21,7 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
 import mindustry.logic.*;
-import mindustry.logic.LExecutor.*;
+import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -86,13 +86,13 @@ public class LogicBlock extends Block{
             if(!accessible()) return;
 
             //if there is no valid link in the first place, nobody cares
-            if(!entity.validLink(world.build(pos))) return;
-            var lbuild = world.build(pos);
+            if(!entity.validLink(state.world.build(pos))) return;
+            var lbuild = state.world.build(pos);
             int x = lbuild.tileX(), y = lbuild.tileY();
             int oldSize = entity.links.size;
 
             entity.links.removeAll(l -> {
-                boolean remove = world.build(l.x, l.y) == lbuild;
+                boolean remove = state.world.build(l.x, l.y) == lbuild;
                 if(remove) l.trySet(entity.executor, null);
                 return remove;
             });
@@ -228,7 +228,7 @@ public class LogicBlock extends Block{
         public int x, y;
         public String name;
         public Building lastBuild;
-        public @Nullable LVar logicVar;
+        public @Nullable LogicVar logicVar;
 
         public LogicLink(int x, int y, String name, boolean valid){
             this.x = x;
@@ -237,7 +237,7 @@ public class LogicBlock extends Block{
             this.valid = valid;
         }
 
-        public void trySet(LExecutor exec, Object value){
+        public void trySet(LogicExecutor exec, Object value){
             if(logicVar != null){
                 logicVar.setlink(value);
             }else{
@@ -251,10 +251,10 @@ public class LogicBlock extends Block{
         }
     }
 
-    public class LogicBuild extends Building implements Ranged, LReadable, LWritable{
+    public class LogicBuild extends Building implements Ranged, LogicReadable, LogicWritable{
         /** logic "source code" as list of asm statements */
         public String code = "";
-        public LExecutor executor = new LExecutor();
+        public LogicExecutor executor = new LogicExecutor();
         public float accumulator = 0;
         public Seq<LogicLink> links = new Seq<>();
         public @Nullable ObjectIntMap<String> linkMap;
@@ -264,7 +264,7 @@ public class LogicBlock extends Block{
         /** Display name, for convenience. This is currently only available for world processors. */
         public @Nullable String tag;
         public char iconTag;
-        public @Nullable LVar linksVar;
+        public @Nullable LogicVar linksVar;
 
         /** Block of code to run after load. */
         public @Nullable Runnable loadBlock;
@@ -304,7 +304,7 @@ public class LogicBlock extends Block{
                             y += tileY();
                         }
 
-                        Building build = world.build(x, y);
+                        Building build = state.world.build(x, y);
 
                         if(build != null){
                             if(!usedBuildings.add(build.id)){
@@ -361,20 +361,20 @@ public class LogicBlock extends Block{
             updateCode(str, false, null);
         }
 
-        public void updateCode(String str, boolean keep, Cons<LAssembler> assemble){
+        public void updateCode(String str, boolean keep, Cons<LogicAssembler> assemble){
             linkMap = null;
             if(str != null){
                 code = str;
 
                 try{
                     //create assembler to store extra variables
-                    LAssembler asm = LAssembler.assemble(str, privileged);
+                    LogicAssembler asm = LogicAssembler.assemble(str, privileged);
 
                     //store connections
                     for(LogicLink link : links){
-                        link.valid = validLink(world.build(link.x, link.y));
+                        link.valid = validLink(state.world.build(link.x, link.y));
                         if(link.valid){
-                            link.logicVar = asm.putConst(link.name, world.build(link.x, link.y));
+                            link.logicVar = asm.putConst(link.name, state.world.build(link.x, link.y));
                         }
                     }
 
@@ -385,7 +385,7 @@ public class LogicBlock extends Block{
                     int index = 0;
                     for(LogicLink link : links){
                         if(link.valid){
-                            Building build = world.build(link.x, link.y);
+                            Building build = state.world.build(link.x, link.y);
                             executor.links[index ++] = build;
                             if(build != null) executor.linkIds.add(build.id);
                         }
@@ -399,9 +399,9 @@ public class LogicBlock extends Block{
                     if(keep){
                         oldUnit = executor.unit.objval;
                         //store any older variables
-                        for(LVar var : executor.vars){
+                        for(LogicVar var : executor.vars){
                             if(!var.constant){
-                                LVar dest = asm.getVar(var.name);
+                                LogicVar dest = asm.getVar(var.name);
                                 if(dest != null && !dest.constant){
                                     dest.set(var);
                                 }
@@ -427,7 +427,7 @@ public class LogicBlock extends Block{
                     executor.unit.isobj = true;
                 }catch(Exception e){
                     //handle malformed code and replace it with nothing
-                    executor.load(LAssembler.assemble(code = "", privileged));
+                    executor.load(LogicAssembler.assemble(code = "", privileged));
                 }
             }
         }
@@ -488,7 +488,7 @@ public class LogicBlock extends Block{
                 var removal = new IntSet();
                 var removeLinks = new Seq<LogicLink>();
                 for(var link : links){
-                    var build = world.build(link.x, link.y);
+                    var build = state.world.build(link.x, link.y);
                     if(build != null){
                         if(!removal.add(build.id)){
                             removeLinks.add(link);
@@ -507,7 +507,7 @@ public class LogicBlock extends Block{
                 for(int i = 0; i < links.size; i++){
                     LogicLink l = links.get(i);
 
-                    var cur = world.build(l.x, l.y);
+                    var cur = state.world.build(l.x, l.y);
 
                     boolean valid = validLink(cur);
                     Block lastBlock = (l.lastBuild == null ? null : l.lastBuild.block);
@@ -531,7 +531,7 @@ public class LogicBlock extends Block{
 
                             //remove redundant links
                             links.removeAll(o -> {
-                                boolean remove = world.build(o.x, o.y) == cur && o != l;
+                                boolean remove = state.world.build(o.x, o.y) == cur && o != l;
                                 if(remove) o.trySet(executor, null); //clear value when removing the link
                                 return remove;
                             });
@@ -581,7 +581,7 @@ public class LogicBlock extends Block{
             int index = 0;
             for(LogicLink link : links){
                 if(link.valid){
-                    Building build = world.build(link.x, link.y);
+                    Building build = state.world.build(link.x, link.y);
                     executor.links[index ++] = build;
                     if(build != null) executor.linkIds.add(build.id);
                 }
@@ -591,14 +591,14 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public boolean readable(LExecutor exec){
+        public boolean readable(LogicExecutor exec){
             return isValid() && (exec.privileged || (this.team == exec.team && !this.block.privileged));
         }
 
         @Override
-        public void read(LVar position, LVar output){
+        public void read(LogicVar position, LogicVar output){
             if(position.isobj && position.objval instanceof String varName){
-                LVar ret = executor.optionalVar(varName);
+                LogicVar ret = executor.optionalVar(varName);
                 if(ret == null){
                     output.setobj(optionalLink(varName));
                     return;
@@ -628,14 +628,14 @@ public class LogicBlock extends Block{
         }
 
         @Override
-        public boolean writable(LExecutor exec){
+        public boolean writable(LogicExecutor exec){
             return readable(exec);
         }
 
         @Override
-        public void write(LVar position, LVar value){
+        public void write(LogicVar position, LogicVar value){
             if(position.isobj && position.objval instanceof String varName){
-                LVar at = executor.optionalVar(varName);
+                LogicVar at = executor.optionalVar(varName);
                 if(at == null || at.constant) return;
                 at.set(value);
             }
@@ -666,7 +666,7 @@ public class LogicBlock extends Block{
             }
 
             for(LogicLink l : links){
-                Building build = world.build(l.x, l.y);
+                Building build = state.world.build(l.x, l.y);
                 if(validLink(build)){
                     Drawf.square(build.x, build.y, build.block.size * tilesize / 2f + 1f, Pal.place);
                 }
@@ -674,7 +674,7 @@ public class LogicBlock extends Block{
 
             //draw top text on separate layer
             for(LogicLink l : links){
-                Building build = world.build(l.x, l.y);
+                Building build = state.world.build(l.x, l.y);
                 if(validLink(build)){
                     build.block.drawPlaceText(l.name, build.tileX(), build.tileY(), true);
                 }
@@ -685,7 +685,7 @@ public class LogicBlock extends Block{
         public void drawSelect(){
             if(!accessible()) return;
 
-            Groups.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
+            state.entities.unit.each(u -> u.controller() instanceof LogicAI ai && ai.controller == this, unit -> {
                 Drawf.square(unit.x, unit.y, unit.hitSize, unit.rotation + 45);
             });
 
@@ -799,7 +799,7 @@ public class LogicBlock extends Block{
             }
 
             for(int i = 0; i < executor.vars.length; i++){
-                LVar v = executor.vars[i];
+                LogicVar v = executor.vars[i];
 
                 //null is the default variable value, so waste no time serializing that
                 if(v.isobj && v.objval == null) continue;
@@ -924,7 +924,7 @@ public class LogicBlock extends Block{
             loadBlock = () -> updateCode(code, false, asm -> {
                 //load up the variables that were stored
                 for(int i = 0; i < varcount; i++){
-                    LVar var = asm.getVar(names[i]);
+                    LogicVar var = asm.getVar(names[i]);
                     if(var != null && (!var.constant || var.name.equals("@unit"))){
                         var value = values[i];
                         if(value instanceof Boxed<?> boxed) value = boxed.unbox();

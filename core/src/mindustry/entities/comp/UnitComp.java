@@ -32,7 +32,7 @@ import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, LogicSenseable, LogicSettable{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
     static final float warpDst = 8f;
 
@@ -161,7 +161,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public boolean isPathImpassable(int tileX, int tileY){
-        return !type.flying && world.tiles.in(tileX, tileY) && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+        return !type.flying && state.world.in(tileX, tileY) && type.pathCost.getCost(team.id, state.pathfinder.get(tileX, tileY)) == -1;
     }
 
     /** @return approx. square size of the physical hitbox for physics */
@@ -230,12 +230,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(this.team == viewer || !state.rules.fog) return false;
 
         if(hitSize <= 16f){
-            return !fogControl.isVisible(viewer, x, y);
+            return !state.fog.isVisible(viewer, x, y);
         }else{
             //for large hitsizes, check around the unit instead
             float trns = hitSize / 2f;
             for(var p : Geometry.d8){
-                if(fogControl.isVisible(viewer, x + p.x * trns, y + p.y * trns)){
+                if(state.fog.isVisible(viewer, x + p.x * trns, y + p.y * trns)){
                     return false;
                 }
             }
@@ -261,7 +261,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case totalItems -> stack().amount;
             case itemCapacity -> type.itemCapacity;
@@ -311,7 +311,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
+    public Object senseObject(LogicProp sensor){
         return switch(sensor){
             case type -> type;
             case name -> controller instanceof Player p ? p.name : null;
@@ -349,7 +349,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public void setProp(LAccess prop, double value){
+    public void setProp(LogicProp prop, double value){
         switch(prop){
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
@@ -385,7 +385,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public void setProp(LAccess prop, Object value){
+    public void setProp(LogicProp prop, Object value){
         switch(prop){
             case team -> {
                 if(value instanceof Team t && !net.client()){
@@ -604,7 +604,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             team.data().updateCount(type, -1);
         }
 
-        Vars.unitPhysics.add(self());
+        Vars.state.unitPhysics.add(self());
 
     }
 
@@ -670,7 +670,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //update bounds
 
         if(type.bounded){
-            float bot = 0f, left = 0f, top = world.unitHeight(), right = world.unitWidth();
+            float bot = 0f, left = 0f, top = state.world.unitHeight, right = state.world.unitWidth;
 
             //TODO hidden map rules only apply to player teams? should they?
             if(state.rules.limitMapArea && !team.isAI()){
@@ -789,7 +789,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //apply knockback based on spawns
         if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal()) && hittable()){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
-            for(Tile spawn : spawner.getSpawns()){
+            for(Tile spawn : state.spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     velAddNet(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
                 }
@@ -927,7 +927,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         }
 
         if(!headless && type.createScorch){
-            Tile deathTile = world.tileWorld(x, y);
+            Tile deathTile = state.world.tileWorld(x, y);
             //decals don't render on liquids, so wreckage sinks instead of leaving a mark on top
             boolean sinks = deathTile != null && !deathTile.floor().hasSurface();
             Color sinkColor = sinks ? deathTile.floor().mapColor : null;

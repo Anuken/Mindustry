@@ -101,7 +101,7 @@ public class UnitAssembler extends PayloadBlock{
         //overlapping construction areas not allowed unless it s being replaced; grow by a tiny amount so edges can't overlap either.
         Rect rect = getRect(Tmp.r1, tile.worldx() + offset, tile.worldy() + offset, rotation).grow(0.1f);
         return
-            !indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b != tile.build && b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
+            !state.indexer.getFlagged(team, BlockFlag.unitAssembler).contains(b -> b != tile.build && b.block instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect)) &&
             !team.data().getBuildings(ConstructBlock.get(size)).contains(b -> b != tile.build && ((ConstructBuild)b).current instanceof UnitAssembler assembler && assembler.getRect(Tmp.r2, b.x, b.y, b.rotation).overlaps(rect));
     }
 
@@ -433,7 +433,7 @@ public class UnitAssembler extends PayloadBlock{
             if(!readUnits.isEmpty()){
                 units.clear();
                 readUnits.each(i -> {
-                    var unit = Groups.unit.getByID(i);
+                    var unit = state.entities.unit.getByID(i);
                     if(unit != null){
                         units.add(unit);
                     }
@@ -453,7 +453,7 @@ public class UnitAssembler extends PayloadBlock{
             //read newly synced drones on client end
             if(units.size < dronesCreated && whenSyncedUnits.size > 0){
                 whenSyncedUnits.each(id -> {
-                    var unit = Groups.unit.getByID(id);
+                    var unit = state.entities.unit.getByID(id);
                     if(unit != null){
                         units.addUnique(unit);
                     }
@@ -678,7 +678,7 @@ public class UnitAssembler extends PayloadBlock{
         public boolean checkSolid(Vec2 v, boolean same){
             var output = unit();
             float hsize = output.hitSize * 1.4f;
-            return ((!output.flying && collisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid)) ||
+            return ((!output.flying && EntityCollisions.overlapsTile(Tmp.r1.setCentered(v.x, v.y, output.hitSize), EntityCollisions::solid)) ||
                 Units.anyEntities(v.x - hsize/2f, v.y - hsize/2f, hsize, hsize, u -> (!same || u.type != output) && !u.spawnedByCore &&
                     ((u.type.allowLegStep && output.allowLegStep) || (output.flying && u.isFlying()) || (!output.flying && u.isGrounded()))));
         }
@@ -704,8 +704,8 @@ public class UnitAssembler extends PayloadBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress;
             return super.sense(sensor);
         }
 

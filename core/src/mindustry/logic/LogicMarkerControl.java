@@ -1,0 +1,38 @@
+package mindustry.logic;
+
+public enum LogicMarkerControl{
+    remove,
+    world("truefalse"),
+    minimap("truefalse"),
+    light("truefalse"),
+    autoscale("truefalse"),
+    pos("x", "y"),
+    endPos("x", "y"),
+    drawLayer("layer"),
+    color("color"),
+    radius("radius"),
+    stroke("stroke"),
+    outline("outline"),
+    rotation("rotation"),
+    shape("sides", "fill", "outline"),
+    arc("start", "end"),
+    flushText("fetch"),
+    fontSize("size"),
+    textHeight("height"),
+    textAlign("align"),
+    lineAlign("align"),
+    labelFlags("background", "outline"),
+    texture("printFlush", "name"),
+    textureSize("width", "height"),
+    posi("index", "x", "y"),
+    uvi("index", "x", "y"),
+    colori("index", "color");
+
+    public final String[] params;
+
+    public static final LogicMarkerControl[] all = values();
+
+    LogicMarkerControl(String... params){
+        this.params = params;
+    }
+}

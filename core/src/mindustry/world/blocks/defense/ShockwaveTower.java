@@ -21,8 +21,6 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class ShockwaveTower extends Block{
-    public int timerCheck = timers ++;
-
     public float range = 170f;
     public float reload = 45f;
     /** Base damage dealt to bullets. */
@@ -103,6 +101,7 @@ public class ShockwaveTower extends Block{
         public float reloadCounter = Mathf.random(reload);
         public float damageSum = 0f, heat = 0f, setReload = reload;
         public boolean wasReady, isQuickFire;
+        public float checkTimer;
         public Seq<Bullet> bullets = new Seq<>();
         public Seq<Unit> units = new Seq<>();
 
@@ -113,7 +112,7 @@ public class ShockwaveTower extends Block{
                 boolean fire = reloadCounter >= setReload;
 
                 //wasReady is used to immediately force a scan once when the tower is ready
-                if((wasReady || timer(timerCheck, checkInterval)) && (fire || (!isQuickFire && reloadCounter >= setReload * quickFirePercentage))){
+                if((wasReady || (checkTimer += Time.delta) >= checkInterval) && (fire || (!isQuickFire && reloadCounter >= setReload * quickFirePercentage))){
                     findTargets();
 
                     isQuickFire = !fire && damageSum >= bulletDamage * quickFireThreshold;
@@ -133,12 +132,20 @@ public class ShockwaveTower extends Block{
             units.clear();
             damageSum = 0f;
 
-            Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
+            state.entities.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
                 if(b.team != team && b.type.hittable && b.within(x, y, range + 1f)){
                     bullets.add(b);
                     damageSum += b.damage;
                 }
             });
+            if(potentialEfficiency > 0 && (reloadCounter += edelta()) >= reload && (checkTimer += Time.delta) >= checkInterval){
+                checkTimer %= checkInterval;
+                targets.clear();
+                state.entities.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
+                    if(b.team != team && b.type.hittable && b.within(x, y, range + 1f)){
+                        targets.add(b);
+                    }
+                });
 
             if(status != StatusEffects.none){
                 Units.nearby(x - range, y - range, range * 2, range * 2, u -> {
@@ -185,7 +192,7 @@ public class ShockwaveTower extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case progress -> Mathf.clamp(reloadCounter / reload);
                 case heat -> heat;

@@ -3,6 +3,7 @@ package mindustry.entities.comp;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.async.*;
@@ -122,7 +123,7 @@ abstract class SegmentComp implements Posc, Rotc, Hitboxc, Unitc, Segmentc{
 
     public void checkParent(){
         if(parentId != -1){
-            var parent = Groups.unit.getByID(parentId);
+            var parent = Vars.state.entities.unit.getByID(parentId);
             if(parent instanceof Segmentc seg){
                 parentSegment = seg;
                 seg.childSegment(this);

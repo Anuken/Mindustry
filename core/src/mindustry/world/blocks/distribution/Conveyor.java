@@ -159,7 +159,7 @@ public class Conveyor extends Block implements Autotiler{
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
             Draw.z(Layer.block - 0.1f);
-            float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
+            float layer = Layer.block - 0.1f, wwidth = state.world.unitWidth, wheight = state.world.unitHeight, scaling = 0.01f;
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
@@ -432,8 +432,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress){
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress){
                 if(len == 0) return 0;
                 return ys[len - 1];
             }
@@ -441,8 +441,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem && len > 0) return ids[len - 1];
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.firstItem && len > 0) return ids[len - 1];
             return super.senseObject(sensor);
         }
 

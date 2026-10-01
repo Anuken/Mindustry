@@ -61,7 +61,7 @@ public class Radar extends Block{
             smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency, 0.05f);
 
             if(Math.abs(fogRadius() - lastRadius) >= 0.5f){
-                Vars.fogControl.forceUpdate(team, this);
+                Vars.state.fog.forceUpdate(team, this);
                 lastRadius = fogRadius();
             }
 

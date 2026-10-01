@@ -103,13 +103,13 @@ public class SectorInfo{
 
     /** Handles core item changes. */
     public void handleCoreItem(Item item, int amount){
-        if(coreDeltas == null) coreDeltas = new int[content.items().size];
+        if(coreDeltas == null || coreDeltas.length != content.items().size) coreDeltas = new int[content.items().size];
         coreDeltas[item.id] += amount;
     }
 
     /** Handles raw production stats. */
     public void handleProduction(Item item, int amount){
-        if(productionDeltas == null) productionDeltas = new int[content.items().size];
+        if(productionDeltas == null || productionDeltas.length != content.items().size) productionDeltas = new int[content.items().size];
         productionDeltas[item.id] += amount;
     }
 
@@ -221,10 +221,10 @@ public class SectorInfo{
         hasCore = entity != null;
         bestCoreType = !hasCore ? Blocks.air : state.rules.defaultTeam.cores().max(e -> e.block.size).block;
         storageCapacity = entity != null ? entity.storageCapacity : 0;
-        hasSpawns = spawner.countSpawns() > 0;
+        hasSpawns = state.spawner.countSpawns() > 0;
         lastPresetName = sector.preset == null ? null : sector.preset.name;
-        lastWidth = world.width();
-        lastHeight = world.height();
+        lastWidth = state.world.width;
+        lastHeight = state.world.height;
 
         lightCoverage = 0f;
         for(var build : state.rules.defaultTeam.data().buildings){
@@ -240,7 +240,7 @@ public class SectorInfo{
             stat.mean = Math.min(stat.mean, rawProduction.get(item, ExportStat::new).mean);
         });
 
-        var pads = indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
+        var pads = state.indexer.getFlagged(state.rules.defaultTeam, BlockFlag.launchPad);
 
         //disable export when launch pads are disabled, or there aren't any active ones
         if(pads.size == 0 || !pads.contains(t -> t.efficiency > 0)){
@@ -266,8 +266,9 @@ public class SectorInfo{
             updateStats(export);
             updateStats(imports);
 
-            if(coreDeltas == null) coreDeltas = new int[content.items().size];
-            if(productionDeltas == null) productionDeltas = new int[content.items().size];
+            int totalItems = content.items().size;
+            if(coreDeltas == null || coreDeltas.length != totalItems) coreDeltas = new int[totalItems];
+            if(productionDeltas == null || productionDeltas.length != totalItems) productionDeltas = new int[totalItems];
 
             //refresh core items
             for(Item item : content.items()){

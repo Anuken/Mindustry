@@ -1,6 +1,5 @@
 package mindustry.ai.types;
 
-import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.entities.*;
@@ -105,7 +104,7 @@ public class BuilderAI extends AIController{
 
             //clear break plan if another player is breaking something
             if(!req.breaking && timer.get(timerTarget2, 40f)){
-                for(Player player : Groups.player){
+                for(Player player : state.entities.player){
                     if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
                         unit.plans.removeFirst();
                         //remove from list of plans
@@ -155,7 +154,7 @@ public class BuilderAI extends AIController{
                     if(u.canBuild() && u != unit && u.activelyBuilding()){
                         BuildPlan plan = u.buildPlan();
 
-                        Building build = world.build(plan.x, plan.y);
+                        Building build = state.world.build(plan.x, plan.y);
                         if(build instanceof ConstructBuild cons){
                             float dist = Math.min(cons.dst(unit) - unit.type.buildRange, 0);
 
@@ -171,7 +170,7 @@ public class BuilderAI extends AIController{
                 if(onlyAssist){
                     float minDst = Float.MAX_VALUE;
                     Player closest = null;
-                    for(var player : Groups.player){
+                    for(var player : state.entities.player){
                         if(!player.dead() && player.isBuilder() && player.team() == unit.team){
                             float dst = player.dst2(unit);
                             if(dst < minDst){
@@ -210,7 +209,7 @@ public class BuilderAI extends AIController{
                     BlockPlan block = blocks.first();
 
                     //check if it's already been placed
-                    if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block() == block.block){
+                    if(state.world.tile(block.x, block.y) != null && state.world.tile(block.x, block.y).block() == block.block){
                         blocks.removeFirst();
                     }else if(Build.validPlace(block.block, unit.team(), block.x, block.y, block.rotation)
                     && (!alwaysFlee || !nearEnemy(block.x, block.y))){ //check if it's valid

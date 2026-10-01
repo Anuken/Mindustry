@@ -38,7 +38,7 @@ import mindustry.world.meta.*;
 import static arc.graphics.g2d.Draw.*;
 import static mindustry.Vars.*;
 
-public class UnitType extends UnlockableContent implements Senseable{
+public class UnitType extends UnlockableContent implements LogicSenseable{
     public static final float shadowTX = -12, shadowTY = -13;
     private static final Vec2 legOffset = new Vec2();
     private static final Seq<UnitStance> tmpStances = new Seq<>();
@@ -535,6 +535,29 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
+    public void removeContent(){
+        super.removeContent();
+
+        //otherwise, a unit re-created with the same name would inherit this constructor
+        if(EntityMapping.nameMap.get(name) == constructor){
+            EntityMapping.nameMap.remove(name);
+        }
+
+        //mod JSON can register units in vanilla factories and default waves
+        for(var block : Vars.content.blocks()){
+            if(block instanceof UnitFactory f){
+                f.plans.removeAll(p -> p.unit == this);
+            }else if(block instanceof Reconstructor r){
+                r.upgrades.removeAll(u -> u[0] == this || u[1] == this);
+            }
+        }
+
+        if(Vars.waves != null && Waves.defaults() != null){
+            Waves.defaults().removeAll(g -> g.type == this);
+        }
+    }
+
+    @Override
     public void postInit(){
         if(databaseTag == null || databaseTag.isEmpty()){
             if(flying){
@@ -655,8 +678,8 @@ public class UnitType extends UnlockableContent implements Senseable{
         //return mining stances based on present items
         if(current == UnitCommand.mineCommand){
             out.add(UnitStance.mineAuto);
-            for(Item item : indexer.getAllPresentOres()){
-                if(unit.canMine(item) && ((mineFloor && indexer.hasOre(item)) || (mineWalls && indexer.hasWallOre(item)))){
+            for(Item item : state.indexer.getAllPresentOres()){
+                if(unit.canMine(item) && ((mineFloor && state.indexer.hasOre(item)) || (mineWalls && state.indexer.hasWallOre(item)))){
                     var itemStance = ItemUnitStance.getByItem(item);
                     if(itemStance != null){
                         out.add(itemStance);
@@ -1485,7 +1508,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     @Override
     public void afterPatch(){
         super.afterPatch();
-        totalRequirements = cachedRequirements = firstRequirements = null;
+        clearRequirementsCache();
 
         //this will technically reset any assigned values, but in vanilla, they're not reassigned anyway
         flowfieldPathType = -1;
@@ -1493,6 +1516,11 @@ public class UnitType extends UnlockableContent implements Senseable{
         pathCostId = -1;
         initPathType();
         updateShieldBounds();
+    }
+
+    /** Clears requirements derived from unit factories and reconstructors. */
+    public void clearRequirementsCache(){
+        totalRequirements = cachedRequirements = firstRequirements = null;
     }
 
     public void updateShieldBounds(){
@@ -1625,7 +1653,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case health, maxHealth -> health;
             case armor -> armor;
@@ -1641,8 +1669,8 @@ public class UnitType extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
         return noSensed;
     }
 
@@ -1850,7 +1878,7 @@ public class UnitType extends UnlockableContent implements Senseable{
     public void drawShadow(Unit unit){
         float e = Mathf.clamp(unit.elevation, shadowElevation, 1f) * shadowElevationScl * (1f - unit.drownTime);
         float x = unit.x + shadowTX * e, y = unit.y + shadowTY * e;
-        Floor floor = world.floorWorld(x, y);
+        Floor floor = state.world.floorWorld(x, y);
 
         float dest = floor.canShadow ? 1f : 0f;
         //yes, this updates state in draw()... which isn't a problem, because I don't want it to be obvious anyway

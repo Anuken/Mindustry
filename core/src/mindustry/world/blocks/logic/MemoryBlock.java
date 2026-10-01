@@ -37,7 +37,7 @@ public class MemoryBlock extends Block{
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case memoryCapacity -> memoryCapacity;
             default -> super.sense(sensor);
@@ -49,7 +49,7 @@ public class MemoryBlock extends Block{
         return accessible();
     }
 
-    public class MemoryBuild extends Building implements LReadable, LWritable{
+    public class MemoryBuild extends Building implements LogicReadable, LogicWritable{
         /** Marks a memory slot as being stored in {@code numberMemory} (instead of {@code objectMemory}) */
         private static final Object sentinel = new Object();
 
@@ -81,12 +81,12 @@ public class MemoryBlock extends Block{
         }
 
         @Override
-        public boolean readable(LExecutor exec){
+        public boolean readable(LogicExecutor exec){
             return isValid() && (exec.privileged || (this.team == exec.team && !this.block.privileged));
         }
 
         @Override
-        public void read(LVar position, LVar output){
+        public void read(LogicVar position, LogicVar output){
             int address = position.numi();
             //Return null when out of bounds. (instead of 0)
             if(address < 0 || address >= objectMemory.length){
@@ -103,12 +103,12 @@ public class MemoryBlock extends Block{
         }
 
         @Override
-        public boolean writable(LExecutor exec){
+        public boolean writable(LogicExecutor exec){
             return readable(exec);
         }
 
         @Override
-        public void write(LVar position, LVar value){
+        public void write(LogicVar position, LogicVar value){
             int address = position.numi();
             if(address < 0 || address >= objectMemory.length) return;
 
@@ -121,7 +121,7 @@ public class MemoryBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case memoryCapacity -> memoryCapacity;
                 default -> super.sense(sensor);

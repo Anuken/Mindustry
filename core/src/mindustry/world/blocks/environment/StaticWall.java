@@ -1,6 +1,7 @@
 package mindustry.world.blocks.environment;
 
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -81,6 +82,34 @@ public class StaticWall extends Prop{
     }
 
     @Override
+    public void packSprites(PackContext packer){
+        if(autotile){
+            String sourceName = name + "-autotile";
+
+            if(packer.has(sourceName)){
+                var source = packer.get(sourceName);
+                try{
+                    if(TileBitmask.generate(packer, source, name) && !packer.has(name)){
+                        //one of the generated cells doubles as this wall's "main" sprite, used for icons/previews
+                        int cell = source.width / 4;
+                        Pixmap cropped = source.crop(cell, cell, cell, cell);
+                        packer.add(name, cropped, true);
+                        cropped.dispose();
+                    }
+                }catch(Throwable e){
+                    Log.err("Failed to autotile: " + name, e);
+                }finally{
+                    //the raw source is only useful for generation, and must not end up in the packed output
+                    packer.discard(sourceName);
+                    source.pixmap.dispose();
+                }
+            }
+        }
+
+        super.packSprites(packer);
+    }
+
+    @Override
     public void load(){
         super.load();
         int size = large.width / 2;
@@ -111,10 +140,10 @@ public class StaticWall extends Prop{
     }
 
     boolean eq(int rx, int ry){
-        return rx < world.width() - 1 && ry < world.height() - 1
-            && world.tile(rx + 1, ry).block() == this
-            && world.tile(rx, ry + 1).block() == this
-            && world.tile(rx, ry).block() == this
-            && world.tile(rx + 1, ry + 1).block() == this;
+        return rx < state.world.width - 1 && ry < state.world.height - 1
+        && state.world.tile(rx + 1, ry).block() == this
+        && state.world.tile(rx, ry + 1).block() == this
+        && state.world.tile(rx, ry).block() == this
+        && state.world.tile(rx + 1, ry + 1).block() == this;
     }
 }

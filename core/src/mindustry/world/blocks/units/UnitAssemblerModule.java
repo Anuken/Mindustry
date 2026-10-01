@@ -63,7 +63,7 @@ public class UnitAssemblerModule extends PayloadBlock{
     }
 
     public @Nullable UnitAssemblerBuild getLink(Team team, int x, int y, int rotation){
-        var results = Vars.indexer.getFlagged(team, BlockFlag.unitAssembler).<UnitAssemblerBuild>as();
+        var results = Vars.state.indexer.getFlagged(team, BlockFlag.unitAssembler).<UnitAssemblerBuild>as();
 
         return results.find(b -> b.moduleFits(this, x * tilesize + offset, y * tilesize + offset, rotation));
     }
@@ -130,8 +130,8 @@ public class UnitAssemblerModule extends PayloadBlock{
 
         @Override
         public void updateTile(){
-            if(lastChange != world.tileChanges){
-                lastChange = world.tileChanges;
+            if(lastChange != state.world.tileChanges){
+                lastChange = state.world.tileChanges;
                 findLink();
             }
 

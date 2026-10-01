@@ -53,6 +53,14 @@ public class UnitStance extends MappableContent{
         }
     }
 
+    @Override
+    public void removeContent(){
+        super.removeContent();
+        for(var stance : Vars.content.unitStances()){
+            stance.incompatibleStanceBits.clear(id);
+        }
+    }
+
     public boolean isCompatible(@Nullable UnitCommand other){
         return other == null || !incompatibleCommandBits.get(other.id);
     }

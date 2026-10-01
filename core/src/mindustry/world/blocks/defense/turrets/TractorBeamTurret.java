@@ -17,7 +17,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class TractorBeamTurret extends BaseTurret{
-    public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
     public float shootCone = 6f;
@@ -74,7 +73,7 @@ public class TractorBeamTurret extends BaseTurret{
 
     public class TractorBeamBuild extends BaseTurretBuild{
         public @Nullable Unit target;
-        public float lastX, lastY, strength;
+        public float lastX, lastY, strength, retargetTimer;
         public boolean any;
         public float coolantMultiplier = 1f;
 
@@ -88,7 +87,8 @@ public class TractorBeamTurret extends BaseTurret{
             float eff = efficiency * coolantMultiplier, edelta = eff * delta();
 
             //retarget
-            if(timer(timerTarget, retargetTime)){
+            if((retargetTimer += Time.delta) >= retargetTime){
+                retargetTimer %= retargetTime;
                 target = Units.closestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
             }
 

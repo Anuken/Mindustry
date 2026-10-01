@@ -18,8 +18,6 @@ import mindustry.io.*;
 import mindustry.io.SaveIO.*;
 import mindustry.ui.*;
 
-import java.io.*;
-
 import static mindustry.Vars.*;
 
 public class LoadDialog extends BaseDialog{
@@ -253,7 +251,7 @@ public class LoadDialog extends BaseDialog{
 
                         d.show();
                     }
-                }catch(SaveException e){
+                }catch(SaveLoadException e){
                     Log.err(e);
                     logic.reset();
                     ui.showErrorMessage("@save.corrupted");
