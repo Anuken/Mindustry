@@ -452,9 +452,9 @@ public class LogicCanvas extends Table{
 
                 //taken from foo's client (again)
                 t.button(Icon.paste, Styles.logici, () -> {
-                }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LExecutor.maxInstructions).get().tapped(() -> {
+                }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions).get().tapped(() -> {
                     try{
-                        this.paste(LAssembler.read(Core.app.getClipboardText().replace("\r\n", "\n"), privileged));
+                        this.paste(LogicAssembler.read(Core.app.getClipboardText().replace("\r\n", "\n"), privileged));
                     }catch(Throwable e){
                         ui.showException(e);
                     }
@@ -549,10 +549,10 @@ public class LogicCanvas extends Table{
             }
         }
 
-        public void paste(Seq<LStatement> states){
+        public void paste(Seq<LogicStatement> states){
             var idx = statements.getChildren().indexOf(this) + 1;
-            var maxAdd = LExecutor.maxInstructions - statements.getChildren().size;
-            Seq<LStatement> pasted = states.copy();
+            var maxAdd = LogicExecutor.maxInstructions - statements.getChildren().size;
+            Seq<LogicStatement> pasted = states.copy();
             if(pasted.size > maxAdd) ui.announce(Core.bundle.format("logic.pastelimit", maxAdd, pasted.size), 5);
             pasted.truncate(maxAdd);
             pasted.reverse();
