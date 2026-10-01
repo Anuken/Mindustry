@@ -214,7 +214,7 @@ public class Teams{
         }
 
         //TODO this is slow and dumb
-        for(Unit unit : Groups.unit){
+        for(Unit unit : state.entities.unit){
             if(unit.type == null) continue;
             TeamData data = unit.team.data();
             data.tree().insert(unit);
@@ -241,7 +241,7 @@ public class Teams{
             count(unit);
         }
 
-        for(var player : Groups.player){
+        for(var player : state.entities.player){
             player.team().data().players.add(player);
         }
 
@@ -392,13 +392,13 @@ public class Teams{
             if(sector != null){
                 boolean any = false;
                 for(var entry : sector.planet.sectorCaptureReplacements){
-                    if(indexer.isBlockPresent(entry.key)){
+                    if(state.indexer.isBlockPresent(entry.key)){
                         any = true;
                     }
                 }
                 if(any){
-                    Geometry.circle(World.toTile(x), World.toTile(y), world.width(), world.height(), Mathf.round(range / tilesize), (tx, ty) -> {
-                        Tile t = world.rawTile(tx, ty);
+                    Geometry.circle(World.toTile(x), World.toTile(y), state.world.width, state.world.height, Mathf.round(range / tilesize), (tx, ty) -> {
+                        Tile t = state.world.rawTile(tx, ty);
                         Block result = sector.planet.sectorCaptureReplacements.get(t.floor());
                         if(result != null && !cores.contains(c -> c.within(t, range))){
                             t.setFloor(result.asFloor());
@@ -450,12 +450,12 @@ public class Teams{
         }
 
         public QuadTree<Unit> tree(){
-            if(unitTree == null) unitTree = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
+            if(unitTree == null) unitTree = new QuadTree<>(Vars.state.world.getQuadBounds(new Rect()));
             return unitTree;
         }
 
         public QuadTree<Unit> unitShieldTree(){
-            if(unitShieldTree == null) unitShieldTree = new UnitShieldQuadtree(Vars.world.getQuadBounds(new Rect()));
+            if(unitShieldTree == null) unitShieldTree = new UnitShieldQuadtree(Vars.state.world.getQuadBounds(new Rect()));
             return unitShieldTree;
         }
 

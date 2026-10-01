@@ -12,6 +12,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -330,6 +331,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.sort(true);
 
+        if(ControlPathfinder.showDebug) state.controlPath.drawDebug();
         Events.fire(Trigger.draw);
         MapPreviewLoader.checkPreviews();
 
@@ -440,7 +442,7 @@ public class Renderer implements ApplicationListener{
         Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
 
-        Groups.draw.draw(Drawc::draw);
+        state.entities.draw.draw(Drawc::draw);
 
         if(settings.getBool("drawhitboxes")){
             DebugCollisionRenderer.draw();
@@ -597,7 +599,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
-        int w = world.width() * tilesize, h = world.height() * tilesize;
+        int w = state.world.width * tilesize, h = state.world.height * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
         if(Vars.checkScreenshotMemory && memory >= (mobile ? 65 : 120)){

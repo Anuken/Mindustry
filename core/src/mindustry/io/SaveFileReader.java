@@ -189,7 +189,7 @@ public abstract class SaveFileReader{
         return map;
     }
 
-    public abstract void read(DataInputStream stream, CounterInputStream counter, SaveReadState state) throws IOException;
+    public abstract void read(DataInputStream stream, CounterInputStream counter, SaveLoadContext state) throws IOException;
 
     public abstract void write(DataOutputStream stream, SaveOptions options) throws IOException;
 

@@ -16,7 +16,6 @@ import mindustry.*;
 import mindustry.core.Version;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
@@ -24,10 +23,10 @@ import mindustry.service.*;
 import mindustry.type.*;
 import mindustry.ui.FileChooser.*;
 import mindustry.ui.dialogs.*;
-import steamworks.*;
 import org.lwjgl.*;
 import org.lwjgl.sdl.*;
 import org.lwjgl.system.*;
+import steamworks.*;
 
 import java.io.*;
 
@@ -441,8 +440,8 @@ public class DesktopLauncher extends ClientLauncher{
                 gameMapWithWave += " | Wave " + state.wave;
             }
             gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : state.rules.infiniteResources ? "Sandbox" : "Survival";
-            if(net.active() && Groups.player.size() > 1){
-                gamePlayersSuffix = " | " + Groups.player.size() + " Players";
+            if(net.active() && Vars.state.entities.player.size() > 1){
+                gamePlayersSuffix = " | " + Vars.state.entities.player.size() + " Players";
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){

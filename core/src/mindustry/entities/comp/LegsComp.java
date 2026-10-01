@@ -165,7 +165,7 @@ abstract class LegsComp implements Posc, Rotc, Hitboxc, Unitc{
             l.moving = move;
             l.stage = moving ? stageF % 1f : Mathf.lerpDelta(l.stage, 0f, 0.1f);
 
-            Tile tile = Vars.world.tileWorld(l.base.x, l.base.y);
+            Tile tile = Vars.state.world.tileWorld(l.base.x, l.base.y);
             Color floorColor = tile == null ? Color.clear : tile.getFloorColor();
             Floor floor = tile == null ? Blocks.air.asFloor() : tile.floor();
 

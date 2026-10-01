@@ -8,6 +8,7 @@ import arc.util.*;
 import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.gen.*;
@@ -27,7 +28,7 @@ public class BaseGenerator{
     private static final int range = 180;
     private static boolean insanity = false;
 
-    private Tiles tiles;
+    private World world;
     private Seq<Tile> cores;
 
     public static Block getDifficultyWall(int size, float difficulty){
@@ -39,8 +40,8 @@ public class BaseGenerator{
         return wallsSmall.getFrac(difficulty * 0.91f);
     }
 
-    public void generate(Tiles tiles, Seq<Tile> cores, Tile spawn, Team team, Sector sector, float difficulty){
-        this.tiles = tiles;
+    public void generate(World world, Seq<Tile> cores, Tile spawn, Team team, Sector sector, float difficulty){
+        this.world = world;
         this.cores = cores;
 
         //don't generate bases when there are no loaded schematics
@@ -103,7 +104,7 @@ public class BaseGenerator{
                     boolean any = false;
 
                     for(Point2 p : Geometry.d4){
-                        Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
+                        Tile o = world.tile(tile.x + p.x, tile.y + p.y);
 
                         //do not block payloads
                         if(o != null && (o.block() instanceof PayloadConveyor || o.block() instanceof PayloadBlock)){
@@ -116,7 +117,7 @@ public class BaseGenerator{
                             continue;
                         }
 
-                        Tile o = tiles.get(tile.x + p.x, tile.y + p.y);
+                        Tile o = world.tile(tile.x + p.x, tile.y + p.y);
                         if(o != null && o.team() == team && !(o.block() instanceof Wall) && !(o.block() instanceof ShockMine)){
                             any = true;
                             break;
@@ -134,7 +135,7 @@ public class BaseGenerator{
                 int walls = 0;
                 for(int cx = 0; cx < 2; cx++){
                     for(int cy = 0; cy < 2; cy++){
-                        Tile tile = tiles.get(curr.x + cx, curr.y + cy);
+                        Tile tile = world.tile(curr.x + cx, curr.y + cy);
                         if(tile == null || tile.block().size != 1 || (tile.block() != wall && !tile.block().alwaysReplace)) return;
 
                         if(tile.block() == wall){
@@ -172,9 +173,9 @@ public class BaseGenerator{
     }
 
     public void postGenerate(){
-        if(tiles == null) return;
+        if(world == null) return;
 
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(tile.isCenter() && tile.team() == state.rules.waveTeam){
                 if(tile.block() instanceof PowerNode){
                     tile.build.configureAny(new Point2[0]);
@@ -188,7 +189,7 @@ public class BaseGenerator{
 
     void pass(Cons<Tile> cons){
         Tile core = cores.first();
-        core.circle(range, (x, y) -> cons.get(tiles.getn(x, y)));
+        core.circle(range, (x, y) -> cons.get(world.getn(x, y)));
     }
 
     /**
@@ -235,7 +236,7 @@ public class BaseGenerator{
                 if(tile.block instanceof Drill && (!insanity || !isTaken(tile.block, tile.x + cx, tile.y + cy))){
 
                     tile.block.iterateTaken(tile.x + cx, tile.y + cy, (ex, ey) -> {
-                        Tile placed = world.tiles.get(ex, ey);
+                        Tile placed = state.world.tile(ex, ey);
 
                         if(placed == null) return;
 
@@ -243,7 +244,7 @@ public class BaseGenerator{
                             set(placed, item);
                         }
 
-                        Tile rand = world.tiles.getc(ex + random.range(1), ey + random.range(1));
+                        Tile rand = state.world.getc(ex + random.range(1), ey + random.range(1));
                         if(rand.floor().hasSurface()){
                             //random ores nearby to make it look more natural
                             set(rand, item);
@@ -260,7 +261,7 @@ public class BaseGenerator{
             for(Stile tile : result.tiles){
                 if(tile.block instanceof Drill){
 
-                    var build = world.build(tile.x + cx, tile.y + cy);
+                    var build = state.world.build(tile.x + cx, tile.y + cy);
 
                     if(build != null && build.block == tile.block){
                         build.items.add(item, build.block.itemCapacity);
@@ -299,8 +300,8 @@ public class BaseGenerator{
     }
 
     static boolean overlaps(int x, int y){
-        Tile tile = world.tiles.get(x, y);
+        Tile tile = state.world.tile(x, y);
 
-        return tile == null || !tile.block().alwaysReplace || world.getDarkness(x, y) > 0;
+        return tile == null || !tile.block().alwaysReplace || state.world.getDarkness(x, y) > 0;
     }
 }

@@ -48,8 +48,6 @@ public class WallCrafter extends Block{
     public @Nullable Consume itemConsumer;
     public boolean hasLiquidBooster;
 
-    public final int timerUse = timers ++;
-
     public WallCrafter(String name){
         super(name);
 
@@ -168,7 +166,7 @@ public class WallCrafter extends Block{
                 cpos.get(rx, ry);
             }
 
-            Tile other = world.tile(rx, ry);
+            Tile other = state.world.tile(rx, ry);
             if(other != null && other.solid()){
                 float at = other.block().attributes.get(attribute);
                 eff += at;
@@ -182,6 +180,8 @@ public class WallCrafter extends Block{
 
     public class WallCrafterBuild extends Building{
         public float time, warmup, totalTime, lastEfficiency;
+        public float useTime;
+        public float dumpTimer;
 
         @Override
         public void updateTile(){
@@ -204,8 +204,9 @@ public class WallCrafter extends Block{
                 }
             }, null) * Mathf.lerp(1f, liquidBoostIntensity, hasLiquidBooster ? optionalEfficiency : 0f) * (itemValid ? itemBoostIntensity : 1f);
 
-            if(itemValid && eff * efficiency > 0 && timer(timerUse, boostItemUseTime / timeScale)){
+            if(itemValid && eff * efficiency > 0 && ((useTime += timeScale * Time.delta) >= boostItemUseTime)){
                 consume();
+                useTime %= boostItemUseTime;
             }
 
             lastEfficiency = eff * timeScale * efficiency;
@@ -217,8 +218,9 @@ public class WallCrafter extends Block{
 
             totalTime += edelta() * warmup * (eff <= 0f ? 0f : 1f);
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump(output);
+                dumpTimer %= dumpTime;
             }
         }
 

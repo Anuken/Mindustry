@@ -141,8 +141,8 @@ public class SolidPump extends Pump{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.efficiency) return (validTiles + boost) * efficiency;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.efficiency) return (validTiles + boost) * efficiency;
             return super.sense(sensor);
         }
 

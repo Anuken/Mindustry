@@ -1,6 +1,7 @@
 package mindustry.io.versions;
 
 import arc.func.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -18,7 +19,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
     }
 
     @Override
-    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveReadState state) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveLoadContext state) throws IOException{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
@@ -32,21 +33,20 @@ public class ShortChunkSaveVersion extends SaveVersion{
                 int id = in.i();
 
                 Entityc entity = (Entityc)mapping[typeid].get();
-                EntityGroup.checkNextId(id);
+                Vars.state.checkNextEntityId(id);
                 entity.id(id);
                 entity.read(in);
                 entity.add();
             });
         }
 
-        Groups.all.each(Entityc::afterReadAll);
-        Groups.unit.each(Entityc::afterReadAll);
-        Groups.build.each(Entityc::afterReadAll);
+        Vars.state.entities.all.each(Entityc::afterReadAll);
+        Vars.state.entities.unit.each(Entityc::afterReadAll);
+        Vars.state.entities.build.each(Entityc::afterReadAll);
     }
 
     @Override
-    public void readMap(DataInput stream, SaveReadState state) throws IOException{
-        var context = state.context;
+    public void readMap(DataInput stream, SaveLoadContext context) throws IOException{
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
@@ -105,7 +105,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
                 if(isCenter){
                     tile.setBlock(block);
                     if(tile.build != null){
-                        if(!state.preview) state.allBuildings.add(tile.build);
+                        if(!context.preview) context.allBuildings.add(tile.build);
                         tile.build.enabled = true;
                     }
                 }

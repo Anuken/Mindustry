@@ -235,7 +235,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        inverseFloodFill(tiles.getn(spawnX, spawnY));
+        inverseFloodFill(world.getn(spawnX, spawnY));
 
         //TODO veins, blend after inverse flood fill?
         blend(Blocks.redStoneWall, Blocks.denseRedStone, 4);
@@ -245,7 +245,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         //TODO enemies get stuck on 1x1 passages.
 
-        tiles.getn(endX, endY).setOverlay(Blocks.spawn);
+        world.getn(endX, endY).setOverlay(Blocks.spawn);
 
         //ores
         pass((x, y) -> {
@@ -309,13 +309,13 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
         //vents
         outer:
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             var floor = tile.floor();
             if((floor == Blocks.rhyolite || floor == Blocks.roughRhyolite) && rand.chance(0.002)){
                 int radius = 2;
                 for(int x = -radius; x <= radius; x++){
                     for(int y = -radius; y <= radius; y++){
-                        Tile other = tiles.get(x + tile.x, y + tile.y);
+                        Tile other = world.tile(x + tile.x, y + tile.y);
                         if(other == null || (other.floor() != Blocks.rhyolite && other.floor() != Blocks.roughRhyolite) || other.block().solid){
                             continue outer;
                         }
@@ -324,7 +324,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
                 ventCount ++;
                 for(var pos : SteamVent.offsets){
-                    Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
+                    Tile other = world.tile(pos.x + tile.x + 1, pos.y + tile.y + 1);
                     other.setFloor(Blocks.rhyoliteVent.asFloor());
                 }
             }
@@ -336,7 +336,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
         //try to add additional vents, but only several times to prevent infinite loops in bad maps
         while(ventCount < minVents && iterations++ < maxIterations){
             outer:
-            for(Tile tile : tiles){
+            for(Tile tile : world){
                 if(rand.chance(0.00018 * (1 + iterations)) && !Mathf.within(tile.x, tile.y, spawnX, spawnY, 5f)){
                     //skip crystals, but only when directly on them
                     if(tile.floor() == Blocks.crystallineStone || tile.floor() == Blocks.crystalFloor){
@@ -346,7 +346,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                     int radius = 1;
                     for(int x = -radius; x <= radius; x++){
                         for(int y = -radius; y <= radius; y++){
-                            Tile other = tiles.get(x + tile.x, y + tile.y);
+                            Tile other = world.tile(x + tile.x, y + tile.y);
                             //skip solids / other vents / arkycite / slag
                             if(other == null || other.block().solid || other.floor().attributes.get(Attribute.steam) != 0 || other.floor() == Blocks.slag || other.floor() == Blocks.arkyciteFloor){
                                 continue outer;
@@ -381,7 +381,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
 
                     ventCount ++;
                     for(var pos : SteamVent.offsets){
-                        Tile other = tiles.get(pos.x + tile.x + 1, pos.y + tile.y + 1);
+                        Tile other = world.tile(pos.x + tile.x + 1, pos.y + tile.y + 1);
                         other.setFloor(vent.asFloor());
                     }
 
@@ -394,7 +394,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
                             //skew circle Y
                             float rcy = cy + cx*0.9f;
                             if(cx*cx + rcy*rcy <= crad2 - noise(rx, ry + rx * 2f * xDir, 2, 0.7f, 8f, crad2 * 1.1f)){
-                                Tile dest = tiles.get(rx, ry);
+                                Tile dest = world.tile(rx, ry);
                                 if(dest != null && dest.floor().attributes.get(Attribute.steam) == 0 && dest.floor() != Blocks.roughRhyolite && dest.floor() != Blocks.arkyciteFloor && dest.floor() != Blocks.slag){
 
                                     dest.setFloor(rand.chance(0.08) ? secondFloor.asFloor() : floor.asFloor());
@@ -411,7 +411,7 @@ public class ErekirPlanetGenerator extends PlanetGenerator{
             }
         }
 
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(tile.overlay().needsSurface && !tile.floor().hasSurface()){
                 tile.setOverlay(Blocks.air);
             }

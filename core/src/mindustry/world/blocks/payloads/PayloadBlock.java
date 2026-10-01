@@ -77,7 +77,7 @@ public class PayloadBlock extends Block{
             boolean legStep = payload instanceof UnitPayload u && u.unit.type.allowLegStep;
             float size = payload.size(), radius = size/2f, x = payload.x(), y = payload.y(), scl = Mathf.clamp(((progress - thresh) / (1f - thresh)) * 1.1f);
 
-            Groups.unit.intersect(x - size/2f, y - size/2f, size, size, u -> {
+            state.entities.unit.intersect(x - size/2f, y - size/2f, size, size, u -> {
                 float dst = u.dst(payload);
                 float rs = radius + u.hitSize/2f;
                 if(u.isGrounded() && u.type.allowLegStep == legStep && dst < rs){

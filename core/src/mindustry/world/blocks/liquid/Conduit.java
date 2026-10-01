@@ -27,8 +27,6 @@ public class Conduit extends LiquidBlock implements Autotiler{
     static final float rotatePad = 6, hpad = rotatePad / 2f / 4f;
     static final float[][] rotateOffsets = {{hpad, hpad}, {-hpad, hpad}, {-hpad, -hpad}, {hpad, -hpad}};
 
-    public final int timerFlow = timers++;
-
     public Color botColor = Color.valueOf("565656");
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
@@ -153,7 +151,7 @@ public class Conduit extends LiquidBlock implements Autotiler{
     }
 
     public class ConduitBuild extends LiquidBuild implements ChainedBuilding{
-        public float smoothLiquid;
+        public float smoothLiquid, flowTimer;
         public int blendbits, xscl = 1, yscl = 1, blending;
         public boolean capped, backCapped = false;
 
@@ -248,7 +246,8 @@ public class Conduit extends LiquidBlock implements Autotiler{
         public void updateTile(){
             smoothLiquid = Mathf.lerpDelta(smoothLiquid, liquids.currentAmount() / liquidCapacity, 0.05f);
 
-            if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
+            if(liquids.currentAmount() > 0.0001f && (flowTimer += Time.delta) >= 1f){
+                flowTimer %= 1f;
                 moveLiquidForward(leaks, liquids.current());
                 noSleep();
             }else{

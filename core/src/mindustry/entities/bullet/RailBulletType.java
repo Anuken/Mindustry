@@ -25,7 +25,7 @@ public class RailBulletType extends BulletType{
         keepVelocity = false;
         lifetime = 1f;
         delayFrags = true;
-        shieldAbsorb = true;
+        absorbable = true;
     }
 
     @Override

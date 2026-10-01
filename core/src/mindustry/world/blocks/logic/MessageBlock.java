@@ -70,7 +70,7 @@ public class MessageBlock extends Block{
         return accessible();
     }
 
-    public class MessageBuild extends Building implements LReadable, LPrintable{
+    public class MessageBuild extends Building implements LogicReadable, LogicPrintable{
         public StringBuilder message = new StringBuilder();
 
         @Override
@@ -169,18 +169,18 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public boolean readable(LExecutor exec){
+        public boolean readable(LogicExecutor exec){
             return isValid();
         }
 
         @Override
-        public void read(LVar position, LVar output){
+        public void read(LogicVar position, LogicVar output){
             int address = position.numi();
             output.setnum(address < 0 || address >= message.length() ? Double.NaN : message.charAt(address));
         }
 
         @Override
-        public boolean printable(LExecutor exec) {
+        public boolean printable(LogicExecutor exec) {
             return isValid() && (exec.privileged || (team == exec.team && !privileged));
         }
 
@@ -191,7 +191,7 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case bufferSize -> message.length();
                 default -> super.sense(sensor);

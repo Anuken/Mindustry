@@ -32,7 +32,7 @@ public abstract class ObjectiveMarker implements JsonSerializable{
     }
 
     /** Control marker with world processor code. Ignores NaN (null) values. */
-    public void control(LMarkerControl type, double p1, double p2, double p3){
+    public void control(LogicMarkerControl type, double p1, double p2, double p3){
         if(Double.isNaN(p1)) return;
 
         switch(type){

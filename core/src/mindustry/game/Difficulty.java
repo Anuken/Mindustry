@@ -17,11 +17,15 @@ public class Difficulty{
     public final String name;
     public float enemyHealthMultiplier, enemySpawnMultiplier, waveTimeMultiplier;
 
-    Difficulty(String name, float enemyHealthMultiplier, float enemySpawnMultiplier, float waveTimeMultiplier){
+    public Difficulty(String name, float enemyHealthMultiplier, float enemySpawnMultiplier, float waveTimeMultiplier){
         this.name = name;
         this.enemySpawnMultiplier = enemySpawnMultiplier;
         this.waveTimeMultiplier = waveTimeMultiplier;
         this.enemyHealthMultiplier = enemyHealthMultiplier;
+    }
+
+    public Difficulty(String name){
+        this.name = name;
     }
 
     public String info(){

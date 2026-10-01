@@ -231,11 +231,11 @@ public class BlockRenderer{
     }
 
     public void reload(){
-        blockTree = new BlockQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
-        blockCachedTree = new BlockQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
-        blockLightTree = new BlockLightQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
-        overlayTree = new OverlayQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
-        floorTree = new FloorQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+        blockTree = new BlockQuadtree(new Rect(0, 0, state.world.unitWidth, state.world.unitHeight));
+        blockCachedTree = new BlockQuadtree(new Rect(0, 0, state.world.unitWidth, state.world.unitHeight));
+        blockLightTree = new BlockLightQuadtree(new Rect(0, 0, state.world.unitWidth, state.world.unitHeight));
+        overlayTree = new OverlayQuadtree(new Rect(0, 0, state.world.unitWidth, state.world.unitHeight));
+        floorTree = new FloorQuadtree(new Rect(0, 0, state.world.unitWidth, state.world.unitHeight));
 
         for(var arr : caches){
             for(SpriteCache cache : arr){
@@ -243,7 +243,7 @@ public class BlockRenderer{
             }
             arr.clear();
         }
-        int chunksx = Mathf.ceil((float)(world.width()) / chunkSize), chunksy = Mathf.ceil((float)(world.height()) / chunkSize);
+        int chunksx = Mathf.ceil((float)(state.world.width) / chunkSize), chunksy = Mathf.ceil((float)(state.world.height) / chunkSize);
         cacheChunks = new CacheChunk[chunksx][chunksy];
 
         shadowEvents.clear();
@@ -252,13 +252,13 @@ public class BlockRenderer{
         hadMapLimit = state.rules.limitMapArea;
 
         shadows.texture.setFilter(TextureFilter.linear, TextureFilter.linear);
-        shadows.resize(world.width(), world.height());
+        shadows.resize(state.world.width, state.world.height);
         shadows.begin(Color.white);
         Draw.proj().setOrtho(0, 0, shadows.width, shadows.height);
 
         Draw.color(blendShadowColor);
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             recordIndex(tile);
 
             if(tile.floor().updateRender(tile)){
@@ -287,13 +287,13 @@ public class BlockRenderer{
 
     public void updateShadows(boolean ignoreBuildings, boolean ignoreTerrain){
         shadows.texture.setFilter(TextureFilter.linear, TextureFilter.linear);
-        shadows.resize(world.width(), world.height());
+        shadows.resize(state.world.width, state.world.height);
         shadows.begin(Color.white);
         Draw.proj().setOrtho(0, 0, shadows.width, shadows.height);
 
         Draw.color(blendShadowColor);
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(tile.block().displayShadow(tile) && (tile.build == null || tile.build.wasVisible) && !(ignoreBuildings && !tile.block().isStatic()) && !(ignoreTerrain && tile.block().isStatic())){
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
@@ -307,7 +307,7 @@ public class BlockRenderer{
     public void updateDarkness(){
         darkEvents.clear();
         dark.texture.setFilter(TextureFilter.linear);
-        dark.resize(world.width(), world.height());
+        dark.resize(state.world.width, state.world.height);
         //fill darkness with black when map area is limited
         dark.begin(state.rules.limitMapArea ? Color.black : Color.white);
 
@@ -319,13 +319,13 @@ public class BlockRenderer{
             Fill.crect(state.rules.limitX, state.rules.limitY, state.rules.limitWidth, state.rules.limitHeight);
         }
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             //skip lighting outside rect
             if(state.rules.limitMapArea && !Rect.contains(state.rules.limitX, state.rules.limitY, state.rules.limitWidth - 1, state.rules.limitHeight - 1, tile.x, tile.y)){
                 continue;
             }
 
-            float darkness = world.getDarkness(tile.x, tile.y);
+            float darkness = state.world.getDarkness(tile.x, tile.y);
 
             if(darkness > 0){
                 float dark = 1f - Math.min((darkness + 0.5f) / 4f, 1f);
@@ -380,11 +380,11 @@ public class BlockRenderer{
     }
 
     boolean indexOverlay(Tile tile){
-        return !tile.block().obstructsLight && tile.overlay().emitLight && world.getDarkness(tile.x, tile.y) < 3;
+        return !tile.block().obstructsLight && tile.overlay().emitLight && state.world.getDarkness(tile.x, tile.y) < 3;
     }
 
     boolean indexFloor(Tile tile){
-        return !tile.block().obstructsLight && tile.floor().emitLight && world.getDarkness(tile.x, tile.y) < 3;
+        return !tile.block().obstructsLight && tile.floor().emitLight && state.world.getDarkness(tile.x, tile.y) < 3;
     }
 
     void recordIndex(Tile tile){
@@ -401,7 +401,7 @@ public class BlockRenderer{
     public void recacheWall(Tile tile){
         for(int cx = tile.x - darkRadius; cx <= tile.x + darkRadius; cx++){
             for(int cy = tile.y - darkRadius; cy <= tile.y + darkRadius; cy++){
-                Tile other = world.tile(cx, cy);
+                Tile other = state.world.tile(cx, cy);
                 if(other != null){
                     darkEvents.add(other.pos());
                     floor.recacheTile(other);
@@ -413,9 +413,9 @@ public class BlockRenderer{
 
     public void checkChanges(){
         darkEvents.each(pos -> {
-            var tile = world.tile(pos);
+            var tile = state.world.tile(pos);
             if(tile != null && tile.block().fillsTile){
-                tile.data = world.getWallDarkness(tile);
+                tile.data = state.world.getWallDarkness(tile);
             }
         });
     }
@@ -428,9 +428,9 @@ public class BlockRenderer{
             Draw.proj().setOrtho(0, 0, dark.width, dark.height);
 
             darkEvents.each(pos -> {
-                var tile = world.tile(pos);
+                var tile = state.world.tile(pos);
                 if(tile == null) return;
-                float darkness = world.getDarkness(tile.x, tile.y);
+                float darkness = state.world.getDarkness(tile.x, tile.y);
                 //then draw the shadow
                 Draw.colorl(darkness <= 0f ? 1f : 1f - Math.min((darkness + 0.5f) / 4f, 1f));
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
@@ -445,7 +445,7 @@ public class BlockRenderer{
         }
 
         Draw.shader(Shaders.darkness);
-        Draw.fbo(dark.texture, world.width(), world.height(), tilesize, tilesize/2f);
+        Draw.fbo(dark.texture, state.world.width, state.world.height, tilesize, tilesize/2f);
         Draw.shader();
     }
 
@@ -501,7 +501,7 @@ public class BlockRenderer{
     public void drawShadows(){
         processShadows();
 
-        float ww = world.width() * tilesize, wh = world.height() * tilesize;
+        float ww = state.world.width * tilesize, wh = state.world.height * tilesize;
         float x = camera.position.x + tilesize / 2f, y = camera.position.y + tilesize / 2f;
         float u = (x - camera.width / 2f) / ww,
         v = (y - camera.height / 2f) / wh,
@@ -874,7 +874,7 @@ public class BlockRenderer{
 
         for(int x = 0; x < size; x++){
             for(int y = 0; y < size; y++){
-                shadowEvents.add(world.tile(x + tx + of, y + ty + of));
+                shadowEvents.add(state.world.tile(x + tx + of, y + ty + of));
             }
         }
     }

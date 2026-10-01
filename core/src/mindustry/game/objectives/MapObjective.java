@@ -45,7 +45,7 @@ public abstract class MapObjective implements AllowSerialization{
         state.rules.objectiveFlags.addAll(flagsAdded);
         completed = true;
 
-        LExecutor.runLogicScript(completionLogicCode);
+        LogicExecutor.runLogicScript(completionLogicCode);
     }
 
     /** @return true if all {@link #parents} are completed, rendering this objective able to execute. */

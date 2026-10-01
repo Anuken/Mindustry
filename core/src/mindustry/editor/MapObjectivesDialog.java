@@ -292,8 +292,8 @@ public class MapObjectivesDialog extends BaseDialog{
             Alignment align = field.getAnnotation(Alignment.class);
             name(cont, name, remover, indexer);
             cont.button(b -> {
-                b.label(() -> LStatement.alignToName.get(get.get(), "center"));
-                b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
+                b.label(() -> LogicStatement.alignToName.get(get.get(), "center"));
+                b.clicked(() -> LogicStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
             }, () -> {});
         });
 

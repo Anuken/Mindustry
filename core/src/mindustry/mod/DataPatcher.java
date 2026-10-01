@@ -38,7 +38,7 @@ public class DataPatcher{
     private Seq<Content> addedContent = new Seq<>();
     private @Nullable PatchAsset currentlyApplyingPatch;
     private @Nullable ContentAsset currentlyApplyingContent;
-    private Seq<LVar> addedVars = new Seq<>();
+    private Seq<LogicVar> addedVars = new Seq<>();
 
     static ContentParser createParser(){
         ContentParser cont = new ContentParser(){
@@ -302,9 +302,9 @@ public class DataPatcher{
 
         //resize capacities in the world (editor). this SHOULD be the only time when fixing arrays is necessary
         if(!Vars.headless && Vars.ui != null && Vars.ui.editor != null && Vars.ui.editor.isShown()){
-            int wh = Vars.world.width() * Vars.world.height();
+            int wh = Vars.state.world.width * Vars.state.world.height;
             for(int i = 0; i < wh; i++){
-                Tile tile = Vars.world.tiles.geti(i);
+                Tile tile = Vars.state.world.geti(i);
 
                 //stale checks for floor/overlay
                 if(tile.floor().removed) tile.setFloor(getReplacementBlock(tile.floor()).asFloor());

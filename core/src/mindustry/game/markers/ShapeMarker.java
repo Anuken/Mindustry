@@ -51,7 +51,7 @@ public class ShapeMarker extends PosMarker{
     }
 
     @Override
-    public void control(LMarkerControl type, double p1, double p2, double p3){
+    public void control(LogicMarkerControl type, double p1, double p2, double p3){
         super.control(type, p1, p2, p3);
 
         if(!Double.isNaN(p1)){
@@ -74,7 +74,7 @@ public class ShapeMarker extends PosMarker{
         }
 
         if(!Double.isNaN(p3)){
-            if(type == LMarkerControl.shape){
+            if(type == LogicMarkerControl.shape){
                 outline = !Mathf.equal((float)p3, 0f);
             }
         }

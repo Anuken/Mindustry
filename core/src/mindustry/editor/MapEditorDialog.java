@@ -127,7 +127,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 (Runnable)() -> FileChooser.export(editor.tags.get("name", "unknown"), mapExtension, file -> MapIO.writeMap(file, editor.createMap(file))),
             "@editor.exportimage", "@editor.exportimage.description", Icon.fileImage,
                 (Runnable)() -> FileChooser.export(editor.tags.get("name", "unknown"), "png", file -> {
-                    Pixmap out = MapIO.writeImage(editor.tiles());
+                    Pixmap out = MapIO.writeImage(state.world);
                     file.writePng(out);
                     out.dispose();
                 })));
@@ -211,7 +211,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         Seq<Building> builds = new Seq<>();
                         Time.clear();
 
-                        world.tiles.eachTile(t -> {
+                        state.world.eachTile(t -> {
                             if(t.build != null && t.isCenter() && t.block().update && t.build.allowUpdate()){
                                 builds.add(t.build);
                                 t.build.updateProximity();
@@ -233,12 +233,12 @@ public class MapEditorDialog extends Dialog implements Disposable{
                             for(var build : builds){
                                 build.update();
                             }
-                            Groups.powerGraph.update();
-                            Groups.bullet.update(); //needed for mass drivers...
+                            state.entities.powerGraph.update();
+                            state.entities.bullet.update(); //needed for mass drivers...
                         }
 
                         //spawned units will cause havoc, so clear them
-                        Groups.unit.clear();
+                        state.entities.unit.clear();
 
                         Time.clear();
                         Time.delta = oldDelta;
@@ -260,7 +260,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         }).padTop(1).size(swidth * 2f + 10, 60f);
 
         resizeDialog = new MapResizeDialog((width, height, shiftX, shiftY) -> {
-            if(!(editor.width() == width && editor.height() == height && shiftX == 0 && shiftY == 0)){
+            if(!(state.world.width == width && state.world.height == height && shiftX == 0 && shiftY == 0)){
                 ui.loadAnd(() -> {
                     editor.resize(width, height, shiftX, shiftY);
                 });
@@ -270,7 +270,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         loadDialog = new MapLoadDialog(map -> ui.loadAnd(() -> {
             try{
                 editor.beginEdit(map);
-            }catch(Exception e){
+            }catch(Throwable e){
                 ui.showException("@editor.errorload", e);
                 Log.err(e);
             }
@@ -337,20 +337,20 @@ public class MapEditorDialog extends Dialog implements Disposable{
             state.rules.fog = false;
             state.map = new Map(StringMap.of(
                 "name", "Editor Playtesting",
-                "width", editor.width(),
-                "height", editor.height()
+                "width", state.world.width,
+                "height", state.world.height
             ));
             state.set(State.playing);
-            world.endMapLoad();
+            state.endMapLoad();
             player.clearUnit();
 
-            for(var unit : Groups.unit){
+            for(var unit : state.entities.unit){
                 if(unit.spawnedByCore){
                     unit.remove();
                 }
             }
 
-            Groups.weather.clear();
+            state.entities.weather.clear();
             logic.play();
 
             Point2 center = view.project(Core.graphics.getWidth()/2f, Core.graphics.getHeight()/2f);
@@ -407,7 +407,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
         player.clearUnit();
 
         //remove player unit
-        Unit unit = Groups.unit.find(u -> u.spawnedByCore);
+        Unit unit = state.entities.unit.find(u -> u.spawnedByCore);
         if(unit != null){
             unit.remove();
         }
@@ -511,7 +511,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
                 shownWithMap = true;
                 editor.beginEdit(MapIO.createMap(file, true));
                 show();
-            }catch(Exception e){
+            }catch(Throwable e){
                 Log.err(e);
                 ui.showException("@editor.errorload", e);
             }

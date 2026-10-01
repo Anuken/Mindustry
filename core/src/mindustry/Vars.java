@@ -14,7 +14,6 @@ import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
 import mindustry.editor.*;
-import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -269,7 +268,6 @@ public class Vars implements Loadable{
     public static Net net;
     public static ContentLoader content;
     public static GameState state;
-    public static EntityCollisions collisions;
     public static Waves waves;
     public static Platform platform = new Platform(){};
     public static Mods mods;
@@ -279,19 +277,10 @@ public class Vars implements Loadable{
     public static BaseRegistry bases;
     public static GlobalVars logicVars;
     public static MapEditor editor;
-    public static AvoidanceProcess avoidance;
-    public static PhysicsProcess unitPhysics = new PhysicsProcess();
     public static DataAssetCache assetCache;
     public static GameService service = new GameService();
-
     public static Universe universe;
-    public static World world;
     public static Maps maps;
-    public static WaveSpawner spawner;
-    public static BlockIndexer indexer;
-    public static Pathfinder pathfinder;
-    public static ControlPathfinder controlPath;
-    public static FogControl fogControl;
 
     public static Control control;
     public static Logic logic;
@@ -309,8 +298,6 @@ public class Vars implements Loadable{
     }
 
     public static void init(){
-        Groups.init();
-
         if(loadLocales){
             String[] stra = Core.files.internal("locales").readString().split("\n");
             locales = new Locale[stra.length];
@@ -351,20 +338,12 @@ public class Vars implements Loadable{
         if(mods == null) mods = new Mods();
 
         content = new ContentLoader();
-        waves = new Waves();
-        collisions = new EntityCollisions();
-        world = new World();
         universe = new Universe();
         becontrol = new BeControl();
         asyncCore = new AsyncCore();
         if(!headless) editor = new MapEditor();
 
         maps = new Maps();
-        spawner = new WaveSpawner();
-        indexer = new BlockIndexer();
-        pathfinder = new Pathfinder();
-        controlPath = new ControlPathfinder();
-        fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();
         assetCache = new DataAssetCache();

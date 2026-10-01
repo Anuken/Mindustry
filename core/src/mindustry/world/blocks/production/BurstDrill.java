@@ -81,8 +81,9 @@ public class BurstDrill extends Drill{
 
             if(invertTime > 0f) invertTime -= delta() / invertedTime;
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump(items.has(dominantItem) ? dominantItem : null);
+                dumpTimer %= dumpTime;
             }
 
             float drillTime = getDrillTime(dominantItem);

@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.maps.filters.FilterOption.*;
 import mindustry.world.*;
@@ -23,9 +24,9 @@ public class EnemySpawnFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(Tiles tiles, GenerateInput in){
+    public void apply(World world, GenerateInput in){
         IntSeq spawns = new IntSeq();
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(tile.overlay() == Blocks.spawn){
                 spawns.add(tile.pos());
             }
@@ -35,7 +36,7 @@ public class EnemySpawnFilter extends GenerateFilter{
 
         int used = Math.min(spawns.size, amount);
         for(int i = used; i < spawns.size; i++){
-            Tile tile = tiles.getp(spawns.get(i));
+            Tile tile = world.getp(spawns.get(i));
             tile.clearOverlay();
         }
     }

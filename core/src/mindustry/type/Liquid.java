@@ -16,7 +16,7 @@ import mindustry.world.meta.*;
 import static mindustry.entities.Puddles.*;
 
 /** A better name for this class would be "fluid", but it's too late for that. */
-public class Liquid extends UnlockableContent implements Senseable{
+public class Liquid extends UnlockableContent implements LogicSenseable{
     //must be static and global so conduits don't conflict - DO NOT INTERACT WITH THESE IN MODS OR I WILL PERSONALLY YELL AT YOU
     public static final int animationFrames = 50;
     public static float animationScaleGas = 190f, animationScaleLiquid = 230f;
@@ -167,15 +167,15 @@ public class Liquid extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
-        if(sensor == LAccess.color) return color.toDoubleBits();
-        if(sensor == LAccess.id) return getLogicId();
+    public double sense(LogicProp sensor){
+        if(sensor == LogicProp.color) return color.toDoubleBits();
+        if(sensor == LogicProp.id) return getLogicId();
         return Double.NaN;
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
         return noSensed;
     }
 

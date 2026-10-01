@@ -59,7 +59,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
             Iterator<BuildPlan> it = plans.iterator();
             while(it.hasNext()){
                 BuildPlan plan = it.next();
-                Tile tile = world.tile(plan.x, plan.y);
+                Tile tile = state.world.tile(plan.x, plan.y);
                 boolean isSameDerelict = (tile != null && tile.build != null && tile.block() == plan.block && tile.build.tileX() == plan.x && tile.build.tileY() == plan.y && tile.team() == Team.derelict);
                 if(tile == null || (plan.breaking && tile.block() == Blocks.air) || (!plan.breaking && ((tile.build != null && tile.build.rotation == plan.rotation && !isSameDerelict) || !plan.block.rotate) &&
                     //the block must be the same, but not derelict and the same
@@ -287,7 +287,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         if(replace != null){
             plans.remove(replace);
         }
-        Tile tile = world.tile(place.x, place.y);
+        Tile tile = state.world.tile(place.x, place.y);
         if(tile != null && tile.build instanceof ConstructBuild cons){
             place.progress = cons.progress;
         }
@@ -353,7 +353,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         Draw.z(Layer.flyingUnit);
 
         BuildPlan plan = active ? buildPlan() : lastActive;
-        Tile tile = world.tile(plan.x, plan.y);
+        Tile tile = state.world.tile(plan.x, plan.y);
 
         if(tile == null || !within(plan, state.rules.infiniteResources ? Float.MAX_VALUE : type.buildRange)){
             return;

@@ -24,7 +24,6 @@ import static mindustry.Vars.*;
 public class TargetDummy extends Block{
     static final float maxDummySize = 30f;
 
-    public final int dpsUpdateTime = timers++;
     public UnitType unitType = UnitTypes.dummy;
     public float pullScale = 0.33f;
     public String emptyStr = "---";
@@ -84,7 +83,7 @@ public class TargetDummy extends Block{
         public int readUnitId = -1;
         public Unit unit;
         public float resetTime = 120f;
-        public float total, reset = resetTime, time, dummySize = 12f;
+        public float total, reset = resetTime, time, dummySize = 12f, dpsTimer;
         public float dps, totalDisplay, timeDisplay;
         public int hits;
         public int hitsDisplay;
@@ -110,7 +109,7 @@ public class TargetDummy extends Block{
             }
 
             if(readUnitId != -1){
-                unit = Groups.unit.getByID(readUnitId);
+                unit = state.entities.unit.getByID(readUnitId);
                 if(unit != null || !net.client()){
                     readUnitId = -1;
                 }
@@ -150,7 +149,8 @@ public class TargetDummy extends Block{
             time += Time.delta;
             reset += Time.delta;
 
-            if(timer(dpsUpdateTime, 20)){
+            if((dpsTimer += Time.delta) >= 20f){
+                dpsTimer %= 20f;
                 dps = total / time * 60f;
                 totalDisplay = total;
                 timeDisplay = time / 60f;

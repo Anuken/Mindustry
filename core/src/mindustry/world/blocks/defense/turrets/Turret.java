@@ -36,7 +36,6 @@ public class Turret extends ReloadTurret{
     //after being logic-controlled and this amount of time passes, the turret will resume normal AI
     public final static float logicControlCooldown = 60 * 2;
 
-    public final int timerTarget = timers++;
     /** Ticks between attempt at finding a target. */
     public float targetInterval = 20;
     /** Target interval for when this turret already has a valid target. -1 = targetInterval */
@@ -286,7 +285,7 @@ public class Turret extends ReloadTurret{
 
         public Seq<AmmoEntry> ammo = new Seq<>();
         public int totalAmmo;
-        public float curRecoil, heat, logicControlTime = -1;
+        public float curRecoil, heat, logicControlTime = -1, targetTimer;
         public @Nullable float[] curRecoils;
         public float shootWarmup, charge, warmupHold = 0f;
         public int totalShots, barrelCounter;
@@ -383,8 +382,8 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
-        public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
-            if(type == LAccess.shoot && !unit.isPlayer()){
+        public void control(LogicExecutor executor, LogicProp type, double p1, double p2, double p3, double p4){
+            if(type == LogicProp.shoot && !unit.isPlayer()){
                 targetPos.set(World.unconv((float)p1), World.unconv((float)p2));
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p3);
@@ -394,8 +393,8 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
-        public void control(LExecutor executor, LAccess type, Object p1, double p2, double p3, double p4){
-            if(type == LAccess.shootp && (unit == null || !unit.isPlayer())){
+        public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
+            if(type == LogicProp.shootp && (unit == null || !unit.isPlayer())){
                 logicControlTime = logicControlCooldown;
                 logicShooting = !Mathf.zero(p2);
 
@@ -408,7 +407,7 @@ public class Turret extends ReloadTurret{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case ammo -> totalAmmo;
                 case ammoCapacity -> maxAmmo;
@@ -555,7 +554,7 @@ public class Turret extends ReloadTurret{
                 float newRange = hasAmmo() ? peekAmmo().rangeChange : 0f;
                 if(newRange != lastRangeChange){
                     lastRangeChange = newRange;
-                    fogControl.forceUpdate(team, this);
+                    state.fog.forceUpdate(team, this);
                 }
             }
 
@@ -567,7 +566,9 @@ public class Turret extends ReloadTurret{
             if(hasAmmo()){
                 if(Float.isNaN(reloadCounter)) reloadCounter = 0;
 
-                if(timer(timerTarget, target != null ? newTargetInterval : targetInterval)){
+                float retargetInterval = target != null ? newTargetInterval : targetInterval;
+                if((targetTimer += Time.delta) >= retargetInterval){
+                    targetTimer %= retargetInterval;
                     findTarget();
                 }
 

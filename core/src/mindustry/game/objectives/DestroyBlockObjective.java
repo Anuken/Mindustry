@@ -25,7 +25,7 @@ public class DestroyBlockObjective extends MapObjective{
 
     @Override
     public boolean update(){
-        var build = world.build(pos.x, pos.y);
+        var build = state.world.build(pos.x, pos.y);
         return build == null || build.team != team || build.block != block;
     }
 

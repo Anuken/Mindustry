@@ -40,7 +40,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Unitc{
 
             int sign = i == 0 ? -1 : 1;
             float cx = Angles.trnsx(rotation - 90, type.waveTrailX * sign, type.waveTrailY) + x, cy = Angles.trnsy(rotation - 90, type.waveTrailX * sign, type.waveTrailY) + y;
-            t.update(cx, cy, world.floorWorld(cx, cy).isLiquid && !flying ? 1 : 0);
+            t.update(cx, cy, state.world.floorWorld(cx, cy).isLiquid && !flying ? 1 : 0);
         }
 
         if(type.crushDamage > 0 && !disarmed){
@@ -50,7 +50,7 @@ abstract class WaterMoveComp implements Posc, Velc, Hitboxc, Unitc{
                 for(int cx = -type.crushRadX; cx <= type.crushRadX; cx++){
                     for(int cy = -type.crushRadY; cy <= type.crushRadY; cy++){
                         Tmp.v1.trns(rotation - 90f, cx * tilesize, cy * tilesize);
-                        var other = Vars.world.buildWorld(x + Tmp.v1.x, y + Tmp.v1.y);
+                        var other = Vars.state.world.buildWorld(x + Tmp.v1.x, y + Tmp.v1.y);
                         if(other != null && other.team != team && other.floor().isLiquid && !other.block.solid && !other.block.solidifes){
                             other.damage(team, type.crushFragile && other.block.crushFragile ? 99999999f : type.crushDamage * crushInterval);
                         }

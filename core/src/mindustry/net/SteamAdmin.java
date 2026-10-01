@@ -54,7 +54,7 @@ public class SteamAdmin{
                 try{
                     data = JsonIO.read(SteamAdminData.class, text);
                     //kick newly banned people immediately
-                    Groups.player.each(p -> data.bans.contains(p.uuid()), p -> p.kick(Packets.KickReason.banned));
+                    Vars.state.entities.player.each(p -> data.bans.contains(p.uuid()), p -> p.kick(Packets.KickReason.banned));
                 }catch(Throwable e){
                     Log.err("Failed to parse Steam ban data", e);
                 }

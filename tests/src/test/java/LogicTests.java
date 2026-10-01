@@ -1,6 +1,5 @@
 import arc.graphics.*;
 import mindustry.logic.*;
-import mindustry.logic.LExecutor.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
@@ -17,16 +16,16 @@ public class LogicTests{
     }
 
     /** Assembles and loads a small mlog program, mirroring the LogicBlock usage pattern. */
-    static LExecutor load(String code){
-        LExecutor exec = new LExecutor();
+    static LogicExecutor load(String code){
+        LogicExecutor exec = new LogicExecutor();
         exec.privileged = true;
-        exec.load(LAssembler.assemble(code, true));
+        exec.load(LogicAssembler.assemble(code, true));
         return exec;
     }
 
     /** Runs a single `set result <value>` line and returns the decoded value assigned to `from`. */
     static Object setFromValue(String code){
-        LExecutor exec = load(code);
+        LogicExecutor exec = load(code);
         assertTrue(exec.instructions.length > 0, "expected at least one instruction to be parsed from: " + code);
         assertTrue(exec.instructions[0] instanceof SetI, "expected a set instruction from: " + code);
         return ((SetI)exec.instructions[0]).from.objval;
@@ -105,7 +104,7 @@ public class LogicTests{
 
     @Test
     void plainNumberIsNotTreatedAsAString(){
-        LExecutor exec = load("set result 5");
+        LogicExecutor exec = load("set result 5");
         SetI set = (SetI)exec.instructions[0];
         assertFalse(set.from.isobj, "a bare number should not be stored as an object value");
         assertEquals(5.0, set.from.numval);
@@ -114,7 +113,7 @@ public class LogicTests{
     @ParameterizedTest(name = "{0}")
     @MethodSource("sanitizeCases")
     void sanitizesInput(String name, String input, String expected){
-        assertEquals(expected, LStatement.sanitize(input));
+        assertEquals(expected, LogicStatement.sanitize(input));
     }
 
     static Stream<Arguments> sanitizeCases(){
@@ -123,7 +122,7 @@ public class LogicTests{
         Arguments.of("a bare single semicolon is invalid", ";", "invalid"),
         Arguments.of("a bare single space is invalid", " ", "invalid"),
         Arguments.of("a single ordinary character passes through unchanged", "a", "a"),
-        Arguments.of("empty input stays empty", "", ""),
+        Arguments.of("empty input gets converted to null", "", "null"),
         Arguments.of("a plain already-quoted value is untouched", "\"hello\"", "\"hello\""),
         Arguments.of("a unescaped quote at the end gets doubled", "\"hello\\\"", "\"hello\\\\\""),
         Arguments.of(
@@ -188,7 +187,7 @@ public class LogicTests{
     @ParameterizedTest(name = "{0}")
     @MethodSource("sanitizeRoundTripCases")
     void sanitizedQuotedValuesRoundTripThroughTheParser(String name, String userInput, String expectedDecoded){
-        String sanitized = LStatement.sanitize(userInput);
+        String sanitized = LogicStatement.sanitize(userInput);
         //sanity check: sanitize should have kept this as a quoted string value
         assertTrue(sanitized.length() >= 2 && sanitized.charAt(0) == '"' && sanitized.charAt(sanitized.length() - 1) == '"', "expected a quoted value, got: " + sanitized);
 
@@ -196,8 +195,8 @@ public class LogicTests{
         assertEquals(expectedDecoded, decoded);
 
         //make sure read/write roundtrips it
-        var statements = LAssembler.read("set result " + sanitized + "\n", true);
-        assertEquals("set result " + sanitized + "\n", LAssembler.write(statements));
+        var statements = LogicAssembler.read("set result " + sanitized + "\n", true);
+        assertEquals("set result " + sanitized + "\n", LogicAssembler.write(statements));
     }
 
     static Stream<Arguments> sanitizeRoundTripCases(){
@@ -294,8 +293,8 @@ public class LogicTests{
     @ParameterizedTest(name = "{0}")
     @MethodSource("parseValCases")
     void parseVarValues(String name, String symbol, Object expected){
-        LAssembler asm = new LAssembler();
-        LVar v = asm.var(symbol);
+        LogicAssembler asm = new LogicAssembler();
+        LogicVar v = asm.var(symbol);
         if(expected instanceof Double d){
             assertFalse(v.isobj, "should be numeric: " + symbol);
             assertEquals(d, v.numval, 0.00001f);
@@ -317,8 +316,8 @@ public class LogicTests{
     @ParameterizedTest(name = "{0}")
     @MethodSource("parseColorCases")
     void parseColorValues(String name, String symbol, double expected){
-        LAssembler asm = new LAssembler();
-        LVar v = asm.var(symbol);
+        LogicAssembler asm = new LogicAssembler();
+        LogicVar v = asm.var(symbol);
         assertFalse(v.isobj);
         assertEquals(expected, v.numval, 0.0);
     }
@@ -355,8 +354,8 @@ public class LogicTests{
     @ParameterizedTest(name = "invalid: [{0}]")
     @MethodSource("invalidNumberCases")
     void parseInvalidNumbers(String symbol){
-        LAssembler asm = new LAssembler();
-        LVar v = asm.var(symbol);
+        LogicAssembler asm = new LogicAssembler();
+        LogicVar v = asm.var(symbol);
         assertTrue(v.isobj, "should not parse as a number: " + symbol);
         assertNull(v.objval);
     }
@@ -412,8 +411,8 @@ public class LogicTests{
 
     @Test
     void varWithProperlyQuotedEmptyString(){
-        LAssembler asm = new LAssembler();
-        LVar v = asm.var("\"\"");
+        LogicAssembler asm = new LogicAssembler();
+        LogicVar v = asm.var("\"\"");
         assertTrue(v.isobj);
         assertEquals("", v.objval);
     }
@@ -432,7 +431,7 @@ public class LogicTests{
 
     @Test
     void crlfAfterUnquotedTokenDoesNotCorruptTheToken(){
-        LExecutor exec = load("set a bar\r\nset b bar\n");
+        LogicExecutor exec = load("set a bar\r\nset b bar\n");
         SetI first = (SetI)exec.instructions[0];
         SetI second = (SetI)exec.instructions[1];
         assertSame(first.from, second.from, "a CRLF-terminated reference to 'bar' must resolve to the same variable as an LF-terminated one");
@@ -446,7 +445,7 @@ public class LogicTests{
     @Test
     void loneCarriageReturnActsAsALineEnding(){
         //old-style Mac ('\r'-only) line endings are normalized the same way as CRLF.
-        LExecutor exec = load("set result 1\rset result2 2\r");
+        LogicExecutor exec = load("set result 1\rset result2 2\r");
         assertEquals(2, exec.instructions.length, "expected two separate statements, split on the lone '\\r'");
     }
 
