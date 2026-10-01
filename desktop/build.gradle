@@ -55,7 +55,7 @@ tasks.register('dist', Jar){
 
     //don't include steam shared libraries unless necessary
     if(!versionModifier.contains("steam")){
-        exclude("**steam**.so", "**steam**.dll", "**steam**.dylib")
+        exclude("**steam**.so", "**steam**.dll", "**steam**.dylib", "**frogworks**.so", "**frogworks**.dll", "**frogworks**.dylib", "**libsdkencryptedappticket**")
     }
 
     archiveFileName = "${appName}.jar"

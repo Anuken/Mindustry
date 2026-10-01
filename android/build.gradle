@@ -21,7 +21,7 @@ task deploy(type: Copy){
 
 android{
     namespace = "io.anuke.mindustry"
-    compileSdk = 37
+    compileSdk = 36
     sourceSets{
         main{
             manifest.srcFile 'AndroidManifest.xml'

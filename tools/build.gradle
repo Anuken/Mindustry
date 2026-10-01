@@ -8,6 +8,8 @@ import arc.packer.*
 import arc.struct.*
 import arc.util.*
 import arc.util.io.*
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import groovy.transform.*
 
 import java.util.concurrent.*
@@ -101,57 +103,47 @@ tasks.register('genSprites', JavaExec){
     workingDir = genFolder
 }
 
-tasks.register('fontgen', JavaExec){
-    dependsOn classes
-    /* icon font pipeline:
-     1. take set of pre-defined icons and SVGs
-     2. use Fontello API to get a font with these
-     3. combine fontello font and standard font, get output font
-     4. use json to generate a file with constants for every icon size+type (during annotation processing)
-     */
+//Takes SVGs from core/assets-raw/icons and generates a font from them, placing it in core/assets/fonts/icon.ttf
+//This uses fantasticicon, launched via npx - I don't like depending on it, but there are no pure Java solutions that I am aware of
+//Codepoints are kept the same via core/assets-raw/icons/codepoints.json
+//TODO: No icons exist yet; I have not drawn them. This task works in principle, but it needs all the SVGs to exist, otherwise it explodes or removes existing icons from the font.
+tasks.register('generateIcons'){
     doLast{
-        Fi folder = Fi.get("core/assets-raw/fontgen/out/")
-        folder.mkdirs()
+        def iconDir = rootProject.file("core/assets-raw/icons")
+        def mapFile = new File(iconDir, "codepoints.json")
+        def outDir = rootProject.file("core/assets/fonts")
+        def svgs = iconDir.listFiles({ f -> f.name.endsWith(".svg") } as FileFilter).sort { it.name }
 
-        Log.info("Session...")
+        //existing [{name, code}] entries -> name to codepoint
+        Map<String, Integer> codes = [:]
+        if(mapFile.exists()) new JsonSlurper().parse(mapFile).each{ codes[it.name as String] = it.code as Integer }
 
-        OS.exec("curl", "--fail", "--output", "core/assets-raw/fontgen/out/session", "--form", "config=@core/assets-raw/fontgen/config.json", "https://fontello.com")
+        //new icons get the next free codepoint
+        int next = Math.max(0xE800, (codes.values().max() ?: 0) + 1)
+        svgs.each{ f ->
+            def name = f.name.replace(".svg", "")
+            if(!codes.containsKey(name)) codes[name] = next++
+        }
 
-        Log.info("Zip...")
+        //only keep icons that exist, sorted by codepoint
+        def used = svgs.collect{ it.name.replace(".svg", "") }
+        codes = codes.findAll{ k, v -> used.contains(k) }.sort{ it.value }
+        mapFile.text = "[\n" + codes.collect{ k, v -> "    " + JsonOutput.toJson([name: k, code: v]) }.join(",\n") + "\n]\n"
 
-        String session = folder.child("session").readString()
+        def config = new File(temporaryDir, "fantasticon.json")
+        config.text = JsonOutput.toJson([
+                inputDir: iconDir.absolutePath, outputDir: outDir.absolutePath, name: "icon",
+                fontTypes: ["ttf"], assetTypes: [], normalize: true, codepoints: codes
+        ])
 
-        Http.get("https://fontello.com/" + session + "/get").block(result -> {
-            Streams.copy(result.getResultAsStream(), folder.child("font.zip").write())
-        })
-
-        Log.info("Icon font...")
-
-        ZipFi zip = new ZipFi(folder.child("font.zip"))
-        Fi dest = folder.child("font.woff")
-        zip.list()[0].child("font").child("fontello.ttf").copyTo(dest)
-        dest.copyTo(Fi.get("core/assets/fonts/icon.ttf"))
-
-        Log.info("Merge...")
-
-        //TODO this is broken
-
-        Log.info(OS.exec("fontforge", "-script",
-                Fi.get("core/assets-raw/fontgen/merge.pe").absolutePath(),
-                Fi.get("core/assets/fonts/font.woff").absolutePath(),
-                Fi.get("core/assets-raw/fontgen/out/font.woff").absolutePath())
-        )
-
-        Log.info("Done.")
+        outDir.mkdirs()
+        def cmd = [System.getProperty("os.name").toLowerCase().contains("win") ? "npx.cmd" : "npx", "--yes", "fantasticon", "--config", config.absolutePath]
+        def pb = new ProcessBuilder(cmd).redirectErrorStream(true)
+        def proc = pb.start()
+        proc.outputStream.close()
+        proc.inputStream.eachLine{ println it }
+        if(proc.waitFor() != 0) throw new GradleException("fantasticon failed!")
     }
-}
-
-tasks.register('icongen', JavaExec){
-    dependsOn classes
-    mainClass = "mindustry.tools.IconConverter"
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = "../core/assets-raw"
 }
 
 tasks.register('updateScripts', JavaExec){

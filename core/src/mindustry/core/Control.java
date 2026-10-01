@@ -182,7 +182,7 @@ public class Control implements ApplicationListener, Loadable{
                     player.admin = true;
                 }catch(IOException e){
                     ui.showException("@server.error", e);
-                    state.set(State.menu);
+                    logic.reset();
                 }
             }
         }));

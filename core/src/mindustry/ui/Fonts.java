@@ -11,6 +11,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.Font.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -64,9 +65,13 @@ public class Fonts{
 
     public static void loadFonts(){
         largeIcons.clear();
-        FreeTypeFontParameter param = fontParameter();
 
-        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = f;
+        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
+            size = 18;
+            shadowColor = Color.darkGray;
+            shadowOffsetY = 2;
+            incremental = true;
+        }})).loaded = f -> Fonts.def = f;
 
         Core.assets.load("monospace", Font.class, new FreeTypeFontLoaderParameter("fonts/monospace.woff", new FreeTypeFontParameter(){{
             size = 16;
@@ -76,6 +81,24 @@ public class Fonts{
             fallback.add(() -> Fonts.def);
         }})).loaded = f -> Fonts.monospace = f;
 
+        //used in the default font (same size as text); not assigned to anything
+        for(boolean outlined : Mathf.booleans){
+            String suffix = outlined ? "-outline" : "";
+            Core.assets.load("iconSmall" + suffix, Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+                size = 18;
+                incremental = true;
+                characters = "\0";
+                borderColor = Color.darkGray;
+            }})).loaded = f -> (outlined ? Fonts.outline : Fonts.def).addFallback(f);
+
+            Core.assets.load("runes" + suffix, Font.class, new FreeTypeFontLoaderParameter("fonts/runes.woff", new FreeTypeFontParameter(){{
+                size = 18;
+                incremental = true;
+                characters = "\0";
+                borderColor = Color.darkGray;
+            }})).loaded = f -> (outlined ? Fonts.outline : Fonts.def).addFallback(f);
+        }
+
         Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
@@ -84,8 +107,8 @@ public class Fonts{
 
         Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 48;
-            incremental = false;
-            characters = "\0" + Iconc.all;
+            incremental = true;
+            characters = "\0";
             borderWidth = 5f;
             borderColor = Color.darkGray;
         }})).loaded = f -> Fonts.iconLarge = f;
@@ -251,7 +274,7 @@ public class Fonts{
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
-        //TOOD: which size to use?
+        //TOOD: which size to use? 2k height is lighter on RAM
         UI.packer = new PixmapPacker(4096, 2048, 2, true);
         UI.packer.setTargetTexture(Core.atlas.find("ui-page-placeholder").texture);
 
@@ -278,13 +301,11 @@ public class Fonts{
             }
         });
 
-        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
             borderColor = Color.darkGray;
             incremental = true;
             size = 18;
-        }};
-
-        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = t -> Fonts.outline = t;
+        }})).loaded = t -> Fonts.outline = t;
 
         Core.assets.load("tech", Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
             size = 18;
@@ -337,12 +358,4 @@ public class Fonts{
         return draw;
     }
 
-    static FreeTypeFontParameter fontParameter(){
-        return new FreeTypeFontParameter(){{
-            size = 18;
-            shadowColor = Color.darkGray;
-            shadowOffsetY = 2;
-            incremental = true;
-        }};
-    }
 }

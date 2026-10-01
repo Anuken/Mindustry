@@ -1,5 +1,6 @@
 import arc.graphics.*;
 import mindustry.logic.*;
+import mindustry.logic.instructions.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;

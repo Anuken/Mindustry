@@ -27,9 +27,10 @@ buildscript{
 }
 
 plugins{
-    id "org.jetbrains.kotlin.jvm" version "2.3.20" apply false
-    id "org.jetbrains.kotlin.kapt" version "2.3.20" apply false
-    id "com.android.application" version "9.4.1" apply false
+    id "org.jetbrains.kotlin.jvm" version "2.4.20" apply false
+    id "org.jetbrains.kotlin.kapt" version "2.4.20" apply false
+    //intelliJ only supports 9.1.0 as of the latest 2026 release
+    id "com.android.application" version "9.1.0" apply false
 }
 
 allprojects{

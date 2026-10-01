@@ -1086,10 +1086,10 @@ public class NetServer implements ApplicationListener{
             info("Opened a server on port @.", Config.port.num());
         }catch(BindException e){
             err("Unable to host: Port " + Config.port.num() + " already in use! Make sure no other servers are running on the same port in your network.");
-            state.set(State.menu);
+            logic.reset();
         }catch(IOException e){
             err(e);
-            state.set(State.menu);
+            logic.reset();
         }
     }
 
