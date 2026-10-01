@@ -80,13 +80,6 @@ public class BurstDrill extends Drill{
             }
 
             if(invertTime > 0f) invertTime -= delta() / invertedTime;
-
-            //normal dump rate
-            if((dumpTimer += delta()) >= dumpTime){
-                dump(items.has(dominantItem) ? dominantItem : null);
-                dumpTimer %= dumpTime;
-            }
-
             float drillTime = getDrillTime(dominantItem);
 
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (drillTime - 20f), 0.1f);
@@ -121,18 +114,11 @@ public class BurstDrill extends Drill{
                 }
             }
 
-            outputAccumulate();
-        }
-
-        //forced dump rate
-        public void outputAccumulate(){
-            if(items.total() == 0) return;
-
-            dumpAccum += delta();
+            dumpTimer += delta();
             float rate = Math.max(drillTime / (dominantItems * drillMultipliers.get(dominantItem, 1f) * liquidBoostIntensity), 0.1f);
-            while(dumpAccum >= rate){
-                dump(dominantItem);
-                dumpAccum -= rate;
+            while(dumpTimer >= rate){
+                dump(items.has(dominantItem) ? dominantItem : null);
+                dumpTimer -= rate;
             }
         }
 
