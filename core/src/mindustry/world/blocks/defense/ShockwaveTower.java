@@ -113,6 +113,7 @@ public class ShockwaveTower extends Block{
 
                 //wasReady is used to immediately force a scan once when the tower is ready
                 if((wasReady || (checkTimer += Time.delta) >= checkInterval) && (fire || (!isQuickFire && reloadCounter >= setReload * quickFirePercentage))){
+                    checkTimer %= checkInterval;
                     findTargets();
 
                     isQuickFire = !fire && damageSum >= bulletDamage * quickFireThreshold;
@@ -138,14 +139,6 @@ public class ShockwaveTower extends Block{
                     damageSum += b.damage;
                 }
             });
-            if(potentialEfficiency > 0 && (reloadCounter += edelta()) >= reload && (checkTimer += Time.delta) >= checkInterval){
-                checkTimer %= checkInterval;
-                targets.clear();
-                state.entities.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
-                    if(b.team != team && b.type.hittable && b.within(x, y, range + 1f)){
-                        targets.add(b);
-                    }
-                });
 
             if(status != StatusEffects.none){
                 Units.nearby(x - range, y - range, range * 2, range * 2, u -> {

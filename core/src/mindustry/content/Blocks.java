@@ -3114,13 +3114,13 @@ public class Blocks{
 
             drillMultipliers.put(Items.beryllium, 2f);
             drillMultipliers.put(Items.sand, 2f);
-            liquidBoostIntensity = 1.75f;
+            liquidBoostIntensity = 2.5f;
 
             fogRadius = 4;
 
             consumePower(160f / 60f);
             consumeLiquid(Liquids.water, 10f/60f);
-            consumeLiquid(Liquids.ozone, 3f / 60f).boost();
+            consumeLiquid(Liquids.ozone, 6f / 60f).boost();
         }};
 
         eruptionDrill = new BurstDrill("eruption-drill"){{
@@ -5200,7 +5200,6 @@ public class Blocks{
                 damage = 210f;
                 buildingDamageMultiplier = 0.3f;
                 hitColor = Color.valueOf("fda981");
-                shieldAbsorb = false;
                 absorbable = false;
             }};
 
