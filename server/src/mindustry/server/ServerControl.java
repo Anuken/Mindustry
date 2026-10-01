@@ -102,9 +102,9 @@ public class ServerControl implements ApplicationListener{
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
-            info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(state.map.plainName()));
+            info("Game over! Reached wave @ with @ players online on map @.", state.wave, state.entities.player.size(), Strings.capitalize(state.map.plainName()));
         }else{
-            info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.plainName()));
+            info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, state.entities.player.size(), Strings.capitalize(state.map.plainName()));
         }
 
         //set the next map to be played
@@ -317,7 +317,7 @@ public class ServerControl implements ApplicationListener{
 
             if(state.isGame()){ //run this only if the server's actually hosting
                 if(Config.autoPause.bool()){
-                    if(Groups.player.isEmpty()){
+                    if(state.entities.player.isEmpty()){
                         autoPaused = true;
                         state.set(State.paused);
                     }else if(autoPaused){
@@ -620,13 +620,13 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.waves){
                     info("  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
-                info("  @ units / @ enemies", Groups.unit.size(), state.enemies);
+                info("  @ units / @ enemies", state.entities.unit.size(), state.enemies);
 
                 info("  @ FPS, @ MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
-                if(Groups.player.size() > 0){
-                    info("  Players: @", Groups.player.size());
-                    for(Player p : Groups.player){
+                if(state.entities.player.size() > 0){
+                    info("  Players: @", state.entities.player.size());
+                    for(Player p : state.entities.player){
                         info("    @ @ / @", p.admin() ? "&r[A]&c" : "&b[P]&c", p.plainName(), p.uuid());
                     }
                 }else{
@@ -986,7 +986,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Player target = Groups.player.find(p -> p.name().equals(arg[0]));
+            Player target = state.entities.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
                 Call.sendMessage("[scarlet]" + target.name() + "[scarlet] has been kicked by the server.");
@@ -1002,7 +1002,7 @@ public class ServerControl implements ApplicationListener{
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
             }else if(arg[0].equals("name")){
-                Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+                Player target = state.entities.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
                 if(target != null){
                     netServer.admins.banPlayer(target.uuid());
                     info("Banned.");
@@ -1016,7 +1016,7 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid type.");
             }
 
-            for(Player player : Groups.player){
+            for(Player player : state.entities.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
                     Call.sendMessage("[scarlet]" + player.name + " has been banned.");
                     player.con.kick(KickReason.banned);
@@ -1087,12 +1087,12 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
+            Player playert = state.entities.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
             if(playert != null){
                 target = playert.getInfo();
             }else{
                 target = netServer.admins.getInfoOptional(arg[1]);
-                playert = Groups.player.find(p -> p.getInfo() == target);
+                playert = state.entities.player.find(p -> p.getInfo() == target);
             }
 
             if(target != null){
@@ -1122,11 +1122,11 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("players", "List all players currently in game.", arg -> {
-            if(Groups.player.size() == 0){
+            if(state.entities.player.size() == 0){
                 info("No players are currently in the server.");
             }else{
-                info("Players: @", Groups.player.size());
-                for(Player user : Groups.player){
+                info("Players: @", state.entities.player.size());
+                for(Player user : state.entities.player){
                     info(" @&lm @ / ID: @ / IP: @", user.admin ? "&r[A]&c" : "&b[P]&c", user.plainName(), user.uuid(), user.ip());
                 }
             }
