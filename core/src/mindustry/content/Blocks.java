@@ -3114,6 +3114,7 @@ public class Blocks{
 
             drillMultipliers.put(Items.beryllium, 2f);
             drillMultipliers.put(Items.sand, 2f);
+            drillMultipliers.put(Items.graphite, 2f);
             liquidBoostIntensity = 2.5f;
 
             fogRadius = 4;
@@ -3146,6 +3147,7 @@ public class Blocks{
 
             drillMultipliers.put(Items.beryllium, 2f);
             drillMultipliers.put(Items.sand, 2f);
+            drillMultipliers.put(Items.graphite, 2f);
             liquidBoostIntensity = 2f;
 
             //TODO different requirements
