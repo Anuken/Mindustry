@@ -81,7 +81,8 @@ public class BurstDrill extends Drill{
 
             if(invertTime > 0f) invertTime -= delta() / invertedTime;
 
-            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
+            //normal dump rate
+            if((dumpTimer += delta()) >= dumpTime){
                 dump(items.has(dominantItem) ? dominantItem : null);
                 dumpTimer %= dumpTime;
             }
@@ -118,6 +119,20 @@ public class BurstDrill extends Drill{
                     drillSound.at(x, y, 1f + Mathf.range(drillSoundPitchRand), drillSoundVolume);
                     drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
                 }
+            }
+
+            outputAccumulate();
+        }
+
+        //forced dump rate
+        public void outputAccumulate(){
+            if(items.total() == 0) return;
+
+            dumpAccum += delta();
+            float rate = Math.max(drillTime / (dominantItems * drillMultipliers.get(dominantItem, 1f) * liquidBoostIntensity), 0.1f);
+            while(dumpAccum >= rate){
+                dump(dominantItem);
+                dumpAccum -= rate;
             }
         }
 
