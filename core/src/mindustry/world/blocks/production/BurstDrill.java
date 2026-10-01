@@ -115,7 +115,7 @@ public class BurstDrill extends Drill{
             }
 
             dumpTimer += delta();
-            float rate = Math.max(drillTime / (dominantItems * drillMultipliers.get(dominantItem, 1f) * liquidBoostIntensity), 0.1f);
+            float rate = Math.min(dumpTime, Math.max(drillTime / (dominantItems * drillMultipliers.get(dominantItem, 1f) * liquidBoostIntensity), 0.1f));
             while(dumpTimer >= rate){
                 dump(items.has(dominantItem) ? dominantItem : null);
                 dumpTimer -= rate;
