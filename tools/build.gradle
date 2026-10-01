@@ -103,6 +103,10 @@ tasks.register('genSprites', JavaExec){
     workingDir = genFolder
 }
 
+//Takes SVGs from core/assets-raw/icons and generates a font from them, placing it in core/assets/fonts/icon.ttf
+//This uses fantasticicon, launched via npx - I don't like depending on it, but there are no pure Java solutions that I am aware of
+//Codepoints are kept the same via core/assets-raw/icons/codepoints.json
+//TODO: No icons exist yet; I have not drawn them. This task works in principle, but it needs all the SVGs to exist, otherwise it explodes or removes existing icons from the font.
 tasks.register('generateIcons'){
     doLast{
         def iconDir = rootProject.file("core/assets-raw/icons")
