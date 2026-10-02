@@ -133,7 +133,7 @@ public class SectorSubmissions{
 
         if(preset.credit == null) preset.credit = author;
         preset.requireUnlock = false;
-        preset.threat = threat;
+        sector.threat = preset.threat = threat;
 
         if(captureWave > 0){
             preset.captureWave = captureWave;

@@ -71,7 +71,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     @Override
     public void generateSector(Sector sector){
-        if(sector.preset != null && (sector.preset.requireUnlock || sector.threat == SectorThreat.low)) return;
+        if(sector.preset != null && (sector.preset.requireUnlock || sector.threat != SectorThreat.low)) return;
 
         float sum = 1f;
         for(Sector other : sector.near()){
