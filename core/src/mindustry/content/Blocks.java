@@ -2535,7 +2535,7 @@ public class Blocks{
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
-            itemDurationMultipliers.put(Items.pyratite, 3f);
+            itemDurationMultipliers.put(Items.pyratite, 10/3f);
 
             drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion());
         }};
@@ -2554,7 +2554,7 @@ public class Blocks{
         steamGenerator = new ConsumeGenerator("steam-generator"){{
             requirements(Category.power, with(Items.copper, 35, Items.graphite, 25, Items.lead, 40, Items.silicon, 30));
             powerProduction = 5.5f;
-            itemDuration = 90f;
+            itemDuration = 120f;
             consumeLiquid(Liquids.water, 0.1f);
             hasLiquids = true;
             size = 2;
@@ -2569,7 +2569,7 @@ public class Blocks{
 
             consume(new ConsumeItemFlammable());
             consume(new ConsumeItemExplode());
-            itemDurationMultipliers.put(Items.pyratite, 3f);
+            itemDurationMultipliers.put(Items.pyratite, 10/3f);
 
             drawer = new DrawMulti(
             new DrawDefault(),
@@ -2589,7 +2589,7 @@ public class Blocks{
         differentialGenerator = new ConsumeGenerator("differential-generator"){{
             requirements(Category.power, with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
             powerProduction = 18f;
-            itemDuration = 220f;
+            itemDuration = 240f;
             hasLiquids = true;
             hasItems = true;
             size = 3;
@@ -2633,8 +2633,8 @@ public class Blocks{
             ambientSoundVolume = 0.11f;
             size = 3;
             health = 1400;
-            itemDuration = 360f;
-            powerProduction = 15f;
+            itemDuration = 300f;
+            powerProduction = 16f;
             heating = 0.005f;
             coolantPower = 0.125f;
 
@@ -2652,7 +2652,7 @@ public class Blocks{
             size = 4;
             health = 900;
             powerProduction = 130f;
-            itemDuration = 140f;
+            itemDuration = 133+1/3f;
             ambientSound = Sounds.loopPulse;
             ambientSoundVolume = 0.08f;
             liquidCapacity = 80f;
