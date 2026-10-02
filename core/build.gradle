@@ -1,2 +1,0 @@
-sourceSets.main.java.srcDirs = ["src/", layout.buildDirectory.dir("generated/sources/annotationProcessor/java/main")]
-sourceSets.main.kotlin.srcDirs = ["src/"]
