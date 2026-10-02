@@ -61,7 +61,7 @@ public class DesktopLauncher extends ClientLauncher{
                     glVersions = new int[][]{{4, 1}, {3, 3}};
                 }else{
                     //try essentially every OpenGL version
-                    glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
+                    glVersions = new int[][]{{4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
                 }
 
                 for(int i = 0; i < arg.length; i++){

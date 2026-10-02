@@ -136,7 +136,7 @@ public final class ClientHarness{
         cfg.height = 480;
         cfg.coreProfile = true;
         //same list as DesktopLauncher
-        cfg.glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
+        cfg.glVersions = new int[][]{{4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
         cfg.vSyncEnabled = false;
         //there is no sound device on CI
         cfg.disableAudio = true;
