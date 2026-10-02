@@ -107,7 +107,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
         for(Tile tile : state.world){
-            if(world.getDarkness(tile.x, tile.y) >= 3){
+            if(state.world.getDarkness(tile.x, tile.y) >= 3){
                 continue;
             }
 
