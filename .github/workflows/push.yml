@@ -55,3 +55,7 @@ jobs:
         fi
     - name: Run unit tests
       run: ./gradlew tests:test --rerun --stacktrace
+    - name: Install client test dependencies
+      run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
+    - name: Run client tests
+      run: ./gradlew tests:clientTest

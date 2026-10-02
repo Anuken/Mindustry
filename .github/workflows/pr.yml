@@ -18,9 +18,13 @@ jobs:
         java-version: 17
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6
+    - name: Install client test dependencies
+      run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
     - name: Run unit tests
       run: ./gradlew tests:test --stacktrace --rerun
-    - name: Run unit tests and build JAR
+    - name: Run client tests
+      run: ./gradlew tests:clientTest
+    - name: Build JAR
       run: ./gradlew desktop:dist
     - name: Upload desktop JAR for testing
       uses: actions/upload-artifact@v7

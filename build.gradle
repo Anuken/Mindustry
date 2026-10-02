@@ -370,7 +370,7 @@ project(":core"){
                     return project.sourceSets.main.compileClasspath
                 }
             })
-            destinationDir = new File(buildDir, 'javadoc')
+            destinationDirectory = layout.buildDirectory.dir('javadoc')
         }
     }
 
@@ -393,41 +393,6 @@ project(":server"){
         implementation project(":core")
         implementation arcModule("backends:backend-headless")
         implementation 'org.jline:jline:4.0.0'
-    }
-}
-
-project(":tests"){
-    apply plugin: "java"
-
-    dependencies{
-        testImplementation project(":core")
-        testImplementation "org.junit.jupiter:junit-jupiter-params:5.7.1"
-        testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.1"
-        testImplementation arcModule("backends:backend-headless")
-        testImplementation "org.json:json:20230618"
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.1"
-        testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-    }
-
-    tasks.withType(JavaCompile){
-        targetCompatibility = JavaVersion.VERSION_17
-        sourceCompatibility = JavaVersion.VERSION_17
-        options.compilerArgs.addAll(['--release', '17'])
-    }
-
-    test{
-        //fork every test so mods don't interact with each other
-        forkEvery = 1
-        //always run tests; cached or up-to-date results can be stale when tests depend on files outside the inputs
-        outputs.upToDateWhen{ false }
-        outputs.cacheIf{ false }
-        jvmArgs = ["-XX:+HeapDumpOnOutOfMemoryError"]
-        useJUnitPlatform()
-        workingDir = new File("../core/assets")
-        testLogging{
-            exceptionFormat = 'full'
-            showStandardStreams = true
-        }
     }
 }
 
