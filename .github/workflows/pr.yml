@@ -23,7 +23,7 @@ jobs:
     - name: Run unit tests
       run: ./gradlew tests:test --stacktrace --rerun
     - name: Run client tests
-      run: ./gradlew tests:clientTest
+      run: ./gradlew pack tests:clientTest
     - name: Build JAR
       run: ./gradlew desktop:dist
     - name: Upload desktop JAR for testing

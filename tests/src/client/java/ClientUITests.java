@@ -34,20 +34,20 @@ public class ClientUITests extends ClientTestBase{
         };
     }
 
-    void showAndHide(Supplier<Dialog> get){
+    void showAndHide(String name, Supplier<Dialog> get){
         ClientHarness.run(() -> get.get().show());
-        ClientHarness.waitUntil("the dialog to open", () -> get.get().isShown(), 300);
+        ClientHarness.waitUntil(name + " dialog to open", () -> get.get().isShown(), 300);
         ClientHarness.frames(10);
 
         ClientHarness.run(() -> get.get().hide());
         //dialog animations run on real time, not game ticks
-        ClientHarness.waitUntil("the dialog to close", () -> !get.get().isShown(), 600);
+        ClientHarness.waitUntil(name + " dialog to close", () -> !get.get().isShown(), 600);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"about", "custom", "load", "settings", "controls", "language", "database", "schematics", "maps"})
     void menuDialogs(String name){
-        showAndHide(() -> dialogs(name));
+        showAndHide(name, () -> dialogs(name));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class ClientUITests extends ClientTestBase{
         playMap(groundZero());
         ClientHarness.frames(30);
 
-        showAndHide(() -> ui.paused);
+        showAndHide("paused", () -> ui.paused);
     }
 
     /** The content info page of everything that has one: the database entry for every block, unit, item, liquid, status effect... */

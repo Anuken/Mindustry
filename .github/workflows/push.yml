@@ -58,4 +58,4 @@ jobs:
     - name: Install client test dependencies
       run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
     - name: Run client tests
-      run: ./gradlew tests:clientTest
+      run: ./gradlew pack tests:clientTest
