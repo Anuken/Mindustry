@@ -1,0 +1,18 @@
+sourceSets.main.java.srcDirs = ["src"]
+sourceSets.main.resources.srcDirs = ["angle/"]
+
+configurations{
+    natives
+}
+
+jar{
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from{
+        configurations.natives.collect{ it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+dependencies{
+    natives libraries.lwjgl
+    api libraries.lwjgl
+}

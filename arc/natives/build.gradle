@@ -1,0 +1,4 @@
+subprojects{
+	sourceSets.main.resources.srcDirs = ["libs"]
+    sourceSets.main.java.srcDirs = []
+}

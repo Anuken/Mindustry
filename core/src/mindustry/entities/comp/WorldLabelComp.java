@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.graphics.*;
+import arc.graphics.font.Font;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;

@@ -4,6 +4,7 @@ import arc.*;
 import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.Font;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;

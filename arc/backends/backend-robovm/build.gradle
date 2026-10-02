@@ -1,0 +1,34 @@
+dependencies{
+    api libraries.robovm
+}
+
+sourceSets.main.resources.srcDirs = ["res"]
+
+tasks.register('fetchMetalANGLEKit', Download){
+    doFirst{
+        file("build/tmp").mkdirs();
+    }
+    src 'https://github.com/libgdx/MetalANGLEKit/releases/download/v1.2.1/metalanglekit.zip'
+    dest 'build/tmp/MetalANGLEKit.zip'
+    onlyIfModified true
+    useETag "all"
+}
+
+tasks.register('verifyMetalANGLEKit', Verify){
+    dependsOn fetchMetalANGLEKit
+    src 'build/tmp/MetalANGLEKit.zip'
+    algorithm 'SHA-256'
+    checksum 'c7785cbe15eb9e5962677513725c8f0e33039f344235cc7691ee5ac35ff5ea91'
+}
+
+tasks.register('extractMetalANGLEKit', Copy){
+    dependsOn verifyMetalANGLEKit
+
+    doFirst{
+        delete("res/META-INF/robovm/ios/libs/")
+        delete("res/META-INF/robovm/ios/libs/")
+        file("res/META-INF/robovm/ios/libs").mkdirs();
+    }
+    from zipTree('build/tmp/MetalANGLEKit.zip')
+    into 'res/META-INF/robovm/ios/libs/'
+}

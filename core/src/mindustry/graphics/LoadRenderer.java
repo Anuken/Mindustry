@@ -5,6 +5,7 @@ import arc.func.*;
 import arc.fx.*;
 import arc.fx.filters.*;
 import arc.graphics.*;
+import arc.graphics.font.Font;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.GLVersion.*;
@@ -172,7 +173,7 @@ public class LoadRenderer implements Disposable{
         Lines.poly(w/2, h/2, 4, rad2);
 
         if(assets.isLoaded("tech") && renderStencil){
-            Font font = assets.get("tech");
+            arc.graphics.font.Font font = assets.get("tech");
             font.getData().markupEnabled = true;
 
             int panei = 0;

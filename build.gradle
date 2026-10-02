@@ -2,14 +2,10 @@ import java.text.SimpleDateFormat
 
 buildscript{
     ext{
-        arcHash = property("archash")
-
-        localArc = new File(rootDir.parent, 'Arc').exists() && !project.hasProperty("noLocalArc")
-
         arcModule = { String name ->
             //skip to last submodule
             name = name.substring(name.lastIndexOf(':') + 1)
-            return "com.github.Anuken${localArc ? "" : ".Arc"}:$name:$arcHash"
+            return "com.github.Anuken:$name:frog"
         }
     }
 
@@ -21,7 +17,7 @@ buildscript{
     }
 
     dependencies{
-        classpath arcModule(":extensions:packer")
+        classpath arcModule(":packer")
         classpath arcModule(":arc-core")
     }
 }
@@ -261,9 +257,7 @@ project(":desktop"){
 
     dependencies{
         implementation project(":core")
-        implementation arcModule("extensions:discord")
         implementation arcModule("natives:natives-desktop")
-        implementation arcModule("natives:natives-freetype-desktop")
 
         if(debugged()) implementation project(":debug")
 
@@ -301,12 +295,12 @@ project(":core"){
         from{ configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) } }
         from zipTree("../server/build/libs/server-release.jar")
         from files("src/")
-        from files("../../Arc/natives/natives-desktop/libs")
-        from files("../../Arc/arc-core/src/")
-        from files("../../Arc/extensions/arcnet/src/")
-        from files("../../Arc/extensions/g3d/src/")
-        from files("../../Arc/extensions/flabel/src/")
-        from files("../../Arc/extensions/freetype/src/")
+        from files("../arc/natives/natives-desktop/libs")
+        from files("../arc/arc-core/src/")
+        from files("../arc/extensions/arcnet/src/")
+        from files("../arc/extensions/g3d/src/")
+        from files("../arc/extensions/flabel/src/")
+        from files("../arc/extensions/freetype/src/")
         from files("../server/src/")
 
         exclude("META-INF/**")
@@ -351,12 +345,8 @@ project(":core"){
 
         api "at.yawk.lz4:lz4-java:1.10.2"
         api arcModule("arc-core")
-        api arcModule("extensions:flabel")
-        api arcModule("extensions:freetype")
-        api arcModule("extensions:fx")
-        api arcModule("extensions:arcnet")
         api "com.github.Anuken:rhino:$rhinoVersion"
-        if(localArc) api arcModule(":extensions:packer")
+        api arcModule(":packer")
 
         compileOnly project(":annotations")
         if(!project.hasProperty("noKapt")) kapt project(":annotations")
@@ -448,7 +438,6 @@ project(":tools"){
         implementation project(":core")
 
         implementation arcModule("natives:natives-desktop")
-        implementation arcModule("natives:natives-freetype-desktop")
         implementation arcModule("backends:backend-headless")
 
         implementation "com.google.guava:guava:33.3.1-jre"

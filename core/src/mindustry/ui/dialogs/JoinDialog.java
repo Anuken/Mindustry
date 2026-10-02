@@ -1,8 +1,8 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.freetype.FreeTypeFontGenerator.*;
 import arc.graphics.*;
+import arc.graphics.font.FreeTypeFontGenerator.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.*;
@@ -10,8 +10,8 @@ import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.Timer;
 import arc.util.*;
+import arc.util.Timer;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import mindustry.*;

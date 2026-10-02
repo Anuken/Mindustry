@@ -1,0 +1,129 @@
+buildscript{
+    repositories{
+        mavenCentral()
+        google()
+        maven{ url = 'https://jitpack.io' }
+    }
+
+    dependencies{
+        classpath "com.badlogicgames.jnigen:jnigen-gradle:3.1.2"
+    }
+}
+
+plugins {
+    id "de.undercouch.download" version "5.0.1"
+}
+
+ext{
+    versions = [:]
+    libraries = [:]
+}
+
+versions.robovm = "2.3.26"
+versions.junit = "4.11"
+versions.lwjgl = "3.4.3"
+versions.soloud = "2026.09.04"
+
+libraries.robovm = [
+    "com.mobidevelop.robovm:robovm-rt:${versions.robovm}",
+    "com.mobidevelop.robovm:robovm-objc:${versions.robovm}",
+    "com.mobidevelop.robovm:robovm-cocoatouch:${versions.robovm}"
+]
+
+libraries.junit = [
+    "junit:junit:${versions.junit}"
+]
+
+libraries.lwjgl = [
+    "org.lwjgl:lwjgl:${versions.lwjgl}",
+    "org.lwjgl:lwjgl:${versions.lwjgl}:natives-linux",
+    "org.lwjgl:lwjgl:${versions.lwjgl}:natives-linux-arm64",
+    "org.lwjgl:lwjgl:${versions.lwjgl}:natives-macos-arm64",
+    "org.lwjgl:lwjgl:${versions.lwjgl}:natives-windows",
+    "org.lwjgl:lwjgl-sdl:${versions.lwjgl}",
+    "org.lwjgl:lwjgl-sdl:${versions.lwjgl}:natives-linux",
+    "org.lwjgl:lwjgl-sdl:${versions.lwjgl}:natives-linux-arm64",
+    "org.lwjgl:lwjgl-sdl:${versions.lwjgl}:natives-macos-arm64",
+    "org.lwjgl:lwjgl-sdl:${versions.lwjgl}:natives-windows",
+    "org.lwjgl:lwjgl-jemalloc:${versions.lwjgl}",
+    "org.lwjgl:lwjgl-jemalloc:${versions.lwjgl}:natives-linux",
+    "org.lwjgl:lwjgl-jemalloc:${versions.lwjgl}:natives-linux-arm64",
+    "org.lwjgl:lwjgl-jemalloc:${versions.lwjgl}:natives-macos-arm64",
+    "org.lwjgl:lwjgl-jemalloc:${versions.lwjgl}:natives-windows",
+    "org.lwjgl:lwjgl-opengl:${versions.lwjgl}",
+    "org.lwjgl:lwjgl-opengl:${versions.lwjgl}:natives-linux",
+    "org.lwjgl:lwjgl-opengl:${versions.lwjgl}:natives-linux-arm64",
+    "org.lwjgl:lwjgl-opengl:${versions.lwjgl}:natives-macos-arm64",
+    "org.lwjgl:lwjgl-opengl:${versions.lwjgl}:natives-windows",
+
+    "org.lwjgl:lwjgl-opengles:${versions.lwjgl}",
+    "org.lwjgl:lwjgl-opengles:${versions.lwjgl}:natives-windows",
+]
+
+allprojects{
+    apply plugin: 'maven-publish'
+    group = 'com.github.Anuken'
+    version = '1.0'
+
+    repositories{
+        mavenCentral()
+        maven{ url = "https://central.sonatype.com/repository/maven-snapshots" }
+        google()
+        maven{ url = 'https://jitpack.io' }
+    }
+
+    ext.aproj = { String module ->
+        if(findProject(module) != null){
+            return project(module)
+        }else{
+            return project(":arc" + module)
+        }
+    }
+
+    tasks.withType(JavaCompile){
+        java{
+            sourceCompatibility = 1.8
+            targetCompatibility = 1.8
+        }
+        options.compilerArgs.addAll(['--release', '8'])
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType(Javadoc){
+        options{
+            addStringOption('Xdoclint:none', '-quiet')
+            addStringOption('-release', '17')
+            encoding('UTF-8')
+        }
+    }
+}
+
+subprojects{
+    apply plugin: "java-library"
+
+    compileJava{
+        options.fork = true
+        options.incremental = true
+    }
+
+    java{
+        withJavadocJar()
+        withSourcesJar()
+    }
+
+    publishing{
+        publications{
+            maven(MavenPublication){
+                from components.java
+            }
+        }
+    }
+}
+
+if(System.getProperty("compileMethodParams") != null){
+    allprojects{
+        tasks.withType(JavaCompile).configureEach{
+            options.compilerArgs << '-parameters'
+        }
+    }
+}

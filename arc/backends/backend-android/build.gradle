@@ -1,0 +1,14 @@
+dependencies{
+    if(!file("libs/android.jar").exists()){
+        def version, highestVersion
+        new File(System.getenv("ANDROID_HOME"), "/platforms").eachFileMatch ~/android-\d+/, {
+            version = it.name.find(/\d+/).toInteger()
+            highestVersion = version > highestVersion ? version : highestVersion
+        }
+
+        def sdkFile = new File(System.getenv("ANDROID_HOME"), "/platforms/android-${highestVersion}/android.jar")
+        if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
+    }else{
+        compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    }
+}

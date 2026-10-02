@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.font.Font;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
