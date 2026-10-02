@@ -2588,8 +2588,8 @@ public class Blocks{
 
         differentialGenerator = new ConsumeGenerator("differential-generator"){{
             requirements(Category.power, with(Items.copper, 70, Items.titanium, 50, Items.lead, 100, Items.silicon, 65, Items.metaglass, 50));
-            powerProduction = 18f;
-            itemDuration = 240f;
+            powerProduction = 18.5f;
+            itemDuration = 160;
             hasLiquids = true;
             hasItems = true;
             size = 3;
