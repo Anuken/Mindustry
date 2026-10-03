@@ -50,6 +50,7 @@ public class BuildTurret extends BaseTurret{
         super.init();
 
         if(elevation < 0) elevation = size / 2f;
+        updateClipRadius(range + tilesize);
 
         //this is super hacky, but since blocks are initialized before units it does not run into init/concurrent modification issues
         unitType = new UnitType("turret-unit-" + name){{
