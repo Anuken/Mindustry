@@ -117,7 +117,6 @@ dependencies{
     api("at.yawk.lz4:lz4-java:1.12.0")
     api("com.github.Anuken:arc-core:frog")
     api("com.github.Anuken:rhino:$rhinoVersion")
-    api("com.github.Anuken:packer:frog")
 
     compileOnly(project(":annotations"))
     if(!project.hasProperty("noKapt")) kapt(project(":annotations"))

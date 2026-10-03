@@ -7,7 +7,6 @@ buildscript{
     }
 
     dependencies{
-        classpath("com.github.Anuken:packer:frog")
         classpath("com.github.Anuken:arc-core:frog")
     }
 }

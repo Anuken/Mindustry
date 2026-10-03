@@ -1,5 +1,4 @@
 include(":arc-core")
-include(":packer")
 
 include(":backends")
 include(":backends:backend-android")

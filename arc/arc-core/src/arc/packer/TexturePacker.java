@@ -712,15 +712,6 @@ public class TexturePacker{
     }
 
     public static void main(String[] args) throws Exception{
-        /*
-        //for testing locally
-        if(true){
-            File rootDir = new File("/home/anuke/Projects/Mindustry");
-            process(new File(rootDir, "core/assets-raw/sprites_out/").getAbsolutePath(), new File(rootDir, "core/assets/sprites/").getAbsolutePath(), "sprites.aatls");
-
-            return;
-        }*/
-
         Settings settings = null;
         String input = null, output = null, packFileName = "pack.aatls";
 
