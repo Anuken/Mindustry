@@ -3372,8 +3372,9 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 22f * 1.5f;
+                    splashDamage = 8f;
                     splashDamageRadius = 24f;
+                    scaledSplashDamage = true;
 
                     frontColor = Pal.scrapAmmoFront;
                     backColor = hitColor = Pal.scrapAmmoBack;
@@ -3386,8 +3387,9 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 27f * 1.5f;
+                    splashDamage = 9f;
                     splashDamageRadius = 15f;
+                    scaledSplashDamage = true;
                 }},
                 Items.metaglass, new FlakBulletType(4f, 3){{
                     backColor = trailColor = Pal.glassAmmoBack;
@@ -3401,9 +3403,10 @@ public class Blocks{
                     width = 6f;
                     height = 8f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 30f * 1.5f;
+                    splashDamage = 10f;
                     splashDamageRadius = 20f;
-                    fragBullets = 6;
+                    scaledSplashDamage = true;
+                    fragBullets = 3;
                     fragBullet = new BasicBulletType(3f, 5){{
                         width = 5f;
                         height = 12f;
@@ -3695,7 +3698,8 @@ public class Blocks{
                     height = 8f;
                     shrinkY = 0f;
                     splashDamageRadius = 30f;
-                    splashDamage = 30f * 1.5f;
+                    splashDamage = 24f;
+                    scaledSplashDamage = true;
                     ammoMultiplier = 5f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
@@ -3713,7 +3717,8 @@ public class Blocks{
                     shrinkY = 0f;
                     homingPower = 0.08f;
                     splashDamageRadius = 20f;
-                    splashDamage = 30f * 1.5f;
+                    splashDamage = 18;
+                    scaledSplashDamage = true;
                     makeFire = true;
                     ammoMultiplier = 5f;
                     hitEffect = Fx.blastExplosion;
@@ -3724,7 +3729,7 @@ public class Blocks{
                     height = 8f;
                     shrinkY = 0f;
                     splashDamageRadius = 25f;
-                    splashDamage = 25f * 1.4f;
+                    splashDamage = 16f;
                     hitEffect = Fx.blastExplosion;
                     despawnEffect = Fx.blastExplosion;
                     ammoMultiplier = 4f;
@@ -3800,8 +3805,9 @@ public class Blocks{
 
                     ammoMultiplier = 5;
 
-                    splashDamage = 15f;
+                    splashDamage = 11f;
                     splashDamageRadius = 22f;
+                    scaledSplashDamage = true;
 
                     makeFire = true;
                     lifetime = 60f;
@@ -4130,8 +4136,9 @@ public class Blocks{
                     width = 6f;
                     height = 11f;
                     hitEffect = Fx.flakExplosion;
-                    splashDamage = 45f;
+                    splashDamage = 22f;
                     splashDamageRadius = 25f;
+                    scaledSplashDamage = true;
                     fragBullet = new BasicBulletType(3f, 12, "bullet"){{
                         width = 5f;
                         height = 12f;
@@ -4152,8 +4159,9 @@ public class Blocks{
                 Items.blastCompound, new FlakBulletType(4f, 8){{
                     shootEffect = Fx.shootBig;
                     ammoMultiplier = 5f;
-                    splashDamage = 45f;
+                    splashDamage = 35f;
                     splashDamageRadius = 60f;
+                    scaledSplashDamage = true;
                     collidesGround = true;
 
                     status = StatusEffects.blasted;
@@ -4165,7 +4173,8 @@ public class Blocks{
                 Items.plastanium, new FlakBulletType(4f, 8){{
                     ammoMultiplier = 4f;
                     splashDamageRadius = 40f;
-                    splashDamage = 37.5f;
+                    splashDamage = 24f;
+                    scaledSplashDamage = true;
                     fragBullet = new BasicBulletType(2.5f, 12, "bullet"){{
                         width = 10f;
                         height = 12f;
@@ -4186,8 +4195,9 @@ public class Blocks{
                 }},
                 Items.surgeAlloy, new FlakBulletType(4.5f, 13){{
                     ammoMultiplier = 5f;
-                    splashDamage = 50f * 1.5f;
+                    splashDamage = 48f;
                     splashDamageRadius = 38f;
+                    scaledSplashDamage = true;
                     lightning = 2;
                     lightningLength = 7;
                     shootEffect = Fx.shootBig;
@@ -4327,6 +4337,7 @@ public class Blocks{
                     ammoMultiplier = 3;
                     splashDamage = 20f;
                     splashDamageRadius = 25f;
+                    scaledSplashDamage = true;
                 }}
             );
             reload = 7f;
