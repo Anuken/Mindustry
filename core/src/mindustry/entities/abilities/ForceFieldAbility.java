@@ -1,33 +1,19 @@
 package mindustry.entities.abilities;
 
 import arc.*;
-import arc.audio.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
-import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.ui.*;
 
 import static mindustry.Vars.*;
 
-public class ForceFieldAbility extends Ability implements UnitShieldProvider{
-    /** Shield radius. */
-    public float radius = 60f;
-    /** Shield regen speed in damage/tick. */
-    public float regen = 0.1f;
-    /** Maximum shield. */
-    public float max = 200f;
-    /** Cooldown after the shield is broken, in ticks. */
-    public float cooldown = 60f * 5;
+public class ForceFieldAbility extends BaseShieldAbility{
     /** Sides of shield polygon. */
     public int sides = 6;
     /** Rotation of shield. */
@@ -35,40 +21,8 @@ public class ForceFieldAbility extends Ability implements UnitShieldProvider{
     /** Whether the shield should follow the unit s rotation. */
     public boolean followUnitRot = false;
 
-    /** Multiplier on unit speed when its shield is hit. */
-    public float unitSlowdown = -1f;
-    /** Number of ticks unit slowdown is applied after being hit. */
-    public float slowdownTime = 80f;
-    /** Number of hits required to reach maximum unit slowdown. */
-    public int shotThreshold = 5;
-
-    public Sound breakSound = Sounds.shieldBreakSmall;
-    public Sound hitSound = Sounds.shieldHit;
-    public float hitSoundVolume = 0.12f;
-
-    /** State. */
-    protected float radiusScale, alpha, shots;
-    protected boolean wasBroken = true;
-
-    private static float realRad;
-    private static Unit paramUnit;
-    private static ForceFieldAbility paramField;
-    private static final Cons<Bullet> shieldConsumer = b -> {
-        if(b.team != paramUnit.team && b.type.absorbable && Intersector.isInRegularPolygon(paramField.sides, paramUnit.x, paramUnit.y, realRad, paramField.rotation + 
-            (paramField.followUnitRot ? paramUnit.rotation : 0f), b.x(), b.y()) && paramUnit.shield > 0){
-
-            b.absorb();
-            Fx.absorb.at(b);
-            paramField.hitSound.at(b.x, b.y, 1f + Mathf.range(0.1f), paramField.hitSoundVolume);
-            paramUnit.shield -= b.type().shieldDamage(b);
-            paramField.alpha = 1f;
-            if(paramField.unitSlowdown > 0f){
-                paramField.shots = Math.min(paramField.shots + 1f, paramField.shotThreshold);
-            }
-        }
-    };
-
-    public ForceFieldAbility(){}
+    public ForceFieldAbility(){
+    }
 
     public ForceFieldAbility(float radius, float regen, float max, float cooldown){
         this.radius = radius;
@@ -86,40 +40,36 @@ public class ForceFieldAbility extends Ability implements UnitShieldProvider{
         this.rotation = rotation;
     }
 
-    public float scaledMax(Unit unit){
-        return max * Vars.state.rules.unitHealth(unit.team);
+    @Override
+    public float shieldBounds(){
+        return realRad > 0f ? realRad : radius;
     }
 
     @Override
-    public float shieldBounds(){
-        return radius;
+    public boolean isBulletInside(Bullet b){
+        Vec2 pos = shieldPos(paramUnit, paramPos);
+        return Intersector.isInRegularPolygon(sides, pos.x, pos.y, realRad, rotation + angleOffset + (followUnitRot ? paramUnit.rotation : 0f), b.x(), b.y());
+    }
+
+    @Override
+    public boolean isUnitInside(Unit unit){
+        Vec2 pos = shieldPos(paramUnit, paramPos);
+        return Intersector.isInRegularPolygon(sides, pos.x, pos.y, realRad, rotation + angleOffset + (followUnitRot ? paramUnit.rotation : 0f), unit.x(), unit.y());
     }
 
     @Override
     public @Nullable Vec2 intersectLaser(Unit unit, float x1, float y1, float x2, float y2, float damage){
-        return unit.shield > 0f ? Damage.raycastRegularPolygon(sides, unit.x, unit.y, radiusScale * radius, rotation, x1, y1, x2, y2) : null;
+        if(!active(unit)) return null;
+        Vec2 pos = shieldPos(unit, paramPos);
+        return Damage.raycastRegularPolygon(sides, pos.x, pos.y, radiusScale * radius, rotation + angleOffset + (followUnitRot ? unit.rotation : 0f), x1, y1, x2, y2);
     }
 
     @Override
-    public float absorbExplosion(Unit unit, float x, float y, float damage){
-        if(unit.shield <= 0f || !Intersector.isInRegularPolygon(sides, unit.x, unit.y, radiusScale * radius, rotation, x, y)) return 0f;
-
-        return absorb(unit, x, y, damage);
-    }
-
-    @Override
-    public float absorbLaser(Unit unit, float x, float y, float damage){
-        return absorb(unit, x, y, damage);
-    }
-
-    protected float absorb(Unit unit, float x, float y, float damage){
-        float absorbed = Math.min(damage, Math.max(unit.shield, 0f));
-        if(absorbed > 0f){
-            Fx.absorb.at(x, y);
-            unit.shield -= damage;
-            alpha = 1f;
-        }
-        return absorbed;
+    public float absorbExplosion(Unit unit, float ex, float ey, float damage){
+        if(!active(unit)) return 0f;
+        Vec2 pos = shieldPos(unit, paramPos);
+        if(!Intersector.isInRegularPolygon(sides, pos.x, pos.y, radiusScale * radius, rotation + angleOffset + (followUnitRot ? unit.rotation : 0f), ex, ey)) return 0f;
+        return absorb(unit, ex, ey, damage, false);
     }
 
     @Override
@@ -127,91 +77,33 @@ public class ForceFieldAbility extends Ability implements UnitShieldProvider{
         super.addStats(t);
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(radius / tilesize, 2)));
         t.row();
-        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
-        t.row();
-        t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));
-        t.row();
-        t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2)));
     }
 
-    @Override
-    public void update(Unit unit){
-        if(unit.shield <= 0f && !wasBroken){
-            unit.shield -= cooldown * regen;
-
-            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), this);
-            breakSound.at(unit.x, unit.y);
-        }
-
-        wasBroken = unit.shield <= 0f;
-
-        if(unitSlowdown > 0f){
-            //slowdown changes are % based
-            shots = Mathf.approachDelta(shots, 0f, shotThreshold / slowdownTime);
-            unit.speedMultiplier = Mathf.approachDelta(1f, unitSlowdown, Mathf.clamp(shots / shotThreshold));
-        }
-
-        if(unit.shield < scaledMax(unit)){
-            unit.shield += Time.delta * regen;
-        }
-
-        alpha = Math.max(alpha - Time.delta/10f, 0f);
-
-        if(unit.shield > 0){
-            radiusScale = Mathf.lerpDelta(radiusScale, 1f, 0.06f);
-            paramUnit = unit;
-            paramField = this;
-            checkRadius(unit);
-
-            state.entities.bullet.intersect(unit.x - realRad, unit.y - realRad, realRad * 2f, realRad * 2f, shieldConsumer);
-        }else{
-            radiusScale = 0f;
-        }
-    }
-
-    @Override
-    public void death(Unit unit){
-
-        //self-destructing units can have a shield on death
-        if(unit.shield > 0f && !wasBroken){
-            Fx.shieldBreak.at(unit.x, unit.y, radius, unit.type.shieldColor(unit), unit);
-            breakSound.at(unit.x, unit.y);
-        }
+    public float shieldRot(){
+        return rotation + angleOffset + (followUnitRot ? paramUnit.rotation : 0f);
     }
 
     @Override
     public void draw(Unit unit){
-        checkRadius(unit);
+        checkRadius();
 
-        if(unit.shield > 0){
-            Draw.color(unit.type.shieldColor(unit), Color.white, Mathf.clamp(alpha));
+        if(getShield(unit) > 0 || widthScale > 0.001f){
+            Draw.z(Layer.shields);
+            Draw.color(shieldColor(unit), Color.white, Mathf.clamp(alpha));
+            Vec2 pos = shieldPos(unit, paramPos);
 
-            if(Vars.renderer.animateSurfaces){
+            if(renderer.animateSurfaces){
                 Draw.z(Layer.shields + 0.001f * alpha);
-                Fill.poly(unit.x, unit.y, sides, realRad, rotation + (followUnitRot ? unit.rotation : 0f));
+                Fill.poly(pos.x, pos.y, sides, realRad, shieldRot());
             }else{
                 Draw.z(Layer.shields);
                 Lines.stroke(1.5f);
                 Draw.alpha(0.09f);
-                Fill.poly(unit.x, unit.y, sides, radius, rotation + (followUnitRot ? unit.rotation : 0f));
+                Fill.poly(pos.x, pos.y, sides, radius, shieldRot());
                 Draw.alpha(1f);
-                Lines.poly(unit.x, unit.y, sides, radius, rotation + (followUnitRot ? unit.rotation : 0f));
+                Lines.poly(pos.x, pos.y, sides, radius, shieldRot());
             }
+            Draw.reset();
         }
-    }
-
-    @Override
-    public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar("stat.shieldhealth", Pal.accent, () -> unit.shield / scaledMax(unit))).row();
-    }
-
-    @Override
-    public void created(Unit unit){
-        unit.shield = scaledMax(unit);
-    }
-
-    public void checkRadius(Unit unit){
-        //timer2 is used to store radius scale as an effect
-        realRad = radiusScale * radius;
     }
 }

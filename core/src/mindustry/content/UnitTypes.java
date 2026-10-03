@@ -3568,6 +3568,7 @@ public class UnitTypes{
                 whenShooting = false;
                 chanceReflect = 1f;
                 reflectMissileTime = 0f;
+                missileUnitMultiplier = 0.8f;
             }});
 
             rotateSpeed = 2.1f;
