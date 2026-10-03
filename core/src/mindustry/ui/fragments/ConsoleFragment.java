@@ -227,6 +227,11 @@ public class ConsoleFragment extends Table{
         open = false; //never true on mobile
     }
 
+    public void close(){
+        shown = false;
+        open = false;
+    }
+
     public void toggle(){
 
         if(!open){
