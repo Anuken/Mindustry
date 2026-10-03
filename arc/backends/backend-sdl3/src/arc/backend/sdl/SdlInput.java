@@ -80,7 +80,7 @@ public class SdlInput extends Input{
             }
 
         }else if(type == SDLEvents.SDL_EVENT_MOUSE_WHEEL){
-            queue.scrolled(event.wheel().integer_x(), event.wheel().integer_y());
+            queue.scrolled(-event.wheel().integer_x(), -event.wheel().integer_y());
         }else if(type == SDLEvents.SDL_EVENT_TEXT_INPUT){
             String text = event.text().textString();
             if(text != null){
