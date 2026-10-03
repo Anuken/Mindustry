@@ -162,7 +162,7 @@ public class DirectionalUnloader extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             int id = read.s();
-            unloadItem = id == -1 ? null : content.items().get(id);
+            unloadItem = id == -1 ? null : content.item(id);
             offset = read.s();
         }
     }
