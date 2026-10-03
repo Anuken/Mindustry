@@ -15,6 +15,9 @@ public class LaserBulletType extends BulletType{
     public float length = 160f;
     public float width = 15f;
     public float lengthFalloff = 0.5f;
+    /** Visual offset for laser drawing. */
+    public float lengthOffset = 0f;
+
     public float sideLength = 29f, sideWidth = 0.7f;
     public float sideAngle = 90f;
     public float lightningSpacing = -1, lightningDelay = 0.1f, lightningAngleRand;
@@ -93,7 +96,7 @@ public class LaserBulletType extends BulletType{
 
     @Override
     public void draw(Bullet b){
-        float realLength = b.fdata;
+        float realLength = b.fdata + lengthOffset;
 
         float f = Mathf.curve(b.fin(), 0f, 0.2f);
         float baseLen = realLength * f;
