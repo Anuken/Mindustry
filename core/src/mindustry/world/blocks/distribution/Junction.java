@@ -7,6 +7,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class Junction extends Block{
@@ -59,7 +61,7 @@ public class Junction extends Block{
                     long l = buffer.buffers[i][0];
                     float time = BufferItem.time(l);
 
-                    if(Time.time >= time + speed / timeScale || Time.time < time){
+                    if(Vars.state.time >= time + speed / timeScale || Vars.state.time < time){
 
                         Item item = content.item(BufferItem.item(l));
                         Building dest = nearby(i);

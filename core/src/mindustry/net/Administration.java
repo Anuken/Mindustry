@@ -10,6 +10,7 @@ import arc.util.pooling.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.ai.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -650,7 +651,7 @@ public class Administration{
         public transient String lastSentMessage;
         public transient int messageInfractions;
         public transient Ratekeeper rate = new Ratekeeper();
-        public transient Interval messageTimer = new Interval();
+        public transient mindustry.game.Interval messageTimer = new Interval();
 
         PlayerInfo(String id){
             this.id = id;

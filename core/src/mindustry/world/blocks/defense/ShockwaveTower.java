@@ -17,6 +17,8 @@ import mindustry.logic.LogicProp;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class ShockwaveTower extends Block{
@@ -132,7 +134,7 @@ public class ShockwaveTower extends Block{
 
             Draw.z(Layer.effect);
             Draw.color(shapeColor, waveColor, Mathf.pow(heat, 2f));
-            Fill.poly(x, y, shapeSides, shapeRadius * potentialEfficiency, Time.time * shapeRotateSpeed);
+            Fill.poly(x, y, shapeSides, shapeRadius * potentialEfficiency, Vars.state.time * shapeRotateSpeed);
             Draw.color();
         }
 

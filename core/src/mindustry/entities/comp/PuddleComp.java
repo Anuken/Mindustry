@@ -13,6 +13,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 import static mindustry.entities.Puddles.*;
 
@@ -39,7 +41,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
     @Import float x, y;
     @Import boolean added;
 
-    transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f), effectTime = Mathf.random(50f);
+    transient float accepting, updateTime, lastRipple = Vars.state.time + Mathf.random(40f), effectTime = Mathf.random(50f);
     float amount;
     Tile tile;
     Liquid liquid;

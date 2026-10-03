@@ -9,6 +9,7 @@ import mindustry.ai.types.*;
 import mindustry.async.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;

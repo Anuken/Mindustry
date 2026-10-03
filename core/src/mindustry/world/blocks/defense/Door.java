@@ -16,6 +16,8 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class Door extends Wall{
@@ -104,8 +106,8 @@ public class Door extends Wall{
         }
 
         public boolean toggleReady(float cooldown){
-            if(Time.time - lastToggleTime < cooldown) return false;
-            lastToggleTime = Time.time;
+            if(Vars.state.time - lastToggleTime < cooldown) return false;
+            lastToggleTime = Vars.state.time;
             return true;
         }
 

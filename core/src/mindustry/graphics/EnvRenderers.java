@@ -9,6 +9,8 @@ import arc.util.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class EnvRenderers{
@@ -45,7 +47,7 @@ public class EnvRenderers{
 
             Draw.blend(Blending.additive);
 
-            float t = Time.time / timeScale;
+            float t = Vars.state.time / timeScale;
             Texture tex = Core.assets.get("sprites/rays.png", Texture.class);
 
             for(int i = 0; i < rays; i++){

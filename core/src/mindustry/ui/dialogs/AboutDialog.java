@@ -12,6 +12,8 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.ui.Links.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class AboutDialog extends BaseDialog{
@@ -76,7 +78,7 @@ public class AboutDialog extends BaseDialog{
             in.add(table).size(w, h).padTop(5).row();
         }
 
-        shown(() -> Time.run(1f, () -> Core.scene.setScrollFocus(pane)));
+        shown(() -> Vars.state.run(1f, () -> Core.scene.setScrollFocus(pane)));
 
         cont.add(pane).growX();
 

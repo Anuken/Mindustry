@@ -18,6 +18,8 @@ import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class NuclearReactor extends PowerGenerator{
@@ -175,7 +177,7 @@ public class NuclearReactor extends PowerGenerator{
         public void drawLight(){
             float fract = productionEfficiency;
             smoothLight = Mathf.lerpDelta(smoothLight, fract, 0.08f);
-            Drawf.light(x, y, (90f + Mathf.absin(5, 5f)) * smoothLight, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * smoothLight);
+            Drawf.light(x, y, (90f + Mathf.absin(Vars.state.time, 5, 5f)) * smoothLight, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * smoothLight);
         }
 
         @Override

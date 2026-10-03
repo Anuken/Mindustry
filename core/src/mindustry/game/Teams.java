@@ -365,7 +365,7 @@ public class Teams{
             finishScheduleDerelict();
 
             //kill all units randomly
-            units.each(u -> Time.run(Mathf.random(0f, 60f * 5f), () -> {
+            units.each(u -> Vars.state.run(Mathf.random(0f, 60f * 5f), () -> {
                 //ensure unit hasn't switched teams for whatever reason
                 if(u.team == team){
                     u.kill();
@@ -417,7 +417,7 @@ public class Teams{
             }
 
             if(Mathf.chance(0.2)){
-                Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+                Vars.state.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
             //don't bother checking previous for performance reasons
             build.addPlan(false, true);
@@ -493,8 +493,8 @@ public class Teams{
         /** @return approximate number of clustered ground units at a specific position */
         public int getClustered(float x, float y){
             //update based on ticks passed (no increment)
-            if(Time.time > lastClusterUpdateTimer + 10f){
-                lastClusterUpdateTimer = Time.time;
+            if(Vars.state.time > lastClusterUpdateTimer + 10f){
+                lastClusterUpdateTimer = Vars.state.time;
                 clusteredCounts.clear();
                 units.each(u -> {
                     //clusters are for artillery, which can't hit flying units

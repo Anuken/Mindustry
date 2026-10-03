@@ -30,6 +30,8 @@ import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class Turret extends ReloadTurret{
@@ -765,7 +767,7 @@ public class Turret extends ReloadTurret{
                 int barrel = barrelCounter;
 
                 if(delay > 0f){
-                    Time.run(delay, () -> {
+                    Vars.state.run(delay, () -> {
                         //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
                         int prev = barrelCounter;
                         barrelCounter = barrel;

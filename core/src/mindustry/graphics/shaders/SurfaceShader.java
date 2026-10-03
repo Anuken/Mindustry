@@ -5,6 +5,8 @@ import arc.graphics.*;
 import arc.util.*;
 import mindustry.graphics.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class SurfaceShader extends Shader{
@@ -35,7 +37,7 @@ public class SurfaceShader extends Shader{
     public void apply(){
         setUniformf("u_campos", Core.camera.position.x - Core.camera.width / 2, Core.camera.position.y - Core.camera.height / 2);
         setUniformf("u_resolution", Core.camera.width, Core.camera.height);
-        setUniformf("u_time", Time.time);
+        setUniformf("u_time", Vars.state.time);
 
         if(hasUniform("u_noise")){
             if(noiseTex == null){

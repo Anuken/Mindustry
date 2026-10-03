@@ -609,7 +609,7 @@ public class HudFragment{
                     });
                     co.addListener(new HandCursorListener());
                 })
-                .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time, 2f, 1f))), true,
+                .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Vars.state.time, 2f, 1f))), true,
                 () -> {
                     if(state.isMenu() || !player.team().data().hasCore()){
                         coreAttackTime = 0f;
@@ -659,7 +659,7 @@ public class HudFragment{
             t.name = "nearpoint";
             t.touchable = Touchable.disabled;
             t.table(Styles.black6, c -> c.add("@nearpoint")
-            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time, 10f, 1f))))
+            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Vars.state.time, 10f, 1f))))
             .labelAlign(Align.center, Align.center))
             .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(state.spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });

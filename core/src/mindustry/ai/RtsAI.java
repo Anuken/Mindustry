@@ -11,8 +11,8 @@ import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.entities.comp.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Interval;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -37,7 +37,7 @@ public class RtsAI{
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
     static final boolean debug = OS.hasProp("mindustry.debug");
 
-    final Interval timer = new Interval(10);
+    final Interval timer = new mindustry.game.Interval(10);
     final TeamData data;
     final ObjectSet<Building> damagedSet = new ObjectSet<>();
     final Seq<Building> damaged = new Seq<>(false);

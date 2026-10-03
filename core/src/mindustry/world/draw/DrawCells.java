@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -25,7 +26,7 @@ public class DrawCells extends DrawBlock{
             for(int i = 0; i < particles; i++){
                 float offset = rand.nextFloat() * 999999f;
                 float x = rand.range(range), y = rand.range(range);
-                float fin = 1f - (((Time.time + offset) / lifetime) % recurrence);
+                float fin = 1f - (((Vars.state.time + offset) / lifetime) % recurrence);
                 float ca = rand.random(0.1f, 1f);
                 float fslope = Mathf.slope(fin);
 

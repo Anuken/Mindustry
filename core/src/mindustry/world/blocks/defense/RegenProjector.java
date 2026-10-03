@@ -15,6 +15,8 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class RegenProjector extends Block{
@@ -62,7 +64,7 @@ public class RegenProjector extends Block{
 
         Drawf.dashSquare(baseColor, x, y, range * tilesize);
         state.indexer.eachBlock(player.team(), Tmp.r1.setCentered(x, y, range * tilesize), b -> true, t -> {
-            Drawf.selected(t, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
+            Drawf.selected(t, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f)));
         });
     }
 
@@ -188,7 +190,7 @@ public class RegenProjector extends Block{
 
             Drawf.dashSquare(baseColor, x, y, range * tilesize);
             for(var target : targets){
-                Drawf.selected(target, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
+                Drawf.selected(target, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f)));
             }
         }
 

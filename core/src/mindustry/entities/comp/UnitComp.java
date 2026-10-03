@@ -91,8 +91,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void wobble(){
-        x += Mathf.sin(Time.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
-        y += Mathf.cos(Time.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+        x += Mathf.sin(Vars.state.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+        y += Mathf.cos(Vars.state.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
     }
 
     public void moveAt(Vec2 vector, float acceleration){

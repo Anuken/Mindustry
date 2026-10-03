@@ -6,6 +6,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class ItemBuffer{
@@ -22,7 +24,7 @@ public class ItemBuffer{
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index++] = TimeItem.get(data, item.id, Time.time);
+        buffer[index++] = TimeItem.get(data, item.id, Vars.state.time);
     }
 
     public void accept(Item item){
@@ -34,7 +36,7 @@ public class ItemBuffer{
             long l = buffer[0];
             float time = TimeItem.time(l);
 
-            if(Time.time >= time + speed || Time.time < time){
+            if(Vars.state.time >= time + speed || Vars.state.time < time){
                 return content.item(TimeItem.item(l));
             }
         }

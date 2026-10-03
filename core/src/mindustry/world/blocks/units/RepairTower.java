@@ -13,6 +13,8 @@ import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class RepairTower extends Block{
@@ -102,10 +104,10 @@ public class RepairTower extends Block{
             Lines.stroke(circleStroke * (1f - mod) * warmup);
             Lines.circle(x, y, range * mod);
             Draw.color(Pal.heal);
-            Fill.square(x, y, squareRad * warmup, Time.time / squareSpinScl);
+            Fill.square(x, y, squareRad * warmup, Vars.state.time / squareSpinScl);
             Draw.reset();
 
-            Drawf.additive(glow, glowColor, warmup * (1f - glowMag + Mathf.absin(Time.time, glowScl, glowMag)), x, y, 0f, Layer.blockAdditive);
+            Drawf.additive(glow, glowColor, warmup * (1f - glowMag + Mathf.absin(Vars.state.time, glowScl, glowMag)), x, y, 0f, Layer.blockAdditive);
         }
 
         @Override

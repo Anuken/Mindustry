@@ -1,10 +1,10 @@
 package mindustry.logic.instructions;
 
 import arc.struct.*;
-import arc.util.*;
 import mindustry.ai.types.*;
 import mindustry.entities.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.logic.*;

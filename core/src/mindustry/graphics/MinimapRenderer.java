@@ -18,6 +18,8 @@ import mindustry.io.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class MinimapRenderer{
@@ -60,7 +62,7 @@ public class MinimapRenderer{
             if(e.tile.block().solid && e.tile.y > 0){
                 Tile tile = state.world.tile(e.tile.x, e.tile.y - 1);
                 if(tile.block() == Blocks.air){
-                    Time.run(0f, () -> update(tile));
+                    Vars.state.post(() -> update(tile));
                 }
             }
         });
@@ -299,10 +301,10 @@ public class MinimapRenderer{
 
         Lines.stroke(Scl.scl(3f));
 
-        Draw.color(state.rules.waveTeam.color, Tmp.c2.set(state.rules.waveTeam.color).value(1.2f), Mathf.absin(Time.time, 16f, 1f));
+        Draw.color(state.rules.waveTeam.color, Tmp.c2.set(state.rules.waveTeam.color).value(1.2f), Mathf.absin(Vars.state.time, 16f, 1f));
 
         float rad = state.rules.dropZoneRadius;
-        float curve = Mathf.curve(Time.time % 240f, 120f, 240f);
+        float curve = Mathf.curve(Vars.state.time % 240f, 120f, 240f);
 
         for(Tile tile : state.spawner.getSpawns()){
             float tx = tile.worldx();

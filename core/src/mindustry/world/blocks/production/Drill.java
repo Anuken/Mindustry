@@ -23,6 +23,8 @@ import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 import mindustry.world.draw.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
@@ -369,7 +371,7 @@ public class Drill extends Block{
             Draw.z(Layer.block + 0.1f);
             if(drawRim){
                 Draw.color(heatColor);
-                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
+                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Vars.state.time, 3f, s)));
                 Draw.blend(Blending.additive);
                 Draw.rect(rimRegion, x, y);
                 Draw.blend();

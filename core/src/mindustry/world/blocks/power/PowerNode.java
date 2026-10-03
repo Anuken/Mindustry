@@ -21,6 +21,8 @@ import mindustry.world.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class PowerNode extends PowerBlock{
@@ -182,7 +184,7 @@ public class PowerNode extends PowerBlock{
     }
 
     protected void setupColor(float satisfaction){
-        Draw.color(Tmp.c1.set(laserColor1).lerp(laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(3f, 0.1f)).a(Renderer.laserOpacity * (useLod ? Lod.alpha2 : 1f)));
+        Draw.color(Tmp.c1.set(laserColor1).lerp(laserColor2, (1f - satisfaction) * 0.86f + Mathf.absin(Vars.state.time, 3f, 0.1f)).a(Renderer.laserOpacity * (useLod ? Lod.alpha2 : 1f)));
     }
 
     public void drawLaser(float x1, float y1, float x2, float y2, int size1, int size2){
@@ -491,7 +493,7 @@ public class PowerNode extends PowerBlock{
         @Override
         public void drawConfigure(){
 
-            Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Time.time, 4f, 1f));
+            Drawf.circles(x, y, tile.block().size * tilesize / 2f + 1f + Mathf.absin(Vars.state.time, 4f, 1f));
 
             if(drawRange){
                 Drawf.circles(x, y, laserRange * tilesize);

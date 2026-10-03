@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -66,8 +67,8 @@ public class ShockMine extends Block{
 
         @Override
         public void unitOn(Unit unit){
-            if(enabled && unit.team != team && Time.time - lastTriggerTime >= cooldown){
-                lastTriggerTime = Time.time;
+            if(enabled && unit.team != team && Vars.state.time - lastTriggerTime >= cooldown){
+                lastTriggerTime = Vars.state.time;
                 triggered();
                 damage(tileDamage);
             }

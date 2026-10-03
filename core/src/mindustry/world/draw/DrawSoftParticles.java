@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.Interp.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -28,14 +29,14 @@ public class DrawSoftParticles extends DrawBlock{
             Draw.color(color, a);
             Draw.blend(Blending.additive);
 
-            float base = (Time.time / particleLife);
+            float base = (Vars.state.time / particleLife);
             rand.setSeed(build.id);
             for(int i = 0; i < particles; i++){
                 float fin = (rand.random(1f) + base) % 1f, fout = 1f - fin;
                 fin = 1f - fin;
                 fout = 1f - fout;
 
-                float angle = rand.random(360f) + (Time.time / rotateScl) % 360f;
+                float angle = rand.random(360f) + (Vars.state.time / rotateScl) % 360f;
                 float col = rand.random(1f);
                 Draw.tint(color, color2, col);
                 float len = particleRad * particleInterp.apply(fout);

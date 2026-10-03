@@ -338,7 +338,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
         }
 
         if(type.drawBuildBeam){
-            float focusLen = type.buildBeamOffset + Mathf.absin(Time.time, 3f, 0.6f);
+            float focusLen = type.buildBeamOffset + Mathf.absin(Vars.state.time, 3f, 0.6f);
             float px = x + Angles.trnsx(rotation, focusLen);
             float py = y + Angles.trnsy(rotation, focusLen);
 
@@ -373,7 +373,7 @@ abstract class BuilderComp implements Posc, Statusc, Teamc, Rotc{
 
         Drawf.buildBeam(px, py, tx, ty, Vars.tilesize * size / 2f);
 
-        Fill.square(px, py, 1.8f + Mathf.absin(Time.time, 2.2f, 1.1f), rotation + 45);
+        Fill.square(px, py, 1.8f + Mathf.absin(Vars.state.time, 2.2f, 1.1f), rotation + 45);
 
         Draw.reset();
         Draw.z(Layer.flyingUnit);

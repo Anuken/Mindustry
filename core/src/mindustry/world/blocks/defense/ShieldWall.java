@@ -9,6 +9,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class ShieldWall extends Wall{
@@ -67,7 +69,7 @@ public class ShieldWall extends Wall{
 
                 Draw.reset();
 
-                Drawf.additive(glowRegion, glowColor, (1f - glowMag + Mathf.absin(glowScl, glowMag)) * shieldRadius, x, y, 0f, Layer.blockAdditive);
+                Drawf.additive(glowRegion, glowColor, (1f - glowMag + Mathf.absin(Vars.state.time, glowScl, glowMag)) * shieldRadius, x, y, 0f, Layer.blockAdditive);
             }
         }
 

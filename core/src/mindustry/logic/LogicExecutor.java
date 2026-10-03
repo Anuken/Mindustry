@@ -3,6 +3,7 @@ package mindustry.logic;
 import arc.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -67,11 +68,11 @@ public class LogicExecutor{
     }
 
     public boolean timeoutDone(Unit unit, float delay){
-        return Time.time >= unitTimeouts.get(unit.id) + delay;
+        return Vars.state.time >= unitTimeouts.get(unit.id) + delay;
     }
 
     public void updateTimeout(Unit unit){
-        unitTimeouts.put(unit.id, Time.time);
+        unitTimeouts.put(unit.id, Vars.state.time);
     }
 
     public boolean initialized(){

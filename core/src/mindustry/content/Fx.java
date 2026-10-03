@@ -16,6 +16,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.units.UnitAssembler.*;
 
+import mindustry.*;
+
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.*;
@@ -1433,7 +1435,7 @@ public class Fx{
         if(Fire.regions[0] == null) return;
         alpha(e.fout());
         rect(Fire.regions[((int)(e.rotation + e.fin() * Fire.frames)) % Fire.frames], e.x + Mathf.randomSeedRange((int)e.y, 2), e.y + Mathf.randomSeedRange((int)e.x, 2));
-        Drawf.light(e.x, e.y, 50f + Mathf.absin(5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
+        Drawf.light(e.x, e.y, 50f + Mathf.absin(Vars.state.time, 5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
     }),
 
     fire = new Effect(50f, e -> {

@@ -566,7 +566,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(createFrags && fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Time.run(0f, () -> createFrags(b, x, y));
+                Vars.state.post(() -> createFrags(b, x, y));
             }else{
                 createFrags(b, x, y);
             }
@@ -823,7 +823,7 @@ public class BulletType extends Content implements Cloneable{
                 b.trail = new Trail(trailLength);
             }
             b.trail.length = trailLength;
-            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
+            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Vars.state.time, trailSinScl, trailSinMag) : 0f)));
         }
     }
 

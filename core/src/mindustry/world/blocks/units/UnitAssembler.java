@@ -614,7 +614,7 @@ public class UnitAssembler extends PayloadBlock{
                 Draw.color(Pal.accent, warmup);
 
                 Shaders.blockbuild.region = plan.unit.fullIcon;
-                Shaders.blockbuild.time = Time.time;
+                Shaders.blockbuild.time = Vars.state.time;
                 Shaders.blockbuild.alpha = warmup;
                 //margin due to units not taking up whole region
                 Shaders.blockbuild.progress = Mathf.clamp(progress + 0.05f);

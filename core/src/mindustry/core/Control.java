@@ -19,6 +19,7 @@ import mindustry.core.GameState.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Interval;
 import mindustry.game.Saves.*;
 import mindustry.game.Teams.*;
 import mindustry.game.conditions.*;
@@ -207,7 +208,7 @@ public class Control implements ApplicationListener, Loadable{
             app.post(this::checkAutoUnlocks);
 
             if(!net.client() && e.sector.preset != null && e.sector.preset.isLastSector && e.initialCapture){
-                Time.run(60f * 2f, () -> {
+                Vars.state.run(60f * 2f, () -> {
                     ui.campaignComplete.show(e.sector.planet);
                 });
             }
@@ -287,7 +288,7 @@ public class Control implements ApplicationListener, Loadable{
                                     float delay = build.dst(ccore) / unitsPerTick + coreDelay;
                                     maxDelay = Math.max(delay, maxDelay);
 
-                                    Time.run(delay, () -> {
+                                    Vars.state.run(delay, () -> {
                                         if(build.tile.build != build){
                                             placeLandBuild(build);
 
@@ -304,9 +305,9 @@ public class Control implements ApplicationListener, Loadable{
                     }
 
                     if(anyBuilds){
-                        Time.run(maxDelay + 1f, this::configurePlaced);
+                        Vars.state.run(maxDelay + 1f, this::configurePlaced);
                         for(var ccore : state.rules.defaultTeam.data().cores){
-                            Time.run(coreDelay, () -> {
+                            Vars.state.run(coreDelay, () -> {
                                 Fx.coreBuildShockwave.at(ccore.x, ccore.y, buildRadius);
                             });
                         }
@@ -807,7 +808,7 @@ public class Control implements ApplicationListener, Loadable{
         }else{
             //this runs in the menu
             if(!state.isPaused()){
-                Time.update();
+                Vars.logic.updateTime();
             }
 
             if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.back)){

@@ -15,6 +15,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 import static mindustry.ai.Pathfinder.*;
 
@@ -228,7 +230,7 @@ public class ControlPathfinder implements Runnable{
                 req.invalidated = true;
                 //concurrent modification!
                 queue.post(() -> threadPathRequests.remove(req));
-                Time.run(0f, () -> unitRequests.remove(req.unit));
+                Vars.state.post(() -> unitRequests.remove(req.unit));
             }
         }
 
@@ -237,7 +239,7 @@ public class ControlPathfinder implements Runnable{
             if(field.lastUpdateId <= state.updateId - 30){
                 //make sure it's only modified on the main thread...? but what about calling get() on this thread??
                 queue.post(() -> fields.remove(field.mapKey));
-                Time.run(0f, () -> fieldList.remove(field));
+                Vars.state.post(() -> fieldList.remove(field));
             }
         }
     }

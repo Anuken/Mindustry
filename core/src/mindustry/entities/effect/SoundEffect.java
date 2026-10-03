@@ -7,6 +7,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -42,7 +43,7 @@ public class SoundEffect extends Effect{
         if(!shouldCreate()) return;
 
         if(startDelay > 0){
-            Time.run(startDelay, () -> sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume)));
+            Vars.state.run(startDelay, () -> sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume)));
         }else{
             sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume));
         }

@@ -20,6 +20,8 @@ import mindustry.world.blocks.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class RepairTurret extends Block{
@@ -116,8 +118,8 @@ public class RepairTurret extends Block{
             lastEnd.setLength(Math.max(2f, lastEnd.len()));
 
             lastEnd.add(offset.trns(
-            rand.random(360f) + Time.time/2f,
-            Mathf.sin(Time.time + rand.random(200f), 55f, rand.random(target.hitSize() * 0.2f, target.hitSize() * 0.45f))
+            rand.random(360f) + Vars.state.time/2f,
+            Mathf.sin(Vars.state.time + rand.random(200f), 55f, rand.random(target.hitSize() * 0.2f, target.hitSize() * 0.45f))
             ).rotate(target instanceof Rotc rot ? rot.rotation() : 0f));
 
             lastEnd.add(originX, originY);
@@ -132,7 +134,7 @@ public class RepairTurret extends Block{
 
             Draw.color(laserColor);
 
-            float f = (Time.time / 85f + rand.random(1f)) % 1f;
+            float f = (Vars.state.time / 85f + rand.random(1f)) % 1f;
 
             Draw.alpha(1f - Interp.pow5In.apply(f));
             Lines.stroke(strength * pulseStroke);

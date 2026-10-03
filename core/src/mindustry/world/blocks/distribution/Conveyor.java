@@ -20,6 +20,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class Conveyor extends Block implements Autotiler{
@@ -141,7 +143,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f && !state.rules.editor ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f && !state.rules.editor ? (int)(((Vars.state.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);

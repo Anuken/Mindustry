@@ -26,6 +26,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -173,7 +174,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         to.addItem(item, removed);
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> transferItemEffect(item, build.x, build.y, to));
+            Vars.state.run(j * 3f, () -> transferItemEffect(item, build.x, build.y, to));
         }
     }
 
@@ -252,7 +253,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
 
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
+            Vars.state.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
         if(amount > 0){
             build.handleStack(item, amount, unit);
@@ -303,7 +304,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
         Fx.itemTransfer.at(x, y, amount, item.color, to);
         if(done != null){
-            Time.run(Fx.itemTransfer.lifetime, done);
+            Vars.state.run(Fx.itemTransfer.lifetime, done);
         }
     }
 
@@ -809,7 +810,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
 
-            Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
+            Vars.state.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
                 Fx.unitSpirit.at(player.x, player.y, 0f, unit);
             }
@@ -1202,11 +1203,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawCommand(Unit sel){
-        Drawf.poly(sel.x, sel.y, 6, sel.hitSize / unitSelectRadScl + Mathf.absin(4f, 1f), 0f, selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
+        Drawf.poly(sel.x, sel.y, 6, sel.hitSize / unitSelectRadScl + Mathf.absin(Vars.state.time, 4f, 1f), 0f, selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
     }
 
     public void drawCommand(Building build){
-        Drawf.poly(build.x, build.y, 4, build.hitSize() / 1.4f + + 0.5f + Mathf.absin(4f, 1f), 0f, commandBuildings.contains(build) ? Pal.remove : Pal.accent);
+        Drawf.poly(build.x, build.y, 4, build.hitSize() / 1.4f + + 0.5f + Mathf.absin(Vars.state.time, 4f, 1f), 0f, commandBuildings.contains(build) ? Pal.remove : Pal.accent);
     }
 
     public void drawCommanded(){
@@ -1316,7 +1317,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     }
 
                     if(ai.targetPos != null && ai.currentCommand() == UnitCommand.loopPayloadCommand && unit instanceof Payloadc pay){
-                        Draw.color(color, 0.4f + Mathf.absin(5f, 0.5f));
+                        Draw.color(color, 0.4f + Mathf.absin(Vars.state.time, 5f, 0.5f));
                         TextureRegion region = pay.hasPayload() ? Icon.download.getRegion() : Icon.upload.getRegion();
                         float offset = 11f;
                         float size = 8f;

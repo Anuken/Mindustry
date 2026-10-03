@@ -14,6 +14,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class TractorBeamTurret extends BaseTurret{
@@ -163,7 +165,7 @@ public class TractorBeamTurret extends BaseTurret{
                 Draw.z(Layer.bullet);
                 float ang = angleTo(lastX, lastY);
 
-                Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
+                Draw.mixcol(laserColor, Mathf.absin(Vars.state.time, 4f, 0.6f));
 
                 Drawf.laser(laser, laserStart, laserEnd,
                 x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),

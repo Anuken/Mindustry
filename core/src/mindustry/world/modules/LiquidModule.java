@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.game.Interval;
 import mindustry.type.*;
 
 import java.util.*;
@@ -19,7 +20,7 @@ public class LiquidModule extends BlockModule{
     /** Visual refresh rate of the value, in ticks. Doesn't affect values, just reduces high-frequency flickering. */
     public static float flowVisualRefreshInterval = 15f;
 
-    private static final Interval flowTimer = new Interval(2);
+    private static final mindustry.game.Interval flowTimer = new Interval(2);
     private static @Nullable WindowedMean[] cacheFlow;
     private static @Nullable float[] cacheSums;
     private static @Nullable float[] displayFlow;

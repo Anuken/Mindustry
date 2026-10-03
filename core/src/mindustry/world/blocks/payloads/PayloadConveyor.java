@@ -14,6 +14,8 @@ import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class PayloadConveyor extends Block{
@@ -266,7 +268,7 @@ public class PayloadConveyor extends Block{
         }
 
         public float time(){
-            return Time.time;
+            return Vars.state.time;
         }
 
         @Override

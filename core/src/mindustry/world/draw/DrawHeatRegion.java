@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -36,7 +37,7 @@ public class DrawHeatRegion extends DrawBlock{
             float z = Draw.z();
             if(layer > 0) Draw.z(layer);
             Draw.blend(Blending.additive);
-            Draw.color(color, Mathf.clamp(hc.heat / hc.heatRequirement()) * (color.a * (1f - pulse + Mathf.absin(pulseScl, pulse))));
+            Draw.color(color, Mathf.clamp(hc.heat / hc.heatRequirement()) * (color.a * (1f - pulse + Mathf.absin(Vars.state.time, pulseScl, pulse))));
             Draw.rect(heat, build.x, build.y);
             Draw.blend();
             Draw.color();

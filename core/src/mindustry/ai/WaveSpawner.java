@@ -17,6 +17,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class WaveSpawner{
@@ -94,7 +96,7 @@ public class WaveSpawner{
             }
         }
 
-        Time.run(121f, () -> spawning = false);
+        Vars.state.run(121f, () -> spawning = false);
     }
 
     public void spawnUnit(SpawnGroup group, float x, float y){
@@ -234,6 +236,6 @@ public class WaveSpawner{
 
         Fx.unitSpawn.at(x, y, rotation, u);
 
-        Time.run(30f, () -> Fx.spawn.at(x, y));
+        Vars.state.run(30f, () -> Fx.spawn.at(x, y));
     }
 }

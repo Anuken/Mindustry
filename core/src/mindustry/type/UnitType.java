@@ -1815,7 +1815,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
     public void drawMining(Unit unit){
         if(drawMineBeam){
-            float focusLen = mineBeamOffset + Mathf.absin(Time.time, 1.1f, 0.5f);
+            float focusLen = mineBeamOffset + Mathf.absin(Vars.state.time, 1.1f, 0.5f);
             float px = unit.x + Angles.trnsx(unit.rotation, focusLen);
             float py = unit.y + Angles.trnsy(unit.rotation, focusLen);
 
@@ -1828,19 +1828,19 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         float swingScl = 12f, swingMag = tilesize / 8f;
         float flashScl = 0.3f;
 
-        float ex = unit.mineTile.worldx() + Mathf.sin(Time.time + 48, swingScl, swingMag);
-        float ey = unit.mineTile.worldy() + Mathf.sin(Time.time + 48, swingScl + 2f, swingMag);
+        float ex = unit.mineTile.worldx() + Mathf.sin(Vars.state.time + 48, swingScl, swingMag);
+        float ey = unit.mineTile.worldy() + Mathf.sin(Vars.state.time + 48, swingScl + 2f, swingMag);
 
         Draw.z(Layer.flyingUnit + 0.1f);
 
-        Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time, 0.5f, flashScl));
+        Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Vars.state.time, 0.5f, flashScl));
 
         Draw.alpha(Renderer.unitLaserOpacity);
         Drawf.laser(mineLaserRegion, mineLaserEndRegion, px, py, ex, ey, 0.75f);
 
         if(unit.isLocal()){
             Lines.stroke(1f, Pal.accent);
-            Lines.poly(unit.mineTile.worldx(), unit.mineTile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Time.time);
+            Lines.poly(unit.mineTile.worldx(), unit.mineTile.worldy(), 4, tilesize / 2f * Mathf.sqrt2, Vars.state.time);
         }
 
         Draw.color();
@@ -1901,7 +1901,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
         //draw back items
         if(unit.item() != null && unit.itemTime > 0.01f){
-            float sin = Mathf.absin(Time.time, 5f, 1f);
+            float sin = Mathf.absin(Vars.state.time, 5f, 1f);
             float size = (itemSize + sin) * unit.itemTime;
 
             Draw.mixcol(Pal.accent, sin * 0.1f);
@@ -1935,7 +1935,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
             unit.trail = new Trail(trailLength);
         }
         Trail trail = unit.trail;
-        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Time.time, 2f, engineSize / 4f) * (useEngineElevation ? unit.elevation : 1f)) * trailScl);
+        trail.draw(trailColor == null ? unit.team.color : trailColor, (engineSize + Mathf.absin(Vars.state.time, 2f, engineSize / 4f) * (useEngineElevation ? unit.elevation : 1f)) * trailScl);
     }
 
     public void drawEngines(Unit unit){
@@ -2011,7 +2011,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
     public Color cellColor(Unit unit){
         float f = Mathf.clamp(unit.healthf());
-        return Tmp.c1.set(Color.black).lerp(unit.team.color, f + Mathf.absin(Time.time, Math.max(f * 5f, 1f), 1f - f));
+        return Tmp.c1.set(Color.black).lerp(unit.team.color, f + Mathf.absin(Vars.state.time, Math.max(f * 5f, 1f), 1f - f));
     }
 
     public void drawLight(Unit unit){
@@ -2243,7 +2243,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
             Tmp.v1.set(x, y).rotate(rot);
             float ex = Tmp.v1.x, ey = Tmp.v1.y;
-            float rad = (radius + Mathf.absin(Time.time, 2f, radius / 4f)) * scale;
+            float rad = (radius + Mathf.absin(Vars.state.time, 2f, radius / 4f)) * scale;
 
             //engine outlines (cursed?)
             /*float z = Draw.z();
@@ -2252,7 +2252,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
             Fill.circle(
                 unit.x + ex,
                 unit.y + ey,
-                (type.outlineRadius * Draw.scl + radius + Mathf.absin(Time.time, 2f, radius / 4f)) * scale
+                (type.outlineRadius * Draw.scl + radius + Mathf.absin(Vars.state.time, 2f, radius / 4f)) * scale
             );
             Draw.z(z);*/
 

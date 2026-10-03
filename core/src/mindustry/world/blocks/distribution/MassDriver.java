@@ -95,7 +95,7 @@ public class MassDriver extends Block{
         if(selected == null || selected.block != this || !selected.within(x * tilesize, y * tilesize, range)) return;
 
         //if so, draw a dotted line towards it while it is in range
-        float sin = Mathf.absin(Time.time, 6f, 1f);
+        float sin = Mathf.absin(Vars.state.time, 6f, 1f);
         Tmp.v1.set(x * tilesize + offset, y * tilesize + offset).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
             x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
@@ -229,7 +229,7 @@ public class MassDriver extends Block{
                             //actually fire
                             fire(other);
                             float timeToArrive = Math.min(bulletLifetime / timeScale, dst(other) / (bulletSpeed * timeScale));
-                            Time.run(timeToArrive, () -> {
+                            Vars.state.run(timeToArrive, () -> {
                                 //remove waiting shooters, it's done firing
                                 other.waitingShooters.remove(this);
                                 other.state = DriverState.idle;
@@ -264,7 +264,7 @@ public class MassDriver extends Block{
 
         @Override
         public void drawConfigure(){
-            float sin = Mathf.absin(Time.time, 6f, 1f);
+            float sin = Mathf.absin(Vars.state.time, 6f, 1f);
 
             Draw.color(Pal.accent);
             Lines.stroke(1f);

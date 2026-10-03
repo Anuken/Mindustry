@@ -13,6 +13,8 @@ import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.entities.Puddles.*;
 
 /** A better name for this class would be "fluid", but it's too late for that. */
@@ -103,7 +105,7 @@ public class Liquid extends UnlockableContent implements LogicSenseable{
     }
 
     public int getAnimationFrame(){
-        return (int)(Time.time / (gas ? animationScaleGas : animationScaleLiquid) * animationFrames + id*5) % animationFrames;
+        return (int)(Vars.state.time / (gas ? animationScaleGas : animationScaleLiquid) * animationFrames + id*5) % animationFrames;
     }
 
     /** @return true if this liquid will boil in this global environment. */
@@ -126,7 +128,7 @@ public class Liquid extends UnlockableContent implements LogicSenseable{
         float smag = puddle.tile.floor().isLiquid ? 0.8f : 0f, sscl = 25f;
 
         Draw.color(Tmp.c1.set(color).shiftValue(-0.05f));
-        Fill.circle(x + Mathf.sin(Time.time + id * 532, sscl, smag), y + Mathf.sin(Time.time + id * 53, sscl, smag), f * 8f);
+        Fill.circle(x + Mathf.sin(Vars.state.time + id * 532, sscl, smag), y + Mathf.sin(Vars.state.time + id * 53, sscl, smag), f * 8f);
 
         float length = f * 6f;
         rand.setSeed(id);
@@ -135,8 +137,8 @@ public class Liquid extends UnlockableContent implements LogicSenseable{
             float vx = x + Tmp.v1.x, vy = y + Tmp.v1.y;
 
             Fill.circle(
-            vx + Mathf.sin(Time.time + i * 532, sscl, smag),
-            vy + Mathf.sin(Time.time + i * 53, sscl, smag),
+            vx + Mathf.sin(Vars.state.time + i * 532, sscl, smag),
+            vy + Mathf.sin(Vars.state.time + i * 53, sscl, smag),
             f * 5f);
         }
 

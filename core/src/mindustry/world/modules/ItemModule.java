@@ -4,6 +4,7 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.game.Interval;
 import mindustry.type.*;
 
 import java.util.*;
@@ -24,7 +25,7 @@ public class ItemModule extends BlockModule{
     private static float[] cacheSums;
     private static float[] displayFlow;
     private static final Bits cacheBits = new Bits();
-    private static final Interval flowTimer = new Interval(2);
+    private static final Interval flowTimer = new mindustry.game.Interval(2);
 
     protected int[] items = new int[content.items().size];
     protected int total;

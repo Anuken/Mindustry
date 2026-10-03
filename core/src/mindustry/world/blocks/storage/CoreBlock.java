@@ -405,7 +405,7 @@ public class CoreBlock extends StorageBlock{
                     });
                     Core.scene.add(image);
 
-                    Time.run(launchDuration(), () -> {
+                    Vars.state.run(launchDuration(), () -> {
                         launchEffect.at(this);
                         Effect.shake(5f, 5f, this);
                         thrusterTime = 1f;
@@ -504,7 +504,7 @@ public class CoreBlock extends StorageBlock{
             Draw.scl(scl);
 
             //draw thruster flame
-            float strength = (1f + (size - 3)/2.5f) * scl * thrusterSize * (0.95f + Mathf.absin(2f, 0.1f));
+            float strength = (1f + (size - 3)/2.5f) * scl * thrusterSize * (0.95f + Mathf.absin(Vars.state.time, 2f, 0.1f));
             float offset = (size - 3) * 3f * scl;
 
             for(int i = 0; i < 4; i++){
@@ -726,7 +726,7 @@ public class CoreBlock extends StorageBlock{
 
                     if(net.server()){
                         //delay so clients don't destroy it afterwards
-                        Time.run(0f, () -> {
+                        Vars.state.post(() -> {
                             tile.setNet(block, lastDamage, 0);
                         });
                     }
@@ -736,7 +736,7 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, lightRadius, Pal.accent, 0.65f + Mathf.absin(20f, 0.1f));
+            Drawf.light(x, y, lightRadius, Pal.accent, 0.65f + Mathf.absin(Vars.state.time, 20f, 0.1f));
         }
 
         @Override

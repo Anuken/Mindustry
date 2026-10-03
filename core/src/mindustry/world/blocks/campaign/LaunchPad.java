@@ -16,6 +16,7 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
@@ -228,7 +229,7 @@ public class LaunchPad extends Block{
         @Import float x,y;
 
         Seq<ItemStack> stacks = new Seq<>();
-        transient Interval in = new Interval();
+        transient Interval in = new mindustry.game.Interval();
 
         @Override
         public void draw(){

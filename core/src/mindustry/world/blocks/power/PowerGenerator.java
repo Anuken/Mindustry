@@ -154,7 +154,7 @@ public class PowerGenerator extends PowerDistributor{
                         Mathf.chance(explosionIgnitionChance *
                             (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(dst / explosionRadius) : 1))
                     ){
-                        Time.run(dst / explosionSpeed, () -> {
+                        Vars.state.run(dst / explosionSpeed, () -> {
                             Fires.create(t);
                         });
                     }

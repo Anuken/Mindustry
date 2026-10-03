@@ -20,6 +20,8 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class BeamDrill extends Block{
@@ -292,10 +294,10 @@ public class BeamDrill extends Block{
                     Point2 p = lasers[i];
                     float lx = face.worldx() - (dir.x/2f)*tilesize, ly = face.worldy() - (dir.y/2f)*tilesize;
 
-                    float width = (laserWidth + Mathf.absin(Time.time + i*5 + (id % 9)*9, glowScl, pulseIntensity)) * warmup;
+                    float width = (laserWidth + Mathf.absin(Vars.state.time + i*5 + (id % 9)*9, glowScl, pulseIntensity)) * warmup;
 
                     Draw.z(Layer.power - 1);
-                    Draw.mixcol(glowColor, Mathf.absin(Time.time + i*5 + id*9, glowScl, glowIntensity));
+                    Draw.mixcol(glowColor, Mathf.absin(Vars.state.time + i*5 + id*9, glowScl, glowIntensity));
                     if(Math.abs(p.x - face.x) + Math.abs(p.y - face.y) == 0){
                         Draw.scl(width);
 
@@ -333,7 +335,7 @@ public class BeamDrill extends Block{
                         Color col = drop.color;
                         Color spark = Tmp.c3.set(sparkColor).lerp(boostHeatColor, boostWarmup);
                         for(int j = 0; j < sparks; j++){
-                            float fin = (Time.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;
+                            float fin = (Vars.state.time / sparkLife + rand.random(sparkRecurrence + 1f)) % sparkRecurrence;
                             float or = rand.range(2f);
                             Tmp.v1.set(sparkRange * fin, 0).rotate(rotdeg() + rand.range(sparkSpread));
 
@@ -350,7 +352,7 @@ public class BeamDrill extends Block{
             if(glowRegion.found()){
                 Draw.z(Layer.blockAdditive);
                 Draw.blend(Blending.additive);
-                Draw.color(Tmp.c1.set(heatColor).lerp(boostHeatColor, boostWarmup), warmup * (heatColor.a * (1f - heatPulse + Mathf.absin(heatPulseScl, heatPulse))));
+                Draw.color(Tmp.c1.set(heatColor).lerp(boostHeatColor, boostWarmup), warmup * (heatColor.a * (1f - heatPulse + Mathf.absin(Vars.state.time, heatPulseScl, heatPulse))));
                 Draw.rect(glowRegion, x, y, rotdeg());
                 Draw.blend();
                 Draw.color();

@@ -19,6 +19,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 /** Utility class for damaging in an area. */
@@ -53,7 +55,7 @@ public class Damage{
             if(build.wasRecentlyHealed(60f * 12f) || build.block.suppressable){
 
                 //add prev check so ability spam doesn't lead to particle spam (essentially, recently suppressed blocks don't get new particles)
-                if(!headless && prev - Time.time <= reload/2f){
+                if(!headless && prev - Vars.state.time <= reload/2f){
                     builds.add(build);
                 }
             }
@@ -63,7 +65,7 @@ public class Damage{
         float scaledChance = applyParticleChance / builds.size;
         for(var build : builds){
             if(Mathf.chance(scaledChance)){
-                Time.run(Mathf.random(maxDelay), () -> {
+                Vars.state.run(Mathf.random(maxDelay), () -> {
                     Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, effectColor, source);
                 });
             }
@@ -94,12 +96,12 @@ public class Damage{
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
                 int length = 5 + Mathf.clamp((int)(Mathf.pow(power, 0.98f) / 500), 1, 18);
-                Time.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3 + Mathf.pow(power, 0.35f), x, y, Mathf.random(360f), length + Mathf.range(2)));
+                Vars.state.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3 + Mathf.pow(power, 0.35f), x, y, Mathf.random(360f), length + Mathf.range(2)));
             }
 
             if(fire){
                 for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-                    Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
+                    Vars.state.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
                 }
             }
 
@@ -108,7 +110,7 @@ public class Damage{
 
             for(int i = 0; i < waves; i++){
                 int f = i;
-                Time.run(i * 2f, () -> {
+                Vars.state.run(i * 2f, () -> {
                     float absorbed = absorbExplosion(ignoreTeam, x, y, damagePerWave);
                     if(absorbed < damagePerWave){
                         damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave - absorbed, false);
@@ -704,7 +706,7 @@ public class Damage{
 
     public static void tileDamage(Team team, int tx, int ty, float baseRadius, float damage, @Nullable Bullet source){
         var world = state.world;
-        Time.run(0f, () -> {
+        Vars.state.post(() -> {
             int x = Mathf.clamp(tx, -100, world.width + 100), y = Mathf.clamp(ty, -100, world.height + 100);
 
             var in = world.build(x, y);

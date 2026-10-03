@@ -78,7 +78,6 @@ public class NetworkIO{
 
         try(DataInputStream stream = new DataInputStream(is)){
             var writer = SaveIO.getSaveWriter();
-            Time.clear();
             writer.readDataPatches(stream, new DefaultWorldContext());
 
             state.rules = JsonIO.read(Rules.class, stream.readUTF());

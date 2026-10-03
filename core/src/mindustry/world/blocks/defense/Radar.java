@@ -86,7 +86,7 @@ public class Radar extends Block{
             Draw.rect(baseRegion, x, y);
             Draw.rect(region, x, y, rotateSpeed * totalProgress);
 
-            Drawf.additive(glowRegion, glowColor, glowColor.a * (1f - glowMag + Mathf.absin(glowScl, glowMag)), x, y, rotateSpeed * totalProgress, Layer.blockAdditive);
+            Drawf.additive(glowRegion, glowColor, glowColor.a * (1f - glowMag + Mathf.absin(Vars.state.time, glowScl, glowMag)), x, y, rotateSpeed * totalProgress, Layer.blockAdditive);
         }
 
         @Override

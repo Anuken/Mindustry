@@ -1,9 +1,11 @@
-package arc.util;
+package mindustry.game;
 
-import java.util.Arrays;
+import mindustry.*;
+
+import java.util.*;
 
 public class Interval{
-    float[] times;
+    public float[] times;
 
     public Interval(int capacity){
         times = new float[capacity];
@@ -21,27 +23,19 @@ public class Interval{
         if(id >= times.length) throw new RuntimeException("Out of bounds! Max timer size is " + times.length + "!");
 
         boolean got = check(id, time);
-        if(got) times[id] = Time.time;
+        if(got) times[id] = Vars.state.time;
         return got;
     }
 
     public boolean check(int id, float time){
-        return Time.time - times[id] >= time || Time.time < times[id];
+        return Vars.state.time - times[id] >= time || Vars.state.time < times[id];
     }
 
     public void reset(int id, float time){
-        times[id] = Time.time - time;
+        times[id] = Vars.state.time - time;
     }
 
     public void clear(){
         Arrays.fill(times, 0);
-    }
-
-    public float getTime(int id){
-        return Time.time - times[id];
-    }
-
-    public float[] getTimes(){
-        return times;
     }
 }

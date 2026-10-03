@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 
 /** Effect that renders noise layers over the camera view. */
@@ -62,7 +63,7 @@ public class NoiseEffect extends Effect{
         float windx = vwindx * speed, windy = vwindy * speed;
 
         float scale  = 1f / noisescl;
-        float scroll = Time.time * scale + offset;
+        float scroll = Vars.state.time * scale + offset;
         Tmp.tr1.texture = noise;
         Core.camera.bounds(Tmp.r1);
         Tmp.tr1.set(Tmp.r1.x * scale, Tmp.r1.y * scale, (Tmp.r1.x + Tmp.r1.width) * scale, (Tmp.r1.y + Tmp.r1.height) * scale);

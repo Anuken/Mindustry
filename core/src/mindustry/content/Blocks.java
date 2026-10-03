@@ -5200,7 +5200,7 @@ public class Blocks{
             }};
 
             drawer = new DrawTurret("reinforced-"){{
-                var heatp = PartProgress.warmup.blend(p -> Mathf.absin(2f, 1f) * p.warmup, 0.2f);
+                var heatp = PartProgress.warmup.blend(p -> Mathf.absin(Vars.state.time, 2f, 1f) * p.warmup, 0.2f);
 
                 parts.add(new RegionPart("-blade"){{
                     progress = PartProgress.warmup;
@@ -5608,7 +5608,7 @@ public class Blocks{
                 }},
                 new RegionPart("-mid"){{
                     progress = PartProgress.recoil;
-                    heatProgress = PartProgress.warmup.add(-0.2f).add(p -> Mathf.sin(9f, 0.2f) * p.warmup);
+                    heatProgress = PartProgress.warmup.add(-0.2f).add(p -> Mathf.sin(Vars.state.time, 9f, 0.2f) * p.warmup);
                     mirror = false;
                     under = true;
                     moveY = -5f;
@@ -6267,7 +6267,7 @@ public class Blocks{
                     parts.add(new RegionPart("-spine"){{
                         outline = false;
                         progress = PartProgress.warmup.delay(fi / 5f);
-                        heatProgress = PartProgress.warmup.add(p -> (Mathf.absin(3f, 0.2f) - 0.2f) * p.warmup);
+                        heatProgress = PartProgress.warmup.add(p -> (Mathf.absin(Vars.state.time, 3f, 0.2f) - 0.2f) * p.warmup);
                         mirror = true;
                         under = true;
                         layerOffset = -0.3f;

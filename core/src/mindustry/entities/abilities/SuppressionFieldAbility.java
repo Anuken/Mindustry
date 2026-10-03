@@ -11,6 +11,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class SuppressionFieldAbility extends Ability{
@@ -67,16 +69,16 @@ public class SuppressionFieldAbility extends Ability{
     public void draw(Unit unit){
         Draw.z(layer);
 
-        float rad = orbRadius + Mathf.absin(orbSinScl, orbSinMag);
+        float rad = orbRadius + Mathf.absin(Vars.state.time, orbSinScl, orbSinMag);
         Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
         float rx = Tmp.v1.x, ry = Tmp.v1.y;
 
-        float base = (Time.time / particleLife);
+        float base = (Vars.state.time / particleLife);
         rand.setSeed(unit.id + hashCode());
         Draw.color(particleColor);
         for(int i = 0; i < particles; i++){
             float fin = (rand.random(1f) + base) % 1f, fout = 1f - fin;
-            float angle = rand.random(360f) + (Time.time / rotateScl + unit.rotation) % 360f;
+            float angle = rand.random(360f) + (Vars.state.time / rotateScl + unit.rotation) % 360f;
             float len = particleLen * particleInterp.apply(fout);
             Fill.circle(
             rx + Angles.trnsx(angle, len),

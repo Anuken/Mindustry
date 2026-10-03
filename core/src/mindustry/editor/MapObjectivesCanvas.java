@@ -18,6 +18,8 @@ import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unchecked")
@@ -262,7 +264,7 @@ public class MapObjectivesCanvas extends WidgetGroup{
                 Lines.curve(x1, y1, cx1, y1, cx2, y2, x2, y2, Math.max(4, (int) (Mathf.dst(x1, y1, x2, y2) / 4f)));
             }
 
-            float progress = (Time.time % (60 * 4)) / (60 * 4);
+            float progress = (Vars.state.time % (60 * 4)) / (60 * 4);
 
             float t2 = progress * progress;
             float t3 = progress * t2;

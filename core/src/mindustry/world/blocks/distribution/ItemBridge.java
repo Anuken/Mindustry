@@ -20,6 +20,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class ItemBridge extends Block{
@@ -276,7 +278,7 @@ public class ItemBridge extends Block{
             Tmp.v2.trns(tile.angleTo(other), 2f);
             float tx = tile.drawx(), ty = tile.drawy();
             float ox = other.drawx(), oy = other.drawy();
-            float alpha = Math.abs((linked ? 100 : 0)-(Time.time * 2f) % 100f) / 100f;
+            float alpha = Math.abs((linked ? 100 : 0)-(Vars.state.time * 2f) % 100f) / 100f;
             float x = Mathf.lerp(ox, tx, alpha);
             float y = Mathf.lerp(oy, ty, alpha);
 
@@ -315,7 +317,7 @@ public class ItemBridge extends Block{
                         boolean linked = other.pos() == link;
 
                         Drawf.select(other.drawx(), other.drawy(),
-                            other.block().size * tilesize / 2f + 2f + (linked ? 0f : Mathf.absin(Time.time, 4f, 1f)), linked ? Pal.place : Pal.breakInvalid);
+                            other.block().size * tilesize / 2f + 2f + (linked ? 0f : Mathf.absin(Vars.state.time, 4f, 1f)), linked ? Pal.place : Pal.breakInvalid);
                     }
                 }
             }
@@ -421,7 +423,7 @@ public class ItemBridge extends Block{
             int i = relativeTo(other.x, other.y);
 
             if(pulse){
-                Draw.color(Color.white, Color.black, Mathf.absin(Time.time, 6f, 0.07f));
+                Draw.color(Color.white, Color.black, Mathf.absin(Vars.state.time, 6f, 0.07f));
             }
 
             float warmup = hasPower ? this.warmup : 1f;

@@ -15,6 +15,7 @@ import mindustry.core.GameState.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;

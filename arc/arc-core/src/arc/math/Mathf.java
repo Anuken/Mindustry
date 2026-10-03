@@ -71,20 +71,12 @@ public final class Mathf{
         return sinTable[(int)((degrees + 90) * degToIndex) & sinMask];
     }
 
-    public static float absin(float scl, float mag){
-        return absin(Time.time, scl, mag);
-    }
-
     public static float absin(float in, float scl, float mag){
         return (sin(in, scl * 2f, mag) + mag) / 2f;
     }
 
     public static float tan(float radians, float scl, float mag){
         return (sin(radians / scl)) / (cos(radians / scl)) * mag;
-    }
-
-    public static float sin(float scl, float mag){
-        return sin(Time.time / scl) * mag;
     }
 
     public static float sin(float radians, float scl, float mag){
