@@ -40,7 +40,7 @@ public class ConsoleFragment extends Table{
         font = Fonts.def;
 
         visible(() -> {
-            if(input.keyTap(Binding.console) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || !(scene.getKeyboardFocus() instanceof TextField)) && !ui.chatfrag.shown()){
+            if(input.keyTap(Binding.console) && (settings.getBool("console") || shown) && (scene.getKeyboardFocus() == chatfield || !(scene.getKeyboardFocus() instanceof TextField)) && !ui.chatfrag.shown()){
                 shown = !shown;
                 if(shown && !open && settings.getBool("console")){
                     toggle();
