@@ -1835,7 +1835,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
         Draw.color(Color.lightGray, Color.white, 1f - flashScl + Mathf.absin(Time.time, 0.5f, flashScl));
 
-        Draw.alpha(Renderer.unitLaserOpacity);
+        Draw.alpha(Renderer.mineLaserOpacity);
         Drawf.laser(mineLaserRegion, mineLaserEndRegion, px, py, ex, ey, 0.75f);
 
         if(unit.isLocal()){
