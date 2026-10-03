@@ -85,7 +85,7 @@ public class Control implements ApplicationListener, Loadable{
             Time.runTask(5f, () -> {
                 String key = "v9-warning-alpha1";
 
-                if(!settings.getBool(key)){
+                if(!settings.getBool(key) && System.getProperty("mindustry.test") == null){
                     //I am not bothering to localize this since it will be removed and rewritten eventually
                     BaseDialog diag = new BaseDialog("Alpha Version Warning");
                     diag.cont.add(

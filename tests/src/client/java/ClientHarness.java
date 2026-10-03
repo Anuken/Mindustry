@@ -66,6 +66,7 @@ public final class ClientHarness{
 
         //read by ClientLauncher#setup
         System.setProperty("mindustry.data.dir", data.absolutePath());
+        System.setProperty("mindustry.test", "true");
 
         //same prelude as DesktopLauncher#main
         Log.useColors = false;
@@ -112,7 +113,7 @@ public final class ClientHarness{
             //one frame is one tick, so that tests are deterministic no matter how slow software GL is
             Time.setDeltaProvider(() -> 1f);
             //don't sleep to hit a frame rate target
-            Core.settings.put("fpscap", 0);
+            Core.settings.put("fpscap", Integer.getInteger("clienttest.fps", 0));
         });
 
         bootErrors = drainErrors();
@@ -132,8 +133,8 @@ public final class ClientHarness{
     private static SdlConfig config(){
         SdlConfig cfg = new SdlConfig();
         cfg.title = "Mindustry (client test)";
-        cfg.width = 640;
-        cfg.height = 480;
+        cfg.width = Integer.getInteger("clienttest.width", 640);
+        cfg.height = Integer.getInteger("clienttest.height", 480);
         cfg.coreProfile = true;
         //same list as DesktopLauncher
         cfg.glVersions = new int[][]{{4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
