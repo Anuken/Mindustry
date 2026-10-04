@@ -204,7 +204,7 @@ public class DataPatcher{
             set.error = false;
 
             try{
-                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.plain));
+                Object someValue = parser.getJson().fromJson(null, Jval.read(set.patch).toString(Jformat.json));
                 if(!(someValue instanceof Jval value)) throw new SerializationException("Patch must be a JSON object.");
 
                 if(Vars.state.rules.planet != null && value.has("requiredPlanets")){

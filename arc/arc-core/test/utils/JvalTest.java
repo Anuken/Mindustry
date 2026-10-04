@@ -115,7 +115,7 @@ public class JvalTest{
 
         String expected = "{\"rate\":1000,\"key\":\"value\",\"text\":\"comma, no quotes!\",\"commas\":{\"one\":1,\"two\":2},\"trailing\":{\"one\":1,\"two\":2},\"haiku\":\"aba1111111111111111111111111111111111basb\\nddddddddddddd1111111dyfh3289gh2goui3ho3hgohjgo3hghddddddddddddddddddddddddddddddddddddddddd\\neeeeeeeeeeeeeeesehshhhsher5hysghyr5yherd5yhg5edhy5syhedyhedyhedyhesdyhgeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeekkkkkllllbvbbbcbZzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\"favNumbers\":[1,2,3,6,42]}";
 
-        assertEquals(expected, val.toString(Jformat.plain));
+        assertEquals(expected, val.toString(Jformat.json));
     }
 
     @Test

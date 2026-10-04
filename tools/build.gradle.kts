@@ -143,7 +143,7 @@ tasks.register("generateIcons"){
 
         mapFile.writeText(
             "[\n" + sorted.entries.joinToString(",\n"){ (k, v) ->
-                "    " + newObject().put("name", k).put("code", v).toString(Jformat.plain)
+                "    " + newObject().put("name", k).put("code", v).toString(Jformat.json)
             } + "\n]\n"
         )
 
@@ -160,7 +160,7 @@ tasks.register("generateIcons"){
                 .put("assetTypes", newArray())
                 .put("normalize", true)
                 .put("codepoints", codepoints)
-                .toString(Jformat.plain)
+                .toString(Jformat.json)
         )
 
         outDir.mkdirs()

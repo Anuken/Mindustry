@@ -279,7 +279,7 @@ public interface Jval{
      * @throws IOException if an I/O error occurs in the writer
      */
     default void writeTo(Writer writer) throws IOException{
-        writeTo(writer, Jformat.plain);
+        writeTo(writer, Jformat.json);
     }
 
     /**
@@ -294,13 +294,13 @@ public interface Jval{
     default void writeTo(Writer writer, Jformat format) throws IOException{
         WritingBuffer buffer = new WritingBuffer(writer, 128);
         switch(format){
-            case plain:
+            case json:
                 JvalWriter.writeJson(this, false, true, buffer, 0);
                 break;
             case minimal:
                 JvalWriter.writeJson(this, false, false, buffer, 0);
                 break;
-            case formatted:
+            case jsonFormatted:
                 JvalWriter.writeJson(this, true, true, buffer, 0);
                 break;
             case hjson:
@@ -481,11 +481,11 @@ public interface Jval{
     /** The toString format. */
     enum Jformat{
         /** JSON (no whitespace). */
-        plain,
+        json,
+        /** Formatted JSON. */
+        jsonFormatted,
         /** Minimal quote-less JSON. Equivalent to libGDX's minimal output type. */
         minimal,
-        /** Formatted JSON. */
-        formatted,
         /** Formatted HJSON. */
         hjson,
     }

@@ -33,7 +33,7 @@ public class StringJsonWriter extends Writer implements JsonWriter{
             newline(current.level + 1);
             writer.write(quoteName(name));
             writer.write(':');
-            if(format == Jformat.formatted || format == Jformat.hjson) writer.write(' ');
+            if(format == Jformat.jsonFormatted || format == Jformat.hjson) writer.write(' ');
             named = true;
             return this;
         }catch(IOException ex){
@@ -93,7 +93,7 @@ public class StringJsonWriter extends Writer implements JsonWriter{
     }
 
     private void newline(int level) throws IOException{
-        if(format != Jformat.formatted && format != Jformat.hjson) return;
+        if(format != Jformat.jsonFormatted && format != Jformat.hjson) return;
         writer.write('\n');
         for(int i = 0; i < level; i++) writer.write("  ");
     }
