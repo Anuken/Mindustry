@@ -489,7 +489,7 @@ public class Vars implements Loadable{
         Binding.init();
 
         //https://github.com/Anuken/Mindustry/issues/8483
-        if(settings.getInt("uiscale") == 5){
+        if(!headless && settings.getInt("uiscale") == 5){
             settings.put("uiscale", 100);
         }
 

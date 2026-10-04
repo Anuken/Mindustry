@@ -32,7 +32,7 @@ public class ServerConfig{
     public boolean enableVotekick = true;
 
     @Desc("Duration of a votekick ban, in seconds.")
-    public int kickDuration = 60 * 60;
+    public int votekickDuration = 60 * 60;
 
     @Desc("Votekick voting round duration, in seconds.")
     public float voteDuration = 0.5f * 60;
