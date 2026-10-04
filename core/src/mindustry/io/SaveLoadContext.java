@@ -2,6 +2,7 @@ package mindustry.io;
 
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -32,8 +33,8 @@ public abstract class SaveLoadContext{
     /** End generating, prepares tiles.*/
     public abstract void end();
 
-    /** Called when a building is finished reading. */
-    public void onReadBuilding(){}
+    /** Called instead of building creation/reading when {@link #preview} is true; the current tile holds the block. */
+    public void onReadPreviewBuilding(Team team){}
 
     /** Called when data finishes reading for a tile. */
     public void onReadTileData(){}

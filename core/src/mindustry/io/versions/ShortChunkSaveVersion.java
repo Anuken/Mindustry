@@ -10,8 +10,6 @@ import mindustry.world.*;
 
 import java.io.*;
 
-import static mindustry.Vars.*;
-
 public class ShortChunkSaveVersion extends SaveVersion{
 
     public ShortChunkSaveVersion(int version){
@@ -125,6 +123,11 @@ public class ShortChunkSaveVersion extends SaveVersion{
                         if(block.hasBuilding()){
                             try{
                                 readLegacyShortChunk(stream, context.reads, (in, len) -> {
+                                    if(context.preview){
+                                        readPreviewBuilding(in, len, context);
+                                        return;
+                                    }
+
                                     byte revision = in.b();
                                     tile.build.readAll(in, revision);
                                 });
@@ -135,8 +138,6 @@ public class ShortChunkSaveVersion extends SaveVersion{
                             //skip the entity region, as the entity and its IO code are now gone
                             skipLegacyShortChunk(stream);
                         }
-
-                        context.onReadBuilding();
                     }
                 }else if(hadDataOld || hadDataNew){ //never read consecutive blocks if there's any kind of data
                     if(hadDataOld){

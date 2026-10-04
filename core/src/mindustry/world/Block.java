@@ -592,9 +592,9 @@ public class Block extends UnlockableContent implements LogicSenseable{
         return 0;
     }
 
-    public Color getColor(Tile tile){
+    public int getColor(Tile tile){
         int mc = minimapColor(tile);
-        return mc == 0 ? mapColor : Tmp.c3.set(mc);
+        return mc == 0 ? mapColor.rgba() : mc;
     }
 
     public boolean outputsItems(){

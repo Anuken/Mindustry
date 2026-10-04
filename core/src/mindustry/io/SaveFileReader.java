@@ -145,6 +145,14 @@ public abstract class SaveFileReader{
         });
     }
 
+    /** Skips exactly this many bytes, throwing if the stream ends early. */
+    protected void skipBytes(DataInput input, int amount) throws IOException{
+        int skipped = input.skipBytes(amount);
+        if(amount != skipped){
+            throw new IOException("Could not skip bytes. Expected length: " + amount + "; Actual length: " + skipped);
+        }
+    }
+
     /** Skip a chunk completely, discarding the bytes. */
     public void skipChunk(DataInput input) throws IOException{
         int length = readChunk(input, (t, len) -> {});

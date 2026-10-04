@@ -160,6 +160,8 @@ public abstract class SaveVersion extends SaveFileReader{
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
             "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id,
+            "teamCount", state.teams.active.size,
+            "spawns", state.spawner.countSpawns(),
             "hasExternalAssets", state.data.getAllExternalAssets().size > 0
         )));
     }
@@ -382,6 +384,11 @@ public abstract class SaveVersion extends SaveFileReader{
                         if(block.hasBuilding()){
                             try{
                                 readChunkReads(stream, state.reads, (in, len) -> {
+                                    if(state.preview){
+                                        readPreviewBuilding(in, len, state);
+                                        return;
+                                    }
+
                                     byte revision = in.b();
                                     tile.build.readAll(in, revision);
                                 });
@@ -392,8 +399,6 @@ public abstract class SaveVersion extends SaveFileReader{
                             //skip the entity region, as the entity and its IO code are now gone
                             skipChunk(stream);
                         }
-
-                        state.onReadBuilding();
                     }
                 }else if(!hadData){ //never read consecutive blocks if there's data
                     int consecutives = stream.readUnsignedByte();
@@ -408,6 +413,16 @@ public abstract class SaveVersion extends SaveFileReader{
         }finally{
             if(!generating) state.end();
         }
+    }
+
+    /** Previews never create buildings: reads only the team from a building chunk (revision, health, rotation, team) and skips the rest. */
+    protected void readPreviewBuilding(Reads in, int len, SaveLoadContext context) throws IOException{
+        in.b(); //revision
+        in.f(); //health
+        in.b(); //rotation
+        byte team = in.b();
+        skipBytes(in.input, len - 7);
+        context.onReadPreviewBuilding(Team.get(team));
     }
 
     public void writeTeamBlocks(DataOutput stream) throws IOException{

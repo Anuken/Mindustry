@@ -9,8 +9,6 @@ import mindustry.world.*;
 
 import java.io.*;
 
-import static mindustry.Vars.*;
-
 public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
 
     public LegacySaveVersion(int version){
@@ -69,6 +67,18 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
                     try{
                         readLegacyShortChunk(stream, context.reads, (in, len) -> {
                             byte version = in.b();
+
+                            if(context.preview){
+                                //previews never create buildings, so only the team is read
+                                stream.readUnsignedShort(); //health
+                                byte packedteam = stream.readByte();
+                                boolean extraTeam = Pack.leftByte(packedteam) == 8;
+                                byte previewTeam = extraTeam ? stream.readByte() : Pack.leftByte(packedteam);
+                                skipBytes(in.input, len - (extraTeam ? 5 : 4));
+                                context.onReadPreviewBuilding(Team.get(previewTeam));
+                                return;
+                            }
+
                             //legacy impl of Building#read()
                             tile.build.health = stream.readUnsignedShort();
                             byte packedrot = stream.readByte();
@@ -90,8 +100,6 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
                     }catch(Throwable e){
                         throw new IOException("Failed to read tile entity of block: " + block, e);
                     }
-
-                    context.onReadBuilding();
                 }else{
                     int consecutives = stream.readUnsignedByte();
 

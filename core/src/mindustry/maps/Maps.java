@@ -409,25 +409,30 @@ public class Maps{
     }
 
     private void createNewPreview(Map map, Cons<Exception> failed){
-        try{
-            //if it's here, then the preview failed to load or doesn't exist, make it
-            //this has to be done synchronously!
-            Pixmap pix = MapIO.generatePreview(map);
-            map.texture = new Texture(pix);
-            mainExecutor.submit(() -> {
-                try{
-                    map.previewFile().writePng(pix);
-                    writeCache(map);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }finally{
-                    pix.dispose();
-                }
-            });
-        }catch(Exception e){
-            failed.get(e);
-            Log.err("Failed to generate preview!", e);
-        }
+        mainExecutor.submit(() -> {
+            try{
+                //generatePreview is (almost) thread safe
+                Pixmap pix = MapIO.generatePreview(map);
+
+                Core.app.post(() -> {
+                    //texture must be generated on main thread
+                    map.texture = new Texture(pix);
+                    mainExecutor.submit(() -> {
+                        try{
+                            map.previewFile().writePng(pix);
+                            writeCache(map);
+                        }catch(Exception e){
+                            Log.err(e);
+                        }finally{
+                            pix.dispose();
+                        }
+                    });
+                });
+            }catch(Exception e){
+                failed.get(e);
+                Log.err("Failed to generate preview!", e);
+            }
+        });
     }
 
     private void writeCache(Map map) throws IOException{
