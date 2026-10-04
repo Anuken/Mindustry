@@ -328,29 +328,29 @@ public class TexturePacker{
         //sync point
         boolean existed = packFile.exists() && packFile.length() > 0;
 
-        try(Writes write = packFile.writes(true)){
+        try(DataOutputStream write = new DataOutputStream(packFile.write(true, 2048))){
             //write meta to start of file
             if(!existed){
-                write.b(TextureAtlasData.formatHeader);
-                write.b(TextureAtlasData.formatVersion);
+                write.write(TextureAtlasData.formatHeader);
+                write.write(TextureAtlasData.formatVersion);
             }
 
             //write every page; reader is expected to read until EOF
             for(Page page : pages){
                 //write a single byte to check for EOF
-                write.b(1);
-                write.str(page.imageName);
+                write.writeByte(1);
+                write.writeUTF(page.imageName);
                 //size
-                write.s(page.imageWidth);
-                write.s(page.imageHeight);
+                write.writeShort(page.imageWidth);
+                write.writeShort(page.imageHeight);
                 //filters, wrapping
-                write.b(settings.filterMin.ordinal());
-                write.b(settings.filterMag.ordinal());
-                write.b(settings.wrapX.ordinal());
-                write.b(settings.wrapY.ordinal());
+                write.writeByte(settings.filterMin.ordinal());
+                write.writeByte(settings.filterMag.ordinal());
+                write.writeByte(settings.wrapX.ordinal());
+                write.writeByte(settings.wrapY.ordinal());
 
                 //write total rects
-                write.i(page.outputRects.sum(i -> 1 + i.aliases.size()));
+                write.writeInt(page.outputRects.sum(i -> 1 + i.aliases.size()));
 
                 page.outputRects.sort();
                 for(Rect rect : page.outputRects){
@@ -368,41 +368,41 @@ public class TexturePacker{
         }
     }
 
-    private void writeRect(Writes write, Page page, Rect rect, String name) throws IOException{
+    private void writeRect(DataOutputStream write, Page page, Rect rect, String name) throws IOException{
         boolean offsets = rect.originalWidth != rect.regionWidth || rect.originalHeight != rect.regionHeight;
 
         //name
-        write.str(Rect.getAtlasName(name, settings.flattenPaths));
+        write.writeUTF(Rect.getAtlasName(name, settings.flattenPaths));
         //xy
-        write.s(page.x + rect.x);
-        write.s((page.y + page.height - rect.y - (rect.height - settings.paddingY)));
+        write.writeShort(page.x + rect.x);
+        write.writeShort((page.y + page.height - rect.y - (rect.height - settings.paddingY)));
         //size
-        write.s(rect.regionWidth);
-        write.s(rect.regionHeight);
+        write.writeShort(rect.regionWidth);
+        write.writeShort(rect.regionHeight);
 
         //optional offsets
-        write.bool(offsets);
+        write.writeBoolean(offsets);
         if(offsets){
             //offset xy
-            write.s(rect.offsetX);
-            write.s((rect.originalHeight - rect.regionHeight - rect.offsetY));
+            write.writeShort(rect.offsetX);
+            write.writeShort((rect.originalHeight - rect.regionHeight - rect.offsetY));
             //original size
-            write.s(rect.originalWidth);
-            write.s(rect.originalHeight);
+            write.writeShort(rect.originalWidth);
+            write.writeShort(rect.originalHeight);
         }
 
         //optional splits
-        write.bool(rect.splits != null);
+        write.writeBoolean(rect.splits != null);
         if(rect.splits != null){
             for(int i = 0; i < 4; i++){
-                write.s(rect.splits[i]);
+                write.writeShort(rect.splits[i]);
             }
         }
         //optional pads
-        write.bool(rect.pads != null);
+        write.writeBoolean(rect.pads != null);
         if(rect.pads != null){
             for(int i = 0; i < 4; i++){
-                write.s(rect.pads[i]);
+                write.writeShort(rect.pads[i]);
             }
         }
     }

@@ -5,11 +5,9 @@ import arc.assets.loaders.TextureLoader.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
-
-import mindustry.*;
 
 import static mindustry.Vars.*;
 

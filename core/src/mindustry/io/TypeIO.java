@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;

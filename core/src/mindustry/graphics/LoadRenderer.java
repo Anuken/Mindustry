@@ -5,7 +5,7 @@ import arc.func.*;
 import arc.fx.*;
 import arc.fx.filters.*;
 import arc.graphics.*;
-import arc.graphics.font.Font;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g3d.*;
 import arc.graphics.gl.GLVersion.*;

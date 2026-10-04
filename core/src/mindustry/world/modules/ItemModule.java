@@ -3,8 +3,8 @@ package mindustry.world.modules;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
-import mindustry.game.Interval;
+import mindustry.game.*;
+import mindustry.io.*;
 import mindustry.type.*;
 
 import java.util.*;

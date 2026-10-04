@@ -4,7 +4,6 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import mindustry.*;
 
 public class ShieldShader extends LoadShader{

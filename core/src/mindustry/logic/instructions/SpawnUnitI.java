@@ -4,8 +4,8 @@ import arc.*;
 import arc.math.*;
 import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 

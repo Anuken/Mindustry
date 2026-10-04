@@ -1,6 +1,6 @@
 package mindustry.world.modules;
 
-import arc.util.io.*;
+import mindustry.io.*;
 
 /** A class that represents compartmentalized tile entity state. */
 public abstract class BlockModule{

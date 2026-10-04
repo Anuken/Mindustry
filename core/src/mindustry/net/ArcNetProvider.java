@@ -13,6 +13,7 @@ import arc.util.Log.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
+import mindustry.io.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -480,8 +481,8 @@ public class ArcNetProvider implements NetProvider{
         private static final boolean debug = false;
 
         ThreadLocal<ByteBuffer> decompressBuffer = Threads.local(() -> ByteBuffer.allocate(32768));
-        ThreadLocal<Reads> reads = Threads.local(() -> new Reads(new ByteBufferInput(decompressBuffer.get())));
-        ThreadLocal<Writes> writes = Threads.local(() -> new Writes(new ByteBufferOutput(decompressBuffer.get())));
+        ThreadLocal<mindustry.io.Reads> reads = Threads.local(() -> new Reads(new ByteBufferInput(decompressBuffer.get())));
+        ThreadLocal<mindustry.io.Writes> writes = Threads.local(() -> new mindustry.io.Writes(new ByteBufferOutput(decompressBuffer.get())));
 
         //for debugging network write counts
         static WindowedMean upload = new WindowedMean(5), download = new WindowedMean(5);

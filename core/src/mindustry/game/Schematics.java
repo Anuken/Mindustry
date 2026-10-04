@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import arc.util.io.Streams.*;
 import arc.util.pooling.*;
 import arc.util.serialization.*;

@@ -10,8 +10,8 @@ import arc.util.serialization.Jval.*;
 import mindustry.game.*;
 import mindustry.io.*;
 import mindustry.maps.Maps.*;
-import mindustry.net.*;
 import mindustry.net.Administration.*;
+import mindustry.net.*;
 import mindustry.ui.dialogs.JoinDialog.*;
 
 import java.io.*;

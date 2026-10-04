@@ -3,8 +3,8 @@ package mindustry.type;
 import arc.func.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
-import arc.util.io.*;
 import mindustry.*;
+import mindustry.io.*;
 
 public class PayloadSeq{
     private ObjectIntMap<UnlockableContent> payloads = new ObjectIntMap<>();

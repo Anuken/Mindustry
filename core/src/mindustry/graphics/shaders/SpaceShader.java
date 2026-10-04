@@ -3,7 +3,6 @@ package mindustry.graphics.shaders;
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.graphics.*;
-import arc.util.*;
 import mindustry.*;
 
 import static mindustry.Vars.*;

@@ -386,26 +386,6 @@ public class Fi implements Comparable<Fi>{
         }
     }
 
-    public Writes writes(boolean append){
-        return new Writes(new DataOutputStream(write(append, Streams.defaultBufferSize)));
-    }
-
-    public Writes writes(){
-        return writes(false);
-    }
-
-    public Reads reads(){
-        return new Reads(new DataInputStream(read(Streams.defaultBufferSize)));
-    }
-
-    public Writes writesDeflate(){
-        return new Writes(new DataOutputStream(new DeflaterOutputStream(write(false, Streams.defaultBufferSize))));
-    }
-
-    public Reads readsDeflate(){
-        return new Reads(new DataInputStream(new InflaterInputStream(read(Streams.defaultBufferSize))));
-    }
-
     public OutputStream write(){
         return write(false);
     }

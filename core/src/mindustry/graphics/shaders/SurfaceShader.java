@@ -2,10 +2,8 @@ package mindustry.graphics.shaders;
 
 import arc.*;
 import arc.graphics.*;
-import arc.util.*;
-import mindustry.graphics.*;
-
 import mindustry.*;
+import mindustry.graphics.*;
 
 import static mindustry.Vars.*;
 

@@ -11,8 +11,6 @@ import mindustry.logic.LogicCanvas.*;
 import mindustry.logic.instructions.*;
 import mindustry.ui.*;
 
-import static mindustry.logic.LogicCanvas.*;
-
 @RegisterStatement("jump")
 public class JumpStatement extends LogicStatement{
     private static Color last = new Color();
@@ -65,7 +63,7 @@ public class JumpStatement extends LogicStatement{
     }
 
     public static void addOp(LogicStatement st, Table t, ConditionOp op, Cons<ConditionOp> getter, String comp0, Cons<String> set0, String comp1, Cons<String> set2){
-        float w = !isCompact() ? 180f : 140f;
+        float w = !LogicCanvas.isCompact() ? 180f : 140f;
 
         if(op != ConditionOp.always) st.field(t, comp0, set0).width(w);
 

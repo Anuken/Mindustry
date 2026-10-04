@@ -107,7 +107,7 @@ public class CallGenerator{
 
     private static void makeWriter(TypeSpec.Builder typespec, MethodEntry ent, ClassSerializer serializer){
         MethodSpec.Builder builder = MethodSpec.methodBuilder("write")
-            .addParameter(Writes.class, "WRITE")
+            .addParameter(tname("mindustry.io.Writes"), "WRITE")
             .addModifiers(Modifier.PUBLIC).addAnnotation(Override.class);
         Seq<Svar> params = ent.element.params();
 
@@ -155,7 +155,7 @@ public class CallGenerator{
 
     private static void makeReader(TypeSpec.Builder typespec, MethodEntry ent, ClassSerializer serializer){
         MethodSpec.Builder readbuilder = MethodSpec.methodBuilder("read")
-            .addParameter(Reads.class, "READ")
+            .addParameter(tname("mindustry.io.Reads"), "READ")
             .addParameter(int.class, "LENGTH")
             .addModifiers(Modifier.PUBLIC).addAnnotation(Override.class);
 

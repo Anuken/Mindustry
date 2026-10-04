@@ -3,7 +3,6 @@ package mindustry.entities.part;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.*;
 
 public abstract class DrawPart{

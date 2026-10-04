@@ -13,7 +13,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.editor.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;

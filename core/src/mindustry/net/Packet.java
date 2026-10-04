@@ -1,6 +1,7 @@
 package mindustry.net;
 
 import arc.util.io.*;
+import mindustry.io.*;
 
 import java.io.*;
 
@@ -8,7 +9,7 @@ public abstract class Packet{
     //internally used by generated code
     protected static final byte[] NODATA = {};
     protected static final ReusableByteInStream BAIS = new ReusableByteInStream();
-    protected static final Reads READ = new Reads(new DataInputStream(BAIS));
+    protected static final mindustry.io.Reads READ = new mindustry.io.Reads(new DataInputStream(BAIS));
 
     //these are constants because I don't want to bother making an enum to mirror the annotation enum
 

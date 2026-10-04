@@ -1,12 +1,10 @@
 package mindustry.world;
 
-import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
-
-import mindustry.*;
 
 import static mindustry.Vars.*;
 

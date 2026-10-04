@@ -3,7 +3,6 @@ package mindustry.io.versions;
 import arc.func.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.world.*;

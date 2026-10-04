@@ -4,7 +4,7 @@ import arc.*;
 import arc.Input.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.font.Font;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;

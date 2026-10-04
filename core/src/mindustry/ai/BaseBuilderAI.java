@@ -9,7 +9,6 @@ import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.*;
-import mindustry.game.Interval;
 import mindustry.game.Schematic.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;

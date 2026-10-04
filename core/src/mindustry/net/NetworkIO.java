@@ -3,8 +3,6 @@ package mindustry.net;
 import arc.*;
 import arc.files.*;
 import arc.struct.*;
-import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.game.*;

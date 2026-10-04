@@ -2,21 +2,20 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.font.Font;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
 import java.util.*;
-
-import mindustry.*;
 
 import static mindustry.Vars.*;
 

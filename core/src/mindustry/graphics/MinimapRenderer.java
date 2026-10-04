@@ -2,7 +2,7 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.font.Font;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -10,6 +10,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -17,8 +18,6 @@ import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-
-import mindustry.*;
 
 import static mindustry.Vars.*;
 

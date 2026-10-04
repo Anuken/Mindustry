@@ -4,7 +4,6 @@ import arc.struct.*;
 import mindustry.ai.types.*;
 import mindustry.entities.*;
 import mindustry.game.*;
-import mindustry.game.Interval;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.logic.*;

@@ -11,7 +11,6 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
-import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;

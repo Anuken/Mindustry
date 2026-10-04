@@ -1,8 +1,8 @@
 package mindustry.entities.comp;
 
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 
 import static mindustry.Vars.*;
 

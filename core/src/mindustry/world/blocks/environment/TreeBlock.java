@@ -2,7 +2,6 @@ package mindustry.world.blocks.environment;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
@@ -36,7 +35,7 @@ public class TreeBlock extends Block{
         }
 
         TextureRegion reg = variants == 0 ? region : variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))];
-        
+
         Draw.z(Layer.power + 1);
         Draw.rectv(reg, x, y, w, h, rot, vec -> vec.add(
         Mathf.sin(vec.y*3 + Vars.state.time, scl, mag) + Mathf.sin(vec.x*3 - Vars.state.time, 70, 0.8f),

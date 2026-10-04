@@ -5,7 +5,6 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.gen.*;

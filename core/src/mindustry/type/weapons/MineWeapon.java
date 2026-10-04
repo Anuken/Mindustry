@@ -2,7 +2,6 @@ package mindustry.type.weapons;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;

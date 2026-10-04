@@ -238,25 +238,25 @@ public class TextureAtlas implements Disposable{
         public final Seq<Region> regions = new Seq<>();
 
         public TextureAtlasData(Fi packFile, Fi imagesDir, boolean flip){
-            try(Reads read = packFile.reads()){
+            try(DataInputStream read = new DataInputStream(packFile.read(8192))){
                 for(byte b : formatHeader){
-                    if(read.b() != b){
+                    if(read.readByte() != b){
                         throw new IOException("Invalid binary header. Have you re-packed sprites?");
                     }
                 }
                 //discard version
-                read.b();
+                read.readByte();
 
-                while(read.checkEOF() != -1){
-                    String image = read.str();
+                while(read.read() != -1){
+                    String image = read.readUTF();
                     Fi file = imagesDir.child(image);
 
-                    short pageWidth = read.s(), pageHeight = read.s();
+                    short pageWidth = read.readShort(), pageHeight = read.readShort();
 
-                    TextureFilter min = TextureFilter.all[read.b()], mag = TextureFilter.all[read.b()];
-                    TextureWrap wrapX = TextureWrap.all[read.b()], wrapY = TextureWrap.all[read.b()];
+                    TextureFilter min = TextureFilter.all[read.readByte()], mag = TextureFilter.all[read.readByte()];
+                    TextureWrap wrapX = TextureWrap.all[read.readByte()], wrapY = TextureWrap.all[read.readByte()];
 
-                    int rects = read.i();
+                    int rects = read.readInt();
 
                     AtlasPage page = new AtlasPage(file, pageWidth, pageHeight, min.isMipMap(), min, mag, wrapX, wrapY);
                     pages.add(page);
@@ -265,28 +265,28 @@ public class TextureAtlas implements Disposable{
                         Region region = new Region();
                         region.flip = flip;
                         region.page = page;
-                        region.name = read.str();
-                        region.left = read.s();
-                        region.top = read.s();
-                        region.width = read.s();
-                        region.height = read.s();
+                        region.name = read.readUTF();
+                        region.left = read.readShort();
+                        region.top = read.readShort();
+                        region.width = read.readShort();
+                        region.height = read.readShort();
 
                         //offsets
-                        if(read.bool()){
-                            region.offsetX = read.s();
-                            region.offsetY = read.s();
-                            region.originalWidth = read.s();
-                            region.originalHeight = read.s();
+                        if(read.readBoolean()){
+                            region.offsetX = read.readShort();
+                            region.offsetY = read.readShort();
+                            region.originalWidth = read.readShort();
+                            region.originalHeight = read.readShort();
                         }
 
                         //splits
-                        if(read.bool()){
-                            region.splits = new int[]{read.s(), read.s(), read.s(), read.s()};
+                        if(read.readBoolean()){
+                            region.splits = new int[]{read.readShort(), read.readShort(), read.readShort(), read.readShort()};
                         }
 
                         //pads
-                        if(read.bool()){
-                            region.pads = new int[]{read.s(), read.s(), read.s(), read.s()};
+                        if(read.readBoolean()){
+                            region.pads = new int[]{read.readShort(), read.readShort(), read.readShort(), read.readShort()};
                         }
 
                         regions.add(region);

@@ -1,4 +1,4 @@
-package arc.util.io;
+package mindustry.io;
 
 import arc.util.*;
 

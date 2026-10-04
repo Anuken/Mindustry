@@ -2,13 +2,13 @@ package mindustry.world.blocks.logic;
 
 import arc.audio.*;
 import arc.graphics.g2d.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class SwitchBlock extends Block{
     public Sound clickSound = Sounds.click;

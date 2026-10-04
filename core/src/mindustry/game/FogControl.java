@@ -1,8 +1,8 @@
 package mindustry.game;
 
 import arc.math.*;
-import arc.struct.Bits;
 import arc.struct.*;
+import arc.struct.Bits;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;

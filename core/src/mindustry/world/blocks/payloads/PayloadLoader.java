@@ -4,11 +4,11 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.PayloadUnloader.*;
@@ -31,7 +31,7 @@ public class PayloadLoader extends PayloadBlock{
 
     public PayloadLoader(String name){
         super(name);
- 
+
         hasItems = true;
         hasLiquids = true;
         hasPower = true;

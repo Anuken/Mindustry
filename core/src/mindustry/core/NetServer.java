@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.struct.Bits;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
@@ -20,6 +21,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.TypeIO.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.mod.data.*;
 import mindustry.net.*;
@@ -44,7 +46,7 @@ public class NetServer implements ApplicationListener{
         planPreviewSyncTime = Timekeeper.ofSeconds(0.5f);
 
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
-    private static final Writes dataWrites = new Writes(null);
+    private static final mindustry.io.Writes dataWrites = new Writes(null);
     private static final IntSeq hiddenIds = new IntSeq();
     private static final IntSeq healthSeq = new IntSeq(maxSnapshotSize / 4 + 1);
     private static final Vec2 vector = new Vec2();
@@ -113,13 +115,13 @@ public class NetServer implements ApplicationListener{
     public int playerCountOverride = -1;
 
     private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
-    private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
+    private mindustry.io.Writes outputBuffer = new mindustry.io.Writes(new DataOutputStream(writeBuffer));
 
     /** Stream for writing player sync data to. */
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
-    private Writes dataStreamWrites = new Writes(dataStream);
+    private mindustry.io.Writes dataStreamWrites = new mindustry.io.Writes(dataStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages - binary version. */

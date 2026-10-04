@@ -12,7 +12,7 @@ import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Interval;
+import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;

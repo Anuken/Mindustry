@@ -1,13 +1,12 @@
 package mindustry.world.blocks.distribution;
 
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
-
-import mindustry.*;
 
 import static mindustry.Vars.*;
 

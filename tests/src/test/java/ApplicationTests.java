@@ -14,6 +14,7 @@ import mindustry.game.*;
 import mindustry.game.markers.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.io.Reads;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
@@ -138,14 +139,14 @@ public class ApplicationTests{
 
         ByteArrayOutputStream ba = new ByteArrayOutputStream();
 
-        TypeIO.writeString(new Writes(new DataOutputStream(ba)), string);
+        TypeIO.writeString(new mindustry.io.Writes(new DataOutputStream(ba)), string);
         assertEquals(TypeIO.readString(new Reads(new DataInputStream(new ByteArrayInputStream(ba.toByteArray())))), string);
 
         SendChatMessageCallPacket pack = new SendChatMessageCallPacket();
         pack.message = string;
 
         buffer.position(0);
-        pack.write(new Writes(new ByteBufferOutput(buffer)));
+        pack.write(new mindustry.io.Writes(new ByteBufferOutput(buffer)));
         int len = buffer.position();
         buffer.position(0);
         pack.message = "INVALID";
@@ -155,7 +156,7 @@ public class ApplicationTests{
         assertEquals(string, pack.message);
 
         buffer.position(0);
-        Writes writes = new Writes(new ByteBufferOutput(buffer));
+        mindustry.io.Writes writes = new mindustry.io.Writes(new ByteBufferOutput(buffer));
         TypeIO.writeString(writes, string);
 
         buffer.position(0);
@@ -168,7 +169,7 @@ public class ApplicationTests{
         con.uuid = "AAAAAAAA";
         con.usid = "AAAAAAAA";
         con.mods = new Seq<>();
-        con.write(new Writes(new ByteBufferOutput(buffer)));
+        con.write(new mindustry.io.Writes(new ByteBufferOutput(buffer)));
 
         con.name = "INVALID";
         buffer.position(0);
@@ -185,7 +186,7 @@ public class ApplicationTests{
         rules.attackMode = true;
         rules.buildSpeedMultiplier = 99f;
 
-        TypeIO.writeRules(new Writes(new ByteBufferOutput(buffer)), rules);
+        TypeIO.writeRules(new mindustry.io.Writes(new ByteBufferOutput(buffer)), rules);
         buffer.position(0);
         Rules res = TypeIO.readRules(new Reads(new ByteBufferInput(buffer)));
 

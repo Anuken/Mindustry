@@ -24,15 +24,15 @@ public class TypeIOResolver{
                 if(meth.is(Modifier.PUBLIC) && meth.is(Modifier.STATIC)){
                     Seq<Svar> params = meth.params();
                     //2 params, second one is type, first is writer
-                    if(params.size == 2 && params.first().tname().toString().equals("arc.util.io.Writes")){
+                    if(params.size == 2 && params.first().tname().toString().equals("mindustry.io.Writes")){
                         //Net suffix indicates that this should only be used for sync operations
                         ObjectMap<String, String> targetMap = meth.name().endsWith("Net") ? out.netWriters : out.writers;
                         targetMap.put(fix(params.get(1).tname().toString()), type.fullName() + "." + meth.name());
-                    }else if(params.size == 1 && params.first().tname().toString().equals("arc.util.io.Reads") && !meth.isVoid()){ //1 param, one is reader, returns type
+                    }else if(params.size == 1 && params.first().tname().toString().equals("mindustry.io.Reads") && !meth.isVoid()){ //1 param, one is reader, returns type
                         //Net suffix indicates that this should only be used for sync operations
                         ObjectMap<String, String> targetMap = meth.name().endsWith("Net") ? out.netReaders : out.readers;
                         targetMap.put(fix(meth.retn().toString()), type.fullName() + "." + meth.name());
-                    }else if(params.size == 2 && params.first().tname().toString().equals("arc.util.io.Reads") && !meth.isVoid() && meth.ret().equals(meth.params().get(1).mirror())){
+                    }else if(params.size == 2 && params.first().tname().toString().equals("mindustry.io.Reads") && !meth.isVoid() && meth.ret().equals(meth.params().get(1).mirror())){
                         //2 params, one is reader, other is type, returns type - these are made to reduce garbage allocated
                         out.mutatorReaders.put(fix(meth.retn().toString()), type.fullName() + "." + meth.name());
                     }

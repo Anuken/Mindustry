@@ -2,7 +2,6 @@ package mindustry.graphics.shaders;
 
 import arc.*;
 import arc.scene.ui.layout.*;
-import arc.util.*;
 import mindustry.*;
 
 public class BuildBeamShader extends LoadShader{

@@ -1,8 +1,8 @@
 package mindustry.world.blocks.power;
 
 import arc.math.*;
-import arc.util.io.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;

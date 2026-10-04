@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.units.*;
@@ -20,8 +21,6 @@ import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 import mindustry.world.modules.*;
-
-import mindustry.*;
 
 import static mindustry.Vars.*;
 

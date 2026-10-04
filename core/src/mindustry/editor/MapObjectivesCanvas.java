@@ -10,6 +10,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.editor.MapObjectivesCanvas.ObjectiveTilemap.ObjectiveTile.*;
 import mindustry.editor.MapObjectivesDialog.*;
 import mindustry.game.objectives.*;
@@ -17,8 +18,6 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
-
-import mindustry.*;
 
 import static mindustry.Vars.*;
 

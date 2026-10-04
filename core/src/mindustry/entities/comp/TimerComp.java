@@ -1,7 +1,7 @@
 package mindustry.entities.comp;
 
 import mindustry.annotations.Annotations.*;
-import mindustry.game.Interval;
+import mindustry.game.*;
 
 @Component
 abstract class TimerComp{

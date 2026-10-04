@@ -24,6 +24,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 
 import static arc.Core.*;
+import static arc.Core.camera;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 

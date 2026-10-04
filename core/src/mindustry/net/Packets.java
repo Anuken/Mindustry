@@ -3,7 +3,6 @@ package mindustry.net;
 import arc.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import arc.util.serialization.*;
 import mindustry.core.*;
 import mindustry.io.*;

@@ -12,7 +12,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Interval;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 import java.util.concurrent.*;
