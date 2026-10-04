@@ -8,7 +8,7 @@ import arc.struct.ObjectIntMap.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.g3d.*;
@@ -106,8 +106,8 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         ObjectIntMap<Block> floorc = new ObjectIntMap<>();
         ObjectSet<UnlockableContent> content = new ObjectSet<>();
 
-        for(Tile tile : world.tiles){
-            if(world.getDarkness(tile.x, tile.y) >= 3){
+        for(Tile tile : state.world){
+            if(state.world.getDarkness(tile.x, tile.y) >= 3){
                 continue;
             }
 
@@ -125,7 +125,7 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         }
 
         //sort counts in descending order
-        Seq<Entry<Block>> entries = floorc.entries().toArray();
+        Seq<Entry<Block>> entries = floorc.entries().toSeq();
         entries.sort(e -> -e.value);
         //remove all blocks occurring < 30 times - unimportant
         entries.removeAll(e -> e.value < 30);
@@ -179,8 +179,8 @@ public abstract class PlanetGenerator extends BasicGenerator implements HexMeshe
         return res % 2 == 0 ? res : res + 1;
     }
 
-    public void generate(Tiles tiles, Sector sec, WorldParams params){
-        this.tiles = tiles;
+    public void generate(World tiles, Sector sec, WorldParams params){
+        this.world = tiles;
         this.seed = params.seedOffset + baseSeed;
         this.sector = sec;
         this.width = tiles.width;

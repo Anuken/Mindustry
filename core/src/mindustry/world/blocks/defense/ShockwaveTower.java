@@ -13,15 +13,15 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.logic.LAccess;
+import mindustry.logic.LogicProp;
 import mindustry.world.*;
 import mindustry.world.meta.*;
+
+import mindustry.*;
 
 import static mindustry.Vars.*;
 
 public class ShockwaveTower extends Block{
-    public int timerCheck = timers ++;
-
     public float range = 110f;
     public float reload = 60f * 1.5f;
     public float bulletDamage = 160;
@@ -48,8 +48,8 @@ public class ShockwaveTower extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.damage, bulletDamage, StatUnit.none);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
@@ -66,14 +66,16 @@ public class ShockwaveTower extends Block{
     public class ShockwaveTowerBuild extends Building{
         public float reloadCounter = Mathf.random(reload);
         public float heat = 0f;
+        public float checkTimer;
         public Seq<Bullet> targets = new Seq<>();
 
         @Override
         public void updateTile(){
-            if(potentialEfficiency > 0 && (reloadCounter += edelta()) >= reload && timer(timerCheck, checkInterval)){
+            if(potentialEfficiency > 0 && (reloadCounter += edelta()) >= reload && (checkTimer += Time.delta) >= checkInterval){
+                checkTimer %= checkInterval;
                 targets.clear();
-                Groups.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
-                    if(b.team != team && b.type.hittable){
+                state.entities.bullet.intersect(x - range, y - range, range * 2, range * 2, b -> {
+                    if(b.team != team && b.type.hittable && b.within(x, y, range + 1f)){
                         targets.add(b);
                     }
                 });
@@ -106,9 +108,12 @@ public class ShockwaveTower extends Block{
 
 
         @Override
-        public double sense(LAccess sensor) {
-            if(sensor == LAccess.progress) return reloadCounter / reload;
-            return super.sense(sensor);
+        public double sense(LogicProp sensor) {
+            return switch(sensor){
+                case progress -> reloadCounter / reload;
+                case heat -> heat;
+                default -> super.sense(sensor);
+            };
         }
 
 
@@ -129,7 +134,7 @@ public class ShockwaveTower extends Block{
 
             Draw.z(Layer.effect);
             Draw.color(shapeColor, waveColor, Mathf.pow(heat, 2f));
-            Fill.poly(x, y, shapeSides, shapeRadius * potentialEfficiency, Time.time * shapeRotateSpeed);
+            Fill.poly(x, y, shapeSides, shapeRadius * potentialEfficiency, Vars.state.time * shapeRotateSpeed);
             Draw.color();
         }
 

@@ -13,7 +13,10 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.units.UnitAssembler.*;
+
+import mindustry.*;
 
 import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
@@ -115,6 +118,30 @@ public class Fx{
         reset();
 
         Draw.scl = p;
+    }),
+
+    //water equivalent of wreck decals - Effect.decal() doesn't render on liquids
+    unitDrown = new Effect(3600f, e -> {
+        if(!(e.data instanceof TextureRegion reg)) return;
+        //small ripples drifting over the debris, so the water still reads as moving on top of it
+        if(!state.isPaused() && Mathf.chanceDelta(0.0002f * (reg.width * reg.height) / (50f * 50f))){
+            float x = e.x + Mathf.range(reg.width * reg.scale / 4f / 3f), y = e.y + Mathf.range(reg.height * reg.scale / 4f / 3f);
+            Tile tile = state.world.tileWorld(x, y);
+            if(tile != null && tile.floor().isLiquid && tile.block() == Blocks.air){
+                Fx.rippleSlow.at(x, y, Mathf.random(0.4f, 1f), tile.floor().mapColor);
+            }
+        }
+
+        //capture position
+        float x = e.x, y = e.y, rotation = e.rotation, fin = e.fin();
+        float color = e.color.toFloatBits();
+        Drawf.underwater(() -> {
+            Draw.z(Layer.scorch);
+            mixcol(color);
+            alpha(0.85f * (1f - Mathf.curve(fin, 0.98f)));
+            rect(reg, x, y, rotation);
+            reset();
+        });
     }),
 
     unitSpirit = new Effect(17f, e -> {
@@ -1361,7 +1388,7 @@ public class Fx{
 
     forceShrink = new Effect(20, e -> {
         color(e.color, e.fout());
-        if(renderer.animateShields){
+        if(renderer.animateSurfaces){
             Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
         }else{
             stroke(1.5f);
@@ -1408,7 +1435,7 @@ public class Fx{
         if(Fire.regions[0] == null) return;
         alpha(e.fout());
         rect(Fire.regions[((int)(e.rotation + e.fin() * Fire.frames)) % Fire.frames], e.x + Mathf.randomSeedRange((int)e.y, 2), e.y + Mathf.randomSeedRange((int)e.x, 2));
-        Drawf.light(e.x, e.y, 50f + Mathf.absin(5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
+        Drawf.light(e.x, e.y, 50f + Mathf.absin(Vars.state.time, 5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
     }),
 
     fire = new Effect(50f, e -> {
@@ -1933,7 +1960,7 @@ public class Fx{
             float angle = rand.random(360f);
             float lenRand = rand.random(0.5f, 1.2f);
             Tmp.v1.trns(angle, circleRad);
- 
+
             for(int s : Mathf.signs){
                 Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.fout() * 10f, e.fout() * 10f * lenRand + 8f, angle + 90f + s * 90f);
             }
@@ -2504,23 +2531,30 @@ public class Fx{
     }),
 
     pulverizeRed = new Effect(40, e -> {
+        color(Pal.redDust, Pal.stoneGray, e.fin());
         randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
-            color(Pal.redDust, Pal.stoneGray, e.fin());
             Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.5f, 45);
         });
     }),
 
     pulverizeSmall = new Effect(30, e -> {
+        color(Pal.stoneGray);
         randLenVectors(e.id, 3, e.fin() * 5f, (x, y) -> {
-            color(Pal.stoneGray);
             Fill.square(e.x + x, e.y + y, e.fout() + 0.5f, 45);
         });
     }),
 
     pulverizeMedium = new Effect(30, e -> {
+        color(Pal.stoneGray);
         randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
-            color(Pal.stoneGray);
             Fill.square(e.x + x, e.y + y, e.fout() + 0.5f, 45);
+        });
+    }),
+
+    unitMine = new Effect(30, e -> {
+        color(e.color, Pal.stoneGray, e.finpowdown());
+        randLenVectors(e.id, 4, e.fin() * 6f, (x, y) -> {
+            Fill.square(e.x + x, e.y + y, e.fout() * 1.3f + 0.4f, 45);
         });
     }),
 
@@ -2724,6 +2758,12 @@ public class Fx{
         Lines.circle(e.x, e.y, (2f + e.fin() * 4f) * e.rotation);
     }).layer(Layer.debris),
 
+    rippleSlow = new Effect(120, e -> {
+        color(Tmp.c1.set(e.color).mul(1.5f), 0.6f);
+        stroke(e.fout() * 1.4f);
+        Lines.circle(e.x, e.y, (e.fin() * 7f) * e.rotation);
+    }).layer(Layer.debris),
+
     bubble = new Effect(20, e -> {
         color(Tmp.c1.set(e.color).shiftValue(0.1f));
         stroke(e.fout() + 0.2f);
@@ -2807,12 +2847,10 @@ public class Fx{
     shieldBreak = new Effect(40, e -> {
         color(e.color);
         stroke(3f * e.fout());
-        if(e.data instanceof ForceFieldAbility ab){
-            Lines.poly(e.x, e.y, ab.sides, e.rotation + e.fin(), ab.rotation);
-            return;
-        }
+        int sides = e.data instanceof ForceProjector f ? f.sides : e.data instanceof ForceFieldAbility a ? a.sides : 6;
+        float rotation = e.data instanceof ForceProjector f ? f.shieldRotation : e.data instanceof ForceFieldAbility a ? a.rotation : 6;
 
-        Lines.poly(e.x, e.y, 6, e.rotation + e.fin());
+        Lines.poly(e.x, e.y, sides, e.rotation + e.fin(), rotation);
     }).followParent(true),
 
     arcShieldBreak = new Effect(40, e -> {

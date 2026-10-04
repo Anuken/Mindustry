@@ -10,11 +10,12 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
+
+import mindustry.*;
 
 import static mindustry.Vars.*;
 import static mindustry.ai.Pathfinder.*;
@@ -24,7 +25,6 @@ import static mindustry.ai.Pathfinder.*;
 public class ControlPathfinder implements Runnable{
     private static final int wallImpassableCap = 1_000_000;
     private static final int solidCap = 7000;
-    private static boolean initialized;
 
     public static boolean showDebug;
 
@@ -83,6 +83,7 @@ public class ControlPathfinder implements Runnable{
     private static final int updateStepInterval = 200;
     private static final int updateFPS = 30;
     private static final int updateInterval = 1000 / updateFPS, invalidateCheckInterval = 1000;
+    private static final PathfindResult pathResult = new PathfindResult();
 
     static final int clusterSize = 12;
 
@@ -110,7 +111,10 @@ public class ControlPathfinder implements Runnable{
     //maps team -> pathCost -> flattened array of clusters in 2D
     //(what about teams? different path costs?)
     final Cluster[][][] clusters = new Cluster[256][][];
-    final int cwidth = Mathf.ceil((float)world.width() / clusterSize), cheight = Mathf.ceil((float)world.height() / clusterSize);
+    /** State this pathfinder belongs to; captured so the thread never touches a newer state. */
+    final GameState state;
+    //cached world size
+    final int ww, wh, cwidth, cheight;
 
     //temporarily used for resolving connections for intra-edges
     final IntSet usedEdges = new IntSet();
@@ -162,7 +166,8 @@ public class ControlPathfinder implements Runnable{
         @Nullable PathfindQueue frontier = new PathfindQueue();
 
         //main thread only!
-        long lastUpdateId = state.updateId;
+        long lastUpdateId;
+        long lastRecomputeTime;
 
         //both threads
         volatile boolean notFound = false;
@@ -175,7 +180,8 @@ public class ControlPathfinder implements Runnable{
         int lastTile;
         @Nullable Tile lastTargetTile;
 
-        PathRequest(Unit unit, int team, int costId, int destination){
+        PathRequest(Unit unit, int team, int costId, int destination, long updateId){
+            this.lastUpdateId = updateId;
             this.unit = unit;
             this.costId = costId;
             this.team = team;
@@ -196,11 +202,12 @@ public class ControlPathfinder implements Runnable{
         final long mapKey;
 
         //main thread only!
-        long lastUpdateId = state.updateId;
+        long lastUpdateId;
 
         //TODO: how are the nodes merged? CAN they be merged?
 
-        FieldCache(PathCost cost, int costId, int team, int goalPos){
+        FieldCache(PathCost cost, int costId, int team, int goalPos, long updateId){
+            this.lastUpdateId = updateId;
             this.cost = cost;
             this.team = team;
             this.goalPos = goalPos;
@@ -215,97 +222,77 @@ public class ControlPathfinder implements Runnable{
         LongSeq[][] portalConnections = new LongSeq[4][];
     }
 
-    //this method is not run in a static initializer because it must only happen after Pathfinder registers its events, which means it should happen in the ControlPathfinder constructor
-    static void checkEvents(){
-        if(initialized) return;
-        initialized = true;
-
-        Events.on(ResetEvent.class, event -> controlPath.stop());
-
-        Events.on(WorldLoadEvent.class, event -> {
-            controlPath.stop();
-            //create a new pathfinder to avoid contaminating the new pathfinding state with the old thread, which may still be running
-            controlPath = new ControlPathfinder();
-            controlPath.start();
-        });
-
-        Events.on(TileChangeEvent.class, e -> {
-            controlPath.updateTile(e.tile);
-        });
-
-        //invalidate paths
-        Events.run(Trigger.update, () -> {
-            for(var req : controlPath.unitRequests.values()){
-                //skipped N update -> drop it
-                if(req.lastUpdateId <= state.updateId - 10 || !req.unit.isAdded()){
-                    req.invalidated = true;
-                    //concurrent modification!
-                    controlPath.queue.post(() -> controlPath.threadPathRequests.remove(req));
-                    Time.run(0f, () -> controlPath.unitRequests.remove(req.unit));
-                }
+    /** Drops stale requests and fields. Main thread only, called once per update. */
+    public void update(){
+        for(var req : unitRequests.values()){
+            //skipped N update -> drop it
+            if(req.lastUpdateId <= state.updateId - 10 || !req.unit.isAdded()){
+                req.invalidated = true;
+                //concurrent modification!
+                queue.post(() -> threadPathRequests.remove(req));
+                Vars.state.post(() -> unitRequests.remove(req.unit));
             }
+        }
 
-            for(var field : controlPath.fieldList){
-                //skipped N update -> drop it
-                if(field.lastUpdateId <= state.updateId - 30){
-                    //make sure it's only modified on the main thread...? but what about calling get() on this thread??
-                    controlPath.queue.post(() -> controlPath.fields.remove(field.mapKey));
-                    Time.run(0f, () -> controlPath.fieldList.remove(field));
-                }
+        for(var field : fieldList){
+            //skipped N update -> drop it
+            if(field.lastUpdateId <= state.updateId - 30){
+                //make sure it's only modified on the main thread...? but what about calling get() on this thread??
+                queue.post(() -> fields.remove(field.mapKey));
+                Vars.state.post(() -> fieldList.remove(field));
             }
-        });
+        }
+    }
 
-        if(showDebug){
-            Events.run(Trigger.draw, () -> {
-                int team = player.team().id;
-                int cost = 0;
+    /** Draws debug info. Only called when showDebug is enabled. */
+    public void drawDebug(){
+        int team = player.team().id;
+        int cost = 0;
 
-                Draw.draw(Layer.overlayUI, () -> {
-                    Lines.stroke(1f);
+        Draw.draw(Layer.overlayUI, () -> {
+            Lines.stroke(1f);
 
-                    if(controlPath.clusters[team] != null && controlPath.clusters[team][cost] != null){
-                        for(int cx = 0; cx < controlPath.cwidth; cx++){
-                            for(int cy = 0; cy < controlPath.cheight; cy++){
+            if(clusters[team] != null && clusters[team][cost] != null){
+                for(int cx = 0; cx < cwidth; cx++){
+                    for(int cy = 0; cy < cheight; cy++){
 
-                                var cluster = controlPath.clusters[team][cost][cy * controlPath.cwidth + cx];
-                                if(cluster != null){
-                                    Lines.stroke(0.5f);
-                                    Draw.color(Color.gray);
-                                    Lines.stroke(1f);
+                        var cluster = clusters[team][cost][cy * cwidth + cx];
+                        if(cluster != null){
+                            Lines.stroke(0.5f);
+                            Draw.color(Color.gray);
+                            Lines.stroke(1f);
 
-                                    Lines.rect(cx * clusterSize * tilesize - tilesize/2f, cy * clusterSize * tilesize - tilesize/2f, clusterSize * tilesize, clusterSize * tilesize);
+                            Lines.rect(cx * clusterSize * tilesize - tilesize/2f, cy * clusterSize * tilesize - tilesize/2f, clusterSize * tilesize, clusterSize * tilesize);
 
 
-                                    for(int d = 0; d < 4; d++){
-                                        IntSeq portals = cluster.portals[d];
-                                        if(portals != null){
+                            for(int d = 0; d < 4; d++){
+                                IntSeq portals = cluster.portals[d];
+                                if(portals != null){
 
-                                            for(int i = 0; i < portals.size; i++){
-                                                int pos = portals.items[i];
-                                                int from = Point2.x(pos), to = Point2.y(pos);
-                                                float width = tilesize * (Math.abs(from - to) + 1), height = tilesize;
+                                    for(int i = 0; i < portals.size; i++){
+                                        int pos = portals.items[i];
+                                        int from = Point2.x(pos), to = Point2.y(pos);
+                                        float width = tilesize * (Math.abs(from - to) + 1), height = tilesize;
 
-                                                controlPath.portalToVec(cluster, cx, cy, d, i, Tmp.v1);
+                                        portalToVec(cluster, cx, cy, d, i, Tmp.v1);
 
-                                                Draw.color(Color.brown);
-                                                Lines.ellipse(30, Tmp.v1.x, Tmp.v1.y, width / 2f, height / 2f, d * 90f - 90f);
+                                        Draw.color(Color.brown);
+                                        Lines.ellipse(30, Tmp.v1.x, Tmp.v1.y, width / 2f, height / 2f, d * 90f - 90f);
 
-                                                LongSeq connections = cluster.portalConnections[d] == null ? null : cluster.portalConnections[d][i];
+                                        LongSeq connections = cluster.portalConnections[d] == null ? null : cluster.portalConnections[d][i];
 
-                                                if(connections != null){
-                                                    Draw.color(Color.forest);
-                                                    for(int coni = 0; coni < connections.size; coni ++){
-                                                        long con = connections.items[coni];
+                                        if(connections != null){
+                                            Draw.color(Color.forest);
+                                            for(int coni = 0; coni < connections.size; coni ++){
+                                                long con = connections.items[coni];
 
-                                                        controlPath.portalToVec(cluster, cx, cy, IntraEdge.dir(con), IntraEdge.portal(con), Tmp.v2);
+                                                portalToVec(cluster, cx, cy, IntraEdge.dir(con), IntraEdge.portal(con), Tmp.v2);
 
-                                                        float
-                                                        x1 = Tmp.v1.x, y1 = Tmp.v1.y,
-                                                        x2 = Tmp.v2.x, y2 = Tmp.v2.y;
-                                                        Lines.line(x1, y1, x2, y2);
+                                                float
+                                                x1 = Tmp.v1.x, y1 = Tmp.v1.y,
+                                                x2 = Tmp.v2.x, y2 = Tmp.v2.y;
+                                                Lines.line(x1, y1, x2, y2);
 
-                                                    }
-                                                }
                                             }
                                         }
                                     }
@@ -313,32 +300,45 @@ public class ControlPathfinder implements Runnable{
                             }
                         }
                     }
+                }
+            }
 
-                    for(var fields : controlPath.fieldList){
-                        try{
-                            for(var entry : fields.fields){
-                                int cx = entry.key % controlPath.cwidth, cy = entry.key / controlPath.cwidth;
-                                for(int y = 0; y < clusterSize; y++){
-                                    for(int x = 0; x < clusterSize; x++){
-                                        int value = entry.value[x + y * clusterSize];
-                                        Tmp.c1.a = 1f;
-                                        Lines.stroke(0.8f, Tmp.c1.fromHsv(value * 3f, 1f, 1f));
-                                        Draw.alpha(0.5f);
-                                        Fill.square((x + cx * clusterSize) * tilesize, (y + cy * clusterSize) * tilesize, tilesize / 2f);
-                                    }
+            for(var fields : fieldList){
+                try{
+                    int mx = World.toTile(Core.input.mouseWorldX());
+                    int my = World.toTile(Core.input.mouseWorldY());
+                    int hoverValue = -100;
+                    for(var entry : fields.fields){
+                        int cx = entry.key % cwidth, cy = entry.key / cwidth;
+                        for(int y = 0; y < clusterSize; y++){
+                            for(int x = 0; x < clusterSize; x++){
+                                int value = entry.value[x + y * clusterSize];
+                                Tmp.c1.a = 1f;
+                                Lines.stroke(0.8f, Tmp.c1.fromHsv(value * 3f, 1f, 1f));
+                                Draw.alpha(0.5f);
+                                Fill.square((x + cx * clusterSize) * tilesize, (y + cy * clusterSize) * tilesize, tilesize / 2f);
+                                if(mx == (x + cx * clusterSize) && my == (y + cy * clusterSize)){
+                                    hoverValue = value;
                                 }
                             }
-                        }catch(Exception ignored){} //probably has some concurrency issues when iterating but I don't care, this is for debugging
+                        }
                     }
-                });
+                    if(hoverValue > -100){
+                        Drawf.text(hoverValue + " / " + fields.cost.getCost(Team.sharded.id, state.pathfinder.get(mx, my)), Core.input.mouseWorldX(), Core.input.mouseWorldY(), Color.white);
+                    }
+                }catch(Exception ignored){} //probably has some concurrency issues when iterating but I don't care, this is for debugging
+            }
+        });
 
-                Draw.reset();
-            });
-        }
+        Draw.reset();
     }
 
-    public ControlPathfinder(){
-        checkEvents();
+    public ControlPathfinder(GameState state){
+        this.state = state;
+        ww = state.world.width;
+        wh = state.world.height;
+        cwidth = Mathf.ceil((float)ww / clusterSize);
+        cheight = Mathf.ceil((float)wh / clusterSize);
     }
 
     public void updateTile(Tile tile){
@@ -385,7 +385,7 @@ public class ControlPathfinder implements Runnable{
     }
 
     /** Starts or restarts the pathfinding thread. */
-    private void start(){
+    public void start(){
         if(net.client() || thread != null) return;
 
         thread = new Thread(this, "Control Pathfinder");
@@ -395,7 +395,7 @@ public class ControlPathfinder implements Runnable{
     }
 
     /** Stops the pathfinding thread. */
-    private void stop(){
+    public void stop(){
         if(thread != null){
             thread.interrupt();
             thread = null;
@@ -446,7 +446,7 @@ public class ControlPathfinder implements Runnable{
         Cluster[][] dim1 = clusters[team];
 
         if(dim1 == null){
-            dim1 = clusters[team] = new Cluster[Team.all.length][];
+            dim1 = clusters[team] = new Cluster[costTypes.size][];
         }
 
         Cluster[] dim2 = dim1[pathCost];
@@ -544,7 +544,7 @@ public class ControlPathfinder implements Runnable{
     }
 
     void updateInnerEdges(int team, PathCost cost, int cx, int cy, Cluster cluster){
-        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
+        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, ww - 1), maxY = Math.min(minY + clusterSize - 1, wh - 1);
 
         usedEdges.clear();
 
@@ -592,8 +592,8 @@ public class ControlPathfinder implements Runnable{
                             float connectionCost = innerAstar(
                                 team, cost,
                                 minX, minY, maxX, maxY,
-                                x + y * wwidth,
-                                otherX + otherY * wwidth,
+                                x + y * ww,
+                                otherX + otherY * ww,
                                 (moveDirs[otherDir * 2] * otherFrom + ox),
                                 (moveDirs[otherDir * 2 + 1] * otherFrom + oy),
                                 (moveDirs[otherDir * 2] * otherTo + ox),
@@ -618,16 +618,16 @@ public class ControlPathfinder implements Runnable{
     }
 
     //distance heuristic: manhattan
-    private static float heuristic(int a, int b){
-        int x = a % wwidth, x2 = b % wwidth, y = a / wwidth, y2 = b / wwidth;
+    private float heuristic(int a, int b){
+        int x = a % ww, x2 = b % ww, y = a / ww, y2 = b / ww;
         return Math.abs(x - x2) + Math.abs(y - y2);
     }
 
-    private static int tcost(int team, PathCost cost, int tilePos){
-        return cost.getCost(team, pathfinder.tiles[tilePos]);
+    private int tcost(int team, PathCost cost, int tilePos){
+        return cost.getCost(team, state.pathfinder.tiles[tilePos]);
     }
 
-    private static float tileCost(int team, PathCost type, int a, int b){
+    private float tileCost(int team, PathCost type, int a, int b){
         //currently flat cost
         return cost(team, type, b);
     }
@@ -659,7 +659,7 @@ public class ControlPathfinder implements Runnable{
         while(frontier.size > 0){
             int current = frontier.poll();
 
-            int cx = current % wwidth, cy = current / wwidth;
+            int cx = current % ww, cy = current / ww;
 
             //found the goal (it's in the portal rectangle)
             if((cx >= goalX1 && cy >= goalY1 && cx <= goalX2 && cy <= goalY2) || current == goalPos){
@@ -668,7 +668,7 @@ public class ControlPathfinder implements Runnable{
 
             for(Point2 point : Geometry.d4){
                 int newx = cx + point.x, newy = cy + point.y;
-                int next = newx + wwidth * newy;
+                int next = newx + ww * newy;
 
                 if(newx > maxX || newy > maxY || newx < minX || newy < minY || tcost(team, cost, next) == impassable) continue;
 
@@ -719,7 +719,7 @@ public class ControlPathfinder implements Runnable{
 
         PathCost cost = idToCost(pathCost);
         Cluster cluster = getCreateCluster(team, pathCost, cx, cy);
-        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, wwidth - 1), maxY = Math.min(minY + clusterSize - 1, wheight - 1);
+        int minX = cx * clusterSize, minY = cy * clusterSize, maxX = Math.min(minX + clusterSize - 1, ww - 1), maxY = Math.min(minY + clusterSize - 1, wh - 1);
 
         int bestPortalPair = Integer.MAX_VALUE;
         float bestCost = Float.MAX_VALUE;
@@ -743,8 +743,8 @@ public class ControlPathfinder implements Runnable{
                 float connectionCost = innerAstar(
                 team, cost,
                 minX, minY, maxX, maxY,
-                tileX + tileY * wwidth,
-                otherX + otherY * wwidth,
+                tileX + tileY * ww,
+                otherX + otherY * ww,
                 (moveDirs[dir * 2] * otherFrom + ox),
                 (moveDirs[dir * 2 + 1] * otherFrom + oy),
                 (moveDirs[dir * 2] * otherTo + ox),
@@ -905,7 +905,7 @@ public class ControlPathfinder implements Runnable{
         //actually do the flow field part
         while(frontier.size > 0){
             int tile = frontier.removeLast();
-            int baseX = tile % wwidth, baseY = tile / wwidth;
+            int baseX = tile % ww, baseY = tile / ww;
             int curWeightIndex = (baseX / clusterSize) + (baseY / clusterSize) * cwidth;
 
             //TODO: how can this be null??? serious problem!
@@ -921,7 +921,7 @@ public class ControlPathfinder implements Runnable{
                     dx = baseX + point.x, dy = baseY + point.y,
                     clx = dx / clusterSize, cly = dy / clusterSize;
 
-                    if(clx < 0 || cly < 0 || dx >= wwidth || dy >= wheight) continue;
+                    if(clx < 0 || cly < 0 || dx >= ww || dy >= wh) continue;
 
                     int nextWeightIndex = clx + cly * cwidth;
 
@@ -930,7 +930,7 @@ public class ControlPathfinder implements Runnable{
                     //out of bounds; not allowed to move this way because no weights were registered here
                     if(weights == null) continue;
 
-                    int newPos = tile + point.x + point.y * wwidth;
+                    int newPos = tile + point.x + point.y * ww;
 
                     //can't move back to the goal
                     if(newPos == goalPos) continue;
@@ -939,7 +939,7 @@ public class ControlPathfinder implements Runnable{
 
                     int newPosArray = (dx - clx * clusterSize) + (dy - cly * clusterSize) * clusterSize;
 
-                    int otherCost = pcost.getCost(team, pathfinder.tiles[newPos]);
+                    int otherCost = pcost.getCost(team, state.pathfinder.tiles[newPos]);
                     int oldCost = weights[newPosArray];
 
                     //a cost of 0 means uninitialized, OR it means we're at the goal position, but that's handled above
@@ -1000,7 +1000,7 @@ public class ControlPathfinder implements Runnable{
                             int worldX = x + ox * clusterSize, worldY = y + oy * clusterSize;
 
                             //add the world-relative position to the frontier, so it recalculates
-                            cache.frontier.addFirst(worldX + worldY * wwidth);
+                            cache.frontier.addFirst(worldX + worldY * ww);
 
                             if(showDebug){
                                 Core.app.post(() -> Fx.placeBlock.at(worldX *tilesize, worldY * tilesize, 1f));
@@ -1015,7 +1015,7 @@ public class ControlPathfinder implements Runnable{
     private void initializePathRequest(PathRequest request, int team, int costId, int unitX, int unitY, int goalX, int goalY){
         PathCost pcost = idToCost(costId);
 
-        int goalPos = (goalX + goalY * wwidth);
+        int goalPos = (goalX + goalY * ww);
 
         int node = findClosestNode(team, costId, unitX, unitY);
         int dest = findClosestNode(team, costId, goalX, goalY);
@@ -1042,7 +1042,7 @@ public class ControlPathfinder implements Runnable{
 
         //create the cache if it doesn't exist, and initialize it
         if(cache == null){
-            cache = new FieldCache(pcost, costId, team, goalPos);
+            cache = new FieldCache(pcost, costId, team, goalPos, state.updateId);
             fields.put(cache.mapKey, cache);
             FieldCache fcache = cache;
             //register field in main thread for iteration
@@ -1082,18 +1082,30 @@ public class ControlPathfinder implements Runnable{
         return ControlPathfinder.costTypes.get(costId);
     }
 
-    public static boolean isNearObstacle(Unit unit, int x1, int y1, int x2, int y2){
+    public boolean isNearObstacle(Unit unit, int x1, int y1, int x2, int y2){
         return raycast(unit.team().id, unit.type.pathCost, x1, y1, x2, y2);
     }
 
-    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 out, @Nullable boolean[] noResultFound){
-        return getPathPosition(unit, destination, destination, out, noResultFound);
+    public static class PathfindResult{
+        /** If true, the request cannot be satisfied. */
+        public boolean unreachable;
+        /** If true, the request is ready to execute. */
+        public boolean move;
+        /** If move is true, this is the next tile to move on. Don't use this unless you know what you are doing. */
+        public @Nullable Tile next;
+        /** Destination vector. Only valid if move is true. */
+        public Vec2 dest = new Vec2();
     }
 
-    public boolean getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination, Vec2 out, @Nullable boolean[] noResultFound){
-        if(noResultFound != null){
-            noResultFound[0] = false;
-        }
+    public PathfindResult getPathPosition(Unit unit, Vec2 destination){
+        return getPathPosition(unit, destination, destination);
+    }
+
+    public PathfindResult getPathPosition(Unit unit, Vec2 destination, Vec2 mainDestination){
+        pathResult.unreachable = false;
+        pathResult.move = false;
+        pathResult.next = null;
+        pathResult.dest.setZero();
 
         int costId = unit.type.pathCostId;
         PathCost cost = idToCost(costId);
@@ -1103,14 +1115,21 @@ public class ControlPathfinder implements Runnable{
         team = unit.team.id,
         tileX = unit.tileX(),
         tileY = unit.tileY(),
-        packedPos = world.packArray(tileX, tileY),
+        packedPos = state.world.packArray(tileX, tileY),
         destX = World.toTile(mainDestination.x),
         destY = World.toTile(mainDestination.y),
         actualDestX = World.toTile(destination.x),
         actualDestY = World.toTile(destination.y),
-        actualDestPos = actualDestX + actualDestY * wwidth,
-        initialCost = tileOn == null ? 0 : cost.getCost(team, pathfinder.tiles[tileOn.array()]),
-        destPos = destX + destY * wwidth;
+        actualDestPos = actualDestX + actualDestY * ww,
+        initialCost = tileOn == null ? 0 : cost.getCost(team, state.pathfinder.tiles[tileOn.array()]),
+        destPos = destX + destY * ww;
+
+        //do not allow commanding into areas outside the map bounds
+        if(!state.world.isInMapArea(World.toTile(destination.x), World.toTile(destination.y))){
+            pathResult.move = false;
+            pathResult.unreachable = true;
+            return pathResult;
+        }
 
         PathRequest request = unitRequests.get(unit);
 
@@ -1118,7 +1137,7 @@ public class ControlPathfinder implements Runnable{
         //tile rect size has tile size factored in, since the ray cannot have thickness
         float tileRectSize = tilesize + Tmp.r3.height;
 
-        int lastRaycastTile = request == null || world.tileChanges != request.lastWorldUpdate ? -1 : request.lastRaycastTile;
+        int lastRaycastTile = request == null || state.world.tileChanges != request.lastWorldUpdate ? -1 : request.lastRaycastTile;
         boolean raycastResult = request != null && request.lastRaycastResult;
 
         //cache raycast results to run every time the world updates, and every tile the unit crosses
@@ -1131,14 +1150,15 @@ public class ControlPathfinder implements Runnable{
             if(request != null){
                 request.lastRaycastTile = packedPos;
                 request.lastRaycastResult = raycastResult;
-                request.lastWorldUpdate = world.tileChanges;
+                request.lastWorldUpdate = state.world.tileChanges;
             }
         }
 
         //if the destination can be trivially reached in a straight line, do that.
         if(raycastResult){
-            out.set(destination);
-            return true;
+            pathResult.dest.set(destination);
+            pathResult.move = true;
+            return pathResult;
         }
 
         boolean any = false;
@@ -1146,7 +1166,9 @@ public class ControlPathfinder implements Runnable{
         long fieldKey = FieldIndex.get(destPos, costId, team);
 
         //use existing request if it exists.
-        if(request != null && request.destination == destPos){
+        if(request != null && (request.destination == destPos ||
+            //can only recompute path only twice a second, unless it's far away
+            (Time.timeSinceMillis(request.lastRecomputeTime) < 1000 && Mathf.dst(destX, destY, request.destination % ww, request.destination / ww) <= 4f))){
             request.lastUpdateId = state.updateId;
 
             Tile initialTileOn = tileOn;
@@ -1154,7 +1176,7 @@ public class ControlPathfinder implements Runnable{
             FieldCache fieldCache = null;
             try{
                 fieldCache = fields.get(fieldKey);
-            }catch(ArrayIndexOutOfBoundsException ignored){ //TODO fix this, rare crash due to remove() elsewhere
+            }catch(Exception ignored){ //TODO fix this, rare crash due to remove() elsewhere
             }
             if(fieldCache == null) fieldCache = request.oldCache;
 
@@ -1188,11 +1210,11 @@ public class ControlPathfinder implements Runnable{
                             Point2 point = Geometry.d4[dir];
                             int dx = tileOn.x + point.x, dy = tileOn.y + point.y;
 
-                            Tile other = world.tile(dx, dy);
+                            Tile other = state.world.tile(dx, dy);
 
                             if(other == null) continue;
 
-                            int packed = world.packArray(dx, dy);
+                            int packed = state.world.packArray(dx, dy);
                             int otherCost = getCost(targetCache, dx, dy, requeue), relCost = otherCost - value;
 
                             if(relCost > 2 || otherCost <= 0){
@@ -1221,6 +1243,7 @@ public class ControlPathfinder implements Runnable{
                                     recalc = true;
                                     any = true;
                                 }
+                                pathResult.next = current;
 
                                 break;
                             }else{
@@ -1250,9 +1273,10 @@ public class ControlPathfinder implements Runnable{
                     if(showDebug && Core.graphics.getFrameId() % 30 == 0){
                         Fx.breakBlock.at(request.lastTargetTile.worldx(), request.lastTargetTile.worldy(), 1);
                     }
-                    out.set(request.lastTargetTile.worldx(), request.lastTargetTile.worldy());
+                    pathResult.dest.set(request.lastTargetTile.worldx(), request.lastTargetTile.worldy());
+                    pathResult.move = true;
                     request.lastTile = recalc ? -1 : initialTileOn.pos();
-                    return true;
+                    return pathResult;
                 }
             }
         }else{
@@ -1262,9 +1286,10 @@ public class ControlPathfinder implements Runnable{
             }
 
             //queue new request.
-            unitRequests.put(unit, request = new PathRequest(unit, team, costId, destPos));
+            unitRequests.put(unit, request = new PathRequest(unit, team, costId, destPos, state.updateId));
 
             PathRequest f = request;
+            request.lastRecomputeTime = Time.millis();
 
             //on the pathfinding thread: initialize the request
             queue.post(() -> {
@@ -1272,17 +1297,17 @@ public class ControlPathfinder implements Runnable{
                 recalculatePath(f);
             });
 
-            return false;
+            pathResult.move = false;
+            return pathResult;
         }
 
-        if(noResultFound != null){
-            noResultFound[0] = request.notFound;
-        }
-        return false;
+        pathResult.move = false;
+        pathResult.unreachable = request.notFound;
+        return pathResult;
     }
 
-    private void recalculatePath(PathRequest request){
-        initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % wwidth, request.destination / wwidth);
+    private void recalculatePath(ControlPathfinder.PathRequest request){
+        initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % ww, request.destination / ww);
     }
 
     private int getCost(FieldCache cache, int x, int y, boolean requeue){
@@ -1302,14 +1327,14 @@ public class ControlPathfinder implements Runnable{
         }
     }
 
-    private static boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = wwidth, wh = wheight;
+    private boolean raycast(int team, PathCost type, int x1, int y1, int x2, int y2){
+        int ww = this.ww, wh = this.wh;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(avoid(team, type, x + y * wwidth)) return true;
+            if(avoid(team, type, x + y * this.ww)) return true;
             if(x == x2 && y == y2) return false;
 
             //diagonal ver
@@ -1329,14 +1354,14 @@ public class ControlPathfinder implements Runnable{
     }
 
     /** @return 0 if nothing was hit, otherwise the packed coordinates. This is an internal function and will likely be moved - do not use!*/
-    public static int raycastFast(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = world.width(), wh = world.height();
+    public int raycastFastAvoid(int team, PathCost type, int x1, int y1, int x2, int y2){
+        int ww = state.world.width, wh = state.world.height;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(solid(team, type, x + y * wwidth, true)) return Point2.pack(x, y);
+            if(avoid(team, type, x + y * this.ww)) return Point2.pack(x, y);
             if(x == x2 && y == y2) return 0;
 
             //no diagonals
@@ -1352,47 +1377,23 @@ public class ControlPathfinder implements Runnable{
         return 0;
     }
 
-    /** @return 0 if nothing was hit, otherwise the packed coordinates. This is an internal function and will likely be moved - do not use!*/
-    public static int raycastFastAvoid(int team, PathCost type, int x1, int y1, int x2, int y2){
-        int ww = world.width(), wh = world.height();
-        int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
-        int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
-        int err = dx - dy;
-
-        while(x >= 0 && y >= 0 && x < ww && y < wh){
-            if(avoid(team, type, x + y * wwidth)) return Point2.pack(x, y);
-            if(x == x2 && y == y2) return 0;
-
-            //no diagonals
-            if(2 * err + dy > dx - 2 * err){
-                err -= dy;
-                x += sx;
-            }else{
-                err += dx;
-                y += sy;
-            }
-        }
-
-        return 0;
-    }
-
-    private static boolean overlap(int initialCost, int team, PathCost type, int x, int y, float startX, float startY, float endX, float endY, float rectSize){
-        if(x < 0 || y < 0 || x >= wwidth || y >= wheight) return false;
-        if(!nearPassable(initialCost, team, type, x + y * wwidth)){
+    private boolean overlap(int initialCost, int team, PathCost type, int x, int y, float startX, float startY, float endX, float endY, float rectSize){
+        if(x < 0 || y < 0 || x >= ww || y >= wh) return false;
+        if(!nearPassable(initialCost, team, type, x + y * ww)){
             return Intersector.intersectSegmentRectangleFast(startX, startY, endX, endY, x * tilesize - rectSize/2f, y * tilesize - rectSize/2f, rectSize, rectSize);
         }
         return false;
     }
 
-    private static boolean raycastRect(int initialCost, float startX, float startY, float endX, float endY, int team, PathCost type, int x1, int y1, int x2, int y2, float rectSize){
-        int ww = wwidth, wh = wheight;
+    private boolean raycastRect(int initialCost, float startX, float startY, float endX, float endY, int team, PathCost type, int x1, int y1, int x2, int y2, float rectSize){
+        int ww = this.ww, wh = this.wh;
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
             if(
-            !nearPassable(initialCost, team, type, x + y * wwidth) ||
+            !nearPassable(initialCost, team, type, x + y * this.ww) ||
             overlap(initialCost,team, type, x + 1, y, startX, startY, endX, endY, rectSize) ||
             overlap(initialCost,team, type, x - 1, y, startX, startY, endX, endY, rectSize) ||
             overlap(initialCost,team, type, x, y + 1, startX, startY, endX, endY, rectSize) ||
@@ -1417,38 +1418,38 @@ public class ControlPathfinder implements Runnable{
         return true;
     }
 
-    private static boolean avoid(int team, PathCost type, int tilePos){
+    private boolean avoid(int team, PathCost type, int tilePos){
         int cost = cost(team, type, tilePos);
         return cost == impassable || cost >= 2;
     }
 
-    private static boolean passable(int team, PathCost cost, int pos){
-        int amount = cost.getCost(team, pathfinder.tiles[pos]);
+    private boolean passable(int team, PathCost cost, int pos){
+        int amount = cost.getCost(team, state.pathfinder.tiles[pos]);
         return amount != impassable && amount < solidCap;
     }
 
-    private static boolean nearPassable(int initialCost, int team, PathCost cost, int pos){
-        int amount = cost.getCost(team, pathfinder.tiles[pos]);
+    private boolean nearPassable(int initialCost, int team, PathCost cost, int pos){
+        int amount = cost.getCost(team, state.pathfinder.tiles[pos]);
         return amount != impassable && amount < Math.min(Math.max(50, initialCost + 1), solidCap);
     }
 
-    private static boolean solid(int team, PathCost type, int x, int y){
-        return x < 0 || y < 0 || x >= wwidth || y >= wheight || solid(team, type, x + y * wwidth, true);
+    private boolean solid(int team, PathCost type, int x, int y){
+        return x < 0 || y < 0 || x >= ww || y >= wh || solid(team, type, x + y * ww, true);
     }
 
-    private static boolean solid(int team, PathCost type, int tilePos, boolean checkWall){
+    private boolean solid(int team, PathCost type, int tilePos, boolean checkWall){
         int cost = cost(team, type, tilePos);
         return cost == impassable || cost >= solidCap;
     }
 
-    private static int cost(int team, PathCost cost, int tilePos){
+    private int cost(int team, PathCost cost, int tilePos){
         if(state.rules.limitMapArea && !Team.get(team).isAI()){
-            int x = tilePos % wwidth, y = tilePos / wwidth;
+            int x = tilePos % ww, y = tilePos / ww;
             if(x < state.rules.limitX || y < state.rules.limitY || x > state.rules.limitX + state.rules.limitWidth || y > state.rules.limitY + state.rules.limitHeight){
                 return impassable;
             }
         }
-        return cost.getCost(team, pathfinder.tiles[tilePos]);
+        return cost.getCost(team, state.pathfinder.tiles[tilePos]);
     }
 
     private void clusterChanged(int team, int pathCost, int cx, int cy){

@@ -3,12 +3,13 @@ package mindustry.graphics;
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
+
+import mindustry.*;
 
 import static mindustry.Vars.*;
 
@@ -46,7 +47,7 @@ public class EnvRenderers{
 
             Draw.blend(Blending.additive);
 
-            float t = Time.time / timeScale;
+            float t = Vars.state.time / timeScale;
             Texture tex = Core.assets.get("sprites/rays.png", Texture.class);
 
             for(int i = 0; i < rays; i++){
@@ -56,8 +57,8 @@ public class EnvRenderers{
                 int pos = (int)time;
                 float life = time % 1f;
                 float opacity = rand.random(0.2f, 0.7f) * Mathf.slope(life) * 0.7f;
-                float x = (rand.random(0f, world.unitWidth()) + (pos % 100)*753) % world.unitWidth();
-                float y = (rand.random(0f, world.unitHeight()) + (pos % 120)*453) % world.unitHeight();
+                float x = (rand.random(0f, state.world.unitWidth) + (pos % 100)*753) % state.world.unitWidth;
+                float y = (rand.random(0f, state.world.unitHeight) + (pos % 120)*453) % state.world.unitHeight;
                 float rot = rand.range(7f);
                 float sizeScale = 1f + rand.range(0.3f);
 

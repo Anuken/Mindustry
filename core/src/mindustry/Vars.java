@@ -13,9 +13,7 @@ import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.editor.*;
-import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -28,6 +26,7 @@ import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -50,9 +49,9 @@ public class Vars implements Loadable{
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
     /** Min game version for all mods. */
-    public static final int minModGameVersion = 136;
+    public static final int minModGameVersion = 161;
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
-    public static final int minJavaModGameVersion = 154;
+    public static final int minJavaModGameVersion = 161;
     /** If true, a button to view sector submission threads is shown. */
     public static boolean showSectorSubmissions = false;
     /** If true, the BE server list is always used. */
@@ -178,7 +177,7 @@ public class Vars implements Loadable{
     /** multicast group for discovery.*/
     public static final String multicastGroup = "227.2.7.7";
     /** Maximum delta time. If the actual delta time (*60) between frames is higher than this number, the game will start to slow down. */
-    public static float maxDeltaClient = 6f, maxDeltaServer = 10f;
+    public static float maxDeltaClient = 4f, maxDeltaServer = 4f;
     /** whether the graphical game client has loaded */
     public static boolean clientLoaded = false;
     /** whether the serpulo campaign sectors were remapped (older save) */
@@ -269,7 +268,6 @@ public class Vars implements Loadable{
     public static Net net;
     public static ContentLoader content;
     public static GameState state;
-    public static EntityCollisions collisions;
     public static Waves waves;
     public static Platform platform = new Platform(){};
     public static Mods mods;
@@ -279,18 +277,10 @@ public class Vars implements Loadable{
     public static BaseRegistry bases;
     public static GlobalVars logicVars;
     public static MapEditor editor;
-    public static AvoidanceProcess avoidance;
     public static DataAssetCache assetCache;
     public static GameService service = new GameService();
-
     public static Universe universe;
-    public static World world;
     public static Maps maps;
-    public static WaveSpawner spawner;
-    public static BlockIndexer indexer;
-    public static Pathfinder pathfinder;
-    public static ControlPathfinder controlPath;
-    public static FogControl fogControl;
 
     public static Control control;
     public static Logic logic;
@@ -308,8 +298,6 @@ public class Vars implements Loadable{
     }
 
     public static void init(){
-        Groups.init();
-
         if(loadLocales){
             String[] stra = Core.files.internal("locales").readString().split("\n");
             locales = new Locale[stra.length];
@@ -350,20 +338,12 @@ public class Vars implements Loadable{
         if(mods == null) mods = new Mods();
 
         content = new ContentLoader();
-        waves = new Waves();
-        collisions = new EntityCollisions();
-        world = new World();
         universe = new Universe();
         becontrol = new BeControl();
         asyncCore = new AsyncCore();
         if(!headless) editor = new MapEditor();
 
         maps = new Maps();
-        spawner = new WaveSpawner();
-        indexer = new BlockIndexer();
-        pathfinder = new Pathfinder();
-        controlPath = new ControlPathfinder();
-        fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();
         assetCache = new DataAssetCache();
@@ -527,7 +507,7 @@ public class Vars implements Loadable{
             Log.info("NOTE: external translation bundle has been loaded.");
 
             if(!headless){
-                Time.run(10f, () -> ui.showInfo(Core.bundle.format("bundle.external", handle.absolutePath())));
+                Vars.state.run(10f, () -> ui.showInfo(Core.bundle.format("bundle.external", handle.absolutePath())));
             }
         }catch(Throwable e){
             //no external bundle found

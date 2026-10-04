@@ -2,9 +2,7 @@ package mindustry.android;
 
 import android.annotation.*;
 import android.os.*;
-import android.os.Build.*;
 import arc.*;
-import arc.backend.android.*;
 import com.android.dex.*;
 import com.android.dx.cf.direct.*;
 import com.android.dx.command.dexer.*;
@@ -13,7 +11,6 @@ import com.android.dx.dex.cf.*;
 import com.android.dx.dex.file.DexFile;
 import com.android.dx.merge.*;
 import dalvik.system.*;
-import mindustry.mod.*;
 import rhino.*;
 
 import java.io.*;
@@ -159,8 +156,9 @@ public class AndroidRhinoContext{
             }catch(IOException e){
                 e.printStackTrace();
             }
-            android.content.Context context = (android.content.Context)((AndroidApplication)Core.app);
-            return new DexClassLoader(dexFile.getPath(), VERSION.SDK_INT >= 21 ? context.getCodeCacheDir().getPath() : context.getCacheDir().getAbsolutePath(), null, getParent()).loadClass(name);
+
+            var context = (android.content.Context)Core.app;
+            return new DexClassLoader(dexFile.getPath(), context.getCodeCacheDir().getPath(), null, getParent()).loadClass(name);
         }
 
         @Override

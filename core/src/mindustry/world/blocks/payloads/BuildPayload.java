@@ -4,7 +4,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -39,6 +38,11 @@ public class BuildPayload implements Payload{
     }
 
     @Override
+    public boolean isDead(){
+        return build.dead;
+    }
+
+    @Override
     public boolean contentEquals(Payload other){
         return other instanceof BuildPayload bp && bp.block() == build.block;
     }
@@ -60,6 +64,7 @@ public class BuildPayload implements Payload{
     public void destroyed(){
         build.dead = true;
         build.onDestroyed();
+        build.afterDestroyed();
     }
 
     @Override

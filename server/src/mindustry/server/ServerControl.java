@@ -9,19 +9,17 @@ import arc.util.Timer;
 import arc.util.CommandHandler.*;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
-import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
-import mindustry.maps.*;
 import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
 import mindustry.mod.data.*;
@@ -31,6 +29,7 @@ import mindustry.net.*;
 import mindustry.type.*;
 import org.jline.reader.*;
 import org.jline.reader.impl.completer.*;
+import org.jline.terminal.*;
 
 import java.io.*;
 import java.net.*;
@@ -76,28 +75,37 @@ public class ServerControl implements ApplicationListener{
     private Fi dataAssetDirectory, rulesFile;
     private Seq<DataAsset> dataAssets = new Seq<>();
 
+    private boolean hasTerminal = false;
     private LineReader lineReader;
 
     public Runnable serverInput = () -> {
-        while(true){
-            try{
-                String line = lineReader.readLine("> ");
-                if(!line.isEmpty()){
-                    Core.app.post(() -> handleCommandString(line));
+        if(!hasTerminal){
+            Scanner scan = new Scanner(System.in);
+            while(scan.hasNext()){
+                String line = scan.nextLine();
+                Core.app.post(() -> handleCommandString(line));
+            }
+        }else{
+            while(true){
+                try{
+                    String line = lineReader.readLine("> ");
+                    if(!line.isEmpty()){
+                        Core.app.post(() -> handleCommandString(line));
+                    }
+                }catch(EndOfFileException | UserInterruptException e){
+                    Core.app.exit();
+                }catch(Exception e){
+                    Core.app.post(() -> { throw new ArcRuntimeException(e); });
                 }
-            }catch(EndOfFileException | UserInterruptException e){
-                Core.app.exit();
-            }catch(Exception e){
-                Core.app.post(() -> { throw new ArcRuntimeException(e); });
             }
         }
     };
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
-            info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(state.map.plainName()));
+            info("Game over! Reached wave @ with @ players online on map @.", state.wave, state.entities.player.size(), Strings.capitalize(state.map.plainName()));
         }else{
-            info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.plainName()));
+            info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, state.entities.player.size(), Strings.capitalize(state.map.plainName()));
         }
 
         //set the next map to be played
@@ -114,7 +122,7 @@ public class ServerControl implements ApplicationListener{
 
             info("Selected next map to be @.", map.plainName());
 
-            play(() -> world.loadMap(map, map.applyRules(lastMode)));
+            play(() -> GameState.loadMap(map, map.applyRules(lastMode)));
         }else{
             netServer.kickAll(KickReason.gameover);
             state.set(State.menu);
@@ -131,6 +139,7 @@ public class ServerControl implements ApplicationListener{
         registerCommands();
 
         lineReader = LineReaderBuilder.builder().completer(new StringsCompleter(handler.getCommandList().map(c -> c.text))).build();
+        hasTerminal = !(Terminal.TYPE_DUMB.equals(lineReader.getTerminal().getType()) || Terminal.TYPE_DUMB_COLOR.equals(lineReader.getTerminal().getType()));
 
         Core.settings.defaults(
             "bans", "",
@@ -152,13 +161,17 @@ public class ServerControl implements ApplicationListener{
             if(level1 == LogLevel.err) text = text.replace(reset, lightRed + bold);
 
             String result = bold + lightBlack + "[" + dateTime.format(LocalDateTime.now()) + "] " + reset + format(tags[level1.ordinal()] + " " + text + "&fr");
-            if(lineReader.isReading()){
-                lineReader.callWidget(LineReader.CLEAR);
-                lineReader.getTerminal().writer().println(result);
-                lineReader.callWidget(LineReader.REDRAW_LINE);
-                lineReader.callWidget(LineReader.REDISPLAY);
+            if(hasTerminal){
+                if(lineReader.isReading()){
+                    lineReader.callWidget(LineReader.CLEAR);
+                    lineReader.getTerminal().writer().println(result);
+                    lineReader.callWidget(LineReader.REDRAW_LINE);
+                    lineReader.callWidget(LineReader.REDISPLAY);
+                }else{
+                    lineReader.getTerminal().writer().println(result);
+                }
             }else{
-                lineReader.getTerminal().writer().println(result);
+                System.out.println(result);
             }
 
             if(Config.logging.bool()){
@@ -305,7 +318,7 @@ public class ServerControl implements ApplicationListener{
 
             if(state.isGame()){ //run this only if the server's actually hosting
                 if(Config.autoPause.bool()){
-                    if(Groups.player.isEmpty()){
+                    if(state.entities.player.isEmpty()){
                         autoPaused = true;
                         state.set(State.paused);
                     }else if(autoPaused){
@@ -381,8 +394,8 @@ public class ServerControl implements ApplicationListener{
         });
     }
 
-    JsonValue readRulesFile(){
-        return JsonIO.json.fromJson(null, Jval.read(rulesFile.readString()).toString(Jformat.plain));
+    Jval readRulesFile(){
+        return JsonIO.json.fromJson(null, rulesFile);
     }
 
     void loadDataAssets(){
@@ -535,15 +548,16 @@ public class ServerControl implements ApplicationListener{
                 lastMode = preset;
                 Core.settings.put("lastServerMode", lastMode.name());
                 try{
-                    world.loadMap(result, result.applyRules(lastMode));
+                    state.loadMap(result, result.applyRules(lastMode));
                     state.rules = result.applyRules(preset);
+                    Events.fire(new RulesLoadEvent(state.rules));
                     logic.play();
 
                     info("Map loaded.");
 
                     netServer.openServer();
-                }catch(MapException e){
-                    err("@: @", e.map.plainName(), e.getMessage());
+                }catch(SaveLoadException e){
+                    err("@: @", state.map.plainName(), e.getMessage());
                 }
             }
         });
@@ -607,13 +621,13 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.waves){
                     info("  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
-                info("  @ units / @ enemies", Groups.unit.size(), state.enemies);
+                info("  @ units / @ enemies", state.entities.unit.size(), state.enemies);
 
                 info("  @ FPS, @ MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
-                if(Groups.player.size() > 0){
-                    info("  Players: @", Groups.player.size());
-                    for(Player p : Groups.player){
+                if(state.entities.player.size() > 0){
+                    info("  Players: @", state.entities.player.size());
+                    for(Player p : state.entities.player){
                         info("    @ @ / @", p.admin() ? "&r[A]&c" : "&b[P]&c", p.plainName(), p.uuid());
                     }
                 }else{
@@ -675,10 +689,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
-            JsonValue base = readRulesFile();
+            Jval base = readRulesFile();
 
             if(arg.length == 0){
-                info("Rules:\n@", Jval.read(base.toJson(OutputType.minimal)).toString(Jformat.hjson));
+                info("Rules:\n@", base.toString(Jformat.hjson));
             }else if(arg.length == 1){
                 err("Invalid usage. Specify which rule to remove or add.");
             }else{
@@ -703,24 +717,19 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     try{
-                        JsonValue value = new JsonReader().parse(arg[2]);
-                        value.name = arg[1];
+                        String name = arg[1];
+                        Jval value = Jval.read(arg[2]);
+                        base.put(name, value);
 
-                        JsonValue parent = new JsonValue(ValueType.object);
-                        parent.addChild(value);
+                        JsonIO.json.readField(state.rules, name, base);
 
-                        JsonIO.json.readField(state.rules, value.name, parent);
-                        if(base.has(value.name)){
-                            base.remove(value.name);
-                        }
-                        base.addChild(arg[1], value);
                         info("Changed rule: @", value.toString().replace("\n", " "));
                     }catch(Throwable e){
                         err("Error parsing rule JSON: @", e.getMessage());
                     }
                 }
 
-                rulesFile.writeString(Jval.read(base.toString()).toString(Jformat.hjson));
+                rulesFile.writeString(base.toString(Jformat.hjson));
                 Call.setRules(state.rules);
             }
         });
@@ -978,7 +987,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Player target = Groups.player.find(p -> p.name().equals(arg[0]));
+            Player target = state.entities.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
                 Call.sendMessage("[scarlet]" + target.name() + "[scarlet] has been kicked by the server.");
@@ -994,7 +1003,7 @@ public class ServerControl implements ApplicationListener{
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
             }else if(arg[0].equals("name")){
-                Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+                Player target = state.entities.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
                 if(target != null){
                     netServer.admins.banPlayer(target.uuid());
                     info("Banned.");
@@ -1008,7 +1017,7 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid type.");
             }
 
-            for(Player player : Groups.player){
+            for(Player player : state.entities.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
                     Call.sendMessage("[scarlet]" + player.name + " has been banned.");
                     player.con.kick(KickReason.banned);
@@ -1079,12 +1088,12 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
+            Player playert = state.entities.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
             if(playert != null){
                 target = playert.getInfo();
             }else{
                 target = netServer.admins.getInfoOptional(arg[1]);
-                playert = Groups.player.find(p -> p.getInfo() == target);
+                playert = state.entities.player.find(p -> p.getInfo() == target);
             }
 
             if(target != null){
@@ -1114,11 +1123,11 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("players", "List all players currently in game.", arg -> {
-            if(Groups.player.size() == 0){
+            if(state.entities.player.size() == 0){
                 info("No players are currently in the server.");
             }else{
-                info("Players: @", Groups.player.size());
-                for(Player user : Groups.player){
+                info("Players: @", state.entities.player.size());
+                for(Player user : state.entities.player){
                     info(" @&lm @ / ID: @ / IP: @", user.admin ? "&r[A]&c" : "&b[P]&c", user.plainName(), user.uuid(), user.ip());
                 }
             }
@@ -1350,7 +1359,7 @@ public class ServerControl implements ApplicationListener{
      * Resets the world state, starts a new game.
      * @param run What task to run to load a new world.
      */
-    public void play(Runnable run){
+    public void play(UnsafeRunnable run){
         play(true, run);
     }
 
@@ -1359,7 +1368,7 @@ public class ServerControl implements ApplicationListener{
      * @param wait Whether to wait for {@link Config#roundExtraTime} seconds before starting a new game.
      * @param run What task to run to load a new world.
      */
-    public void play(boolean wait, Runnable run){
+    public void play(boolean wait, UnsafeRunnable run){
         inGameOverWait = true;
         cancelPlayTask();
 
@@ -1371,12 +1380,14 @@ public class ServerControl implements ApplicationListener{
                 run.run();
 
                 state.rules = state.map.applyRules(lastMode);
+                Events.fire(new RulesLoadEvent(state.rules));
                 logic.play();
 
                 reloader.end();
                 inGameOverWait = false;
-            }catch(MapException e){
-                err("@: @", e.map.plainName(), e.getMessage());
+            }catch(Throwable e){
+                err("Error loading map @: @", state.map.plainName(), e.getMessage());
+                state.set(State.menu);
                 net.closeServer();
             }
         };

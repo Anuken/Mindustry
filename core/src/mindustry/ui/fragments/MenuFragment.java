@@ -20,6 +20,8 @@ import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 import static mindustry.gen.Tex.*;
 
@@ -105,7 +107,7 @@ public class MenuFragment{
                     }
                 });
             }).size(200, 60).name("becheck").update(t -> {
-                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
+                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(Vars.state.time, 5f, 1f)) : Color.white);
             }));
         }
 

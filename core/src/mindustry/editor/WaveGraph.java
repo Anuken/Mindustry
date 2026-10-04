@@ -2,6 +2,7 @@ package mindustry.editor;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.font.Font;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;

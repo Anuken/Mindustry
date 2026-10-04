@@ -1,0 +1,35 @@
+{
+  "superclass": "mindustry.graphics.g3d.HexMesh",
+  "divisions": {
+    "type": "int",
+    "default": "1"
+  },
+  "octaves": {
+    "type": "double",
+    "default": "1"
+  },
+  "persistence": {
+    "type": "double",
+    "default": "0.5"
+  },
+  "scl": {
+    "type": "double",
+    "default": "1"
+  },
+  "pow": {
+    "type": "double",
+    "default": "1"
+  },
+  "mag": {
+    "type": "double",
+    "default": "0.5"
+  },
+  "colorScale": {
+    "type": "float",
+    "default": "1"
+  },
+  "colors": {
+    "type": "arc.graphics.Color[]",
+    "doc": "Color gradient, indexed by noise height. Required - no default."
+  }
+}

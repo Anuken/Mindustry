@@ -1,0 +1,4 @@
+{
+  "doc": "Reload of the weapon - 1 right after shooting, 0 when ready to fire. A sensor value for PartProgress.type - not an operation (see PartProgress and the 'op' field for those).",
+  "superclass": "mindustry.entities.part.DrawPart$PartProgress"
+}

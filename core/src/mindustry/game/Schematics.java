@@ -5,7 +5,6 @@ import arc.assets.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
@@ -17,16 +16,16 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
 import mindustry.gen.*;
-import mindustry.input.*;
 import mindustry.input.InputHandler.*;
+import mindustry.input.*;
 import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.distribution.*;
@@ -175,7 +174,7 @@ public class Schematics implements Loadable{
         FrameBuffer buffer = getBuffer(schematic);
         Draw.flush();
         buffer.begin();
-        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.getWidth(), buffer.getHeight());
+        Pixmap pixmap = ScreenUtils.getFrameBufferPixmap(0, 0, buffer.width, buffer.height);
         file.writePng(pixmap);
         buffer.end();
     }
@@ -184,7 +183,7 @@ public class Schematics implements Loadable{
         if(errored.contains(schematic)) return errorTexture;
 
         try{
-            return getBuffer(schematic).getTexture();
+            return getBuffer(schematic).texture;
         }catch(Throwable t){
             Log.err("Failed to get preview for schematic '@' (@)", schematic.name(), schematic.file);
             Log.err(t);
@@ -220,7 +219,7 @@ public class Schematics implements Loadable{
             shadowBuffer.begin(Color.clear);
 
             Draw.trans().idt();
-            Draw.proj().setOrtho(0, 0, shadowBuffer.getWidth(), shadowBuffer.getHeight());
+            Draw.proj().setOrtho(0, 0, shadowBuffer.width, shadowBuffer.height);
 
             Draw.color();
             schematic.tiles.each(t -> {
@@ -240,14 +239,22 @@ public class Schematics implements Loadable{
 
             buffer.begin(Color.clear);
 
-            Draw.proj().setOrtho(0, buffer.getHeight(), buffer.getWidth(), -buffer.getHeight());
+            Draw.proj().setOrtho(0, buffer.height, buffer.width, -buffer.height);
 
-            Tmp.tr1.set(shadowBuffer.getTexture(), 0, 0, schematic.width + padding, schematic.height + padding);
+            Tmp.tr1.set(shadowBuffer.texture, 0, 0, schematic.width + padding, schematic.height + padding);
             Draw.color(0f, 0f, 0f, 1f);
-            Draw.rect(Tmp.tr1, buffer.getWidth()/2f, buffer.getHeight()/2f, buffer.getWidth(), -buffer.getHeight());
+            Draw.rect(Tmp.tr1, buffer.width /2f, buffer.height /2f, buffer.width, -buffer.height);
             Draw.color();
 
-            Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
+            Seq<BuildPlan> plans = schematic.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config){
+                @Override
+                public Tile tile(){
+                    //fake tile to return for previews to work properly
+                    emptyTile.x = (short)x;
+                    emptyTile.y = (short)y;
+                    return emptyTile;
+                }
+            });
 
             Draw.flush();
             //scale each plan to fit schematic
@@ -263,6 +270,10 @@ public class Schematics implements Loadable{
             });
 
             plans.each(req -> req.block.drawPlanConfigTop(req, eachPlans));
+
+            //reset state
+            emptyTile.x = 0;
+            emptyTile.y = 0;
 
             Draw.flush();
             Draw.trans().idt();
@@ -390,7 +401,7 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Building linked = world.build(cx, cy);
+                Building linked = state.world.build(cx, cy);
                 if(linked != null && (!linked.isDiscovered(team) || !linked.wasVisible)) continue;
 
                 Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.current : linked.block;
@@ -421,7 +432,7 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Building tile = world.build(cx, cy);
+                Building tile = state.world.build(cx, cy);
                 if(tile != null && (!tile.isDiscovered(team) || !tile.wasVisible)) continue;
                 Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.current : tile.block;
 
@@ -452,8 +463,8 @@ public class Schematics implements Loadable{
     /** Places the last launch loadout at the coordinates and fills it with the launch resources. */
     public static void placeLaunchLoadout(int x, int y){
         placeLoadout(universe.getLastLoadout(), x, y, state.rules.defaultTeam);
-        if(world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
-        world.tile(x, y).build.items.add(universe.getLaunchResources());
+        if(state.world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
+        state.world.tile(x, y).build.items.add(universe.getLaunchResources());
     }
 
     public static void placeLoadout(Schematic schem, int x, int y){
@@ -470,7 +481,7 @@ public class Schematics implements Loadable{
         if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.copy().sort(s -> -s.block.schematicPriority).each(st -> {
-            Tile tile = world.tile(st.x + ox, st.y + oy);
+            Tile tile = state.world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
             //check for blocks that are in the way.
@@ -508,7 +519,7 @@ public class Schematics implements Loadable{
     public static void place(Schematic schem, int x, int y, Team team, boolean overwrite){
         int ox = x - schem.width/2, oy = y - schem.height/2;
         schem.tiles.each(st -> {
-            Tile tile = world.tile(st.x + ox, st.y + oy);
+            Tile tile = state.world.tile(st.x + ox, st.y + oy);
             if(tile == null || (!overwrite && !Build.validPlace(st.block, team, tile.x, tile.y, st.rotation))) return;
 
             tile.setBlock(st.block, team, st.rotation);
@@ -521,6 +532,21 @@ public class Schematics implements Loadable{
     }
 
     //region IO methods
+
+    public static boolean isSchematic(Fi file){
+        try{
+            try(InputStream input = file.read()){
+                for(byte b : header){
+                    if(input.read() != b){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }catch(Throwable t){
+            return false;
+        }
+    }
 
     /** Loads a schematic from base64. May throw an exception. */
     public static Schematic readBase64(String schematic){
@@ -564,7 +590,7 @@ public class Schematics implements Loadable{
 
             ContentMapper mapper = null;
 
-            //set up content mapping if found; this should not fail
+            //set up content mapping if found
             if(map.containsKey("contentMap")){
                 IntMap<ObjectIntMap<String>> nameMap = JsonIO.json.fromJson(IntMap.class, ObjectIntMap.class, map.get("contentMap", "{}"));
                 IntMap<IntMap<Content>> contentMap = new IntMap<>();
@@ -578,12 +604,7 @@ public class Schematics implements Loadable{
                 mapper = (type, id) -> contentMap.get(type.ordinal(), IntMap::new).get(id);
             }
 
-            String[] labels = null;
-
-            //try to read the categories, but skip if it fails
-            try{
-                labels = JsonIO.read(String[].class, map.get("labels", "[]"));
-            }catch(Exception ignored){}
+            String[] labels = Jval.read(map.get("labels", "[]")).asStringArray();
 
             IntMap<Block> blocks = new IntMap<>();
             int length = stream.readUnsignedByte();

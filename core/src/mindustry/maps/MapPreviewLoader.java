@@ -10,8 +10,8 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import mindustry.type.*;
 
 import java.lang.reflect.*;
 

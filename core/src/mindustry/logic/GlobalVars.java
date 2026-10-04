@@ -8,7 +8,6 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.game.*;
 import mindustry.type.*;
@@ -28,17 +27,15 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static LVar
+    private static LogicVar
         varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer,
-        varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile, varClientMusicPlaying;
+        varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile, varClientMusicPlaying, varClientCurrentMusic;
 
-    private ObjectMap<String, LVar> vars = new ObjectMap<>();
+    private ObjectMap<String, LogicVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
     private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
     private int[][] contentIdToLogicId;
-
-    public static final Seq<String> soundNames = new Seq<>();
 
     public void init(){
         putEntryOnly("sectionProcessor");
@@ -90,6 +87,7 @@ public class GlobalVars{
         varClientTeam = putEntry("@clientTeam", 0, true);
         varClientMobile = putEntry("@clientMobile", 0, true);
         varClientMusicPlaying = putEntry("@clientMusicPlaying", 0, true);
+        varClientCurrentMusic = putEntry("@clientCurrentMusic", null, true);
 
         //special enums
         put("@ctrlProcessor", ctrlProcessor);
@@ -101,7 +99,6 @@ public class GlobalVars{
             for(Sound sound : Core.assets.getAll(Sound.class, new Seq<>(Sound.class))){
                 if(sound != Sounds.none && sound.file != null){
                     String name = sound.file.nameWithoutExtension();
-                    soundNames.add(name);
                     put("@sfx-" + name, Sounds.getSoundId(sound));
                 }
             }
@@ -138,6 +135,10 @@ public class GlobalVars{
             put("@" + weather.name, weather);
         }
 
+        for(StatusEffect effect : Vars.content.statusEffects()){
+            put("@status-" + effect.name, effect);
+        }
+
         for(var entry : Colors.getColors().entries()){
             //ignore uppercase variants, they are duplicates
             if(Character.isUpperCase(entry.key.charAt(0))) continue;
@@ -146,11 +147,11 @@ public class GlobalVars{
         }
 
         //store sensor constants
-        for(LAccess sensor : LAccess.all){
+        for(LogicProp sensor : LogicProp.all){
             put("@" + sensor.name(), sensor);
         }
 
-        LStatement.nameToAlign.each((name, align) -> put("@" + name, align));
+        LogicStatement.nameToAlign.each((name, align) -> put("@" + name, align));
 
         logicIdToContent = new UnlockableContent[ContentType.all.length][];
         contentIdToLogicId = new int[ContentType.all.length][];
@@ -201,8 +202,8 @@ public class GlobalVars{
         varWave.numval = state.wave;
         varWaveTime.numval = state.wavetime / 60f;
 
-        varMapW.numval = world.width();
-        varMapH.numval = world.height();
+        varMapW.numval = state.world.width;
+        varMapH.numval = state.world.height;
 
         //network
         varServer.numval = (net.server() || !net.active()) ? 1 : 0;
@@ -216,10 +217,14 @@ public class GlobalVars{
             varClientTeam.numval = player.team().id;
             varClientMobile.numval = mobile ? 1 : 0;
             varClientMusicPlaying.numval = control.sound.isPlaying() ? 1 : 0;
+
+            var music = control.sound.getCurrent();
+            String dpName = music == null || music.file == null ? null : state.data.getAudioName(music.file);
+            varClientCurrentMusic.objval = music == null || music.file == null ? null : (dpName == null ? music.file.nameWithoutExtension() : dpName);
         }
     }
 
-    public LVar waitVar(){
+    public LogicVar waitVar(){
         return varWait;
     }
 
@@ -245,7 +250,7 @@ public class GlobalVars{
     }
 
     /** @return a constant variable if there is a constant with this name, or null. */
-    public @Nullable LVar get(String name){
+    public @Nullable LogicVar get(String name){
         return vars.get(name);
     }
 
@@ -253,7 +258,7 @@ public class GlobalVars{
      * @return a constant variable by name.
      * Attempting to get privileged variable from a non-privileged logic executor returns a null constant.
      */
-    public @Nullable LVar get(String name, boolean privileged){
+    public @Nullable LogicVar get(String name, boolean privileged){
         if(!privileged && privilegedNames.contains(name)) return vars.get("null");
         return vars.get(name);
     }
@@ -264,19 +269,19 @@ public class GlobalVars{
     }
 
     /** Adds a constant value by name. */
-    public LVar put(String name, Object value, boolean privileged){
+    public LogicVar put(String name, Object value, boolean privileged){
         return put(name, value, privileged, true);
     }
 
     /** Adds a constant value by name. */
-    public LVar put(String name, Object value, boolean privileged, boolean hidden){
-        LVar existingVar = vars.get(name);
+    public LogicVar put(String name, Object value, boolean privileged, boolean hidden){
+        LogicVar existingVar = vars.get(name);
         if(existingVar != null){ //don't overwrite existing vars (see #6910)
             Log.debug("Failed to add global logic variable '@', as it already exists.", name);
             return existingVar;
         }
 
-        LVar var = new LVar(name);
+        LogicVar var = new LogicVar(name);
         var.constant = true;
         if(value instanceof Number num){
             var.isobj = false;
@@ -296,22 +301,26 @@ public class GlobalVars{
     }
 
     /** Removes a global variable - used for data patch reset. This variable is assumed not to be privileged or have a documentation entry. */
-    public void remove(LVar lvar){
-        LVar match = vars.get(lvar.name);
+    public void remove(LogicVar lvar){
+        LogicVar match = vars.get(lvar.name);
         if(match == lvar){
             vars.remove(lvar.name);
         }
     }
 
-    public LVar put(String name, Object value){
+    public void remove(String name){
+        vars.remove(name);
+    }
+
+    public LogicVar put(String name, Object value){
         return put(name, value, false);
     }
 
-    public LVar putEntry(String name, Object value){
+    public LogicVar putEntry(String name, Object value){
         return put(name, value, false, false);
     }
 
-    public LVar putEntry(String name, Object value, boolean privileged){
+    public LogicVar putEntry(String name, Object value, boolean privileged){
         return put(name, value, privileged, false);
     }
 

@@ -6,6 +6,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class DirectionalItemBuffer{
@@ -23,7 +25,7 @@ public class DirectionalItemBuffer{
 
     public void accept(int buffer, Item item){
         if(!accepts(buffer)) return;
-        buffers[buffer][indexes[buffer]++] = BufferItem.get(item.id, Time.time);
+        buffers[buffer][indexes[buffer]++] = BufferItem.get(item.id, Vars.state.time);
     }
 
     public Item poll(int buffer, float speed){
@@ -31,7 +33,7 @@ public class DirectionalItemBuffer{
             long l = buffers[buffer][0];
             float time = BufferItem.time(l);
 
-            if(Time.time >= time + speed || Time.time < time){
+            if(Vars.state.time >= time + speed || Vars.state.time < time){
                 return content.item(BufferItem.item(l));
             }
         }

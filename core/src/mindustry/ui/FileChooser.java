@@ -14,7 +14,7 @@ public class FileChooser{
 
     public static void export(String name, String extension, FileWriter writer){
         if(!ios){
-            FileChooser.save(extension).name(name).submit(file -> {
+            FileChooser.save(extension).name(name.endsWith("." + extension) ? name : name + "." + extension).submit(file -> {
                 ui.loadAnd(() -> {
                     try{
                         writer.write(file);
@@ -81,6 +81,7 @@ public class FileChooser{
             if(fileName == null){
                 fileName = "file." + extensions[0];
             }
+            fileName = Strings.sanitizeFilename(fileName);
         }
 
         /** Submits the request to handle a single file. */

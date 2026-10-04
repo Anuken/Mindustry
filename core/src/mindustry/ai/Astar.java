@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.core.*;
 import mindustry.world.*;
 
 import java.util.*;
@@ -27,15 +28,15 @@ public class Astar{
     }
 
     public static Seq<Tile> pathfind(int startX, int startY, int endX, int endY, TileHeuristic th, DistanceHeuristic dh, Boolf<Tile> passable){
-        Tiles tiles = world.tiles;
+        World world = state.world;
 
-        Tile start = tiles.getn(startX, startY);
-        Tile end = tiles.getn(endX, endY);
+        Tile start = world.getn(startX, startY);
+        Tile end = world.getn(endX, endY);
 
-        GridBits closed = new GridBits(tiles.width, tiles.height);
+        GridBits closed = new GridBits(world.width, world.height);
 
-        if(costs == null || costs.length != tiles.width * tiles.height){
-            costs = new float[tiles.width * tiles.height];
+        if(costs == null || costs.length != world.width * world.height){
+            costs = new float[world.width * world.height];
         }
 
         Arrays.fill(costs, 0);
@@ -43,8 +44,8 @@ public class Astar{
         queue.clear();
         queue.comparator = Structs.comparingFloat(a -> costs[a.array()] + dh.cost(a.x, a.y, end.x, end.y));
         queue.add(start);
-        if(rotations == null || rotations.length != world.width() || rotations[0].length != world.height()){
-            rotations = new byte[world.width()][world.height()];
+        if(rotations == null || rotations.length != world.width || rotations[0].length != world.height){
+            rotations = new byte[world.width][world.height];
         }
 
         boolean found = false;
@@ -58,8 +59,8 @@ public class Astar{
             closed.set(next.x, next.y);
             for(Point2 point : Geometry.d4){
                 int newx = next.x + point.x, newy = next.y + point.y;
-                if(Structs.inBounds(newx, newy, tiles.width, tiles.height)){
-                    Tile child = tiles.getn(newx, newy);
+                if(Structs.inBounds(newx, newy, world.width, world.height)){
+                    Tile child = world.getn(newx, newy);
                     if(passable.get(child)){
                         float newCost = th.cost(next, child) + baseCost;
                         if(!closed.get(child.x, child.y)){
@@ -82,7 +83,7 @@ public class Astar{
             out.add(current);
 
             byte rot = rotations[current.x][current.y];
-            current = tiles.getn(current.x + Geometry.d4x[rot], current.y + Geometry.d4y[rot]);
+            current = world.getn(current.x + Geometry.d4x[rot], current.y + Geometry.d4y[rot]);
         }
 
         out.reverse();

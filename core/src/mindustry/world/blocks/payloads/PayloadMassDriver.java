@@ -7,6 +7,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -78,8 +79,8 @@ public class PayloadMassDriver extends PayloadBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.payloadCapacity, StatValues.squared(maxPayloadSize, StatUnit.blocksSquared));
         stats.add(Stat.reload, 60f / (chargeTime + reload), StatUnit.perSecond);
@@ -111,7 +112,7 @@ public class PayloadMassDriver extends PayloadBlock{
         if(selected == null || selected.block != this || !selected.within(x * tilesize, y * tilesize, range)) return;
 
         //if so, draw a dotted line towards it while it is in range
-        float sin = Mathf.absin(Time.time, 6f, 1f);
+        float sin = Mathf.absin(Vars.state.time, 6f, 1f);
         Tmp.v1.set(x * tilesize + offset, y * tilesize + offset).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
             x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
@@ -147,6 +148,26 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         @Override
+        public boolean acceptUnitPayload(Unit unit){
+            return unit != null && unit.hitSize <= maxPayloadSize * tilesize;
+        }
+
+        @Override
+        public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LogicProp.config){
+                configured(null, p1 instanceof Building b ? b.pos() : -1);
+            }
+        }
+
+        @Override
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.config){
+                return linkValid() ? Vars.state.world.build(link) : null;
+            }
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public float buildRotation(){
             return rotation;
         }
@@ -154,7 +175,7 @@ public class PayloadMassDriver extends PayloadBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            Building link = world.build(this.link);
+            Building link = Vars.state.world.build(this.link);
             boolean hasLink = linkValid();
 
             //discharge when charging isn't happening
@@ -332,8 +353,8 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(1f - reloadCounter / reload);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(1f - reloadCounter / reload);
             return super.sense(sensor);
         }
 
@@ -396,7 +417,7 @@ public class PayloadMassDriver extends PayloadBlock{
             Draw.z(Layer.effect);
 
             if(charge > 0 && linkValid()){
-                Building link = world.build(this.link);
+                Building link = Vars.state.world.build(this.link);
 
                 float fin = Interp.pow2Out.apply(charge / chargeTime), fout = 1f-fin, len = length*1.8f, w = curSize/2f + 7f*fout;
                 Vec2 right = Tmp.v1.trns(turretRotation, len, w);
@@ -419,7 +440,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
         @Override
         public void drawConfigure(){
-            float sin = Mathf.absin(Time.time, 6f, 1f);
+            float sin = Mathf.absin(Vars.state.time, 6f, 1f);
 
             Draw.color(Pal.accent);
             Lines.stroke(1f);
@@ -431,7 +452,7 @@ public class PayloadMassDriver extends PayloadBlock{
             }
 
             if(linkValid()){
-                Building target = world.build(link);
+                Building target = Vars.state.world.build(link);
                 Drawf.circles(target.x, target.y, (target.block.size / 2f + 1) * tilesize + sin - 2f, Pal.place);
                 Drawf.arrow(x, y, target.x, target.y, size * tilesize + sin, 4f + sin);
             }
@@ -464,7 +485,7 @@ public class PayloadMassDriver extends PayloadBlock{
         }
 
         protected boolean linkValid(){
-            return link != -1 && world.build(this.link) instanceof PayloadDriverBuild other && other.block == block && other.team == team && within(other, range);
+            return link != -1 && Vars.state.world.build(this.link) instanceof PayloadDriverBuild other && other.block == block && other.team == team && within(other, range);
         }
 
         @Override

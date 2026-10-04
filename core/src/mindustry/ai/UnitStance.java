@@ -6,7 +6,6 @@ import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.type.*;
@@ -54,6 +53,14 @@ public class UnitStance extends MappableContent{
         }
     }
 
+    @Override
+    public void removeContent(){
+        super.removeContent();
+        for(var stance : Vars.content.unitStances()){
+            stance.incompatibleStanceBits.clear(id);
+        }
+    }
+
     public boolean isCompatible(@Nullable UnitCommand other){
         return other == null || !incompatibleCommandBits.get(other.id);
     }
@@ -94,12 +101,20 @@ public class UnitStance extends MappableContent{
         holdPosition = new UnitStance("holdposition", "effect", Binding.unitStanceHoldPosition);
         mineAuto = new UnitStance("mineauto", "settings", null, false);
 
-        //Only vanilla items are supported for now
         for(Item item : Vars.content.items()){
             new ItemUnitStance(item);
         }
 
         Seq.with(UnitCommand.repairCommand, UnitCommand.assistCommand, UnitCommand.rebuildCommand)
         .each(c -> c.extraStances.add(holdPosition));
+    }
+
+    public static void loadAfterMods(){
+        //load stances for mod items
+        for(Item item : Vars.content.items()){
+            if(ItemUnitStance.getByItem(item) == null){
+                new ItemUnitStance(item);
+            }
+        }
     }
 }

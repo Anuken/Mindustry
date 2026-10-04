@@ -120,9 +120,9 @@ public class CellLiquid extends Liquid{
             Draw.color(colorFrom, colorTo, rand.random(1f));
 
             Fill.circle(
-            vx + Mathf.sin(Time.time + i * 532, sscl, smag),
-            vy + Mathf.sin(Time.time + i * 53, sscl, smag),
-            f * 3.8f * rand.random(0.35f, 1f) * Mathf.absin(Time.time + ((i + id) % 60) * 54, 75f * rand.random(1f, 2f), 1f));
+            vx + Mathf.sin(Vars.state.time + i * 532, sscl, smag),
+            vy + Mathf.sin(Vars.state.time + i * 53, sscl, smag),
+            f * 3.8f * rand.random(0.35f, 1f) * Mathf.absin(Vars.state.time + ((i + id) % 60) * 54, 75f * rand.random(1f, 2f), 1f));
         }
 
         Draw.color();

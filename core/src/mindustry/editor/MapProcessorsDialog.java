@@ -34,9 +34,9 @@ public class MapProcessorsDialog extends BaseDialog{
             boolean foundAny = false;
 
             outer:
-            for(int y = 0; y < Vars.world.height(); y++){
-                for(int x = 0; x < Vars.world.width(); x++){
-                    Tile tile = Vars.world.rawTile(x, y);
+            for(int y = 0; y < Vars.state.world.height; y++){
+                for(int x = 0; x < Vars.state.world.width; x++){
+                    Tile tile = Vars.state.world.rawTile(x, y);
                     if(!tile.synthetic()){
                         foundAny = true;
                         tile.setNet(Blocks.worldProcessor, Team.sharded, 0);
@@ -143,8 +143,8 @@ public class MapProcessorsDialog extends BaseDialog{
 
         processors.clear();
 
-        //scan the entire world for processors (Groups.build can be empty, indexer is probably inaccurate)
-        Vars.world.tiles.eachTile(t -> {
+        //scan the entire world for processors (state.entities.build can be empty, indexer is probably inaccurate)
+        Vars.state.world.eachTile(t -> {
             if(t.isCenter() && t.block() == Blocks.worldProcessor){
                 processors.add(t.build);
             }

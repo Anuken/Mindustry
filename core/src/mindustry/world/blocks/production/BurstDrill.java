@@ -18,6 +18,7 @@ public class BurstDrill extends Drill{
     public float shake = 2f;
     public Interp speedCurve = Interp.pow2In;
 
+    public @Load("@-top") TextureRegion topRegion;
     public @Load("@-top-invert") TextureRegion topInvertRegion;
     public @Load("@-glow") TextureRegion glowRegion;
     public @Load("@-arrow") TextureRegion arrowRegion;
@@ -55,8 +56,8 @@ public class BurstDrill extends Drill{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
             stats.remove(Stat.booster);
@@ -80,8 +81,9 @@ public class BurstDrill extends Drill{
 
             if(invertTime > 0f) invertTime -= delta() / invertedTime;
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump(items.has(dominantItem) ? dominantItem : null);
+                dumpTimer %= dumpTime;
             }
 
             float drillTime = getDrillTime(dominantItem);
@@ -93,7 +95,7 @@ public class BurstDrill extends Drill{
 
                 float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
 
-                timeDrilled += speedCurve.apply(progress / drillTime) * speed;
+                totalProgress += speedCurve.apply(progress / drillTime) * speed;
 
                 lastDrillSpeed = 1f / drillTime * speed * dominantItems;
                 progress += delta() * speed;

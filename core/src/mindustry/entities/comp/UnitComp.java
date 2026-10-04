@@ -7,12 +7,12 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.async.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.units.*;
@@ -24,16 +24,15 @@ import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
-import mindustry.world.blocks.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.payloads.*;
-import mindustry.world.meta.*;
 
+import static java.lang.Float.*;
 import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, Senseable, Settable{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Syncc, Shieldc, Displayable, Ranged, Minerc, Builderc, LogicSenseable, LogicSettable{
     private static final Vec2 tmp1 = new Vec2(), tmp2 = new Vec2();
     static final float warpDst = 8f;
 
@@ -92,8 +91,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void wobble(){
-        x += Mathf.sin(Time.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
-        y += Mathf.cos(Time.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+        x += Mathf.sin(Vars.state.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
+        y += Mathf.cos(Vars.state.time + (id % 10) * 12, 25f, 0.05f) * Time.delta * elevation;
     }
 
     public void moveAt(Vec2 vector, float acceleration){
@@ -162,7 +161,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public boolean isPathImpassable(int tileX, int tileY){
-        return !type.flying && world.tiles.in(tileX, tileY) && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+        return !type.flying && state.world.in(tileX, tileY) && type.pathCost.getCost(team.id, state.pathfinder.get(tileX, tileY)) == -1;
     }
 
     /** @return approx. square size of the physical hitbox for physics */
@@ -172,7 +171,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     /** @return whether there is solid, un-occupied ground under this unit. */
     public boolean canLand(){
-        return !onSolid() && Units.count(x, y, physicSize(), f -> f != self() && f.isGrounded()) == 0;
+        float psize = physicSize();
+        return !onSolid() && !Units.any(x - psize/2f, y - psize/2f, psize, psize, f -> f != self() && f.isGrounded());
     }
 
     public boolean inRange(Position other){
@@ -213,9 +213,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     @Override
     @Replace
-    public boolean isSyncHidden(Player player){
+    public boolean isSyncHidden(Team team){
         //shooting reveals position so bullets can be seen
-        return !isShooting() && inFogTo(player.team());
+        return !isShooting() && inFogTo(team);
     }
 
     @Override
@@ -230,12 +230,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(this.team == viewer || !state.rules.fog) return false;
 
         if(hitSize <= 16f){
-            return !fogControl.isVisible(viewer, x, y);
+            return !state.fog.isVisible(viewer, x, y);
         }else{
             //for large hitsizes, check around the unit instead
             float trns = hitSize / 2f;
             for(var p : Geometry.d8){
-                if(fogControl.isVisible(viewer, x + p.x * trns, y + p.y * trns)){
+                if(state.fog.isVisible(viewer, x + p.x * trns, y + p.y * trns)){
                     return false;
                 }
             }
@@ -261,7 +261,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case totalItems -> stack().amount;
             case itemCapacity -> type.itemCapacity;
@@ -269,6 +269,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case health -> health;
             case shield -> shield;
             case maxHealth -> maxHealth;
+            case flying -> isFlying() ? 1f : 0f;
             case x -> World.conv(x);
             case y -> World.conv(y);
             case velocityX -> vel.x * 60f / tilesize;
@@ -303,14 +304,14 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case size -> hitSize / tilesize;
             case color -> Color.toDoubleBits(team.color.r, team.color.g, team.color.b, 1f);
             case selectedRotation -> controller instanceof Player p ? p.selectedRotation : 0;
-            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : Float.NaN;
-            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : Float.NaN;
-            default -> Float.NaN;
+            case pingX -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingX) : NaN;
+            case pingY -> controller instanceof Player p && p.isPinging() ? World.conv(p.pingY) : NaN;
+            default -> NaN;
         };
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
+    public Object senseObject(LogicProp sensor){
         return switch(sensor){
             case type -> type;
             case name -> controller instanceof Player p ? p.name : null;
@@ -329,23 +330,26 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public double sense(Content content){
-        if(content == stack().item) return stack().amount;
-        if(content instanceof UnitType u){
+    public double sense(Object object){
+        if(object == stack().item) return stack().amount;
+        if(object instanceof UnitType u){
             return ((Object)this) instanceof Payloadc pay ?
                     (pay.payloads().isEmpty() ? 0 :
                     pay.payloads().count(p -> p instanceof UnitPayload up && up.unit.type == u)) : 0;
         }
-        if(content instanceof Block b){
+        if(object instanceof Block b){
             return ((Object)this) instanceof Payloadc pay ?
                     (pay.payloads().isEmpty() ? 0 :
                     pay.payloads().count(p -> p instanceof BuildPayload bp && bp.build.block == b)) : 0;
         }
-        return Float.NaN;
+        if(object instanceof StatusEffect s){
+            return hasEffect(s) ? getDuration(s) / 60 : 0;
+        }
+        return NaN;
     }
 
     @Override
-    public void setProp(LAccess prop, double value){
+    public void setProp(LogicProp prop, double value){
         switch(prop){
             case health -> {
                 health = (float)Mathf.clamp(value, 0, maxHealth);
@@ -381,7 +385,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     @Override
-    public void setProp(LAccess prop, Object value){
+    public void setProp(LogicProp prop, Object value){
         switch(prop){
             case team -> {
                 if(value instanceof Team t && !net.client()){
@@ -413,6 +417,9 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(content instanceof Item item){
             stack.item = item;
             stack.amount = Mathf.clamp((int)value, 0, type.itemCapacity);
+        }
+        if(content instanceof StatusEffect effect){
+            setDuration(effect, (float)value * 60f);
         }
     }
 
@@ -597,6 +604,8 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             team.data().updateCount(type, -1);
         }
 
+        Vars.state.unitPhysics.add(self());
+
     }
 
     @Override
@@ -652,10 +661,16 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         type.update(self());
 
+        // Sometimes becomes NaN at extreme delta
+        if(Float.isNaN(x) || Float.isNaN(y)){
+            remove();
+            return;
+        }
+
         //update bounds
 
         if(type.bounded){
-            float bot = 0f, left = 0f, top = world.unitHeight(), right = world.unitWidth();
+            float bot = 0f, left = 0f, top = state.world.unitHeight, right = state.world.unitWidth;
 
             //TODO hidden map rules only apply to player teams? should they?
             if(state.rules.limitMapArea && !team.isAI()){
@@ -675,7 +690,10 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
                 if(x > right - tilesize) dx -= (x - (right - tilesize))/warpDst;
                 if(y > top - tilesize) dy -= (y - (top - tilesize))/warpDst;
 
-                velAddNet(dx * Time.delta, dy * Time.delta);
+                //cap velocity to prevent infinity when using timecontrol or similar mods
+                float maxMagnitude = 10f / Math.max(Time.delta, 1f);
+
+                velAddNet(Mathf.clamp(dx * Time.delta, -maxMagnitude, maxMagnitude), Mathf.clamp(dy * Time.delta, -maxMagnitude, maxMagnitude));
                 float margin = tilesize * 1f;
                 x = Mathf.clamp(x, left - margin, right - tilesize + margin);
                 y = Mathf.clamp(y, bot - margin, top - tilesize + margin);
@@ -771,7 +789,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         //apply knockback based on spawns
         if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal()) && hittable()){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
-            for(Tile spawn : spawner.getSpawns()){
+            for(Tile spawn : state.spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
                     velAddNet(Tmp.v1.set(this).sub(spawn.worldx(), spawn.worldy()).setLength(0.1f + 1f - dst(spawn) / relativeSize).scl(0.45f * Time.delta));
                 }
@@ -901,19 +919,28 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //if this unit crash landed (was flying), damage stuff in a radius
         if(type.flying && !spawnedByCore && type.createWreck && state.rules.unitCrashDamage(team) > 0){
-            var shields = indexer.getEnemy(team, BlockFlag.shield);
             float crashDamage = Mathf.pow(hitSize, 0.75f) * type.crashDamageMultiplier * 2.5f * state.rules.unitCrashDamage(team);
-            if(shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, crashDamage))){
-                Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage, true, false, true);
+            float absorbed = Damage.absorbExplosion(team, x, y, crashDamage);
+            if(absorbed < crashDamage){
+                Damage.damage(team, x, y, Mathf.pow(hitSize, 0.94f) * 1.25f, crashDamage - absorbed, true, false, true);
             }
         }
 
         if(!headless && type.createScorch){
+            Tile deathTile = state.world.tileWorld(x, y);
+            //decals don't render on liquids, so wreckage sinks instead of leaving a mark on top
+            boolean sinks = deathTile != null && !deathTile.floor().hasSurface();
+            Color sinkColor = sinks ? deathTile.floor().mapColor : null;
+
             for(int i = 0; i < type.wreckRegions.length; i++){
                 if(type.wreckRegions[i].found()){
                     float range = type.hitSize /4f;
                     Tmp.v1.rnd(range);
-                    Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    if(sinks){
+                        Fx.unitDrown.at(x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90, sinkColor, type.wreckRegions[i]);
+                    }else{
+                        Effect.decal(type.wreckRegions[i], x + Tmp.v1.x, y + Tmp.v1.y, rotation - 90);
+                    }
                 }
             }
         }

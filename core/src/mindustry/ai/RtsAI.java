@@ -11,8 +11,8 @@ import mindustry.ai.types.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.*;
-import mindustry.entities.comp.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Interval;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -37,7 +37,7 @@ public class RtsAI{
     static final ObjectFloatMap<Building> weights = new ObjectFloatMap<>();
     static final boolean debug = OS.hasProp("mindustry.debug");
 
-    final Interval timer = new Interval(10);
+    final Interval timer = new mindustry.game.Interval(10);
     final TeamData data;
     final ObjectSet<Building> damagedSet = new ObjectSet<>();
     final Seq<Building> damaged = new Seq<>(false);
@@ -228,7 +228,7 @@ public class RtsAI{
                 Building build = null;
 
                 //find closest turret to attack.
-                for(var turret : Vars.indexer.getEnemy(data.team, BlockFlag.turret)){
+                for(var turret : Vars.state.indexer.getEnemy(data.team, BlockFlag.turret)){
                     if(turret.within(defend, ((Ranged)turret).range())){
                         float dst = turret.dst2(defend);
                         if(dst < mindst){
@@ -287,10 +287,10 @@ public class RtsAI{
         targets.clear();
         if(naval){
             //naval units can only target enemy cores, because those are assumed to always be reachable. other blocks may not be!
-            targets.addAll(Vars.indexer.getEnemy(data.team, BlockFlag.core));
+            targets.addAll(Vars.state.indexer.getEnemy(data.team, BlockFlag.core));
         }else{
             for(var flag : flags){
-                targets.addAll(Vars.indexer.getEnemy(data.team, flag));
+                targets.addAll(Vars.state.indexer.getEnemy(data.team, flag));
             }
         }
         targets.removeAll(b -> assignedTargets.contains(b.id) || invalidTarget.contains(b.pos()));
@@ -330,7 +330,7 @@ public class RtsAI{
         float[] health = {0f}, dps = {0f};
         float extraRadius = 50f;
 
-        for(var turret : Vars.indexer.getEnemy(data.team, BlockFlag.turret)){
+        for(var turret : Vars.state.indexer.getEnemy(data.team, BlockFlag.turret)){
             if(turret instanceof BaseTurretBuild t && turret.block instanceof Turret tb && ((tb.targetAir && air) || (tb.targetGround && !air)) && Intersector.distanceSegmentPoint(fromX, fromY,  x, y, t.x, t.y) <= t.range() + extraRadius){
                 health[0] += t.health;
                 dps[0] += t.estimateDps();

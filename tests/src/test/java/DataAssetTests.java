@@ -1,6 +1,5 @@
 import arc.struct.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -11,6 +10,10 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataAssetTests{
+
+    static void assertNoWarnings(){
+        if(Vars.state.data.getContent().size > 0) assertEquals(0, Vars.state.data.getContent().first().warnings.size, "There must be no warnings, but one was logged: " + Vars.state.data.getContent().first().warnings);
+    }
 
     @BeforeAll
     static void init(){
@@ -35,6 +38,8 @@ public class DataAssetTests{
         name: 'Test Item'
         hardness: 10
         """);
+
+        assertNoWarnings();
 
         Item it = find(ContentType.item, "testitem");
         assertNotNull(it);
@@ -67,6 +72,8 @@ public class DataAssetTests{
 
         UnitType it = find(ContentType.unit, "testunit");
 
+        assertNoWarnings();
+
         assertNotNull(it);
         assertTrue(it.create(Team.sharded) instanceof TankUnit);
         assertEquals("Test Unit", it.localizedName);
@@ -91,6 +98,7 @@ public class DataAssetTests{
     void noNullFieldsAllowed(){
 
         loadContent(ContentType.block, "badblock", """
+        type: Floor
         name: 'This will explode'
         flags: null
         """);

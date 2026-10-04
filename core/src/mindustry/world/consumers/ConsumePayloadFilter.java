@@ -4,8 +4,8 @@ import arc.func.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.meta.*;
 

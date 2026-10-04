@@ -8,12 +8,13 @@ import arc.util.*;
 import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
-import mindustry.ctype.Content;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
+
+import mindustry.*;
 
 import static mindustry.Vars.*;
 
@@ -32,7 +33,6 @@ public class PayloadConveyor extends Block{
         rotate = true;
         update = true;
         outputsPayload = true;
-        noUpdateDisabled = true;
         acceptsUnitPayloads = true;
         priority = TargetPriority.transport;
         envEnabled |= Env.space | Env.underwater;
@@ -52,7 +52,7 @@ public class PayloadConveyor extends Block{
         int ntrns = size;
 
         for(int i = 0; i < 4; i++){
-            Tile tile = world.tile(x + Geometry.d4x[i] * ntrns, y + Geometry.d4y[i] * ntrns);
+            Tile tile = state.world.tile(x + Geometry.d4x[i] * ntrns, y + Geometry.d4y[i] * ntrns);
             if(tile != null && tile.build != null && tile.isCenter() && tile.build.block.outputsPayload && tile.build.block.size == size && (i == rotation || tile.block().rotate && i == (tile.build.rotation + 2) % 4)){
                 Drawf.selected(tile.x, tile.y, tile.block(), tile.build.team.color);
             }
@@ -60,8 +60,8 @@ public class PayloadConveyor extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.payloadCapacity, StatValues.squared(payloadLimit, StatUnit.blocksSquared));
     }
@@ -135,19 +135,25 @@ public class PayloadConveyor extends Block{
 
         @Override
         public void updateTile(){
-            if(!enabled) return;
-
             if(item != null){
                 item.update(null, this);
+                if(item.isDead()){
+                    item = null;
+                }
             }
 
-            lastInterp = curInterp;
-            curInterp = fract();
-            //rollover skip
-            if(lastInterp > curInterp) lastInterp = 0f;
-            progress = time() % moveTime;
+            if(enabled){
+                lastInterp = curInterp;
+                curInterp = fract();
+                //rollover skip
+                if(lastInterp > curInterp) lastInterp = 0f;
+                progress = time() % moveTime;
+            }
 
             updatePayload();
+
+            if(!enabled) return;
+
             if(item != null && next == null){
                 PayloadBlock.pushOutput(item, progress / moveTime);
             }
@@ -266,7 +272,7 @@ public class PayloadConveyor extends Block{
         }
 
         public float time(){
-            return Time.time;
+            return Vars.state.time;
         }
 
         @Override
@@ -297,10 +303,10 @@ public class PayloadConveyor extends Block{
         }
 
         @Override
-        public double sense(Content content){
-            if(item instanceof UnitPayload up && up.unit.type == content) return 1;
-            if(item instanceof BuildPayload bp && bp.build.block == content) return 1;
-            return super.sense(content);
+        public double sense(Object object){
+            if(item instanceof UnitPayload up && up.unit.type == object) return 1;
+            if(item instanceof BuildPayload bp && bp.build.block == object) return 1;
+            return super.sense(object);
         }
 
         @Override
@@ -322,7 +328,8 @@ public class PayloadConveyor extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            read.f(); //why is progress written?
+            //for derelicts
+            progress = read.f();
             itemRotation = read.f();
             item = Payload.read(read);
         }

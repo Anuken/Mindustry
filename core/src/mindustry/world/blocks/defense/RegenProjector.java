@@ -15,6 +15,8 @@ import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class RegenProjector extends Block{
@@ -61,8 +63,8 @@ public class RegenProjector extends Block{
         y += offset;
 
         Drawf.dashSquare(baseColor, x, y, range * tilesize);
-        indexer.eachBlock(player.team(), Tmp.r1.setCentered(x, y, range * tilesize), b -> true, t -> {
-            Drawf.selected(t, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
+        state.indexer.eachBlock(player.team(), Tmp.r1.setCentered(x, y, range * tilesize), b -> true, t -> {
+            Drawf.selected(t, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f)));
         });
     }
 
@@ -88,9 +90,9 @@ public class RegenProjector extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = optionalUseTime;
-        super.setStats();
+        super.setStats(stats);
 
         stats.add(Stat.repairTime, (int)(1f / (healPercent / 100f) / 60f), StatUnit.seconds);
         stats.add(Stat.range, range, StatUnit.blocks);
@@ -115,13 +117,13 @@ public class RegenProjector extends Block{
         public void updateTargets(){
             targets.clear();
             taken.clear();
-            indexer.eachBlock(team, Tmp.r1.setCentered(x, y, range * tilesize), b -> true, targets::add);
+            state.indexer.eachBlock(team, Tmp.r1.setCentered(x, y, range * tilesize), b -> true, targets::add);
         }
 
         @Override
         public void updateTile(){
-            if(lastChange != world.tileChanges){
-                lastChange = world.tileChanges;
+            if(lastChange != state.world.tileChanges){
+                lastChange = state.world.tileChanges;
                 updateTargets();
             }
 
@@ -167,7 +169,7 @@ public class RegenProjector extends Block{
                 lastUpdateFrame = state.updateId;
 
                 for(var entry : mendMap.entries()){
-                    var build = world.build(entry.key);
+                    var build = state.world.build(entry.key);
                     if(build != null){
                         build.heal(entry.value);
                         build.recentlyHealed();
@@ -188,7 +190,7 @@ public class RegenProjector extends Block{
 
             Drawf.dashSquare(baseColor, x, y, range * tilesize);
             for(var target : targets){
-                Drawf.selected(target, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f)));
+                Drawf.selected(target, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f)));
             }
         }
 

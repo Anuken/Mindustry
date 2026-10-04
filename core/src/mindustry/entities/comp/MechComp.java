@@ -63,7 +63,7 @@ abstract class MechComp implements Posc, Hitboxc, Unitc, Mechc, ElevationMovec{
         //large mechs can only drown when all the nearby floors are deep
         if(hitSize >= 12 && canDrown()){
             for(Point2 p : Geometry.d8){
-                Floor f = world.floorWorld(x + p.x * tilesize, y + p.y * tilesize);
+                Floor f = state.world.floorWorld(x + p.x * tilesize, y + p.y * tilesize);
                 if(!f.isDeep()){
                     return null;
                 }

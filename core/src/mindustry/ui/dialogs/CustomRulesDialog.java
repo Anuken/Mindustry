@@ -8,10 +8,11 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.serialization.*;
 import mindustry.*;
+import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
-import mindustry.editor.BannedContentDialog;
+import mindustry.editor.*;
 import mindustry.game.*;
 import mindustry.game.Rules.*;
 import mindustry.gen.*;
@@ -39,7 +40,7 @@ public class CustomRulesDialog extends BaseDialog{
     public Seq<String> categoryNames;
     public String currentName = "";
     public String ruleSearch = "";
-    public Seq<Runnable> additionalSetup; // for modding to easily add new rules
+    public static Seq<Runnable> additionalSetup; // for modding to easily add new rules
 
     public CustomRulesDialog(){
         this(false);
@@ -69,7 +70,7 @@ public class CustomRulesDialog extends BaseDialog{
                 var style = Styles.cleart;
                 t.defaults().size(280f, 64f).pad(2f);
 
-                t.button("@waves.copy", Icon.copy, style, () -> {
+                t.button("@copy.clipboard", Icon.copy, style, () -> {
                     ui.showInfoFade("@copied");
 
                     //hack: don't write the spawns, they just waste space
@@ -80,7 +81,7 @@ public class CustomRulesDialog extends BaseDialog{
                     dialog.hide();
                 }).marginLeft(12f).row();
 
-                t.button("@waves.load", Icon.download, style, () -> {
+                t.button("@load.clipboard", Icon.download, style, () -> {
                     try{
                         Rules newRules = JsonIO.read(Rules.class, Core.app.getClipboardText());
                         //objectives and spawns are considered to be map-specific; don't use them
@@ -120,18 +121,15 @@ public class CustomRulesDialog extends BaseDialog{
     void setup(){
         cont.clear();
         cont.table(t -> {
-            t.add("@search").padRight(10);
+            t.image(Icon.zoom).padRight(8);
             var field = t.field(ruleSearch, text -> {
                 ruleSearch = text.trim().replaceAll(" +", " ").toLowerCase();
                 setupMain();
-            }).grow().pad(8).get();
+            }).growX().pad(8).get();
+            field.setMessageText("@players.search");
             field.setCursorPosition(ruleSearch.length());
             Core.scene.setKeyboardFocus(field);
-            t.button(Icon.cancel, Styles.emptyi, () -> {
-                ruleSearch = "";
-                setupMain();
-            }).padLeft(10f).size(35f);
-        }).row();
+        }).fillX().row();
         Cell<ScrollPane> paneCell = cont.pane(m -> main = m);
 
         setupMain();
@@ -144,6 +142,7 @@ public class CustomRulesDialog extends BaseDialog{
         main.clear();
         main.left().defaults().fillX().left();
         main.row();
+        main.marginRight(25f);
 
         category("waves");
         check("@rules.waves", b -> rules.waves = b, () -> rules.waves);
@@ -161,6 +160,7 @@ public class CustomRulesDialog extends BaseDialog{
         category("resourcesbuilding");
         check("@rules.alloweditworldprocessors", b -> rules.allowEditWorldProcessors = b, () -> rules.allowEditWorldProcessors);
         check("@rules.infiniteresources", b -> rules.infiniteResources = b, () -> rules.infiniteResources);
+        check("@rules.corebuildandconfig", b -> rules.coreBuildAndConfig = b, () -> rules.coreBuildAndConfig);
         check("@rules.onlydepositcore", b -> rules.onlyDepositCore = b, () -> rules.onlyDepositCore);
         check("@rules.coreunloaders", b -> rules.allowCoreUnloaders = b, () -> rules.allowCoreUnloaders);
         check("@rules.derelictrepair", b -> rules.derelictRepair = b, () -> rules.derelictRepair);
@@ -176,7 +176,7 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
         if(Core.bundle.get("configure").toLowerCase().contains(ruleSearch)){
-            current.button("@configure",
+            current.button("@configure", Icon.boxSmall,
                 () -> loadoutDialog.show(999999, rules.loadout,
                     i -> true,
                     () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
@@ -185,7 +185,7 @@ public class CustomRulesDialog extends BaseDialog{
         }
 
         if(Core.bundle.get("bannedblocks").toLowerCase().contains(ruleSearch)){
-            current.button("@bannedblocks", () -> bannedBlocks.show(rules.bannedBlocks)).left().width(300f).row();
+            current.button("@bannedblocks", Icon.cancelSmall, () -> bannedBlocks.show(rules.bannedBlocks)).left().width(300f).row();
         }
         check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
         check("@bannedblocks.whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
@@ -206,7 +206,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.logicunitdeconstruct", b -> rules.logicUnitDeconstruct = b, () -> rules.logicUnitDeconstruct, () -> rules.logicUnitControl);
 
         if(Core.bundle.get("bannedunits").toLowerCase().contains(ruleSearch)){
-            current.button("@bannedunits", () -> bannedUnits.show(rules.bannedUnits)).left().width(300f).row();
+            current.button("@bannedunits", Icon.unitsSmall, () -> bannedUnits.show(rules.bannedUnits)).left().width(300f).row();
         }
         check("@bannedunits.whitelist", b -> rules.unitWhitelist = b, () -> rules.unitWhitelist);
 
@@ -216,7 +216,6 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.placerangecheck", b -> rules.placeRangeCheck = b, () -> rules.placeRangeCheck);
         check("@rules.polygoncoreprotection", b -> rules.polygonCoreProtection = b, () -> rules.polygonCoreProtection);
         number("@rules.enemycorebuildradius", f -> rules.enemyCoreBuildRadius = f * tilesize, () -> Math.min(rules.enemyCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection);
-
 
         category("environment");
         check("@rules.pauseDisabled", b -> rules.pauseDisabled = b, () -> rules.pauseDisabled);
@@ -233,6 +232,11 @@ public class CustomRulesDialog extends BaseDialog{
 
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
+        if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
+            current.button("@rules.weather", Icon.rainSmall, this::weatherDialog).width(250f).left().row();
+        }
+
+        category("light");
         if(Core.bundle.get("rules.ambientlight").toLowerCase().contains(ruleSearch)){
             current.button(b -> {
                 b.left();
@@ -244,10 +248,33 @@ public class CustomRulesDialog extends BaseDialog{
                 b.add("@rules.ambientlight");
             }, () -> ui.picker.show(rules.ambientLight, rules.ambientLight::set)).left().width(250f).row();
         }
+        check("@rules.lighting.unitlight", b -> rules.unitLight = b, () -> rules.unitLight);
 
-        if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
-            current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
-        }
+        category("music");
+
+        Boolp allowMusic = () -> !rules.disableMusic;
+        Func<String, Seq<MusicContainer>> parser = str -> {
+            try{
+                return Jval.read("[" + str + "]").asArray().map( j -> new MusicContainer(j.asString()));
+            }catch(Throwable e){
+                return null;
+            }
+        };
+
+        check("@rules.alwaysplaymusic", b -> rules.alwaysPlayMusic = b, () -> rules.alwaysPlayMusic, allowMusic);
+        check("@rules.nomusic", b -> rules.disableMusic = b, () -> rules.disableMusic);
+
+        text("@rules.ambientmusic",
+            s -> rules.ambientMusic = s.trim().isEmpty() ? null : parser.get(s),
+            () -> rules.ambientMusic == null ? "" : rules.ambientMusic.toString(", "),
+            text -> parser.get(text) != null,
+        allowMusic);
+
+        text("@rules.darkmusic",
+            s -> rules.darkMusic = s.trim().isEmpty() ? null : parser.get(s),
+            () -> rules.darkMusic == null ? "" : rules.darkMusic.toString(", "),
+            text -> parser.get(text) != null,
+        allowMusic);
 
         category("planet");
         if(Core.bundle.get("rules.title.planet").toLowerCase().contains(ruleSearch)){
@@ -275,7 +302,6 @@ public class CustomRulesDialog extends BaseDialog{
                 }).group(group).checked(b -> rules.planet == Planets.sun);
             }).left().fill(false).expand(false, false).row();
         }
-
 
         category("teams");
         //not sure where else to put this
@@ -422,6 +448,21 @@ public class CustomRulesDialog extends BaseDialog{
             .padRight(50f)
             .update(a -> a.setDisabled(!condition.get()))
             .valid(f -> Strings.canParsePositiveFloat(f) && Strings.parseFloat(f) >= min && Strings.parseFloat(f) <= max).width(120f).left();
+        }).padTop(0);
+        ruleInfo(cell, text);
+        current.row();
+    }
+
+    public void text(String text, Cons<String> cons, Prov<String> prov, Boolf<String> valid, Boolp condition){
+        if(!Core.bundle.get(text.substring(1)).toLowerCase().contains(ruleSearch)) return;
+        var cell = current.table(t -> {
+            t.left();
+            t.add(text).left().padRight(5)
+            .update(a -> a.setColor(condition.get() ? Color.white : Color.gray));
+            t.field(prov.get(), cons)
+            .padRight(50f)
+            .update(a -> a.setDisabled(!condition.get()))
+            .valid(valid::get).width(300f).left();
         }).padTop(0);
         ruleInfo(cell, text);
         current.row();

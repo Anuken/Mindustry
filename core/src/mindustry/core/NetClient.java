@@ -10,7 +10,6 @@ import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
@@ -20,6 +19,8 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.game.markers.*;
+import mindustry.game.objectives.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
@@ -44,7 +45,7 @@ public class NetClient implements ApplicationListener{
         planSyncTime = Timekeeper.ofSeconds(0.5f),
         pingTime = Timekeeper.ofSeconds(1f);
     private static final Reads dataReads = new Reads(null);
-    private static final JsonValue tmpJsonMap = new JsonValue(ValueType.object);
+    private static final Jval tmpJsonMap = Jval.newObject();
 
     private long ping;
     //private Interval timer = new Interval(5);
@@ -163,6 +164,25 @@ public class NetClient implements ApplicationListener{
             }
             Log.info("Requesting @ asset(s) from the server.", missing.size);
             Call.requestAssets(missing.toArray());
+        });
+
+        net.handleClient(TextureStream.class, data -> {
+            try(DataInputStream in = new DataInputStream(data.stream)){
+                String name = in.readUTF();
+                int length = in.readInt();
+                byte[] pngData = new byte[length];
+                in.readFully(pngData);
+                if(!headless){
+                    //empty image data means we're removing the texture instead. see NetServer.removeTexture()
+                    if(pngData.length == 0){
+                        state.data.removeTexture(name);
+                    }else{
+                        state.data.addTexture(name, pngData);
+                    }
+                }
+            }catch(IOException e){
+                Log.err("Failed to read server texture stream", e);
+            }
         });
 
         net.handleClient(StreamBegin.class, data -> {
@@ -319,7 +339,7 @@ public class NetClient implements ApplicationListener{
         //detect and kick for foul play
         if(player != null && player.con != null && !player.con.chatRate.allow(2000, Config.chatSpamLimit.num())){
             player.con.kick(KickReason.kick);
-            netServer.admins.blacklistDos(player.con.address);
+            player.con.blacklist();
             return;
         }
 
@@ -371,7 +391,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(called = Loc.client, variants = Variant.one)
+    @Remote(called = Loc.client, variants = Variant.one, priority = PacketPriority.high)
     public static void connect(String ip, int port){
         if(!steam && (ip.startsWith("steam:") || ip.startsWith("steamserver:"))) return;
         netClient.disconnectQuietly();
@@ -425,6 +445,42 @@ public class NetClient implements ApplicationListener{
         ui.loadfrag.hide();
     }
 
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void createMarker(int id, ObjectiveMarker marker){
+        state.markers.add(id, marker);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void removeMarker(int id){
+        state.markers.remove(id);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarker(int id, LogicMarkerControl control, double p1, double p2, double p3){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.control(control, p1, p2, p3);
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerText(int id, LogicMarkerControl type, boolean fetch, String text){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            if(type == LogicMarkerControl.flushText){
+                marker.setText(text, fetch);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerTexture(int id, Object texture){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.setTexture(texture);
+        }
+    }
+
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
         state.rules = rules;
@@ -434,8 +490,8 @@ public class NetClient implements ApplicationListener{
     public static void setRule(String rule, String jsonData){
         try{
             //readField searches for the specified value, so create a fake parent for it.
-            tmpJsonMap.child = null;
-            tmpJsonMap.addChild(rule, new JsonReader().parse(jsonData));
+            tmpJsonMap.clear().put(rule, Jval.read(jsonData));
+
             JsonIO.json.readField(state.rules, rule, tmpJsonMap);
         }catch(Throwable error){
             Log.err("Failed to read rule", error);
@@ -463,7 +519,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void worldDataBegin(){
-        Groups.clear();
+        state.entities.clear();
         netClient.removed.clear();
         logic.reset();
         netClient.connecting = true;
@@ -498,14 +554,14 @@ public class NetClient implements ApplicationListener{
         if(netClient != null){
             netClient.addRemovedEntity(playerid);
         }
-        Groups.player.removeByID(playerid);
+        state.entities.player.removeByID(playerid);
     }
 
     public static void readSyncEntity(DataInputStream input, Reads read) throws IOException{
         int id = input.readInt();
         byte typeID = input.readByte();
 
-        Syncc entity = Groups.sync.getByID(id);
+        Syncc entity = state.entities.sync.getByID(id);
         boolean add = false, created = false;
 
         if(entity == null && id == player.id()){
@@ -537,7 +593,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
+    @Remote(variants = Variant.both, priority = PacketPriority.low, unreliable = true)
     public static void entitySnapshot(short amount, byte[] data){
         try{
             netClient.lastSnapshotTimestamp = Time.millis();
@@ -558,7 +614,7 @@ public class NetClient implements ApplicationListener{
     public static void hiddenSnapshot(IntSeq ids){
         for(int i = 0; i < ids.size; i++){
             int id = ids.items[i];
-            var entity = Groups.sync.getByID(id);
+            var entity = state.entities.sync.getByID(id);
             if(entity != null){
                 entity.handleSyncHidden();
             }
@@ -575,7 +631,7 @@ public class NetClient implements ApplicationListener{
             for(int i = 0; i < amount; i++){
                 int pos = input.readInt();
                 short block = input.readShort();
-                Tile tile = world.tile(pos);
+                Tile tile = state.world.tile(pos);
                 if(tile == null || tile.build == null){
                     Log.warn("Missing entity at @. Skipping block snapshot.", tile);
                     break;
@@ -591,7 +647,7 @@ public class NetClient implements ApplicationListener{
         }
     }
 
-    @Remote(variants = Variant.one, priority = PacketPriority.low, unreliable = true)
+    @Remote(priority = PacketPriority.low, unreliable = true)
     public static void stateSnapshot(float waveTime, int wave, int enemies, boolean paused, boolean gameOver, int timeData, byte tps, long rand0, long rand1, byte[] coreData){
         try{
             if(wave > state.wave){
@@ -701,7 +757,7 @@ public class NetClient implements ApplicationListener{
         lastSent = 0;
         lastSnapshotTimestamp = 0;
 
-        Groups.clear();
+        state.entities.clear();
         ui.chatfrag.clearMessages();
     }
 

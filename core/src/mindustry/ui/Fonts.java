@@ -4,15 +4,14 @@ import arc.*;
 import arc.Graphics.Cursor.*;
 import arc.assets.*;
 import arc.files.*;
-import arc.freetype.*;
-import arc.freetype.FreeTypeFontGenerator.*;
-import arc.freetype.FreetypeFontLoader.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
+import arc.graphics.font.*;
+import arc.graphics.font.Font.*;
+import arc.graphics.font.FreeTypeFontGenerator.*;
+import arc.graphics.font.FreetypeFontLoader.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.Font.*;
-import arc.graphics.g2d.PixmapPacker.*;
 import arc.graphics.g2d.TextureAtlas.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
@@ -22,6 +21,8 @@ import mindustry.*;
 import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.mod.Mods.*;
+import mindustry.type.*;
 
 import java.io.*;
 import java.util.*;
@@ -33,8 +34,9 @@ public class Fonts{
     private static IntMap<String> unicodeToName = new IntMap<>();
     private static ObjectMap<String, String> stringIcons = new ObjectMap<>();
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
+    private static int lastUsedModCodepoint;
 
-    public static Font def, outline, icon, iconLarge, tech, logic, monospace;
+    public static arc.graphics.font.Font def, outline, icon, iconLarge, tech, logic, monospace;
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -63,11 +65,15 @@ public class Fonts{
 
     public static void loadFonts(){
         largeIcons.clear();
-        FreeTypeFontParameter param = fontParameter();
 
-        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = f -> Fonts.def = f;
+        Core.assets.load("default", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
+            size = 18;
+            shadowColor = Color.darkGray;
+            shadowOffsetY = 2;
+            incremental = true;
+        }})).loaded = f -> Fonts.def = f;
 
-        Core.assets.load("monospace", Font.class, new FreeTypeFontLoaderParameter("fonts/monospace.woff", new FreeTypeFontParameter(){{
+        Core.assets.load("monospace", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/monospace.woff", new FreeTypeFontParameter(){{
             size = 16;
             incremental = true;
             //most people will never see the monospace font, so don't pre-bake anything
@@ -75,21 +81,39 @@ public class Fonts{
             fallback.add(() -> Fonts.def);
         }})).loaded = f -> Fonts.monospace = f;
 
-        Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+        //used in the default font (same size as text); not assigned to anything
+        for(boolean outlined : Mathf.booleans){
+            String suffix = outlined ? "-outline" : "";
+            Core.assets.load("iconSmall" + suffix, arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+                size = 18;
+                incremental = true;
+                characters = "\0";
+                borderColor = Color.darkGray;
+            }})).loaded = f -> (outlined ? Fonts.outline : Fonts.def).addFallback(f);
+
+            Core.assets.load("runes" + suffix, arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/runes.woff", new FreeTypeFontParameter(){{
+                size = 18;
+                incremental = true;
+                characters = "\0";
+                borderColor = Color.darkGray;
+            }})).loaded = f -> (outlined ? Fonts.outline : Fonts.def).addFallback(f);
+        }
+
+        Core.assets.load("icon", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
             characters = "\0";
         }})).loaded = f -> Fonts.icon = f;
 
-        Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("iconLarge", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 48;
-            incremental = false;
-            characters = "\0" + Iconc.all;
+            incremental = true;
+            characters = "\0";
             borderWidth = 5f;
             borderColor = Color.darkGray;
         }})).loaded = f -> Fonts.iconLarge = f;
 
-        Core.assets.load("logic", Font.class, new FreeTypeFontLoaderParameter("fonts/logic.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("logic", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/logic.ttf", new FreeTypeFontParameter(){{
             size = 16;
             //generated all at once, it's fast enough anyway
             incremental = false;
@@ -101,7 +125,7 @@ public class Fonts{
     public static void loadExtraFonts(){
         //Japanese needs to override the default font with its own characters - see https://heistak.github.io/your-code-displays-japanese-wrong/
         if(Locale.getDefault().getLanguage().equals("ja")){
-            Core.assets.load("font_jp", Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
+            Core.assets.load("font_jp", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
                 size = 18;
                 incremental = true;
                 shadowColor = Color.darkGray;
@@ -109,7 +133,7 @@ public class Fonts{
                 characters = "\u0000 ";
             }})).loaded = f -> Fonts.def.data.setOverride(f.data);
 
-            Core.assets.load("font_jp_outline", Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
+            Core.assets.load("font_jp_outline", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
                 size = 18;
                 incremental = true;
                 borderColor = Color.darkGray;
@@ -134,37 +158,51 @@ public class Fonts{
         });
     }
 
-    public static void registerIcon(String name, String regionName, int ch, TextureRegion region){
-        int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
-
+    public static void registerIcon(String name, int ch, TextureRegion region){
         unicodeIcons.put(name, ch);
         stringIcons.put(name, ((char)ch) + "");
-        unicodeToName.put(ch, regionName);
+        unicodeToName.put(ch, region instanceof AtlasRegion at ? at.name : name);
 
-        Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
+        if(!Vars.headless){
+            int size = (int)(Fonts.def.getData().lineHeight/Fonts.def.getData().scaleY);
 
-        Glyph glyph = new Glyph();
-        glyph.id = ch;
-        glyph.srcX = 0;
-        glyph.srcY = 0;
-        glyph.width = (int)out.x;
-        glyph.height = (int)out.y;
-        glyph.u = region.u;
-        glyph.v = region.v2;
-        glyph.u2 = region.u2;
-        glyph.v2 = region.v;
-        glyph.xoffset = 0;
-        glyph.yoffset = -size;
-        glyph.xadvance = size;
-        glyph.kerning = null;
-        glyph.fixedWidth = true;
-        glyph.page = 0;
-        Fonts.def.getData().setGlyph(ch, glyph);
-        Fonts.outline.getData().setGlyph(ch, glyph);
+            Vec2 out = Scaling.fit.apply(region.width, region.height, size, size);
+
+            Glyph glyph = new Glyph();
+            glyph.id = ch;
+            glyph.srcX = 0;
+            glyph.srcY = 0;
+            glyph.width = (int)out.x;
+            glyph.height = (int)out.y;
+            glyph.u = region.u;
+            glyph.v = region.v2;
+            glyph.u2 = region.u2;
+            glyph.v2 = region.v;
+            glyph.texture = region.texture;
+            glyph.xoffset = (size - glyph.width) / 2;
+            glyph.yoffset = (size - glyph.height) / 2 - size;
+            glyph.xadvance = size;
+            glyph.kerning = null;
+            glyph.fixedWidth = true;
+            glyph.page = 0;
+            Fonts.def.getData().setGlyph(ch, glyph);
+            Fonts.outline.getData().setGlyph(ch, glyph);
+        }
+    }
+
+    public static void unregisterIcon(String name){
+        int id = unicodeIcons.remove(name, 0);
+        stringIcons.remove(name);
+        if(id != 0){
+            unicodeToName.remove(id);
+        }
+    }
+
+    public static boolean hasIcon(String name){
+        return unicodeIcons.containsKey(name);
     }
 
     public static void loadContentIcons(){
-        Texture uitex = Core.atlas.find("logo").texture;
 
         try(var reader = Core.files.internal("icons/icons.properties").reader(Vars.bufferSize)){
             String line;
@@ -173,13 +211,8 @@ public class Fonts{
                 String[] nametex = split[1].split("\\|");
                 String character = split[0], texture = nametex[1];
                 int ch = Integer.parseInt(character);
-                TextureRegion region = Core.atlas.find(texture);
 
-                if(region.texture != uitex){
-                    continue;
-                }
-
-                registerIcon(nametex[0], texture, ch, region);
+                registerIcon(nametex[0], ch, Core.atlas.find(texture));
             }
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -187,28 +220,32 @@ public class Fonts{
 
         stringIcons.put("alphachan", stringIcons.get("alphaaaa"));
 
-        //TODO: mod emojis can't work because most mod icons are not on the UI page!
-        /*
-        if(Vars.mods.list().contains(m -> m.shouldBeEnabled())){
-            ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit};
-            int startChar = 0xE000 + 1;
+        for(Team team : Team.baseTeams){
+            team.emoji = stringIcons.get(team.name, "");
+        }
+    }
+
+    public static void loadModContentIcons(){
+        if(Vars.mods.list().contains(LoadedMod::shouldBeEnabled)){
+            ContentType[] types = {ContentType.liquid, ContentType.item, ContentType.block, ContentType.status, ContentType.unit, ContentType.team, ContentType.weather};
+            lastUsedModCodepoint = 0xE000 + 1;
 
             for(var type : types){
                 for(var cont : Vars.content.getBy(type)){
                     if(!cont.isVanilla() && cont instanceof UnlockableContent u && u.uiIcon.found()){
-                        int id = startChar;
+                        int id = lastUsedModCodepoint;
 
-                        registerIcon(u.name, u.uiIcon instanceof AtlasRegion atlas ? atlas.name : u.name, id, u.uiIcon);
+                        registerIcon(u.name, id, u.uiIcon);
 
-                        startChar ++;
+                        lastUsedModCodepoint ++;
                     }
                 }
             }
-        }*/
-
-        for(Team team : Team.baseTeams){
-            team.emoji = stringIcons.get(team.name, "");
         }
+    }
+
+    public static int getLastUsedModCodepoint(){
+        return lastUsedModCodepoint;
     }
 
     public static void loadContentIconsHeadless(){
@@ -222,6 +259,7 @@ public class Fonts{
 
                 unicodeIcons.put(nametex[0], ch);
                 stringIcons.put(nametex[0], ((char)ch) + "");
+                unicodeToName.put(ch, nametex[0]);
             }
         }catch(IOException e){
             throw new RuntimeException(e);
@@ -236,15 +274,16 @@ public class Fonts{
 
     /** Called from a static context for use in the loading screen.*/
     public static void loadDefaultFont(){
-        int max = Gl.getInt(Gl.maxTextureSize);
+        //TOOD: which size to use? 2k height is lighter on RAM
+        UI.packer = new PixmapPacker(4096, 2048, 2, true);
+        UI.packer.setTargetTexture(Core.atlas.find("ui-page-placeholder").texture);
 
-        UI.packer = new PixmapPacker(max >= 4096 ? 4096 : 2048, 2048, 2, true);
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(Core.files::internal));
-        Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(Core.files::internal){
+        Core.assets.setLoader(arc.graphics.font.Font.class, null, new FreetypeFontLoader(Core.files::internal){
             ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
 
             @Override
-            public Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
+            public arc.graphics.font.Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
                 if(fileName.endsWith("outline")){
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
@@ -262,54 +301,18 @@ public class Fonts{
             }
         });
 
-        FreeTypeFontParameter param = new FreeTypeFontParameter(){{
+        Core.assets.load("outline", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
             borderColor = Color.darkGray;
             incremental = true;
             size = 18;
-        }};
+        }})).loaded = t -> Fonts.outline = t;
 
-        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, param)).loaded = t -> Fonts.outline = t;
-
-        Core.assets.load("tech", Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("tech", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
             size = 18;
         }})).loaded = f -> {
             Fonts.tech = f;
             Fonts.tech.getData().down *= 1.5f;
         };
-    }
-
-    /** Merges the UI and font atlas together for better performance. */
-    public static void mergeFontAtlas(TextureAtlas atlas){
-        //grab all textures from the ui page, remove all the regions assigned to it, then copy them over to UI.packer and replace the texture in this atlas.
-
-        //grab old UI texture and regions...
-        Texture texture = atlas.find("logo").texture;
-
-        Page page = UI.packer.getPages().first();
-
-        Seq<AtlasRegion> regions = atlas.getRegions().select(t -> t.texture == texture);
-        for(AtlasRegion region : regions){
-            //get new pack rect
-            page.setDirty(false);
-            Rect rect = UI.packer.pack(region.name, atlas.getPixmap(region), region.splits, region.pads);
-
-            //set new texture
-            region.texture = UI.packer.getPages().first().getTexture();
-            //set its new position
-            region.set((int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
-            //add old texture
-            atlas.getTextures().add(region.texture);
-            //clear it
-            region.pixmapRegion = null;
-        }
-
-        //remove old texture, it will no longer be used
-        atlas.getTextures().remove(texture);
-        texture.dispose();
-        atlas.disposePixmap(texture);
-
-        page.setDirty(true);
-        page.updateTexture(TextureFilter.linear, TextureFilter.linear, false);
     }
 
     public static TextureRegionDrawable getGlyph(Font font, char glyph){
@@ -346,7 +349,7 @@ public class Fonts{
 
             @Override
             public float imageSize(){
-                return size;
+                return size / Scl.scl(1f);
             }
         };
 
@@ -355,12 +358,4 @@ public class Fonts{
         return draw;
     }
 
-    static FreeTypeFontParameter fontParameter(){
-        return new FreeTypeFontParameter(){{
-            size = 18;
-            shadowColor = Color.darkGray;
-            shadowOffsetY = 2;
-            incremental = true;
-        }};
-    }
 }

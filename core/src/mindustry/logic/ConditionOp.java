@@ -28,7 +28,7 @@ public enum ConditionOp{
         this.objFunction = objFunction;
     }
 
-    public boolean test(LVar va, LVar vb){
+    public boolean test(LogicVar va, LogicVar vb){
         if(this == ConditionOp.strictEqual){
             return va.isobj == vb.isobj && ((va.isobj && Structs.eq(va.objval, vb.objval)) || (!va.isobj && va.numval == vb.numval));
         }

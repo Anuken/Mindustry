@@ -25,7 +25,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class BuildTurret extends BaseTurret{
-    public final int timerTarget = timers++, timerTarget2 = timers++;
     public int targetInterval = 15;
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
@@ -51,11 +50,13 @@ public class BuildTurret extends BaseTurret{
         super.init();
 
         if(elevation < 0) elevation = size / 2f;
+        updateClipRadius(range + tilesize);
 
         //this is super hacky, but since blocks are initialized before units it does not run into init/concurrent modification issues
         unitType = new UnitType("turret-unit-" + name){{
             hidden = true;
             internal = true;
+            packSprites = false;
             speed = 0f;
             hitSize = 0f;
             health = 1;
@@ -78,8 +79,8 @@ public class BuildTurret extends BaseTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.addPercent(Stat.buildSpeed, buildSpeed);
     }
@@ -93,6 +94,7 @@ public class BuildTurret extends BaseTurret{
         public BlockUnitc unit = (BlockUnitc)unitType.create(team);
         public @Nullable Unit following;
         public @Nullable BlockPlan lastPlan;
+        public float targetTimer, validateTimer;
         public float warmup;
 
         {
@@ -155,7 +157,8 @@ public class BuildTurret extends BaseTurret{
                         lastPlan = null;
                     }
 
-                }else if(unit.buildPlan() == null && timer(timerTarget, targetInterval)){ //search for new stuff
+                }else if(unit.buildPlan() == null && (targetTimer += Time.delta) >= targetInterval){ //search for new stuff
+                    targetTimer %= targetInterval;
                     Queue<BlockPlan> blocks = team.data().plans;
                     for(int i = 0; i < blocks.size; i++){
                         var block = blocks.get(i);
@@ -181,7 +184,7 @@ public class BuildTurret extends BaseTurret{
                             if(u.canBuild() && u.activelyBuilding()){
                                 BuildPlan plan = u.buildPlan();
 
-                                Building build = world.build(plan.x, plan.y);
+                                Building build = state.world.build(plan.x, plan.y);
                                 if(build instanceof ConstructBuild && within(build, range)){
                                     following = u;
                                 }
@@ -192,7 +195,8 @@ public class BuildTurret extends BaseTurret{
                     BuildPlan req = unit.buildPlan();
 
                     //clear break plan if another player is breaking something
-                    if(!req.breaking && timer.get(timerTarget2, 30f)){
+                    if(!req.breaking && (validateTimer += Time.delta) >= 30f){
+                        validateTimer %= 30f;
                         for(Player player : team.data().players){
                             if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
                                 unit.plans().removeFirst();
@@ -280,7 +284,7 @@ public class BuildTurret extends BaseTurret{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case buildX, buildY -> unit.sense(sensor);
                 default -> super.sense(sensor);
@@ -288,7 +292,7 @@ public class BuildTurret extends BaseTurret{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case building, breaking -> unit.senseObject(sensor);
                 default -> super.senseObject(sensor);

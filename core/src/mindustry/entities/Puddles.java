@@ -27,7 +27,7 @@ public class Puddles{
 
     /** Returns the Puddle on the specified tile. May return null. */
     public static @Nullable Puddle get(Tile tile){
-        return tile == null ? null : world.tiles.getPuddle(tile.array());
+        return tile == null ? null : state.world.getPuddle(tile.array());
     }
 
     public static void deposit(Tile tile, Tile source, Liquid liquid, float amount, boolean initial){
@@ -58,9 +58,9 @@ public class Puddles{
 
             Puddle p = get(tile);
 
-            if(initial && p != null && p.lastRipple <= Time.time - 40f){
+            if(initial && p != null && p.lastRipple <= Vars.state.time - 40f){
                 Fx.ripple.at(ax, ay, 1f, tile.floor().liquidDrop.color);
-                p.lastRipple = Time.time;
+                p.lastRipple = Vars.state.time;
             }
             return;
         }
@@ -82,9 +82,9 @@ public class Puddles{
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
-            if(initial && p.lastRipple <= Time.time - 40f && p.amount >= maxLiquid / 2f){
+            if(initial && p.lastRipple <= Vars.state.time - 40f && p.amount >= maxLiquid / 2f){
                 Fx.ripple.at(ax, ay, 1f, p.liquid.color);
-                p.lastRipple = Time.time;
+                p.lastRipple = Vars.state.time;
             }
         }else{
             float added = reactPuddle(p.liquid, liquid, amount, p.tile, (p.x + source.worldx())/2f, (p.y + source.worldy())/2f);
@@ -106,11 +106,11 @@ public class Puddles{
     public static void remove(Tile tile){
         if(tile == null) return;
 
-        world.tiles.setPuddle(tile.array(), null);
+        state.world.setPuddle(tile.array(), null);
     }
 
     public static void register(Puddle puddle){
-        world.tiles.setPuddle(puddle.tile.array(), puddle);
+        state.world.setPuddle(puddle.tile.array(), puddle);
     }
 
     /** Reacts two liquids together at a location. */

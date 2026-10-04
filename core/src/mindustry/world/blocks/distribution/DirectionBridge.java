@@ -102,7 +102,7 @@ public class DirectionBridge extends Block{
                 int dx = Geometry.d4x(d), dy = Geometry.d4y(d);
 
                 for(int i = 1; i <= range; i++){
-                    Tile other = world.tile(x - dx * i, y - dy * i);
+                    Tile other = state.world.tile(x - dx * i, y - dy * i);
 
                     if(other != null && other.build instanceof DirectionBridgeBuild build && build.block == this && build.team == player.team()){
                         if(build.rotation == d){
@@ -129,7 +129,7 @@ public class DirectionBridge extends Block{
 
         //find the output link
         for(int i = 1; i <= range; i++){
-            Tile other = world.tile(x + dx * i, y + dy * i);
+            Tile other = state.world.tile(x + dx * i, y + dy * i);
 
             if(other != null && other.build instanceof DirectionBridgeBuild build && build.block == this && build.team == player.team()){
                 length = i;

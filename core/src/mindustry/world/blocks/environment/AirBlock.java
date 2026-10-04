@@ -13,7 +13,7 @@ public class AirBlock extends Floor{
         hasShadow = false;
         useColor = false;
         wall = this;
-        generateIcons = false;
+        packSprites = false;
         needsSurface = false;
         canShadow = false;
         drawCached = false;
@@ -25,7 +25,9 @@ public class AirBlock extends Floor{
 
     @OverrideCallSuper
     @Override
-    public void load(){}
+    public void load(){
+        loadIcon();
+    }
 
     @OverrideCallSuper
     @Override

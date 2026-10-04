@@ -32,8 +32,8 @@ public class Pump extends LiquidBlock{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.add(Stat.output, 60f * pumpAmount * size * size, StatUnit.liquidSecond);
     }
 
@@ -41,7 +41,7 @@ public class Pump extends LiquidBlock{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
 
         if(valid && tile != null){
             float amount = 0f;
@@ -133,9 +133,9 @@ public class Pump extends LiquidBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.efficiency) return shouldConsume() ? efficiency : 0f;
-            if(sensor == LAccess.totalLiquids) return liquidDrop == null ? 0f : liquids.get(liquidDrop);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.efficiency) return shouldConsume() ? efficiency : 0f;
+            if(sensor == LogicProp.totalLiquids) return liquidDrop == null ? 0f : liquids.get(liquidDrop);
             return super.sense(sensor);
         }
 

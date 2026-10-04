@@ -6,12 +6,12 @@ import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import com.google.common.reflect.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.net.*;
@@ -28,12 +28,13 @@ public class ScriptMainGenerator{
         Seq<String> nameBlacklist = Seq.with();
         Seq<Class<?>> whitelist = Seq.with(Draw.class, Fill.class, Lines.class, Core.class, TextureAtlas.class, TextureRegion.class, Time.class, System.class, PrintStream.class,
         AtlasRegion.class, String.class, Mathf.class, Angles.class, Color.class, Runnable.class, Object.class, Icon.class, Tex.class, Shader.class,
-        Sounds.class, Musics.class, Call.class, Texture.class, TextureData.class, Pixmap.class, I18NBundle.class, Interval.class, DataInput.class, DataOutput.class,
+        Sounds.class, Musics.class, Call.class, Texture.class, Pixmap.class, I18NBundle.class, Interval.class, DataInput.class, DataOutput.class,
         DataInputStream.class, DataOutputStream.class, Integer.class, Float.class, Double.class, Long.class, Boolean.class, Short.class, Byte.class, Character.class);
         Seq<String> nopackage = Seq.with("java.lang", "java");
 
         Seq<Class<?>> classes = Seq.withArrays(
             getClasses("mindustry"),
+            getClasses("arc"),
             getClasses("arc.func"),
             getClasses("arc.struct"),
             getClasses("arc.scene"),
@@ -57,7 +58,7 @@ public class ScriptMainGenerator{
         ObjectSet<String> used = ObjectSet.with();
 
         StringBuilder result = new StringBuilder("//Generated class. Do not modify.\n");
-        result.append("\n").append(new Fi("core/assets/scripts/base.js").readString()).append("\n");
+        result.append("\n").append(new Fi("scripts/base.js").readString()).append("\n");
         for(Class type : classes){
             if(used.contains(type.getPackage().getName()) || nopackage.contains(s -> type.getName().startsWith(s))) continue;
             result.append("importPackage(Packages.").append(type.getPackage().getName()).append(")\n");
@@ -70,7 +71,7 @@ public class ScriptMainGenerator{
             result.append("const ").append(type.getSimpleName()).append(" = ").append("Packages.").append(type.getName().replace('$', '.')).append("\n");
         }
 
-        new Fi("core/assets/scripts/global.js").writeString(result.toString());
+        new Fi("scripts/global.js").writeString(result.toString());
 
         //map simple name to type
         Seq<String> packages = Seq.with(
@@ -109,12 +110,16 @@ public class ScriptMainGenerator{
 
         for(Class<?> c : mapped){
             cdef.append("        classes.put(\"").append(c.getSimpleName()).append("\", ").append(c.getCanonicalName()).append(".class);\n");
+            SchemaGenerator.writeSchema(c);
         }
 
-        new Fi("core/src/mindustry/mod/ClassMap.java").writeString(classTemplate.replace("$CLASSES$", cdef.toString()));
-        Log.info("Generated @ class mappings.", mapped.size);
-    }
+        SchemaGenerator.finalizeSchemas(mapped);
 
+        new Fi("../../core/src/mindustry/mod/ClassMap.java").writeString(classTemplate.replace("$CLASSES$", cdef.toString()));
+        Log.info("Generated @ class mappings.", mapped.size);
+
+        SchemaGenerator.writeDefaultContent();
+    }
     public static Seq<Class> getClasses(String packageName) throws Exception{
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 

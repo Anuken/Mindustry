@@ -15,7 +15,6 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class ImpactReactor extends PowerGenerator{
-    public final int timerUse = timers++;
     public float warmupSpeed = 0.001f;
     public float itemDuration = 60f;
 
@@ -53,8 +52,9 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        stats.timePeriod = itemDuration;
+        super.setStats(stats);
 
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
@@ -62,17 +62,24 @@ public class ImpactReactor extends PowerGenerator{
 
         if(consPower != null){
             //exponential decay formula
-            float max = -(float)Math.log(0.001f) / warmupSpeed / 60f;
-            float equal = -(float)Math.log(1f - Mathf.pow(consPower.usage / powerProduction, 1f / 5f)) / warmupSpeed / 60f;
-            stats.add(Stat.warmupTime, t -> {
-                t.add(Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized() + (consPower != null ?
-                " ~ " + Strings.autoFixed(equal, 2) + " " + StatUnit.seconds.localized() + " " + StatUnit.powerEquilibrium.localized() : ""));
-            });
+            float max = statWarmup(0.001f);
+            float t90 = statWarmup(0.1f), t99 = statWarmup(0.01f);
+            float equal = statWarmup(1f - Mathf.pow(consPower.usage / powerProduction, 1f / 5f));
+
+            stats.add(Stat.warmupTime, t -> t.add(
+                Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized() +
+                (consPower != null ? " ~ " + Strings.autoFixed(equal, 2) + " " + StatUnit.seconds.localized() + " " + StatUnit.powerEquilibrium.localized() : "")
+            ).tooltip(Core.bundle.format("bar.lerpwarmuptime", Strings.autoFixed(t90, 2), Strings.autoFixed(t99, 2))));
         }
     }
 
+    //progress remaining
+    public float statWarmup(float progress){
+        return -(float)Math.log(progress) / warmupSpeed / 60f;
+    }
+
     public class ImpactReactorBuild extends GeneratorBuild{
-        public float warmup, totalProgress;
+        public float warmup, totalProgress, useTimer;
 
         @Override
         public void updateTile(){
@@ -88,8 +95,9 @@ public class ImpactReactor extends PowerGenerator{
                     Events.fire(Trigger.impactPower);
                 }
 
-                if(timer(timerUse, itemDuration / timeScale)){
+                if((useTimer += timeScale * Time.delta) >= itemDuration){
                     consume();
+                    useTimer %= itemDuration;
                 }
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.01f);
@@ -116,8 +124,8 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.heat) return warmup;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return warmup;
             return super.sense(sensor);
         }
 

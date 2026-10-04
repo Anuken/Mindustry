@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 
 public class DrawCircles extends DrawBlock{
@@ -28,7 +29,7 @@ public class DrawCircles extends DrawBlock{
         Draw.color(color, build.warmup() * color.a);
 
         for(int i = 0; i < amount; i++){
-            float life = ((Time.time / timeScl + i/(float)amount) % 1f);
+            float life = ((Vars.state.time / timeScl + i/(float)amount) % 1f);
 
             Lines.stroke(build.warmup() * strokeInterp.apply(strokeMax, strokeMin, life));
             Lines.poly(build.x + x, build.y + y, sides, radiusOffset + life * radius);

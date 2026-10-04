@@ -5,6 +5,7 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.Input.*;
 import arc.graphics.*;
+import arc.graphics.font.Font;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
@@ -70,7 +71,7 @@ public class MessageBlock extends Block{
         return accessible();
     }
 
-    public class MessageBuild extends Building implements LReadable{
+    public class MessageBuild extends Building implements LogicReadable, LogicPrintable{
         public StringBuilder message = new StringBuilder();
 
         @Override
@@ -169,18 +170,29 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public boolean readable(LExecutor exec){
+        public boolean readable(LogicExecutor exec){
             return isValid();
         }
 
         @Override
-        public void read(LVar position, LVar output){
+        public void read(LogicVar position, LogicVar output){
             int address = position.numi();
             output.setnum(address < 0 || address >= message.length() ? Double.NaN : message.charAt(address));
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public boolean printable(LogicExecutor exec) {
+            return isValid() && (exec.privileged || (team == exec.team && !privileged));
+        }
+
+        @Override
+        public void print(StringBuilder text) {
+            message.setLength(0);
+            message.append(text, 0, Math.min(text.length(), maxTextLength));
+        }
+
+        @Override
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case bufferSize -> message.length();
                 default -> super.sense(sensor);
@@ -212,7 +224,7 @@ public class MessageBlock extends Block{
         @Override
         public void updateTableAlign(Table table){
             Vec2 pos = Core.input.mouseScreen(x, y + size * tilesize / 2f + 1);
-            table.setPosition(pos.x, pos.y, Align.bottom);
+            table.setPosition(pos.x - Core.scene.marginLeft, pos.y - Core.scene.marginBottom, Align.bottom);
         }
 
         @Override

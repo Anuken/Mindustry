@@ -4,13 +4,13 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.graphics.MultiPacker;
+import mindustry.graphics.PackContext;
 import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
+import mindustry.ui.builder.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
@@ -21,6 +21,7 @@ public class EventType{
     public enum Trigger{
         shock,
         cannotUpgrade,
+        fireCreate,
         openConsole,
         blastFreeze,
         impactPower,
@@ -86,10 +87,10 @@ public class EventType{
     public static class ContentInitEvent{}
     /** Called *after* all content has been added to the atlas, but before its pixmaps are disposed. */
     public static class AtlasPackEvent{
-        public final MultiPacker multiPacker;
+        public final PackContext packContext;
 
-        public AtlasPackEvent(MultiPacker multiPacker){
-          this.multiPacker = multiPacker;
+        public AtlasPackEvent(PackContext packContext){
+          this.packContext = packContext;
         }
     }
     /** Called *after* all mod content has been loaded, but before it has been initialized. */
@@ -114,6 +115,15 @@ public class EventType{
 
         public DataPatchLoadEvent(Seq<DataAsset> assets){
             this.assets = assets;
+        }
+    }
+
+    /** Called when a new texture is received from the server via {@link mindustry.core.NetServer#sendTexture}. */
+    public static class TextureStreamEvent {
+        public final String name;
+
+        public TextureStreamEvent(String name){
+            this.name = name;
         }
     }
 
@@ -205,6 +215,19 @@ public class EventType{
             this.player = player;
             this.menuId = menuId;
             this.option = option;
+        }
+    }
+
+    /** Consider using Menus.registerMenu instead. */
+    public static class MenuBuilderOptionChooseEvent{
+        public final Player player;
+        public final int menuId;
+        public final MenuResult result;
+
+        public MenuBuilderOptionChooseEvent(Player player, int menuId, MenuResult result){
+            this.player = player;
+            this.menuId = menuId;
+            this.result = result;
         }
     }
 
@@ -387,6 +410,20 @@ public class EventType{
     }
 
     /**
+     * Called when a bullet has been created.
+     * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
+     * Do not modify any tiles inside listeners that use this tile.
+     * */
+    public static class BulletCreateEvent{
+        public Bullet bullet;
+
+        public BulletCreateEvent set(Bullet bullet){
+            this.bullet = bullet;
+            return this;
+        }
+    }
+
+    /**
      * Called *before* a tile has changed.
      * WARNING! This event is special: its instance is reused! Do not cache or use with a timer.
      * Do not modify any tiles inside listeners that use this tile.
@@ -492,6 +529,22 @@ public class EventType{
 
         public ResearchEvent(UnlockableContent content){
             this.content = content;
+        }
+    }
+
+    /** Called when all rules of the current map are loaded. */
+    public static class RulesLoadEvent{
+        public final Rules rules;
+        public final boolean fromSave;
+
+        public RulesLoadEvent(Rules rules){
+            this.rules = rules;
+            this.fromSave = false;
+        }
+
+        public RulesLoadEvent(Rules rules, boolean fromSave){
+            this.rules = rules;
+            this.fromSave = fromSave;
         }
     }
 
@@ -715,28 +768,28 @@ public class EventType{
     }
 
     /** Called after connecting; when a player receives world data and is ready to play. Fired only once, after initial connection. */
-    public static class PlayerJoin{
+    public static class PlayerJoinEvent{
         public final Player player;
 
-        public PlayerJoin(Player player){
+        public PlayerJoinEvent(Player player){
             this.player = player;
         }
     }
 
     /** Called when a player connects, but has not joined the game yet.*/
-    public static class PlayerConnect{
+    public static class PlayerConnectEvent{
         public final Player player;
 
-        public PlayerConnect(Player player){
+        public PlayerConnectEvent(Player player){
             this.player = player;
         }
     }
 
     /** Called before a player leaves the game. */
-    public static class PlayerLeave{
+    public static class PlayerLeaveEvent{
         public final Player player;
 
-        public PlayerLeave(Player player){
+        public PlayerLeaveEvent(Player player){
             this.player = player;
         }
     }

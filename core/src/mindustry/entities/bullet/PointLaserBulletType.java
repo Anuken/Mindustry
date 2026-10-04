@@ -10,6 +10,8 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 /** A continuous bullet type that only damages in a point. */
@@ -37,7 +39,7 @@ public class PointLaserBulletType extends BulletType{
         collides = false;
         pierce = true;
         hittable = false;
-        absorbable = false;
+        absorbable = true;
         optimalLifeFract = 0.5f;
         shootEffect = smokeEffect = Fx.none;
 
@@ -68,7 +70,7 @@ public class PointLaserBulletType extends BulletType{
         super.draw(b);
 
         Draw.color(color);
-        Drawf.laser(laser, laserEnd, b.x, b.y, b.aimX, b.aimY, b.fslope() * (1f - oscMag + Mathf.absin(Time.time, oscScl, oscMag)));
+        Drawf.laser(laser, laserEnd, b.x, b.y, b.aimX, b.aimY, b.fslope() * (1f - oscMag + Mathf.absin(Vars.state.time, oscScl, oscMag)));
 
         Draw.reset();
     }
@@ -78,6 +80,14 @@ public class PointLaserBulletType extends BulletType{
         updateTrail(b);
         updateTrailEffects(b);
         updateBulletInterval(b);
+
+        float dst = b.dst(b.aimX, b.aimY);
+        float length = Damage.findShieldLength(b, dst, laserAbsorb);
+        if(length < dst){
+            Tmp.v1.set(b.aimX - b.x, b.aimY - b.y).setLength(length);
+            b.aimX = Tmp.v1.x + b.x;
+            b.aimY = Tmp.v1.y + b.y;
+        }
 
         if(b.timer.get(0, damageInterval)){
             Damage.collidePoint(b, b.team, hitEffect, b.aimX, b.aimY);
@@ -90,6 +100,11 @@ public class PointLaserBulletType extends BulletType{
         if(shake > 0){
             Effect.shake(shake, shake, b);
         }
+    }
+
+    @Override
+    public float shieldDamage(Bullet b){
+        return b.damage / damageInterval * Time.delta * shieldDamageMultiplier;
     }
 
     @Override
@@ -114,7 +129,7 @@ public class PointLaserBulletType extends BulletType{
                 b.trail = new Trail(trailLength);
             }
             b.trail.length = trailLength;
-            b.trail.update(b.aimX, b.aimY, b.fslope() * (1f - (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
+            b.trail.update(b.aimX, b.aimY, b.fslope() * (1f - (trailSinMag > 0 ? Mathf.absin(Vars.state.time, trailSinScl, trailSinMag) : 0f)));
         }
     }
 

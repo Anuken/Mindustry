@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.Interp.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 
 public class DrawParticles extends DrawBlock{
@@ -28,13 +29,13 @@ public class DrawParticles extends DrawBlock{
             Draw.blend(blending);
             Draw.color(color);
 
-            float base = Time.time / particleLife;
+            float base = Vars.state.time / particleLife;
             rand.setSeed(build.id);
             for(int i = 0; i < particles; i++){
                 float fin = (rand.random(2f) + base) % 1f;
                 if(reverse) fin = 1f - fin;
                 float fout = 1f - fin;
-                float angle = rand.random(360f) + (Time.time / rotateScl) % 360f;
+                float angle = rand.random(360f) + (Vars.state.time / rotateScl) % 360f;
                 float len = particleRad * particleInterp.apply(fout);
 
                 Draw.alpha(a * (1f - Mathf.curve(fin, 1f - fadeMargin)));

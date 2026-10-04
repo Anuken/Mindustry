@@ -1,0 +1,11 @@
+{
+  "doc": "Adds a constant or another PartProgress's value to this one. Set exactly one of 'amount' or 'other'. Applied via PartProgress's 'op'/'operation' field (e.g. `op: add`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "amount": {
+    "type": "float",
+    "doc": "Constant amount to add."
+  },
+  "other": {
+    "type": "mindustry.entities.part.DrawPart$PartProgress",
+    "doc": "Another progress function whose value is added instead of a constant."
+  }
+}

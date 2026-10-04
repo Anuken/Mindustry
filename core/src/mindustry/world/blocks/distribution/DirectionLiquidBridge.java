@@ -10,8 +10,6 @@ import mindustry.world.blocks.liquid.*;
 import mindustry.world.meta.*;
 
 public class DirectionLiquidBridge extends DirectionBridge{
-    public final int timerFlow = timers++;
-
     public float speed = 5f;
     public float liquidPadding = 1f;
 
@@ -33,7 +31,8 @@ public class DirectionLiquidBridge extends DirectionBridge{
         return new TextureRegion[]{bottomRegion, region, dirRegion};
     }
 
-    public class DuctBridgeBuild extends DirectionBridgeBuild{
+    public class DirectionLiquidBridgeBuild extends DirectionBridgeBuild{
+        public float flowTimer;
 
         @Override
         public void drawCached(){
@@ -65,7 +64,8 @@ public class DirectionLiquidBridge extends DirectionBridge{
             }
 
             if(link == null){
-                if(liquids.currentAmount() > 0.0001f && timer(timerFlow, 1)){
+                if(liquids.currentAmount() > 0.0001f && (flowTimer += Time.delta) >= 1f){
+                    flowTimer %= 1f;
                     moveLiquidForward(false, liquids.current());
                 }
             }

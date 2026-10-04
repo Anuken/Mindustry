@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
@@ -80,9 +81,9 @@ public class ConsumeGenerator extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = itemDuration;
-        super.setStats();
+        super.setStats(stats);
 
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
@@ -168,7 +169,7 @@ public class ConsumeGenerator extends PowerGenerator{
             //???
             drawer.drawLight(this);
             //TODO hard coded
-            Drawf.light(x, y, (60f + Mathf.absin(10f, 5f)) * size, Color.orange, 0.5f * warmup);
+            Drawf.light(x, y, (60f + Mathf.absin(Vars.state.time, 10f, 5f)) * size, Color.orange, 0.5f * warmup);
         }
     }
 }

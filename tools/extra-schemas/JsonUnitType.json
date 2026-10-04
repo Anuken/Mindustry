@@ -1,0 +1,5 @@
+{
+  "doc": "Type of unit that is created.",
+  "superclass": "Enum",
+  "values": ["flying", "mech", "legs", "naval", "payload", "missile", "tank", "hover", "tether", "crawl"]
+}

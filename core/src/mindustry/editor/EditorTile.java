@@ -36,7 +36,7 @@ public class EditorTile extends Tile{
 
         op(DrawOperation.opFloor, floor.id);
 
-        world.floorChanges ++;
+        state.world.floorChanges ++;
 
         this.floor = type;
         type.floorChanged(this);
@@ -88,7 +88,7 @@ public class EditorTile extends Tile{
             build.wasVisible = true;
         }
 
-        world.tileChanges ++;
+        state.world.tileChanges ++;
 
         type.blockChanged(this);
     }
@@ -114,12 +114,12 @@ public class EditorTile extends Tile{
             return;
         }
 
-        if(!floor.hasSurface() && overlay.asFloor().needsSurface && (overlay instanceof OreBlock || !floor.supportsOverlay)) return;
+        if(!floor.hasSurface() && overlay.asFloor().needsSurface && (overlay instanceof OreBlock || !floor.supportsOverlay || !overlay.asFloor().supportsBeingOverlaid)) return;
         if(this.overlay == overlay) return;
         op(DrawOperation.opOverlay, this.overlay.id);
         super.setOverlay(overlay);
 
-        world.floorChanges ++;
+        state.world.floorChanges ++;
 
         ((Floor)overlay).floorChanged(this);
     }
@@ -188,11 +188,11 @@ public class EditorTile extends Tile{
     }
 
     private void updateStatic(){
-        editor.renderer.updateStatic(x, y);
+        if(!headless) editor.renderer.updateStatic(x, y);
     }
 
     private boolean skip(){
-        return state.isGame() || editor.isLoading() || world.isGenerating();
+        return state.isGame() || editor.isLoading() || state.generating;
     }
 
     private void op(int type, short value){

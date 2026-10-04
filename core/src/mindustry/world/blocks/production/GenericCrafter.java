@@ -54,7 +54,6 @@ public class GenericCrafter extends Block{
         super(name);
         update = true;
         solid = true;
-        hasItems = true;
         ambientSound = Sounds.loopMachine;
         sync = true;
         ambientSoundVolume = 0.03f;
@@ -63,9 +62,9 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = craftTime;
-        super.setStats();
+        super.setStats(stats);
         if((hasItems && itemCapacity > 0) || outputItems != null){
             stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
         }
@@ -99,7 +98,7 @@ public class GenericCrafter extends Block{
     public boolean rotatedOutput(int fromX, int fromY, Tile destination){
         if(!(destination.build instanceof ConduitBuild)) return false;
 
-        Building crafter = world.build(fromX, fromY);
+        Building crafter = state.world.build(fromX, fromY);
         if(crafter == null) return false;
         int relative = Mathf.mod(crafter.relativeTo(destination) - crafter.rotation, 4);
         for(int dir : liquidOutputDirections){
@@ -121,6 +120,7 @@ public class GenericCrafter extends Block{
         if(outputItems == null && outputItem != null){
             outputItems = new ItemStack[]{outputItem};
         }
+
         if(outputLiquids == null && outputLiquid != null){
             outputLiquids = new LiquidStack[]{outputLiquid};
         }
@@ -140,9 +140,8 @@ public class GenericCrafter extends Block{
     public void afterPatch(){
         super.afterPatch();
 
-        outputsLiquid = outputLiquids != null;
-
         if(outputItems != null) hasItems = true;
+        outputsLiquid = outputLiquids != null;
         if(outputLiquids != null) hasLiquids = true;
     }
 
@@ -185,9 +184,11 @@ public class GenericCrafter extends Block{
     }
 
     public class GenericCrafterBuild extends Building{
+        public float dumpTimer;
         public float progress;
         public float totalProgress;
         public float warmup;
+        public @Nullable float[] outputAccumulator = outputItems != null && outputItems.length > 0 ? new float[outputItems.length] : null;
 
         @Override
         public void draw(){
@@ -207,7 +208,7 @@ public class GenericCrafter extends Block{
         public boolean shouldConsume(){
             if(outputItems != null){
                 for(var output : outputItems){
-                    if(items.get(output.item) + output.amount > itemCapacity){
+                    if(items.get(output.item) + scaleOutput(output.amount) > itemCapacity){
                         return false;
                     }
                 }
@@ -275,7 +276,7 @@ public class GenericCrafter extends Block{
             if(outputLiquids != null){
                 max = 0f;
                 for(var s : outputLiquids){
-                    float value = (liquidCapacity - liquids.get(s.liquid)) / (s.amount * edelta());
+                    float value = (liquidCapacity - liquids.get(s.liquid)) / (scaleOutput(s.amount) * edelta());
                     scaling = Math.min(scaling, value);
                     max = Math.max(max, value);
                 }
@@ -299,12 +300,27 @@ public class GenericCrafter extends Block{
             return totalProgress;
         }
 
+        /** Allows scaling the crafter's output dynamically. */
+        public float scaleOutput(float amount){
+            return amount;
+        }
+
         public void craft(){
             consume();
 
             if(outputItems != null){
-                for(var output : outputItems){
-                    for(int i = 0; i < output.amount; i++){
+                //instantiated here instead of created() because of outputItems runtime changes
+                if(outputAccumulator == null || outputAccumulator.length != outputItems.length){
+                    outputAccumulator = new float[outputItems.length];
+                }
+                for(int i = 0; i < outputItems.length; i++){
+                    ItemStack output = outputItems[i];
+
+                    outputAccumulator[i] += scaleOutput(output.amount);
+                    int floored = Mathf.floor(outputAccumulator[i]);
+                    outputAccumulator[i] -= floored;
+
+                    for(int j = 0; j < floored; j++){
                         offload(output.item);
                     }
                 }
@@ -317,10 +333,14 @@ public class GenericCrafter extends Block{
         }
 
         public void dumpOutputs(){
-            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
+            if(outputItems != null && (dumpTimer += timeScale * Time.delta) >= dumpTime){
                 for(ItemStack output : outputItems){
-                    dump(output.item);
+                    int amount = Math.max(1, Mathf.round(scaleOutput(output.amount)));
+                    for(int i = 0; i < amount; i++){
+                        if(!dump(output.item)) break;
+                    }
                 }
+                dumpTimer %= dumpTime;
             }
 
             if(outputLiquids != null){
@@ -333,10 +353,10 @@ public class GenericCrafter extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress();
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress();
             //attempt to prevent wild total liquid fluctuation, at least for crafters
-            if(sensor == LAccess.totalLiquids && outputLiquid != null) return liquids.get(outputLiquid.liquid);
+            if(sensor == LogicProp.totalLiquids && outputLiquid != null) return liquids.get(outputLiquid.liquid);
             return super.sense(sensor);
         }
 

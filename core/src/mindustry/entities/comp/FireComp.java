@@ -38,7 +38,6 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
 
     @Override
     public void update(){
-
         animation += Time.delta / ticksPerFrame;
         warmup += Time.delta;
         animation %= frames;
@@ -76,7 +75,7 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
         if(flammability > 1f && (spreadTimer += Time.delta * Mathf.clamp(flammability / 5f, 0.3f, 2f)) >= spreadDelay){
             spreadTimer = 0f;
             Point2 p = Geometry.d4[Mathf.random(3)];
-            Tile other = world.tile(tile.x + p.x, tile.y + p.y);
+            Tile other = state.world.tile(tile.x + p.x, tile.y + p.y);
             Fires.create(other);
         }
 
@@ -113,7 +112,7 @@ abstract class FireComp implements Timedc, Posc, Syncc, Drawc{
         Draw.rect(regions[Math.min((int)animation, regions.length - 1)], x + Mathf.randomSeedRange((int)y, 2), y + Mathf.randomSeedRange((int)x, 2));
         Draw.reset();
 
-        Drawf.light(x, y, 50f + Mathf.absin(5f, 5f), Pal.lightFlame, 0.6f  * Mathf.clamp(warmup / warmupDuration));
+        Drawf.light(x, y, 50f + Mathf.absin(Vars.state.time, 5f, 5f), Pal.lightFlame, 0.6f  * Mathf.clamp(warmup / warmupDuration));
     }
 
     @Replace

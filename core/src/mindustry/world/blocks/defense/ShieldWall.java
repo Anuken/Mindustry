@@ -9,6 +9,8 @@ import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class ShieldWall extends Wall{
@@ -28,8 +30,8 @@ public class ShieldWall extends Wall{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.shieldHealth, shieldHealth);
     }
@@ -54,7 +56,7 @@ public class ShieldWall extends Wall{
 
                 Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
-                if(renderer.animateShields){
+                if(renderer.animateSurfaces){
                     Fill.square(x, y, radius);
                 }else{
                     Lines.stroke(1.5f);
@@ -67,7 +69,7 @@ public class ShieldWall extends Wall{
 
                 Draw.reset();
 
-                Drawf.additive(glowRegion, glowColor, (1f - glowMag + Mathf.absin(glowScl, glowMag)) * shieldRadius, x, y, 0f, Layer.blockAdditive);
+                Drawf.additive(glowRegion, glowColor, (1f - glowMag + Mathf.absin(Vars.state.time, glowScl, glowMag)) * shieldRadius, x, y, 0f, Layer.blockAdditive);
             }
         }
 

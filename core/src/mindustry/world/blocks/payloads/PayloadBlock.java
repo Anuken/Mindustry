@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -15,7 +14,7 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class PayloadBlock extends Block{
-    public float payloadSpeed = 0.7f, payloadRotateSpeed = 5f;
+    public float payloadSpeed = 0.7f, payloadRotateSpeed = 3f;
 
     public String regionSuffix = "";
     public TextureRegion topRegion, outRegion, inRegion;
@@ -78,7 +77,7 @@ public class PayloadBlock extends Block{
             boolean legStep = payload instanceof UnitPayload u && u.unit.type.allowLegStep;
             float size = payload.size(), radius = size/2f, x = payload.x(), y = payload.y(), scl = Mathf.clamp(((progress - thresh) / (1f - thresh)) * 1.1f);
 
-            Groups.unit.intersect(x - size/2f, y - size/2f, size, size, u -> {
+            state.entities.unit.intersect(x - size/2f, y - size/2f, size, size, u -> {
                 float dst = u.dst(payload);
                 float rs = radius + u.hitSize/2f;
                 if(u.isGrounded() && u.type.allowLegStep == legStep && dst < rs){
@@ -101,7 +100,10 @@ public class PayloadBlock extends Block{
 
         @Override
         public boolean canControlSelect(Unit unit){
-            return !unit.spawnedByCore && unit.type.allowedInPayloads && this.payload == null && acceptUnitPayload(unit) && unit.tileOn() != null && unit.tileOn().build == this;
+            if(unit.spawnedByCore || !unit.type.allowedInPayloads || this.payload != null || !acceptUnitPayload(unit)) return false;
+
+            //ground units can be accepted when they are near solid blocks
+            return (unit.isGrounded() && !unit.type.allowLegStep && solid) ? unit.within(this, size * tilesize * 0.7f + unit.hitSize / 2f) : unit.tileOn() != null && unit.tileOn().build == this;
         }
 
         @Override
@@ -119,8 +121,15 @@ public class PayloadBlock extends Block{
 
         @Override
         public void handlePayload(Building source, Payload payload){
+            if(payload instanceof UnitPayload up){
+                var unit = up.unit;
+                float clampPos = size * tilesize * 0.7f + unit.hitSize / 2f;
+                this.payVector.set(unit.x, unit.y).sub(this).clamp(-clampPos, -clampPos, clampPos, clampPos);
+            }else{
+                this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
+            }
+
             this.payload = (T)payload;
-            this.payVector.set(source).sub(this).clamp(-size * tilesize / 2f, -size * tilesize / 2f, size * tilesize / 2f, size * tilesize / 2f);
             this.payRotation = payload.rotation();
 
             updatePayload();
@@ -158,6 +167,9 @@ public class PayloadBlock extends Block{
         public void updateTile(){
             if(payload != null){
                 payload.update(null, this);
+                if(payload.isDead()){
+                    payload = null;
+                }
             }
         }
 
@@ -253,10 +265,10 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public double sense(Content content){
-            if(payload instanceof UnitPayload up && up.unit.type == content) return 1;
-            if(payload instanceof BuildPayload bp && bp.build.block == content) return 1;
-            return super.sense(content);
+        public double sense(Object object){
+            if(payload instanceof UnitPayload up && up.unit.type == object) return 1;
+            if(payload instanceof BuildPayload bp && bp.build.block == object) return 1;
+            return super.sense(object);
         }
 
         @Override

@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.Interp.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 
 public class DrawCrucibleFlame extends DrawBlock{
@@ -21,7 +22,7 @@ public class DrawCrucibleFlame extends DrawBlock{
         if(build.warmup() > 0f && flameColor.a > 0.001f){
             Lines.stroke(circleStroke * build.warmup());
 
-            float si = Mathf.absin(flameRadiusScl, flameRadiusMag);
+            float si = Mathf.absin(Vars.state.time, flameRadiusScl, flameRadiusMag);
             float a = alpha * build.warmup();
             Draw.blend(Blending.additive);
 
@@ -31,11 +32,11 @@ public class DrawCrucibleFlame extends DrawBlock{
             Draw.color(flameColor, a);
             Lines.circle(build.x + x, build.y + y, (flameRad + circleSpace + si) * build.warmup());
 
-            float base = (Time.time / particleLife);
+            float base = (Vars.state.time / particleLife);
             rand.setSeed(build.id);
             for(int i = 0; i < particles; i++){
                 float fin = (rand.random(1f) + base) % 1f, fout = 1f - fin;
-                float angle = rand.random(360f) + (Time.time / rotateScl) % 360f;
+                float angle = rand.random(360f) + (Vars.state.time / rotateScl) % 360f;
                 float len = particleRad * particleInterp.apply(fout);
                 Draw.alpha(a * (1f - Mathf.curve(fin, 1f - fadeMargin)));
                 Fill.circle(

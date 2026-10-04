@@ -6,7 +6,7 @@
     <iosInfoPList>Info.plist.xml</iosInfoPList>
     <resources>
         <resource>
-            <directory>../ios/assets</directory>
+            <directory>../core/assets</directory>
             <includes>
                 <include>**</include>
             </includes>
@@ -35,7 +35,6 @@
     </forceLinkClasses>
     <libs>
         <lib>z</lib>
-        <lib>libs/libarc-freetype.a</lib>
     </libs>
     <frameworks>
         <framework>arc</framework>

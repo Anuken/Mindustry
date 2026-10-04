@@ -40,7 +40,7 @@ public class EditorRenderer implements Disposable{
         //clear darkness
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
-                Tile tile = world.tile(x, y);
+                Tile tile = state.world.tile(x, y);
                 if(tile.block() instanceof StaticWall){
                     tile.data = 0;
                 }
@@ -57,13 +57,18 @@ public class EditorRenderer implements Disposable{
             attribute vec4 a_position;
             attribute vec4 a_color;
             attribute vec2 a_texCoord0;
+            attribute float a_depth;
+
             uniform mat4 u_projTrans;
             varying vec4 v_color;
             varying vec2 v_texCoords;
+            varying float v_depth;
+
             void main(){
                v_color = a_color;
                v_color.a = v_color.a * (255.0/254.0);
                v_texCoords = a_texCoord0;
+               v_depth = a_depth;
                gl_Position = u_projTrans * a_position;
             }
             """,
@@ -71,10 +76,11 @@ public class EditorRenderer implements Disposable{
             """
             varying lowp vec4 v_color;
             varying vec2 v_texCoords;
-            uniform sampler2D u_texture;
+            varying float v_depth;
+            uniform highp sampler2DArray u_texture;
         
             void main(){
-              gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+              gl_FragColor = v_color * texture2D(u_texture, vec3(v_texCoords, v_depth));
             }
             """
             );
@@ -85,14 +91,14 @@ public class EditorRenderer implements Disposable{
         //don't process terrain updates every frame (helps with lag on low end devices)
         boolean doUpdate = Core.graphics.getFrameId() % 2 == 0;
 
-        boolean prev = renderer.animateWater;
-        renderer.animateWater = false;
+        boolean prev = renderer.animateSurfaces;
+        renderer.animateSurfaces = false;
 
         Tmp.m4.set(Draw.trans());
         Draw.trans().idt();
 
         Tmp.v3.set(Core.camera.position);
-        Core.camera.position.set(world.width()/2f * tilesize, world.height()/2f * tilesize);
+        Core.camera.position.set(state.world.width/2f * tilesize, state.world.height/2f * tilesize);
         Core.camera.width = 999999f;
         Core.camera.height = 999999f;
         Core.camera.mat.set(Draw.proj()).mul(Tmp.m3.setToTranslation(tx, ty).scale(tw / (width * tilesize), th / (height * tilesize)).translate(4f, 4f));
@@ -112,7 +118,8 @@ public class EditorRenderer implements Disposable{
         Draw.proj(Core.camera.mat);
 
         Draw.shader(Shaders.darkness);
-        Draw.rect(Draw.wrap(renderer.blocks.getShadowBuffer().getTexture()), world.width() * tilesize/2f - tilesize/2f, world.height() * tilesize/2f - tilesize/2f, world.width() * tilesize, -world.height() * tilesize);
+        FrameBuffer frameBuffer = renderer.blocks.getShadowBuffer();
+        Draw.rect(Draw.wrap(frameBuffer.texture), state.world.width * tilesize/2f - tilesize/2f, state.world.height * tilesize/2f - tilesize/2f, state.world.width * tilesize, -state.world.height * tilesize);
         Draw.shader();
 
         Draw.proj(Tmp.m2);
@@ -121,7 +128,7 @@ public class EditorRenderer implements Disposable{
         if(editor.showTerrain){
             renderer.blocks.floor.drawLayer(CacheLayer.walls, doUpdate);
         }
-        renderer.animateWater = prev;
+        renderer.animateSurfaces = prev;
 
         if(chunks == null) return;
 
@@ -154,8 +161,8 @@ public class EditorRenderer implements Disposable{
         renderer.blocks.floor.recacheTile(x, y);
         if(x > 0) renderer.blocks.floor.recacheTile(x - 1, y);
         if(y > 0) renderer.blocks.floor.recacheTile(x, y - 1);
-        if(x < world.width() - 1) renderer.blocks.floor.recacheTile(x + 1, y);
-        if(y < world.height() - 1) renderer.blocks.floor.recacheTile(x, y + 1);
+        if(x < state.world.width - 1) renderer.blocks.floor.recacheTile(x + 1, y);
+        if(y < state.world.height - 1) renderer.blocks.floor.recacheTile(x, y + 1);
     }
 
     void updateBlock(Tile tile){
@@ -206,7 +213,7 @@ public class EditorRenderer implements Disposable{
 
         for(int x = cx * chunkSize; x < (cx + 1) * chunkSize; x++){
             for(int y = cy * chunkSize; y < (cy + 1) * chunkSize; y++){
-                Tile tile = world.tile(x, y);
+                Tile tile = state.world.tile(x, y);
 
                 if(tile != null && tile.block() != Blocks.air && tile.block().cacheLayer == CacheLayer.normal && tile.isCenter()){
                     tmpTiles.add(tile);

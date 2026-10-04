@@ -4,6 +4,7 @@ import arc.*;
 import arc.Input.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.Font;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
@@ -56,7 +57,7 @@ public class ChatFragment extends Table{
                 }
             }
 
-            return net.active() && ui.hudfrag.shown;
+            return net.active() && ui.hudfrag.shown();
         });
 
         update(() -> {
@@ -211,7 +212,7 @@ public class ChatFragment extends Table{
             }
             if(space != -1){
                 int x = Strings.parseInt(message, 10, -1, 0, comma), y = Strings.parseInt(message, 10, -1, comma + 1 + (extra ? 1 : 0), space);
-                if(world.tiles.in(x, y)){
+                if(state.world.in(x, y)){
                     Call.pingLocation(player, x * tilesize, y * tilesize, message.substring(space).trim());
                 }
             }

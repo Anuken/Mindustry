@@ -17,7 +17,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class PointDefenseTurret extends ReloadTurret{
-    public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
     public @Load(value = "@-base", fallback = "block-@size") TextureRegion baseRegion;
@@ -48,8 +47,8 @@ public class PointDefenseTurret extends ReloadTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);
         stats.add(Stat.damage, bulletDamage, StatUnit.none);
@@ -57,13 +56,15 @@ public class PointDefenseTurret extends ReloadTurret{
 
     public class PointDefenseBuild extends ReloadTurretBuild{
         public @Nullable Bullet target;
+        public float retargetTimer;
 
         @Override
         public void updateTile(){
 
             //retarget
-            if(timer(timerTarget, retargetTime)){
-                target = Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
+            if((retargetTimer += Time.delta) >= retargetTime){
+                retargetTimer %= retargetTime;
+                target = state.entities.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
             }
 
             //pooled bullets
@@ -71,7 +72,7 @@ public class PointDefenseTurret extends ReloadTurret{
                 target = null;
             }
 
-            if(coolant != null){
+            if(coolant != null && reloadCounter < reload){
                 updateCooling();
             }
 

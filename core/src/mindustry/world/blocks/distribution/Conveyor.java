@@ -22,6 +22,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class Conveyor extends Block implements Autotiler{
@@ -54,8 +56,8 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
@@ -151,7 +153,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f && !state.rules.editor ? (int)(((Vars.state.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -173,8 +175,8 @@ public class Conveyor extends Block implements Autotiler{
             float
 
             layer = Layer.block - 0.1f,
-            wwidth = world.unitWidth(),
-            wheight = world.unitHeight(),
+            wwidth = state.world.unitWidth(),
+            wheight = state.world.unitHeight(),
             scaling = 0.01f,
             alpha = Renderer.blockInterp,
 
@@ -487,8 +489,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress){
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress){
                 if(len == 0) return 0;
                 return ys[len - 1];
             }
@@ -496,8 +498,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem && len > 0) return ids[len - 1];
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.firstItem && len > 0) return ids[len - 1];
             return super.senseObject(sensor);
         }
 

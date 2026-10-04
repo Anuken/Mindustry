@@ -20,6 +20,7 @@ import javax.lang.model.element.*;
 import javax.lang.model.type.*;
 import java.lang.annotation.*;
 import java.util.*;
+import java.util.regex.*;
 
 @SupportedAnnotationTypes({
 "mindustry.annotations.Annotations.EntityDef",
@@ -29,6 +30,11 @@ import java.util.*;
 "mindustry.annotations.Annotations.TypeIOHandler"
 })
 public class EntityProcess extends BaseProcessor{
+    static final Pattern selfParamPattern = Pattern.compile("this\\.<(.*)>self\\(\\)");
+    static final Pattern selfPattern = Pattern.compile("self\\(\\)");
+    static final Pattern yieldPattern = Pattern.compile(" yield ");
+    static final Pattern missingPattern = Pattern.compile("\\/\\*missing\\*\\/");
+
     Seq<EntityDefinition> definitions = new Seq<>();
     Seq<GroupDefinition> groupDefs = new Seq<>();
     Seq<Stype> baseComponents;
@@ -77,12 +83,12 @@ public class EntityProcess extends BaseProcessor{
                 for(Smethod elem : component.methods()){
                     if(elem.is(Modifier.ABSTRACT) || elem.is(Modifier.NATIVE)) continue;
                     //get all statements in the method, store them
-                    methodBlocks.put(elem.descString(), elem.tree().getBody().toString()
-                        .replaceAll("this\\.<(.*)>self\\(\\)", "this") //fix parameterized self() calls
-                        .replaceAll("self\\(\\)", "this") //fix self() calls
-                        .replaceAll(" yield ", "") //fix enchanced switch
-                        .replaceAll("\\/\\*missing\\*\\/", "var") //fix vars
-                    );
+                    String body = elem.tree().getBody().toString();
+                    body = selfParamPattern.matcher(body).replaceAll("this"); //fix parameterized self() calls
+                    body = selfPattern.matcher(body).replaceAll("this"); //fix self() calls
+                    body = yieldPattern.matcher(body).replaceAll(""); //fix enhanced switch
+                    body = missingPattern.matcher(body).replaceAll("var"); //fix vars
+                    methodBlocks.put(elem.descString(), body);
                 }
             }
 
@@ -234,15 +240,21 @@ public class EntityProcess extends BaseProcessor{
                     return result;
                 });
 
+                Seq<Stype> exclusions = types(an, GroupDef::exclude).map(stype -> {
+                    Stype result = interfaceToComp(stype);
+                    if(result == null) throw new IllegalArgumentException("Interface " + stype + " does not have an associated component!");
+                    return result;
+                });
+
                 //representative component type
                 Stype repr = types.first();
                 String groupType = repr.annotation(Component.class).base() ? baseName(repr) : interfaceName(repr);
 
-                String name = group.name().startsWith("g") ? group.name().substring(1) : group.name();
+                String name = group.name();
 
                 boolean collides = an.collide();
                 groupDefs.add(new GroupDefinition(name,
-                    ClassName.bestGuess(packageName + "." + groupType), types, an.spatial(), an.mapping(), collides, an.update()));
+                    ClassName.bestGuess(packageName + "." + groupType), types, exclusions, an.spatial(), an.mapping(), collides, an.update()));
 
                 TypeSpec.Builder accessor = TypeSpec.interfaceBuilder("IndexableEntity__" + name);
                 accessor.addMethod(MethodSpec.methodBuilder("setIndex__" + name).addModifiers(Modifier.ABSTRACT, Modifier.PUBLIC).addParameter(int.class, "index").returns(void.class).build());
@@ -258,7 +270,9 @@ public class EntityProcess extends BaseProcessor{
 
                 //all component classes (not interfaces)
                 Seq<Stype> components = allComponents(type);
-                Seq<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !Structs.contains(ann.excludeGroups(), g.name) && !g.components.contains(s -> !components.contains(s))) || g.manualInclusions.contains(type));
+                Seq<GroupDefinition> groups = groupDefs.select(g -> (!g.components.isEmpty() && !Structs.contains(ann.excludeGroups(), g.name)
+                    && !g.components.contains(s -> !components.contains(s)) && !g.excludedComponents.contains(s -> components.contains(s))));
+
                 ObjectMap<String, Seq<Smethod>> methods = new ObjectMap<>();
                 ObjectMap<FieldSpec, Svar> specVariables = new ObjectMap<>();
                 ObjectSet<String> usedFields = new ObjectSet<>();
@@ -489,10 +503,10 @@ public class EntityProcess extends BaseProcessor{
                         for(GroupDefinition def : groups){
                             if(first.name().equals("add")){
                                 //remove/add from each group, assume imported
-                                mbuilder.addStatement("index__$L = Groups.$L.addIndex(this)", def.name, def.name);
+                                mbuilder.addStatement("index__$L = mindustry.Vars.state.entities.$L.addIndex(this)", def.name, def.name);
                             }else{
                                 //remove/add from each group, assume imported
-                                mbuilder.addStatement("Groups.$L.removeIndex(this, index__$L);", def.name, def.name);
+                                mbuilder.addStatement("mindustry.Vars.state.entities.$L.removeIndex(this, index__$L);", def.name, def.name);
 
                                 mbuilder.addStatement("index__$L = -1", def.name);
                             }
@@ -558,7 +572,15 @@ public class EntityProcess extends BaseProcessor{
                         String blockName = elem.up().getSimpleName().toString().toLowerCase().replace("comp", "");
 
                         //skip empty blocks
-                        if(str.replace("{", "").replace("\n", "").replace("}", "").replace("\t", "").replace(" ", "").isEmpty()){
+                        boolean empty = true;
+                        for(int i = 0; i < str.length(); i++){
+                            char c = str.charAt(i);
+                            if(c != '{' && c != '}' && c != '\n' && c != '\t' && c != ' '){
+                                empty = false;
+                                break;
+                            }
+                        }
+                        if(empty){
                             continue;
                         }
 
@@ -582,7 +604,7 @@ public class EntityProcess extends BaseProcessor{
                     //add free code to remove methods - always at the end
                     //this only gets called next frame.
                     if(first.name().equals("remove") && ann.pooled()){
-                        mbuilder.addStatement("mindustry.gen.Groups.queueFree(($T)this)", Poolable.class);
+                        mbuilder.addStatement("mindustry.Vars.state.entities.queueFree(($T)this)", Poolable.class);
                     }
 
                     if(!legacy || specialIO){
@@ -638,17 +660,17 @@ public class EntityProcess extends BaseProcessor{
                 definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs, legacy));
             }
 
-            //generate groups
-            TypeSpec.Builder groupsBuilder = TypeSpec.classBuilder("Groups").addModifiers(Modifier.PUBLIC);
-            MethodSpec.Builder groupInit = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            //generate entities, the per-state container of all groups
+            TypeSpec.Builder groupsBuilder = TypeSpec.classBuilder("Entities").addModifiers(Modifier.PUBLIC);
+            MethodSpec.Builder groupInit = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
             for(GroupDefinition group : groupDefs){
                 //class names for interface/group
                 ClassName itype =  group.baseType;
                 ClassName groupc = ClassName.bestGuess("mindustry.entities.EntityGroup");
+                TypeName groupType = ParameterizedTypeName.get(groupc, itype);
 
                 //add field...
-                groupsBuilder.addField(ParameterizedTypeName.get(
-                    ClassName.bestGuess("mindustry.entities.EntityGroup"), itype), group.name, Modifier.PUBLIC, Modifier.STATIC);
+                groupsBuilder.addField(groupType, group.name, Modifier.PUBLIC);
 
                 groupInit.addStatement("$L = new $T<>($L.class, $L, $L, (e, pos) -> { if(e instanceof $L.IndexableEntity__$L ix) ix.setIndex__$L(pos); })", group.name, groupc, itype, group.spatial, group.mapping, packageName, group.name, group.name);
             }
@@ -656,9 +678,9 @@ public class EntityProcess extends BaseProcessor{
             //write the groups
             groupsBuilder.addMethod(groupInit.build());
 
-            groupsBuilder.addField(boolean.class, "isClearing", Modifier.PUBLIC, Modifier.STATIC);
+            groupsBuilder.addField(boolean.class, "isClearing", Modifier.PUBLIC);
 
-            MethodSpec.Builder groupClear = MethodSpec.methodBuilder("clear").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            MethodSpec.Builder groupClear = MethodSpec.methodBuilder("clear").addModifiers(Modifier.PUBLIC);
             groupClear.addStatement("isClearing = true");
             for(GroupDefinition group : groupDefs){
                 groupClear.addStatement("$L.clear()", group.name);
@@ -669,11 +691,11 @@ public class EntityProcess extends BaseProcessor{
             groupsBuilder.addMethod(groupClear.build());
 
             //add method for pool storage
-            groupsBuilder.addField(FieldSpec.builder(ParameterizedTypeName.get(Seq.class, Poolable.class), "freeQueue", Modifier.PRIVATE, Modifier.STATIC).initializer("new Seq<>()").build());
+            groupsBuilder.addField(FieldSpec.builder(ParameterizedTypeName.get(Seq.class, Poolable.class), "freeQueue", Modifier.PRIVATE).initializer("new Seq<>()").build());
 
             //method for freeing things
             MethodSpec.Builder groupFreeQueue = MethodSpec.methodBuilder("queueFree")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC)
                 .addParameter(Poolable.class, "obj")
                 .addStatement("freeQueue.add(obj)");
 
@@ -682,13 +704,13 @@ public class EntityProcess extends BaseProcessor{
             //add method for resizing all necessary groups
             MethodSpec.Builder groupResize = MethodSpec.methodBuilder("resize")
                 .addParameter(TypeName.FLOAT, "x").addParameter(TypeName.FLOAT, "y").addParameter(TypeName.FLOAT, "w").addParameter(TypeName.FLOAT, "h")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                .addModifiers(Modifier.PUBLIC);
 
             MethodSpec.Builder groupUpdate = MethodSpec.methodBuilder("update")
-            .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            .addModifiers(Modifier.PUBLIC);
 
             MethodSpec.Builder groupPoolUpdate = MethodSpec.methodBuilder("updatePooling")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                .addModifiers(Modifier.PUBLIC);
 
             //free everything pooled at the start of each updaet
             groupPoolUpdate
@@ -994,13 +1016,13 @@ public class EntityProcess extends BaseProcessor{
     class GroupDefinition{
         final String name;
         final ClassName baseType;
-        final Seq<Stype> components;
+        final Seq<Stype> components, excludedComponents;
         final boolean spatial, mapping, collides, updates;
-        final ObjectSet<Selement> manualInclusions = new ObjectSet<>();
 
-        public GroupDefinition(String name, ClassName bestType, Seq<Stype> components, boolean spatial, boolean mapping, boolean collides, boolean updates){
+        public GroupDefinition(String name, ClassName bestType, Seq<Stype> components, Seq<Stype> excludedComponents, boolean spatial, boolean mapping, boolean collides, boolean updates){
             this.baseType = bestType;
             this.components = components;
+            this.excludedComponents = excludedComponents;
             this.name = name;
             this.spatial = spatial;
             this.mapping = mapping;

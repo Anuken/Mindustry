@@ -212,7 +212,7 @@ public class MapImagesView implements AssetView{
         inner.top().left();
 
         float size = 200f;
-        int cols = (int)Math.max(1, (Core.graphics.getWidth() - Scl.scl(20f)) * 0.9f / Scl.scl(size + 14f));
+        int cols = (int)Math.max(1, (Core.graphics.getWidth() - Scl.scl(40f)) / Scl.scl(size + 10f));
         int i = 0;
         for(var image : getImages()){
             //showing generated images is confusing, so don't.
@@ -260,8 +260,13 @@ public class MapImagesView implements AssetView{
                     b.defaults().size((size - 10f) / 4f);
                     var istyle = Styles.emptyi;
                     b.button(Icon.pencil, istyle, () -> {
-                        ui.showTextInput("@save.rename", "@patch.path", image.path, res -> {
+                        ui.showTextInput("@save.rename", "@patch.path", 1000, image.path, res -> {
                             if(!res.endsWith(".png")) res = res + ".png";
+
+                            if(!DataAsset.validPath(res)){
+                                ui.showErrorMessage("@asset.path.invalid");
+                                return;
+                            }
 
                             Fi fi = new Fi(res);
                             String name = fi.nameWithoutExtension();
@@ -291,6 +296,7 @@ public class MapImagesView implements AssetView{
                     b.button(Icon.trash, istyle, () -> {
                         ui.showConfirm("@asset.image.delete.confirm", () -> {
                             Core.atlas.getRegionMap().remove(regionPrefix + image.name);
+                            Core.atlas.getDrawables().remove(regionPrefix + image.name);
                             getImages().remove(image);
                             diag.rebuild();
                         });

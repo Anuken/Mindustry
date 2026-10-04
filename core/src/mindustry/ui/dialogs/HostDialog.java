@@ -3,7 +3,6 @@ package mindustry.ui.dialogs;
 import arc.*;
 import arc.scene.ui.*;
 import arc.util.*;
-import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.net.*;
@@ -97,14 +96,6 @@ public class HostDialog extends BaseDialog{
                 net.host(Core.settings.getInt("port", port));
                 player.admin = true;
                 Events.fire(new HostEvent());
-
-                if(steam && Core.settings.getBool("steampublichost2")){
-                    if(Version.modifier.contains("beta") || Version.modifier.contains("alpha")){
-                        Core.settings.put("steampublichost2", false);
-                        platform.updateLobby();
-                        Core.settings.getBoolOnce("betapublic", () -> ui.showInfo("@public.beta"));
-                    }
-                }
             }catch(Exception e){
                 ui.showException(e.getMessage() != null && e.getMessage().toLowerCase(Locale.ROOT).contains("address already in use") ? "@server.error.addressinuse" : "@server.error", e);
             }

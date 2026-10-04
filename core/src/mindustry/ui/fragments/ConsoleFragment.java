@@ -3,6 +3,7 @@ package mindustry.ui.fragments;
 import arc.*;
 import arc.Input.*;
 import arc.graphics.*;
+import arc.graphics.font.Font;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
@@ -40,12 +41,13 @@ public class ConsoleFragment extends Table{
         font = Fonts.def;
 
         visible(() -> {
-            if(input.keyTap(Binding.console) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null) && !ui.chatfrag.shown()){
+            if(input.keyTap(Binding.console) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || !(scene.getKeyboardFocus() instanceof TextField)) && !ui.chatfrag.shown()){
                 shown = !shown;
                 if(shown && !open && settings.getBool("console")){
                     toggle();
                 }
                 if(shown){
+                    toFront();
                     chatfield.requestKeyboard();
                 }else if(scene.getKeyboardFocus() == chatfield){
                     scene.setKeyboardFocus(null);
@@ -60,7 +62,7 @@ public class ConsoleFragment extends Table{
         });
 
         update(() -> {
-            if(input.keyTap(Binding.chat) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || scene.getKeyboardFocus() == null)){
+            if(input.keyTap(Binding.chat) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || !(scene.getKeyboardFocus() instanceof TextField))){
                 toggle();
             }
 
@@ -215,8 +217,8 @@ public class ConsoleFragment extends Table{
         "var team = Vars.player.team();" +
         "var core = Vars.player.core();" +
         "var items = Vars.player.team().items();" +
-        "var build = Vars.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
-        "var cursor = Vars.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var build = Vars.state.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var cursor = Vars.state.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
         "var cursorUnit = Units.closestEnemy(null, Core.input.mouseWorldX(), Core.input.mouseWorldY(), 70, u => true);" +
         "\n";
     }

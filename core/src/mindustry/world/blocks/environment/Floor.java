@@ -12,7 +12,6 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -54,6 +53,8 @@ public class Floor extends Block{
     public float overlayAlpha = 0.65f;
     /** whether this floor supports an overlay floor */
     public boolean supportsOverlay = false;
+    /** if false, this floor can't be used as an overlay (liquid underlay), even if the floor it's placed on supports it */
+    public boolean supportsBeingOverlaid = true;
     /** shallow water flag used for generation */
     public boolean shallow = false;
     /** Group of blocks that this block does not draw edges on. */
@@ -95,7 +96,7 @@ public class Floor extends Block{
     protected TextureRegion[] autotileRegions, autotileMidRegions;
     protected TextureRegion[][] autotileVariantRegions;
     protected int tilingSize;
-    protected TextureRegion[][] edges;
+    protected @Nullable TextureRegion[][] edges;
     protected Seq<Floor> blenders = new Seq<>();
     protected Bits blended = new Bits(256);
     protected int[] dirs = new int[8];
@@ -167,6 +168,15 @@ public class Floor extends Block{
 
         if(Core.atlas.has(name + "-edge")){
             edges = Core.atlas.find(name + "-edge").split(tsize, tsize);
+            if(edges.length != 3 || edges[0].length != 3){
+                //edges must be 3x3
+                var error = Core.atlas.find("error");
+                edges = new TextureRegion[][]{
+                new TextureRegion[]{error, error, error},
+                new TextureRegion[]{error, error, error},
+                new TextureRegion[]{error, error, error},
+                };
+            }
         }
         region = variantRegions[0];
         edgeRegion = Core.atlas.find("edge");
@@ -211,17 +221,40 @@ public class Floor extends Block{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        if(autotile){
+            for(int v = 0; v < Math.max(autotileVariants, 1); v++){
+                String suffix = autotileVariants <= 1 ? "" : "" + (v + 1);
+                String sourceName = name + "-autotile" + suffix;
 
-        if(blendGroup != this){
-            return;
+                if(!packer.has(sourceName)) continue;
+
+                var source = packer.get(sourceName);
+                try{
+                    String prefix = name + (autotileVariants <= 1 ? "" : "-" + (v + 1));
+                    if(TileBitmask.generate(packer, source, prefix) && v == 0 && !packer.has(name)){
+                        //one of the generated cells doubles as this floor's "main" sprite, used for icons/previews/edges
+                        int cell = source.width / 4;
+                        Pixmap cropped = source.crop(cell, cell, cell, cell);
+                        packer.add(name, cropped, true);
+                        cropped.dispose();
+                    }
+                }catch(Throwable e){
+                    Log.err("Failed to autotile: " + name, e);
+                }finally{
+                    //the raw source is only useful for generation, and must not end up in the packed output
+                    packer.discard(sourceName);
+                    source.pixmap.dispose();
+                }
+            }
         }
 
-        if(Core.atlas.has(name + "-edge")) return;
+        super.packSprites(packer);
 
-        var image = packer.get(icons()[0]);
-        var edge = packer.get(Core.atlas.find(name + "-edge-stencil", "edge-stencil"));
+        if(packer.has(name + "-edge") || blendGroup != this || !drawEdgeOut) return;
+
+        var image = packer.has(name) ? packer.get(name) : packer.get(name + "1");
+        var edge = packer.get(name + "-edge-stencil", "edge-stencil");
         Pixmap result = new Pixmap(edge.width, edge.height);
 
         for(int x = 0; x < edge.width; x++){
@@ -230,7 +263,7 @@ public class Floor extends Block{
             }
         }
 
-        packer.add(PageType.environment, name + "-edge", result);
+        packer.add(name + "-edge", result, true);
         result.dispose();
     }
 

@@ -4,7 +4,6 @@ import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.io.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -40,6 +39,11 @@ public interface Payload extends Position{
 
     /** update this payload inside a container unit or building. either can be null. */
     default void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){}
+
+    /** @return if this payload died for whatever reason (e.g. reactor/combustion generator exploding itself) */
+    default boolean isDead(){
+        return false;
+    }
 
     /** @return whether this payload was dumped. */
     default boolean dump(){

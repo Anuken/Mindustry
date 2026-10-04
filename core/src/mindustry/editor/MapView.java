@@ -11,7 +11,6 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.ui.*;
@@ -19,7 +18,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class MapView extends Element implements GestureListener{
-    EditorTool tool = Vars.mobile ? EditorTool.zoom : EditorTool.pencil;
+    EditorTool tool = EditorTool.zoom;
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
@@ -197,7 +196,7 @@ public class MapView extends Element implements GestureListener{
 
         if(Core.scene.getScrollFocus() != this) return;
 
-        zoom += Core.input.axis(Binding.zoom) / 10f * zoom;
+        if(!ui.consolefrag.shown()) zoom += Core.input.axis(Binding.zoom) / 10f * zoom;
         clampZoom();
     }
 
@@ -206,12 +205,12 @@ public class MapView extends Element implements GestureListener{
     }
 
     public Point2 project(float x, float y){
-        float ratio = 1f / ((float)editor.width() / editor.height());
+        float ratio = 1f / ((float)state.world.width / state.world.height);
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
-        x = (x - getWidth() / 2 + sclwidth / 2 - offsetx * zoom) / sclwidth * editor.width();
-        y = (y - getHeight() / 2 + sclheight / 2 - offsety * zoom) / sclheight * editor.height();
+        x = (x - getWidth() / 2 + sclwidth / 2 - offsetx * zoom) / sclwidth * state.world.width;
+        y = (y - getHeight() / 2 + sclheight / 2 - offsety * zoom) / sclheight * state.world.height;
 
         if(editor.drawBlock.size % 2 == 0 && tool != EditorTool.eraser){
             return Tmp.p1.set((int)(x - 0.5f), (int)(y - 0.5f));
@@ -221,12 +220,12 @@ public class MapView extends Element implements GestureListener{
     }
 
     private Vec2 unproject(int x, int y){
-        float ratio = 1f / ((float)editor.width() / editor.height());
+        float ratio = 1f / ((float)state.world.width / state.world.height);
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
-        float px = ((float)x / editor.width()) * sclwidth + offsetx * zoom - sclwidth / 2 + getWidth() / 2;
-        float py = ((float)(y) / editor.height()) * sclheight
+        float px = ((float)x / state.world.width) * sclwidth + offsetx * zoom - sclwidth / 2 + getWidth() / 2;
+        float py = ((float)(y) / state.world.height) * sclheight
         + offsety * zoom - sclheight / 2 + getHeight() / 2;
         return vec.set(px, py);
     }
@@ -234,16 +233,16 @@ public class MapView extends Element implements GestureListener{
     @Override
     public void draw(){
         //can cause NaN
-        if(editor.width() == 0 || editor.height() == 0) return;
+        if(state.world.width == 0 || state.world.height == 0) return;
 
-        float ratio = 1f / ((float)editor.width() / editor.height());
+        float ratio = 1f / ((float)state.world.width / state.world.height);
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
         float sclheight = size * zoom * ratio;
         float centerx = x + width / 2 + offsetx * zoom;
         float centery = y + height / 2 + offsety * zoom;
 
-        image.setImageSize(editor.width(), editor.height());
+        image.setImageSize(state.world.width, state.world.height);
 
         if(!ScissorStack.push(rect.set(x + Core.scene.marginLeft, y + Core.scene.marginBottom, width, height))){
             return;
@@ -283,7 +282,7 @@ public class MapView extends Element implements GestureListener{
             }
         }
 
-        float scaling = zoom * Math.min(width, height) / editor.width();
+        float scaling = zoom * Math.min(width, height) / state.world.width;
 
         Draw.color(Pal.accent);
         Lines.stroke(Scl.scl(2f));

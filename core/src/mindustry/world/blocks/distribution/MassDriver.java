@@ -1,6 +1,5 @@
 package mindustry.world.blocks.distribution;
 
-import arc.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -10,6 +9,7 @@ import arc.util.*;
 import arc.util.io.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -60,12 +60,19 @@ public class MassDriver extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void load(){
+        super.load();
+
+        bullet.load(); //double loading is fine
+    }
+
+    @Override
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
         stats.add(Stat.reload, table -> {
-            table.add((String)(Strings.autoFixed(60f / reload, 2) + StatUnit.perSecond.localized() + " ~ " + 
+            table.add((String)(Strings.autoFixed(60f / reload, 2) + StatUnit.perSecond.localized() + " ~ " +
                 Strings.autoFixed(itemCapacity * (60f / reload), 2) + " " + StatUnit.itemsSecond.localized()));
         });
         stats.add(Stat.receiveRate, 60f, StatUnit.itemsSecond);
@@ -88,7 +95,7 @@ public class MassDriver extends Block{
         if(selected == null || selected.block != this || !selected.within(x * tilesize, y * tilesize, range)) return;
 
         //if so, draw a dotted line towards it while it is in range
-        float sin = Mathf.absin(Time.time, 6f, 1f);
+        float sin = Mathf.absin(Vars.state.time, 6f, 1f);
         Tmp.v1.set(x * tilesize + offset, y * tilesize + offset).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
             x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
@@ -121,6 +128,21 @@ public class MassDriver extends Block{
         public OrderedSet<Building> waitingShooters = new OrderedSet<>();
 
         @Override
+        public void control(LogicExecutor executor, LogicProp type, Object p1, double p2, double p3, double p4){
+            if(executor.privileged && type == LogicProp.config){
+                configured(null, p1 instanceof Building b ? b.pos() : -1);
+            }
+        }
+
+        @Override
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.config){
+                return linkValid() ? Vars.state.world.build(link) : null;
+            }
+            return super.senseObject(sensor);
+        }
+
+        @Override
         public float buildRotation(){
             return rotation;
         }
@@ -131,7 +153,7 @@ public class MassDriver extends Block{
 
         @Override
         public void updateTile(){
-            Building link = world.build(this.link);
+            Building link = Vars.state.world.build(this.link);
             boolean hasLink = linkValid();
 
             if(hasLink){
@@ -207,7 +229,7 @@ public class MassDriver extends Block{
                             //actually fire
                             fire(other);
                             float timeToArrive = Math.min(bulletLifetime / timeScale, dst(other) / (bulletSpeed * timeScale));
-                            Time.run(timeToArrive, () -> {
+                            Vars.state.run(timeToArrive, () -> {
                                 //remove waiting shooters, it's done firing
                                 other.waitingShooters.remove(this);
                                 other.state = DriverState.idle;
@@ -221,8 +243,8 @@ public class MassDriver extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(1f - reloadCounter);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(1f - reloadCounter);
             return super.sense(sensor);
         }
 
@@ -242,7 +264,7 @@ public class MassDriver extends Block{
 
         @Override
         public void drawConfigure(){
-            float sin = Mathf.absin(Time.time, 6f, 1f);
+            float sin = Mathf.absin(Vars.state.time, 6f, 1f);
 
             Draw.color(Pal.accent);
             Lines.stroke(1f);
@@ -254,7 +276,7 @@ public class MassDriver extends Block{
             }
 
             if(linkValid()){
-                Building target = world.build(link);
+                Building target = Vars.state.world.build(link);
                 Drawf.circles(target.x, target.y, (target.block.size / 2f + 1) * tilesize + sin - 2f, Pal.place);
                 Drawf.arrow(x, y, target.x, target.y, size * tilesize + sin, 4f + sin);
             }
@@ -345,7 +367,7 @@ public class MassDriver extends Block{
 
         protected boolean linkValid(){
             if(link == -1) return false;
-            return world.build(this.link) instanceof MassDriverBuild other && other.block == block && other.team == team && within(other, range);
+            return Vars.state.world.build(this.link) instanceof MassDriverBuild other && other.block == block && other.team == team && within(other, range);
         }
 
         @Override

@@ -461,15 +461,16 @@ public class GameService{
             if(campaign()){
                 SStat.maxWavesSurvived.max(Vars.state.wave);
 
-                if(state.stats.buildingsBuilt == 0 && state.wave >= 10){
+                //TODO: remove (263 is uniquely broken)
+                if(state.stats.buildingsBuilt == 0 && state.wave >= 10 && !(Vars.state.getSector() != null && Vars.state.getPlanet() == Planets.serpulo && Vars.state.getSector().id == 263)){
                     survive10WavesNoBlocks.complete();
                 }
             }
         });
 
-        Events.on(PlayerJoin.class, e -> {
+        Events.on(PlayerJoinEvent.class, e -> {
             if(Vars.net.server()){
-                SStat.maxPlayersServer.max(Groups.player.size());
+                SStat.maxPlayersServer.max(state.entities.player.size());
             }
         });
 
@@ -553,9 +554,9 @@ public class GameService{
 
     private void checkUpdate(){
         if(campaign()){
-            SStat.maxUnitActive.max(Groups.unit.count(t -> t.team == player.team()));
+            SStat.maxUnitActive.max(state.entities.unit.count(t -> t.team == player.team()));
 
-            if(Groups.unit.count(u -> u.type == UnitTypes.poly && u.team == player.team()) >= 10){
+            if(state.entities.unit.count(u -> u.type == UnitTypes.poly && u.team == player.team()) >= 10){
                 active10Polys.complete();
             }
 
@@ -566,7 +567,7 @@ public class GameService{
                 }
             }
 
-            for(var up : Groups.powerGraph){
+            for(var up : state.entities.powerGraph){
                 var graph = up.graph();
                 if(graph.all.size > 1 && graph.all.first().team == player.team() && graph.hasPowerBalanceSamples()){
                     float balance = graph.getPowerBalance() * 60f;

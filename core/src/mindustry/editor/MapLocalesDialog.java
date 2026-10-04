@@ -7,10 +7,8 @@ import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
-import arc.scene.utils.*;
 import arc.struct.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -430,12 +428,12 @@ public class MapLocalesDialog extends BaseDialog{
             p.table(Tex.button, t -> {
                 t.defaults().size(350f, 60f).left();
 
-                t.button("@waves.copy", Icon.copy, Styles.flatt, () -> {
+                t.button("@copy.clipboard", Icon.copy, Styles.flatt, () -> {
                     Core.app.setClipboardText(writeLocale(locale));
                     ui.showInfoFade("@copied");
                     dialog.hide();
                 }).marginLeft(12f).row();
-                t.button("@waves.load", Icon.download, Styles.flatt, () -> {
+                t.button("@load.clipboard", Icon.download, Styles.flatt, () -> {
                     locales.put(locale, readLocale(Core.app.getClipboardText()));
                     buildTables();
                     saved = false;
@@ -456,12 +454,12 @@ public class MapLocalesDialog extends BaseDialog{
             p.table(Tex.button, t -> {
                 t.defaults().size(450f, 60f).left();
 
-                t.button("@waves.copy", Icon.copy, Styles.flatt, () -> {
+                t.button("@copy.clipboard", Icon.copy, Styles.flatt, () -> {
                     Core.app.setClipboardText(writeBundles());
                     ui.showInfoFade("@copied");
                     dialog.hide();
                 }).marginLeft(12f).row();
-                t.button("@waves.load", Icon.download, Styles.flatt, () -> {
+                t.button("@load.clipboard", Icon.download, Styles.flatt, () -> {
                     locales = readBundles(Core.app.getClipboardText());
                     buildTables();
                     saved = false;
@@ -620,7 +618,7 @@ public class MapLocalesDialog extends BaseDialog{
         BaseDialog dialog = new BaseDialog("@locales.addicon");
 
         Table icons = new Table();
-        TextField search = Elem.newField("", v -> iconsTable(icons, v.replace(" ", "").toLowerCase(), dialog, cons));
+        TextField search = new TextField("", v -> iconsTable(icons, v.replace(" ", "").toLowerCase(), dialog, cons));
         search.setMessageText("@search");
 
         dialog.cont.table(t -> {

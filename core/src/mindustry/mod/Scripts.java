@@ -93,7 +93,7 @@ public class Scripts implements Disposable{
 
     private boolean run(String script, String file, boolean wrap){
         try{
-            if(currentMod != null){
+            if(currentMod != null && wrap){
                 //inject script info into file
                 context.evaluateString(scope, "modName = \"" + currentMod.name + "\"\nscriptName = \"" + file + "\"", "initscript.js", 1);
             }

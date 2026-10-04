@@ -2,9 +2,8 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.gl.*;
-import arc.math.geom.*;
+import arc.math.*;
 import arc.util.*;
 
 public class CubemapMesh implements Disposable{
@@ -60,8 +59,8 @@ public class CubemapMesh implements Disposable{
         this.map = map;
         this.map.setFilter(TextureFilter.linear);
         this.mesh = new Mesh(true, vertices.length, 0, VertexAttribute.position3);
-        mesh.getVerticesBuffer().limit(vertices.length);
-        mesh.getVerticesBuffer().put(vertices, 0, vertices.length);
+        mesh.getVertices().limit(vertices.length);
+        mesh.getVertices().put(vertices, 0, vertices.length);
 
         shader = new Shader(Core.files.internal("shaders/cubemap.vert"), Core.files.internal("shaders/cubemap.frag"));
     }

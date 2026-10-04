@@ -1,0 +1,3 @@
+{
+  "doc": "Inverts progress (1 - progress). Applied via PartProgress's 'op'/'operation' field (e.g. `op: inv`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object."
+}

@@ -16,13 +16,14 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 
 public class Door extends Wall{
     protected final static Rect rect = new Rect();
     protected final static Queue<DoorBuild> doorQueue = new Queue<>();
 
-    public final int timerToggle = timers++;
     public Effect openfx = Fx.dooropen;
     public Effect closefx = Fx.doorclose;
     public Sound doorSound = Sounds.door;
@@ -36,7 +37,7 @@ public class Door extends Wall{
         consumesTap = true;
 
         config(Boolean.class, (DoorBuild base, Boolean open) -> {
-            if(!world.isGenerating()){
+            if(!state.generating){
                 doorSound.at(base);
                 base.effect();
             }
@@ -52,7 +53,8 @@ public class Door extends Wall{
 
                 if(chainEffect) entity.effect();
                 entity.open = open;
-                if(!world.isGenerating()) pathfinder.updateTile(entity.tile);
+                entity.recache();
+                if(!state.generating) state.pathfinder.updateTile(entity.tile);
             }
         });
     }
@@ -65,6 +67,7 @@ public class Door extends Wall{
     public class DoorBuild extends Building{
         public boolean open = false;
         public Seq<DoorBuild> chained = new Seq<>();
+        public float lastToggleTime;
 
         @Override
         public void onProximityAdded(){
@@ -84,22 +87,28 @@ public class Door extends Wall{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.enabled) return open ? 1 : 0;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.enabled) return open ? 1 : 0;
             return super.sense(sensor);
         }
 
         @Override
-        public void control(LAccess type, double p1, double p2, double p3, double p4){
-            if(type == LAccess.enabled){
+        public void control(LogicExecutor executor, LogicProp type, double p1, double p2, double p3, double p4){
+            if(type == LogicProp.enabled){
                 boolean shouldOpen = !Mathf.zero(p1);
 
-                if(net.client() || open == shouldOpen || (Units.anyEntities(tile) && !shouldOpen) || !origin().timer(timerToggle, 80f)){
+                if(net.client() || open == shouldOpen || (Units.anyEntities(tile) && !shouldOpen) || !origin().toggleReady(80f)){
                     return;
                 }
 
                 configureAny(shouldOpen);
             }
+        }
+
+        public boolean toggleReady(float cooldown){
+            if(Vars.state.time - lastToggleTime < cooldown) return false;
+            lastToggleTime = Vars.state.time;
+            return true;
         }
 
         public DoorBuild origin(){
@@ -145,7 +154,7 @@ public class Door extends Wall{
 
         @Override
         public void tapped(){
-            if((Units.anyEntities(tile) && open) || !origin().timer(timerToggle, 60f)){
+            if((Units.anyEntities(tile) && open) || !origin().toggleReady(60f)){
                 return;
             }
 

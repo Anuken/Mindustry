@@ -1,7 +1,7 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.flabel.*;
+import arc.scene.flabel.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.actions.*;

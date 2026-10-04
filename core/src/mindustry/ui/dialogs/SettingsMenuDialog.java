@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.input.*;
 import arc.scene.*;
 import arc.scene.event.*;
@@ -18,15 +17,14 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.zip.*;
 
 import static arc.Core.*;
@@ -260,6 +258,7 @@ public class SettingsMenuDialog extends BaseDialog{
             t.button("@data.import", Icon.download, style, () -> ui.showConfirm("@confirm", "@data.import.confirm", () -> FileChooser.open("zip").submit(file -> {
                 try{
                     importData(file);
+                    mapPreviewDirectory.deleteDirectory();
                     control.saves.resetSave();
                     state = new GameState();
                     Core.app.exit();
@@ -352,7 +351,7 @@ public class SettingsMenuDialog extends BaseDialog{
         menu.button("@settings.data", Icon.save, style, isize, () -> dataDialog.show()).marginLeft(marg).row();
         menu.button("@settings.dev", Icon.fileCode, style, isize, () -> visible(3)).marginLeft(marg).row();
 
-        int i = 3;
+        int i = 4;
         for(var cat : categories){
             int index = i;
             if(cat.icon == null){
@@ -402,9 +401,11 @@ public class SettingsMenuDialog extends BaseDialog{
         });
 
         game.checkPref("savecreate", true);
+        game.checkPref("skipcoreanimation", false);
         game.checkPref("blockreplace", true);
         game.checkPref("conveyorpathfinding", true);
         game.checkPref("hints", true);
+        game.checkPref("logiclocalization", true);
 
         if(!mobile){
             game.checkPref("backgroundpause", true);
@@ -439,7 +440,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         graphics.sliderPref("screenshake", 4, 0, 8, i -> (i / 4f) + "x");
 
-        graphics.sliderPref("bloomintensity", 6, 0, 16, i -> (int)(i/4f * 100f) + "%");
+        graphics.sliderPref("bloomintensity", 6, 0, 16, i -> (int)(i / 4f * 100f) + "%");
         graphics.sliderPref("bloomblur", 2, 1, 16, i -> i + "x");
 
         graphics.sliderPref("fpscap", 240, 10, 245, 5, s -> {
@@ -502,6 +503,24 @@ public class SettingsMenuDialog extends BaseDialog{
             }
         }
 
+        graphics.checkPref("smaa", enableSmaa());
+
+        graphics.checkPref("linear", true, b -> {
+            atlas.getTexture().setFilter(b ? TextureFilter.linear : TextureFilter.nearest);
+        });
+
+        if(Core.settings.getBool("linear")){
+            atlas.getTexture().setFilter(TextureFilter.linear);
+        }
+
+        graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
+
+        graphics.checkPref("pixelate", false, val -> {
+            if(val){
+                Events.fire(Trigger.enablePixelation);
+            }
+        });
+
         graphics.checkPref("effects", true);
         graphics.checkPref("atmosphere", true);
         graphics.checkPref("drawlight", true);
@@ -521,41 +540,12 @@ public class SettingsMenuDialog extends BaseDialog{
             graphics.checkPref("mouseposition", false);
         }
         graphics.checkPref("fps", false);
-        graphics.checkPref("playerindicators", true);
+        graphics.checkPref("playerindicators", false);
         graphics.checkPref("showpings", true);
         graphics.checkPref("showotherbuildplans", true);
         graphics.checkPref("indicators", true);
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
-
-        if(Shaders.shield != null){
-            graphics.checkPref("animatedshields", true);
-        }
-
-        graphics.checkPref("bloom", true, val -> renderer.toggleBloom(val));
-
-        graphics.checkPref("pixelate", false, val -> {
-            if(val){
-                Events.fire(Trigger.enablePixelation);
-            }
-        });
-
-        //iOS (and possibly Android) devices do not support linear filtering well, so disable it
-        graphics.checkPref("linear", !mobile, b -> {
-            for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = b ? TextureFilter.linear : TextureFilter.nearest;
-                tex.setFilter(filter, filter);
-            }
-        });
-
-        if(Core.settings.getBool("linear")){
-            for(Texture tex : Core.atlas.getTextures()){
-                TextureFilter filter = TextureFilter.linear;
-                tex.setFilter(filter, filter);
-            }
-        }
-
-        graphics.checkPref("skipcoreanimation", false);
         graphics.checkPref("hidedisplays", false);
 
         if(OS.isMac){
@@ -569,6 +559,7 @@ public class SettingsMenuDialog extends BaseDialog{
         dev.sliderPref("buildingtimestep", 30, 10, 65, 5, s -> s > 60 ? bundle.get("off") : s + "");
         dev.checkPref("console", false);
         dev.checkPref("drawhitboxes", false);
+        dev.checkPref("showperformance", false);
 
         if(!ios){
             dev.checkPref("modcrashdisable", true);
@@ -654,6 +645,31 @@ public class SettingsMenuDialog extends BaseDialog{
         }
 
         prefs.add(tables.get(index));
+    }
+
+    private static boolean enableSmaa(){
+        if(mobile || maxTextureSize < 16384 || Core.graphics.getGLVersion().rendererString == null){
+            return false;
+        }
+
+        String renderer = Core.graphics.getGLVersion().rendererString.toLowerCase(Locale.ROOT);
+
+        String[] goodRenderers = {
+        //nvidia discrete
+        "geforce gtx", "geforce rtx", "nvidia titan", "quadro rtx", "nvidia rtx",
+
+        //amd discrete
+        "radeon rx",
+
+        //intel discrete
+        "intel(r) arc",
+        };
+
+        for(String good : goodRenderers){
+            if(renderer.contains(good)) return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -816,25 +832,13 @@ public class SettingsMenuDialog extends BaseDialog{
 
             @Override
             public void add(SettingsTable table){
-                Button box = new Button(Styles.grayt);
-                box.background(Styles.grayPanel);
-                box.margin(10f);
-
-                box.add(new Image()).update(i -> i.setDrawable(box.isOver() ? (box.isChecked() ? Tex.checkOnOver : Tex.checkOver) : box.isChecked() ? Tex.checkOn : Tex.checkOff))
-                    .size(32f).padRight(8f).padLeft(-4f);
-
-                box.add(title);
-
-                box.update(() -> box.setChecked(settings.getBool(name)));
-
-                box.clicked(() -> {
-                    settings.put(name, box.isChecked());
+                Table box = Elems.check(title, () -> settings.getBool(name), value -> {
+                    settings.put(name, value);
                     if(changed != null){
-                        changed.get(box.isChecked());
+                        changed.get(value);
                     }
                 });
 
-                box.left();
                 addDesc(table.add(box).minWidth(Math.min(500f, Core.graphics.getWidth() / 1.2f / Scl.scl(1f))).fillX().height(45f).left().padTop(7f).get());
                 table.row();
             }

@@ -98,7 +98,7 @@ public interface Platform{
         return uuid;
     }
 
-    /** Only used for iOS or android: open the share menu for a map or save. */
+    /** Only used for iOS: open the share menu for a map or save. */
     default void shareFile(Fi file){
     }
 

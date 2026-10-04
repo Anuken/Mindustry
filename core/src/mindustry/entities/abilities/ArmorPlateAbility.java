@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -65,7 +66,7 @@ public class ArmorPlateAbility extends Ability{
                 Draw.draw(Draw.z(), () -> {
                     Shaders.armor.region = shineRegion;
                     Shaders.armor.progress = warmup;
-                    Shaders.armor.time = -Time.time / 20f * shineSpeed;
+                    Shaders.armor.time = -Vars.state.time / 20f * shineSpeed;
 
                     Draw.color(color == null ? unit.team.color : color);
                     Draw.shader(Shaders.armor);

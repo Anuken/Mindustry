@@ -10,7 +10,9 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.EventType.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 
 import java.util.concurrent.*;
@@ -31,7 +33,7 @@ public class SoundControl{
     public AudioBus uiBus = new AudioBus();
 
     protected Music lastRandomPlayed;
-    protected Interval timer = new Interval(4);
+    protected mindustry.game.Interval timer = new Interval(4);
     protected long lastPlayed;
     protected @Nullable Music current;
     protected float fade;
@@ -52,7 +54,9 @@ public class SoundControl{
         Events.on(ClientLoadEvent.class, e -> reload());
 
         //only run music 10 seconds after a wave spawns
-        Events.on(WaveEvent.class, e -> Time.run(Mathf.random(8f, 15f) * 60f, () -> {
+        Events.on(WaveEvent.class, e -> Vars.state.run(Mathf.random(8f, 15f) * 60f, () -> {
+            if(state.rules.disableMusic) return;
+
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);
 
             if(boss){
@@ -166,15 +170,17 @@ public class SoundControl{
             //this just fades out the last track to make way for ingame music
             silence();
 
-            if(alwaysPlayMusic()){
-                if(current == null){
-                    playRandom();
-                }
-            }else if(Time.timeSinceMillis(lastPlayed) > 1000 * musicInterval / 60f){
-                //chance to play it per interval
-                if(Mathf.chance(musicChance)){
-                    lastPlayed = Time.millis();
-                    playRandom();
+            if(!state.rules.disableMusic){
+                if(alwaysPlayMusic()){
+                    if(current == null){
+                        playRandom();
+                    }
+                }else if(Time.timeSinceMillis(lastPlayed) > 1000 * musicInterval / 60f){
+                    //chance to play it per interval
+                    if(Mathf.chance(musicChance)){
+                        lastPlayed = Time.millis();
+                        playRandom();
+                    }
                 }
             }
         }
@@ -192,10 +198,17 @@ public class SoundControl{
             current = null;
         }
         playOnce(music);
+        if(current == music){
+            silenced = true; //music played successfully, don't fade it out
+        }
     }
 
     public boolean isPlaying(){
         return current != null && current.isPlaying();
+    }
+
+    public @Nullable Music getCurrent(){
+        return current;
     }
 
     /** Plays a random track.*/
@@ -244,6 +257,10 @@ public class SoundControl{
         return Mathf.chance(state.enemies / 70f + 0.1f);
     }
 
+    protected float volumeMultiplier(){
+        return Core.settings.getInt("musicvol") / 100f * Mathf.clamp(state.rules.musicVolume);
+    }
+
     /** Plays and fades in a music track. This must be called every frame.
      * If something is already playing, fades out that track and fades in this new music.*/
     protected void play(@Nullable Music music){
@@ -258,7 +275,7 @@ public class SoundControl{
 
         //update volume of current track
         if(current != null){
-            current.setVolume(fade * Core.settings.getInt("musicvol") / 100f);
+            current.setVolume(fade * volumeMultiplier());
         }
 
         //do not update once the track has faded out completely, just stop
@@ -307,7 +324,7 @@ public class SoundControl{
         //set fade to 1 and play it, stopping the current when it's done
         fade = 1f;
         current = music;
-        current.setVolume(1f);
+        current.setVolume(volumeMultiplier());
         current.setLooping(false);
         current.play();
     }
@@ -328,6 +345,11 @@ public class SoundControl{
         if(cached == null) cached = Core.assets.getOrNull(name + ".mp3", Music.class);
         if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".ogg", Music.class);
         if(cached == null) cached = Core.assets.getOrNull("music/" + name + ".mp3", Music.class);
+        if(cached == null && Vars.mods.orderedMods().any()){ //try loading a modded file
+            String path = FileTree.getAudioPath("music/" + name);
+            if(path == null) return null;
+            return Vars.tree.loadMusic(name);
+        }
         return cached;
     }
 
@@ -371,13 +393,15 @@ public class SoundControl{
             ambientThread.inputSources.add(source);
         }else{
             launchingAmbientThread = true;
-            ambientThread = new AudioThread();
-            ambientThread.setDaemon(true);
+            AudioThread thread = new AudioThread();
+            thread.setDaemon(true);
+            ambientThread = thread;
 
             //start thread with all the sources that were added during launch
             Core.app.post(() -> {
-                if(ambientThread != null){
-                    ambientThread.start();
+                //only start if this is still the active thread, and only ever once
+                if(ambientThread == thread){
+                    thread.start();
                     launchingAmbientThread = false;
                 }
             });

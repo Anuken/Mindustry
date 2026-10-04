@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -14,7 +15,7 @@ import mindustry.world.*;
 abstract class LaunchCoreComp implements Drawc, Timedc{
     @Import float x, y;
 
-    transient Interval in = new Interval();
+    transient mindustry.game.Interval in = new Interval();
     Block block;
 
     @Override

@@ -35,17 +35,8 @@ public class AvoidanceProcess implements AsyncProcess{
 
     @Override
     public void init(){
-        wwidth = Vars.world.width();
-        wheight = Vars.world.height();
-    }
-
-    @Override
-    public void reset(){
-        buffer1 = buffer2 = avoidance = null;
-        swap = false;
-        modified = false;
-        active = false;
-        requests.clear();
+        wwidth = Vars.state.world.width;
+        wheight = Vars.state.world.height;
     }
 
     @Override
@@ -92,7 +83,7 @@ public class AvoidanceProcess implements AsyncProcess{
             float rad = Float.intBitsToFloat(items[i + 1]);
             float rad2 = rad * rad;
 
-            int r = Math.max(1, Mathf.ceil(rad));
+            int r = Mathf.clamp(1, Mathf.ceil(rad), 20);
 
             for(int dx = -r; dx <= r; dx++){
                 for(int dy = -r; dy <= r; dy++){

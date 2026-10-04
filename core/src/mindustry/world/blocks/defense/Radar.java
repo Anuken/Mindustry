@@ -61,7 +61,7 @@ public class Radar extends Block{
             smoothEfficiency = Mathf.lerpDelta(smoothEfficiency, efficiency, 0.05f);
 
             if(Math.abs(fogRadius() - lastRadius) >= 0.5f){
-                Vars.fogControl.forceUpdate(team, this);
+                Vars.state.fog.forceUpdate(team, this);
                 lastRadius = fogRadius();
             }
 
@@ -86,7 +86,7 @@ public class Radar extends Block{
             Draw.rect(baseRegion, x, y);
             Draw.rect(region, x, y, rotateSpeed * totalProgress);
 
-            Drawf.additive(glowRegion, glowColor, glowColor.a * (1f - glowMag + Mathf.absin(glowScl, glowMag)), x, y, rotateSpeed * totalProgress, Layer.blockAdditive);
+            Drawf.additive(glowRegion, glowColor, glowColor.a * (1f - glowMag + Mathf.absin(Vars.state.time, glowScl, glowMag)), x, y, rotateSpeed * totalProgress, Layer.blockAdditive);
         }
 
         @Override

@@ -13,6 +13,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
+import mindustry.*;
+
 import static mindustry.Vars.*;
 import static mindustry.entities.Puddles.*;
 
@@ -39,7 +41,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
     @Import float x, y;
     @Import boolean added;
 
-    transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f), effectTime = Mathf.random(50f);
+    transient float accepting, updateTime, lastRipple = Vars.state.time + Mathf.random(40f), effectTime = Mathf.random(50f);
     float amount;
     Tile tile;
     Liquid liquid;
@@ -66,7 +68,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
             float deposited = Math.min((amount - maxLiquid / 1.5f) / 4f, 0.3f * Time.delta);
             int targets = 0;
             for(Point2 point : Geometry.d4){
-                Tile other = world.tile(tile.x + point.x, tile.y + point.y);
+                Tile other = state.world.tile(tile.x + point.x, tile.y + point.y);
                 if(other != null && (other.block() == Blocks.air || liquid.moveThroughBlocks)){
                     targets ++;
                     Puddles.deposit(other, tile, liquid, deposited, false);
@@ -86,9 +88,8 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
 
         if(Puddles.get(tile) != self() && added){
             //force removal without pool free
-            Groups.all.remove(self());
-            Groups.draw.remove(self());
-            Groups.puddle.remove(self());
+            state.entities.all.remove(self());
+            state.entities.draw.remove(self());
             added = false;
             return;
         }

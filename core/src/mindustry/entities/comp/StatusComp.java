@@ -6,7 +6,6 @@ import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -34,7 +33,25 @@ abstract class StatusComp implements Posc{
 
     /** Adds a status effect to this unit. */
     public void apply(StatusEffect effect, float duration){
+        applyStatus(effect, duration, false);
+    }
+
+    public float getDuration(StatusEffect effect){
+        var entry = statuses.find(e -> e.effect == effect);
+        return entry == null ? 0 : entry.time;
+    }
+
+    public void setDuration(StatusEffect effect, float duration){
+        applyStatus(effect, duration, true);
+    }
+
+    private void applyStatus(StatusEffect effect, float duration, boolean shorten){
         if(effect == StatusEffects.none || effect == null || isImmune(effect)) return; //don't apply empty or immune effects
+
+        if(shorten && duration == 0){
+            if(hasEffect(effect)) unapply(effect);
+            return;
+        }
 
         //unlock status effects regardless of whether they were applied to friendly units
         if(state.isCampaign()){
@@ -45,9 +62,9 @@ abstract class StatusComp implements Posc{
             //check for opposite effects
             for(int i = 0; i < statuses.size; i ++){
                 StatusEntry entry = statuses.get(i);
-                //extend effect
+                //extend or shorten effect
                 if(entry.effect == effect){
-                    entry.time = Math.max(entry.time, duration);
+                    entry.time = shorten ? duration : Math.max(entry.time, duration);
                     effect.applied(self(), entry.time, true);
                     return;
                 }else if(entry.effect.applyTransition(self(), effect, entry, duration)){ //find reaction
@@ -67,11 +84,6 @@ abstract class StatusComp implements Posc{
             statuses.add(entry);
             effect.applied(self(), duration, false);
         }
-    }
-
-    public float getDuration(StatusEffect effect){
-        var entry = statuses.find(e -> e.effect == effect);
-        return entry == null ? 0 : entry.time;
     }
 
     public void clearStatuses(){

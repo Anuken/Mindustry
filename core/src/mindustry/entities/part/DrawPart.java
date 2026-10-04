@@ -4,6 +4,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 
 public abstract class DrawPart{
     public static final PartParams params = new PartParams();
@@ -86,8 +87,8 @@ public abstract class DrawPart{
         heat = p -> p.heat,
         /** Lifetime fraction, 0 to 1. Only for missiles. */
         life = p -> p.life,
-        /** Current unscaled value of Time.time. */
-        time = p -> Time.time;
+        /** Current unscaled value of Vars.state.time. */
+        time = p -> Vars.state.time;
 
         float get(PartParams p);
 
@@ -255,15 +256,15 @@ public abstract class DrawPart{
         }
 
         static PartProgress sin(PartProgress self, float offset, float scl, float mag){
-            return p -> self.get(p) + Mathf.sin(Time.time + offset, scl, mag);
+            return p -> self.get(p) + Mathf.sin(Vars.state.time + offset, scl, mag);
         }
 
         static PartProgress sin(PartProgress self, float scl, float mag){
-            return p -> self.get(p) + Mathf.sin(scl, mag);
+            return p -> self.get(p) + Mathf.sin(Vars.state.time, scl, mag);
         }
 
         static PartProgress absin(PartProgress self, float scl, float mag){
-            return p -> self.get(p) + Mathf.absin(scl, mag);
+            return p -> self.get(p) + Mathf.absin(Vars.state.time, scl, mag);
         }
 
         static PartProgress mod(PartProgress self, float amount){

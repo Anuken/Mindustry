@@ -11,6 +11,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
@@ -48,7 +49,7 @@ public class PlayerListFragment{
             });
 
             cont.table(Tex.buttonTrans, pane -> {
-                pane.label(() -> Core.bundle.format(Groups.player.size() == 1 ? "players.single" : "players", Groups.player.size()));
+                pane.label(() -> Core.bundle.format(state.entities.player.size() == 1 ? "players.single" : "players", state.entities.player.size()));
                 pane.row();
 
                 search = pane.field(null, text -> rebuild()).grow().pad(8).name("search").maxTextLength(maxNameLength).get();
@@ -82,7 +83,7 @@ public class PlayerListFragment{
         boolean found = false;
 
         players.clear();
-        Groups.player.copy(players);
+        state.entities.player.copy(players);
 
         players.sort(Structs.comps(Structs.comparing(Player::team), Structs.comparingBool(p -> !p.admin)));
         if(search.getText().length() > 0){
@@ -132,8 +133,7 @@ public class PlayerListFragment{
             });
 
             button.add(iconTable).size(h);
-            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).style(Styles.outlineLabel).width(170f).pad(10);
-            button.add().grow();
+            button.add("[#" + user.color().toString().toUpperCase() + "]" + user.name()).style(Styles.outlineLabel).growX().wrap(true).pad(10);
 
             button.background(Tex.underline);
 
@@ -236,11 +236,9 @@ public class PlayerListFragment{
                         dialog.cont.button("@back", Icon.left, dialog::hide).padTop(-1f).size(220f, 55f);
 
                         dialog.show();
-
-
                     }).size(h);
                 }
-            }else if(!user.isLocal() && !user.admin && net.client() && Groups.player.size() >= 3 && player.team() == user.team()){ //votekick
+            }else if(!user.isLocal() && !user.admin && net.client() && state.entities.player.size() >= 3 && player.team() == user.team()){ //votekick
                 button.add().growY();
 
                 button.button(Icon.hammer, ustyle,
@@ -249,7 +247,7 @@ public class PlayerListFragment{
                 .size(h);
             }
 
-            content.add(button).width(350f).height(h + 14);
+            content.add(button).width(mobile ? 350f : 470f).height(h + 14);
             content.row();
         }
 

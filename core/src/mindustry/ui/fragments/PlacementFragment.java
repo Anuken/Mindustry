@@ -130,7 +130,7 @@ public class PlacementFragment{
     }
 
     boolean updatePick(InputHandler input){
-        Tile tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+        Tile tile = state.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
         if(tile != null && Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
             var build = tile.build;
 
@@ -261,7 +261,7 @@ public class PlacementFragment{
             if(hovered() instanceof Unit unit && unit.type.unlockedNow()){
                 ui.content.show(unit.type());
             }else{
-                var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+                var build = state.world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
                 Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
                 if(displayBlock != null && displayBlock.unlockedNow()){
@@ -277,7 +277,7 @@ public class PlacementFragment{
     public void build(Group parent){
         parent.fill(full -> {
             toggler = full;
-            full.bottom().right().visible(() -> ui.hudfrag.shown);
+            full.bottom().right().visible(() -> ui.hudfrag.shown());
 
             full.table(frame -> {
 
@@ -312,7 +312,7 @@ public class PlacementFragment{
 
                         button.update(() -> { //color unplacable things gray
                             Building core = player.core();
-                            Color color = (state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
+                            Color color = (state.rules.isInfiniteResources(player.team()) || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -404,29 +404,31 @@ public class PlacementFragment{
                                         line.left();
                                         line.image(stack.item.uiIcon).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
-                                        line.labelWrap(() -> {
+                                        line.label(() -> {
                                             Building core = player.core();
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
-                                            if(core == null || state.rules.infiniteResources) return "*/" + stackamount;
+                                            if(core == null || state.rules.isInfiniteResources(player.team())) return "*/" + stackamount;
 
                                             int amount = core.items.get(stack.item);
                                             String color = (amount < stackamount / 2f ? "[scarlet]" : amount < stackamount ? "[accent]" : "[white]");
 
                                             return color + UI.formatAmount(amount) + "[white]/" + stackamount;
-                                        }).padLeft(5);
+                                        }).padLeft(5).wrap(true); //TODO: in practice wrapping does nothing and items will go offscreen, is this fine?
                                     }).left();
                                     req.row();
                                 }
                             }).growX().left().margin(3);
 
-                            if((!displayBlock.isPlaceable() || !player.isBuilder()) && !state.rules.editor){
-                                topTable.row();
-                                topTable.table(b -> {
-                                    b.image(Icon.cancel).padRight(2).color(Color.scarlet);
-                                    b.add(!player.isBuilder() ? "@unit.nobuild" : !displayBlock.supportsEnv(state.rules.env) ? "@unsupported.environment" : "@banned").width(190f).wrap();
-                                    b.left();
-                                }).padTop(2).left();
-                            }
+                            topTable.row();
+                            topTable.collapser(b -> {
+                                b.left();
+                                b.marginTop(2f);
+                                b.image(Icon.cancel).padRight(2).color(Color.scarlet);
+                                b.label(() -> {
+                                    var reason = getUnplaceableReason(displayBlock);
+                                    return reason == null ? "" : reason;
+                                }).width(190f).wrap();
+                            }, () -> getUnplaceableReason(displayBlock) != null).left();
 
                         }else if(hovered != null){
                             //show hovered item, whatever that may be
@@ -689,7 +691,7 @@ public class PlacementFragment{
                             t.row();
                             control.input.buildPlacementUI(t);
                         }).name("inputTable").growX();
-                    }).fillY().bottom().touchable(Touchable.enabled);
+                    }).growX().fillY().bottom().touchable(Touchable.enabled);
                     blockCatTable.table(categories -> {
                         categories.bottom();
                         categories.add(new Image(Styles.black6){
@@ -748,6 +750,16 @@ public class PlacementFragment{
         });
     }
 
+    @Nullable String getUnplaceableReason(Block block){
+        if(block == null) return null;
+        if(!player.isBuilder()) return "@unit.nobuild";
+        if(state.isEditor()) return null; //always placeable in editor as long as there's a builder
+        if(!block.supportsEnv(state.rules.env)) return "@unsupported.environment";
+        if(block.isBanned()) return "@banned";
+        if(block.isOverPlacementLimit(player.team())) return Core.bundle.format("block.limit", state.rules.blockLimits.get(block));
+        return null;
+    }
+
     Seq<Category> getCategories(){
         return returnCatArray.clear().addAll(Category.all).sort((c1, c2) -> Boolean.compare(categoryEmpty[c1.ordinal()], categoryEmpty[c2.ordinal()]));
     }
@@ -787,7 +799,7 @@ public class PlacementFragment{
         if(unit != null) return unit;
 
         //check tile being hovered over
-        Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Tile hoverTile = state.world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null && hoverTile.inMapArea()){
             //if the tile has a building, display it
             if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team()) && hoverTile.build.inMapArea()){
@@ -795,7 +807,7 @@ public class PlacementFragment{
             }
 
             //if the tile has a drop, display the drop
-            if((hoverTile.drop() != null && hoverTile.block() == Blocks.air) || hoverTile.wallDrop() != null || hoverTile.floor().liquidDrop != null){
+            if(hoverTile.displayable()){
                 return hoverTile;
             }
         }

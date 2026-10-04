@@ -47,7 +47,6 @@ public class Binding{
 
     cancelOrders = KeyBind.add("cancel_orders", KeyCode.unset),
 
-    unitStanceShoot = KeyBind.add("unit_stance_shoot", KeyCode.unset),
     unitStanceHoldFire = KeyBind.add("unit_stance_hold_fire", KeyCode.unset),
     unitStancePursueTarget = KeyBind.add("unit_stance_pursue_target", KeyCode.unset),
     unitStancePatrol = KeyBind.add("unit_stance_patrol", KeyCode.unset),
@@ -60,7 +59,6 @@ public class Binding{
     unitCommandRebuild = KeyBind.add("unit_command_rebuild", KeyCode.unset),
     unitCommandAssist = KeyBind.add("unit_command_assist", KeyCode.unset),
     unitCommandMine = KeyBind.add("unit_command_mine", KeyCode.unset),
-    unitCommandBoost = KeyBind.add("unit_command_boost", KeyCode.unset),
     unitCommandEnterPayload = KeyBind.add("unit_command_enter_payload", KeyCode.unset),
     unitCommandLoadUnits = KeyBind.add("unit_command_load_units", KeyCode.unset),
     unitCommandLoadBlocks = KeyBind.add("unit_command_load_blocks", KeyCode.unset),
@@ -87,6 +85,7 @@ public class Binding{
 
     zoom = KeyBind.add("zoom", new Axis(KeyCode.scroll), "view"),
     detachCamera = KeyBind.add("detach_camera", KeyCode.unset),
+    teleportCursor = KeyBind.add("teleport_cursor", KeyCode.unset),
     menu = KeyBind.add("menu", Vars.android ? KeyCode.back : KeyCode.escape),
     fullscreen = KeyBind.add("fullscreen", KeyCode.f11),
     pause = KeyBind.add("pause", KeyCode.space),
@@ -106,7 +105,8 @@ public class Binding{
     chatScroll = KeyBind.add("chat_scroll", new Axis(KeyCode.scroll)),
     chatMode = KeyBind.add("chat_mode", KeyCode.tab),
     console = KeyBind.add("console", KeyCode.f8),
-    debugHitboxes = KeyBind.add("debug_hitboxes", KeyCode.unset)
+    debugHitboxes = KeyBind.add("debug_hitboxes", KeyCode.unset),
+    performanceMetrics = KeyBind.add("performance_metrics", KeyCode.unset)
     ;
 
     //dummy static class initializer

@@ -35,9 +35,9 @@ public class Separator extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = craftTime;
-        super.setStats();
+        super.setStats(stats);
 
         int[] sum = {0};
         for(var r : results) sum[0] += r.amount;
@@ -74,6 +74,7 @@ public class Separator extends Block{
     }
 
     public class SeparatorBuild extends Building{
+        public float dumpTimer;
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -163,14 +164,15 @@ public class Separator extends Block{
                 }
             }
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump();
+                dumpTimer %= dumpTime;
             }
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress;
             return super.sense(sensor);
         }
 

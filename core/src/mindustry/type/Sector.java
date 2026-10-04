@@ -2,9 +2,7 @@ package mindustry.type;
 
 import arc.*;
 import arc.func.*;
-import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
@@ -34,8 +32,7 @@ public class Sector{
     public @Nullable Sector shieldTarget;
     public SectorInfo info = new SectorInfo();
 
-    /** Number 0-1 indicating the difficulty based on nearby bases. */
-    public float threat;
+    public SectorThreat threat = SectorThreat.low;
     public boolean generateEnemyBase;
 
     public Sector(Planet planet, Ptile tile){
@@ -73,15 +70,6 @@ public class Sector{
             }
         }
         return false;
-    }
-
-    /** Displays threat as a formatted string. */
-    public String displayThreat(){
-        float step = 0.25f;
-        String color = Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.round(threat, step)).toString();
-        String[] threats = {"low", "medium", "high", "extreme", "eradication"};
-        int index = Math.min((int)(threat / step), threats.length - 1);
-        return "[#" + color + "]" + Core.bundle.get("threat." + threats[index]);
     }
 
     /** @return whether this sector can be landed on at all.
@@ -123,7 +111,7 @@ public class Sector{
     }
 
     public boolean isShielded(){
-        return preset != null && preset.shieldSectors.size > 0 && preset.shieldSectors.contains(s -> !s.isCaptured());
+        return preset != null && preset.shieldSectors.size > 0 && !isCaptured() && preset.shieldSectors.contains(s -> !s.isCaptured());
     }
 
     public boolean isAttacked(){

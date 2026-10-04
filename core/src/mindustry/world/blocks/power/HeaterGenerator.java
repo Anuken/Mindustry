@@ -3,6 +3,7 @@ package mindustry.world.blocks.power;
 import arc.math.*;
 import arc.util.io.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
 import mindustry.world.draw.*;
@@ -23,8 +24,8 @@ public class HeaterGenerator extends ConsumeGenerator{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.output, heatOutput, StatUnit.heatUnits);
     }
@@ -60,6 +61,12 @@ public class HeaterGenerator extends ConsumeGenerator{
         @Override
         public float heat(){
             return heat;
+        }
+
+        @Override
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return heat;
+            return super.sense(sensor);
         }
 
         @Override

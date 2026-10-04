@@ -52,13 +52,11 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         for(Payload pay : payloads){
-            //apparently BasedUser doesn't want this and several plugins use it
-            //if(pay instanceof BuildPayload build){
-            //    build.build.team = team;
-            //}
             pay.set(x, y, rotation);
             pay.update(self(), null);
         }
+        //remove dead payloads after they explode
+        payloads.removeAll(Payload::isDead);
     }
 
     @Override
@@ -144,6 +142,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(on != null && on.build != null && on.build.team == team && on.build.acceptPayload(on.build, payload)){
             Fx.unitDrop.at(on.build);
             on.build.handlePayload(on.build, payload);
+            playPayloadDropSound(payload);
             return true;
         }
 
@@ -166,7 +165,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         if(payload instanceof BuildPayload b){
             Building tile = b.build;
             int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
-            on = Vars.world.tile(tx, ty);
+            on = Vars.state.world.tile(tx, ty);
             return on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false);
         }else if(payload instanceof UnitPayload p){
             var u = p.unit;
@@ -195,17 +194,13 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         u.set(x + Tmp.v1.x, y + Tmp.v1.y);
         u.rotation(rotation);
         //reset the ID to a new value to make sure it's synced
-        u.id = EntityGroup.nextId();
+        u.id = Vars.state.nextEntityId();
         //decrement count to prevent double increment
         if(!u.isAdded()) u.team.data().updateCount(u.type, -1);
         u.add();
         u.unloaded();
-        Sound dropSound =
-            payload.size() <= 12f ? Sounds.payloadDrop1 :
-            payload.size() <= 20f ? Sounds.payloadDrop2 :
-            Sounds.payloadDrop3;
-        dropSound.at(self(), Mathf.random(0.9f, 1.1f));
         Events.fire(new PayloadDropEvent(self(), u));
+        playPayloadDropSound(payload);
 
         return true;
     }
@@ -214,7 +209,7 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
     boolean dropBlock(BuildPayload payload){
         Building tile = payload.build;
         int tx = World.toTile(x - tile.block.offset), ty = World.toTile(y - tile.block.offset);
-        Tile on = Vars.world.tile(tx, ty);
+        Tile on = Vars.state.world.tile(tx, ty);
         if(on != null && Build.validPlace(tile.block, tile.team, tx, ty, tile.rotation, false)){
             payload.place(on, tile.rotation);
             Events.fire(new PayloadDropEvent(self(), tile));
@@ -230,6 +225,14 @@ abstract class PayloadComp implements Posc, Rotc, Hitboxc, Unitc{
         }
 
         return false;
+    }
+
+    void playPayloadDropSound(Payload payload){
+        Sound dropSound =
+            payload.size() <= 12f ? Sounds.payloadDrop1 :
+            payload.size() <= 20f ? Sounds.payloadDrop2 :
+            Sounds.payloadDrop3;
+        dropSound.at(self(), Mathf.random(0.9f, 1.1f));
     }
 
     void contentInfo(Table table, float itemSize, float width){

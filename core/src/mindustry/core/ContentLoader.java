@@ -8,7 +8,6 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.io.*;
@@ -110,7 +109,6 @@ public class ContentLoader{
 
     /** Calls Content#loadIcon() and Content#load() on everything. Use only after all modules have been created on the client. */
     public void load(){
-        initialize(Content::loadIcon);
         initialize(Content::load);
     }
 
@@ -123,7 +121,7 @@ public class ContentLoader{
                 try{
                     callable.get(content);
                 }catch(Throwable e){
-                    if(content.minfo.mod != null){
+                    if(content.isModded()){
                         Log.err(e);
                         mods.handleContentError(content, e);
                     }else{
@@ -217,6 +215,14 @@ public class ContentLoader{
 
     public Seq<Content>[] getContentMap(){
         return contentMap;
+    }
+
+    public void eachModdedUnlockable(Cons<UnlockableContent> cons){
+        each(c -> {
+            if(c instanceof UnlockableContent u && c.isModded()){
+                cons.get(u);
+            }
+        });
     }
 
     public void each(Cons<Content> cons){

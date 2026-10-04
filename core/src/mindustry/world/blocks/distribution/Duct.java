@@ -30,6 +30,7 @@ public class Duct extends Block implements Autotiler{
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
+    public @Load("@-cap") TextureRegion capRegion;
 
     public @Nullable Block bridgeReplacement, junctionReplacement;
 
@@ -56,8 +57,8 @@ public class Duct extends Block implements Autotiler{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
     }
@@ -133,8 +134,9 @@ public class Duct extends Block implements Autotiler{
         public @Nullable Item current;
         public int recDir = 0;
         public int blendbits, xscl, yscl, blending;
-        public @Nullable Building next;
+        public @Nullable Building next, prev;
         public @Nullable DuctBuild nextc;
+        public boolean capped, backCapped = false;
 
         float lastFrom, lastTo;
         Item lastItem;
@@ -190,6 +192,11 @@ public class Duct extends Block implements Autotiler{
             Draw.z(Layer.blockUnder + 0.2f);
             drawAt(x, y, blendbits, rotation, SliceMode.none, under);
             Draw.reset();
+
+            if(!under) return;
+
+            if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
+            if(backCapped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg() + 180);
         }
 
         @Override
@@ -278,6 +285,10 @@ public class Duct extends Block implements Autotiler{
             next = front();
             if(next != null && next.team != team) next = null;
             nextc = next instanceof DuctBuild d ? d : null;
+
+            prev = back();
+            capped = next == null || next.team != team || !next.block.hasItems;
+            backCapped = blendbits == 0 && (prev == null || prev.team != team || !prev.block.hasItems);
         }
 
         @Override
@@ -301,8 +312,8 @@ public class Duct extends Block implements Autotiler{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress;
             return super.sense(sensor);
         }
     }

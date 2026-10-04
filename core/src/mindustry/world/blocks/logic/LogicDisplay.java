@@ -3,18 +3,17 @@ package mindustry.world.blocks.logic;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -52,6 +51,7 @@ public class LogicDisplay extends Block{
 
     public int displaySize = 64;
     public float scaleFactor = 1f;
+    public Color backgroundColor = Pal.darkerMetal;
 
     static{
         Events.on(ResetEvent.class, e -> displays.clear());
@@ -68,8 +68,8 @@ public class LogicDisplay extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.displaySize, "@x@", displaySize, displaySize);
     }
@@ -81,7 +81,7 @@ public class LogicDisplay extends Block{
         clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
     }
 
-    public class LogicDisplayBuild extends Building{
+    public class LogicDisplayBuild extends Building implements LogicDrawable{
         //The root display (bottom left corner of display for tileable displays)
         public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
@@ -91,6 +91,7 @@ public class LogicDisplay extends Block{
         public @Nullable Mat transform;
         public long operations;
         public int index = -1;
+        public boolean processing = false;
 
         @Override
         public void draw(){
@@ -105,14 +106,14 @@ public class LogicDisplay extends Block{
             Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(buffer != null){
-                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * scaleFactor * Draw.scl, -buffer.getHeight() * scaleFactor * Draw.scl);
+                    Draw.rect(Draw.wrap(buffer.texture), x, y, buffer.width * scaleFactor * Draw.scl, -buffer.height * scaleFactor * Draw.scl);
                 }
             });
             Draw.blend();
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> displaySize;
                 case bufferSize -> rootDisplay.commands.size;
@@ -121,8 +122,14 @@ public class LogicDisplay extends Block{
             };
         }
 
-        public void flushCommands(LongSeq graphicsBuffer){
-            int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
+        @Override
+        public boolean drawable(LogicExecutor exec){
+            return isValid() && (exec.privileged || (team == exec.team && !privileged));
+        }
+
+        @Override
+        public void draw(LongSeq graphicsBuffer){
+            int added = Math.min(graphicsBuffer.size, LogicExecutor.maxDisplayBuffer - commands.size);
 
             for(int i = 0; i < added; i++){
                 commands.addLast(graphicsBuffer.items[i]);
@@ -135,26 +142,46 @@ public class LogicDisplay extends Block{
             if(buffer == null){
                 buffer = new FrameBuffer(displaySize, displaySize);
                 //clear the buffer - some OSs leave garbage in it
-                buffer.begin(Pal.darkerMetal);
+                buffer.begin(backgroundColor);
                 buffer.end();
             }
         }
 
         public void getBufferRegion(TextureRegion region){
-            if(buffer != null){
-                region.set(buffer.getTexture(), 0, buffer.getTexture().height, buffer.getTexture().width, -buffer.getTexture().height);
+            if(rootDisplay.buffer != null){
+                region.set(rootDisplay.buffer.texture, 0, rootDisplay.buffer.texture.height,
+                rootDisplay.buffer.texture.width, -rootDisplay.buffer.texture.height);
             }
         }
 
         public void processCommands(){
             //don't bother processing commands if displays are off
             if(!commands.isEmpty() && buffer != null){
+                processing = true;
+
+                //force update of off-screen displays used as a source in commandImage
+                for (int i = 0; i < commands.size; i++){
+                    long c = commands.get(i);
+                    if(DisplayCmd.type(c) != commandImage) continue;
+                    int packed = (DisplayCmd.p4(c) << 10) | DisplayCmd.p1(c);
+                    int ctype = packed & 0x1F;
+                    if(ctype != displayDrawType) continue;
+
+                    int id = packed >> 5;
+                    if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
+                        LogicDisplayBuild source = displays.get(id).rootDisplay;
+                        if(source.isAdded() && !source.processing){
+                            source.rootDisplay.processCommands();
+                        }
+                    }
+                }
+
                 Draw.draw(Draw.z(), () -> {
                     if(buffer == null || commands.isEmpty()) return;
 
                     Tmp.m1.set(Draw.proj());
                     Tmp.m2.set(Draw.trans());
-                    Draw.proj(0, 0, buffer.getWidth(), buffer.getHeight());
+                    Draw.proj(0, 0, buffer.width, buffer.height);
                     if(transform != null){
                         Draw.trans(transform);
                     }
@@ -188,7 +215,7 @@ public class LogicDisplay extends Block{
                                 int id = packed >> 5;
                                 if(ctype == displayDrawType){
                                     if(id != index && id < displays.size && id >= 0 && displays.get(id).buffer != null){
-                                        displays.get(id).getBufferRegion(Tmp.tr1);
+                                        displays.get(id).rootDisplay.getBufferRegion(Tmp.tr1);
                                         Draw.rect(Tmp.tr1, x, y, p2, p2 / Tmp.tr1.ratio(), p3);
                                     }
                                 }else if(ctype < ContentType.all.length && Vars.content.getByID(ContentType.all[ctype], id) instanceof UnlockableContent u){
@@ -217,6 +244,8 @@ public class LogicDisplay extends Block{
                     Draw.trans(Tmp.m2);
                     Draw.reset();
                 });
+
+                processing = false;
             }
         }
 

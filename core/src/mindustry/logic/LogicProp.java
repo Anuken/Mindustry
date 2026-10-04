@@ -1,0 +1,114 @@
+package mindustry.logic;
+
+import arc.struct.*;
+
+/** Setter/getter enum for logic-controlled objects. */
+public enum LogicProp{
+    totalItems,
+    firstItem,
+    totalLiquids,
+    totalPower,
+    itemCapacity,
+    liquidCapacity,
+    powerCapacity,
+    powerNetStored,
+    powerNetCapacity,
+    powerNetIn,
+    powerNetOut,
+    links,
+    ammo,
+    ammoCapacity,
+    currentAmmoType,
+    memoryCapacity,
+    health,
+    maxHealth,
+    heat,
+    shield,
+    armor,
+    efficiency,
+    progress,
+    timescale,
+    rotation,
+    x,
+    y,
+    velocityX,
+    velocityY,
+    shootX,
+    shootY,
+    cameraX,
+    cameraY,
+    cameraWidth,
+    cameraHeight,
+    displayWidth,
+    displayHeight,
+    bufferSize,
+    operations,
+    size,
+    solid,
+    dead,
+    range,
+    shooting,
+    boosting,
+    mineX,
+    mineY,
+    mining,
+    buildX,
+    buildY,
+    pingX,
+    pingY,
+    pingText,
+    building,
+    breaking,
+    speed,
+    team,
+    type,
+    flag,
+    flying,
+    controlled,
+    controller,
+    name,
+    payloadCount,
+    payloadType,
+    totalPayload,
+    payloadCapacity,
+    maxUnits,
+    id,
+    selectedBlock,
+    selectedRotation,
+    bulletLifetime,
+    bulletTime,
+
+    //values with parameters are considered controllable
+    enabled("to"), //"to" is standard for single parameter access
+    shoot("x", "y", "shoot"),
+    shootp(true, "unit", "shoot"),
+    config(true, "to"),
+    color("to");
+
+    public final String[] params;
+    public final boolean isObj;
+    public boolean privileged;
+
+    private static final ObjectSet<LogicProp> privilegedAccess = ObjectSet.with(cameraX, cameraY, cameraWidth, cameraHeight);
+
+    public static final LogicProp[]
+        all = values(),
+        senseable = Seq.select(all, t -> t.params.length <= 1 && !privilegedAccess.contains(t)).toArray(LogicProp.class),
+        senseablePrivileged = Seq.select(all, t -> t.params.length <= 1).toArray(LogicProp.class),
+        controls = Seq.select(all, t -> t.params.length > 0).toArray(LogicProp.class),
+        settable = {x, y, velocityX, velocityY, rotation, speed, armor, health, shield, team, flag, totalPower, payloadType, bulletTime, bulletLifetime};
+
+    static{
+        privilegedAccess.each(l -> l.privileged = privilegedAccess.contains(l));
+    }
+
+    LogicProp(String... params){
+        this.params = params;
+        isObj = false;
+    }
+
+    LogicProp(boolean obj, String... params){
+        this.params = params;
+        isObj = obj;
+    }
+}

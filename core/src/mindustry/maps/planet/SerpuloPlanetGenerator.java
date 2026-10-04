@@ -10,6 +10,7 @@ import arc.util.noise.*;
 import mindustry.ai.*;
 import mindustry.ai.BaseRegistry.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.maps.generators.*;
@@ -66,6 +67,24 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
     float rawHeight(Vec3 position){
         return (Mathf.pow(Simplex.noise3d(seed, 7, 0.5f, 1f/3f, position.x * scl, position.y * scl + heightYOffset, position.z * scl) * heightScl, 2.3f) + waterOffset) / (1f + waterOffset);
+    }
+
+    @Override
+    public void generateSector(Sector sector){
+        if(sector.preset != null && (sector.preset.requireUnlock || sector.threat != SectorThreat.low)) return;
+
+        float sum = 1f;
+        for(Sector other : sector.near()){
+            if(other.generateEnemyBase){
+                sum += 0.95f;
+            }
+        }
+
+        if(sector.hasEnemyBase()){
+            sum += 0.88f;
+        }
+
+        sector.threat = SectorThreat.all[Mathf.clamp((int)sum, 1, 4)];
     }
 
     @Override
@@ -148,7 +167,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             var sector = (Sector)sectors[i];
 
             if(sector.hasEnemyBase() && !sector.isCaptured()){
-                dst = Math.min(dst, position.dst(sector.tile.v) - (sector.preset != null ? sector.preset.difficulty/10f * 0.03f - 0.03f : 0f));
+                dst = Math.min(dst, position.dst(sector.tile.v) - (sector.preset != null ? (sector.preset.threat.ordinal()+1) / 5f * 0.03f - 0.03f : 0f));
             }else if(sector.hasBase()){
                 float cdst = position.dst(sector.tile.v);
                 if(cdst < captureDst){
@@ -295,7 +314,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                         for(int y = -rad; y <= rad; y++){
                             int wx = t.x + x, wy = t.y + y;
                             if(Structs.inBounds(wx, wy, width, height) && Mathf.within(x, y, rad)){
-                                Tile other = tiles.getn(wx, wy);
+                                Tile other = world.getn(wx, wy);
                                 other.setBlock(Blocks.air);
                                 if(Mathf.within(x, y, rad - 1) && !other.floor().isLiquid){
                                     Floor floor = other.floor();
@@ -345,7 +364,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
         Room spawn = null;
         Seq<Room> enemies = new Seq<>();
-        int enemySpawns = rand.random(1, Math.max((int)(sector.threat * 4), 1));
+        int enemySpawns = rand.random(1, Math.max((int)((1 + sector.threat.ordinal())/5f * 4), 1));
         int offset = rand.nextInt(360);
         float length = width/2.55f - rand.random(13, 23);
         int angleStep = 5;
@@ -360,7 +379,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             //check for water presence
             for(int rx = -waterCheckRad; rx <= waterCheckRad; rx++){
                 for(int ry = -waterCheckRad; ry <= waterCheckRad; ry++){
-                    Tile tile = tiles.get(cx + rx, cy + ry);
+                    Tile tile = world.tile(cx + rx, cy + ry);
                     if(tile == null || tile.floor().liquidDrop != null){
                         waterTiles ++;
                     }
@@ -401,11 +420,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         cells(1);
 
-        int tlen = tiles.width * tiles.height;
+        int tlen = world.width * world.height;
         int total = 0, waters = 0;
 
         for(int i = 0; i < tlen; i++){
-            Tile tile = tiles.geti(i);
+            Tile tile = world.geti(i);
             if(tile.block() == Blocks.air){
                 total ++;
                 if(tile.floor().liquidDrop == Liquids.water){
@@ -460,7 +479,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                         if((cx) * (cx) + (cy) * (cy) <= deepRadius * deepRadius){
                             int wx = cx + x, wy = cy + y;
 
-                            Tile tile = tiles.get(wx, wy);
+                            Tile tile = world.tile(wx, wy);
                             if(tile != null && (!tile.floor().isLiquid || tile.block() != Blocks.air)){
                                 //found something solid, skip replacing anything
                                 return;
@@ -485,7 +504,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                             if((cx) * (cx) + (cy) * (cy) <= deepRadius * deepRadius){
                                 int wx = cx + x, wy = cy + y;
 
-                                Tile tile = tiles.get(wx, wy);
+                                Tile tile = world.tile(wx, wy);
                                 if(tile != null && (tile.floor().shallow || !tile.floor().isLiquid)){
                                     //found something shallow, skip replacing anything
                                     return;
@@ -550,7 +569,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
         median(2);
 
-        inverseFloodFill(tiles.getn(spawn.x, spawn.y));
+        inverseFloodFill(world.getn(spawn.x, spawn.y));
 
         tech();
 
@@ -578,7 +597,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     ore = Blocks.air;
                     boolean all = true;
                     for(Point2 p : Geometry.d4){
-                        Tile other = tiles.get(x + p.x, y + p.y);
+                        Tile other = world.tile(x + p.x, y + p.y);
                         if(other == null || (other.floor() != Blocks.hotrock && other.floor() != Blocks.magmarock)){
                             all = false;
                         }
@@ -603,7 +622,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                 boolean any = false;
                 boolean all = true;
                 for(Point2 p : Geometry.d4){
-                    Tile other = tiles.get(x + p.x, y + p.y);
+                    Tile other = world.tile(x + p.x, y + p.y);
                     if(other != null && other.block() == Blocks.air){
                         any = true;
                     }else{
@@ -618,7 +637,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             //random stuff
             dec: {
                 for(int i = 0; i < 4; i++){
-                    Tile near = tiles.get(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
+                    Tile near = world.tile(x + Geometry.d4[i].x, y + Geometry.d4[i].y);
                     if(near != null && near.block() != Blocks.air){
                         break dec;
                     }
@@ -630,7 +649,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             }
         });
 
-        float difficulty = sector.threat;
+        float difficulty = (1 + sector.threat.ordinal())/5f;
         int ruinCount = rand.random(-2, 4);
 
         if(ruinCount > 0){
@@ -641,7 +660,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
             //create list of potential positions
             for(int x = padding; x < width - padding; x++){
                 for(int y = padding; y < height - padding; y++){
-                    Tile tile = tiles.getn(x, y);
+                    Tile tile = world.getn(x, y);
                     if(!tile.solid() && (tile.drop() != null || tile.floor().liquidDrop != null)){
                         ints.add(tile.pos());
                     }
@@ -664,7 +683,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
                 float range = difficulty + rand.random(diffRange);
 
-                Tile tile = tiles.getn(x, y);
+                Tile tile = world.getn(x, y);
                 BasePart part = null;
                 if(tile.overlay().itemDrop != null){
                     part = bases.forResource(tile.drop()).getFrac(range);
@@ -676,12 +695,12 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
 
                 //actually place the part
                 if(part != null && BaseGenerator.tryPlace(part, x, y, Team.derelict, rand, (cx, cy) -> {
-                    Tile other = tiles.getn(cx, cy);
+                    Tile other = world.getn(cx, cy);
                     if(other.floor().hasSurface()){
                         other.setOverlay(Blocks.oreScrap);
                         for(int j = 1; j <= 2; j++){
                             for(Point2 p : Geometry.d8){
-                                Tile t = tiles.get(cx + p.x*j, cy + p.y*j);
+                                Tile t = world.tile(cx + p.x*j, cy + p.y*j);
                                 if(t != null && t.floor().hasSurface() && rand.chance(j == 1 ? 0.4 : 0.2)){
                                     t.setOverlay(Blocks.oreScrap);
                                 }
@@ -692,11 +711,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
                     placed ++;
 
                     int debrisRadius = Math.max(part.schematic.width, part.schematic.height)/2 + 3;
-                    Geometry.circle(x, y, tiles.width, tiles.height, debrisRadius, (cx, cy) -> {
+                    Geometry.circle(x, y, world.width, world.height, debrisRadius, (cx, cy) -> {
                         float dst = Mathf.dst(cx, cy, x, y);
                         float removeChance = Mathf.lerp(0.05f, 0.5f, dst / debrisRadius);
 
-                        Tile other = tiles.getn(cx, cy);
+                        Tile other = world.getn(cx, cy);
                         if(other.build != null && other.isCenter()){
                             if(other.team() == Team.derelict && rand.chance(removeChance)){
                                 other.remove();
@@ -710,7 +729,7 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         }
 
         //remove invalid ores
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(tile.overlay().needsSurface && !tile.floor().hasSurface()){
                 tile.setOverlay(Blocks.air);
             }
@@ -719,11 +738,11 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         Schematics.placeLaunchLoadout(spawn.x, spawn.y);
 
         for(Room espawn : enemies){
-            tiles.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
+            world.getn(espawn.x, espawn.y).setOverlay(Blocks.spawn);
         }
 
         if(sector.hasEnemyBase()){
-            basegen.generate(tiles, enemies.map(r -> tiles.getn(r.x, r.y)), tiles.get(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);
+            basegen.generate(world, enemies.map(r -> world.getn(r.x, r.y)), world.tile(spawn.x, spawn.y), state.rules.waveTeam, sector, difficulty);
 
             state.rules.attackMode = sector.info.attack = true;
         }else{
@@ -738,17 +757,17 @@ public class SerpuloPlanetGenerator extends PlanetGenerator{
         state.rules.enemyCoreBuildRadius = 600f;
 
         //spawn air only when spawn is blocked
-        state.rules.spawns = Waves.generate(difficulty, new Rand(sector.id), state.rules.attackMode, state.rules.attackMode && spawner.countGroundSpawns() == 0, naval);
+        state.rules.spawns = Waves.generate(difficulty, new Rand(sector.id), state.rules.attackMode, state.rules.attackMode && state.spawner.countGroundSpawns() == 0, naval);
     }
 
     @Override
-    public void postGenerate(Tiles tiles){
+    public void postGenerate(World tiles){
         if(sector.hasEnemyBase()){
             basegen.postGenerate();
 
             //spawn air enemies
-            if(spawner.countGroundSpawns() == 0){
-                state.rules.spawns = Waves.generate(sector.threat, new Rand(sector.id), state.rules.attackMode, true, false);
+            if(state.spawner.countGroundSpawns() == 0){
+                state.rules.spawns = Waves.generate((sector.threat.ordinal() + 1)/5f, new Rand(sector.id), state.rules.attackMode, true, false);
             }
         }
     }

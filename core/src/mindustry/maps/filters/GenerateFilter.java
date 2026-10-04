@@ -5,34 +5,34 @@ import arc.math.*;
 import arc.scene.ui.*;
 import arc.util.*;
 import arc.util.noise.*;
+import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
-import java.io.*;
-
-public abstract class GenerateFilter implements Cloneable, Serializable{
+public abstract class GenerateFilter implements Cloneable, AllowSerialization{
     public int seed = 0;
 
-    public void apply(Tiles tiles, GenerateInput in){
+    public void apply(World world, GenerateInput in){
 
         if(isBuffered()){
             //buffer of tiles used, each tile packed into a long struct
-            long[] buffer = new long[tiles.width * tiles.height];
+            long[] buffer = new long[world.width * world.height];
 
-            for(int i = 0; i < tiles.width * tiles.height; i++){
-                in.set(tiles.geti(i));
+            for(int i = 0; i < world.width * world.height; i++){
+                in.set(world.geti(i));
                 apply(in);
 
                 buffer[i] = PackTile.get(in.block.id, in.floor.id, in.overlay.id);
             }
 
             //write to buffer
-            for(int i = 0; i < tiles.width * tiles.height; i++){
-                Tile tile = tiles.geti(i);
+            for(int i = 0; i < world.width * world.height; i++){
+                Tile tile = world.geti(i);
                 long b = buffer[i];
 
                 Block block = Vars.content.block(PackTile.block(b)), floorb = Vars.content.block(PackTile.floor(b)), overlay = Vars.content.block(PackTile.overlay(b));
@@ -47,7 +47,7 @@ public abstract class GenerateFilter implements Cloneable, Serializable{
                 }
             }
         }else{
-            for(Tile tile : tiles){
+            for(Tile tile : world){
                 in.set(tile);
                 apply(in);
 
@@ -172,7 +172,7 @@ public abstract class GenerateFilter implements Cloneable, Serializable{
             this.height = height;
         }
 
-        Tile tile(float x, float y){
+        public Tile tile(float x, float y){
             return buffer.get(Mathf.clamp((int)x, 0, width - 1), Mathf.clamp((int)y, 0, height - 1));
         }
 

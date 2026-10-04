@@ -31,7 +31,7 @@ public class ItemSource extends Block{
         drawCached = true;
         drawDynamic = false;
 
-        config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item);
+        config(Item.class, (ItemSourceBuild tile, Item item) -> tile.outputItem = item.removed ? null : item);
         configClear((ItemSourceBuild tile) -> tile.outputItem = null);
     }
 
@@ -42,8 +42,8 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.output, itemsPerSecond, StatUnit.itemsSecond);
     }

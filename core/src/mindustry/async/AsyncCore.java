@@ -11,10 +11,7 @@ import static mindustry.Vars.*;
 
 public class AsyncCore{
     //all processes to be executed each frame
-    public final Seq<AsyncProcess> processes = Seq.with(
-        new PhysicsProcess(),
-        avoidance = new AvoidanceProcess()
-    );
+    public final Seq<AsyncProcess> processes = new Seq<>();
 
     //futures to be awaited
     private final Seq<Future<?>> futures = new Seq<>();
@@ -24,16 +21,13 @@ public class AsyncCore{
     public AsyncCore(){
         Events.on(WorldLoadEvent.class, e -> {
             complete();
-            for(AsyncProcess p : processes){
-                p.init();
-            }
+            processes.clear();
+            processes.add(state.unitPhysics, state.avoidance);
         });
 
         Events.on(ResetEvent.class, e -> {
             complete();
-            for(AsyncProcess p : processes){
-                p.reset();
-            }
+            processes.clear();
         });
     }
 

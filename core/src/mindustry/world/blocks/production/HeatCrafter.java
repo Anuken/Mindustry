@@ -3,6 +3,7 @@ package mindustry.world.blocks.production;
 import arc.*;
 import arc.math.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
@@ -32,8 +33,8 @@ public class HeatCrafter extends GenericCrafter{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
         stats.add(Stat.maxEfficiency, (int)(maxEfficiency * 100f), StatUnit.percent);
@@ -49,6 +50,12 @@ public class HeatCrafter extends GenericCrafter{
             heat = calculateHeat(sideHeat);
 
             super.updateTile();
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(heatRequirement > 0 && heat <= 0f && enabled) return BlockStatus.noInput;
+            return super.status();
         }
 
         @Override
@@ -69,6 +76,12 @@ public class HeatCrafter extends GenericCrafter{
         @Override
         public float warmupTarget(){
             return Mathf.clamp(heat / heatRequirement);
+        }
+
+        @Override
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return heat;
+            return super.sense(sensor);
         }
 
         @Override

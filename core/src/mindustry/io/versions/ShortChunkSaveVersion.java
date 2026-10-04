@@ -1,6 +1,7 @@
 package mindustry.io.versions;
 
 import arc.func.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -18,7 +19,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
     }
 
     @Override
-    public void readWorldEntities(DataInput stream, Prov[] mapping) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveLoadContext state) throws IOException{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
@@ -32,18 +33,20 @@ public class ShortChunkSaveVersion extends SaveVersion{
                 int id = in.i();
 
                 Entityc entity = (Entityc)mapping[typeid].get();
-                EntityGroup.checkNextId(id);
+                Vars.state.checkNextEntityId(id);
                 entity.id(id);
                 entity.read(in);
                 entity.add();
             });
         }
 
-        Groups.all.each(Entityc::afterReadAll);
+        Vars.state.entities.all.each(Entityc::afterReadAll);
+        Vars.state.entities.unit.each(Entityc::afterReadAll);
+        Vars.state.entities.build.each(Entityc::afterReadAll);
     }
 
     @Override
-    public void readMap(DataInput stream, WorldContext context) throws IOException{
+    public void readMap(DataInput stream, SaveLoadContext context) throws IOException{
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
@@ -101,7 +104,10 @@ public class ShortChunkSaveVersion extends SaveVersion{
                 //set block only if this is the center; otherwise, it's handled elsewhere
                 if(isCenter){
                     tile.setBlock(block);
-                    if(tile.build != null) tile.build.enabled = true;
+                    if(tile.build != null){
+                        if(!context.preview) context.allBuildings.add(tile.build);
+                        tile.build.enabled = true;
+                    }
                 }
 
                 //must be assigned after setBlock, because that can reset data

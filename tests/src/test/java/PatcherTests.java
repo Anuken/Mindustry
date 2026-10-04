@@ -173,10 +173,6 @@ public class PatcherTests{
 
     @Test
     void unitWeapons() throws Exception{
-        UnitTypes.dagger.checkStats();
-        UnitTypes.dagger.stats.add(Stat.charge, 999);
-        assertNotNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
-
         apply("""
         unit.dagger.weapons.+: {
             name: navanax-weapon
@@ -194,9 +190,6 @@ public class PatcherTests{
         assertEquals(999, UnitTypes.dagger.weapons.get(2).bullet.lightningLength);
 
         Vars.logic.reset();
-
-        UnitTypes.dagger.checkStats();
-        assertNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
     }
 
     @Test

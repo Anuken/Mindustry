@@ -1,0 +1,42 @@
+{
+  "superclass": "mindustry.graphics.g3d.PlanetMesh",
+  "seed": {
+    "type": "int",
+    "default": "0"
+  },
+  "speed": {
+    "type": "float",
+    "doc": "Rotation speed of the cloud layer, relative to the planet's own rotation.",
+    "default": "0"
+  },
+  "radius": {
+    "type": "float",
+    "doc": "Extra radius added on top of the planet's own radius, i.e. how high above the surface the cloud layer sits.",
+    "default": "1"
+  },
+  "divisions": {
+    "type": "int",
+    "default": "3"
+  },
+  "color": {
+    "type": "arc.graphics.Color",
+    "default": "\"ffffff\""
+  },
+  "octaves": {
+    "type": "int",
+    "default": "1"
+  },
+  "persistence": {
+    "type": "float",
+    "default": "0.5"
+  },
+  "scale": {
+    "type": "float",
+    "default": "1"
+  },
+  "thresh": {
+    "type": "float",
+    "doc": "Noise threshold above which a hex is skipped (left as a gap in the cloud layer).",
+    "default": "0.5"
+  }
+}

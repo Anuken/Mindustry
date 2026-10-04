@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
 import arc.util.serialization.*;
+import arc.util.serialization.Jval.*;
 import com.squareup.javapoet.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.annotations.*;
@@ -36,7 +37,7 @@ public class AssetsProcess extends BaseProcessor{
         MethodSpec.Builder icload = MethodSpec.methodBuilder("load").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
         CodeBlock.Builder ichinit = CodeBlock.builder();
         String resources = rootDirectory + "/core/assets-raw/sprites/ui";
-        Jval icons = Jval.read(Fi.get(rootDirectory + "/core/assets-raw/fontgen/config.json").readString());
+        JsonArray icons = Jval.read(Fi.get(rootDirectory + "/core/assets-raw/icons/codepoints.json").readString()).asArray();
 
         ObjectMap<String, String> texIcons = new OrderedMap<>();
         PropertiesUtils.load(texIcons, Fi.get(rootDirectory + "/core/assets/icons/icons.properties").reader());
@@ -62,10 +63,10 @@ public class AssetsProcess extends BaseProcessor{
 
         ObjectSet<String> used = new ObjectSet<>();
 
-        for(Jval val : icons.get("glyphs").asArray()){
-            String name = capitalize(val.getString("css", ""));
+        for(Jval val : icons){
+            String name = capitalize(val.getString("name", ""));
 
-            if(!val.getBool("selected", true) || !used.add(name)) continue;
+            if(!used.add(name)) continue;
 
             int code = val.getInt("code", 0);
             iconcAll.append((char)code);
