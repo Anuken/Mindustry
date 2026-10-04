@@ -573,7 +573,6 @@ public class Logic implements ApplicationListener{
             }else{
                 state.entities.build.fixedUpdate(timestep);
             }
-            state.entities.build.update();
         }
         PerfCounter.buildingUpdate.end();
 
