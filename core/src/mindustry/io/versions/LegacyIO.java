@@ -86,7 +86,7 @@ public class LegacyIO{
         migrated.parent().mkdirs();
         FileIO.swap(settingsFile, migrated);
 
-        dataDir.child("settings_backups").deleteDirectory();
+        //no reason to pollute main directory with this; settings_backups still exists just in case
         dataDir.child("settings_backup.bin").delete();
 
         Log.info("Legacy settings migrated; the old file was moved to @.", migrated.path());
