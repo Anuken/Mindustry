@@ -14,7 +14,6 @@ import mindustry.logic.*;
 import mindustry.maps.Map;
 import mindustry.mod.*;
 import mindustry.mod.data.*;
-import mindustry.net.Administration.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -185,8 +184,8 @@ public class NetworkIO{
     }
 
     public static ByteBuffer writeServerData(){
-        String name = (headless ? Config.serverName.string() : player.name);
-        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
+        String name = (headless ? netServer.config.name : player.name);
+        String description = headless && !netServer.config.desc.equals("off") ? netServer.config.desc : "";
         String map = state.map.name();
 
         ByteBuffer buffer = ByteBuffer.allocate(500);
@@ -204,7 +203,7 @@ public class NetworkIO{
 
         writeString(buffer, description, 100);
         writeString(buffer, state.rules.modeName == null ? "" : state.rules.modeName, 50);
-        buffer.putShort((short)Core.settings.getInt("port", port));
+        buffer.putShort(headless ? (short)netServer.config.port : (short)Core.settings.getInt("port", port));
         return buffer;
     }
 

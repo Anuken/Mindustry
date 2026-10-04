@@ -45,20 +45,11 @@ public class Maps{
 
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
-    private ShuffleMode shuffleMode = ShuffleMode.all;
 
     private @Nullable MapProvider shuffler;
     private @Nullable Map nextMapOverride;
 
     private ObjectSet<Map> previewList = new ObjectSet<>();
-
-    public ShuffleMode getShuffleMode(){
-        return shuffleMode;
-    }
-
-    public void setShuffleMode(ShuffleMode mode){
-        this.shuffleMode = mode;
-    }
 
     /** Set the provider for the map(s) to be played on. Will override the default shuffle mode setting.*/
     public void setMapProvider(MapProvider provider){
@@ -79,7 +70,7 @@ public class Maps{
         }
 
         if(shuffler != null) return shuffler.next(mode, previous);
-        return shuffleMode.next(mode, previous);
+        return Vars.netServer.config.shuffleMode.next(mode, previous);
     }
 
     /** Returns a list of all maps, including custom ones. */

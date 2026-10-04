@@ -13,7 +13,6 @@ import arc.util.Log.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
-import mindustry.net.Administration.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -58,7 +57,7 @@ public class ArcNetProvider implements NetProvider{
         //fetch this in the main thread to prevent threading issues
         Events.run(Trigger.update, () -> {
             playerLimitCache = netServer.admins.getPlayerLimit();
-            packetSpamLimit = Config.packetSpamLimit.num();
+            packetSpamLimit = netServer.config.packetSpamLimit;
         });
 
         client = new Client(16384, clientReadBufferSize, new PacketSerializer()){

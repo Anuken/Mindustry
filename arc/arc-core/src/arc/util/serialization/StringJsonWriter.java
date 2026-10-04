@@ -26,11 +26,10 @@ public class StringJsonWriter extends Writer implements JsonWriter{
     public JsonWriter name(String name){
         try{
             if(current == null || current.array) throw new IllegalStateException("Current item must be an object.");
-            if(!current.needsComma)
-                current.needsComma = true;
-            else
-                writer.write(',');
-            newline(current.level + 1);
+            boolean first = !current.needsComma;
+            current.needsComma = true;
+            if(!first && format != Jformat.hjson) writer.write(',');
+            if(!(first && current.level < 0)) newline(current.level + 1);
             writer.write(quoteName(name));
             writer.write(':');
             if(format == Jformat.jsonFormatted || format == Jformat.hjson) writer.write(' ');
@@ -45,8 +44,8 @@ public class StringJsonWriter extends Writer implements JsonWriter{
     public JsonWriter object(){
         try{
             requireCommaOrName();
-            int level = current == null ? 0 : current.level + 1;
-            writer.write('{');
+            int level = current == null ? (format == Jformat.hjson ? -1 : 0) : current.level + 1;
+            if(level >= 0) writer.write('{');
             stack.add(current = new JsonObject(false, level));
             return this;
         }catch(IOException ex){
@@ -81,10 +80,9 @@ public class StringJsonWriter extends Writer implements JsonWriter{
     private void requireCommaOrName() throws IOException{
         if(current == null) return;
         if(current.array){
-            if(!current.needsComma)
-                current.needsComma = true;
-            else
-                writer.write(',');
+            boolean first = !current.needsComma;
+            current.needsComma = true;
+            if(!first && format != Jformat.hjson) writer.write(',');
             newline(current.level + 1);
         }else{
             if(!named) throw new IllegalStateException("Name must be set.");
@@ -120,7 +118,7 @@ public class StringJsonWriter extends Writer implements JsonWriter{
             JsonObject pop = stack.pop();
             current = stack.size == 0 ? null : stack.peek();
             if(pop.needsComma) newline(pop.level);
-            writer.write(pop.array ? ']' : '}');
+            if(pop.array || pop.level >= 0) writer.write(pop.array ? ']' : '}');
             return this;
         }catch(IOException ex){
             throw new SerializationException(ex);

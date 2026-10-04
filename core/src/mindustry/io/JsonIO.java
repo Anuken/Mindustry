@@ -1,8 +1,10 @@
 package mindustry.io;
 
+import arc.files.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.Jval.*;
@@ -43,6 +45,23 @@ public class JsonIO{
 
     public static <T> T readBytes(Class<T> type, Class<?> elementType, DataInputStream input) throws IOException{
         return json.readValue(type, elementType, UBJson.read(input));
+    }
+
+    public static String write(Object object, Jformat format){
+        StringWriter buffer = new StringWriter();
+        JsonWriter jsonWriter = new StringJsonWriter(buffer, format);
+        try{
+            json.writeValue(jsonWriter, object, object.getClass(), null);
+        }finally{
+            Streams.close(jsonWriter);
+        }
+        return buffer.toString();
+    }
+
+    public static void write(Object object, Jformat format, Fi file) throws IOException{
+        try(JsonWriter writer = new StringJsonWriter(file.writer(false), format)){
+            json.writeValue(writer, object, object.getClass(), null);
+        }
     }
 
     public static String write(Object object){
