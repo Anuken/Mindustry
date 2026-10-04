@@ -84,7 +84,7 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public Fi previewFile(){
-        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + "_v2.png");
+        return Vars.mapPreviewDirectory.child((workshop ? file.parent().name() : file.nameWithoutExtension()) + "_v3.png");
     }
 
     public Fi cacheFile(){
@@ -232,7 +232,7 @@ public class Map implements Comparable<Map>, Publishable{
     @Override
     public Fi createSteamPreview(String id){
         //I have no idea what the hell I was even thinking with this preview stuff
-        return Vars.mapPreviewDirectory.child((workshop && file.parent().exists() && file.parent().extEquals(".png") ? file.parent().name() : file.nameWithoutExtension()) + "_v2.png");
+        return Vars.mapPreviewDirectory.child((workshop && file.parent().exists() && file.parent().extEquals(".png") ? file.parent().name() : file.nameWithoutExtension()) + "_v3.png");
     }
 
     @Override

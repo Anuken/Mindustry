@@ -2,8 +2,11 @@ package mindustry.io;
 
 import arc.files.*;
 import arc.graphics.*;
+import arc.math.*;
+import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.*;
@@ -68,9 +71,12 @@ public class MapIO{
         SaveIO.load(map.file, cons);
     }
 
+    /** Per-tile flags retained while reading a map for preview; used by the shading pass. */
+    private static final byte flagSolid = 1, flagLiquid = 2, flagDark = 4, flagAir = 8;
+
     /**
-     * Generates a preview of a map. This is mostly safe, but writes to map spawns/teams in the same method, which is a bit risky, but I don't have any better ideas.
-     * There's no way (that I can see) of checking teams/spawns in a map without reading every time.
+     * Generates a preview of a map. This is mostly thread safe, but writes to map spawns/teams in the same method, which is a bit risky, but I don't have any better ideas.
+     * There's no way (that I can see) of checking teams/spawns in a map without reading every tile.
      * After I wrote this comment, I added both to meta, but it's too late now; all older saves don't have team/spawn info, so it has to be recalculated every time and cached in a dat file next to the preview.
      * Removing spawns/teams isn't an option either, as people would become unable to filter maps by supported gamemode.
      * */
@@ -85,27 +91,45 @@ public class MapIO{
             if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
             ver.readRegion("meta", stream, counter, ver::readStringMap);
 
-            Pixmap floors = new Pixmap(map.width, map.height);
-            Pixmap walls = new Pixmap(map.width, map.height);
-            int black = 255;
-            int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
+            final int width = map.width, height = map.height;
+            final int len = width*height;
+            final short[] floorIds = new short[len], overlayIds = new short[len];
+            //unshaded color of each tile (minimap logic: wall/building/floor/overlay)
+            final int[] colors = new int[len];
+            final byte[] flags = new byte[len];
 
-            int width = map.width, height = map.height;
-            int len = width*height;
-            short[] floorIds = new short[len];
-            boolean[] overlays = new boolean[len];
+            var tile = new CachedTile(){
+                /** Index of the last tile that had setBlock called on it, i.e. whose block is actually loaded in this shared instance. */
+                int blockIndex = -1;
 
-            CachedTile tile = new CachedTile(){
+                /** Computes color + flags for the tile currently loaded in this shared instance. Safe to call multiple times as more data is read. */
+                void record(){
+                    int idx = x + y * width;
+                    if(idx != blockIndex) return;
+
+                    int color = previewColor(this);
+                    byte flag = flagsFor(block, floor, isDarkened());
+                    colors[idx] = color;
+                    flags[idx] = flag;
+                }
+
                 @Override
                 public void setBlock(Block type){
                     //do not super.setBlock as that affects the current world; previews never create buildings
                     this.block = type;
                     this.build = null;
-                    int c = colorFor(type, Blocks.air, Blocks.air, team());
-                    if(c != black){
-                        walls.setRaw(x, floors.height - 1 - y, c);
-                        floors.set(x, floors.height - 1 - y + 1, shade);
-                    }
+
+                    this.data = 0;
+                    this.floorData = 0;
+                    this.overlayData = 0;
+                    this.extraData = 0;
+                    //floor/overlay are not stored in this instance when reading, so look them up
+                    int idx = x + y * width;
+                    this.blockIndex = idx;
+                    this.floor = (Floor)content.block(floorIds[idx]);
+                    this.overlay = (Floor)content.block(overlayIds[idx]);
+
+                    record();
                 }
             };
 
@@ -123,15 +147,22 @@ public class MapIO{
 
                 @Override
                 public void onReadPreviewBuilding(Team team){
-                    //read team colors
-                    int c = team.color.rgba8888();
-                    int size = tile.block().size;
-                    int offsetx = -(size - 1) / 2;
-                    int offsety = -(size - 1) / 2;
+                    //multiblocks only call setBlock on their center tile, so every tile of the footprint gets the team color
+                    //and the block's flags here; shadows/darkness then see the multiblock as a whole
+                    int c = team.color.rgba();
+                    Block block = tile.block();
+                    boolean dark = tile.isDarkened();
+                    int size = block.size;
+                    int offset = -(size - 1) / 2;
+
                     for(int dx = 0; dx < size; dx++){
                         for(int dy = 0; dy < size; dy++){
-                            int drawx = tile.x + dx + offsetx, drawy = tile.y + dy + offsety;
-                            walls.set(drawx, floors.height - 1 - drawy, c);
+                            int px = tile.x + dx + offset, py = tile.y + dy + offset;
+                            if(px < 0 || py < 0 || px >= width || py >= height) continue;
+
+                            int idx = px + py * width;
+                            colors[idx] = c;
+                            flags[idx] = flagsFor(block, (Floor)content.block(floorIds[idx]), dark);
                         }
                     }
 
@@ -142,39 +173,32 @@ public class MapIO{
 
                 @Override
                 public Tile tile(int index){
-                    tile.x = (short)(index % map.width);
-                    tile.y = (short)(index / map.width);
+                    tile.x = (short)(index % width);
+                    tile.y = (short)(index / width);
                     return tile;
                 }
 
                 @Override
                 public Tile create(int x, int y, int floorID, int overlayID, int wallID){
-                    floors.set(x, floors.height - 1 - y, colorFor(Blocks.air, content.block(floorID), content.block(overlayID), Team.derelict));
+                    int idx = x + y * width;
+                    floorIds[idx] = (short)floorID;
+                    overlayIds[idx] = (short)overlayID;
 
                     if(content.block(overlayID) == Blocks.spawn){
                         map.spawns ++;
                     }
-                    floorIds[x + y * width] = (short)floorID;
-                    overlays[x + y * width] = overlayID != 0;
+                    //default to air over this floor. Older save versions never call setBlock for runs of air,
+                    //and multiblock parts never get it either, so this is the only place those tiles get a color
+                    tile.x = (short)x;
+                    tile.y = (short)y;
+                    tile.setBlock(Blocks.air);
                     return tile;
                 }
 
                 @Override
                 public void onReadTileData(){
-                    Block block = tile.block();
-                    Block floor = content.block(floorIds[tile.x + tile.y*width]);
-
-                    if(!block.synthetic() && block != Blocks.air){
-                        int color = block.minimapColor(tile);
-                        if(color != 0){
-                            walls.set(tile.x, walls.height - 1 - tile.y, color);
-                        }
-                    }else if(!overlays[tile.x + tile.y * width] && block == Blocks.air){
-                        int color = floor.minimapColor(tile);
-                        if(color != 0){
-                            floors.set(tile.x, floors.height - 1 - tile.y, color);
-                        }
-                    }
+                    //data (extraData for colored walls, etc.) is now available, so recompute
+                    tile.record();
                 }
             };
 
@@ -183,10 +207,144 @@ public class MapIO{
             if(ver.version == 11) ver.skipChunk(stream);
             ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, context));
 
-            floors.draw(walls, true);
-            walls.dispose();
-            return floors;
+            return shadePreview(map, width, height, colors, flags);
         }
+    }
+
+    private static byte flagsFor(Block block, Floor floor, boolean dark){
+        int f = 0;
+        if(block == Blocks.air) f |= flagAir;
+        if(block.solid) f |= flagSolid;
+        if(floor.isLiquid) f |= flagLiquid;
+        if(dark) f |= flagDark;
+        return (byte)f;
+    }
+
+    /** Second pass: applies darkness, shadows and shore shading exactly like MinimapRenderer.colorFor. */
+    private static Pixmap shadePreview(Map map, int width, int height, int[] colors, byte[] flags){
+        byte[] darkness = computeDarkness(flags, width, height);
+        Pixmap pixmap = new Pixmap(width, height);
+        Color color = new Color();
+
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                int idx = x + y * width;
+                int flag = flags[idx];
+
+                //map limit doesn't apply (it would look bad in previews)
+                //assume borderDarkness is true in rules (parsing rules just for this rarely-changed flag is a waste)
+                float dark = borderDarkness(x, y, width, height, false, 0, 0, 0, 0);
+                if((flag & flagDark) != 0){
+                    dark = Math.max(dark, darkness[idx]);
+                }
+
+                boolean hasAbove = y < height - 1;
+                int aboveFlag = hasAbove ? flags[idx + width] : 0;
+
+                boolean shadow = (flag & flagAir) != 0 && (aboveFlag & flagSolid) != 0;
+                boolean shore = (flag & flagLiquid) != 0 && (!hasAbove || (aboveFlag & flagLiquid) == 0);
+
+                pixmap.setRaw(x, height - 1 - y, shadeColor(color, colors[idx], dark, shadow, shore));
+            }
+        }
+
+        return pixmap;
+    }
+
+    /** Same shading as MinimapRenderer.colorFor, after the base color has been determined. */
+    private static int shadeColor(Color color, int base, float darkness, boolean shadow, boolean shore){
+        color.set(base);
+        color.mul(1f - Mathf.clamp(darkness / 4f));
+
+        if(shadow){
+            color.mul(0.7f);
+        }else if(shore){
+            color.mul(0.84f, 0.84f, 0.9f, 1f);
+        }
+
+        return color.rgba();
+    }
+
+    /** Map-edge darkness; copy of the first part of World.getDarkness. */
+    private static float borderDarkness(int x, int y, int width, int height, boolean limitMapArea, int limitX, int limitY, int limitWidth, int limitHeight){
+        int edgeBlend = 2;
+        int edgeDst;
+
+        if(!limitMapArea){
+            edgeDst = Math.min(x, Math.min(y, Math.min(-(x - (width - 1)), -(y - (height - 1)))));
+        }else{
+            edgeDst =
+            Math.min(x - limitX,
+            Math.min(y - limitY,
+            Math.min(-(x - (limitX + limitWidth - 1)), -(y - (limitY + limitHeight - 1)))));
+        }
+
+        return edgeDst <= edgeBlend ? (edgeBlend - edgeDst) * (4f / edgeBlend) : 0f;
+    }
+
+    /** Array-based copy of World.applyDarkness. Returns the per-tile "data" value, only meaningful for tiles with flagDark. */
+    private static byte[] computeDarkness(byte[] flags, int width, int height){
+        int len = width * height;
+        byte[] dark = new byte[len], buffer = new byte[len], out = new byte[len];
+
+        for(int i = 0; i < len; i++){
+            if((flags[i] & flagDark) != 0){
+                dark[i] = darkRadius;
+            }
+        }
+
+        for(int i = 0; i < darkRadius; i++){
+            for(int y = 0; y < height; y++){
+                for(int x = 0; x < width; x++){
+                    int idx = x + y * width;
+                    boolean min = false;
+                    for(Point2 point : Geometry.d4){
+                        int nx = x + point.x, ny = y + point.y;
+                        if(nx >= 0 && ny >= 0 && nx < width && ny < height && dark[nx + ny * width] < dark[idx]){
+                            min = true;
+                            break;
+                        }
+                    }
+                    buffer[idx] = (byte)Math.max(0, dark[idx] - (min ? 1 : 0));
+                }
+            }
+
+            System.arraycopy(buffer, 0, dark, 0, len);
+        }
+
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                int idx = x + y * width;
+                boolean darkened = (flags[idx] & flagDark) != 0;
+
+                if(darkened){
+                    out[idx] = dark[idx];
+                }
+
+                if(dark[idx] == darkRadius){
+                    boolean full = true;
+                    for(Point2 p : Geometry.d4){
+                        int px = p.x + x, py = p.y + y;
+                        if(px >= 0 && py >= 0 && px < width && py < height && !(darkened && dark[px + py * width] == darkRadius)){
+                            full = false;
+                            break;
+                        }
+                    }
+
+                    if(full) out[idx] = (byte)(darkRadius + 1);
+                }
+            }
+        }
+
+        return out;
+    }
+
+    /** Base (unshaded) color of a tile; same logic as MinimapRenderer.colorFor before shading. */
+    private static int previewColor(Tile tile){
+        Block real = tile.block();
+        int bc = real.minimapColor(tile);
+        if(bc == 0 && real == Blocks.air && tile.overlay() == Blocks.air) bc = tile.floor().minimapColor(tile);
+        return bc == 0 ? colorFor(real, tile.floor(), tile.overlay(), tile.team()) : bc;
     }
 
     private static void readPreviewContentHeader(DataInput stream, SaveLoadContext context) throws IOException{
@@ -210,19 +368,20 @@ public class MapIO{
         context.reads = new MappedReads(null, map);
     }
 
-    public static Pixmap generatePreview(World tiles){
-        Pixmap pixmap = new Pixmap(tiles.width, tiles.height);
+    /** Generates a preview from a loaded world. Shading matches the minimap and the file-based generatePreview(Map). */
+    public static Pixmap generatePreview(World world){
+        Pixmap pixmap = new Pixmap(world.width, world.height);
+        Color color = new Color();
+
         for(int x = 0; x < pixmap.width; x++){
             for(int y = 0; y < pixmap.height; y++){
-                Tile tile = tiles.getn(x, y);
-                int color = 0;
-                if(!tile.block().synthetic() && tile.block() != Blocks.air){
-                    color = tile.block().minimapColor(tile);
-                }else if(tile.overlay() == Blocks.air && tile.block() == Blocks.air){
-                    color = tile.floor().minimapColor(tile);
-                }
-                if(color == 0) color = colorFor(tile.block(), tile.floor(), tile.overlay(), tile.team());
-                pixmap.set(x, pixmap.height - 1 - y, color);
+                Tile tile = world.getn(x, y);
+                Tile above = y < world.height - 1 ? world.rawTile(x, y + 1) : null;
+
+                boolean shadow = tile.block() == Blocks.air && above != null && above.block().solid;
+                boolean shore = tile.floor().isLiquid && (above == null || !above.floor().isLiquid);
+
+                pixmap.setRaw(x, pixmap.height - 1 - y, shadeColor(color, previewColor(tile), world.getDarkness(x, y), shadow, shore));
             }
         }
         return pixmap;
