@@ -31,6 +31,15 @@ public class ServerConfig{
     @Desc("Whether votekick is enabled.")
     public boolean enableVotekick = true;
 
+    @Desc("Duration of a votekick ban, in seconds.")
+    public int kickDuration = 60 * 60;
+
+    @Desc("Votekick voting round duration, in seconds.")
+    public float voteDuration = 0.5f * 60;
+
+    @Desc("Cooldown between votekicks per player, in seconds.")
+    public int voteCooldown = 60 * 5;
+
     @Desc("Commands run at startup. This should be a comma-separated list.")
     public String startCommands = "";
 

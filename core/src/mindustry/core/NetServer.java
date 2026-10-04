@@ -112,14 +112,6 @@ public class NetServer implements ApplicationListener{
     /** If >= 0, the reported server player count is overridden by this value. If < 0, the size of the player group is used instead. */
     public int playerCountOverride = -1;
 
-    //TODO: move to config! Also make votekicking a toggleable option in config (votekick: true/false)
-    /** Duration of a kick in seconds. */
-    public static int kickDuration = 60 * 60;
-    /** Voting round duration in seconds. */
-    public static float voteDuration = 0.5f * 60;
-    /** Cooldown between votes in seconds. */
-    public static int voteCooldown = 60 * 5;
-
     private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
     private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
 
@@ -446,10 +438,10 @@ public class NetServer implements ApplicationListener{
                     }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
-                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> Timekeeper.ofSeconds(voteCooldown));
+                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> Timekeeper.ofSeconds(config.voteCooldown));
 
                         if(!vtime.get()){
-                            player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
+                            player.sendMessage("[scarlet]You must wait " + config.voteCooldown/60 + " minutes between votekicks.");
                             return;
                         }
 
@@ -1451,7 +1443,7 @@ public class NetServer implements ApplicationListener{
                     currentlyKicking = null;
                     task.cancel();
                 }
-            }, voteDuration);
+            }, config.voteDuration);
         }
 
         void vote(Player player, int d){
@@ -1470,8 +1462,8 @@ public class NetServer implements ApplicationListener{
 
         boolean checkPass(){
             if(votes >= votesRequired()){
-                Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60)));
-                state.entities.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, kickDuration * 1000));
+                Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (config.kickDuration / 60)));
+                state.entities.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, config.kickDuration * 1000L));
                 currentlyKicking = null;
                 task.cancel();
                 return true;
