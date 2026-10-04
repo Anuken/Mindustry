@@ -101,11 +101,11 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         //if fixedUpdate isn't called, e.g. when the game is paused or map is reloaded, the time counter needs to 'sync' with the actual proper time
         if(lastTimeAccess < Core.graphics.getFrameId() - 1){
             totalUpdates = 0;
-            updateId = state.updateId;
+            updateId = Vars.state.updateId;
             timeCounter = Vars.state.timePrecise;
         }
 
-        long prevUpdateId = state.updateId;
+        long prevUpdateId = Vars.state.updateId;
         double targetDelta = 1.0 / targetUps;
         float timeDelta = (float)targetDelta * 60f;
         float prevDelta = Time.delta;
@@ -130,7 +130,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
             Vars.logic.updateTime();
             update();
             fixedCounter -= targetDelta;
-            state.updateId = updateId ++;
+            Vars.state.updateId = updateId ++;
         }
 
         timeCounter = Vars.state.timePrecise;
@@ -138,7 +138,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         Time.delta = prevDelta;
         Vars.state.setTime(prevTime);
         Vars.state.runs = oldRuns;
-        state.updateId = prevUpdateId;
+        Vars.state.updateId = prevUpdateId;
 
         lastRenderInterpolation = (float)(fixedCounter / targetDelta);
         lastTimeAccess = Core.graphics.getFrameId();

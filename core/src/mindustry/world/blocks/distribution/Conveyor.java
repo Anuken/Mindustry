@@ -10,7 +10,6 @@ import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -175,8 +174,8 @@ public class Conveyor extends Block implements Autotiler{
             float
 
             layer = Layer.block - 0.1f,
-            wwidth = state.world.unitWidth(),
-            wheight = state.world.unitHeight(),
+            wwidth = state.world.unitWidth,
+            wheight = state.world.unitHeight,
             scaling = 0.01f,
             alpha = Renderer.blockInterp,
 

@@ -169,7 +169,7 @@ public class Renderer implements ApplicationListener{
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
         blockTimestep = logic.hasFixedTimestep();
-        blockRenderUpdateId = Groups.build.getFixedUpdateId();
+        blockRenderUpdateId = state.entities.build.getFixedUpdateId();
         animateSurfaces = settings.getBool("animatedwater");
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
@@ -444,7 +444,7 @@ public class Renderer implements ApplicationListener{
         }
 
         Events.fire(Trigger.drawOver);
-        blockInterp = blockTimestep ? Groups.build.getRenderInterpolation() : 1f;
+        blockInterp = blockTimestep ? state.entities.build.getRenderInterpolation() : 1f;
         renderUpdate = !state.isPaused();
         blocks.drawBlocks();
 
