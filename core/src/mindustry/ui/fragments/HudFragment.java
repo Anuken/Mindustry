@@ -1145,7 +1145,7 @@ public class HudFragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((logic.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : (waitingf.get((int)(state.wavetime/60)))));
+                builder.append((Vars.state.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : (waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }

@@ -665,7 +665,7 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    if(!isWaitingWave()){
+                    if(!state.isWaitingWave()){
                         state.wavetime = Math.max(state.wavetime - Time.delta, 0);
                     }
                 }
@@ -693,10 +693,5 @@ public class Logic implements ApplicationListener{
         }
 
         PerfCounter.stateUpdate.end(PerfCounter.entityUpdate.latestValueNs());
-    }
-
-    /** @return whether the wave timer is paused due to enemies */
-    public boolean isWaitingWave(){
-        return (state.rules.waitEnemies || (state.wave >= state.rules.winWave && state.rules.winWave > 0)) && state.enemies > 0;
     }
 }

@@ -4,7 +4,6 @@ import arc.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.pooling.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.async.*;
@@ -121,6 +120,11 @@ public class GameState{
     /** Makes sure the next ID is higher than this one, so future entities cannot possibly use it. */
     public void checkNextEntityId(int id){
         lastId = Math.max(lastId, id + 1);
+    }
+
+    /** @return whether the wave timer is paused due to enemies */
+    public boolean isWaitingWave(){
+        return (rules.waitEnemies || (wave >= rules.winWave && rules.winWave > 0)) && enemies > 0;
     }
 
     @Nullable
