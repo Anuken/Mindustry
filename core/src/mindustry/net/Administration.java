@@ -189,12 +189,9 @@ public class Administration{
         return true;
     }
 
+    //TODO: remove when Core.settings is refactored
     public int getPlayerLimit(){
-        return Core.settings.getInt("playerlimit", headless ? 30 : 0);
-    }
-
-    public void setPlayerLimit(int limit){
-        Core.settings.put("playerlimit", limit);
+        return headless ? netServer.config.playerLimit : Core.settings.getInt("playerlimit", 0);
     }
 
     public boolean isStrict(){

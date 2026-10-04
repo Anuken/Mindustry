@@ -193,7 +193,7 @@ public class NetworkIO{
         writeString(buffer, name, 100);
         writeString(buffer, map, 64);
 
-        buffer.putInt(Core.settings.getInt("totalPlayers", state.entities.player.size()));
+        buffer.putInt(Vars.netServer != null && Vars.netServer.playerCountOverride >= 0 ? Vars.netServer.playerCountOverride : state.entities.player.size());
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);

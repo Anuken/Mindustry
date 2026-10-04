@@ -19,6 +19,9 @@ public class ServerConfig{
     @Desc("The port to host on.")
     public int port = Vars.port;
 
+    @Desc("Maximum amount of players allowed to be online at once. 0 to disable the limit.")
+    public int playerLimit = 30;
+
     @Desc("Whether to auto-update and exit when a new bleeding-edge update arrives.")
     public boolean autoUpdate = false;
 

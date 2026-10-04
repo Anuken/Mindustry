@@ -404,6 +404,7 @@ public class ServerControl implements ApplicationListener{
         c.name = Core.settings.getString("servername", c.name);
         c.desc = Core.settings.getString("desc", c.desc);
         c.port = Core.settings.getInt("port", c.port);
+        c.playerLimit = Core.settings.getInt("playerlimit", c.playerLimit);
         c.autoUpdate = Core.settings.getBool("autoUpdate", c.autoUpdate);
         c.showConnectMessages = Core.settings.getBool("showConnectMessages", c.showConnectMessages);
         c.enableVotekick = Core.settings.getBool("enableVotekick", c.enableVotekick);
@@ -851,26 +852,6 @@ public class ServerControl implements ApplicationListener{
             }
 
             info("Core filled.");
-        });
-
-        handler.register("playerlimit", "[off/somenumber]", "Set the server player limit.", arg -> {
-            if(arg.length == 0){
-                info("Player limit is currently @.", netServer.admins.getPlayerLimit() == 0 ? "off" : netServer.admins.getPlayerLimit());
-                return;
-            }
-            if(arg[0].equals("off")){
-                netServer.admins.setPlayerLimit(0);
-                info("Player limit disabled.");
-                return;
-            }
-
-            if(Strings.canParsePositiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
-                int lim = Strings.parseInt(arg[0]);
-                netServer.admins.setPlayerLimit(lim);
-                info("Player limit is now &lc@.", lim);
-            }else{
-                err("Limit must be a number above 0.");
-            }
         });
 
         handler.register("config", "[name/reload] [value...]", "Configure server settings.", arg -> {

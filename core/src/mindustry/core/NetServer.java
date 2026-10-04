@@ -109,6 +109,10 @@ public class NetServer implements ApplicationListener{
 
     /** Current kick session. */
     public @Nullable VoteSession currentlyKicking = null;
+    /** If >= 0, the reported server player count is overridden by this value. If < 0, the size of the player group is used instead. */
+    public int playerCountOverride = -1;
+
+    //TODO: move to config! Also make votekicking a toggleable option in config (votekick: true/false)
     /** Duration of a kick in seconds. */
     public static int kickDuration = 60 * 60;
     /** Voting round duration in seconds. */
