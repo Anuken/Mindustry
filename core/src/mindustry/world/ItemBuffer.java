@@ -59,6 +59,9 @@ public class ItemBuffer{
         byte length = read.b();
         for(int i = 0; i < length; i++){
             long l = read.l();
+            //re-pack the item ID through the reader's content mapping
+            Item item = read.content(ContentType.item, TimeItem.item(l));
+            if(item != null) l = TimeItem.get(TimeItem.data(l), item.id, TimeItem.time(l));
             if(i < buffer.length){
                 buffer[i] = l;
             }

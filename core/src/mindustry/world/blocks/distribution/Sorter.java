@@ -166,7 +166,7 @@ public class Sorter extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            sortItem = content.item(read.s());
+            sortItem = read.item();
 
             if(revision == 1){
                 new DirectionalItemBuffer(20).read(read);

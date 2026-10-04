@@ -95,7 +95,7 @@ public class Constructor extends BlockProducer{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            recipe = Vars.content.block(read.s());
+            recipe = read.block();
         }
     }
 }

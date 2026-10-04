@@ -587,7 +587,7 @@ public class Schematics implements Loadable{
                 map.put(stream.readUTF(), stream.readUTF());
             }
 
-            ContentMapper mapper = null;
+            Reads read = new Reads(stream);
 
             //set up content mapping if found
             if(map.containsKey("contentMap")){
@@ -600,7 +600,13 @@ public class Schematics implements Loadable{
                         inner.put(ce.value, content.getByName(ContentType.all[entry.key], ce.key));
                     }
                 }
-                mapper = (type, id) -> contentMap.get(type.ordinal(), IntMap::new).get(id);
+                read = new Reads(stream){
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public <T extends Content> T content(ContentType type, int id){
+                        return (T)contentMap.get(type.ordinal(), IntMap::new).get(id);
+                    }
+                };
             }
 
             String[] labels = Jval.read(map.get("labels", "[]")).asStringArray();
@@ -617,13 +623,11 @@ public class Schematics implements Loadable{
 
             if(limitSchematicSize && total > 128 * 128) throw new IOException("Invalid schematic: Too many blocks.");
 
-            Reads read = new Reads(stream);
-
             Seq<Stile> tiles = new Seq<>(total);
             for(int i = 0; i < total; i++){
                 Block block = blocks.get(stream.readByte());
                 int position = stream.readInt();
-                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(read, false, mapper);
+                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(read);
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
                     tiles.add(new Stile(block, Point2.x(position), Point2.y(position), config, rotation));

@@ -161,8 +161,7 @@ public class DirectionalUnloader extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            int id = read.s();
-            unloadItem = id == -1 ? null : content.item(id);
+            unloadItem = read.item();
             offset = read.s();
         }
     }

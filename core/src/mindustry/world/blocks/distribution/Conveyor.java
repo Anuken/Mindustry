@@ -422,7 +422,7 @@ public class Conveyor extends Block implements Autotiler{
                 }
 
                 if(i < capacity){
-                    ids[i] = content.item(id);
+                    ids[i] = read.content(ContentType.item, id);
                     xs[i] = x;
                     ys[i] = y;
                 }

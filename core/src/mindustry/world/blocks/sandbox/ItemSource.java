@@ -135,7 +135,7 @@ public class ItemSource extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            outputItem = content.item(read.s());
+            outputItem = read.item();
         }
     }
 }

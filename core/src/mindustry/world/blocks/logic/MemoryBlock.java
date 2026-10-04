@@ -181,7 +181,7 @@ public class MemoryBlock extends Block{
                         numberMemory[i] = value;
                     }
                 }else{
-                    Object value = TypeIO.readObject(read, true, null, false, true, type);
+                    Object value = TypeIO.readObject(read, true, false, true, type);
                     if(i < objectMemory.length){
                         objectMemory[i] = value;
                     }

@@ -98,7 +98,7 @@ public class NetworkIO{
 
             var context = new DefaultWorldContext();
 
-            writer.readContentHeader(stream);
+            writer.readContentHeader(stream, context);
             writer.readMap(stream, context);
             writer.readEntities(stream, context);
             writer.readMarkers(stream);
@@ -108,8 +108,6 @@ public class NetworkIO{
             state.entities.unit.each(e -> netClient.addRemovedEntity(e.id()));
         }catch(IOException e){
             throw new RuntimeException(e);
-        }finally{
-            content.setTemporaryMapper(null);
         }
     }
 

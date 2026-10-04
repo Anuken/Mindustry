@@ -98,7 +98,7 @@ public class UnitCargoUnloadPoint extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            item = Vars.content.item(read.s());
+            item = read.item();
             stale = read.bool();
         }
     }

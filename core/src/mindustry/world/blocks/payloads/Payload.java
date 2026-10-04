@@ -100,7 +100,7 @@ public interface Payload extends Position{
 
         byte type = read.b();
         if(type == payloadBlock){
-            Block block = content.block(read.s());
+            Block block = read.block();
             BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
             payload.build.readAll(read, version);

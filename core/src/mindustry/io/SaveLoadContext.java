@@ -11,6 +11,8 @@ public abstract class SaveLoadContext{
     public boolean preview;
     public @Nullable String ruleString;
     public Seq<Building> allBuildings = new Seq<>();
+    /** Used for reading all content in this load; replaced with a mapped version when the content header is read. */
+    public Reads reads = new Reads(null);
 
     /** Return a tile in the tile array.*/
     public abstract Tile tile(int index);

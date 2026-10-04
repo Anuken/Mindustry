@@ -210,7 +210,7 @@ public class ItemTurret extends Turret{
             totalAmmo = 0;
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
+                Item item = read.content(ContentType.item, revision < 2 ? read.ub() : read.s());
                 int itemAmount = Math.min(read.s(), maxAmmo);
 
                 //only add ammo if this is a valid ammo type

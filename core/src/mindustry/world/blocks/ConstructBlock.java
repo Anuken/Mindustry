@@ -520,8 +520,8 @@ public class ConstructBlock extends Block{
                 }
             }
 
-            if(pid != -1) previous = content.block(pid);
-            if(rid != -1) current = content.block(rid);
+            if(pid != -1) previous = read.content(ContentType.block, pid);
+            if(rid != -1) current = read.content(ContentType.block, rid);
 
             if(previous == null) previous = Blocks.air;
             if(current == null) current = Blocks.air;

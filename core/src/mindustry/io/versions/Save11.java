@@ -24,17 +24,12 @@ public class Save11 extends SaveVersion{
     @Override
     public void read(DataInputStream stream, CounterInputStream counter, SaveLoadContext saveState) throws IOException{
         readRegion("meta", stream, counter, in -> readMeta(in, saveState));
-        readRegion("content", stream, counter, this::readContentHeader);
-
-        try{
-            readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
-            readRegion("map", stream, counter, in -> readMap(in, saveState));
-            readRegion("entities", stream, counter, in -> readEntities(in, saveState));
-            readRegion("markers", stream, counter, this::readMarkers);
-            readRegion("custom", stream, counter, this::readCustomChunks);
-        }finally{
-            content.setTemporaryMapper(null);
-        }
+        readRegion("content", stream, counter, in -> readContentHeader(in, saveState));
+        readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
+        readRegion("map", stream, counter, in -> readMap(in, saveState));
+        readRegion("entities", stream, counter, in -> readEntities(in, saveState));
+        readRegion("markers", stream, counter, this::readMarkers);
+        readRegion("custom", stream, counter, this::readCustomChunks);
     }
 
     //old, simplified string-only data patches

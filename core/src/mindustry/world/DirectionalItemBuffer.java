@@ -69,6 +69,10 @@ public class DirectionalItemBuffer{
                     value = BufferItem.get(BufferItemLegacy.item(value), BufferItemLegacy.time(value));
                 }
 
+                //re-pack the item ID through the reader's content mapping
+                Item item = read.content(ContentType.item, BufferItem.item(value));
+                if(item != null) value = BufferItem.get(item.id, BufferItem.time(value));
+
                 if(j < buffers[i].length){
                     buffers[i][j] = value;
                 }

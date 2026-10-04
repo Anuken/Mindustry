@@ -210,7 +210,7 @@ public class PayloadRouter extends PayloadConveyor{
             if(revision >= 1){
                 byte ctype = read.b();
                 short sort = read.s();
-                sorted = ctype == -1 ? null : Vars.content.getByID(ContentType.all[ctype], sort);
+                sorted = ctype == -1 ? null : read.content(ContentType.all[ctype], sort);
                 recDir = read.b();
                 checkMatch();
             }

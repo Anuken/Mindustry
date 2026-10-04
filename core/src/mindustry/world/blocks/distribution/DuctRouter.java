@@ -203,7 +203,7 @@ public class DuctRouter extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             if(revision >= 1){
-                sortItem = content.item(read.s());
+                sortItem = read.item();
             }
         }
     }

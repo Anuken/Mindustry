@@ -176,8 +176,6 @@ public class SaveIO{
             }
         }catch(Throwable e){
             throw new SaveLoadException(e);
-        }finally{
-            content.setTemporaryMapper(null);
         }
     }
 

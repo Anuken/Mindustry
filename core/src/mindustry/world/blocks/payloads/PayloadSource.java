@@ -177,8 +177,8 @@ public class PayloadSource extends PayloadBlock{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            unit = Vars.content.unit(read.s());
-            configBlock = Vars.content.block(read.s());
+            unit = read.unit();
+            configBlock = read.block();
             if(revision >= 1){
                 commandPos = TypeIO.readVecNullable(read);
             }

@@ -83,15 +83,11 @@ public abstract class SaveVersion extends SaveFileReader{
         readRegion("meta", stream, counter, in -> readMeta(in, saveState));
         if(version >= 12) readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
 
-        try{
-            readRegion("content", stream, counter, this::readContentHeader);
-            readRegion("map", stream, counter, in -> readMap(in, saveState));
-            readRegion("entities", stream, counter, stream1 -> readEntities(stream1, saveState));
-            if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
-            readRegion("custom", stream, counter, this::readCustomChunks);
-        }finally{
-            content.setTemporaryMapper(null);
-        }
+        readRegion("content", stream, counter, in -> readContentHeader(in, saveState));
+        readRegion("map", stream, counter, in -> readMap(in, saveState));
+        readRegion("entities", stream, counter, stream1 -> readEntities(stream1, saveState));
+        if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
+        readRegion("custom", stream, counter, this::readCustomChunks);
     }
 
     @Override
@@ -322,10 +318,11 @@ public abstract class SaveVersion extends SaveFileReader{
             //read floor and create tiles first
             for(int i = 0; i < width * height; i++){
                 int x = i % width, y = i / width;
-                short floorid = stream.readShort();
-                short oreid = stream.readShort();
+                Block floor = state.reads.content(ContentType.block, stream.readShort());
+                Block overlay = state.reads.content(ContentType.block, stream.readShort());
                 int consecutives = stream.readUnsignedByte();
-                if(content.block(floorid) == Blocks.air) floorid = Blocks.stone.id;
+                if(floor == Blocks.air) floor = Blocks.stone;
+                int floorid = floor == null ? Blocks.stone.id : floor.id, oreid = overlay == null ? Blocks.air.id : overlay.id;
 
                 state.create(x, y, floorid, oreid, (short)0);
 
@@ -339,7 +336,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
             //read blocks
             for(int i = 0; i < width * height; i++){
-                Block block = content.block(stream.readShort());
+                Block block = state.reads.content(ContentType.block, stream.readShort());
                 Tile tile = state.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
@@ -384,7 +381,7 @@ public abstract class SaveVersion extends SaveFileReader{
                     if(isCenter){ //only read entity for center blocks
                         if(block.hasBuilding()){
                             try{
-                                readChunkReads(stream, (in, len) -> {
+                                readChunkReads(stream, state.reads, (in, len) -> {
                                     byte revision = in.b();
                                     tile.build.readAll(in, revision);
                                 });
@@ -486,10 +483,11 @@ public abstract class SaveVersion extends SaveFileReader{
         state.markers.read(stream);
     }
 
-    public void readTeamBlocks(DataInput stream) throws IOException{
+    public void readTeamBlocks(DataInput stream, SaveLoadContext context) throws IOException{
         int teamc = stream.readInt();
 
-        var reads = new Reads(stream);
+        var reads = context.reads;
+        reads.input = stream;
 
         for(int i = 0; i < teamc; i++){
             Team team = Team.get(stream.readInt());
@@ -504,7 +502,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 var obj = TypeIO.readObject(reads);
                 //cannot have two in the same position
                 if(set.add(Point2.pack(x, y))){
-                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid), obj));
+                    data.plans.addLast(new BlockPlan(x, y, rot, reads.content(ContentType.block, bid), obj));
                 }
             }
         }
@@ -516,7 +514,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
-            readChunkReads(stream, (in, len) -> {
+            readChunkReads(stream, state.reads, (in, len) -> {
                 int typeid = in.ub();
                 if(mapping[typeid] == null){
                     in.skip(len - 1);
@@ -566,7 +564,7 @@ public abstract class SaveVersion extends SaveFileReader{
 
     public void readEntities(DataInput stream, SaveLoadContext state) throws IOException{
         var mapping = readEntityMapping(stream);
-        readTeamBlocks(stream);
+        readTeamBlocks(stream, state);
         readWorldEntities(stream, mapping, state);
     }
 
@@ -642,7 +640,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readContentHeader(DataInput stream) throws IOException{
+    public void readContentHeader(DataInput stream, SaveLoadContext context) throws IOException{
         int mapped = stream.readUnsignedByte();
 
         MappableContent[][] map = new MappableContent[ContentType.all.length][0];
@@ -659,7 +657,7 @@ public abstract class SaveVersion extends SaveFileReader{
             }
         }
 
-        content.setTemporaryMapper(map);
+        context.reads = new MappedReads(null, map);
 
         //HACK: versions below 11 don't read the patch chunk, which means the event for reading patches is never triggered.
         //manually fire the event here for older versions.

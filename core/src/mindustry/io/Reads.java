@@ -1,6 +1,10 @@
 package mindustry.io;
 
 import arc.util.*;
+import mindustry.*;
+import mindustry.entities.bullet.*;
+import mindustry.type.*;
+import mindustry.world.*;
 
 import java.io.*;
 
@@ -137,6 +141,44 @@ public class Reads implements Closeable{
         }catch(IOException e){
             throw new RuntimeException(e);
         }
+    }
+
+    /** Reads a short ID and resolves it to content of the specified type. */
+    public <T extends Content> T content(ContentType type){
+        return content(type, s());
+    }
+
+    /** Resolves an already-read content ID. Override this to change how IDs are mapped. */
+    public <T extends Content> T content(ContentType type, int id){
+        return Vars.content.getByID(type, id);
+    }
+
+    public Item item(){
+        return content(ContentType.item);
+    }
+
+    public Liquid liquid(){
+        return content(ContentType.liquid);
+    }
+
+    public Block block(){
+        return content(ContentType.block);
+    }
+
+    public UnitType unit(){
+        return content(ContentType.unit);
+    }
+
+    public BulletType bullet(){
+        return content(ContentType.bullet);
+    }
+
+    public StatusEffect status(){
+        return content(ContentType.status);
+    }
+
+    public Weather weather(){
+        return content(ContentType.weather);
     }
 
     /** read string (UTF) */

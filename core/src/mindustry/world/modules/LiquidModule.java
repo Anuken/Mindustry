@@ -185,7 +185,7 @@ public class LiquidModule extends BlockModule{
         int count = legacy ? read.ub() : read.s();
 
         for(int j = 0; j < count; j++){
-            Liquid liq = content.liquid(legacy ? read.ub() : read.s());
+            Liquid liq = read.content(ContentType.liquid, legacy ? read.ub() : read.s());
             float amount = read.f();
             if(liq != null){
                 int liquidid = liq.id;

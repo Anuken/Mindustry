@@ -104,10 +104,7 @@ public class MapIO{
             };
 
             //version 12 has content patches here, version 11 has them after the content header
-            if(ver.version >= 12) ver.skipChunk(stream);
-            ver.readRegion("content", stream, counter, MapIO::readPreviewContentHeader);
-            if(ver.version == 11) ver.skipChunk(stream);
-            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new SaveLoadContext(){
+            var context = new SaveLoadContext(){
                 {
                     preview = true;
                 }
@@ -178,17 +175,20 @@ public class MapIO{
                         }
                     }
                 }
-            }));
+            };
+
+            if(ver.version >= 12) ver.skipChunk(stream);
+            ver.readRegion("content", stream, counter, in -> readPreviewContentHeader(in, context));
+            if(ver.version == 11) ver.skipChunk(stream);
+            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, context));
 
             floors.draw(walls, true);
             walls.dispose();
             return floors;
-        }finally{
-            content.setTemporaryMapper(null);
         }
     }
 
-    private static void readPreviewContentHeader(DataInput stream) throws IOException{
+    private static void readPreviewContentHeader(DataInput stream, SaveLoadContext context) throws IOException{
         //reads content header while refusing to fire patch loaded event
         int mapped = stream.readUnsignedByte();
 
@@ -206,7 +206,7 @@ public class MapIO{
             }
         }
 
-        content.setTemporaryMapper(map);
+        context.reads = new MappedReads(null, map);
     }
 
     public static Pixmap generatePreview(World tiles){
