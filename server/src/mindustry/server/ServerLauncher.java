@@ -6,6 +6,7 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
+import mindustry.io.versions.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Net;
@@ -43,6 +44,8 @@ public class ServerLauncher implements ApplicationListener{
         Core.settings.setDataDirectory(Core.files.local("config"));
         loadLocales = false;
         headless = true;
+
+        LegacyIO.migrateServerSettings();
 
         Vars.loadSettings();
         Vars.init();

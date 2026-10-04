@@ -297,7 +297,25 @@ public class Vars implements Loadable{
         init();
     }
 
+    public static void initDirectories(){
+        if(dataDirectory != null) return;
+        settings.setAppName(appName);
+        dataDirectory = settings.getDataDirectory();
+        screenshotDirectory = dataDirectory.child("screenshots/");
+        customMapDirectory = dataDirectory.child("maps/");
+        mapPreviewDirectory = dataDirectory.child("previews/");
+        saveDirectory = dataDirectory.child("saves/");
+        tmpDirectory = dataDirectory.child("tmp/");
+        modDirectory = dataDirectory.child("mods/");
+        assetCacheDirectory = dataDirectory.child("assetCache");
+        schematicDirectory = dataDirectory.child("schematics/");
+        bebuildDirectory = dataDirectory.child("be_builds/");
+        serverCacheFile = dataDirectory.child("server_list.json");
+    }
+
     public static void init(){
+        initDirectories();
+
         if(loadLocales){
             String[] stra = Core.files.internal("locales").readString().split("\n");
             locales = new Locale[stra.length];
@@ -317,21 +335,11 @@ public class Vars implements Loadable{
         Version.init();
         CacheLayer.init();
 
+
         if(!headless){
             Log.info("[Mindustry] Version: @", Version.buildString());
         }
 
-        dataDirectory = settings.getDataDirectory();
-        screenshotDirectory = dataDirectory.child("screenshots/");
-        customMapDirectory = dataDirectory.child("maps/");
-        mapPreviewDirectory = dataDirectory.child("previews/");
-        saveDirectory = dataDirectory.child("saves/");
-        tmpDirectory = dataDirectory.child("tmp/");
-        modDirectory = dataDirectory.child("mods/");
-        assetCacheDirectory = dataDirectory.child("assetCache");
-        schematicDirectory = dataDirectory.child("schematics/");
-        bebuildDirectory = dataDirectory.child("be_builds/");
-        serverCacheFile = dataDirectory.child("server_list.json");
         emptyMap = new Map(new StringMap());
 
         if(tree == null) tree = new FileTree();
@@ -477,16 +485,19 @@ public class Vars implements Loadable{
 
         //needed to make sure binding values are correct
         Vars.android = app.isAndroid();
-        settings.defaults("locale", "default", "blocksync", true);
-        settings.setAutosave(false);
-        settings.load();
 
-        //this should not be necessary, but in case Binding is initialized before Settings#load(), do that here
-        for(KeyBind bind : KeyBind.all){
-            bind.load();
+        if(!headless){
+            settings.defaults("locale", "default", "blocksync", true);
+            settings.setAutosave(false);
+            settings.load();
+
+            //this should not be necessary, but in case Binding is initialized before Settings#load(), do that here
+            for(KeyBind bind : KeyBind.all){
+                bind.load();
+            }
+
+            Binding.init();
         }
-
-        Binding.init();
 
         //https://github.com/Anuken/Mindustry/issues/8483
         if(!headless && settings.getInt("uiscale") == 5){

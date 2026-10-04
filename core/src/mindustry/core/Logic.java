@@ -120,8 +120,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            //save settings
-            Core.settings.manualSave();
+            if(!headless) Core.settings.manualSave();
         });
 
         //sync research
@@ -335,7 +334,7 @@ public class Logic implements ApplicationListener{
         //fire change event, since it was technically changed
         Events.fire(new StateChangeEvent(prev, State.menu));
 
-        Core.settings.manualSave();
+        if(!headless) Core.settings.manualSave();
     }
 
     public void skipWave(){
@@ -531,7 +530,7 @@ public class Logic implements ApplicationListener{
         if(netServer != null){
             netServer.admins.forceSave();
         }
-        Core.settings.manualSave();
+        if(!headless) Core.settings.manualSave();
     }
 
     protected void updateEntities(){
@@ -583,9 +582,9 @@ public class Logic implements ApplicationListener{
         state.controlPath.update();
         universe.updateGlobal();
 
-        if(Core.settings.modified() && !state.isPlaying()){
+        if(!state.isPlaying()){
             netServer.admins.forceSave();
-            Core.settings.forceSave();
+            if(!headless && Core.settings.modified()) Core.settings.forceSave();
         }
 
         boolean runStateCheck = !net.client() && !state.isEditor() && state.rules.canGameOver;

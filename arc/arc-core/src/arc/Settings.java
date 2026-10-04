@@ -25,7 +25,7 @@ public class Settings{
     protected boolean modified;
     protected Cons<Throwable> errorHandler;
     protected boolean hasErrored;
-    protected boolean shouldAutosave = true;
+    protected boolean shouldAutosave = false;
     protected boolean loaded = false;
     protected boolean writeCompressed = false;
     private long lastBackupTime;
@@ -60,7 +60,7 @@ public class Settings{
     }
 
     /** Set whether the data should autosave immediately upon changing a value.
-     * Default value: true. */
+     * Default value: false. */
     public void setAutosave(boolean autosave){
         this.shouldAutosave = autosave;
     }

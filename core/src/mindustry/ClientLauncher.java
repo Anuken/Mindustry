@@ -44,6 +44,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             Core.settings.setDataDirectory(files.absolute(dataDir));
         }
 
+        initDirectories();
         checkLaunch();
         loadLogger();
 

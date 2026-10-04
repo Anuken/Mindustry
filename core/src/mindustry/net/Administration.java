@@ -1,10 +1,12 @@
 package mindustry.net;
 
 import arc.*;
+import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.Log.*;
+import arc.util.io.*;
 import arc.util.pooling.Pool.*;
 import arc.util.pooling.*;
 import arc.util.serialization.*;
@@ -12,11 +14,14 @@ import mindustry.*;
 import mindustry.ai.*;
 import mindustry.game.Interval;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.payloads.*;
 
+import java.io.*;
 import java.util.regex.*;
+import java.util.zip.*;
 
 import static mindustry.Vars.*;
 import static mindustry.game.EventType.*;
@@ -33,7 +38,11 @@ public class Administration{
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
     public Seq<Pattern> bannedNames = new Seq<>();
 
-    private boolean modified, loaded;
+    private final Fi bansDirectory = dataDirectory.child("bans");
+    private final Fi ipsFile = bansDirectory.child("ips.txt"), subnetsFile = bansDirectory.child("subnet.txt"), namesFile = bansDirectory.child("names.txt");
+    private final Fi whitelistFile = dataDirectory.child("whitelist.txt"), playersFile = dataDirectory.child("players.dat");
+
+    private boolean playersModified, ipsModified, subnetsModified, namesModified, whitelistModified;
     private ObjectMap<String, IdEncounterInfo> encounteredIDsForIp = new ObjectMap<>();
 
     public Administration(){
@@ -126,12 +135,12 @@ public class Administration{
 
     public void removeSubnetBan(String ip){
         subnetBans.remove(ip);
-        save();
+        saveSubnetBans();
     }
 
     public void addSubnetBan(String ip){
         subnetBans.add(ip);
-        save();
+        saveSubnetBans();
     }
 
     public boolean isSubnetBanned(String ip){
@@ -140,7 +149,7 @@ public class Administration{
 
     public void addNameBan(String regex) throws PatternSyntaxException{
         bannedNames.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
-        save();
+        saveNameBans();
     }
 
     /** Adds a chat filter. This will transform the chat messages of every player.
@@ -232,6 +241,7 @@ public class Administration{
 
         bannedIPs.add(ip);
         save();
+        saveBannedIPs();
         Events.fire(new PlayerIpBanEvent(ip));
         return true;
     }
@@ -266,6 +276,7 @@ public class Administration{
 
         if(found){
             save();
+            saveBannedIPs();
             Events.fire(new PlayerIpUnbanEvent(ip));
         }
         return found;
@@ -283,6 +294,7 @@ public class Administration{
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
         save();
+        saveBannedIPs();
         Events.fire(new PlayerUnbanEvent(state.entities.player.find(p -> id.equals(p.uuid())), id));
         return true;
     }
@@ -381,7 +393,7 @@ public class Administration{
         PlayerInfo info = getCreateInfo(id);
         if(whitelist.contains(info.adminUsid + id)) return false;
         whitelist.add(info.adminUsid + id);
-        save();
+        saveWhitelist();
         return true;
     }
 
@@ -389,7 +401,7 @@ public class Administration{
         PlayerInfo info = getCreateInfo(id);
         if(whitelist.contains(info.adminUsid + id)){
             whitelist.remove(info.adminUsid + id);
-            save();
+            saveWhitelist();
             return true;
         }
         return false;
@@ -484,37 +496,86 @@ public class Administration{
         }
     }
 
+    /** Marks player data as modified. */
     public void save(){
-        modified = true;
+        playersModified = true;
     }
 
+    public void saveBannedIPs(){
+        ipsModified = true;
+    }
+
+    public void saveSubnetBans(){
+        subnetsModified = true;
+    }
+
+    public void saveNameBans(){
+        namesModified = true;
+    }
+
+    public void saveWhitelist(){
+        whitelistModified = true;
+    }
+
+    /** Writes every data set that has been modified since it was last written. */
     public void forceSave(){
-        if(modified && loaded){
-            Core.settings.putJson("player-data", playerInfo);
-            Core.settings.putJson("ip-kicks", kickedIPs);
-            Core.settings.putJson("ip-bans", String.class, bannedIPs);
-            Core.settings.putJson("whitelist-ids", String.class, whitelist);
-            Core.settings.putJson("banned-subnets", String.class, subnetBans);
-            Core.settings.putJson("banned-names", String.class, bannedNames.map(Pattern::pattern));
-            modified = false;
+        if(playersModified) writePlayers();
+        if(ipsModified) ipsModified = !writeLines(ipsFile, bannedIPs);
+        if(subnetsModified) subnetsModified = !writeLines(subnetsFile, subnetBans);
+        if(namesModified) namesModified = !writeLines(namesFile, bannedNames.map(Pattern::pattern));
+        if(whitelistModified) whitelistModified = !writeLines(whitelistFile, whitelist);
+    }
+
+    private void writePlayers(){
+        try{
+            FileIO.atomicWrite(playersFile, tmp -> {
+                try(DataOutputStream out = new DataOutputStream(new FastDeflaterOutputStream(tmp.write(false, 8192)))){
+                    JsonIO.writeBytes(playerInfo, PlayerInfo.class, out);
+                }
+            });
+            playersModified = false;
+        }catch(Throwable t){
+            Log.err("Failed to write " + playersFile.name() + "!", t);
         }
+    }
+
+    private boolean writeLines(Fi file, Seq<String> lines){
+        try{
+            FileIO.atomicWrite(file, tmp -> FileIO.writeLines(lines, tmp));
+            return true;
+        }catch(Throwable t){
+            Log.err("Failed to write " + file.name() + "!", t);
+            return false;
+        }
+    }
+
+    private Seq<String> loadLines(Fi file){
+        return file.exists() ? FileIO.readLines(file) : new Seq<>();
     }
 
     @SuppressWarnings("unchecked")
     private void load(){
-        loaded = true;
-        //load default data
-        playerInfo = Core.settings.getJson("player-data", ObjectMap.class, ObjectMap::new);
-        kickedIPs = Core.settings.getJson("ip-kicks", ObjectMap.class, ObjectMap::new);
-        bannedIPs = Core.settings.getJson("ip-bans", Seq.class, Seq::new);
-        whitelist = Core.settings.getJson("whitelist-ids", Seq.class, Seq::new);
-        subnetBans = Core.settings.getJson("banned-subnets", Seq.class, Seq::new);
+        bannedIPs = loadLines(ipsFile);
+        subnetBans = loadLines(subnetsFile);
+        whitelist = loadLines(whitelistFile);
 
-        Seq<String> nameRegexes = Core.settings.getJson("banned-names", Seq.class, String.class, Seq::new);
-        for(var regex : nameRegexes){
+        for(String regex : loadLines(namesFile)){
             try{
                 bannedNames.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
             }catch(Exception ignored){
+            }
+        }
+
+        if(playersFile.exists()){
+            try(DataInputStream in = new DataInputStream(new InflaterInputStream(playersFile.read(8192)))){
+                playerInfo = JsonIO.readBytes(ObjectMap.class, PlayerInfo.class, in);
+            }catch(Throwable t){
+                if(headless){
+                    throw new RuntimeException("Failed to read " + playersFile.name() + "! This is non-recoverable, fix or remove the file before starting again.", t);
+                }else{
+                    //crashing isn't acceptable on the client
+                    Log.err("Failed to read player data file. It will be wiped.", t);
+                }
             }
         }
     }

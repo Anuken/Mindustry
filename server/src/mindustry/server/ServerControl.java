@@ -33,8 +33,6 @@ import org.jline.terminal.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
-import java.nio.file.*;
-import java.nio.file.Files;
 import java.time.*;
 import java.time.format.*;
 import java.util.*;
@@ -141,13 +139,6 @@ public class ServerControl implements ApplicationListener{
         lineReader = LineReaderBuilder.builder().completer(new StringsCompleter(handler.getCommandList().map(c -> c.text))).build();
         hasTerminal = !(Terminal.TYPE_DUMB.equals(lineReader.getTerminal().getType()) || Terminal.TYPE_DUMB_COLOR.equals(lineReader.getTerminal().getType()));
 
-        Core.settings.defaults(
-            "bans", "",
-            "admins", ""
-        );
-        //TODO: remove: settings will fail to save if they are empty, so put a placeholder value in them. this should be removed when settings.bin is phased out
-        Core.settings.put("frog", true);
-
         loadServerConfig();
         //update log level
         Log.level = netServer.config.debug ? LogLevel.debug : LogLevel.info;
@@ -237,24 +228,8 @@ public class ServerControl implements ApplicationListener{
 
         rulesFile = dataDirectory.child("rules.hjson");
 
-        if(!rulesFile.exists() && !Core.settings.has("globalrules")){
+        if(!rulesFile.exists()){
             rulesFile.writeString(defaultRuleString);
-        }
-
-        //load the old 'globalrules' value
-        if(Core.settings.has("globalrules")){
-            try{
-                Jval base = Jval.newObject();
-                if(rulesFile.exists()){
-                    base.asObject().putAll(Jval.read(rulesFile.readString()).asObject());
-                }
-                base.asObject().putAll(Jval.read(Core.settings.getString("globalrules")).asObject());
-                rulesFile.writeString(base.toString(Jformat.hjson));
-
-                Core.settings.remove("globalrules");
-            }catch(Exception e){
-                Log.err("Failed to load previous global rules: ", e);
-            }
         }
 
         dataAssetDirectory = dataDirectory.child("assets");
@@ -333,12 +308,9 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        //autosave settings once a minute
+        //autosave admin data once a minute
         float saveInterval = 60;
-        Timer.schedule(() -> {
-            netServer.admins.forceSave();
-            Core.settings.forceSave();
-        }, saveInterval, saveInterval);
+        Timer.schedule(() -> netServer.admins.forceSave(), saveInterval, saveInterval);
 
         if(!mods.orderedMods().isEmpty()){
             info("@ mods loaded.", mods.orderedMods().size);
@@ -392,76 +364,15 @@ public class ServerControl implements ApplicationListener{
             return; //even if reading fails, legacy configs shouldn't be read, don't overwrite
         }
 
-        netServer.config = loadLegacyConfig();
+        netServer.config = new ServerConfig();
         saveServerConfig();
     }
 
-    /** Reads old Config values out of Core.settings by their legacy (pre-ServerConfig) keys, including old key overrides. */
-    ServerConfig loadLegacyConfig(){
-        ServerConfig c = new ServerConfig();
-
-        //note: the values are intentionally not removed from the config (yet) in case something goes wrong; the settings.bin file is being removed anyway, so there's no point
-        c.name = Core.settings.getString("servername", c.name);
-        c.desc = Core.settings.getString("desc", c.desc);
-        c.port = Core.settings.getInt("port", c.port);
-        c.playerLimit = Core.settings.getInt("playerlimit", c.playerLimit);
-        c.autoUpdate = Core.settings.getBool("autoUpdate", c.autoUpdate);
-        c.showConnectMessages = Core.settings.getBool("showConnectMessages", c.showConnectMessages);
-        c.enableVotekick = Core.settings.getBool("enableVotekick", c.enableVotekick);
-        c.startCommands = Core.settings.getString("startCommands", c.startCommands);
-        c.logging = Core.settings.getBool("logging", c.logging);
-        c.strict = Core.settings.getBool("strict", c.strict);
-        c.antiSpam = Core.settings.getBool("antiSpam", c.antiSpam);
-        c.interactRateWindow = Core.settings.getInt("interactRateWindow", c.interactRateWindow);
-        c.interactRateLimit = Core.settings.getInt("interactRateLimit", c.interactRateLimit);
-        c.interactRateKick = Core.settings.getInt("interactRateKick", c.interactRateKick);
-        c.messageRateLimit = Core.settings.getInt("messageRateLimit", c.messageRateLimit);
-        c.messageSpamKick = Core.settings.getInt("messageSpamKick", c.messageSpamKick);
-        c.packetSpamLimit = Core.settings.getInt("packetSpamLimit", c.packetSpamLimit);
-        c.uuidChangeLimit = Core.settings.getInt("uuidChangeLimit", c.uuidChangeLimit);
-        c.uuidChangeTimePeriod = Core.settings.getInt("uuidChangeTimePeriod", c.uuidChangeTimePeriod);
-        c.chatSpamLimit = Core.settings.getInt("chatSpamLimit", c.chatSpamLimit);
-        c.socketInput = Core.settings.getBool("socket", c.socketInput);
-        c.socketInputPort = Core.settings.getInt("socketInputPort", c.socketInputPort);
-        c.socketInputAddress = Core.settings.getString("socketInputAddress", c.socketInputAddress);
-        c.allowCustomClients = Core.settings.getBool("allow-custom", c.allowCustomClients);
-        c.whitelist = Core.settings.getBool("whitelist", c.whitelist);
-        c.motd = Core.settings.getString("motd", c.motd);
-        c.autosave = Core.settings.getBool("autosave", c.autosave);
-        c.autosaveAmount = Core.settings.getInt("autosaveAmount", c.autosaveAmount);
-        c.autosaveSpacing = Core.settings.getInt("autosaveSpacing", c.autosaveSpacing);
-        c.debug = Core.settings.getBool("debug", c.debug);
-        c.snapshotInterval = Core.settings.getInt("snapshotInterval", c.snapshotInterval);
-        c.autoPause = Core.settings.getBool("autoPause", c.autoPause);
-        c.roundExtraTime = Core.settings.getInt("roundExtraTime", c.roundExtraTime);
-        c.maxLogLength = Core.settings.getInt("maxLogLength", c.maxLogLength);
-        c.logCommands = Core.settings.getBool("logCommands", c.logCommands);
-        //this should never happen, but in case it does, log the error. no individual catch blocks.
-        try{
-            c.shuffleMode = ShuffleMode.valueOf(Core.settings.getString("shufflemode", c.shuffleMode.name()));
-            c.lastGamemode = Gamemode.valueOf(Core.settings.getString("lastServerMode", c.lastGamemode.name()));
-        }catch(Exception e){
-            Log.err("Invalid legacy config server value", e);
-        }
-
-        return c;
-    }
-
     void saveServerConfig(){
-        Fi tmp = configFile.sibling(configFile.name() + ".tmp");
-
         try{
-            JsonIO.write(netServer.config, Jformat.hjson, tmp);
+            FileIO.atomicWrite(configFile, tmp -> JsonIO.write(netServer.config, Jformat.hjson, tmp));
         }catch(Throwable t){
             err("Failed to write config.hjson!", t);
-            return;
-        }
-
-        try{
-            Files.move(tmp.file().toPath(), configFile.file().toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        }catch(IOException e){
-            err("Atomic config save failed, falling back to non-atomic move.", e);
-            tmp.moveTo(configFile);
         }
     }
 
@@ -801,34 +712,6 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        handler.register("dumpsettings", "Print every settings value. Useful for debugging.", arg -> {
-            var allKeys = Seq.with(Core.settings.keys());
-            allKeys.sort();
-            int maxLength = allKeys.max(String::length).length();
-            Log.info("Total values: @ | @ bytes", allKeys.size, Strings.formatByteCount(Core.settings.getSettingsFile().length()));
-
-            for(String key : allKeys){
-                var value = Core.settings.get(key, null);
-
-                String valueToString;
-
-                if(value instanceof byte[] b) valueToString = "[" + b.length + " bytes]";
-                else valueToString = String.valueOf(value);
-
-                String typeName = switch(value == null ? "null" : value.getClass().getSimpleName()){
-                    case "Integer" -> "int   ";
-                    case "Boolean" -> "bool  ";
-                    case "Float"   -> "float ";
-                    case "Long"    -> "long  ";
-                    case "byte[]"  -> "byte[]";
-                    case "String"  -> "string";
-                    default -> value.getClass().getSimpleName();
-                };
-
-                Log.info("&lg@  &lg| @&lg |  &lg@", key + " ".repeat(maxLength - key.length()), typeName, valueToString);
-            }
-        });
-
         handler.register("fillitems", "[team]", "Fill the core with items.", arg -> {
             if(!state.isGame()){
                 err("Not playing. Host first.");
@@ -964,7 +847,7 @@ public class ServerControl implements ApplicationListener{
             }else if(arg.length == 1){
                 if(arg[0].equals("clear")){
                     names.clear();
-                    netServer.admins.save();
+                    netServer.admins.saveNameBans();
                 }else{
                     err("You must provide a name regex to add or remove.");
                 }
@@ -989,7 +872,7 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     names.remove(target);
-                    netServer.admins.save();
+                    netServer.admins.saveNameBans();
                     info("Unbanned regex: @", arg[1]);
                 }else{
                     err("Incorrect usage. Provide add/remove as the second argument.");
