@@ -83,7 +83,7 @@ public abstract class Graphics implements Disposable{
      */
     public abstract long getFrameId();
 
-    /** @return the time span between the current frame and the last frame in seconds. Might be smoothed over n frames. */
+    /** @return the time span between the current frame and the last frame in seconds. */
     public abstract float getDeltaTime();
 
     /** @return the average number of frames per second */
