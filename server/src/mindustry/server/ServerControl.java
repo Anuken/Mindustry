@@ -328,7 +328,8 @@ public class ServerControl implements ApplicationListener{
         toggleSocket(netServer.config.socketInput);
 
         Events.on(ServerLoadEvent.class, e -> {
-            if(serverInput != null){
+            //tests drive the server through the harness, not stdin
+            if(serverInput != null && System.getProperty("mindustry.test") == null){
                 Thread thread = new Thread(serverInput, "Server Controls");
                 thread.setDaemon(true);
                 thread.start();
@@ -704,6 +705,7 @@ public class ServerControl implements ApplicationListener{
                         info("Changed rule: @", value.toString().replace("\n", " "));
                     }catch(Throwable e){
                         err("Error parsing rule JSON: @", e.getMessage());
+                        return; //don't update rules with invalid data if parsing fails
                     }
                 }
 
@@ -1090,7 +1092,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Fi newestSave = saveDirectory.findAll(f -> f.name().startsWith("auto_")).min(Fi::lastModified);
+            Fi newestSave = saveDirectory.findAll(f -> f.name().startsWith("auto_")).max(Fi::lastModified);
 
             if(newestSave == null){
                 err("No auto-saves found! Type `config autosave true` to enable auto-saves.");

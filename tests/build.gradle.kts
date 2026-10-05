@@ -13,6 +13,11 @@ sourceSets{
         java.setSrcDirs(listOf("src/client/java"))
         resources.setSrcDirs(listOf("src/client/resources", "src/test/resources"))
     }
+
+    create("serverTest"){
+        java.setSrcDirs(listOf("src/server/java"))
+        resources.setSrcDirs(listOf("src/server/resources", "src/test/resources"))
+    }
 }
 
 dependencies{
@@ -32,6 +37,16 @@ dependencies{
     "clientTestImplementation"("com.github.Anuken:natives-desktop:frog")
     "clientTestRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.7.1")
     "clientTestRuntimeOnly"("org.junit.platform:junit-platform-launcher")
+
+    //real headless server tests
+    "serverTestImplementation"(project(":core"))
+    "serverTestImplementation"(project(":server"))
+    "serverTestImplementation"("com.github.Anuken:backend-headless:frog")
+    "serverTestImplementation"("org.jline:jline:4.0.0")
+    "serverTestImplementation"("org.junit.jupiter:junit-jupiter-api:5.7.1")
+    "serverTestImplementation"("org.junit.jupiter:junit-jupiter-params:5.7.1")
+    "serverTestRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.7.1")
+    "serverTestRuntimeOnly"("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.test{
@@ -43,6 +58,31 @@ tasks.test{
     jvmArgs = listOf("-XX:+HeapDumpOnOutOfMemoryError")
     useJUnitPlatform()
     workingDir = file("../core/assets")
+    testLogging{
+        exceptionFormat = TestExceptionFormat.FULL
+        showStandardStreams = true
+    }
+}
+
+//Boots the real dedicated server (ServerLauncher) in a headless application. Run with: gradle tests:serverTest
+tasks.register<Test>("serverTest"){
+    group = "verification"
+    description = "Runs tests against a real headless server instance."
+
+    testClassesDirs = sourceSets["serverTest"].output.classesDirs
+    classpath = sourceSets["serverTest"].runtimeClasspath
+
+    //one server per JVM: Vars and Core are static
+    forkEvery = 1
+    maxParallelForks = 1
+    outputs.upToDateWhen{ false }
+    outputs.cacheIf{ false }
+    useJUnitPlatform()
+    workingDir = file("../core/assets")
+
+    jvmArgs = listOf("-XX:+HeapDumpOnOutOfMemoryError")
+    systemProperty("servertest.data.dir", layout.buildDirectory.dir("server_test_data").get().asFile.absolutePath)
+
     testLogging{
         exceptionFormat = TestExceptionFormat.FULL
         showStandardStreams = true

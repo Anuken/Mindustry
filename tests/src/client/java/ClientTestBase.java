@@ -87,6 +87,8 @@ public abstract class ClientTestBase{
             state.rules.waves = false;
             state.rules.waveTimer = false;
             state.rules.borderDarkness = false;
+            //prevent unit death
+            state.rules.unitCap = 100000;
 
             state.beginMapLoad();
             World world = state.resizeWorld(width, height);

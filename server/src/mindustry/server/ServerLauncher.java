@@ -41,7 +41,8 @@ public class ServerLauncher implements ApplicationListener{
 
     @Override
     public void init(){
-        Core.settings.setDataDirectory(Core.files.local("config"));
+        String dataDir = System.getProperty("mindustry.data.dir", OS.env("MINDUSTRY_DATA_DIR"));
+        Core.settings.setDataDirectory(dataDir != null ? Core.files.absolute(dataDir) : Core.files.local("config"));
         loadLocales = false;
         headless = true;
 
