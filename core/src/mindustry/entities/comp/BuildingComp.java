@@ -1333,7 +1333,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         Draw.color(team.color);
         if(block.teamOverlayRegion.found()){
             //custom = centered, otherwise bottom left
-            Draw.rect(block.teamOverlayRegion, x, y);
+            Draw.rect(block.teamOverlayRegion, x, y, block.rotateTeamOverlay ? rotdeg() : 0f);
         }else{
             Draw.rect(block.defaultTeamOverlayRegion, x - block.size * tilesize / 2f + 4, y - block.size * tilesize / 2f + 4);
         }

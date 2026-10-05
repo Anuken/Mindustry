@@ -137,6 +137,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public boolean drawArrow = true;
     /** whether to draw the team corner by default */
     public boolean drawTeamOverlay = true;
+    /** whether to rotate the enemy-team overlay sprite (only applied to custom ones) */
+    public boolean rotateTeamOverlay = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
