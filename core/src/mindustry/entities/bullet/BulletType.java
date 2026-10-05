@@ -369,7 +369,7 @@ public class BulletType extends Content implements Cloneable{
     /** Liquid that puddles created are made of. */
     public Liquid puddleLiquid = Liquids.water;
 
-    /** Whether to display the ammo multiplayer for this bullet type in its stats. */
+    /** Whether to display the ammo multiplier for this bullet type in its stats. */
     public boolean displayAmmoMultiplier = true;
     /** If >0, this is displayed divided by the ammo multiplier. */
     public float statLiquidConsumed;

@@ -27,6 +27,7 @@ public class StatUnit{
     seconds = new StatUnit("seconds"),
     minutes = new StatUnit("minutes"),
     shots = new StatUnit("shots"),
+    bullets = new StatUnit("bullets"),
     perSecond = new StatUnit("perSecond", false),
     perMinute = new StatUnit("perMinute", false),
     perShot = new StatUnit("perShot", false),

@@ -28,7 +28,10 @@ public class ItemTurret extends Turret{
     }
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
+    @Override
     public void ammo(Object... objects){
+        super.ammo(objects);
+
         ammoTypes = OrderedMap.of(objects);
     }
 

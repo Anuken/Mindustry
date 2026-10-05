@@ -23,8 +23,11 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
+    @Override
     public void ammo(Object... objects){
-        ammoTypes = ObjectMap.of(objects);
+        super.ammo(objects);
+
+        ammoTypes = OrderedMap.of(objects);
     }
 
     @Override

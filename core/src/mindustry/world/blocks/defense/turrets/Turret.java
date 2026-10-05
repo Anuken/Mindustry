@@ -156,6 +156,9 @@ public class Turret extends ReloadTurret{
     /** How much the screen shakes per shot. */
     public float shake = 0f;
 
+    /** Map of ammo types. */
+    public ObjectMap<?, BulletType> ammoTypes = new OrderedMap<>();
+
     /** Defines drawing behavior for this turret. */
     public DrawBlock drawer = new DrawTurret();
 
@@ -185,10 +188,12 @@ public class Turret extends ReloadTurret{
         super.setStats(stats);
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
-        stats.add(Stat.reload, 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)) * shoot.shots, StatUnit.perSecond);
+        stats.add(Stat.reload, t -> {
+            t.add(Strings.autoFixed(60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)), 2) +
+            StatUnit.perSecond.localized() + (!bulletPatternShots() && shoot.shots > 1 ? " ~ " + shoot.shots + " " + StatUnit.bullets.localized() : ""));
+        });
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
-        if(ammoPerShot != 1) stats.add(Stat.ammoUse, ammoPerShot, StatUnit.perShot);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
         if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
     }
@@ -265,6 +270,19 @@ public class Turret extends ReloadTurret{
         public abstract BulletType type();
     }
 
+    /** Initializes accepted ammo map. Format: [Object, bullet1, Object, bullet2...] */
+    public void ammo(Object... objects){
+        ammoTypes = OrderedMap.of(objects);
+    }
+
+    /** Return whether the number of shots from any {@link BulletType} differ from {@link #shoot} shots. */
+    public boolean bulletPatternShots(){
+        for(var entry : ammoTypes.entries()){
+            var p = entry.value.shootPattern;
+            if(p != null && p.shots != shoot.shots) return true;
+        }
+        return false;
+    }
 
     @Override
     public boolean rotatedOutput(int x, int y){
@@ -766,7 +784,7 @@ public class Turret extends ReloadTurret{
                 int barrel = barrelCounter;
 
                 if(delay > 0f){
-                    Vars.state.run(delay, () -> {
+                    state.run(delay, () -> {
                         //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
                         int prev = barrelCounter;
                         barrelCounter = barrel;
