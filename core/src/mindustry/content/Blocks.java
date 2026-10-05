@@ -3999,9 +3999,6 @@ public class Blocks{
                     collidesTiles = false;
                     splashDamageRadius = 30f * 0.75f;
                     splashDamage = 70f;
-                    shootPattern = new ShootPattern(){{
-                        shots = 20;
-                    }};
 
                     backColor = hitColor = trailColor = Pal.graphiteAmmoBack;
                     frontColor = Pal.graphiteAmmoFront;

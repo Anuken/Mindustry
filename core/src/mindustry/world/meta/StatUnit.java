@@ -31,6 +31,7 @@ public class StatUnit{
     perSecond = new StatUnit("perSecond", false),
     perMinute = new StatUnit("perMinute", false),
     perShot = new StatUnit("perShot", false),
+    perBurst = new StatUnit("perBurst", false),
     perLeg = new StatUnit("perLeg"),
     perSide = new StatUnit("perSide"),
     timesSpeed = new StatUnit("timesSpeed", false),

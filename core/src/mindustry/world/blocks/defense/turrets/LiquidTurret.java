@@ -38,6 +38,7 @@ public class LiquidTurret extends Turret{
     @Override
     public void setStats(Stats stats){
         super.setStats(stats);
+        ammoTypes.each((l, b) -> b.statLiquidConsumed = reloadInterval() / 60f);
 
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
     }

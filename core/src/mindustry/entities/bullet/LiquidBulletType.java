@@ -39,7 +39,6 @@ public class LiquidBulletType extends BulletType{
         shootEffect = Fx.none;
         drag = 0.001f;
         knockback = 0.55f;
-        displayAmmoMultiplier = false;
     }
 
     public LiquidBulletType(){

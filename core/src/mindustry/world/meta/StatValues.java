@@ -729,7 +729,15 @@ public class StatValues{
                 boolean compact = t instanceof UnitType && !showUnit || nested;
 
                 BulletType type = map.get(t);
-                Turret turret = blockName != null && Vars.content.block(blockName) instanceof Turret turr ? turr : null; //not ideal but there s enough overloads already
+                Turret turret = blockName != null && Vars.content.block(blockName) instanceof Turret tur ? tur : null; //not ideal but there s enough overloads already
+                int patternShots;
+                if(type.shootPattern != null){
+                    patternShots = type.shootPattern.shots;
+                }else if(turret != null){
+                    patternShots = turret.shoot.shots;
+                }else{
+                    patternShots = 1;
+                }
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
                     ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false, blockName).display(table);
@@ -739,21 +747,25 @@ public class StatValues{
                 table.table(Styles.grayPanel, bt -> {
                     bt.left().top().defaults().padRight(3).left();
                     //no point in displaying unit icon twice
-                    if(!compact){
+                    if(!compact && !(t instanceof Turret)){
                         bt.table(title -> {
                             title.image(icon(t)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top().with(i -> withTooltip(i, t, false));
 
                             title.add(t.localizedName).padRight(10).left().top();
 
-                            if(type.displayAmmoMultiplier){
+                            if(type.displayAmmoMultiplier && turret != null){
+                                float once = !turret.consumeAmmoOnce ? patternShots : 1f;
+
                                 if(type.statLiquidConsumed > 0f){
-                                    title.add("[stat]" + fixValue(type.statLiquidConsumed / type.ammoMultiplier * 60f) + "[lightgray]" + StatUnit.perSecond.localized());
-                                }else if(turret != null && (!(t instanceof Turret tt) || tt.displayAmmoMultiplier)){
-                                    title.add("[stat]" + fixValue(turret.ammoPerShot / type.ammoMultiplier) + "[lightgray]" + StatUnit.perShot.localized());
+                                    title.add("[stat]" + fixValue(once * type.statLiquidConsumed / type.ammoMultiplier * 60f) +
+                                        "[lightgray]" + StatUnit.perSecond.localized());
+                                }else if(!(t instanceof Turret tt) || tt.displayAmmoMultiplier){
+                                    title.add("[stat]" + fixValue(once * turret.ammoPerShot / type.ammoMultiplier) +
+                                        "[lightgray]" + (patternShots > 1 ? StatUnit.perBurst.localized() : StatUnit.perShot.localized()));
                                 }
                             }
                         });
-                        bt.row();
+                        bt.row().marginBottom(6f);
                     }
 
                     if(blockName != null && t != null){
@@ -761,14 +773,7 @@ public class StatValues{
                         bt.row();
                     }
 
-                    int patternShots = 0;
-                    if(type.shootPattern != null){
-                        patternShots = type.shootPattern.shots;
-                    }else if(turret != null && turret.bulletPatternShots()){
-                        patternShots = turret.shoot.shots;
-                    }
-
-                    if(patternShots > 1){
+                    if(patternShots > 1 && (turret == null || turret.bulletPatternShots())){
                         bt.add("[stat]" + patternShots + " [lightgray]" + StatUnit.bullets.localized()).row();
                     }
 

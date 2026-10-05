@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -189,8 +188,8 @@ public class Turret extends ReloadTurret{
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         stats.add(Stat.reload, t -> {
-            t.add(Strings.autoFixed(60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)), 2) +
-            StatUnit.perSecond.localized() + (!bulletPatternShots() && shoot.shots > 1 ? " ~ " + shoot.shots + " " + StatUnit.bullets.localized() : ""));
+            t.add(Strings.autoFixed(reloadInterval(), 3) +
+            StatUnit.perSecond.localized() + (!bulletPatternShots() && shoot.shots > 1 ? " x " + shoot.shots + " " + StatUnit.bullets.localized() : ""));
         });
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
@@ -249,12 +248,6 @@ public class Turret extends ReloadTurret{
         drawer.getRegionsToOutline(this, out);
     }
 
-    public void limitRange(BulletType bullet, float margin){
-        float realRange = bullet.rangeChange + range;
-        //doesn't handle drag
-        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin + 10f) / bullet.speed;
-    }
-
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
@@ -262,6 +255,16 @@ public class Turret extends ReloadTurret{
         if(drawMinRange){
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, minRange, Pal.placing);
         }
+    }
+
+    public float reloadInterval(){
+        return 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)); //in seconds
+    }
+
+    public void limitRange(BulletType bullet, float margin){
+        float realRange = bullet.rangeChange + range;
+        //doesn't handle drag
+        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin + 10f) / bullet.speed;
     }
 
     public static abstract class AmmoEntry{
@@ -778,7 +781,6 @@ public class Turret extends ReloadTurret{
             }
 
             ShootPattern pattern = type.shootPattern != null ? type.shootPattern : shoot;
-
             pattern.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
                 int barrel = barrelCounter;
