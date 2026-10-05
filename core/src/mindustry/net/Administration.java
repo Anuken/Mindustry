@@ -34,6 +34,9 @@ public class Administration{
     public Seq<String> subnetBans = new Seq<>();
     public ObjectSet<String> dosBlacklist = new ObjectSet<>();
     public ObjectMap<String, Long> kickedIPs = new ObjectMap<>();
+
+    private final ObjectMap<String, Seq<PlayerInfo>> ipIndex = new ObjectMap<>();
+    private final ObjectSet<String> bannedIPSet = new ObjectSet<>();
     public Seq<Pattern> bannedNames = new Seq<>();
 
     private final Fi bansDirectory = dataDirectory.child("bans");
@@ -216,7 +219,16 @@ public class Administration{
         info.lastIP = ip;
         info.timesJoined++;
         if(!info.names.contains(name, false)) info.names.add(name);
-        if(!info.ips.contains(ip, false)) info.ips.add(ip);
+        if(!info.ips.contains(ip, false)){
+            info.ips.add(ip);
+            indexIP(ip, info);
+        }
+    }
+
+    private void indexIP(String ip, PlayerInfo info){
+        Seq<PlayerInfo> list = ipIndex.get(ip);
+        if(list == null) ipIndex.put(ip, list = new Seq<>(false, 1));
+        list.add(info);
     }
 
     public boolean banPlayer(String uuid){
@@ -228,16 +240,14 @@ public class Administration{
      * If there are players who at any point had this IP, they will be UUID banned as well.
      */
     public boolean banPlayerIP(String ip){
-        if(bannedIPs.contains(ip, false))
+        if(bannedIPSet.contains(ip))
             return false;
 
-        for(PlayerInfo info : playerInfo.values()){
-            if(info.ips.contains(ip, false)){
-                info.banned = true;
-            }
-        }
+        Seq<PlayerInfo> infos = ipIndex.get(ip);
+        if(infos != null) infos.each(info -> info.banned = true);
 
         bannedIPs.add(ip);
+        bannedIPSet.add(ip);
         save();
         saveBannedIPs();
         Events.fire(new PlayerIpBanEvent(ip));
@@ -261,16 +271,16 @@ public class Administration{
      * This method also unbans any player that was banned and had this IP.
      */
     public boolean unbanPlayerIP(String ip){
-        boolean found = bannedIPs.contains(ip, false);
+        boolean found = bannedIPSet.contains(ip);
 
-        for(PlayerInfo info : playerInfo.values()){
-            if(info.ips.contains(ip, false)){
-                info.banned = false;
-                found = true;
-            }
+        Seq<PlayerInfo> infos = ipIndex.get(ip);
+        if(infos != null){
+            infos.each(info -> info.banned = false);
+            found = true;
         }
 
         bannedIPs.remove(ip, false);
+        bannedIPSet.remove(ip);
 
         if(found){
             save();
@@ -291,6 +301,7 @@ public class Administration{
 
         info.banned = false;
         bannedIPs.removeAll(info.ips, false);
+        for(String ip : info.ips) bannedIPSet.remove(ip);
         save();
         saveBannedIPs();
         Events.fire(new PlayerUnbanEvent(state.entities.player.find(p -> id.equals(p.uuid())), id));
@@ -406,7 +417,8 @@ public class Administration{
     }
 
     public boolean isIPBanned(String ip){
-        return bannedIPs.contains(ip, false) || (findByIP(ip) != null && findByIP(ip).banned) || (steam && ip.startsWith("steam") && SteamAdmin.isBanned(ip));
+        PlayerInfo found = findByIP(ip);
+        return bannedIPSet.contains(ip) || (found != null && found.banned) || (steam && ip.startsWith("steam") && SteamAdmin.isBanned(ip));
     }
 
     public boolean isIDBanned(String uuid){
@@ -451,15 +463,8 @@ public class Administration{
     }
 
     public Seq<PlayerInfo> findByIPs(String ip){
-        Seq<PlayerInfo> result = new Seq<>();
-
-        for(PlayerInfo info : playerInfo.values()){
-            if(info.ips.contains(ip, false)){
-                result.add(info);
-            }
-        }
-
-        return result;
+        Seq<PlayerInfo> list = ipIndex.get(ip);
+        return list == null ? new Seq<>() : new Seq<>(list);
     }
 
     public PlayerInfo getInfo(String id){
@@ -471,12 +476,8 @@ public class Administration{
     }
 
     public PlayerInfo findByIP(String ip){
-        for(PlayerInfo info : playerInfo.values()){
-            if(info.ips.contains(ip, false)){
-                return info;
-            }
-        }
-        return null;
+        Seq<PlayerInfo> list = ipIndex.get(ip);
+        return list == null ? null : list.first();
     }
 
     public Seq<PlayerInfo> getWhitelisted(){
@@ -554,6 +555,7 @@ public class Administration{
     @SuppressWarnings("unchecked")
     private void load(){
         bannedIPs = loadLines(ipsFile);
+        bannedIPSet.addAll(bannedIPs);
         subnetBans = loadLines(subnetsFile);
         whitelist = loadLines(whitelistFile);
 
@@ -575,6 +577,10 @@ public class Administration{
                     Log.err("Failed to read player data file. It will be wiped.", t);
                 }
             }
+        }
+
+        for(PlayerInfo info : playerInfo.values()){
+            for(String ip : info.ips) indexIP(ip, info);
         }
     }
 
