@@ -146,7 +146,7 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public void drawTeamTop(){
+        public void dropped(){
             carried = false;
         }
 
