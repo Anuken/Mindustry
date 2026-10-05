@@ -2,7 +2,6 @@ package mindustry.core;
 
 import arc.*;
 import arc.files.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.util.serialization.*;
 import mindustry.mod.*;
@@ -13,6 +12,7 @@ import mindustry.ui.FileChooser.*;
 import rhino.*;
 
 import java.net.*;
+import java.security.*;
 
 public interface Platform{
 
@@ -89,8 +89,9 @@ public interface Platform{
     default String getUUID(){
         String uuid = Core.settings.getString("uuid", "");
         if(uuid.isEmpty()){
-            byte[] result = new byte[8];
-            new Rand().nextBytes(result);
+            //UUID is 16 bytes as of v9, used to be 8 bytes
+            byte[] result = new byte[16];
+            new SecureRandom().nextBytes(result);
             uuid = new String(Base64Coder.encode(result));
             Core.settings.put("uuid", uuid);
             return uuid;

@@ -492,7 +492,7 @@ public class DesktopLauncher extends ClientLauncher{
                 new Rand(SVars.user.user.getSteamID().getAccountID()).nextBytes(result);
                 return new String(Base64Coder.encode(result));
             }catch(Exception e){
-                e.printStackTrace();
+                Log.err(e);
             }
         }
 
