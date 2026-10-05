@@ -428,6 +428,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public TextureRegion region;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
+    public @Load("@-team-overlay") TextureRegion teamOverlayRegion;
+    public @Load("block-border") TextureRegion defaultTeamOverlayRegion;
     public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
 
     protected static final Seq<Tile> tempTiles = new Seq<>();

@@ -30,6 +30,7 @@ public class StorageBlock extends Block{
         envEnabled = Env.any;
         drawCached = true;
         drawDynamic = false;
+        drawTeamOverlay = false; //vaults/containers/cores already tint themselves
     }
 
     @Override
