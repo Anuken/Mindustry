@@ -111,8 +111,8 @@ public class LParser{
             tokens[1] = opNameChanges.get(tokens[1], tokens[1]);
         }
         if(tokens[0].equals("status")){
-            if(Vars.content.statusEffect(tokens[1]) != null){
-                tokens[1] = "@status-" + tokens[1];
+            if(Vars.content.statusEffect(tokens[2]) != null){
+                tokens[2] = "@status-" + tokens[2];
             }
         }
     }
