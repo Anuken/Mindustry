@@ -3,6 +3,10 @@ package mindustry.mod;
 import arc.struct.*;
 
 public class ModClassLoader extends ClassLoader{
+    static{
+        registerAsParallelCapable();
+    }
+
     private Seq<ClassLoader> children = new Seq<>();
     private ThreadLocal<Boolean> inChild = new ThreadLocal<>(){
         @Override

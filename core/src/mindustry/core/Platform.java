@@ -22,6 +22,7 @@ public interface Platform{
             static{
                 registerAsParallelCapable();
             }
+
             @Override
             protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
                 //check for loaded state
