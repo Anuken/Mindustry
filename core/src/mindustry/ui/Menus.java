@@ -74,11 +74,11 @@ public class Menus{
         });
 
         dialog.originalListener = result -> {
-            dialog.wasHidden = true; //don't trigger the hidden listener
             result.token = token;
             if(net.client()) Call.menuBuilderChoose(player, id, result);
 
             if(hideOnClick){
+                dialog.wasHidden = true; //don't trigger the hidden listener
                 dialog.hide();
             }
         };

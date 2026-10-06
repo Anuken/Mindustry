@@ -1021,6 +1021,7 @@ public class ControlPathfinder implements Runnable{
 
         if(dest == Integer.MAX_VALUE){
             request.notFound = true;
+            request.oldCache = null;
             //no node found (TODO: invalid state??)
             return;
         }
@@ -1162,7 +1163,7 @@ public class ControlPathfinder implements Runnable{
 
         boolean any = false;
 
-        long fieldKey = FieldIndex.get(destPos, costId, team);
+        long fieldKey = FieldIndex.get(request != null ? request.destination : destPos, costId, team);
 
         //use existing request if it exists.
         if(request != null && (request.destination == destPos ||
@@ -1280,12 +1281,28 @@ public class ControlPathfinder implements Runnable{
             }
         }else{
             //destroy the old one immediately, it's invalid now
+            FieldCache previousField = null;
             if(request != null){
                 request.lastUpdateId = -1000;
+
+                FieldCache current = null;
+                try{
+                    current = fields.get(FieldIndex.get(request.destination, costId, team));
+                }catch(Exception ignored){
+                }
+
+                if(current != null && current.frontier.isEmpty()){
+                    previousField = current;
+                }else if(request.oldCache != null){
+                    previousField = request.oldCache;
+                }else{
+                    previousField = current;
+                }
             }
 
             //queue new request.
             unitRequests.put(unit, request = new PathRequest(unit, team, costId, destPos, state.updateId));
+            request.oldCache = previousField;
 
             PathRequest f = request;
             request.lastRecomputeTime = Time.millis();
