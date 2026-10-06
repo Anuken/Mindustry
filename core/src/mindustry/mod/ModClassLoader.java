@@ -4,7 +4,11 @@ import arc.struct.*;
 
 public class ModClassLoader extends ClassLoader{
     static{
-        registerAsParallelCapable();
+        try{
+            registerAsParallelCapable();
+        }catch(Throwable ignore){
+            // Android once again ruining my day...
+        }
     }
 
     private Seq<ClassLoader> children = new Seq<>();
