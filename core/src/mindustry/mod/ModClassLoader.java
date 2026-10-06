@@ -3,6 +3,14 @@ package mindustry.mod;
 import arc.struct.*;
 
 public class ModClassLoader extends ClassLoader{
+    static{
+        try{
+            registerAsParallelCapable();
+        }catch(Throwable ignore){
+            // Android once again ruining my day...
+        }
+    }
+
     private Seq<ClassLoader> children = new Seq<>();
     private ThreadLocal<Boolean> inChild = new ThreadLocal<>(){
         @Override
