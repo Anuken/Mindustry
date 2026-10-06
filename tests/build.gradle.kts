@@ -39,6 +39,10 @@ val testCommonRuntime = configurations.create("testCommonRuntime"){
     isCanBeConsumed = false
 }
 
+val androidSignature = configurations.create("androidSignature"){
+    isCanBeConsumed = false
+}
+
 configurations{
     for(name in listOf("test", "clientTest", "serverTest")){
         named("${name}Implementation"){ extendsFrom(testCommon) }
@@ -54,6 +58,8 @@ dependencies{
     testCommonRuntime("org.junit.platform:junit-platform-launcher")
 
     testImplementation("com.github.Anuken:backend-headless:frog")
+    testImplementation("org.codehaus.mojo:animal-sniffer:1.23")
+    "androidSignature"("net.sf.androidscents.signature:android-api-level-21:5.0.1_r2@signature")
 
     //graphical client tests
     "clientTestImplementation"("com.github.Anuken:backend-sdl3:frog")
@@ -80,6 +86,9 @@ tasks.test{
     jvmArgs = listOf("-XX:+HeapDumpOnOutOfMemoryError")
     useJUnitPlatform()
     workingDir = file("../core/assets")
+    doFirst{
+        systemProperty("android.signature", androidSignature.singleFile.absolutePath)
+    }
     testLogging{
         exceptionFormat = TestExceptionFormat.FULL
         showStandardStreams = true
