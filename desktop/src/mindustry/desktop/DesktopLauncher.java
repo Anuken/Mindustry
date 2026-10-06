@@ -28,6 +28,7 @@ import org.lwjgl.system.*;
 import steamworks.*;
 
 import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -84,6 +85,10 @@ public class DesktopLauncher extends ClientLauncher{
                                     }
                                 }
                                 Log.err("Invalid GL version format string: '@'. GL version must be of the form <major>.<minor>", str);
+                            }
+                            case "open" -> {
+                                Fi file = new Fi(arg[i + 1]);
+                                Events.on(ClientCreateEvent.class, e -> Core.app.getListeners().each(a -> a.fileDropped(file)));
                             }
                             case "coreGl" -> coreProfile = true;
                             case "noAngle" -> useAngle = false;

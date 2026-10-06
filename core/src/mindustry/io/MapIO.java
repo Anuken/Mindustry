@@ -88,7 +88,7 @@ public class MapIO{
             Pixmap floors = new Pixmap(map.width, map.height);
             Pixmap walls = new Pixmap(map.width, map.height);
             int black = 255;
-            int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
+            int shade = Color.rgba8888(0f, 0f, 0.1f, 0.5f);
 
             int width = map.width, height = map.height;
             int len = width*height;
@@ -104,7 +104,11 @@ public class MapIO{
                     int c = colorFor(type, Blocks.air, Blocks.air, team());
                     if(c != black){
                         walls.setRaw(x, floors.height - 1 - y, c);
-                        floors.set(x, floors.height - 1 - y + 1, shade);
+                        int offset = -(type.size - 1) / 2;
+                        for(int dx = 0; dx < type.size; dx++){
+                            int px = x + dx + offset, py = floors.height - 1 - (y + offset) + 1;
+                            floors.set(px, py, Pixmap.blend(shade, floors.get(px, py)));
+                        }
                     }
                 }
             };
@@ -182,6 +186,16 @@ public class MapIO{
             ver.readRegion("content", stream, counter, in -> readPreviewContentHeader(in, context));
             if(ver.version == 11) ver.skipChunk(stream);
             ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, context));
+
+            for(int y = 0; y < height; y++){
+                for(int x = 0; x < width; x++){
+                    if(!((Floor)content.block(floorIds[x + y * width])).isLiquid) continue;
+                    if(y < height - 1 && ((Floor)content.block(floorIds[x + (y + 1) * width])).isLiquid) continue;
+
+                    int row = height - 1 - y;
+                    floors.set(x, row, new Color(floors.get(x, row)).mul(0.84f, 0.84f, 0.9f, 1f));
+                }
+            }
 
             floors.draw(walls, true);
             walls.dispose();

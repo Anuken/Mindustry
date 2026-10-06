@@ -1,4 +1,3 @@
-
 import arc.files.*
 import arc.graphics.*
 import arc.packer.*
@@ -276,4 +275,18 @@ tasks.register("updateBundles"){
             child.writeString(result.toString())
         }
     }
+}
+
+//Standalone jar for generating map previews: java -jar tools/build/libs/MapPreview.jar in.msav out.png
+tasks.register<Jar>("mapPreviewJar"){
+    dependsOn(tasks.classes, configurations.runtimeClasspath)
+    archiveFileName.set("MapPreview.jar")
+    manifest{ attributes("Main-Class" to "mindustry.tools.MapPreviewCLI") }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from(sourceSets.main.get().output)
+    from(rootProject.file("core/assets")){ include("locales", "logicids.dat", "sprites/block_colors.png", "planets/**") }
+    from({ configurations.runtimeClasspath.get().map{ if(it.isDirectory) it else zipTree(it) } })
+    exclude("META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA")
+    exclude("com/**") //tools dependencies, unnecessary
 }
