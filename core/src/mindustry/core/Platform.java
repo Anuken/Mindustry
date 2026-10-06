@@ -19,18 +19,29 @@ public interface Platform{
     /** Dynamically creates a class loader for a jar file. This loader must be child-first. */
     default ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
         return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent){
+            static{
+                registerAsParallelCapable();
+            }
             @Override
             protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
                 //check for loaded state
-                Class<?> loadedClass = findLoadedClass(name);
-                if(loadedClass == null){
-                    try{
-                        //try to load own class first
-                        loadedClass = findClass(name);
-                    }catch(ClassNotFoundException e){
-                        //use parent if not found
-                        return parent.loadClass(name);
+                Class<?> loadedClass;
+                //lock per class name
+                synchronized(getClassLoadingLock(name)){
+                    //check for loaded state
+                    loadedClass = findLoadedClass(name);
+                    if(loadedClass == null){
+                        try{
+                            //try to load own class first
+                            loadedClass = findClass(name);
+                        }catch(ClassNotFoundException ignored){
+                        }
                     }
+                }
+
+                //use parent if not found
+                if(loadedClass == null){
+                    return parent.loadClass(name);
                 }
 
                 if(resolve){
