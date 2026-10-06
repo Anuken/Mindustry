@@ -147,6 +147,16 @@ public final class DriverClient{
         return command("net");
     }
 
+    /** @return the chat messages the client has received, newest first, one per line. */
+    public String chat(){
+        return command("chat");
+    }
+
+    /** Sends a chat message to the server, as if typed in the chat box. */
+    public void say(String text){
+        command("say " + text);
+    }
+
     /** @return the single-word value of a key in the output of {@link #state} (state, tick, wave...) or null. Use {@link #js} for anything else. */
     public String stateValue(String key){
         Matcher matcher = Pattern.compile("(?:^|\\s)" + Pattern.quote(key) + "=(\\S*)").matcher(state());

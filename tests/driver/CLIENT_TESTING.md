@@ -43,6 +43,8 @@ Commands are strictly sequential. Every command returns plain text; failures ret
 | `connect [host] [port]` | join a server the way the join dialog does (default localhost, 6567) |
 | `disconnect` | leave the server and return to the menu |
 | `net` | connection state: client/active, player count, own name and id |
+| `chat` | chat messages received so far, newest first, one per line |
+| `say <text>` | send a chat message to the server |
 | `js <code>` | run JavaScript on the render thread with the whole game in scope |
 | `quit` | shut down (also stops Xvfb) |
 

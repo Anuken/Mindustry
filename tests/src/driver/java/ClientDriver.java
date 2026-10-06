@@ -38,7 +38,7 @@ public class ClientDriver extends ClientTestBase{
     input:    click <x> <y> [right] | move <x> <y> | drag <x1> <y1> <x2> <y2> | scroll <dy> | key <KeyCode> [down|up] | type <text>
               clicktext <text> | clicktile <tx> <ty> [right]
     loading:  menu | map <internal map, e.g. serpulo/groundZero> | sector <preset, e.g. groundZero> | js <code>
-    network:  connect [host] [port] | disconnect | net
+    network:  connect [host] [port] | disconnect | net | chat | say <text>
     window:   resize <w> <h>
     other:    ping | help | quit
     pixel coordinates are screenshot pixels, origin top-left""";
@@ -243,6 +243,22 @@ public class ClientDriver extends ClientTestBase{
                 return "connecting to " + host + ":" + serverPort + ", poll `net` and `state`";
             }
             case "disconnect": ClientHarness.run(() -> netClient.disconnectQuietly()); return "disconnected";
+            //chat messages the client has received, newest first
+            case "chat": {
+                String messages = ClientHarness.call(() -> {
+                    var field = mindustry.ui.fragments.ChatFragment.class.getDeclaredField("messages");
+                    field.setAccessible(true);
+                    var all = (arc.struct.Seq<?>)field.get(ui.chatfrag);
+                    return all.isEmpty() ? "no messages" : all.toString("\n").replace("\r", "");
+                });
+                return messages;
+            }
+            //sends a chat message to the server, like typing it in the chat box
+            case "say": {
+                if(rest.isEmpty()) throw new IllegalArgumentException("usage: say <text>");
+                ClientHarness.run(() -> mindustry.gen.Call.sendChatMessage(rest));
+                return "sent";
+            }
             case "net": return ClientHarness.call(() -> "client=" + net.client() + " active=" + net.active()
                 + " players=" + state.entities.player.size() + " me=" + player.name + "#" + player.id()
                 + " state=" + state.getState());
