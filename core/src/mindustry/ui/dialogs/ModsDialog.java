@@ -644,7 +644,7 @@ public class ModsDialog extends BaseDialog{
                 if(language.equals("Java") || language.equals("Kotlin") || language.equals("Groovy") || language.equals("Scala")){
                     githubImportJavaMod(repo, release, forceEnable);
                 }else{
-                    githubImportBranch(mainBranch, repo, release, forceEnable);
+                    githubImportScriptMod(mainBranch, repo, release, forceEnable);
                 }
             }, this::importFail);
         }
@@ -673,6 +673,38 @@ public class ModsDialog extends BaseDialog{
                 throw new ArcRuntimeException("No JAR file found in releases. Make sure you have a valid jar file in the mod's latest Github Release.");
             }
         }, this::importFail);
+    }
+
+    public void githubImportScriptMod(String branch, String repo, @Nullable String release, boolean forceEnable){
+        // try to get release first
+        Http.get(ghApi + "/repos/" + repo + "/releases/" + (release == null ? "latest" : release), res -> {
+            if(cancelledImport) return;
+            var json = Jval.read(res.getResultAsString());
+            var assets = json.get("assets").asArray();
+
+            var asset = assets.find(j -> j.getString("name").endsWith(".zip"));
+            if(asset != null){
+                //grab actual file
+                var url = asset.getString("browser_download_url");
+
+                Http.get(url, result -> {
+                    if(cancelledImport) return;
+                    handleMod(repo, result, forceEnable);
+                }, this::importFail);
+            }else{
+                // no asset found. fallback to branch
+                githubImportBranch(branch, repo, release, forceEnable);
+            }
+        }, e -> {
+            if(e instanceof HttpStatusException info){
+                // if no releases, try branch
+                if(info.status == HttpStatus.NOT_FOUND){
+                    githubImportBranch(branch, repo, release, forceEnable);
+                    return;
+                }
+            }
+            importFail(e);
+        });
     }
 
     public void githubImportBranch(String branch, String repo, @Nullable String release, boolean forceEnable){
