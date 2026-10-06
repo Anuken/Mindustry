@@ -442,6 +442,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         }
     }
 
+
+    public static void setUnitStanceChunked(IntSeq ids, UnitStance stance, boolean enable){
+        ids.chunked(1000, values -> setUnitStance(Vars.player, values, stance, enable));
+    }
+
+    public static void setUnitCommandChunked(IntSeq ids, UnitCommand command){
+        ids.chunked(1000, values -> setUnitCommand(Vars.player, values, command));
+    }
+
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
     public static void setUnitStance(Player player, int[] unitIds, UnitStance stance, boolean enable){
         if(player == null || unitIds == null || stance == null) return;
