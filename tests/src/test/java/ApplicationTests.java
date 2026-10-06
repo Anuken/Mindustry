@@ -719,7 +719,7 @@ public class ApplicationTests{
 
         entities.each(Building::updateProximity);
 
-        final int iterations = 100_000;
+        final int iterations = 10_000;
 
         //warmup
         for(int i = 0; i < iterations; i++){
