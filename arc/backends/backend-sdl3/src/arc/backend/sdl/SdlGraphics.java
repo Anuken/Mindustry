@@ -93,6 +93,15 @@ public class SdlGraphics extends Graphics{
         return logicalHeight == 0 ? y : y * getHeight() / logicalHeight;
     }
 
+    /** Inverse of scaleX/scaleY: converts getWidth()/getHeight() space to window points. */
+    float toWindowX(float x){
+        return getWidth() == 0 ? x : x * logicalWidth / getWidth();
+    }
+
+    float toWindowY(float y){
+        return getHeight() == 0 ? y : y * logicalHeight / getHeight();
+    }
+
     @Override
     public int getWidth(){
         if(app.config.hdpiMode == HdpiUtils.HdpiMode.pixels){
@@ -163,7 +172,8 @@ public class SdlGraphics extends Graphics{
 
     @Override
     public float getDensity(){
-        return displayScale;
+        //pixels per window point: 2 on retina, 1 otherwise
+        return logicalWidth == 0 ? 1f : backBufferWidth / (float)logicalWidth;
     }
 
     @Override

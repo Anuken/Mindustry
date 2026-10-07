@@ -95,10 +95,11 @@ public class SdlApplication implements Application{
                 if(lastFocus != null){
                     Vec2 pos = lastFocus.localToStageCoordinates(Tmp.v1.setZero());
                     try(MemoryStack stack = MemoryStack.stackPush()){
+                        //SDL expects window points, not pixels
                         SDL_Rect rect = SDL_Rect.malloc(stack)
-                        .set((int)pos.x,
-                        Core.graphics.getHeight() - 1 - (int)(pos.y + lastFocus.getHeight()),
-                        (int)lastFocus.getWidth(), (int)lastFocus.getHeight());
+                        .set((int)graphics.toWindowX(pos.x),
+                        (int)graphics.toWindowY(Core.graphics.getHeight() - 1 - (pos.y + lastFocus.getHeight())),
+                        (int)graphics.toWindowX(lastFocus.getWidth()), (int)graphics.toWindowY(lastFocus.getHeight()));
 
                         SDLKeyboard.nSDL_SetTextInputArea(window, rect.address(), 0);
                     }

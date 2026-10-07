@@ -504,7 +504,13 @@ public class Vars implements Loadable{
             settings.put("uiscale", 100);
         }
 
-        Scl.setProduct(Math.max(settings.getInt("uiscale", 100), 25) / 100f);
+        //when the backend reports raw pixels as the screen size (HdpiMode.pixels), everything must be scaled up by the pixel density, or the UI/world just gets smaller on hidpi displays
+        float density = 1f;
+        if(!headless && Core.graphics != null && app.isDesktop() && Core.graphics.getWidth() == Core.graphics.getBackBufferWidth()){
+            density = Math.max(Core.graphics.getDensity(), 1f);
+        }
+
+        Scl.setProduct(Math.max(settings.getInt("uiscale", 100), 25) / 100f * density);
 
         if(!loadLocales) return;
 
