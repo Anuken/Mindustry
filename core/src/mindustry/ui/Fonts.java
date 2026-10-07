@@ -66,14 +66,14 @@ public class Fonts{
     public static void loadFonts(){
         largeIcons.clear();
 
-        Core.assets.load("default", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
+        Core.assets.load("default", Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
             size = 18;
             shadowColor = Color.darkGray;
             shadowOffsetY = 2;
             incremental = true;
         }})).loaded = f -> Fonts.def = f;
 
-        Core.assets.load("monospace", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/monospace.woff", new FreeTypeFontParameter(){{
+        Core.assets.load("monospace", Font.class, new FreeTypeFontLoaderParameter("fonts/monospace.woff", new FreeTypeFontParameter(){{
             size = 16;
             incremental = true;
             //most people will never see the monospace font, so don't pre-bake anything
@@ -84,14 +84,14 @@ public class Fonts{
         //used in the default font (same size as text); not assigned to anything
         for(boolean outlined : Mathf.booleans){
             String suffix = outlined ? "-outline" : "";
-            Core.assets.load("iconSmall" + suffix, arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+            Core.assets.load("iconSmall" + suffix, Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
                 size = 18;
                 incremental = true;
                 characters = "\0";
                 borderColor = Color.darkGray;
             }})).loaded = f -> (outlined ? Fonts.outline : Fonts.def).addFallback(f);
 
-            Core.assets.load("runes" + suffix, arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/runes.woff", new FreeTypeFontParameter(){{
+            Core.assets.load("runes" + suffix, Font.class, new FreeTypeFontLoaderParameter("fonts/runes.woff", new FreeTypeFontParameter(){{
                 size = 18;
                 incremental = true;
                 characters = "\0";
@@ -99,13 +99,13 @@ public class Fonts{
             }})).loaded = f -> (outlined ? Fonts.outline : Fonts.def).addFallback(f);
         }
 
-        Core.assets.load("icon", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("icon", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 30;
             incremental = true;
             characters = "\0";
         }})).loaded = f -> Fonts.icon = f;
 
-        Core.assets.load("iconLarge", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("iconLarge", Font.class, new FreeTypeFontLoaderParameter("fonts/icon.ttf", new FreeTypeFontParameter(){{
             size = 48;
             incremental = true;
             characters = "\0";
@@ -113,7 +113,7 @@ public class Fonts{
             borderColor = Color.darkGray;
         }})).loaded = f -> Fonts.iconLarge = f;
 
-        Core.assets.load("logic", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/logic.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("logic", Font.class, new FreeTypeFontLoaderParameter("fonts/logic.ttf", new FreeTypeFontParameter(){{
             size = 16;
             //generated all at once, it's fast enough anyway
             incremental = false;
@@ -125,7 +125,7 @@ public class Fonts{
     public static void loadExtraFonts(){
         //Japanese needs to override the default font with its own characters - see https://heistak.github.io/your-code-displays-japanese-wrong/
         if(Locale.getDefault().getLanguage().equals("ja")){
-            Core.assets.load("font_jp", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
+            Core.assets.load("font_jp", Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
                 size = 18;
                 incremental = true;
                 shadowColor = Color.darkGray;
@@ -133,7 +133,7 @@ public class Fonts{
                 characters = "\u0000 ";
             }})).loaded = f -> Fonts.def.data.setOverride(f.data);
 
-            Core.assets.load("font_jp_outline", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
+            Core.assets.load("font_jp_outline", Font.class, new FreeTypeFontLoaderParameter("fonts/font_jp.woff", new FreeTypeFontParameter(){{
                 size = 18;
                 incremental = true;
                 borderColor = Color.darkGray;
@@ -279,7 +279,7 @@ public class Fonts{
         UI.packer.setTargetTexture(Core.atlas.find("ui-page-placeholder").texture);
 
         Core.assets.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(Core.files::internal));
-        Core.assets.setLoader(arc.graphics.font.Font.class, null, new FreetypeFontLoader(Core.files::internal){
+        Core.assets.setLoader(Font.class, null, new FreetypeFontLoader(Core.files::internal){
             ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
 
             @Override
@@ -301,13 +301,13 @@ public class Fonts{
             }
         });
 
-        Core.assets.load("outline", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
+        Core.assets.load("outline", Font.class, new FreeTypeFontLoaderParameter(mainFont, new FreeTypeFontParameter(){{
             borderColor = Color.darkGray;
             incremental = true;
             size = 18;
         }})).loaded = t -> Fonts.outline = t;
 
-        Core.assets.load("tech", arc.graphics.font.Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
+        Core.assets.load("tech", Font.class, new FreeTypeFontLoaderParameter("fonts/tech.ttf", new FreeTypeFontParameter(){{
             size = 18;
         }})).loaded = f -> {
             Fonts.tech = f;

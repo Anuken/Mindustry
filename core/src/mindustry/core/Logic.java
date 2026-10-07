@@ -120,7 +120,9 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            if(!headless) Core.settings.manualSave();
+            if(!headless) synchronized(Core.settings){
+                Core.settings.forceSave();
+            }
         });
 
         //sync research
@@ -334,7 +336,9 @@ public class Logic implements ApplicationListener{
         //fire change event, since it was technically changed
         Events.fire(new StateChangeEvent(prev, State.menu));
 
-        if(!headless) Core.settings.manualSave();
+        if(!headless) synchronized(Core.settings){
+            Core.settings.forceSave();
+        }
     }
 
     public void skipWave(){
@@ -530,7 +534,9 @@ public class Logic implements ApplicationListener{
         if(netServer != null){
             netServer.admins.forceSave();
         }
-        if(!headless) Core.settings.manualSave();
+        if(!headless) synchronized(Core.settings){
+            Core.settings.forceSave();
+        }
     }
 
     protected void updateEntities(){

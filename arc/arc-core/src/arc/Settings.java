@@ -104,13 +104,6 @@ public class Settings{
         modified = false;
     }
 
-    /** Manually save, if the settings have been loaded at some point. */
-    public synchronized void manualSave(){
-        if(loaded){
-            forceSave();
-        }
-    }
-
     /** Saves if any modifications were done. */
     public synchronized void autosave(){
         if(modified && shouldAutosave){
