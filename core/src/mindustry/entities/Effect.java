@@ -156,7 +156,7 @@ public class Effect{
             if(startDelay <= 0f){
                 add(x, y, rotation, color, data);
             }else{
-                Time.run(startDelay, () -> add(x, y, rotation, color, data));
+                Vars.state.run(startDelay, () -> add(x, y, rotation, color, data));
             }
         }
     }
@@ -273,7 +273,7 @@ public class Effect{
         int waves = Math.max(1, Mathf.ceil(rad / spacing));
         for(int i = 0; i < waves; i++){
             int fi = i;
-            Time.run(i * 3.5f, () -> {
+            Vars.state.run(i * 3.5f, () -> {
                 float radius = 1 + spacing * fi;
                 int rays = Mathf.ceil(radius * Mathf.PI * 2f / 6f * density);
                 for(int r = 0; r < rays; r++){

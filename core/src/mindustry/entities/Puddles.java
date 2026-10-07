@@ -58,9 +58,9 @@ public class Puddles{
 
             Puddle p = get(tile);
 
-            if(initial && p != null && p.lastRipple <= Time.time - 40f){
+            if(initial && p != null && p.lastRipple <= Vars.state.time - 40f){
                 Fx.ripple.at(ax, ay, 1f, tile.floor().liquidDrop.color);
-                p.lastRipple = Time.time;
+                p.lastRipple = Vars.state.time;
             }
             return;
         }
@@ -82,9 +82,9 @@ public class Puddles{
         }else if(p.liquid == liquid){
             p.accepting = Math.max(amount, p.accepting);
 
-            if(initial && p.lastRipple <= Time.time - 40f && p.amount >= maxLiquid / 2f){
+            if(initial && p.lastRipple <= Vars.state.time - 40f && p.amount >= maxLiquid / 2f){
                 Fx.ripple.at(ax, ay, 1f, p.liquid.color);
-                p.lastRipple = Time.time;
+                p.lastRipple = Vars.state.time;
             }
         }else{
             float added = reactPuddle(p.liquid, liquid, amount, p.tile, (p.x + source.worldx())/2f, (p.y + source.worldy())/2f);

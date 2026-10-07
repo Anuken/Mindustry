@@ -457,7 +457,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     Color color =
                     sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
                     sec.preset != null && sec.preset.requireUnlock ?
-                        sec.preset.unlocked() ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time, 10f, 1f)) :
+                        sec.preset.unlocked() ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Vars.state.time, 10f, 1f)) :
                         Color.gray :
                     sec.hasEnemyBase() ? Team.crux.color :
                     null;
@@ -583,7 +583,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(hovered != null && state.uiAlpha > 0.01f){
             planets.drawPlane(hovered, () -> {
-                Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
+                Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(Vars.state.time, 5f, 1f));
                 Draw.alpha(state.uiAlpha);
 
                 var icon =

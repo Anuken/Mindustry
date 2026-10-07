@@ -4,11 +4,10 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
 import mindustry.io.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import java.io.*;
-
-import static mindustry.Vars.*;
 
 public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
 
@@ -30,10 +29,11 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
             //read floor and create tiles first
             for(int i = 0; i < width * height; i++){
                 int x = i % width, y = i / width;
-                short floorid = stream.readShort();
-                short oreid = stream.readShort();
+                Block floor = context.reads.content(ContentType.block, stream.readShort());
+                Block overlay = context.reads.content(ContentType.block, stream.readShort());
                 int consecutives = stream.readUnsignedByte();
-                if(content.block(floorid) == Blocks.air) floorid = Blocks.stone.id;
+                if(floor == Blocks.air) floor = Blocks.stone;
+                int floorid = floor == null ? Blocks.stone.id : floor.id, oreid = overlay == null ? Blocks.air.id : overlay.id;
 
                 context.create(x, y, floorid, oreid, (short)0);
 
@@ -47,7 +47,7 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
 
             //read blocks
             for(int i = 0; i < width * height; i++){
-                Block block = content.block(stream.readShort());
+                Block block = context.reads.content(ContentType.block, stream.readShort());
                 Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
 
@@ -65,8 +65,20 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
 
                 if(block.hasBuilding()){
                     try{
-                        readLegacyShortChunk(stream, (in, len) -> {
+                        readLegacyShortChunk(stream, context.reads, (in, len) -> {
                             byte version = in.b();
+
+                            if(context.preview){
+                                //previews never create buildings, so only the team is read
+                                stream.readUnsignedShort(); //health
+                                byte packedteam = stream.readByte();
+                                boolean extraTeam = Pack.leftByte(packedteam) == 8;
+                                byte previewTeam = extraTeam ? stream.readByte() : Pack.leftByte(packedteam);
+                                skipBytes(in.input, len - (extraTeam ? 5 : 4));
+                                context.onReadPreviewBuilding(Team.get(previewTeam));
+                                return;
+                            }
+
                             //legacy impl of Building#read()
                             tile.build.health = stream.readUnsignedShort();
                             byte packedrot = stream.readByte();
@@ -88,8 +100,6 @@ public abstract class LegacySaveVersion extends LegacyRegionSaveVersion{
                     }catch(Throwable e){
                         throw new IOException("Failed to read tile entity of block: " + block, e);
                     }
-
-                    context.onReadBuilding();
                 }else{
                     int consecutives = stream.readUnsignedByte();
 

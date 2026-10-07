@@ -946,7 +946,7 @@ public class Mods implements Loadable{
             return null;
         }
 
-        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.plain));
+        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.json));
         meta.cleanup();
         return meta;
     }

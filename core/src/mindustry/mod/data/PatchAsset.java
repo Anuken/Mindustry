@@ -43,7 +43,7 @@ public class PatchAsset extends DataAsset{
     @Override
     public void readOverride(String path, Fi file) throws IOException{
         setPath(path);
-        patch = Jval.read(file.readString()).toString(Jformat.plain);
+        patch = Jval.read(file.readString()).toString(Jformat.json);
     }
 
     @Override

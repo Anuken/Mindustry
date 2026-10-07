@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -38,7 +39,7 @@ public class DrawHeatInput extends DrawBlock{
             for(int i = 0; i < 4; i++){
                 if(side[i] > 0){
                     Draw.blend(Blending.additive);
-                    Draw.color(heatColor, side[i] / hc.heatRequirement() * (heatColor.a * (1f - heatPulse + Mathf.absin(heatPulseScl, heatPulse))));
+                    Draw.color(heatColor, side[i] / hc.heatRequirement() * (heatColor.a * (1f - heatPulse + Mathf.absin(Vars.state.time, heatPulseScl, heatPulse))));
                     Draw.rect(heat, build.x, build.y, i * 90f);
                     Draw.blend();
                     Draw.color();

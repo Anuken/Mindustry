@@ -1,6 +1,5 @@
 package mindustry.entities.effect;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -65,7 +64,7 @@ public class TriangleEffect extends Effect{
 
         Draw.color(colorFrom, colorTo, colFin);
         Color lightColor = this.lightColor == null ? Draw.getColor() : this.lightColor;
-        
+
         Drawf.tri(pos.x + e.x, pos.y + e.y, width, height, realRotation + offset + e.time * spin);
         Drawf.light(pos.x + e.x, pos.y + e.y, lightScl, lightColor, lightOpac * Draw.getColorAlpha());
     }

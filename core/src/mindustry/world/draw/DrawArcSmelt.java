@@ -3,7 +3,7 @@ package mindustry.world.draw;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 
 public class DrawArcSmelt extends DrawBlock{
@@ -21,7 +21,7 @@ public class DrawArcSmelt extends DrawBlock{
         if(build.warmup() > 0f && flameColor.a > 0.001f){
             Lines.stroke(circleStroke * build.warmup());
 
-            float si = Mathf.absin(flameRadiusScl, flameRadiusMag);
+            float si = Mathf.absin(Vars.state.time, flameRadiusScl, flameRadiusMag);
             float a = alpha * build.warmup();
             Draw.blend(blending);
 
@@ -33,7 +33,7 @@ public class DrawArcSmelt extends DrawBlock{
 
             Lines.stroke(particleStroke * build.warmup());
 
-            float base = (Time.time / particleLife);
+            float base = (Vars.state.time / particleLife);
             rand.setSeed(build.id);
             for(int i = 0; i < particles; i++){
                 float fin = (rand.random(1f) + base) % 1f, fout = 1f - fin;

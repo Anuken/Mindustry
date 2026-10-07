@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
+import arc.struct.Bits;
 import arc.util.*;
 import arc.util.CommandHandler.*;
 import arc.util.io.*;
@@ -20,6 +21,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.TypeIO.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.mod.data.*;
 import mindustry.net.*;
@@ -44,7 +46,7 @@ public class NetServer implements ApplicationListener{
         planPreviewSyncTime = Timekeeper.ofSeconds(0.5f);
 
     private static final FloatBuffer fbuffer = FloatBuffer.allocate(20);
-    private static final Writes dataWrites = new Writes(null);
+    private static final mindustry.io.Writes dataWrites = new Writes(null);
     private static final IntSeq hiddenIds = new IntSeq();
     private static final IntSeq healthSeq = new IntSeq(maxSnapshotSize / 4 + 1);
     private static final Vec2 vector = new Vec2();
@@ -53,6 +55,7 @@ public class NetServer implements ApplicationListener{
     private static final float correctDist = tilesize * 14f;
 
     public Administration admins = new Administration();
+    public ServerConfig config = new ServerConfig();
     public CommandHandler clientCommands = new CommandHandler("/");
     public TeamAssigner assigner = (player, players) -> {
         if(state.rules.pvp){
@@ -108,21 +111,17 @@ public class NetServer implements ApplicationListener{
 
     /** Current kick session. */
     public @Nullable VoteSession currentlyKicking = null;
-    /** Duration of a kick in seconds. */
-    public static int kickDuration = 60 * 60;
-    /** Voting round duration in seconds. */
-    public static float voteDuration = 0.5f * 60;
-    /** Cooldown between votes in seconds. */
-    public static int voteCooldown = 60 * 5;
+    /** If >= 0, the reported server player count is overridden by this value. If < 0, the size of the player group is used instead. */
+    public int playerCountOverride = -1;
 
     private ReusableByteOutStream writeBuffer = new ReusableByteOutStream(127);
-    private Writes outputBuffer = new Writes(new DataOutputStream(writeBuffer));
+    private mindustry.io.Writes outputBuffer = new mindustry.io.Writes(new DataOutputStream(writeBuffer));
 
     /** Stream for writing player sync data to. */
     private ReusableByteOutStream syncStream = new ReusableByteOutStream();
     /** Data stream for writing player sync data to. */
     private DataOutputStream dataStream = new DataOutputStream(syncStream);
-    private Writes dataStreamWrites = new Writes(dataStream);
+    private mindustry.io.Writes dataStreamWrites = new mindustry.io.Writes(dataStream);
     /** Packet handlers for custom types of messages. */
     private ObjectMap<String, Seq<Cons2<Player, String>>> customPacketHandlers = new ObjectMap<>();
     /** Packet handlers for custom types of messages - binary version. */
@@ -171,7 +170,7 @@ public class NetServer implements ApplicationListener{
             if(admins.isIPBanned(con.address) || admins.isSubnetBanned(con.address) || con.kicked || !con.isConnected()) return;
 
             if(admins.checkUuidChanges(con.address, packet.uuid)){
-                Log.info("Banning IP @ due to more than @ ID changes in @ hour(s).", con.address, Config.uuidChangeLimit.num(), Config.uuidChangeTimePeriod.num());
+                Log.info("Banning IP @ due to more than @ ID changes in @ hour(s).", con.address, config.uuidChangeLimit, config.uuidChangeTimePeriod);
                 con.kick(KickReason.banned);
                 return;
             }
@@ -392,7 +391,7 @@ public class NetServer implements ApplicationListener{
         ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
 
         clientCommands.<Player>register("votekick", "[player] [reason...]", "Vote to kick a player with a valid reason.", (args, player) -> {
-            if(!Config.enableVotekick.bool()){
+            if(!config.enableVotekick){
                 player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
                 return;
             }
@@ -441,10 +440,10 @@ public class NetServer implements ApplicationListener{
                     }else if(found.team() != player.team()){
                         player.sendMessage("[scarlet]Only players on your team can be kicked.");
                     }else{
-                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> Timekeeper.ofSeconds(voteCooldown));
+                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> Timekeeper.ofSeconds(config.voteCooldown));
 
                         if(!vtime.get()){
-                            player.sendMessage("[scarlet]You must wait " + voteCooldown/60 + " minutes between votekicks.");
+                            player.sendMessage("[scarlet]You must wait " + config.voteCooldown/60 + " minutes between votekicks.");
                             return;
                         }
 
@@ -616,12 +615,12 @@ public class NetServer implements ApplicationListener{
         if(!player.con.hasDisconnected){
             if(player.con.hasConnected){
                 Events.fire(new PlayerLeaveEvent(player));
-                if(Config.showConnectMessages.bool()) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
+                if(netServer.config.showConnectMessages) Call.sendMessage("[accent]" + player.name + "[accent] has disconnected.");
                 Call.playerDisconnect(player.id());
             }
 
             String message = Strings.format("&lb@&fi&lk has disconnected. [&lb@&fi&lk] (@)", player.plainName(), player.uuid(), reason);
-            if(Config.showConnectMessages.bool()) info(message);
+            if(netServer.config.showConnectMessages) info(message);
         }
 
         //force despawn the player unit upon disconnection in case the game is paused
@@ -1007,14 +1006,14 @@ public class NetServer implements ApplicationListener{
 
         player.con.hasConnected = true;
 
-        if(Config.showConnectMessages.bool()){
+        if(netServer.config.showConnectMessages){
             Call.sendMessage("[accent]" + player.name + "[accent] has connected.");
             String message = Strings.format("&lb@&fi&lk has connected. &fi&lk[&lb@&fi&lk]", player.plainName(), player.uuid());
             info(message);
         }
 
-        if(!Config.motd.string().equalsIgnoreCase("off")){
-            player.sendMessage(Config.motd.string());
+        if(!netServer.config.motd.equalsIgnoreCase("off")){
+            player.sendMessage(netServer.config.motd);
         }
 
         Events.fire(new PlayerJoinEvent(player));
@@ -1082,14 +1081,14 @@ public class NetServer implements ApplicationListener{
     /** Should only be used on the headless backend. */
     public void openServer(){
         try{
-            net.host(Config.port.num());
-            info("Opened a server on port @.", Config.port.num());
+            net.host(config.port);
+            info("Opened a server on port @.", config.port);
         }catch(BindException e){
-            err("Unable to host: Port " + Config.port.num() + " already in use! Make sure no other servers are running on the same port in your network.");
-            state.set(State.menu);
+            err("Unable to host: Port " + config.port + " already in use! Make sure no other servers are running on the same port in your network.");
+            logic.reset();
         }catch(IOException e){
             err(e);
-            state.set(State.menu);
+            logic.reset();
         }
     }
 
@@ -1309,7 +1308,7 @@ public class NetServer implements ApplicationListener{
 
     void sync(){
         try{
-            int interval = Config.snapshotInterval.num();
+            int interval = config.snapshotInterval;
             state.entities.player.each(p -> !p.isLocal(), player -> {
                 if(player.con == null || !player.con.isConnected()){
                     onDisconnect(player, "disappeared");
@@ -1446,7 +1445,7 @@ public class NetServer implements ApplicationListener{
                     currentlyKicking = null;
                     task.cancel();
                 }
-            }, voteDuration);
+            }, config.voteDuration);
         }
 
         void vote(Player player, int d){
@@ -1465,8 +1464,8 @@ public class NetServer implements ApplicationListener{
 
         boolean checkPass(){
             if(votes >= votesRequired()){
-                Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60)));
-                state.entities.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, kickDuration * 1000));
+                Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (config.votekickDuration / 60)));
+                state.entities.player.each(p -> p.uuid().equals(target.uuid()), p -> p.kick(KickReason.vote, config.votekickDuration * 1000L));
                 currentlyKicking = null;
                 task.cancel();
                 return true;

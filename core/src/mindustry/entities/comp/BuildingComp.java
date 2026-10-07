@@ -14,7 +14,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
@@ -28,6 +27,7 @@ import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -484,24 +484,24 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         applyHealSuppression(amount, Pal.sapBullet);
     }
     public void applyHealSuppression(float amount, Color suppressColor){
-        healSuppressionTime = Math.max(healSuppressionTime, Time.time + amount);
+        healSuppressionTime = Math.max(healSuppressionTime, Vars.state.time + amount);
         this.suppressColor = suppressColor;
     }
 
     public boolean isHealSuppressed(){
-        return block.suppressable && Time.time <= healSuppressionTime;
+        return block.suppressable && Vars.state.time <= healSuppressionTime;
     }
 
     public void recentlyHealed(){
-        lastHealTime = Time.time;
+        lastHealTime = Vars.state.time;
     }
 
     public boolean wasRecentlyHealed(float duration){
-        return lastHealTime + duration >= Time.time;
+        return lastHealTime + duration >= Vars.state.time;
     }
 
     public boolean wasRecentlyDamaged(){
-        return lastDamageTime + recentDamageTime >= Time.time;
+        return lastDamageTime + recentDamageTime >= Vars.state.time;
     }
 
     public void eachEdge(Cons<Tile> cons){
@@ -613,9 +613,9 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         return 0f;
     }
 
-    /** @return total time this block has been producing something; non-crafter blocks usually return Time.time. */
+    /** @return total time this block has been producing something; non-crafter blocks usually return Vars.state.time. */
     public float totalProgress(){
-        return Time.time;
+        return Vars.state.time;
     }
 
     public float progress(){
@@ -1331,7 +1331,13 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
 
     public void drawTeam(){
         Draw.color(team.color);
-        Draw.rect("block-border", x - block.size * tilesize / 2f + 4, y - block.size * tilesize / 2f + 4);
+        if(block.teamOverlayRegion.found()){
+            //custom = centered, otherwise bottom left
+            Draw.rect(block.teamOverlayRegion, x, y, block.rotateTeamOverlay ? rotdeg() : 0f);
+        }else{
+            Draw.rect(block.defaultTeamOverlayRegion, x - block.size * tilesize / 2f + 4, y - block.size * tilesize / 2f + 4);
+        }
+
         Draw.color();
     }
 
@@ -1466,7 +1472,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         float splash = Mathf.clamp(amount / 4f, 0f, 10f);
 
         for(int i = 0; i < Mathf.clamp(amount / 5, 0, 30); i++){
-            Time.run(i / 2f, () -> {
+            Vars.state.run(i / 2f, () -> {
                 Tile other = state.world.tileWorld(x + Mathf.range(block.size * tilesize / 2), y + Mathf.range(block.size * tilesize / 2));
                 if(other != null){
                     Puddles.deposit(other, liquid, splash);
@@ -2065,7 +2071,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         if(dead()) return;
 
         float dm = state.rules.blockHealth(team);
-        lastDamageTime = Time.time;
+        lastDamageTime = Vars.state.time;
 
         if(Mathf.zero(dm)){
             damage = health + 1;

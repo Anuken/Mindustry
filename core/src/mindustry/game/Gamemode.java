@@ -81,6 +81,6 @@ public enum Gamemode{
 
     @Override
     public String toString(){
-        return Core.bundle.get("mode." + name() + ".name");
+        return Core.bundle.get("mode." + name() + ".name", name());
     }
 }

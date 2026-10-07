@@ -3,6 +3,7 @@ package mindustry.input;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.input.GestureDetector.*;
@@ -11,8 +12,8 @@ import arc.math.geom.*;
 import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.layout.*;
-import arc.struct.Queue;
 import arc.struct.*;
+import arc.struct.Queue;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
@@ -172,7 +173,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
         to.addItem(item, removed);
         for(int j = 0; j < Mathf.clamp(removed / 3, 1, 8); j++){
-            Time.run(j * 3f, () -> transferItemEffect(item, build.x, build.y, to));
+            Vars.state.run(j * 3f, () -> transferItemEffect(item, build.x, build.y, to));
         }
     }
 
@@ -251,7 +252,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         if(unit != null && unit.item() == item) unit.stack.amount = Math.max(unit.stack.amount - amount, 0);
 
         for(int i = 0; i < Mathf.clamp(amount / 3, 1, 8); i++){
-            Time.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
+            Vars.state.run(i * 3, () -> createItemTransfer(item, amount, x, y, build, () -> {}));
         }
         if(amount > 0){
             build.handleStack(item, amount, unit);
@@ -302,7 +303,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     public static void createItemTransfer(Item item, int amount, float x, float y, Position to, Runnable done){
         Fx.itemTransfer.at(x, y, amount, item.color, to);
         if(done != null){
-            Time.run(Fx.itemTransfer.lifetime, done);
+            Vars.state.run(Fx.itemTransfer.lifetime, done);
         }
     }
 
@@ -440,6 +441,15 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
         }
+    }
+
+
+    public static void setUnitStanceChunked(IntSeq ids, UnitStance stance, boolean enable){
+        ids.chunked(1000, values -> setUnitStance(Vars.player, values, stance, enable));
+    }
+
+    public static void setUnitCommandChunked(IntSeq ids, UnitCommand command){
+        ids.chunked(1000, values -> setUnitCommand(Vars.player, values, command));
     }
 
     @Remote(called = Loc.server, targets = Loc.both, forward = true)
@@ -808,7 +818,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                 }
             }
 
-            Time.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
+            Vars.state.run(Fx.unitSpirit.lifetime, () -> Fx.unitControl.at(unit.x, unit.y, 0f, unit));
             if(!player.dead()){
                 Fx.unitSpirit.at(player.x, player.y, 0f, unit);
             }
@@ -1201,11 +1211,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     }
 
     public void drawCommand(Unit sel){
-        Drawf.poly(sel.x, sel.y, 6, sel.hitSize / unitSelectRadScl + Mathf.absin(4f, 1f), 0f, selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
+        Drawf.poly(sel.x, sel.y, 6, sel.hitSize / unitSelectRadScl + Mathf.absin(Vars.state.time, 4f, 1f), 0f, selectedUnits.contains(sel) ? Pal.remove : Pal.accent);
     }
 
     public void drawCommand(Building build){
-        Drawf.poly(build.x, build.y, 4, build.hitSize() / 1.4f + + 0.5f + Mathf.absin(4f, 1f), 0f, commandBuildings.contains(build) ? Pal.remove : Pal.accent);
+        Drawf.poly(build.x, build.y, 4, build.hitSize() / 1.4f + + 0.5f + Mathf.absin(Vars.state.time, 4f, 1f), 0f, commandBuildings.contains(build) ? Pal.remove : Pal.accent);
     }
 
     public void drawCommanded(){
@@ -1315,7 +1325,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
                     }
 
                     if(ai.targetPos != null && ai.currentCommand() == UnitCommand.loopPayloadCommand && unit instanceof Payloadc pay){
-                        Draw.color(color, 0.4f + Mathf.absin(5f, 0.5f));
+                        Draw.color(color, 0.4f + Mathf.absin(Vars.state.time, 5f, 0.5f));
                         TextureRegion region = pay.hasPayload() ? Icon.download.getRegion() : Icon.upload.getRegion();
                         float offset = 11f;
                         float size = 8f;

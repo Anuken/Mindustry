@@ -6,7 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -14,14 +14,15 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -369,7 +370,7 @@ public class Drill extends Block{
             Draw.z(Layer.block + 0.1f);
             if(drawRim){
                 Draw.color(heatColor);
-                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
+                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Vars.state.time, 3f, s)));
                 Draw.blend(Blending.additive);
                 Draw.rect(rimRegion, x, y);
                 Draw.blend();

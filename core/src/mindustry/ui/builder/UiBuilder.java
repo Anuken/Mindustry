@@ -3,7 +3,7 @@ package mindustry.ui.builder;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.io.*;
 
 /** Builder-style API for building dialogs on servers. It is recommended to statically import all the methods in this class. */
 public class UiBuilder{
@@ -73,24 +73,24 @@ public class UiBuilder{
         public T color(Color color){ return prop(UiKey.color, color.toString()); }
         public T color(String colorHex){ return prop(UiKey.color, colorHex); }
 
-        public void write(Writes out){
+        public void write(mindustry.io.Writes out){
             out.b(type.ordinal());
             writeEntries(out, entries);
         }
 
-        static void writeEntries(Writes out, Seq<Entry> entries){
+        static void writeEntries(mindustry.io.Writes out, Seq<Entry> entries){
             out.s(entries.size);
             for(Entry e : entries) writeEntry(out, e);
         }
 
-        public static NodeBuilder<?> read(Reads in){
+        public static NodeBuilder<?> read(mindustry.io.Reads in){
             UiKey type = UiKey.all[in.ub()];
             NodeBuilder<?> node = create(type);
             readEntries(in, node.entries);
             return node;
         }
 
-        static void readEntries(Reads in, Seq<Entry> entries){
+        static void readEntries(mindustry.io.Reads in, Seq<Entry> entries){
             int count = in.us();
             for(int i = 0; i < count; i++) entries.add(readEntry(in));
         }
@@ -114,7 +114,7 @@ public class UiBuilder{
             };
         }
 
-        static void writeEntry(Writes out, Entry e){
+        static void writeEntry(mindustry.io.Writes out, Entry e){
             out.s(e.key.ordinal());
             if(e.value instanceof String s){
                 out.b(0);

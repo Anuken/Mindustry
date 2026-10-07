@@ -44,6 +44,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
             Core.settings.setDataDirectory(files.absolute(dataDir));
         }
 
+        initDirectories();
         checkLaunch();
         loadLogger();
 
@@ -135,6 +136,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
 
         assets.load("sprites/error.png", Texture.class);
+        assets.load("sprites/nomap.png", Texture.class);
         //TODO: this takes 300+ms to load, which means 300ms of black screen
         atlas = new TextureAtlas(Core.files.internal("sprites/sprites.aatls"));
         Fonts.loadDefaultFont();
@@ -308,7 +310,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         if(OS.isIos || OS.isAndroid) return;
 
         if(file.extEquals(saveExtension) || file.extEquals(schematicExtension)){
-            handleFileImport(file);
+            runOnClientLoad(() -> handleFileImport(file));
         }
     }
 

@@ -11,13 +11,14 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -228,7 +229,7 @@ public class LaunchPad extends Block{
         @Import float x,y;
 
         Seq<ItemStack> stacks = new Seq<>();
-        transient Interval in = new Interval();
+        transient Interval in = new mindustry.game.Interval();
 
         @Override
         public void draw(){

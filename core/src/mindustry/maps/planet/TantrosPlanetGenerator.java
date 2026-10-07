@@ -11,8 +11,6 @@ import mindustry.maps.generators.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
-import static mindustry.Vars.*;
-
 public class TantrosPlanetGenerator extends PlanetGenerator{
     Color c1 = Color.valueOf("5057a6"), c2 = Color.valueOf("272766");
 

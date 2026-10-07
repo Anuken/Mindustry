@@ -8,12 +8,13 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 
 import static mindustry.Vars.*;
@@ -104,8 +105,8 @@ public class Door extends Wall{
         }
 
         public boolean toggleReady(float cooldown){
-            if(Time.time - lastToggleTime < cooldown) return false;
-            lastToggleTime = Time.time;
+            if(Vars.state.time - lastToggleTime < cooldown) return false;
+            lastToggleTime = Vars.state.time;
             return true;
         }
 

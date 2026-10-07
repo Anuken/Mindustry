@@ -9,8 +9,8 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Tooltip.*;
-import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.Stack;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
@@ -577,7 +577,7 @@ public class PlacementFragment{
                                         int scol = 0;
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitCommand(player, units.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)).toArray(), command);
+                                                InputHandler.setUnitCommandChunked(units.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)), command);
                                             }).checked(i -> activeCommands.get(command.id)).size(50f).tooltip(command.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
@@ -600,7 +600,7 @@ public class PlacementFragment{
                                         for(var stance : stances){
 
                                             coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
+                                                InputHandler.setUnitStanceChunked(units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)), stance, !activeStances.get(stance.id));
                                             }).checked(i -> activeStances.get(stance.id)).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
@@ -656,14 +656,14 @@ public class PlacementFragment{
                                 for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
                                     if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
+                                        InputHandler.setUnitStanceChunked(control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)), stance, !activeStances.get(stance.id));
                                     }
                                 }
 
                                 for(UnitCommand command : commands){
                                     //first stance must always be the stop stance
                                     if(command.keybind != null && Core.input.keyTap(command.keybind)){
-                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)).toArray(), command);
+                                        InputHandler.setUnitCommandChunked(control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)), command);
                                     }
                                 }
                             }

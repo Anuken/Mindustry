@@ -4,13 +4,14 @@ import arc.*;
 import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.EnumSet;
 import arc.struct.*;
+import arc.struct.EnumSet;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
@@ -136,6 +137,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public boolean drawArrow = true;
     /** whether to draw the team corner by default */
     public boolean drawTeamOverlay = true;
+    /** whether to rotate the enemy-team overlay sprite (only applied to custom ones) */
+    public boolean rotateTeamOverlay = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
@@ -427,6 +430,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public TextureRegion region;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
+    public @Load("@-team-overlay") TextureRegion teamOverlayRegion;
+    public @Load("block-border") TextureRegion defaultTeamOverlayRegion;
     public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
 
     protected static final Seq<Tile> tempTiles = new Seq<>();
@@ -591,9 +596,9 @@ public class Block extends UnlockableContent implements LogicSenseable{
         return 0;
     }
 
-    public Color getColor(Tile tile){
+    public int getColor(Tile tile){
         int mc = minimapColor(tile);
-        return mc == 0 ? mapColor : Tmp.c3.set(mc);
+        return mc == 0 ? mapColor.rgba() : mc;
     }
 
     public boolean outputsItems(){

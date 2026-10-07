@@ -3,8 +3,8 @@ package mindustry.type;
 import arc.func.*;
 import arc.struct.*;
 import arc.struct.ObjectIntMap.*;
-import arc.util.io.*;
 import mindustry.*;
+import mindustry.io.*;
 
 public class PayloadSeq{
     private ObjectIntMap<UnlockableContent> payloads = new ObjectIntMap<>();
@@ -100,12 +100,12 @@ public class PayloadSeq{
         if(amount >= 0){
             //old format, block only - can safely ignore, really
             for(int i = 0; i < amount; i++){
-                add(Vars.content.block(read.s()), read.i());
+                add(read.block(), read.i());
             }
         }else{
             //new format
             for(int i = 0; i < -amount; i++){
-                add(Vars.content.getByID(ContentType.all[read.ub()], read.s()), read.i());
+                add(read.content(ContentType.all[read.ub()]), read.i());
             }
         }
 

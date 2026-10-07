@@ -5,12 +5,13 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -266,7 +267,7 @@ public class PayloadConveyor extends Block{
         }
 
         public float time(){
-            return Time.time;
+            return Vars.state.time;
         }
 
         @Override

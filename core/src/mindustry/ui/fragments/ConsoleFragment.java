@@ -3,6 +3,7 @@ package mindustry.ui.fragments;
 import arc.*;
 import arc.Input.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
@@ -40,7 +41,7 @@ public class ConsoleFragment extends Table{
         font = Fonts.def;
 
         visible(() -> {
-            if(input.keyTap(Binding.console) && settings.getBool("console") && (scene.getKeyboardFocus() == chatfield || !(scene.getKeyboardFocus() instanceof TextField)) && !ui.chatfrag.shown()){
+            if(input.keyTap(Binding.console) && (settings.getBool("console") || shown) && (scene.getKeyboardFocus() == chatfield || !(scene.getKeyboardFocus() instanceof TextField)) && !ui.chatfrag.shown()){
                 shown = !shown;
                 if(shown && !open && settings.getBool("console")){
                     toggle();
@@ -225,6 +226,11 @@ public class ConsoleFragment extends Table{
     public void toggleMobile(){
         shown = !shown;
         open = false; //never true on mobile
+    }
+
+    public void close(){
+        shown = false;
+        open = false;
     }
 
     public void toggle(){

@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import com.google.common.reflect.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.net.*;

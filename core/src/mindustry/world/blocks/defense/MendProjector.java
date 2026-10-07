@@ -6,11 +6,12 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -77,7 +78,7 @@ public class MendProjector extends Block{
 
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
-        state.indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+        state.indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f))));
     }
 
     public class MendBuild extends Building implements Ranged{
@@ -135,7 +136,7 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            state.indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+            state.indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f))));
 
             Drawf.dashCircle(x, y, realRange, baseColor);
         }
@@ -147,12 +148,12 @@ public class MendProjector extends Block{
 
         @Override
         public void draw(){
-            float f = 1f - (Time.time / 100f) % 1f;
+            float f = 1f - (Vars.state.time / 100f) % 1f;
 
             if(!Lod.l2) return;
 
             Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f * Lod.alpha2);
+            Draw.alpha(heat * Mathf.absin(Vars.state.time, 50f / Mathf.PI2, 1f) * 0.5f * Lod.alpha2);
             Draw.rect(topRegion, x, y);
             Draw.alpha(Lod.alpha2);
             Lines.stroke((2f * f + 0.2f) * heat);

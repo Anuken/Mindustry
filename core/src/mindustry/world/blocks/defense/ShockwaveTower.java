@@ -1,7 +1,5 @@
 package mindustry.world.blocks.defense;
 
-import static mindustry.Vars.*;
-
 import arc.*;
 import arc.audio.*;
 import arc.graphics.*;
@@ -9,6 +7,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -210,7 +209,7 @@ public class ShockwaveTower extends Block{
 
             Draw.z(Layer.effect);
             Draw.color(shapeColor, waveColor, Mathf.pow(heat, 2f));
-            Fill.poly(x, y, shapeSides, shapeRadius * potentialEfficiency, Time.time * shapeRotateSpeed);
+            Fill.poly(x, y, shapeSides, shapeRadius * potentialEfficiency, Vars.state.time * shapeRotateSpeed);
             Draw.color();
         }
 

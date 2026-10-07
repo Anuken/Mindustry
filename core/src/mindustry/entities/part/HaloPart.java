@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.graphics.*;
 
 public class HaloPart extends DrawPart{
@@ -34,7 +35,7 @@ public class HaloPart extends DrawPart{
 
         float
         prog = progress.getClamp(params, clampProgress),
-        baseRot = Time.time * rotateSpeed,
+        baseRot = Vars.state.time * rotateSpeed,
         rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog),
         triLen = triLengthTo < 0 ? triLength : Mathf.lerp(triLength, triLengthTo, prog),
         str = strokeTo < 0 ? stroke : Mathf.lerp(stroke, strokeTo, prog),
@@ -59,7 +60,7 @@ public class HaloPart extends DrawPart{
                 Draw.color(color);
             }
 
-            float haloRot = (haloRotation + haloRotateSpeed * Time.time) * sign;
+            float haloRot = (haloRotation + haloRotateSpeed * Vars.state.time) * sign;
 
             for(int v = 0; v < shapes; v++){
                 float rot = haloRot + v * 360f / shapes + params.rotation;

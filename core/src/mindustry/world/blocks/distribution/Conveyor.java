@@ -6,7 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -14,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -141,7 +142,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f && !state.rules.editor ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f && !state.rules.editor ? (int)(((Vars.state.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -421,7 +422,7 @@ public class Conveyor extends Block implements Autotiler{
                 }
 
                 if(i < capacity){
-                    ids[i] = content.item(id);
+                    ids[i] = read.content(ContentType.item, id);
                     xs[i] = x;
                     ys[i] = y;
                 }

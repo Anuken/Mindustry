@@ -3,13 +3,12 @@ package mindustry.desktop;
 import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
-import arc.discord.*;
-import arc.discord.DiscordRPC.*;
 import arc.files.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.DiscordRPC.*;
 import arc.util.Log.*;
 import arc.util.serialization.*;
 import mindustry.*;
@@ -29,6 +28,7 @@ import org.lwjgl.system.*;
 import steamworks.*;
 
 import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -62,7 +62,7 @@ public class DesktopLauncher extends ClientLauncher{
                     glVersions = new int[][]{{4, 1}, {3, 3}};
                 }else{
                     //try essentially every OpenGL version
-                    glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
+                    glVersions = new int[][]{{4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
                 }
 
                 for(int i = 0; i < arg.length; i++){
@@ -85,6 +85,10 @@ public class DesktopLauncher extends ClientLauncher{
                                     }
                                 }
                                 Log.err("Invalid GL version format string: '@'. GL version must be of the form <major>.<minor>", str);
+                            }
+                            case "open" -> {
+                                Fi file = new Fi(arg[i + 1]);
+                                Events.on(ClientCreateEvent.class, e -> Core.app.getListeners().each(a -> a.fileDropped(file)));
                             }
                             case "coreGl" -> coreProfile = true;
                             case "noAngle" -> useAngle = false;
@@ -493,7 +497,7 @@ public class DesktopLauncher extends ClientLauncher{
                 new Rand(SVars.user.user.getSteamID().getAccountID()).nextBytes(result);
                 return new String(Base64Coder.encode(result));
             }catch(Exception e){
-                e.printStackTrace();
+                Log.err(e);
             }
         }
 

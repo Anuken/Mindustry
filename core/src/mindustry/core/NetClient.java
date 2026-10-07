@@ -337,7 +337,7 @@ public class NetClient implements ApplicationListener{
         if(net.server() && player != null && player.con != null && (Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded())) return;
 
         //detect and kick for foul play
-        if(player != null && player.con != null && !player.con.chatRate.allow(2000, Config.chatSpamLimit.num())){
+        if(player != null && player.con != null && !player.con.chatRate.allow(2000, netServer.config.chatSpamLimit)){
             player.con.kick(KickReason.kick);
             player.con.blacklist();
             return;
@@ -354,7 +354,7 @@ public class NetClient implements ApplicationListener{
         Events.fire(new PlayerChatEvent(player, message));
 
         //log commands before they are handled
-        if(message.startsWith(netServer.clientCommands.getPrefix()) && Config.logCommands.bool()){
+        if(message.startsWith(netServer.clientCommands.getPrefix()) && netServer.config.logCommands){
             //log with brackets
             Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
         }

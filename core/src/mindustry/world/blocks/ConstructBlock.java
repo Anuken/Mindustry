@@ -7,7 +7,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -17,6 +16,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -263,7 +263,7 @@ public class ConstructBlock extends Block{
 
                 for(TextureRegion region : current.getGeneratedIcons()){
                     Shaders.blockbuild.region = region;
-                    Shaders.blockbuild.time = Time.time;
+                    Shaders.blockbuild.time = Vars.state.time;
                     Shaders.blockbuild.progress = progress;
 
                     Draw.rect(region, x, y, current.rotate && (noOverrides || current.regionRotated2 == i || current.regionRotated1 == i) ? rotdeg() + current.visualRotationOffset : 0);
@@ -520,8 +520,8 @@ public class ConstructBlock extends Block{
                 }
             }
 
-            if(pid != -1) previous = content.block(pid);
-            if(rid != -1) current = content.block(rid);
+            if(pid != -1) previous = read.content(ContentType.block, pid);
+            if(rid != -1) current = read.content(ContentType.block, rid);
 
             if(previous == null) previous = Blocks.air;
             if(current == null) current = Blocks.air;

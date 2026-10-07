@@ -6,7 +6,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.style.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.core.*;
 import mindustry.entities.EntityCollisions.*;
@@ -14,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;

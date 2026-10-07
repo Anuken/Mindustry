@@ -9,7 +9,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -22,6 +22,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -765,7 +766,7 @@ public class Turret extends ReloadTurret{
                 int barrel = barrelCounter;
 
                 if(delay > 0f){
-                    Time.run(delay, () -> {
+                    Vars.state.run(delay, () -> {
                         //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
                         int prev = barrelCounter;
                         barrelCounter = barrel;

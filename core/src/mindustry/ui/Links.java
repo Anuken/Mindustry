@@ -4,11 +4,8 @@ import arc.*;
 import arc.graphics.*;
 import arc.scene.style.*;
 import arc.util.*;
-import mindustry.*;
-import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.mod.Mods.*;
 
 public class Links{
     private static LinkEntry[] links;

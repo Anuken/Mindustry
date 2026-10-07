@@ -5,12 +5,13 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
@@ -163,7 +164,7 @@ public class TractorBeamTurret extends BaseTurret{
                 Draw.z(Layer.bullet);
                 float ang = angleTo(lastX, lastY);
 
-                Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
+                Draw.mixcol(laserColor, Mathf.absin(Vars.state.time, 4f, 0.6f));
 
                 Drawf.laser(laser, laserStart, laserEnd,
                 x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),

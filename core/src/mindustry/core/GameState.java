@@ -24,11 +24,17 @@ import mindustry.world.blocks.legacy.*;
 import static mindustry.Vars.*;
 
 public class GameState{
+    /** Time elapsed in this game state, in ticks. This value is reset when a save is loaded. */
+    public float time;
+    /** Same as {@link time}, but stored as a double, to prevent increment precision issues when time gets to a high value. */
+    public double timePrecise;
+    public TimeRuns runs = new TimeRuns();
+
     /** Current wave number, can be anything in non-wave modes. */
     public int wave = 1;
     /** Wave countdown in ticks. */
     public float wavetime;
-    /** Logic tick. */
+    /** Logic tick. Unlike time, this value is absolute; it isn't clamped or affected by extreme delta values. */
     public double tick;
     /** Continuously ticks up every non-paused update. */
     public long updateId;
@@ -85,6 +91,21 @@ public class GameState{
     /** EntityID allocation state. */
     private int lastId = 0, lastLocalId = -2;
 
+    public void run(float delay, Runnable runnable){
+        runs.runs.add(runnable);
+        runs.times.add(delay);
+    }
+
+    /** Runs a task next frame. Unlike {@link Application#post(Runnable)}, this gets cleared when the game resets. */
+    public void post(Runnable runnable){
+        run(0f, runnable);
+    }
+
+    public void setTime(double timeInternal){
+        timePrecise = timeInternal;
+        time = (float)timeInternal;
+    }
+
     /** Clients allocate negative IDs (-1 is null in TypeIO) so local entities never collide with server IDs. */
     public int nextEntityId(){
         if(net != null && net.client()){
@@ -99,6 +120,11 @@ public class GameState{
     /** Makes sure the next ID is higher than this one, so future entities cannot possibly use it. */
     public void checkNextEntityId(int id){
         lastId = Math.max(lastId, id + 1);
+    }
+
+    /** @return whether the wave timer is paused due to enemies */
+    public boolean isWaitingWave(){
+        return (rules.waitEnemies || (wave >= rules.winWave && rules.winWave > 0)) && enemies > 0;
     }
 
     @Nullable
@@ -351,5 +377,11 @@ public class GameState{
                 throw new SaveLoadException(headless ? "Attack mode is on, but there is no enemy core" : Core.bundle.format("map.nospawn.attack", checkRules.waveTeam.coloredName()));
             }
         }
+    }
+
+    /** Parallel arrays: Action | Time remaining in ticks until activated */
+    public static class TimeRuns{
+        public Seq<Runnable> runs = new Seq<>(false, 16, Runnable.class);
+        public FloatSeq times = new FloatSeq(false, 16);
     }
 }

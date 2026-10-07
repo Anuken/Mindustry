@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -15,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -154,7 +154,7 @@ public class PowerGenerator extends PowerDistributor{
                         Mathf.chance(explosionIgnitionChance *
                             (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(dst / explosionRadius) : 1))
                     ){
-                        Time.run(dst / explosionSpeed, () -> {
+                        Vars.state.run(dst / explosionSpeed, () -> {
                             Fires.create(t);
                         });
                     }

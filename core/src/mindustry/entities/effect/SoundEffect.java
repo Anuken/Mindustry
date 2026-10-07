@@ -1,14 +1,10 @@
 package mindustry.entities.effect;
 
-import arc.*;
 import arc.audio.*;
-import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.struct.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
-import mindustry.game.EventType.*;
 import mindustry.gen.*;
 
 /** Plays a sound effect when created and simultaneously renders an effect. */
@@ -42,11 +38,11 @@ public class SoundEffect extends Effect{
         if(!shouldCreate()) return;
 
         if(startDelay > 0){
-            Time.run(startDelay, () -> sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume)));
+            Vars.state.run(startDelay, () -> sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume)));
         }else{
             sound.at(x, y, Mathf.random(minPitch, maxPitch), Mathf.random(minVolume, maxVolume));
         }
-        
+
         effect.create(x, y, rotation, color, data);
     }
 }

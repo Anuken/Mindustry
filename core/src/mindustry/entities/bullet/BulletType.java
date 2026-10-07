@@ -587,7 +587,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(createFrags && fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Time.run(0f, () -> createFrags(b, x, y));
+                Vars.state.post(() -> createFrags(b, x, y));
             }else{
                 createFrags(b, x, y);
             }
@@ -770,19 +770,19 @@ public class BulletType extends Content implements Cloneable{
             float realAimY = b.aimY < 0 ? b.y : b.aimY;
 
             Teamc target;
-            //home in on allies if possible
-            if(heals()){
+
+            //home in on what the unit is aiming at
+            if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
+                target = b.aimTile.build;
+            }else if(heals()){
+                //home in on allies if possible
                 target = Units.closestTarget(null, realAimX, realAimY, homingRange, b.team,
                     e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
                     t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id));
             }else{
-                if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
-                    target = b.aimTile.build;
-                }else{
-                    target = Units.closestTarget(b.team, realAimX, realAimY, homingRange,
-                        e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
-                        t -> t != null && collidesGround && !b.hasCollided(t.id));
-                }
+                target = Units.closestTarget(b.team, realAimX, realAimY, homingRange,
+                    e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
+                    t -> t != null && collidesGround && !b.hasCollided(t.id));
             }
 
             if(target != null){
@@ -875,7 +875,7 @@ public class BulletType extends Content implements Cloneable{
                 b.trail = new Trail(trailLength);
             }
             b.trail.length = trailLength;
-            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
+            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Vars.state.time, trailSinScl, trailSinMag) : 0f)));
         }
     }
 

@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -94,7 +95,7 @@ public class WaveSpawner{
             }
         }
 
-        Time.run(121f, () -> spawning = false);
+        Vars.state.run(121f, () -> spawning = false);
     }
 
     public void spawnUnit(SpawnGroup group, float x, float y){
@@ -234,6 +235,6 @@ public class WaveSpawner{
 
         Fx.unitSpawn.at(x, y, rotation, u);
 
-        Time.run(30f, () -> Fx.spawn.at(x, y));
+        Vars.state.run(30f, () -> Fx.spawn.at(x, y));
     }
 }

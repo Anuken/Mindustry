@@ -5,8 +5,8 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -95,7 +95,7 @@ public class Constructor extends BlockProducer{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            recipe = Vars.content.block(read.s());
+            recipe = read.block();
         }
     }
 }

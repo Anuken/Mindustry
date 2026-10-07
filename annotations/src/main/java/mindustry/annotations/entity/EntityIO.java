@@ -238,7 +238,7 @@ public class EntityIO{
             if(write){
                 s("s", field + " == null ? -1 : " + field + ".id");
             }else{
-                st(field + "mindustry.Vars.content.getByID(mindustry.type.ContentType.$L, read.s())", BaseProcessor.simpleName(type).toLowerCase().replace("type", ""));
+                st(field + "read.content(mindustry.type.ContentType.$L)", BaseProcessor.simpleName(type).toLowerCase().replace("type", ""));
             }
         }else if((serializer.writers.containsKey(type) || (network && serializer.netWriters.containsKey(type))) && write){
             st("$L(write, $L)", network ? serializer.getNetWriter(type, null) : serializer.writers.get(type), field);

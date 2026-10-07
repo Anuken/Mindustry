@@ -13,7 +13,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -21,6 +21,7 @@ import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -159,7 +160,7 @@ public class Accelerator extends Block{
 
             for(int l = 0; l < 4; l++){
                 float length = 7f + l * 5f;
-                Draw.color(Tmp.c1.set(Pal.darkMetal).lerp(team.color, statusLerp), Pal.darkMetal, Mathf.absin(Time.time + l*50f, 10f, 1f));
+                Draw.color(Tmp.c1.set(Pal.darkMetal).lerp(team.color, statusLerp), Pal.darkMetal, Mathf.absin(Vars.state.time + l*50f, 10f, 1f));
 
                 for(int i = 0; i < 4; i++){
                     float rot = i*90f + 45f;
@@ -355,7 +356,7 @@ public class Accelerator extends Block{
             chargeSound.at(this);
             constructSound.at(this);
 
-            Time.run(chargeDuration, () -> {
+            Vars.state.run(chargeDuration, () -> {
                 Fx.coreLaunchConstruct.at(x, y, launchBlock.size);
                 Fx.launchAccelerator.at(x, y);
                 Effect.shake(10f, 14f, this);
@@ -369,7 +370,7 @@ public class Accelerator extends Block{
                 float spacing = 12f;
                 for(int i = 0; i < 13; i++){
                     int fi = i;
-                    Time.run(i * 2f, () -> {
+                    Vars.state.run(i * 2f, () -> {
                         float radius = block.size/2f + 1 + spacing * fi;
                         int rays = Mathf.ceil(radius * Mathf.PI * 2f / 6f);
                         for(int r = 0; r < rays; r++){
@@ -582,7 +583,7 @@ public class Accelerator extends Block{
             Draw.scl(scl);
 
             //draw thruster flame
-            float strength = (1f + (launchBlock.size - 3)/2.5f) * scl * thrusterSize * (0.95f + Mathf.absin(2f, 0.1f));
+            float strength = (1f + (launchBlock.size - 3)/2.5f) * scl * thrusterSize * (0.95f + Mathf.absin(Vars.state.time, 2f, 0.1f));
             float offset = (launchBlock.size - 3) * 3f * scl;
 
             for(int i = 0; i < 4; i++){

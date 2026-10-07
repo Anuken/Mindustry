@@ -1,11 +1,11 @@
 package mindustry.entities.comp;
 
-import arc.util.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.game.*;
 
 @Component
 abstract class TimerComp{
-    transient Interval timer = new Interval(6);
+    transient Interval timer = new mindustry.game.Interval(6);
 
     public boolean timer(int index, float time){
         if(Float.isInfinite(time)) return false;

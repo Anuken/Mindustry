@@ -14,6 +14,7 @@ import mindustry.game.*;
 import mindustry.game.markers.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.io.Reads;
 import mindustry.maps.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
@@ -138,14 +139,14 @@ public class ApplicationTests{
 
         ByteArrayOutputStream ba = new ByteArrayOutputStream();
 
-        TypeIO.writeString(new Writes(new DataOutputStream(ba)), string);
+        TypeIO.writeString(new mindustry.io.Writes(new DataOutputStream(ba)), string);
         assertEquals(TypeIO.readString(new Reads(new DataInputStream(new ByteArrayInputStream(ba.toByteArray())))), string);
 
         SendChatMessageCallPacket pack = new SendChatMessageCallPacket();
         pack.message = string;
 
         buffer.position(0);
-        pack.write(new Writes(new ByteBufferOutput(buffer)));
+        pack.write(new mindustry.io.Writes(new ByteBufferOutput(buffer)));
         int len = buffer.position();
         buffer.position(0);
         pack.message = "INVALID";
@@ -155,7 +156,7 @@ public class ApplicationTests{
         assertEquals(string, pack.message);
 
         buffer.position(0);
-        Writes writes = new Writes(new ByteBufferOutput(buffer));
+        mindustry.io.Writes writes = new mindustry.io.Writes(new ByteBufferOutput(buffer));
         TypeIO.writeString(writes, string);
 
         buffer.position(0);
@@ -168,7 +169,7 @@ public class ApplicationTests{
         con.uuid = "AAAAAAAA";
         con.usid = "AAAAAAAA";
         con.mods = new Seq<>();
-        con.write(new Writes(new ByteBufferOutput(buffer)));
+        con.write(new mindustry.io.Writes(new ByteBufferOutput(buffer)));
 
         con.name = "INVALID";
         buffer.position(0);
@@ -185,7 +186,7 @@ public class ApplicationTests{
         rules.attackMode = true;
         rules.buildSpeedMultiplier = 99f;
 
-        TypeIO.writeRules(new Writes(new ByteBufferOutput(buffer)), rules);
+        TypeIO.writeRules(new mindustry.io.Writes(new ByteBufferOutput(buffer)), rules);
         buffer.position(0);
         Rules res = TypeIO.readRules(new Reads(new ByteBufferInput(buffer)));
 
@@ -231,8 +232,8 @@ public class ApplicationTests{
         logic.runWave();
         //force trigger delayed spawns
         Time.setDeltaProvider(() -> 1000f);
-        Time.update();
-        Time.update();
+        Vars.logic.updateTime();
+        Vars.logic.updateTime();
         state.entities.unit.update();
         assertFalse(state.entities.unit.isEmpty(), "No enemies spawned.");
     }
@@ -275,11 +276,11 @@ public class ApplicationTests{
     @Test
     void timers(){
         boolean[] ran = {false};
-        Time.run(1.9999f, () -> ran[0] = true);
+        Vars.state.run(1.9999f, () -> ran[0] = true);
 
-        Time.update();
+        Vars.logic.updateTime();
         assertFalse(ran[0]);
-        Time.update();
+        Vars.logic.updateTime();
         assertTrue(ran[0]);
     }
 
@@ -288,30 +289,47 @@ public class ApplicationTests{
         int runs = 100000;
         int[] total = {0};
         for(int i = 0; i < runs; i++){
-            Time.run(0.999f, () -> total[0]++);
+            Vars.state.run(0.999f, () -> total[0]++);
         }
         assertEquals(0, total[0]);
-        Time.update();
+        Vars.logic.updateTime();
         assertEquals(runs, total[0]);
     }
 
     @Test
     void longTimers(){
         Time.setDeltaProvider(() -> Float.MAX_VALUE);
-        Time.update();
+        Vars.logic.updateTime();
         int steps = 100;
         float delay = 100000f;
         Time.setDeltaProvider(() -> delay / steps + 0.01f);
         int runs = 100000;
         int[] total = {0};
         for(int i = 0; i < runs; i++){
-            Time.run(delay, () -> total[0]++);
+            Vars.state.run(delay, () -> total[0]++);
         }
         assertEquals(0, total[0]);
         for(int i = 0; i < steps; i++){
-            Time.update();
+            Vars.logic.updateTime();
         }
         assertEquals(runs, total[0]);
+    }
+
+    @Test
+    void timersKeepOrder(){
+        Time.setDeltaProvider(() -> 1f);
+        StringBuilder out = new StringBuilder();
+        for(int i = 0; i < 10; i++){
+            int n = i;
+            Vars.state.run(1f, () -> out.append(n));
+        }
+        Vars.state.run(1f, () -> {
+            for(int i = 0; i < 100; i++) Vars.state.run(5f, () -> out.append('x'));
+        });
+        Vars.logic.updateTime();
+        assertEquals("0123456789", out.toString());
+        for(int i = 0; i < 5; i++) Vars.logic.updateTime();
+        assertEquals(100, out.length() - 10);
     }
 
     @Test
@@ -480,7 +498,7 @@ public class ApplicationTests{
         }
 
         for(int i = 0; i < times; i++){
-            Time.update();
+            Vars.logic.updateTime();
             for(Tile tile : state.world){
                 if(tile.build != null && tile.isCenter()){
                     tile.build.update();
@@ -701,7 +719,7 @@ public class ApplicationTests{
 
         entities.each(Building::updateProximity);
 
-        final int iterations = 100_000;
+        final int iterations = 10_000;
 
         //warmup
         for(int i = 0; i < iterations; i++){

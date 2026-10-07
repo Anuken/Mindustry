@@ -7,13 +7,14 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -116,8 +117,8 @@ public class RepairTurret extends Block{
             lastEnd.setLength(Math.max(2f, lastEnd.len()));
 
             lastEnd.add(offset.trns(
-            rand.random(360f) + Time.time/2f,
-            Mathf.sin(Time.time + rand.random(200f), 55f, rand.random(target.hitSize() * 0.2f, target.hitSize() * 0.45f))
+            rand.random(360f) + Vars.state.time/2f,
+            Mathf.sin(Vars.state.time + rand.random(200f), 55f, rand.random(target.hitSize() * 0.2f, target.hitSize() * 0.45f))
             ).rotate(target instanceof Rotc rot ? rot.rotation() : 0f));
 
             lastEnd.add(originX, originY);
@@ -132,7 +133,7 @@ public class RepairTurret extends Block{
 
             Draw.color(laserColor);
 
-            float f = (Time.time / 85f + rand.random(1f)) % 1f;
+            float f = (Vars.state.time / 85f + rand.random(1f)) % 1f;
 
             Draw.alpha(1f - Interp.pow5In.apply(f));
             Lines.stroke(strength * pulseStroke);

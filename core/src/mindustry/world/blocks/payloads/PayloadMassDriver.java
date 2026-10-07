@@ -6,7 +6,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -14,6 +13,7 @@ import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.world.blocks.*;
 import mindustry.world.meta.*;
@@ -112,7 +112,7 @@ public class PayloadMassDriver extends PayloadBlock{
         if(selected == null || selected.block != this || !selected.within(x * tilesize, y * tilesize, range)) return;
 
         //if so, draw a dotted line towards it while it is in range
-        float sin = Mathf.absin(Time.time, 6f, 1f);
+        float sin = Mathf.absin(Vars.state.time, 6f, 1f);
         Tmp.v1.set(x * tilesize + offset, y * tilesize + offset).sub(selected.x, selected.y).limit((size / 2f + 1) * tilesize + sin + 0.5f);
         float x2 = x * tilesize - Tmp.v1.x, y2 = y * tilesize - Tmp.v1.y,
             x1 = selected.x + Tmp.v1.x, y1 = selected.y + Tmp.v1.y;
@@ -440,7 +440,7 @@ public class PayloadMassDriver extends PayloadBlock{
 
         @Override
         public void drawConfigure(){
-            float sin = Mathf.absin(Time.time, 6f, 1f);
+            float sin = Mathf.absin(Vars.state.time, 6f, 1f);
 
             Draw.color(Pal.accent);
             Lines.stroke(1f);

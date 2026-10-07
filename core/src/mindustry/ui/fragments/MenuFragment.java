@@ -14,6 +14,7 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -105,7 +106,7 @@ public class MenuFragment{
                     }
                 });
             }).size(200, 60).name("becheck").update(t -> {
-                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
+                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(Vars.state.time, 5f, 1f)) : Color.white);
             }));
         }
 

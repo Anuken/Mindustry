@@ -5,6 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -39,7 +40,7 @@ abstract class PuddleComp implements Posc, Puddlec, Drawc, Syncc{
     @Import float x, y;
     @Import boolean added;
 
-    transient float accepting, updateTime, lastRipple = Time.time + Mathf.random(40f), effectTime = Mathf.random(50f);
+    transient float accepting, updateTime, lastRipple = Vars.state.time + Mathf.random(40f), effectTime = Mathf.random(50f);
     float amount;
     Tile tile;
     Liquid liquid;

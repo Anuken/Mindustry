@@ -5,7 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -213,10 +213,6 @@ public class UnitTypes{
                 shrinkY = 0f;
                 shrinkInterp = Interp.slope;
 
-                trailChance = 10f / 60f;
-                trailColor = Pal.bulletYellowBack;
-                trailEffect = Fx.bulletSparkSmokeTrailSmall;
-                trailSpread = 12f;
                 shootEffect = Fx.shootScepterSecondary;
                 hitEffect = Fx.hitScepterSecondary;
             }};
@@ -253,7 +249,14 @@ public class UnitTypes{
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
                     despawnSound = Sounds.shockBullet;
-                    bulletInterval = 4f;
+                    intervalAngle = 180f;
+                    intervalRandomSpread = 15;
+                    bulletInterval = 45f;
+                    intervalBullets = 2;
+
+                    trailEffect = Fx.disperseTrail;
+                    trailChance = 0.44f;
+                    trailRotation = true;
 
                     intervalBullet = new LightningBulletType(){{
                         damage = 5f;
@@ -3421,7 +3424,7 @@ public class UnitTypes{
                     moveRot = 40f - i * 25f;
                     mirror = true;
                     progress = PartProgress.warmup.delay(i * 0.2f);
-                    heatProgress = p -> Mathf.absin(Time.time + i * 14f, 7f, 1f);
+                    heatProgress = p -> Mathf.absin(Vars.state.time + i * 14f, 7f, 1f);
 
                     heatColor = Pal.techBlue;
                 }});

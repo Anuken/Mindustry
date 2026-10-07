@@ -479,7 +479,7 @@ public class Weapon implements Cloneable{
             int barrel = mount.barrelCounter;
 
             if(delay > 0f){
-                Time.run(delay, () -> {
+                Vars.state.run(delay, () -> {
                     //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
                     int prev = mount.barrelCounter;
                     mount.barrelCounter = barrel;

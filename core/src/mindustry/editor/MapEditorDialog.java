@@ -209,39 +209,42 @@ public class MapEditorDialog extends Dialog implements Disposable{
                         Time.delta = deltaScl;
 
                         Seq<Building> builds = new Seq<>();
-                        Time.clear();
+                        state.runs = new TimeRuns();
 
-                        state.world.eachTile(t -> {
-                            if(t.build != null && t.isCenter() && t.block().update && t.build.allowUpdate()){
-                                builds.add(t.build);
-                                t.build.updateProximity();
-                            }
-                        });
-
-                        for(int i = 0; i < steps; i++){
-                            for(TeamData data : state.teams.getActive()){
-                                if(data.team.rules().fillItems && data.cores.size > 0){
-                                    var core = data.cores.first();
-                                    content.items().each(it -> {
-                                        if(it.isOnPlanet(Vars.state.getPlanet()) && !it.isHidden()){
-                                            core.items.set(it, core.getMaximumAccepted(it));
-                                        }
-                                    });
+                        try{
+                            state.world.eachTile(t -> {
+                                if(t.build != null && t.isCenter() && t.block().update && t.build.allowUpdate()){
+                                    builds.add(t.build);
+                                    t.build.updateProximity();
                                 }
+                            });
+
+                            for(int i = 0; i < steps; i++){
+                                for(TeamData data : state.teams.getActive()){
+                                    if(data.team.rules().fillItems && data.cores.size > 0){
+                                        var core = data.cores.first();
+                                        content.items().each(it -> {
+                                            if(it.isOnPlanet(Vars.state.getPlanet()) && !it.isHidden()){
+                                                core.items.set(it, core.getMaximumAccepted(it));
+                                            }
+                                        });
+                                    }
+                                }
+                                Vars.logic.updateTime();
+                                for(var build : builds){
+                                    build.update();
+                                }
+                                state.entities.powerGraph.update();
+                                state.entities.bullet.update(); //needed for mass drivers...
                             }
-                            Time.update();
-                            for(var build : builds){
-                                build.update();
-                            }
-                            state.entities.powerGraph.update();
-                            state.entities.bullet.update(); //needed for mass drivers...
+
+                            //spawned units will cause havoc, so clear them
+                            state.entities.unit.clear();
+                        }finally{
+                            state.runs = new TimeRuns();
+                            Time.delta = oldDelta;
                         }
 
-                        //spawned units will cause havoc, so clear them
-                        state.entities.unit.clear();
-
-                        Time.clear();
-                        Time.delta = oldDelta;
                     });
 
                     dialog.hide();

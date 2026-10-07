@@ -347,7 +347,11 @@ public class Tile implements Position, QuadTreeObject, Displayable{
     }
 
     public Color getFloorColor(){
-        return floor.getColor(this);
+        return getFloorColor(Tmp.c3);
+    }
+
+    public Color getFloorColor(Color out){
+        return out.set(floor.getColor(this));
     }
 
     public void recacheWall(){

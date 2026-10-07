@@ -45,20 +45,11 @@ public class Maps{
 
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
-    private ShuffleMode shuffleMode = ShuffleMode.all;
 
     private @Nullable MapProvider shuffler;
     private @Nullable Map nextMapOverride;
 
     private ObjectSet<Map> previewList = new ObjectSet<>();
-
-    public ShuffleMode getShuffleMode(){
-        return shuffleMode;
-    }
-
-    public void setShuffleMode(ShuffleMode mode){
-        this.shuffleMode = mode;
-    }
 
     /** Set the provider for the map(s) to be played on. Will override the default shuffle mode setting.*/
     public void setMapProvider(MapProvider provider){
@@ -79,7 +70,7 @@ public class Maps{
         }
 
         if(shuffler != null) return shuffler.next(mode, previous);
-        return shuffleMode.next(mode, previous);
+        return Vars.netServer.config.shuffleMode.next(mode, previous);
     }
 
     /** Returns a list of all maps, including custom ones. */
@@ -418,25 +409,30 @@ public class Maps{
     }
 
     private void createNewPreview(Map map, Cons<Exception> failed){
-        try{
-            //if it's here, then the preview failed to load or doesn't exist, make it
-            //this has to be done synchronously!
-            Pixmap pix = MapIO.generatePreview(map);
-            map.texture = new Texture(pix);
-            mainExecutor.submit(() -> {
-                try{
-                    map.previewFile().writePng(pix);
-                    writeCache(map);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }finally{
-                    pix.dispose();
-                }
-            });
-        }catch(Exception e){
-            failed.get(e);
-            Log.err("Failed to generate preview!", e);
-        }
+        mainExecutor.submit(() -> {
+            try{
+                //generatePreview is (almost) thread safe
+                Pixmap pix = MapIO.generatePreview(map);
+
+                Core.app.post(() -> {
+                    //texture must be generated on main thread
+                    map.texture = new Texture(pix);
+                    mainExecutor.submit(() -> {
+                        try{
+                            map.previewFile().writePng(pix);
+                            writeCache(map);
+                        }catch(Exception e){
+                            Log.err(e);
+                        }finally{
+                            pix.dispose();
+                        }
+                    });
+                });
+            }catch(Exception e){
+                failed.get(e);
+                Log.err("Failed to generate preview!", e);
+            }
+        });
     }
 
     private void writeCache(Map map) throws IOException{

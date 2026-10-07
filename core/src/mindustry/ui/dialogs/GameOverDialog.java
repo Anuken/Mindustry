@@ -1,10 +1,10 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.flabel.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.actions.*;
+import arc.scene.flabel.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;

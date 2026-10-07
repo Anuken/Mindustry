@@ -27,7 +27,6 @@ public class ContentLoader{
     private ObjectMap<String, MappableContent>[] contentNameMap = new ObjectMap[ContentType.all.length];
     private Seq<Content>[] contentMap = new Seq[ContentType.all.length];
     private ObjectMap<String, MappableContent> nameMap = new ObjectMap<>();
-    private MappableContent[][] temporaryMapper;
     private @Nullable LoadedMod currentMod;
     private @Nullable Content lastAdded;
     private ObjectSet<Cons<Content>> initialization = new ObjectSet<>();
@@ -44,7 +43,6 @@ public class ContentLoader{
         result.initialization.addAll(initialization);
         result.lastAdded = lastAdded;
         result.currentMod = currentMod;
-        result.temporaryMapper = temporaryMapper;
         result.nameMap.putAll(nameMap);
         for(int i = 0; i < contentMap.length; i++){
             result.contentMap[i].addAll(contentMap[i]);
@@ -204,10 +202,6 @@ public class ContentLoader{
         nameMap.put(content.name, content);
     }
 
-    public void setTemporaryMapper(MappableContent[][] temporaryMapper){
-        this.temporaryMapper = temporaryMapper;
-    }
-
     /** @return the last registered content with the specified name. Note that the content loader makes no attempt to resolve name conflicts. This method can be unreliable. */
     public @Nullable MappableContent byName(String name){
         return nameMap.get(name);
@@ -246,18 +240,6 @@ public class ContentLoader{
     }
 
     public <T extends Content> T getByID(ContentType type, int id){
-
-        if(temporaryMapper != null && temporaryMapper[type.ordinal()] != null && temporaryMapper[type.ordinal()].length != 0){
-            //-1 = invalid content
-            if(id < 0){
-                return null;
-            }
-            if(temporaryMapper[type.ordinal()].length <= id || temporaryMapper[type.ordinal()][id] == null){
-                return (T)contentMap[type.ordinal()].get(0); //default value is always ID 0
-            }
-            return (T)temporaryMapper[type.ordinal()][id];
-        }
-
         if(id >= contentMap[type.ordinal()].size || id < 0){
             return null;
         }

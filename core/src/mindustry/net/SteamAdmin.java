@@ -5,7 +5,6 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.serialization.*;
 import mindustry.*;
-import mindustry.gen.*;
 import mindustry.io.*;
 
 /** Handles a database of banned Steam users. */

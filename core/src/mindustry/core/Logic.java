@@ -120,8 +120,7 @@ public class Logic implements ApplicationListener{
                 }
             }
 
-            //save settings
-            Core.settings.manualSave();
+            if(!headless) Core.settings.manualSave();
         });
 
         //sync research
@@ -332,11 +331,10 @@ public class Logic implements ApplicationListener{
         State prev = state.getState();
         //recreate gamestate - sets state to menu
         state = new GameState();
-        Time.clear();
         //fire change event, since it was technically changed
         Events.fire(new StateChangeEvent(prev, State.menu));
 
-        Core.settings.manualSave();
+        if(!headless) Core.settings.manualSave();
     }
 
     public void skipWave(){
@@ -351,7 +349,54 @@ public class Logic implements ApplicationListener{
         Events.fire(new WaveEvent());
     }
 
-    private void checkGameState(){
+    public void updateTime(){
+        state.timePrecise += Time.delta;
+
+        if(Double.isInfinite(state.timePrecise) || Double.isNaN(state.timePrecise)){
+            state.timePrecise = 0;
+        }
+
+        state.time = (float)state.timePrecise;
+
+        var runs = state.runs;
+        var tasks = runs.runs;
+        var delays = runs.times;
+
+        //write index
+        int keep = 0;
+        int i = 0;
+
+        while(i < tasks.size){
+            Runnable task = tasks.items[i];
+            float remaining = delays.items[i] - Time.delta;
+            i++;
+
+            if(remaining <= 0f){
+                task.run();
+
+                //callback reset state, stop updating tasks
+                if(state.runs != runs) return;
+            }else{
+                tasks.items[keep] = task;
+                delays.items[keep] = remaining;
+                keep++;
+            }
+        }
+
+        if(state.runs == runs){
+            int oldSize = tasks.size;
+            int newSize = keep + oldSize - i;
+
+            //null out the tail
+            Arrays.fill(tasks.items, newSize, oldSize, null);
+
+            tasks.size = newSize;
+            delays.size = newSize;
+        }
+
+    }
+
+    public void checkGameState(){
         //campaign maps do not have a 'win' state!
         if(state.isCampaign()){
             //gameover only when cores are dead
@@ -400,7 +445,7 @@ public class Logic implements ApplicationListener{
         }
     }
 
-    protected void updateWeather(){
+    public void updateWeather(){
         state.rules.weather.removeAll(w -> w.weather == null);
 
         for(WeatherEntry entry : state.rules.weather){
@@ -462,7 +507,7 @@ public class Logic implements ApplicationListener{
     public static void gameOver(Team winner){
         state.stats.wavesLasted = state.wave;
         state.won = player.team() == winner;
-        Time.run(60f * 3f, () -> ui.restart.show(winner));
+        Vars.state.run(60f * 3f, () -> ui.restart.show(winner));
         netClient.setQuiet();
     }
 
@@ -485,7 +530,7 @@ public class Logic implements ApplicationListener{
         if(netServer != null){
             netServer.admins.forceSave();
         }
-        Core.settings.manualSave();
+        if(!headless) Core.settings.manualSave();
     }
 
     protected void updateEntities(){
@@ -537,9 +582,9 @@ public class Logic implements ApplicationListener{
         state.controlPath.update();
         universe.updateGlobal();
 
-        if(Core.settings.modified() && !state.isPlaying()){
+        if(!state.isPlaying()){
             netServer.admins.forceSave();
-            Core.settings.forceSave();
+            if(!headless && Core.settings.modified()) Core.settings.forceSave();
         }
 
         boolean runStateCheck = !net.client() && !state.isEditor() && state.rules.canGameOver;
@@ -553,7 +598,7 @@ public class Logic implements ApplicationListener{
                 Events.fire(Trigger.beforeGameUpdate);
 
                 float delta = Core.graphics.getDeltaTime();
-                state.tick += Float.isNaN(delta) || Float.isInfinite(delta) ? 0f : delta * 60f;
+                state.tick += Float.isNaN(delta) || Float.isInfinite(delta) ? 0.0 : delta * 60.0;
                 state.updateId ++;
                 state.teams.updateTeamStats();
                 MapPreviewLoader.checkPreviews();
@@ -569,7 +614,7 @@ public class Logic implements ApplicationListener{
                 if(state.isCampaign()){
                     universe.update();
                 }
-                Time.update();
+                updateTime();
 
                 logicVars.update();
 
@@ -619,7 +664,7 @@ public class Logic implements ApplicationListener{
                 }
 
                 if(state.rules.waves && state.rules.waveTimer && !state.gameOver){
-                    if(!isWaitingWave()){
+                    if(!state.isWaitingWave()){
                         state.wavetime = Math.max(state.wavetime - Time.delta, 0);
                     }
                 }
@@ -647,10 +692,5 @@ public class Logic implements ApplicationListener{
         }
 
         PerfCounter.stateUpdate.end(PerfCounter.entityUpdate.latestValueNs());
-    }
-
-    /** @return whether the wave timer is paused due to enemies */
-    public boolean isWaitingWave(){
-        return (state.rules.waitEnemies || (state.wave >= state.rules.winWave && state.rules.winWave > 0)) && state.enemies > 0;
     }
 }

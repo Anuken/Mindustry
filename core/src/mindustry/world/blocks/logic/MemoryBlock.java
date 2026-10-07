@@ -1,6 +1,5 @@
 package mindustry.world.blocks.logic;
 
-import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
@@ -8,9 +7,9 @@ import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
-import static mindustry.Vars.*;
-
 import java.util.*;
+
+import static mindustry.Vars.*;
 
 public class MemoryBlock extends Block{
     public int memoryCapacity = 32;
@@ -182,7 +181,7 @@ public class MemoryBlock extends Block{
                         numberMemory[i] = value;
                     }
                 }else{
-                    Object value = TypeIO.readObject(read, true, null, false, true, type);
+                    Object value = TypeIO.readObject(read, true, false, true, type);
                     if(i < objectMemory.length){
                         objectMemory[i] = value;
                     }

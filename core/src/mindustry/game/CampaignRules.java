@@ -1,7 +1,6 @@
 package mindustry.game;
 
 import mindustry.*;
-import mindustry.gen.*;
 import mindustry.type.*;
 
 public class CampaignRules{

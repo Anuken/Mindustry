@@ -1,9 +1,9 @@
 package mindustry.world;
 
-import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
@@ -23,7 +23,7 @@ public class DirectionalItemBuffer{
 
     public void accept(int buffer, Item item){
         if(!accepts(buffer)) return;
-        buffers[buffer][indexes[buffer]++] = BufferItem.get(item.id, Time.time);
+        buffers[buffer][indexes[buffer]++] = BufferItem.get(item.id, Vars.state.time);
     }
 
     public Item poll(int buffer, float speed){
@@ -31,7 +31,7 @@ public class DirectionalItemBuffer{
             long l = buffers[buffer][0];
             float time = BufferItem.time(l);
 
-            if(Time.time >= time + speed || Time.time < time){
+            if(Vars.state.time >= time + speed || Vars.state.time < time){
                 return content.item(BufferItem.item(l));
             }
         }
@@ -68,6 +68,10 @@ public class DirectionalItemBuffer{
                     //read value as the old format with 1-byte items, and create a new one with the new 2-byte format
                     value = BufferItem.get(BufferItemLegacy.item(value), BufferItemLegacy.time(value));
                 }
+
+                //re-pack the item ID through the reader's content mapping
+                Item item = read.content(ContentType.item, BufferItem.item(value));
+                if(item != null) value = BufferItem.get(item.id, BufferItem.time(value));
 
                 if(j < buffers[i].length){
                     buffers[i][j] = value;

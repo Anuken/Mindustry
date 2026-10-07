@@ -4,8 +4,8 @@ import arc.files.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.mod.Mods.*;
 import mindustry.mod.*;
+import mindustry.mod.Mods.*;
 import mindustry.mod.data.*;
 
 /** Base class for a content type that is loaded in {@link mindustry.core.ContentLoader}. */

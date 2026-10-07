@@ -50,7 +50,7 @@ public class SchemaGenerator{
             }
         }
         root.put("mappings", mappings);
-        outputDir.child("allContent.json").writeString(root.toString(Jformat.formatted));
+        outputDir.child("allContent.json").writeString(root.toString(Jformat.jsonFormatted));
     }
 
     //called from ScriptMainGenerator
@@ -112,7 +112,7 @@ public class SchemaGenerator{
             injector.get(val);
         }
 
-        outputDir.child(type.getCanonicalName() + ".json").writeString(val.toString(Jformat.formatted));
+        outputDir.child(type.getCanonicalName() + ".json").writeString(val.toString(Jformat.jsonFormatted));
     }
 
     //writes a schema for an enum type the first time it's encountered as a field value; subsequent calls are no-ops
@@ -133,7 +133,7 @@ public class SchemaGenerator{
         }
         val.put("values", values);
 
-        outputDir.child(enumType.getCanonicalName() + ".json").writeString(val.toString(Jformat.formatted));
+        outputDir.child(enumType.getCanonicalName() + ".json").writeString(val.toString(Jformat.jsonFormatted));
     }
 
     //registers an injector adding/overwriting fields on type's generated schema, for JSON keys with no real backing field

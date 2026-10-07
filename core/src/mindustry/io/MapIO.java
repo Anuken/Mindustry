@@ -68,6 +68,12 @@ public class MapIO{
         SaveIO.load(map.file, cons);
     }
 
+    /**
+     * Generates a preview of a map. This is mostly safe, but writes to map spawns/teams in the same method, which is a bit risky, but I don't have any better ideas.
+     * There's no way (that I can see) of checking teams/spawns in a map without reading every time.
+     * After I wrote this comment, I added both to meta, but it's too late now; all older saves don't have team/spawn info, so it has to be recalculated every time and cached in a dat file next to the preview.
+     * Removing spawns/teams isn't an option either, as people would become unable to filter maps by supported gamemode.
+     * */
     public static Pixmap generatePreview(Map map) throws IOException{
         map.spawns = 0;
         map.teams.clear();
@@ -82,7 +88,7 @@ public class MapIO{
             Pixmap floors = new Pixmap(map.width, map.height);
             Pixmap walls = new Pixmap(map.width, map.height);
             int black = 255;
-            int shade = Color.rgba8888(0f, 0f, 0f, 0.5f);
+            int shade = Color.rgba8888(0f, 0f, 0.1f, 0.5f);
 
             int width = map.width, height = map.height;
             int len = width*height;
@@ -92,53 +98,49 @@ public class MapIO{
             CachedTile tile = new CachedTile(){
                 @Override
                 public void setBlock(Block type){
-                    //do not super.setBlock as that affects the current world
+                    //do not super.setBlock as that affects the current world; previews never create buildings
                     this.block = type;
-                    this.build = type.newBuilding().init(this, this.team(), false, 0);
+                    this.build = null;
                     int c = colorFor(type, Blocks.air, Blocks.air, team());
                     if(c != black){
                         walls.setRaw(x, floors.height - 1 - y, c);
-                        floors.set(x, floors.height - 1 - y + 1, shade);
+                        int offset = -(type.size - 1) / 2;
+                        for(int dx = 0; dx < type.size; dx++){
+                            int px = x + dx + offset, py = floors.height - 1 - (y + offset) + 1;
+                            floors.set(px, py, Pixmap.blend(shade, floors.get(px, py)));
+                        }
                     }
                 }
             };
 
             //version 12 has content patches here, version 11 has them after the content header
-            if(ver.version >= 12) ver.skipChunk(stream);
-            ver.readRegion("content", stream, counter, MapIO::readPreviewContentHeader);
-            if(ver.version == 11) ver.skipChunk(stream);
-            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, new SaveLoadContext(){
+            var context = new SaveLoadContext(){
                 {
                     preview = true;
                 }
 
                 @Override public void resize(int width, int height){}
                 @Override public boolean isGenerating(){return false;}
-                @Override public void begin(){
-                    state.generating = true;
-                }
-                @Override public void end(){
-                    state.generating = false;
-                }
+                //must not touch the global state, as previews can run off the main thread
+                @Override public void begin(){}
+                @Override public void end(){}
 
                 @Override
-                public void onReadBuilding(){
+                public void onReadPreviewBuilding(Team team){
                     //read team colors
-                    if(tile.build != null){
-                        int c = tile.build.team.color.rgba8888();
-                        int size = tile.block().size;
-                        int offsetx = -(size - 1) / 2;
-                        int offsety = -(size - 1) / 2;
-                        for(int dx = 0; dx < size; dx++){
-                            for(int dy = 0; dy < size; dy++){
-                                int drawx = tile.x + dx + offsetx, drawy = tile.y + dy + offsety;
-                                walls.set(drawx, floors.height - 1 - drawy, c);
-                            }
+                    int c = team.color.rgba8888();
+                    int size = tile.block().size;
+                    int offsetx = -(size - 1) / 2;
+                    int offsety = -(size - 1) / 2;
+                    for(int dx = 0; dx < size; dx++){
+                        for(int dy = 0; dy < size; dy++){
+                            int drawx = tile.x + dx + offsetx, drawy = tile.y + dy + offsety;
+                            walls.set(drawx, floors.height - 1 - drawy, c);
                         }
+                    }
 
-                        if(tile.build.block instanceof CoreBlock){
-                            map.teams.add(tile.build.team.id);
-                        }
+                    if(tile.block() instanceof CoreBlock){
+                        map.teams.add(team.id);
                     }
                 }
 
@@ -171,24 +173,37 @@ public class MapIO{
                         if(color != 0){
                             walls.set(tile.x, walls.height - 1 - tile.y, color);
                         }
-                    }else if(!overlays[tile.array()] && block == Blocks.air){
+                    }else if(!overlays[tile.x + tile.y * width] && block == Blocks.air){
                         int color = floor.minimapColor(tile);
                         if(color != 0){
                             floors.set(tile.x, floors.height - 1 - tile.y, color);
                         }
                     }
                 }
-            }));
+            };
+
+            if(ver.version >= 12) ver.skipChunk(stream);
+            ver.readRegion("content", stream, counter, in -> readPreviewContentHeader(in, context));
+            if(ver.version == 11) ver.skipChunk(stream);
+            ver.readRegion("preview_map", stream, counter, in -> ver.readMap(in, context));
+
+            for(int y = 0; y < height; y++){
+                for(int x = 0; x < width; x++){
+                    if(!((Floor)content.block(floorIds[x + y * width])).isLiquid) continue;
+                    if(y < height - 1 && ((Floor)content.block(floorIds[x + (y + 1) * width])).isLiquid) continue;
+
+                    int row = height - 1 - y;
+                    floors.set(x, row, new Color(floors.get(x, row)).mul(0.84f, 0.84f, 0.9f, 1f));
+                }
+            }
 
             floors.draw(walls, true);
             walls.dispose();
             return floors;
-        }finally{
-            content.setTemporaryMapper(null);
         }
     }
 
-    private static void readPreviewContentHeader(DataInput stream) throws IOException{
+    private static void readPreviewContentHeader(DataInput stream, SaveLoadContext context) throws IOException{
         //reads content header while refusing to fire patch loaded event
         int mapped = stream.readUnsignedByte();
 
@@ -206,7 +221,7 @@ public class MapIO{
             }
         }
 
-        content.setTemporaryMapper(map);
+        context.reads = new MappedReads(null, map);
     }
 
     public static Pixmap generatePreview(World tiles){

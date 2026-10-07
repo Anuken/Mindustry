@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -81,7 +82,7 @@ public class LaserBulletType extends BulletType{
                 int f = idx++;
 
                 for(int s : Mathf.signs){
-                    Time.run(f * lightningDelay, () -> {
+                    Vars.state.run(f * lightningDelay, () -> {
                         if(b.isAdded() && b.type == this){
                             Lightning.create(b, lightningColor,
                                 lightningDamage < 0 ? damage : lightningDamage,

@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 
@@ -41,7 +42,7 @@ public class LongPowerNode extends PowerNode{
             super.draw();
 
             if(warmup > 0.001f){
-                Drawf.additive(glow, Tmp.c1.set(glowColor).mula(warmup).mula(1f - glowMag + Mathf.absin(glowScl, glowMag)), x, y);
+                Drawf.additive(glow, Tmp.c1.set(glowColor).mula(warmup).mula(1f - glowMag + Mathf.absin(Vars.state.time, glowScl, glowMag)), x, y);
             }
         }
     }

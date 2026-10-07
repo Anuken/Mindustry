@@ -18,7 +18,6 @@ import mindustry.ui.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
-import static mindustry.logic.LogicCanvas.*;
 
 /**
  * A statement is an intermediate representation of an instruction, to be used mostly in UI.
@@ -83,7 +82,7 @@ public abstract class LogicStatement{
 
     protected void param(Cell<Label> label){
         String text = name() + "." + label.get().getText().toString().trim();
-        tooltip(label, text);
+        LogicCanvas.tooltip(label, text);
     }
 
     /** Sanitizes variable input strings from text fields into values that will not break logic parsing. */
@@ -242,7 +241,7 @@ public abstract class LogicStatement{
                     hide.run();
                 }).self(c -> {
                     if(p instanceof Enum e){
-                        tooltip(c, e);
+                        LogicCanvas.tooltip(c, e);
                     }
                 }).checked(current.equals(p)).group(group));
 

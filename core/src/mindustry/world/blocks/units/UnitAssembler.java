@@ -10,15 +10,14 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.struct.EnumSet;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.game.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -614,7 +613,7 @@ public class UnitAssembler extends PayloadBlock{
                 Draw.color(Pal.accent, warmup);
 
                 Shaders.blockbuild.region = plan.unit.fullIcon;
-                Shaders.blockbuild.time = Time.time;
+                Shaders.blockbuild.time = Vars.state.time;
                 Shaders.blockbuild.alpha = warmup;
                 //margin due to units not taking up whole region
                 Shaders.blockbuild.progress = Mathf.clamp(progress + 0.05f);

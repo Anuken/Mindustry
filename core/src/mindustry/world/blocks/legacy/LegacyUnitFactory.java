@@ -1,8 +1,8 @@
 package mindustry.world.blocks.legacy;
 
-import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.world.*;
 
 public class LegacyUnitFactory extends LegacyBlock{

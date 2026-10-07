@@ -26,8 +26,8 @@ import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.io.SaveIO.*;
-import mindustry.maps.Map;
 import mindustry.maps.*;
+import mindustry.maps.Map;
 import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
@@ -85,7 +85,7 @@ public class Control implements ApplicationListener, Loadable{
             Time.runTask(5f, () -> {
                 String key = "v9-warning-alpha1";
 
-                if(!settings.getBool(key)){
+                if(!settings.getBool(key) && System.getProperty("mindustry.test") == null){
                     //I am not bothering to localize this since it will be removed and rewritten eventually
                     BaseDialog diag = new BaseDialog("Alpha Version Warning");
                     diag.cont.add(
@@ -182,7 +182,7 @@ public class Control implements ApplicationListener, Loadable{
                     player.admin = true;
                 }catch(IOException e){
                     ui.showException("@server.error", e);
-                    state.set(State.menu);
+                    logic.reset();
                 }
             }
         }));
@@ -207,7 +207,7 @@ public class Control implements ApplicationListener, Loadable{
             app.post(this::checkAutoUnlocks);
 
             if(!net.client() && e.sector.preset != null && e.sector.preset.isLastSector && e.initialCapture){
-                Time.run(60f * 2f, () -> {
+                Vars.state.run(60f * 2f, () -> {
                     ui.campaignComplete.show(e.sector.planet);
                 });
             }
@@ -287,7 +287,7 @@ public class Control implements ApplicationListener, Loadable{
                                     float delay = build.dst(ccore) / unitsPerTick + coreDelay;
                                     maxDelay = Math.max(delay, maxDelay);
 
-                                    Time.run(delay, () -> {
+                                    Vars.state.run(delay, () -> {
                                         if(build.tile.build != build){
                                             placeLandBuild(build);
 
@@ -304,9 +304,9 @@ public class Control implements ApplicationListener, Loadable{
                     }
 
                     if(anyBuilds){
-                        Time.run(maxDelay + 1f, this::configurePlaced);
+                        Vars.state.run(maxDelay + 1f, this::configurePlaced);
                         for(var ccore : state.rules.defaultTeam.data().cores){
-                            Time.run(coreDelay, () -> {
+                            Vars.state.run(coreDelay, () -> {
                                 Fx.coreBuildShockwave.at(ccore.x, ccore.y, buildRadius);
                             });
                         }
@@ -807,7 +807,7 @@ public class Control implements ApplicationListener, Loadable{
         }else{
             //this runs in the menu
             if(!state.isPaused()){
-                Time.update();
+                Vars.logic.updateTime();
             }
 
             if(!scene.hasDialog() && !scene.root.getChildren().isEmpty() && !(scene.root.getChildren().peek() instanceof Dialog) && Core.input.keyTap(KeyCode.back)){

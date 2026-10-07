@@ -3,9 +3,9 @@ package mindustry.world.blocks.payloads;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -100,7 +100,7 @@ public interface Payload extends Position{
 
         byte type = read.b();
         if(type == payloadBlock){
-            Block block = content.block(read.s());
+            Block block = read.block();
             BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
             payload.build.readAll(read, version);

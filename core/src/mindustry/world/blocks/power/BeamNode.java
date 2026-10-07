@@ -210,9 +210,9 @@ public class BeamNode extends PowerBlock{
             if(Mathf.zero(Renderer.laserOpacity) || team == Team.derelict) return;
 
             Draw.z(Layer.power);
-            Draw.color(laserColor1, laserColor2, (1f - power.graph.getSatisfaction()) * 0.86f + Mathf.absin(3f, 0.1f));
+            Draw.color(laserColor1, laserColor2, (1f - power.graph.getSatisfaction()) * 0.86f + Mathf.absin(Vars.state.time, 3f, 0.1f));
             Draw.alpha(Renderer.laserOpacity);
-            float w = laserWidth + Mathf.absin(pulseScl, pulseMag);
+            float w = laserWidth + Mathf.absin(Vars.state.time, pulseScl, pulseMag);
 
             for(int i = 0; i < 4; i ++){
                 if(dests[i] != null && links[i].wasVisible && (!(links[i].block instanceof BeamNode node) ||

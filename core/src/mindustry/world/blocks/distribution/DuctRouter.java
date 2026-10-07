@@ -3,11 +3,11 @@ package mindustry.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -203,7 +203,7 @@ public class DuctRouter extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             if(revision >= 1){
-                sortItem = content.item(read.s());
+                sortItem = read.item();
             }
         }
     }

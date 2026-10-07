@@ -3,14 +3,12 @@ package mindustry.io.versions;
 import arc.func.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.type.*;
 import mindustry.world.*;
 
 import java.io.*;
-
-import static mindustry.Vars.*;
 
 public class ShortChunkSaveVersion extends SaveVersion{
 
@@ -23,7 +21,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
-            readLegacyShortChunk(stream, (in, len) -> {
+            readLegacyShortChunk(stream, state.reads, (in, len) -> {
                 int typeid = in.ub();
                 if(mapping[typeid] == null){
                     in.skip(len - 1);
@@ -60,10 +58,11 @@ public class ShortChunkSaveVersion extends SaveVersion{
             //read floor and create tiles first
             for(int i = 0; i < width * height; i++){
                 int x = i % width, y = i / width;
-                short floorid = stream.readShort();
-                short oreid = stream.readShort();
+                Block floor = context.reads.content(ContentType.block, stream.readShort());
+                Block overlay = context.reads.content(ContentType.block, stream.readShort());
                 int consecutives = stream.readUnsignedByte();
-                if(content.block(floorid) == Blocks.air) floorid = Blocks.stone.id;
+                if(floor == Blocks.air) floor = Blocks.stone;
+                int floorid = floor == null ? Blocks.stone.id : floor.id, oreid = overlay == null ? Blocks.air.id : overlay.id;
 
                 context.create(x, y, floorid, oreid, (short)0);
 
@@ -77,7 +76,7 @@ public class ShortChunkSaveVersion extends SaveVersion{
 
             //read blocks
             for(int i = 0; i < width * height; i++){
-                Block block = content.block(stream.readShort());
+                Block block = context.reads.content(ContentType.block, stream.readShort());
                 Tile tile = context.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
@@ -123,7 +122,12 @@ public class ShortChunkSaveVersion extends SaveVersion{
                     if(isCenter){ //only read entity for center blocks
                         if(block.hasBuilding()){
                             try{
-                                readLegacyShortChunk(stream, (in, len) -> {
+                                readLegacyShortChunk(stream, context.reads, (in, len) -> {
+                                    if(context.preview){
+                                        readPreviewBuilding(in, len, context);
+                                        return;
+                                    }
+
                                     byte revision = in.b();
                                     tile.build.readAll(in, revision);
                                 });
@@ -134,8 +138,6 @@ public class ShortChunkSaveVersion extends SaveVersion{
                             //skip the entity region, as the entity and its IO code are now gone
                             skipLegacyShortChunk(stream);
                         }
-
-                        context.onReadBuilding();
                     }
                 }else if(hadDataOld || hadDataNew){ //never read consecutive blocks if there's any kind of data
                     if(hadDataOld){

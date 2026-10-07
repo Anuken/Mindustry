@@ -170,7 +170,7 @@ public class RepairBeamWeapon extends Weapon{
                 wy = unit.y + Angles.trnsy(weaponRotation, x, y),
                 z = Draw.z();
             RepairTurret.drawBeam(wx, wy, unit.rotation + mount.rotation, shootY, unit.id, mount.target == null || controllable ? null : (Sized)mount.target, unit.team, heal.strength,
-            pulseStroke, pulseRadius, beamWidth + Mathf.absin(widthSinScl, widthSinMag), heal.lastEnd, heal.offset, laserColor, laserTopColor,
+            pulseStroke, pulseRadius, beamWidth + Mathf.absin(Vars.state.time, widthSinScl, widthSinMag), heal.lastEnd, heal.offset, laserColor, laserTopColor,
             laser, laserEnd, laserTop, laserTopEnd);
             Draw.z(z);
         }

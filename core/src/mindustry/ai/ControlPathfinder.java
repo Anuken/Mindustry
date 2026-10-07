@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -228,7 +229,7 @@ public class ControlPathfinder implements Runnable{
                 req.invalidated = true;
                 //concurrent modification!
                 queue.post(() -> threadPathRequests.remove(req));
-                Time.run(0f, () -> unitRequests.remove(req.unit));
+                Vars.state.post(() -> unitRequests.remove(req.unit));
             }
         }
 
@@ -237,7 +238,7 @@ public class ControlPathfinder implements Runnable{
             if(field.lastUpdateId <= state.updateId - 30){
                 //make sure it's only modified on the main thread...? but what about calling get() on this thread??
                 queue.post(() -> fields.remove(field.mapKey));
-                Time.run(0f, () -> fieldList.remove(field));
+                Vars.state.post(() -> fieldList.remove(field));
             }
         }
     }
@@ -1020,6 +1021,7 @@ public class ControlPathfinder implements Runnable{
 
         if(dest == Integer.MAX_VALUE){
             request.notFound = true;
+            request.oldCache = null;
             //no node found (TODO: invalid state??)
             return;
         }
@@ -1161,7 +1163,7 @@ public class ControlPathfinder implements Runnable{
 
         boolean any = false;
 
-        long fieldKey = FieldIndex.get(destPos, costId, team);
+        long fieldKey = FieldIndex.get(request != null ? request.destination : destPos, costId, team);
 
         //use existing request if it exists.
         if(request != null && (request.destination == destPos ||
@@ -1279,12 +1281,28 @@ public class ControlPathfinder implements Runnable{
             }
         }else{
             //destroy the old one immediately, it's invalid now
+            FieldCache previousField = null;
             if(request != null){
                 request.lastUpdateId = -1000;
+
+                FieldCache current = null;
+                try{
+                    current = fields.get(FieldIndex.get(request.destination, costId, team));
+                }catch(Exception ignored){
+                }
+
+                if(current != null && current.frontier.isEmpty()){
+                    previousField = current;
+                }else if(request.oldCache != null){
+                    previousField = request.oldCache;
+                }else{
+                    previousField = current;
+                }
             }
 
             //queue new request.
             unitRequests.put(unit, request = new PathRequest(unit, team, costId, destPos, state.updateId));
+            request.oldCache = previousField;
 
             PathRequest f = request;
             request.lastRecomputeTime = Time.millis();

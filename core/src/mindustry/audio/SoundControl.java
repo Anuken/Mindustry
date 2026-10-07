@@ -12,6 +12,7 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 
 import java.util.concurrent.*;
@@ -32,7 +33,7 @@ public class SoundControl{
     public AudioBus uiBus = new AudioBus();
 
     protected Music lastRandomPlayed;
-    protected Interval timer = new Interval(4);
+    protected mindustry.game.Interval timer = new Interval(4);
     protected long lastPlayed;
     protected @Nullable Music current;
     protected float fade;
@@ -53,7 +54,7 @@ public class SoundControl{
         Events.on(ClientLoadEvent.class, e -> reload());
 
         //only run music 10 seconds after a wave spawns
-        Events.on(WaveEvent.class, e -> Time.run(Mathf.random(8f, 15f) * 60f, () -> {
+        Events.on(WaveEvent.class, e -> Vars.state.run(Mathf.random(8f, 15f) * 60f, () -> {
             if(state.rules.disableMusic) return;
 
             boolean boss = state.rules.spawns.contains(group -> group.getSpawned(state.wave - 2) > 0 && group.effect == StatusEffects.boss);

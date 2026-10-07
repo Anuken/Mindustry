@@ -5,7 +5,7 @@ import arc.assets.loaders.TextureLoader.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
@@ -45,7 +45,7 @@ public class EnvRenderers{
 
             Draw.blend(Blending.additive);
 
-            float t = Time.time / timeScale;
+            float t = Vars.state.time / timeScale;
             Texture tex = Core.assets.get("sprites/rays.png", Texture.class);
 
             for(int i = 0; i < rays; i++){

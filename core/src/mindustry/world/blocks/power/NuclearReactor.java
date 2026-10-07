@@ -6,12 +6,13 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -175,7 +176,7 @@ public class NuclearReactor extends PowerGenerator{
         public void drawLight(){
             float fract = productionEfficiency;
             smoothLight = Mathf.lerpDelta(smoothLight, fract, 0.08f);
-            Drawf.light(x, y, (90f + Mathf.absin(5, 5f)) * smoothLight, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * smoothLight);
+            Drawf.light(x, y, (90f + Mathf.absin(Vars.state.time, 5, 5f)) * smoothLight, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * smoothLight);
         }
 
         @Override
