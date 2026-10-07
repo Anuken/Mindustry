@@ -38,6 +38,7 @@ public class Stat implements Comparable<Stat>{
     canBoost = new Stat("canBoost"),
     boostingSpeed = new Stat("boostingspeed"),
     maxUnits = new Stat("maxUnits"),
+    unitCapMultiplier = new Stat("unitCapMultiplier"),
 
     damageMultiplier = new Stat("damageMultiplier"),
     healthMultiplier = new Stat("healthMultiplier"),
