@@ -202,7 +202,7 @@ public class MenuFragment{
         Drawable background = Styles.black6;
 
         container.left();
-        container.add().width(Core.graphics.getWidth()/10f);
+        container.add().width(Core.graphics.getWidth() / 10f / Scl.scl(1f));
         container.table(background, t -> {
             t.defaults().width(width).height(70f);
             t.name = "buttons";
