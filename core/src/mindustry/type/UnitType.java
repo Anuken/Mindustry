@@ -112,6 +112,8 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     researchCostMultiplier = 50,
     /** multiplier for knockback this unit receives */
     knockbackMultiplier = 1f,
+    /** multiplier for this unit's unit cap**/
+    unitCapMultiplier = 1f,
 
     /** for ground units, the layer upon which this unit is drawn */
     groundLayer = Layer.groundUnit,
