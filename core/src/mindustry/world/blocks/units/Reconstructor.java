@@ -387,7 +387,7 @@ public class Reconstructor extends UnitBlock{
             if(payload == null) return null;
 
             UnitType t = upgrade(payload.unit.type);
-            if(t == null && previous(payload.unit.type) != null) t = payload.unit.type;
+            if(t == null && downgrade(payload.unit.type) != null) t = payload.unit.type;
             return t != null && (t.unlockedNowHost() || team.isAI()) ? t : null;
         }
 
@@ -405,7 +405,7 @@ public class Reconstructor extends UnitBlock{
             return r == null ? null : r[1];
         }
 
-        public UnitType previous(UnitType type){
+        public UnitType downgrade(UnitType type){
             UnitType[] r = upgrades.find(u -> u[1] == type);
             return r == null ? null : r[0];
         }
