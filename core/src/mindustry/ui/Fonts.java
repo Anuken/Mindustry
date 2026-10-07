@@ -36,7 +36,7 @@ public class Fonts{
     private static ObjectMap<String, TextureRegion> largeIcons = new ObjectMap<>();
     private static int lastUsedModCodepoint;
 
-    public static arc.graphics.font.Font def, outline, icon, iconLarge, tech, logic, monospace;
+    public static Font def, outline, icon, iconLarge, tech, logic, monospace;
 
     public static int getUnicode(String content){
         return unicodeIcons.get(content, 0);
@@ -283,7 +283,7 @@ public class Fonts{
             ObjectSet<FreeTypeFontParameter> scaled = new ObjectSet<>();
 
             @Override
-            public arc.graphics.font.Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
+            public Font loadSync(AssetManager manager, String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
                 if(fileName.endsWith("outline")){
                     parameter.fontParameters.borderWidth = Scl.scl(2f);
                     parameter.fontParameters.spaceX -= parameter.fontParameters.borderWidth;
