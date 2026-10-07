@@ -4,6 +4,7 @@ import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
 import arc.files.*;
+import arc.graphics.HdpiUtils.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
@@ -92,7 +93,10 @@ public class DesktopLauncher extends ClientLauncher{
                             }
                             case "coreGl" -> coreProfile = true;
                             case "noAngle" -> useAngle = false;
-                            case "highdpi" -> highDpi = true;
+                            case "highdpi" -> {
+                                highDpi = true;
+                                hdpiMode = HdpiMode.pixels;
+                            }
                             case "compatibilityGl" -> coreProfile = false;
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
