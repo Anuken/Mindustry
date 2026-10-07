@@ -28,6 +28,7 @@ public class SdlGraphics extends Graphics{
     int backBufferHeight;
     int logicalWidth;
     int logicalHeight;
+    float displayScale = 1f;
 
     SdlGraphics(SdlApplication app){
         this.app = app;
@@ -64,18 +65,32 @@ public class SdlGraphics extends Graphics{
         frameId++;
     }
 
-    void updateSize(int width, int height){
-        logicalWidth = width;
-        logicalHeight = height;
-
+    /** Re-queries logical (window) size, pixel size and scale from SDL. */
+    void updateSize(){
         try(MemoryStack stack = MemoryStack.stackPush()){
             IntBuffer w = stack.mallocInt(1), h = stack.mallocInt(1);
+            SDLVideo.SDL_GetWindowSize(app.window, w, h);
+            logicalWidth = w.get(0);
+            logicalHeight = h.get(0);
+
             SDLVideo.SDL_GetWindowSizeInPixels(app.window, w, h);
             backBufferWidth = w.get(0);
             backBufferHeight = h.get(0);
         }
 
+        float scale = SDLVideo.SDL_GetWindowDisplayScale(app.window);
+        displayScale = scale > 0 ? scale : 1f;
+
         Gl.viewport(0, 0, backBufferWidth, backBufferHeight);
+    }
+
+    /** Converts a window-space coordinate (as reported by SDL events) to the coordinate space of getWidth()/getHeight(). */
+    float scaleX(float x){
+        return logicalWidth == 0 ? x : x * getWidth() / logicalWidth;
+    }
+
+    float scaleY(float y){
+        return logicalHeight == 0 ? y : y * getHeight() / logicalHeight;
     }
 
     @Override
@@ -128,12 +143,12 @@ public class SdlGraphics extends Graphics{
 
     @Override
     public float getPpiX(){
-        return 0;
+        return 96f * displayScale;
     }
 
     @Override
     public float getPpiY(){
-        return 0;
+        return 96f * displayScale;
     }
 
     @Override
@@ -148,7 +163,7 @@ public class SdlGraphics extends Graphics{
 
     @Override
     public float getDensity(){
-        return 0;
+        return displayScale;
     }
 
     @Override

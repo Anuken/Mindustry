@@ -92,6 +92,7 @@ public class DesktopLauncher extends ClientLauncher{
                             }
                             case "coreGl" -> coreProfile = true;
                             case "noAngle" -> useAngle = false;
+                            case "highdpi" -> highDpi = true;
                             case "compatibilityGl" -> coreProfile = false;
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
