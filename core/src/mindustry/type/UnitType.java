@@ -852,6 +852,10 @@ public class UnitType extends UnlockableContent implements Senseable{
         if(immunities.size > 0){
             stats.add(Stat.immunities, StatValues.statusEffects(immunities.toSeq().sort()));
         }
+
+        if(unitCapMultiplier != 1){
+            stats.add(Stat.unitCapMultiplier, Strings.autoFixed(unitCapMultiplier, 4) + "x");
+        }
     }
 
     protected void checkEntityMapping(Unit example){
