@@ -486,7 +486,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void lookAt(float angle){
-        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta * speedMultiplier());
+        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta * speedMultiplier() * rotateSpeedMultiplier());
     }
 
     public void lookAt(Position pos){
@@ -599,7 +599,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         team.data().updateCount(type, 1);
 
         //check if over unit cap
-        if(type.useUnitCap && count() > cap() && !spawnedByCore && !dead && !state.rules.editor){
+        if(type.useUnitCap && count() > Mathf.ceil(cap() * type.unitCapMultiplier) && !spawnedByCore && !dead && !state.rules.editor){
             Call.unitCapDeath(self());
             team.data().updateCount(type, -1);
         }

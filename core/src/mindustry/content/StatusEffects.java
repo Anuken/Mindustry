@@ -198,6 +198,7 @@ public class StatusEffects{
             intervalDamageTime = 15f;
 
             effectChance = 0.1f;
+            parentizeEffect = true;
             effect = Fx.corrosionVapor;
         }};
 

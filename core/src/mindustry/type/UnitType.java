@@ -100,6 +100,8 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     wreckHealthMultiplier = 0.25f,
     /** a VERY ROUGH estimate of unit DPS; initialized in init() */
     dpsEstimate = -1,
+    /** a VERY ROUGH estimate of total unit damage; initialized in init() */
+    damageEstimate = -1,
     /** graphics clipping size; <0 to calculate automatically */
     clipSize = -1,
     /** multiplier for how slowly this unit drowns - higher numbers, slower drowning. */
@@ -110,6 +112,8 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     researchCostMultiplier = 50,
     /** multiplier for knockback this unit receives */
     knockbackMultiplier = 1f,
+    /** multiplier for this unit's unit cap */
+    unitCapMultiplier = 1f,
 
     /** for ground units, the layer upon which this unit is drawn */
     groundLayer = Layer.groundUnit,
@@ -871,6 +875,10 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         if(immunities.size > 0){
             stats.add(Stat.immunities, StatValues.statusEffects(immunities.toSeq().sort()));
         }
+
+        if(unitCapMultiplier != 1){
+            stats.add(Stat.unitCapMultiplier, Strings.autoFixed(unitCapMultiplier, 4) + "x");
+        }
     }
 
     protected void checkEntityMapping(Unit example){
@@ -1007,14 +1015,13 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
             }
         }
 
-        if(fogRadius < 0){
-            //TODO depend on range?
-            fogRadius = Math.max(58f * 3f, hitSize * 2f) / 8f;
-        }
-
         if(!weapons.contains(w -> w.useAttackRange)){
             if(range < 0 || range == Float.MAX_VALUE) range = mineRange;
             if(maxRange < 0 || maxRange == Float.MAX_VALUE) maxRange = mineRange;
+        }
+
+        if(fogRadius < 0){
+            fogRadius = Math.max(58f * 3f, Math.min(maxRange * 0.75f, 500f)) / 8f;
         }
 
         if(mechStride < 0){
@@ -1144,6 +1151,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         }
 
         estimateDps();
+        estimateDamage();
 
         //only do this after everything else was initialized
         sample = constructor.get();
@@ -1160,8 +1168,15 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
                 dpsEstimate /= 15f;
             }
         }
+        if(damageEstimate < 0){
+            damageEstimate = weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f);
+        }
 
         return dpsEstimate;
+    }
+
+    public float estimateDamage(){
+        return damageEstimate < 0 ? weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f) : damageEstimate;
     }
 
     @CallSuper

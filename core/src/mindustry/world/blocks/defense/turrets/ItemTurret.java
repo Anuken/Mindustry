@@ -82,7 +82,7 @@ public class ItemTurret extends Turret{
             @Override
             public float efficiency(Building build){
                 //valid when it can shoot
-                return build instanceof ItemTurretBuild it && it.ammo.size > 0 && (it.ammo.peek().amount >= ammoPerShot || it.cheating()) ? 1f : 0f;
+                return build instanceof ItemTurretBuild it && it.ammo.size > 0 && (it.ammo.peek().amount + 0.0001f >= ammoPerShot || it.cheating()) ? 1f : 0f;
             }
 
             @Override
@@ -179,7 +179,7 @@ public class ItemTurret extends Turret{
             }
 
             //must not be found
-            ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
+            ammo.add(new ItemEntry(item, type.ammoMultiplier));
         }
 
         @Override
@@ -189,7 +189,7 @@ public class ItemTurret extends Turret{
 
         @Override
         public byte version(){
-            return 2;
+            return 3;
         }
 
         @Override
@@ -199,7 +199,7 @@ public class ItemTurret extends Turret{
             for(AmmoEntry entry : ammo){
                 ItemEntry i = (ItemEntry)entry;
                 write.s(i.item.id);
-                write.s(i.amount);
+                write.f(i.amount);
             }
         }
 
@@ -211,7 +211,7 @@ public class ItemTurret extends Turret{
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
                 Item item = read.content(ContentType.item, revision < 2 ? read.ub() : read.s());
-                int itemAmount = Math.min(read.s(), maxAmmo);
+                float itemAmount = Math.min(revision < 3 ? read.s() : read.f(), maxAmmo);
 
                 //only add ammo if this is a valid ammo type
                 if(item != null && ammoTypes.containsKey(item)){
@@ -225,7 +225,7 @@ public class ItemTurret extends Turret{
     public class ItemEntry extends AmmoEntry{
         public Item item;
 
-        ItemEntry(Item item, int amount){
+        ItemEntry(Item item, float amount){
             this.item = item;
             this.amount = amount;
         }
