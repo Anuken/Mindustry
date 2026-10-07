@@ -57,7 +57,7 @@ public class UnitCargoLoader extends Block{
                 unitType.useUnitCap ? Units.getStringCap(e.team, e.unit.type) : "∞"
             ),
             () -> Pal.power,
-            () -> unitType.useUnitCap ? (float)e.team.data().countType(unitType) / Mathf.ceil(Units.getCap(e.team) * e.unit.type.unitCapMultiplier) : 1f
+            () -> unitType.useUnitCap ? (float)e.team.data().countType(unitType) / Mathf.ceil(Units.getCap(e.team) * unitType.unitCapMultiplier) : 1f
         ));
     }
 
