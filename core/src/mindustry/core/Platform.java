@@ -4,6 +4,7 @@ import arc.*;
 import arc.files.*;
 import arc.struct.*;
 import arc.util.serialization.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
@@ -17,6 +18,7 @@ import java.security.*;
 public interface Platform{
 
     /** Dynamically creates a class loader for a jar file. This loader must be child-first. */
+    @IgnoreAndroidApi
     default ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
         return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent){
             static{

@@ -1,23 +1,17 @@
 package mindustry.mod;
 
 import arc.struct.*;
+import arc.util.*;
+import mindustry.annotations.Annotations.*;
 
+@IgnoreAndroidApi
 public class ModClassLoader extends ClassLoader{
-    static{
-        try{
-            registerAsParallelCapable();
-        }catch(Throwable ignore){
-            // Android once again ruining my day...
-        }
-    }
-
     private Seq<ClassLoader> children = new Seq<>();
-    private ThreadLocal<Boolean> inChild = new ThreadLocal<>(){
-        @Override
-        protected Boolean initialValue(){
-            return Boolean.FALSE;
-        }
-    };
+    private ThreadLocal<Boolean> inChild = Threads.local(() -> Boolean.FALSE);
+
+    static{
+        registerAsParallelCapable();
+    }
 
     public ModClassLoader(ClassLoader parent){
         super(parent);
