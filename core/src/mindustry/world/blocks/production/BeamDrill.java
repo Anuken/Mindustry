@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -301,12 +302,12 @@ public class BeamDrill extends Block{
                         Draw.scl(width);
 
                         if(boostWarmup < 0.99f){
-                            Draw.alpha(1f - boostWarmup);
+                            Draw.alpha((1f - boostWarmup) * Renderer.mineLaserOpacity);
                             Draw.rect(laserCenter, lx, ly);
                         }
 
                         if(boostWarmup > 0.01f){
-                            Draw.alpha(boostWarmup);
+                            Draw.alpha(boostWarmup * Renderer.mineLaserOpacity);
                             Draw.rect(laserCenterBoost, lx, ly);
                         }
 
@@ -315,12 +316,12 @@ public class BeamDrill extends Block{
                         float lsx = (p.x - dir.x/2f) * tilesize, lsy = (p.y - dir.y/2f) * tilesize;
 
                         if(boostWarmup < 0.99f){
-                            Draw.alpha(1f - boostWarmup);
+                            Draw.alpha((1f - boostWarmup) * Renderer.mineLaserOpacity);
                             Drawf.laser(laser, laserEnd, lsx, lsy, lx, ly, width);
                         }
 
                         if(boostWarmup > 0.001f){
-                            Draw.alpha(boostWarmup);
+                            Draw.alpha(boostWarmup * Renderer.mineLaserOpacity);
                             Drawf.laser(laserBoost, laserEndBoost, lsx, lsy, lx, ly, width);
                         }
                     }
