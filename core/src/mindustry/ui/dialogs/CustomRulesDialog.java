@@ -40,7 +40,7 @@ public class CustomRulesDialog extends BaseDialog{
     public Seq<String> categoryNames;
     public String currentName = "";
     public String ruleSearch = "";
-    public static Seq<Runnable> additionalSetup; // for modding to easily add new rules
+    public static Seq<Runnable> additionalSetup = new Seq<>(); // for modding to easily add new rules
 
     public CustomRulesDialog(){
         this(false);
@@ -57,7 +57,6 @@ public class CustomRulesDialog extends BaseDialog{
         shown(this::setup);
         addCloseButton();
 
-        additionalSetup = new Seq<>();
         categories = new Seq<>();
         categoryNames = new Seq<>();
 
@@ -139,6 +138,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     void setupMain(){
         categories.clear();
+        categoryNames.clear();
         main.clear();
         main.left().defaults().fillX().left();
         main.row();
