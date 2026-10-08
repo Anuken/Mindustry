@@ -275,12 +275,12 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
     public boolean drawLiquidLight = true;
-    /** Environmental flags that are *all* required for this block to function. 0 = any environment */
-    public int envRequired = 0;
+    /** Environmental flags that are *all* required for this block to function. Empty = any environment */
+    public Environments envRequired = Environments.none;
     /** The environment flags that this block can function in. If the env matches any of these, it will be enabled. */
-    public int envEnabled = Env.terrestrial;
+    public Environments envEnabled = Environments.of(Env.terrestrial);
     /** The environment flags that this block *cannot* function in. If the env matches any of these, it will be *disabled*. */
-    public int envDisabled = 0;
+    public Environments envDisabled = Environments.none;
     /** Whether to periodically sync this block across the network. */
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode. */
@@ -1041,8 +1041,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     }
 
     /** @return whether this block supports a specific environment. */
-    public boolean supportsEnv(int env){
-        return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
+    public boolean supportsEnv(Environments env){
+        return envEnabled.containsAny(env) && !envDisabled.containsAny(env) && (envRequired.isEmpty() || env.containsAll(envRequired));
     }
 
     /** Called to set up configuration UI in the editor. {@link #editorConfigurable} must be true.

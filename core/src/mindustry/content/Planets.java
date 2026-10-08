@@ -52,7 +52,7 @@ public class Planets{
             alwaysUnlocked = true;
             landCloudColor = Color.valueOf("ed6542");
             atmosphereColor = Color.valueOf("f07218");
-            defaultEnv = Env.scorching | Env.terrestrial;
+            defaultEnv = Environments.of(Env.scorching, Env.terrestrial);
             startSector = 10;
             atmosphereRadIn = 0.02f;
             atmosphereRadOut = 0.5f;
@@ -115,7 +115,7 @@ public class Planets{
             startSector = 10;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
-            defaultEnv = Env.underwater | Env.terrestrial;
+            defaultEnv = Environments.of(Env.underwater, Env.terrestrial);
             ruleSetter = r -> {
 
             };
@@ -180,7 +180,7 @@ public class Planets{
             drawOrbit = false;
             accessible = false;
             clipRadius = 2f;
-            defaultEnv = Env.space;
+            defaultEnv = Environments.of(Env.space);
             icon = "commandRally";
             defaultCore = Blocks.coreBastion;
             generator = new AsteroidGenerator();

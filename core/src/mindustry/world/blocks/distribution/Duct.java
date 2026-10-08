@@ -49,7 +49,7 @@ public class Duct extends Block implements Autotiler{
         noSideBlend = true;
         isDuct = true;
         priority = TargetPriority.transport;
-        envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        envEnabled = Environments.of(Env.space, Env.terrestrial, Env.underwater);
 
         drawCached = true;
         buildingCacheLayer = BuildingCacheLayer.under;

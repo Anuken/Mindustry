@@ -84,6 +84,30 @@ public class PatcherTests{
     }
 
     @Test
+    void envArrays() throws Exception{
+        var prev = Blocks.duo.envEnabled;
+
+        apply("block.duo.envEnabled: [space, underwater]");
+
+        assertNoWarnings();
+        assertEquals(Environments.of(Env.space, Env.underwater), Blocks.duo.envEnabled);
+
+        resetAfter();
+
+        assertEquals(prev, Blocks.duo.envEnabled);
+    }
+
+    @Test
+    void envNumbersRejected() throws Exception{
+        var prev = Blocks.duo.envEnabled;
+
+        apply("block.duo.envEnabled: 3");
+
+        assertFalse(getPatches().first().warnings.isEmpty(), "A bare number must not be accepted for an env field.");
+        assertEquals(prev, Blocks.duo.envEnabled);
+    }
+
+    @Test
     void reconstructorPlans() throws Exception{
         var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
         var prev = reconstructor.upgrades.copy();

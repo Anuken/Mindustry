@@ -41,7 +41,7 @@ public class OverdriveProjector extends Block{
         canOverdrive = false;
         emitLight = true;
         lightRadius = 50f;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         ambientSound = Sounds.loopCircuit;
         ambientSoundVolume = 0.13f;
     }

@@ -36,7 +36,7 @@ public class DuctRouter extends Block{
         clearOnDoubleTap = true;
         underBullets = true;
         priority = TargetPriority.transport;
-        envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        envEnabled = Environments.of(Env.space, Env.terrestrial, Env.underwater);
         drawCached = true;
         drawDynamic = false;
 

@@ -74,7 +74,7 @@ public class BeamDrill extends Block{
         ambientSoundVolume = 0.05f;
         ambientSound = Sounds.loopMineBeam;
 
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         flags = EnumSet.of(BlockFlag.drill);
     }
 

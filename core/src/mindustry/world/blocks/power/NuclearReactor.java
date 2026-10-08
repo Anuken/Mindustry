@@ -60,7 +60,7 @@ public class NuclearReactor extends PowerGenerator{
         emitLight = true;
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
         schematicPriority = -5;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
 
         explosionShake = 6f;
         explosionShakeDuration = 16f;

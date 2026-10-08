@@ -34,7 +34,7 @@ public class PayloadConveyor extends Block{
         outputsPayload = true;
         acceptsUnitPayloads = true;
         priority = TargetPriority.transport;
-        envEnabled |= Env.space | Env.underwater;
+        envEnabled = envEnabled.with(Environments.of(Env.space, Env.underwater));
         sync = true;
         underBullets = true;
     }

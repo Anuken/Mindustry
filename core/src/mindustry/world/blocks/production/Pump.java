@@ -27,7 +27,7 @@ public class Pump extends LiquidBlock{
         super(name);
         group = BlockGroup.liquids;
         floating = true;
-        envEnabled = Env.terrestrial;
+        envEnabled = Environments.of(Env.terrestrial);
     }
 
     @Override

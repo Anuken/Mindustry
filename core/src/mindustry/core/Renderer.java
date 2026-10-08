@@ -20,6 +20,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -89,7 +90,7 @@ public class Renderer implements ApplicationListener{
         shakeReduction = shakeIntensity / shakeTime;
     }
 
-    public void addEnvRenderer(int mask, Runnable render){
+    public void addEnvRenderer(Environments mask, Runnable render){
         envRenderers.add(new EnvRenderer(mask, render));
     }
 
@@ -351,7 +352,7 @@ public class Renderer implements ApplicationListener{
 
         //render all matching environments
         for(var renderer : envRenderers){
-            if((renderer.env & state.rules.env) == renderer.env){
+            if(state.rules.env.containsAll(renderer.env)){
                 renderer.renderer.run();
             }
         }
@@ -651,12 +652,12 @@ public class Renderer implements ApplicationListener{
     }
 
     public static class EnvRenderer{
-        /** Environment bitmask; must match env exactly when and-ed. */
-        public final int env;
+        /** The rules env must contain all of these for this renderer to run. */
+        public final Environments env;
         /** Rendering callback. */
         public final Runnable renderer;
 
-        public EnvRenderer(int env, Runnable renderer){
+        public EnvRenderer(Environments env, Runnable renderer){
             this.env = env;
             this.renderer = renderer;
         }

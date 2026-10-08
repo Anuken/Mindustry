@@ -26,7 +26,7 @@ public class ItemSource extends Block{
         configurable = true;
         saveConfig = true;
         noUpdateDisabled = true;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
         clearOnDoubleTap = true;
         drawCached = true;
         drawDynamic = false;

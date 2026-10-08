@@ -85,7 +85,7 @@ public class Planet extends UnlockableContent{
     /** Whether this planet is listed in the planet access UI. **/
     public boolean accessible = true;
     /** Environment flags for sectors on this planet. */
-    public int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
+    public Environments defaultEnv = Environments.of(Env.terrestrial, Env.spores, Env.groundOil, Env.groundWater, Env.oxygen);
     /** Environment attributes. */
     public Attributes defaultAttributes = new Attributes();
     /** If true, a day/night cycle is simulated. */

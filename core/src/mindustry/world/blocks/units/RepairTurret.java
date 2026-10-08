@@ -60,7 +60,7 @@ public class RepairTurret extends Block{
         //yeah, this isn't the same thing, but it's close enough
         group = BlockGroup.projectors;
 
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         ambientSound = Sounds.beamHeal;
         ambientSoundVolume = 1f;
     }

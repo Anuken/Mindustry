@@ -45,7 +45,7 @@ public class RegenProjector extends Block{
         hasItems = true;
         emitLight = true;
         suppressable = true;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         rotateDraw = false;
         flags = EnumSet.of(BlockFlag.blockRepair);
         ambientSound = Sounds.loopRegen;

@@ -26,7 +26,7 @@ public class PayloadBlock extends Block{
         sync = true;
         group = BlockGroup.payloads;
         acceptsUnitPayloads = true;
-        envEnabled |= Env.space | Env.underwater;
+        envEnabled = envEnabled.with(Environments.of(Env.space, Env.underwater));
     }
 
     @Override

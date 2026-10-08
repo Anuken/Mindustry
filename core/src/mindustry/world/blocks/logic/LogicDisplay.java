@@ -64,7 +64,7 @@ public class LogicDisplay extends Block{
         canOverdrive = false;
         group = BlockGroup.logic;
         drawDisabled = false;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
     }
 
     @Override

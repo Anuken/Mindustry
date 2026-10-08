@@ -29,7 +29,7 @@ public class LightBlock extends Block{
         update = true;
         configurable = true;
         saveConfig = true;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         swapDiagonalPlacement = true;
 
         config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);

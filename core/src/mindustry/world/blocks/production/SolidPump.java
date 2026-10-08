@@ -33,7 +33,7 @@ public class SolidPump extends Pump{
         super(name);
         hasPower = true;
         //only supports ground by default
-        envEnabled = Env.terrestrial;
+        envEnabled = Environments.of(Env.terrestrial);
     }
 
     @Override

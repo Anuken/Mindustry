@@ -13,7 +13,7 @@ public class LiquidVoid extends Block{
         solid = true;
         update = true;
         group = BlockGroup.liquids;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
         liquidCapacity = 10000f;
     }
 

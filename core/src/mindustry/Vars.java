@@ -61,7 +61,7 @@ public class Vars implements Loadable{
     /** Default accessible content types used for player-selectable icons. */
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit, ContentType.status};
     /** Default rule environment. */
-    public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
+    public static final Environments defaultEnv = Environments.of(Env.terrestrial, Env.spores, Env.groundOil, Env.groundWater, Env.oxygen);
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
     /** Maximum extra padding around deployment schematics. */

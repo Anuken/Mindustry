@@ -12,7 +12,7 @@ public class Fracker extends SolidPump{
         hasItems = true;
         ambientSound = Sounds.loopDrill;
         ambientSoundVolume = 0.03f;
-        envRequired |= Env.groundOil;
+        envRequired = envRequired.with(Env.groundOil);
     }
 
     @Override

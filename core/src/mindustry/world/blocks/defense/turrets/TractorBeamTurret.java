@@ -45,7 +45,7 @@ public class TractorBeamTurret extends BaseTurret{
 
         rotateSpeed = 10f;
         coolantMultiplier = 1f;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
     }
 
     @Override
