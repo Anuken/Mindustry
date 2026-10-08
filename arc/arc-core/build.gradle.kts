@@ -5,6 +5,8 @@ plugins{
     id("com.badlogicgames.jnigen.jnigen-gradle")
 }
 
+val soloudVersion = "2026.10.01"
+
 sourceSets{
     main{
         java.setSrcDirs(listOf("src"))
@@ -142,8 +144,6 @@ tasks.register("cleanNatives"){
         delete("$rootDir/arc-core/csrc/stb_image.h")
     }
 }
-
-val soloudVersion = "2026.09.04"
 
 fun runQuietly(vararg command: String, workingDir: File? = null){
     providers.exec{
