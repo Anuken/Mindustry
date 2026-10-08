@@ -487,7 +487,7 @@ public class Vars implements Loadable{
         Vars.android = app.isAndroid();
 
         if(!headless){
-            settings.defaults("locale", "default", "blocksync", true);
+            settings.defaults("locale", "default");
             settings.setAutosave(false);
             settings.load();
 
