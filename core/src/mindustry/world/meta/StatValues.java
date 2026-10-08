@@ -15,6 +15,8 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -179,6 +181,17 @@ public class StatValues{
                 }
             }
         };
+    }
+
+    public static String unitSort(Sortf value){
+        String name = null;
+        for(var field : UnitSorts.class.getFields()){  //should probably be cached
+            if(Reflect.<Sortf>get(field) == value){
+                name = field.getName().toLowerCase();
+                break;
+            }
+        }
+        return name != null ? Core.bundle.get("sort." + name) : "unknown";
     }
 
     public static Table displayLiquid(Liquid liquid, float amount, boolean perSecond){
@@ -730,6 +743,7 @@ public class StatValues{
 
                 BulletType type = map.get(t);
                 Turret turret = blockName != null && Vars.content.block(blockName) instanceof Turret tur ? tur : null; //not ideal but there s enough overloads already
+
                 int patternShots;
                 if(type.shootPattern != null){
                     patternShots = type.shootPattern.shots;
@@ -773,8 +787,8 @@ public class StatValues{
                         bt.row();
                     }
 
-                    if(patternShots > 1 && (turret == null || turret.bulletPatternShots())){
-                        bt.add("[stat]" + patternShots + " [lightgray]" + StatUnit.bullets.localized()).row();
+                    if(patternShots > 1 && (turret == null || turret.notBulletPatternShots())){
+                        sep(bt, "[stat]" + patternShots + " [lightgray]" + StatUnit.bullets.localized());
                     }
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
@@ -912,6 +926,19 @@ public class StatValues{
 
                     if(!type.targetBlocks){
                         sep(bt, "@bullet.notargetsbuildings");
+                    }
+
+                    Sortf unitSort;
+                    if(type.unitSort != null){
+                        unitSort = type.unitSort;
+                    }else if(turret != null){
+                        unitSort = turret.unitSort;
+                    }else{
+                        unitSort = null;
+                    }
+
+                    if(unitSort != null && (turret == null || turret.notBulletUnitSort())){
+                        sep(bt, "[stat]" + unitSort(unitSort) + " [lightgray]" + Stat.targetPriority.localized().toLowerCase());
                     }
 
                     if(type.intervalBullet != null){

@@ -189,10 +189,11 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         stats.add(Stat.reload, t -> {
             t.add(Strings.autoFixed(reloadInterval(), 3) +
-            StatUnit.perSecond.localized() + (!bulletPatternShots() && shoot.shots > 1 ? " x " + shoot.shots + " " + StatUnit.bullets.localized() : ""));
+            StatUnit.perSecond.localized() + (!notBulletPatternShots() && shoot.shots > 1 ? " x " + shoot.shots + " " + StatUnit.bullets.localized() : ""));
         });
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
+        if(!notBulletUnitSort() && unitSort != UnitSorts.closest) stats.add(Stat.targetPriority, unitSort);
         if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
         if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
     }
@@ -279,10 +280,19 @@ public class Turret extends ReloadTurret{
     }
 
     /** Return whether the number of shots from any {@link BulletType} differ from {@link #shoot} shots. */
-    public boolean bulletPatternShots(){
+    public boolean notBulletPatternShots(){
         for(var entry : ammoTypes.entries()){
             var p = entry.value.shootPattern;
             if(p != null && p.shots != shoot.shots) return true;
+        }
+        return false;
+    }
+
+    /** Return whether the {@link #unitSort} from any {@link BulletType} differ from this turret. */
+    public boolean notBulletUnitSort(){
+        for(var entry : ammoTypes.entries()){
+            var p = entry.value.unitSort;
+            if(p != null && p != unitSort) return true;
         }
         return false;
     }
@@ -662,7 +672,7 @@ public class Turret extends ReloadTurret{
 
         protected Posc findEnemy(float range){
             var ammo = peekAmmo();
-            Sortf sort = ammo.unitSort != UnitSorts.closest ? ammo.unitSort : unitSort;
+            Sortf sort = ammo.unitSort != null ? ammo.unitSort : unitSort;
             if(targetAir && !targetGround){
                 return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), sort);
             }else{
