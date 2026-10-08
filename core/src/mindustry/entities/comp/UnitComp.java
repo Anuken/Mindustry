@@ -60,6 +60,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     transient int lastFogPos;
     /** Only used in suicide units */
     transient boolean hasTarget;
+    transient float lastRotation;
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
@@ -146,6 +147,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         moveAt(Tmp.v2.trns(rotation, vec.len()));
 
         if(!vec.isZero()){
+            lastRotation = rotation;
             rotation = Angles.moveToward(rotation, vec.angle(), type.rotateSpeed * Time.delta * speedMultiplier);
         }
     }

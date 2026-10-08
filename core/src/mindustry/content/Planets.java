@@ -81,6 +81,7 @@ public class Planets{
                 r.lighting = false;
                 r.coreDestroyClear = true;
                 r.onlyDepositCore = true;
+                r.unitCap = 5;
             };
             campaignRuleDefaults.fog = true;
             campaignRuleDefaults.hideSpawns = false;

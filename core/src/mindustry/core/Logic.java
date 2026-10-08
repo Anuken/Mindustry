@@ -118,6 +118,9 @@ public class Logic implements ApplicationListener{
                 if(state.getPlanet().enemyFactoryActivationDelay > 0f && state.rules.waveTeam.rules().unitFactoryActivationDelay == 0f){
                     state.rules.waveTeam.rules().unitFactoryActivationDelay = state.getPlanet().enemyFactoryActivationDelay;
                 }
+                if(state.getPlanet() == Planets.erekir && state.rules.unitCap == 0){
+                    state.rules.unitCap = 5;
+                }
             }
 
             if(!headless) synchronized(Core.settings){

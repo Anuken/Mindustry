@@ -3115,13 +3115,13 @@ public class Blocks{
             drillMultipliers.put(Items.beryllium, 2f);
             drillMultipliers.put(Items.sand, 2f);
             drillMultipliers.put(Items.graphite, 2f);
-            liquidBoostIntensity = 2.5f;
+            liquidBoostIntensity = 1.75f;
 
             fogRadius = 4;
 
             consumePower(160f / 60f);
             consumeLiquid(Liquids.water, 10f/60f);
-            consumeLiquid(Liquids.ozone, 6f / 60f).boost();
+            consumeLiquid(Liquids.ozone, 3f / 60f).boost();
         }};
 
         eruptionDrill = new BurstDrill("eruption-drill"){{
@@ -3217,7 +3217,7 @@ public class Blocks{
             //TODO should this be higher?
             buildCostMultiplier = 0.7f;
 
-            unitCapModifier = 15;
+            unitCapModifier = 10;
             researchCostMultiplier = 0.07f;
         }};
 
@@ -3234,7 +3234,7 @@ public class Blocks{
             buildCostMultiplier = 0.7f;
             requiresCoreZone = true;
 
-            unitCapModifier = 15;
+            unitCapModifier = 10;
             researchCostMultipliers.put(Items.silicon, 0.5f);
             researchCostMultiplier = 0.17f;
         }};
@@ -3252,7 +3252,7 @@ public class Blocks{
             buildCostMultiplier = 0.7f;
             requiresCoreZone = true;
 
-            unitCapModifier = 15;
+            unitCapModifier = 10;
             researchCostMultipliers.put(Items.silicon, 0.4f);
             researchCostMultiplier = 0.1f;
         }};
@@ -4731,6 +4731,7 @@ public class Blocks{
                 splashDamageRadius = 36f;
                 splashDamage = 750f;
                 rangeChange = 10f*8f;
+                reloadMultiplier = 0.8f;
                 scaledSplashDamage = true;
                 backColor = hitColor = trailColor = Color.valueOf("ab8ec5");
                 frontColor = Color.white;
@@ -5358,13 +5359,13 @@ public class Blocks{
                 shootEffect = Fx.shootBig;
                 smokeEffect = Fx.shootSmokeMissileColor;
                 hitColor = Color.valueOf("ffd37f");
-                ammoMultiplier = 2f;
+                ammoMultiplier = 3f;
                 reloadMultiplier = 0.8f;
 
                 spawnUnit = new MissileUnitType("scathe-missile-phase"){{
-                    speed = 2.5f;
+                    speed = 2.15f;
+                    missileRange = 1350;
                     maxRange = 6f;
-                    lifetime = 60f * 9.77f;
                     hitSize = 14f;
                     outlineColor = Pal.darkOutline;
                     engineColor = trailColor = Color.valueOf("ffd37f");
@@ -5393,8 +5394,7 @@ public class Blocks{
                     }});
 
                     fogRadius = 6f;
-
-                    health = 350;
+                    health = 380;
 
                     weapons.add(new Weapon(){{
                         shootCone = 360f;
@@ -5403,7 +5403,7 @@ public class Blocks{
                         deathExplosionEffect = Fx.massiveExplosion;
                         shootOnDeath = true;
                         shake = 10f;
-                        bullet = new ExplosionBulletType(280f, 90f){{
+                        bullet = new ExplosionBulletType(190, 90f){{
                             //mirror stats
                             reloadMultiplier = 0.8f;
                             ammoMultiplier = 2f;
@@ -5420,9 +5420,8 @@ public class Blocks{
 
                             fragLifeMin = 0.1f;
                             fragBullets = 7;
-                            fragBullet = new ArtilleryBulletType(3.4f, 32){{
+                            fragBullet = new ArtilleryBulletType(3.4f, 30){{
                                 buildingDamageMultiplier = 0.2f;
-                                drag = 0.02f;
                                 hitEffect = Fx.massiveExplosion;
                                 despawnEffect = Fx.scatheSlash;
                                 knockback = 0.8f;
@@ -5430,7 +5429,7 @@ public class Blocks{
                                 width = height = 18f;
                                 collidesTiles = false;
                                 splashDamageRadius = 56f;
-                                splashDamage = 90f;
+                                splashDamage = 70f;
                                 backColor = trailColor = hitColor = engineColor;
                                 frontColor = Color.white;
                                 smokeEffect = Fx.shootBigSmoke2;
@@ -5457,7 +5456,7 @@ public class Blocks{
                         followUnitRot = true;
                         radius = 120;
                         regen = 0f;
-                        max = 2600f;
+                        max = 3000f;
                         cooldown = 999999999f;
                         unitSlowdown = 0.3f;
                         shotThreshold = 12;

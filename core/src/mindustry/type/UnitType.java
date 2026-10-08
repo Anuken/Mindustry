@@ -78,8 +78,6 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     descentSpeed = 0.08f,
     /** how fast this unit falls upon death */
     fallSpeed = 0.018f,
-    /** how many ticks it takes this missile to accelerate to full speed */
-    missileAccelTime = 0f,
     /** raw health amount */
     health = 200f,
     /** incoming damage is reduced by this amount */
@@ -509,8 +507,12 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
     /** lifetime of this missile. */
     public float lifetime = 60f * 5f;
+    /** range of this missile. Overrides lifetime. */
+    public float missileRange = -1f;
     /** ticks that must pass before this missile starts homing. */
     public float homingDelay = 10f;
+    /** how many ticks it takes this missile to accelerate to full speed */
+    public float missileAccelTime = 0f;
 
     //REGIONS
 
@@ -1015,6 +1017,10 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
             }
         }
 
+        if(missileRange > 0){
+            lifetime = getMissileLife(missileRange);
+        }
+
         if(!weapons.contains(w -> w.useAttackRange)){
             if(range < 0 || range == Float.MAX_VALUE) range = mineRange;
             if(maxRange < 0 || maxRange == Float.MAX_VALUE) maxRange = mineRange;
@@ -1177,6 +1183,14 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
     public float estimateDamage(){
         return damageEstimate < 0 ? weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f) : damageEstimate;
+    }
+
+    public float getMissileLife(float range){
+        float life = range / speed;
+        if(missileAccelTime <= 0) return life;
+        //if MissileAI accel formula ever changes integrate to get these 2 again
+        if(life > missileAccelTime) return life + missileAccelTime * 2f / 3f;
+        return Mathf.pow(3f * life * Mathf.sqr(missileAccelTime), 1f / 3f);
     }
 
     @CallSuper

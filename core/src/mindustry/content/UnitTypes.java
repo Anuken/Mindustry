@@ -2700,6 +2700,7 @@ public class UnitTypes{
                 shootY = 4.5f;
                 recoil = 1f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 2.2f;
                 mirror = false;
                 x = 0f;
@@ -2747,6 +2748,7 @@ public class UnitTypes{
                 shootY = 10f;
                 recoil = 1f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1.4f;
                 mirror = false;
                 shootCone = 2f;
@@ -2830,6 +2832,7 @@ public class UnitTypes{
                 shootY = 16f;
                 recoil = 3f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1.625f;
                 mirror = false;
                 shootCone = 2f;
@@ -2909,12 +2912,13 @@ public class UnitTypes{
 
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.shootTank;
-                layerOffset = 0.0001f;
+                layerOffset = 0.01f;
                 reload = 80f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1f;
                 mirror = false;
                 x = 0f;
@@ -2979,6 +2983,7 @@ public class UnitTypes{
                     shootY = 5.5f;
                     recoil = 2f;
                     rotate = true;
+                    rotateSpeedMoveAdd = true;
                     rotateSpeed = 2f;
                     shootSound = Sounds.shootStell;
 
@@ -3028,6 +3033,7 @@ public class UnitTypes{
                 shake = 5f;
                 recoil = 5f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 0.6f;
                 mirror = false;
                 x = 0f;
@@ -4624,6 +4630,7 @@ public class UnitTypes{
             playerControllable = false;
             envDisabled = 0;
             payloadCapacity = 0f;
+            unitCapMultiplier = 1.5f;
 
             lowAltitude = false;
             flying = true;

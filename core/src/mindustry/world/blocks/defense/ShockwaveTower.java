@@ -19,6 +19,8 @@ import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
+import static mindustry.Vars.*;
+
 public class ShockwaveTower extends Block{
     public float range = 170f;
     public float reload = 45f;

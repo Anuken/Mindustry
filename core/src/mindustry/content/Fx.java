@@ -2,7 +2,6 @@ package mindustry.content;
 
 import arc.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -19,7 +18,6 @@ import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.units.UnitAssembler.*;
 
 import static arc.graphics.g2d.Draw.*;
-import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.*;
@@ -80,7 +78,7 @@ public class Fx{
         alpha(e.fout(Interp.pow4Out));
 
         float size = 10f + e.fout(Interp.pow10In) * 25f;
-        Draw.rect(Icon.warning.getRegion(), e.x, e.y, size, size);
+        rect(Icon.warning.getRegion(), e.x, e.y, size, size);
     }),
 
     unitEnvKill = new Effect(80f, e -> {
@@ -88,7 +86,7 @@ public class Fx{
         alpha(e.fout(Interp.pow4Out));
 
         float size = 10f + e.fout(Interp.pow10In) * 25f;
-        Draw.rect(Icon.cancel.getRegion(), e.x, e.y, size, size);
+        rect(Icon.cancel.getRegion(), e.x, e.y, size, size);
     }),
 
     unitControl = new Effect(30f, e -> {
@@ -111,14 +109,14 @@ public class Fx{
         if(!(e.data instanceof Unit select) || select.type == null) return;
 
         float scl = e.fout(Interp.pow2Out);
-        float p = Draw.scl;
-        Draw.scl *= scl;
+        float p = scl;
+        scl *= scl;
 
         mixcol(Pal.accent, 1f);
         rect(select.type.fullIcon, select.x, select.y, select.rotation - 90f);
         reset();
 
-        Draw.scl = p;
+        scl = p;
     }),
 
     //water equivalent of wreck decals - Effect.decal() doesn't render on liquids
@@ -137,7 +135,7 @@ public class Fx{
         float x = e.x, y = e.y, rotation = e.rotation, fin = e.fin();
         float color = e.color.toFloatBits();
         Drawf.underwater(() -> {
-            Draw.z(Layer.scorch);
+            z(Layer.scorch);
             mixcol(color);
             alpha(0.85f * (1f - Mathf.curve(fin, 0.98f)));
             rect(reg, x, y, rotation);
@@ -180,7 +178,7 @@ public class Fx{
     pointBeam = new Effect(25f, 300f, e -> {
         if(!(e.data instanceof Position pos)) return;
 
-        Draw.color(e.color, e.fout());
+        color(e.color, e.fout());
         Lines.stroke(1.5f);
         Lines.line(e.x, e.y, pos.getX(), pos.getY());
         Drawf.light(e.x, e.y, pos.getX(), pos.getY(), 20f, e.color, 0.6f * e.fout());
@@ -355,16 +353,16 @@ public class Fx{
     unitWreck = new Effect(200f, e -> {
         if(!(e.data instanceof TextureRegion reg)) return;
 
-        Draw.mixcol(Pal.rubble, 1f);
+        mixcol(Pal.rubble, 1f);
 
         float vel = e.fin(Interp.pow5Out) * 2f * Mathf.randomSeed(e.id, 1f);
         float totalRot = Mathf.randomSeed(e.id + 1, 10f);
         Tmp.v1.trns(Mathf.randomSeed(e.id + 2, 360f), vel);
 
-        Draw.z(Mathf.lerp(Layer.flyingUnitLow, Layer.debris, e.fin()));
-        Draw.alpha(e.fout(Interp.pow5Out));
+        z(Mathf.lerp(Layer.flyingUnitLow, Layer.debris, e.fin()));
+        alpha(e.fout(Interp.pow5Out));
 
-        Draw.rect(reg, e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.rotation - 90 + totalRot * e.fin(Interp.pow5Out));
+        rect(reg, e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.rotation - 90 + totalRot * e.fin(Interp.pow5Out));
     }),
 
     rocketSmoke = new Effect(120, e -> {
@@ -545,7 +543,7 @@ public class Fx{
 
         //shrapnel
         rand.setSeed(e.id + 3);
-        Draw.z(Layer.effect + 0.001f);
+        z(Layer.effect + 0.001f);
         for(int i = 0; i < 18; i++){
             float angle = rand.random(360f);
             float dist = rand.random(25f, 85f) * e.finpow();
@@ -561,7 +559,7 @@ public class Fx{
             float tipY = ty + Mathf.sinDeg(angle) * size * 5f * e.foutpow();
             Drawf.light(tipX, tipY, size * 12f, e.color, 0.7f * e.foutpow());
         }
-        Draw.z();
+        z();
 
         //shockwave
         e.scaled(30f, i -> {
@@ -803,7 +801,7 @@ public class Fx{
 
         //perimeter smoke
         rand.setSeed(e.id);
-        Draw.z(Layer.effect -0.01f);
+        z(Layer.effect -0.01f);
         for(int i = 0; i < 10; i++){
             float angle = (360f / 9f) * i + rand.range(22f);
             float dist = 68f + rand.range(10f);
@@ -816,7 +814,7 @@ public class Fx{
             Fill.circle(px, py, size * a);
             Drawf.light(px, py, size * a * 2.5f, e.color, a * 0.4f);
         }
-        Draw.z();
+        z();
 
         //inside smoke
         rand.setSeed(e.id + 1);
@@ -848,7 +846,7 @@ public class Fx{
             Drawf.light(px, py, 20f, e.color, dotA * 0.5f);
         }
 
-        Draw.reset();
+        reset();
     }),
 
     smokeAoeAlpha = new Effect(60f * 3f, 250f, e -> {
@@ -862,27 +860,27 @@ public class Fx{
         float opacity = a * 0.5f;
         float layerAlphaM = 0.65f, layerColorM = 0.88f;
 
-        Draw.z(Layer.scorch);
+        z(Layer.scorch);
         float salpha = 1f, offset = 0f;
         Color col = Tmp.c1.set(e.color);
 
         for(int i = 0; i < layers; i++){
-            float rot = Time.time * (i % 2 == 0 ? 0.25f : -0.18f) + offset * 90f;
-            float pulse = 1f + Mathf.sin(Time.time * 0.1f + offset * 600f) * 0.06f;
+            float rot = state.time * (i % 2 == 0 ? 0.25f : -0.18f) + offset * 90f;
+            float pulse = 1f + Mathf.sin(state.time * 0.1f + offset * 600f) * 0.06f;
 
             Tmp.tr1.texture = noiseAlphaCircle;
             Tmp.tr1.set(0f, 0f, 1f, 1f);
 
-            Draw.alpha(salpha * opacity);
-            Draw.tint(col);
-            Draw.rect(Tmp.tr1, e.x, e.y, radius * 2f * pulse, -(radius * 2f * pulse), rot);
+            alpha(salpha * opacity);
+            tint(col);
+            rect(Tmp.tr1, e.x, e.y, radius * 2f * pulse, -(radius * 2f * pulse), rot);
 
             salpha *= layerAlphaM;
             offset += 0.29f;
             col.mul(layerColorM);
         }
-        Draw.z();
-        Draw.reset();
+        z();
+        reset();
     }),
 
     missileTrailSmoke = new Effect(180f, 300f, b -> {
@@ -928,7 +926,7 @@ public class Fx{
     missileReflect = new Effect(15f, 80f, e -> {
         if(!(e.data instanceof Float size)) return;
 
-        Draw.color(Color.white, e.color, e.fin());
+        color(Color.white, e.color, e.fin());
         Lines.stroke(e.fout() * 1.5f);
         Angles.randLenVectors(e.id, Math.min(6, Math.max(Math.round(size / 30), 1)),
         6f + e.finpow() * 26f, e.rotation + 180f, Math.min(15f, 5f + size * 0.5f), (x, y) -> { //moves to the oposite side
@@ -1032,7 +1030,7 @@ public class Fx{
     }).layer(Layer.bullet + 2f),
 
     scatheSlash = new Effect(40f, 160f, e -> {
-        Draw.color(e.color);
+        color(e.color);
         for(int s : Mathf.signs){
             Drawf.tri(e.x, e.y, e.fout() * 25f, e.foutpow() * 66f + 6f, e.rotation + s * 90f);
         }
@@ -1734,9 +1732,9 @@ public class Fx{
             Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
         }else{
             stroke(1.5f);
-            Draw.alpha(0.09f);
+            alpha(0.09f);
             Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
-            Draw.alpha(1f);
+            alpha(1f);
             Lines.poly(e.x, e.y, 6, e.rotation * e.fout());
         }
     }).layer(Layer.shields),
@@ -2080,10 +2078,10 @@ public class Fx{
             color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
             stroke((1.7f * e.fout()) * (1f + (intensity - 1f) / 2f));
 
-            Draw.z(Layer.effect + 0.001f);
+            z(Layer.effect + 0.001f);
             randLenVectors(e.id + 1, e.finpow() + 0.001f, (int)(9 * intensity), 40f * intensity, (x, y, in, out) -> {
                 lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + out * 4 * (3f + intensity));
-                Drawf.light(e.x + x, e.y + y, (out * 4 * (3f + intensity)) * 3.5f, Draw.getColor(), 0.8f);
+                Drawf.light(e.x + x, e.y + y, (out * 4 * (3f + intensity)) * 3.5f, getColor(), 0.8f);
             });
         });
     }),
@@ -2111,7 +2109,7 @@ public class Fx{
         }
 
         b.scaled(baseLifetime, e -> {
-            Draw.color();
+            color();
             e.scaled(5 + intensity * 2f, i -> {
                 stroke((3.1f + intensity/5f) * i.fout());
                 Lines.circle(e.x, e.y, (3f + i.fin() * 14f) * intensity);
@@ -2121,10 +2119,10 @@ public class Fx{
             color(Pal.lighterOrange, Pal.reactorPurple, e.fin());
             stroke((2f * e.fout()));
 
-            Draw.z(Layer.effect + 0.001f);
+            z(Layer.effect + 0.001f);
             randLenVectors(e.id + 1, e.finpow() + 0.001f, (int)(8 * intensity), 28f * intensity, (x, y, in, out) -> {
                 lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + out * 4 * (4f + intensity));
-                Drawf.light(e.x + x, e.y + y, (out * 4 * (3f + intensity)) * 3.5f, Draw.getColor(), 0.8f);
+                Drawf.light(e.x + x, e.y + y, (out * 4 * (3f + intensity)) * 3.5f, getColor(), 0.8f);
             });
         });
     }),
@@ -2152,7 +2150,7 @@ public class Fx{
         }
 
         b.scaled(baseLifetime, e -> {
-            Draw.color();
+            color();
             e.scaled(5 + intensity * 2f, i -> {
                 stroke((3.1f + intensity/5f) * i.fout());
                 Lines.circle(e.x, e.y, (3f + i.fin() * 14f) * intensity);
@@ -2162,10 +2160,10 @@ public class Fx{
             color(Color.white, Pal.lighterOrange, e.fin());
             stroke((2f * e.fout()));
 
-            Draw.z(Layer.effect + 0.001f);
+            z(Layer.effect + 0.001f);
             randLenVectors(e.id + 1, e.finpow() + 0.001f, (int)(8 * intensity), 30f * intensity, (x, y, in, out) -> {
                 lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + out * 4 * (4f + intensity));
-                Drawf.light(e.x + x, e.y + y, (out * 4 * (3f + intensity)) * 3.5f, Draw.getColor(), 0.8f);
+                Drawf.light(e.x + x, e.y + y, (out * 4 * (3f + intensity)) * 3.5f, getColor(), 0.8f);
             });
         });
     }),
@@ -2542,6 +2540,16 @@ public class Fx{
         Fill.circle(Tmp.v4.x, Tmp.v4.y, e.fslope() * 2f + 0.1f);
     }).followParent(false).rotWithParent(false),
 
+    overHeatParticle = new Effect(35f, e -> {
+        color(e.color, Color.white, e.fin());
+        stroke(e.fout() * 1.4f + 0.5f);
+        if(e.rotation > 0) z(e.rotation);
+
+        randLenVectors(e.id, 4, 17f * e.fin(), (x, y) -> {
+            lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 3f + 0.5f);
+        });
+    }),
+
     surgeCruciSmoke = new Effect(160f, e -> {
         color(Pal.slagOrange);
         alpha(0.6f);
@@ -2633,19 +2641,19 @@ public class Fx{
 
         rand.setSeed(e.id);
         e.scaled(5, i -> {
-            Draw.color(e.color, Color.white, i.fout());
+            color(e.color, Color.white, i.fout());
             Fill.circle(e.x, e.y, 3.5f * i.fout());
         });
 
         e.scaled(7, i -> {
-            Draw.color(e.color, Color.white, i.fout());
+            color(e.color, Color.white, i.fout());
             Lines.stroke(1.4f * i.fout());
             Lines.circle(e.x, e.y, 6f * i.fin());
         });
 
         Mathf.rand.setSeed(e.id);
         Lines.stroke(1.2f * e.fout());
-        Draw.color(e.color, Color.white, e.fout() * 0.4f);
+        color(e.color, Color.white, e.fout() * 0.4f);
 
         for(int i = 0; i < 6; i++){
             float angle = e.rotation + 180f + Mathf.rand.range(60f);
@@ -2654,7 +2662,7 @@ public class Fx{
         }
 
         Angles.randLenVectors(e.id, 5, 3f + 10f * e.fin(), e.rotation + 180f, 75f * dst, (dx, dy) -> {
-            Draw.color(e.color, Color.white, e.fout());
+            color(e.color, Color.white, e.fout());
             Fill.circle(e.x + dx, e.y + dy, 1.3f * e.fout());
         });
     }),
@@ -3269,7 +3277,7 @@ public class Fx{
 
         mixcol(e.color, 1f);
         alpha(e.fout());
-        Draw.rect(block.fullIcon, e.x, e.y);
+        rect(block.fullIcon, e.x, e.y);
     }),
 
     rotateBlock = new Effect(30, e -> {
@@ -3324,9 +3332,9 @@ public class Fx{
         float sizeL = size / 13f;
 
         //squished hexagon
-        Draw.z(Layer.effect + 1);
+        z(Layer.effect + 1);
         Tmp.c1.set(e.color);
-        Draw.color(e.color, Tmp.c1.add(Color.white), e.fout());
+        color(e.color, Tmp.c1.add(Color.white), e.fout());
         if(Mathf.absin(e.fin() * 40f, 1f, 1f) > e.fin() * 0.7f){
             Lines.stroke(1f + e.fout() * 1.2f);
             float hexSize = size * 0.25f * e.finpow() + 2f;
@@ -3343,8 +3351,8 @@ public class Fx{
             }
         }
 
-        Draw.color(Color.white, e.color, e.fin());
-        Draw.alpha(0.6f);
+        color(Color.white, e.color, e.fin());
+        alpha(0.6f);
         for(int i : Mathf.signs){
             float angle = e.rotation + 90f * i;
             float offX = Angles.trnsx(angle, sizeL), offY = Angles.trnsy(angle, sizeL);
@@ -3396,7 +3404,7 @@ public class Fx{
         float spacing = dst / links;
 
         Lines.stroke(2.5f * e.fout());
-        Draw.color(Color.white, e.color, e.fin());
+        color(Color.white, e.color, e.fin());
 
         Lines.beginLine();
 
@@ -3433,7 +3441,7 @@ public class Fx{
         float spacing = dst / links;
 
         Lines.stroke(4f * e.fout());
-        Draw.color(Color.white, e.color, e.fin());
+        color(Color.white, e.color, e.fin());
 
         Lines.beginLine();
 
@@ -3477,7 +3485,7 @@ public class Fx{
     debugLine = new Effect(90f, 1000000000000f, e -> {
        if(!(e.data instanceof Vec2[] vec)) return;
 
-       Draw.color(e.color);
+       color(e.color);
        Lines.stroke(2f);
 
        if(vec.length == 2){
@@ -3489,16 +3497,16 @@ public class Fx{
            Lines.endLine();
        }
 
-       Draw.reset();
+       reset();
     }),
     debugRect = new Effect(90f, 1000000000000f, e -> {
         if(!(e.data instanceof Rect rect)) return;
 
-        Draw.color(e.color);
+        color(e.color);
         Lines.stroke(2f);
 
         Lines.rect(rect);
 
-        Draw.reset();
+        reset();
     });
 }
