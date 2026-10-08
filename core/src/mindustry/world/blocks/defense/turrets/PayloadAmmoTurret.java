@@ -30,8 +30,11 @@ public class PayloadAmmoTurret extends Turret{
     }
 
     /** Initializes accepted ammo map. Format: [block1, bullet1, block2, bullet2...] */
+    @Override
     public void ammo(Object... objects){
-        ammoTypes = ObjectMap.of(objects);
+        super.ammo(objects);
+
+        ammoTypes = OrderedMap.of(objects);
     }
 
     /** Makes copies of all bullets and limits their range. */

@@ -76,7 +76,7 @@ public class BulletType extends Content implements Cloneable{
     public Effect despawnEffect = Fx.hitBulletSmall;
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
-    /** Pattern used to shoot this bullet. If null, uses turret's default pattern. */
+    /** Pattern used to shoot this bullet. If null, uses the turret's default pattern. */
     public @Nullable ShootPattern shootPattern = null;
     /** Effect created when charging starts; only usable in single-shot weapons with a firstShotDelay / shotDelay. */
     public Effect chargeEffect = Fx.none;
@@ -120,8 +120,8 @@ public class BulletType extends Content implements Cloneable{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 8f;
-    /** Turret only. Function for choosing which unit to target. Overrides turret sorting */
-    public Sortf unitSort = UnitSorts.closest;
+    /** Turret only. Function for choosing which unit to target. Overrides turret sorting. If null, uses the turret's default sorting */
+    public @Nullable Sortf unitSort = null;
     /** Chance for this bullet to apply a status effect */
     public float statusChance = 1f;
     /** Turret only. If false, blocks will not be targeted. */
@@ -369,7 +369,7 @@ public class BulletType extends Content implements Cloneable{
     /** Liquid that puddles created are made of. */
     public Liquid puddleLiquid = Liquids.water;
 
-    /** Whether to display the ammo multiplayer for this bullet type in its stats. */
+    /** Whether to display the ammo multiplier for this bullet type in its stats. */
     public boolean displayAmmoMultiplier = true;
     /** If >0, this is displayed divided by the ammo multiplier. */
     public float statLiquidConsumed;

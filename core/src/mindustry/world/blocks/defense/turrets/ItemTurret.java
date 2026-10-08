@@ -28,7 +28,10 @@ public class ItemTurret extends Turret{
     }
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
+    @Override
     public void ammo(Object... objects){
+        super.ammo(objects);
+
         ammoTypes = OrderedMap.of(objects);
     }
 
@@ -50,7 +53,7 @@ public class ItemTurret extends Turret{
 
         stats.remove(Stat.itemCapacity);
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
-        stats.add(Stat.ammoCapacity, maxAmmo / Math.max(ammoPerShot, 1), StatUnit.shots);
+        stats.add(Stat.ammoCapacity, maxAmmo, StatUnit.items);
     }
 
     @Override

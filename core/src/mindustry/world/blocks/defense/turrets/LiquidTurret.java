@@ -28,13 +28,17 @@ public class LiquidTurret extends Turret{
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
+    @Override
     public void ammo(Object... objects){
-        ammoTypes = ObjectMap.of(objects);
+        super.ammo(objects);
+
+        ammoTypes = OrderedMap.of(objects);
     }
 
     @Override
     public void setStats(Stats stats){
         super.setStats(stats);
+        ammoTypes.each((l, b) -> b.statLiquidConsumed = reloadInterval() / 60f);
 
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
     }
