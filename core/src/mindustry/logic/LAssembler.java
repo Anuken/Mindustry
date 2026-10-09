@@ -11,10 +11,7 @@ import mindustry.logic.LExecutor.*;
 public class LAssembler{
     public static ObjectMap<String, Func<String[], LStatement>> customParsers = new ObjectMap<>();
 
-    private static final long invalidNumNegative = Long.MIN_VALUE;
-    private static final long invalidNumPositive = Long.MAX_VALUE;
-
-    private boolean privileged;
+    public boolean privileged;
     /** Maps names to variable. */
     public OrderedMap<String, LVar> vars = new OrderedMap<>();
     /** All instructions to be executed. */
@@ -31,7 +28,6 @@ public class LAssembler{
 
     public static LAssembler assemble(String data, boolean privileged){
         LAssembler asm = new LAssembler();
-
         Seq<LStatement> st = read(data, privileged);
 
         asm.privileged = privileged;
@@ -57,21 +53,18 @@ public class LAssembler{
         return new LParser(text, privileged).parse();
     }
 
-    /** @return a variable by name.
-     * This may be a constant variable referring to a number or object. */
+    /**
+     * @return a variable by name. This may be a constant variable referring to a number or object.
+     * @param symbol the string literal, numeric literal, or variable name. Leading or trailing spaces are not allowed.
+     * */
     public LVar var(String symbol){
         LVar constVar = Vars.logicVars.get(symbol, privileged);
         if(constVar != null) return constVar;
 
-        symbol = symbol.trim();
-
         //string case
-        if(!symbol.isEmpty() && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
-            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n"));
+        if(symbol.length() > 1 && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
+            return putConst("___" + symbol, unescape(symbol.substring(1, symbol.length() - 1)));
         }
-
-        //remove spaces for non-strings
-        symbol = symbol.replace(' ', '_');
 
         //use a positive invalid number if number might be negative, else use a negative invalid number
         double value = parseDouble(symbol);
@@ -79,29 +72,83 @@ public class LAssembler{
         if(Double.isNaN(value)){
             return putVar(symbol);
         }else{
+            if(Double.isInfinite(value)) value = 0.0;
             //this creates a hidden const variable with the specified value
             return putConst("___" + value, value);
         }
     }
 
+    /** Decodes \n, \", \\ and uXXXX escape sequences in a string literal's contents (quotes already stripped). */
+    static String unescape(String s){
+        if(s.indexOf('\\') == -1) return s;
+
+        StringBuilder out = new StringBuilder(s.length());
+        for(int i = 0; i < s.length(); i++){
+            char c = s.charAt(i);
+            if(c == '\\' && i + 1 < s.length()){
+                char next = s.charAt(i + 1);
+                if(next == 'n'){
+                    out.append('\n');
+                    i ++;
+                    continue;
+                }else if(next == '"' || next == '\\'){
+                    out.append(next);
+                    i ++;
+                    continue;
+                }else if(next == 'u' && i + 5 < s.length()){
+                    out.append((char)Integer.parseInt(s.substring(i + 2, i + 6), 16));
+                    i += 5;
+                    continue;
+                }
+            }
+            out.append(c);
+        }
+        return out.toString();
+    }
+
     double parseDouble(String symbol){
+        //fail fast for obvious non-numbers
+        if(symbol.isEmpty() || !isNumStart(symbol.charAt(0))) return Double.NaN;
+
         //parse hex/binary syntax
-        if(symbol.startsWith("0b")) return parseLong(false, symbol, 2, 2, symbol.length());
-        if(symbol.startsWith("+0b")) return parseLong(false, symbol, 2, 3, symbol.length());
-        if(symbol.startsWith("-0b")) return parseLong(true,symbol,  2, 3, symbol.length());
-        if(symbol.startsWith("0x")) return parseLong(false,symbol,  16, 2, symbol.length());
-        if(symbol.startsWith("+0x")) return parseLong(false,symbol,  16, 3, symbol.length());
-        if(symbol.startsWith("-0x")) return parseLong(true,symbol,  16, 3, symbol.length());
+        if(symbol.startsWith("0b")) return parseHexOrBin(false, symbol, true, 2);
+        if(symbol.startsWith("+0b")) return parseHexOrBin(false, symbol, true, 3);
+        if(symbol.startsWith("-0b")) return parseHexOrBin(true, symbol, true, 3);
+        if(symbol.startsWith("0x")) return parseHexOrBin(false, symbol, false, 2);
+        if(symbol.startsWith("+0x")) return parseHexOrBin(false, symbol, false, 3);
+        if(symbol.startsWith("-0x")) return parseHexOrBin(true, symbol, false, 3);
         if(symbol.startsWith("%[") && symbol.endsWith("]") && symbol.length() > 3) return parseNamedColor(symbol);
         if(symbol.startsWith("%") && (symbol.length() == 7 || symbol.length() == 9)) return parseColor(symbol);
 
         return Strings.parseDouble(symbol, Double.NaN);
     }
 
-    double parseLong(boolean negative, String s, int radix, int start, int end) {
-        long usedInvalidNum = negative ? invalidNumPositive : invalidNumNegative;
-        long l = Strings.parseLong(s, radix, start, end, usedInvalidNum);
-        return l == usedInvalidNum ? Double.NaN : negative ? -l : l;
+    boolean isNumStart(char c){
+        //note that 'e10' isn't a valid number; '%ffffff' is. Hex numbers start with '0x'.
+        return c >= '0' && c <= '9' || c == '.' || c == '-' || c == '+' || c == '%';
+    }
+
+    //parses *unsigned* hex or bin number, including negative ones (0xffffffffffffffff as -1)
+    //detects overflow by input length and uses bit manipulation to avoid signed arithmetics
+    double parseHexOrBin(boolean negative, String s, boolean binary, int offset){
+        int end = s.length();
+        if(offset >= end) return Double.NaN;
+
+        int pos = offset;
+        while(pos < end && s.charAt(pos) == '0') pos ++;    //skip leading zeros to avoid incorrect overflow detection
+
+        int shift = binary ? 1 : 4;
+        if(end - pos > 64 / shift) return Double.NaN;
+
+        long acc = 0;
+        int radix = 1 << shift;
+        while(pos < end){
+            int digit = Character.digit(s.charAt(pos), radix);
+            if(digit < 0) return Double.NaN;
+            acc = acc << shift | digit;
+            pos ++;
+        }
+        return negative ? -acc : acc;
     }
 
     double parseColor(String symbol){

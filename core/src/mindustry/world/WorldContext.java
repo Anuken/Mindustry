@@ -26,6 +26,9 @@ public interface WorldContext{
     /** Called when a building is finished reading. */
     default void onReadBuilding(){}
 
+    /** Called when data finishes reading for a tile. */
+    default void onReadTileData(){}
+
     default @Nullable Sector getSector(){
         return null;
     }

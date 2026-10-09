@@ -1,5 +1,7 @@
 package mindustry.io.versions;
 
+import mindustry.io.*;
+
 import java.io.*;
 
 public class Save1 extends LegacySaveVersion{
@@ -9,7 +11,7 @@ public class Save1 extends LegacySaveVersion{
     }
 
     @Override
-    public void readEntities(DataInput stream) throws IOException{
+    public void readEntities(DataInput stream, SaveReadState state) throws IOException{
         readLegacyEntities(stream);
     }
 }

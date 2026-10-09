@@ -22,11 +22,10 @@ public class ConsumeLiquid extends ConsumeLiquidBase{
         this(null, 0f);
     }
 
-
     @Override
     public void apply(Block block){
         super.apply(block);
-        block.liquidFilter[liquid.id] = true;
+        if(liquid.id < block.liquidFilter.length) block.liquidFilter[liquid.id] = true;
     }
 
     @Override

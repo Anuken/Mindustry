@@ -24,7 +24,7 @@ public class ConsumeLiquids extends Consume{
     public void apply(Block block){
         block.hasLiquids = true;
         for(var stack : liquids){
-            block.liquidFilter[stack.liquid.id] = true;
+            if(stack.liquid.id < block.liquidFilter.length) block.liquidFilter[stack.liquid.id] = true;
         }
     }
 

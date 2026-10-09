@@ -51,6 +51,9 @@ public class PayloadUnloader extends PayloadLoader{
         public void updateTile(){
             if(payload != null){
                 payload.update(null, this);
+                if(payload.isDead()){
+                    payload = null;
+                }
             }
             lastOutputPower = 0f;
 

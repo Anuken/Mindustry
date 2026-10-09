@@ -10,6 +10,7 @@ import mindustry.world.*;
 
 public class DrawWeave extends DrawBlock{
     public TextureRegion weave;
+    public float x, y;
 
     @Override
     public void draw(Building build){
@@ -19,8 +20,8 @@ public class DrawWeave extends DrawBlock{
         Draw.alpha(build.warmup());
 
         Lines.lineAngleCenter(
-        build.x + Mathf.sin(build.totalProgress(), 6f, Vars.tilesize / 3f * build.block.size),
-        build.y,
+        build.x + x + Mathf.sin(build.totalProgress(), 6f, Vars.tilesize / 3f * build.block.size),
+        build.y + y,
         90,
         build.block.size * Vars.tilesize / 2f);
 

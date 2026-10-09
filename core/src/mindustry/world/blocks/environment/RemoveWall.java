@@ -43,7 +43,7 @@ public class RemoveWall extends Block{
     }
 
     @Override
-    public void placeEnded(Tile tile, @Nullable Unit builder){
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, Object config){
         tile.setBlock(Blocks.air);
         if(tile.overlay().wallOre){
             tile.setOverlay(Blocks.air);

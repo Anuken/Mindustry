@@ -15,10 +15,13 @@ public enum LogicRule{
     lighting,
     canGameOver,
     ambientLight,
+    unitLight,
     solarMultiplier,
     dragMultiplier,
     ban,
     unban,
+    pauseDisabled,
+    musicVolume,
 
     //team specific
     buildSpeed,

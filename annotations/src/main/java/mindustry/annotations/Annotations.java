@@ -35,6 +35,10 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface NoSync{}
 
+    /** Indicates that a field should be synced, but not serialized */
+    @Target({ElementType.FIELD})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface NoSerialize{}
 
     /** Indicates that a component field is imported from other components. This means it doesn't actually exist. */
     @Target({ElementType.FIELD})
@@ -81,9 +85,11 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface GroupDef{
         Class[] value();
+        Class[] exclude() default {};
         boolean collide() default false;
         boolean spatial() default false;
         boolean mapping() default false;
+        boolean update() default false;
     }
 
     /** Indicates an entity definition. */
@@ -103,6 +109,8 @@ public class Annotations{
         boolean genio() default true;
         /** Whether I made a massive mistake by merging two different class branches */
         boolean legacy() default false;
+        /** Groups to exclude. */
+        String[] excludeGroups() default {};
     }
 
     /** Indicates an internal interface for entity components. */

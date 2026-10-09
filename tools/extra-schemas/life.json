@@ -1,0 +1,4 @@
+{
+  "doc": "Lifetime fraction, 0 to 1. Only for missiles. A sensor value for PartProgress.type - not an operation (see PartProgress and the 'op' field for those).",
+  "superclass": "mindustry.entities.part.DrawPart$PartProgress"
+}

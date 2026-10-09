@@ -12,6 +12,7 @@ abstract class BlockUnitComp implements Unitc{
     @Import Team team;
 
     @ReadOnly transient Building tile;
+    transient float ammo;
 
     public void tile(Building tile){
         this.tile = tile;
@@ -41,6 +42,12 @@ abstract class BlockUnitComp implements Unitc{
     @Override
     public TextureRegion icon(){
         return tile.block.uiIcon;
+    }
+
+    @Replace
+    @Override
+    public float ammof(){
+        return ammo;
     }
 
     @Override

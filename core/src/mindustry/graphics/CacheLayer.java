@@ -1,6 +1,5 @@
 package mindustry.graphics;
 
-import arc.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
 import arc.math.*;
@@ -97,20 +96,19 @@ public class CacheLayer{
 
         @Override
         public void begin(){
-            if(!Core.settings.getBool("animatedwater")) return;
+            if(!renderer.animateWater) return;
 
-            renderer.effectBuffer.begin();
-            Core.graphics.clear(Color.clear);
-            renderer.blocks.floor.beginc();
+            renderer.effectBuffer.begin(Color.clear);
+            renderer.blocks.floor.beginDraw();
         }
 
         @Override
         public void end(){
-            if(!Core.settings.getBool("animatedwater")) return;
+            if(!renderer.animateWater) return;
 
             renderer.effectBuffer.end();
             renderer.effectBuffer.blit(shader);
-            renderer.blocks.floor.beginc();
+            renderer.blocks.floor.beginDraw();
         }
     }
 }

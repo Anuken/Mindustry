@@ -7,6 +7,7 @@ import arc.struct.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
+import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -49,8 +50,8 @@ public class ItemTurret extends Turret{
         super.setStats();
 
         stats.remove(Stat.itemCapacity);
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes));
-        stats.add(Stat.ammoCapacity, maxAmmo / ammoPerShot, StatUnit.shots);
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
+        stats.add(Stat.ammoCapacity, maxAmmo / Math.max(ammoPerShot, 1), StatUnit.shots);
     }
 
     @Override
@@ -91,7 +92,9 @@ public class ItemTurret extends Turret{
             }
         });
 
-        ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        if(targetGround){
+            ammoTypes.each((item, type) -> placeOverlapRange = Math.max(placeOverlapRange, range + type.rangeChange + placeOverlapMargin));
+        }
 
         super.init();
     }
@@ -117,10 +120,13 @@ public class ItemTurret extends Turret{
         }
 
         @Override
-        public void updateTile(){
-            unit.ammo((float)unit.type().ammoCapacity * totalAmmo / maxAmmo);
+        public UnlockableContent getAmmoContent(){
+            return ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
+        }
 
-            super.updateTile();
+        @Override
+        public float getAmmoFraction(){
+            return (float)totalAmmo / maxAmmo;
         }
 
         @Override
@@ -206,12 +212,12 @@ public class ItemTurret extends Turret{
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
                 Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
-                short a = read.s();
+                int itemAmount = Math.min(read.s(), maxAmmo);
 
                 //only add ammo if this is a valid ammo type
                 if(item != null && ammoTypes.containsKey(item)){
-                    totalAmmo += a;
-                    ammo.add(new ItemEntry(item, a));
+                    totalAmmo += itemAmount;
+                    ammo.add(new ItemEntry(item, itemAmount));
                 }
             }
         }

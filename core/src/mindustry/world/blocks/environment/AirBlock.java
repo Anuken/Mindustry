@@ -16,6 +16,8 @@ public class AirBlock extends Floor{
         generateIcons = false;
         needsSurface = false;
         canShadow = false;
+        drawCached = false;
+        drawDynamic = false;
     }
 
     @Override

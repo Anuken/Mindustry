@@ -47,6 +47,7 @@ public class MapLocales extends ObjectMap<String, StringMap> implements JsonSeri
     public String getProperty(String key){
         if(!containsProperty(currentLocale(), key)){
             if(containsProperty("en", key)) return get("en").get(key);
+            if(bundle.has(key)) return bundle.get(key);
             return "???" + key + "???";
         }
         return get(currentLocale()).get(key);

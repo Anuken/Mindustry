@@ -18,7 +18,6 @@ public class PointBulletType extends BulletType{
          collides = false;
          reflectable = false;
          keepVelocity = false;
-         backMove = false;
      }
 
     @Override
@@ -61,7 +60,8 @@ public class PointBulletType extends BulletType{
             Building build = Vars.world.buildWorld(px, py);
             if(build != null && build.team != b.team){
                 build.collision(b);
-                 hit(b, px, py);
+                hit(b, px, py);
+                b.hit = true;
             }
         }
 

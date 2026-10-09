@@ -14,6 +14,14 @@ public class MinerAI extends AIController{
     public Tile ore;
 
     @Override
+    public void stanceChanged(){
+        if(targetItem != null && unit.controller() instanceof CommandAI ai && !ai.hasStance(UnitStance.mineAuto) && !ai.hasStance(ItemUnitStance.getByItem(targetItem))){
+            mining = false;
+            targetItem = null;
+        }
+    }
+
+    @Override
     public void updateMovement(){
         Building core = unit.closestCore();
 
@@ -23,13 +31,15 @@ public class MinerAI extends AIController{
             unit.mineTile(null);
         }
 
-        Item autoItem = unit.controller() instanceof CommandAI ai && ai.stance instanceof ItemUnitStance stance ? stance.item : null;
+        CommandAI ai = unit.controller() instanceof CommandAI a ? a : null;
 
         if(mining){
-            if(autoItem != null){
-                targetItem = autoItem;
-            }else if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
-                targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
+            if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
+                if(ai != null && !ai.hasStance(UnitStance.mineAuto)){
+                    targetItem = content.items().min(i -> ((unit.type.mineFloor && indexer.hasOre(i)) || (unit.type.mineWalls && indexer.hasWallOre(i))) && unit.canMine(i) && ai.hasStance(ItemUnitStance.getByItem(i)), i -> core.items.get(i));
+                }else{
+                    targetItem = unit.type.mineItems.min(i -> ((unit.type.mineFloor && indexer.hasOre(i)) || (unit.type.mineWalls && indexer.hasWallOre(i))) && unit.canMine(i), i -> core.items.get(i));
+                }
             }
 
             //core full of the target item, do nothing
@@ -45,8 +55,8 @@ public class MinerAI extends AIController{
             }else{
                 if(timer.get(timerTarget3, 60) && targetItem != null){
                     ore = null;
-                    if(unit.type.mineFloor) ore = indexer.findClosestOre(unit, targetItem);
-                    if(ore == null && unit.type.mineWalls) ore = indexer.findClosestWallOre(unit, targetItem);
+                    if(unit.type.mineFloor) ore = indexer.findClosestOre(core.x, core.y, targetItem);
+                    if(ore == null && unit.type.mineWalls) ore = indexer.findClosestWallOre(core.x, core.y, targetItem);
                 }
 
                 if(ore != null){

@@ -274,7 +274,7 @@ public class Waves{
         {nova, pulsar, quasar, vela, corvus},
         {crawler, atrax, spiroct, arkyid, toxopid},
         {risso, minke, bryde, sei, omura},
-        {risso, oxynoe, cyerce, aegires, navanax}, //retusa intentionally left out as it cannot damage the core properly
+        {retusa, oxynoe, cyerce, aegires, navanax},
         {flare, horizon, zenith, rand.chance(0.5) ? quad : antumbra, rand.chance(0.1) ? quad : eclipse}
         };
 

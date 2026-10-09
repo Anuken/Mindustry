@@ -56,6 +56,15 @@ public class CallGenerator{
                 packet.addMethod(writeHandleMethod(ent, true));
             }
 
+            if(!(ent.where.isClient && ent.where.isServer)){
+                packet.addMethod( MethodSpec.methodBuilder("allow")
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(boolean.class, "server")
+                .addAnnotation(Override.class)
+                .returns(boolean.class)
+                .addCode("return " + (ent.where.isClient ? "server" : "!server") + ";").build());
+            }
+
             //register packet
             register.addStatement("mindustry.net.Net.registerPacket($L.$L::new)", packageName, ent.packetClassName);
 
@@ -193,7 +202,7 @@ public class CallGenerator{
                 builder.addStatement("$L = READ.$L()", varName, pname);
             }else{
                 //else, try and find a serializer
-                String ser = serializer.readers.get(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), false));
+                String ser = serializer.getNetReader(typeName.replace("mindustry.gen.", ""), SerializerResolver.locate(ent.element.e, var.mirror(), false));
 
                 if(ser == null){ //make sure a serializer exists!
                     BaseProcessor.err("No read method to read class type '" + typeName + "' in method " + ent.targetMethod + "; " + serializer.readers, var);

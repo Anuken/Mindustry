@@ -100,6 +100,17 @@ public class Units{
         unit.remove();
     }
 
+    /** Removes a unit after spawning the death effects. */
+    @Remote(called = Loc.server)
+    public static void unitSafeDeath(Unit unit){
+        if(unit == null) return;
+        unit.type.deathExplosionEffect.at(unit.x, unit.y, unit.hitSize / 8f);
+        float shake = unit.type.deathShake < 0 ? unit.hitSize / 3f : unit.type.deathShake;
+        Effect.shake(shake, shake, unit);
+        unit.type.deathSound.at(unit, 1f, unit.type.deathSoundVolume);
+        unit.remove();
+    }
+
     /** @return whether a new instance of a unit of this team can be created. */
     public static boolean canCreate(Team team, UnitType type){
         return !type.useUnitCap || (team.data().countType(type) < getCap(team) && !type.isBanned());
@@ -254,13 +265,18 @@ public class Units{
 
     /** Returns the closest target enemy. First, units are checked, then tile entities. */
     public static Teamc closestTarget(Team team, float x, float y, float range, Boolf<Unit> unitPred, Boolf<Building> tilePred){
+        return closestTarget(team, x, y, range, null, unitPred, tilePred);
+    }
+
+    /** Returns the closest target enemy. First, units are checked, then tile entities. */
+    public static Teamc closestTarget(Team team, float x, float y, float range, @Nullable Team sourceTeam, Boolf<Unit> unitPred, Boolf<Building> tilePred){
         if(team == Team.derelict) return null;
 
         Unit unit = closestEnemy(team, x, y, range, unitPred);
         if(unit != null){
             return unit;
         }else{
-            return findEnemyTile(team, x, y, range, tilePred);
+            return indexer.findEnemyTile(team, x, y, range, UnitSorts.buildingDefault, tilePred, sourceTeam);
         }
     }
 

@@ -23,13 +23,18 @@ public class WaveSpawner{
     private static final float margin = 0f, coreMargin = tilesize * 2f, maxSteps = 30;
 
     private int tmpCount;
-    private Seq<Tile> spawns = new Seq<>();
+    private Seq<Tile> spawns = new Seq<>(false);
     private boolean spawning = false;
     private boolean any = false;
     private Tile firstSpawn = null;
 
     public WaveSpawner(){
         Events.on(WorldLoadEvent.class, e -> reset());
+
+        Events.on(TileOverlayChangeEvent.class, e -> {
+            if(e.previous == Blocks.spawn) spawns.remove(e.tile);
+            if(e.overlay == Blocks.spawn) spawns.add(e.tile);
+        });
     }
 
     @Nullable
@@ -169,13 +174,11 @@ public class WaveSpawner{
     }
 
     private void eachFlyerSpawn(int filterPos, Floatc2 cons){
-        boolean airUseSpawns = state.rules.airUseSpawns;
 
         for(Tile tile : spawns){
             if(filterPos != -1 && filterPos != tile.pos()) continue;
 
-            if(!airUseSpawns){
-
+            if(!state.rules.airUseSpawns){
                 float angle = Angles.angle(world.width() / 2f, world.height() / 2f, tile.x, tile.y);
                 float trns = Math.max(world.width(), world.height()) * Mathf.sqrt2 * tilesize;
                 float spawnX = Mathf.clamp(world.width() * tilesize / 2f + Angles.trnsx(angle, trns), -margin, world.width() * tilesize + margin);
@@ -186,7 +189,7 @@ public class WaveSpawner{
             }
         }
 
-        if(state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
+        if(state.rules.wavesSpawnAtCores && state.rules.attackMode && state.teams.isActive(state.rules.waveTeam)){
             for(Building core : state.rules.waveTeam.data().cores){
                 if(filterPos != -1 && filterPos != core.pos()) continue;
 

@@ -21,6 +21,7 @@ public class SwitchBlock extends Block{
         update = true;
         drawDisabled = false;
         autoResetEnabled = false;
+        configureSound = Sounds.none;
         group = BlockGroup.logic;
         envEnabled = Env.any;
 
@@ -42,7 +43,7 @@ public class SwitchBlock extends Block{
             if(privileged) return;
             super.damage(damage);
         }
-        
+
         @Override
         public boolean canPickup(){
             return !privileged;
@@ -80,8 +81,8 @@ public class SwitchBlock extends Block{
         }
 
         @Override
-        public void readAll(Reads read, byte revision){
-            super.readAll(read, revision);
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
 
             if(revision == 1){
                 enabled = read.bool();

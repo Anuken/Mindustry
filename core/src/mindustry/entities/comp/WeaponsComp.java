@@ -16,13 +16,8 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     /** weapon mount array, never null */
     @SyncLocal WeaponMount[] mounts = {};
     @ReadOnly transient boolean isRotate;
-    transient float aimX, aimY;
+    @NoSerialize float aimX, aimY;
     boolean isShooting;
-    float ammo;
-
-    float ammof(){
-        return ammo / type.ammoCapacity;
-    }
 
     void setWeaponRotation(float rotation){
         for(WeaponMount mount : mounts){
@@ -58,6 +53,11 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
     /** Aim at something. This will make all mounts point at it. */
     void aim(float x, float y){
+        aim(x, y, false);
+    }
+
+    /** Aim at something. This will make all mounts point at it. */
+    void aim(float x, float y, boolean clearTarget){
         Tmp.v1.set(x, y).sub(this.x, this.y);
         if(Tmp.v1.len() < type.aimDst) Tmp.v1.setLength(type.aimDst);
 
@@ -66,6 +66,7 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
 
         for(WeaponMount mount : mounts){
             if(mount.weapon.controllable){
+                if(clearTarget) mount.target = null;
                 mount.aimX = x;
                 mount.aimY = y;
             }

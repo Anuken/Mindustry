@@ -28,13 +28,13 @@ public class Binding{
     rotatePlaced = KeyBind.add("rotateplaced", KeyCode.r),
     diagonalPlacement = KeyBind.add("diagonal_placement", KeyCode.controlLeft),
     pick = KeyBind.add("pick", KeyCode.mouseMiddle),
+    ping = KeyBind.add("ping", KeyCode.p),
 
     rebuildSelect = KeyBind.add("rebuild_select", KeyCode.b),
     schematicSelect = KeyBind.add("schematic_select", KeyCode.f),
     schematicFlipX = KeyBind.add("schematic_flip_x", KeyCode.z),
     schematicFlipY = KeyBind.add("schematic_flip_y", KeyCode.x),
     schematicMenu = KeyBind.add("schematic_menu", KeyCode.t),
-
 
     commandMode = KeyBind.add("command_mode", KeyCode.shiftLeft, "command"),
     commandQueue = KeyBind.add("command_queue", KeyCode.mouseMiddle),
@@ -47,18 +47,18 @@ public class Binding{
 
     cancelOrders = KeyBind.add("cancel_orders", KeyCode.unset),
 
-    unitStanceShoot = KeyBind.add("unit_stance_shoot", KeyCode.unset),
     unitStanceHoldFire = KeyBind.add("unit_stance_hold_fire", KeyCode.unset),
     unitStancePursueTarget = KeyBind.add("unit_stance_pursue_target", KeyCode.unset),
     unitStancePatrol = KeyBind.add("unit_stance_patrol", KeyCode.unset),
     unitStanceRam = KeyBind.add("unit_stance_ram", KeyCode.unset),
+    unitStanceBoost = KeyBind.add("unit_stance_boost", KeyCode.unset),
+    unitStanceHoldPosition = KeyBind.add("unit_stance_hold_position", KeyCode.unset),
 
     unitCommandMove = KeyBind.add("unit_command_move", KeyCode.unset),
     unitCommandRepair = KeyBind.add("unit_command_repair", KeyCode.unset),
     unitCommandRebuild = KeyBind.add("unit_command_rebuild", KeyCode.unset),
     unitCommandAssist = KeyBind.add("unit_command_assist", KeyCode.unset),
     unitCommandMine = KeyBind.add("unit_command_mine", KeyCode.unset),
-    unitCommandBoost = KeyBind.add("unit_command_boost", KeyCode.unset),
     unitCommandEnterPayload = KeyBind.add("unit_command_enter_payload", KeyCode.unset),
     unitCommandLoadUnits = KeyBind.add("unit_command_load_units", KeyCode.unset),
     unitCommandLoadBlocks = KeyBind.add("unit_command_load_blocks", KeyCode.unset),
@@ -85,6 +85,7 @@ public class Binding{
 
     zoom = KeyBind.add("zoom", new Axis(KeyCode.scroll), "view"),
     detachCamera = KeyBind.add("detach_camera", KeyCode.unset),
+    teleportCursor = KeyBind.add("teleport_cursor", KeyCode.unset),
     menu = KeyBind.add("menu", Vars.android ? KeyCode.back : KeyCode.escape),
     fullscreen = KeyBind.add("fullscreen", KeyCode.f11),
     pause = KeyBind.add("pause", KeyCode.space),
@@ -94,7 +95,7 @@ public class Binding{
     planetMap = KeyBind.add("planet_map", KeyCode.n),
     blockInfo = KeyBind.add("block_info", KeyCode.f1),
     toggleMenus = KeyBind.add("toggle_menus", KeyCode.c),
-    screenshot = KeyBind.add("screenshot", KeyCode.p),
+    screenshot = KeyBind.add("screenshot", KeyCode.f12),
     togglePowerLines = KeyBind.add("toggle_power_lines", KeyCode.f5),
     toggleBlockStatus = KeyBind.add("toggle_block_status", KeyCode.f6),
     playerList = KeyBind.add("player_list", KeyCode.tab, "multiplayer"),
@@ -103,7 +104,9 @@ public class Binding{
     chatHistoryNext = KeyBind.add("chat_history_next", KeyCode.down),
     chatScroll = KeyBind.add("chat_scroll", new Axis(KeyCode.scroll)),
     chatMode = KeyBind.add("chat_mode", KeyCode.tab),
-    console = KeyBind.add("console", KeyCode.f8)
+    console = KeyBind.add("console", KeyCode.f8),
+    debugHitboxes = KeyBind.add("debug_hitboxes", KeyCode.unset),
+    performanceMetrics = KeyBind.add("performance_metrics", KeyCode.unset)
     ;
 
     //dummy static class initializer

@@ -36,8 +36,15 @@ public interface Payload extends Position{
     /** @return the time taken to build this payload. */
     float buildTime();
 
+    boolean contentEquals(Payload other);
+
     /** update this payload inside a container unit or building. either can be null. */
     default void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){}
+
+    /** @return if this payload died for whatever reason (e.g. reactor/combustion generator exploding itself) */
+    default boolean isDead(){
+        return false;
+    }
 
     /** @return whether this payload was dumped. */
     default boolean dump(){

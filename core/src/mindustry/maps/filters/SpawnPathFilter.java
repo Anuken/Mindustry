@@ -21,7 +21,7 @@ public class SpawnPathFilter extends GenerateFilter{
     @Override
     public FilterOption[] options(){
         return new FilterOption[]{
-            new SliderOption("radius", () -> radius, f -> radius = (int)f, 1, 20).display(),
+            new SliderOption("radius", () -> radius, f -> radius = (int)f, 1, 20, 1f).display(),
             new BlockOption("wall", () -> block, b -> block = b, wallsOnly)
         };
     }

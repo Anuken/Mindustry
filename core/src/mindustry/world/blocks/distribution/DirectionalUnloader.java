@@ -42,9 +42,17 @@ public class DirectionalUnloader extends Block{
         envDisabled = Env.none;
         clearOnDoubleTap = true;
         priority = TargetPriority.transport;
+        drawCached = true;
+        drawDynamic = false;
 
-        config(Item.class, (DirectionalUnloaderBuild tile, Item item) -> tile.unloadItem = item);
-        configClear((DirectionalUnloaderBuild tile) -> tile.unloadItem = null);
+        config(Item.class, (DirectionalUnloaderBuild tile, Item item) -> {
+            tile.unloadItem = item;
+            tile.recache();
+        });
+        configClear((DirectionalUnloaderBuild tile) -> {
+            tile.unloadItem = null;
+            tile.recache();
+        });
     }
 
     @Override
@@ -96,8 +104,7 @@ public class DirectionalUnloader extends Block{
                                 front.handleItem(this, item);
                                 back.items.remove(item, 1);
                                 back.itemTaken(item);
-                                offset ++;
-                                offset %= itemc;
+                                offset = item.id + 1;
                                 break;
                             }
                         }
@@ -155,7 +162,7 @@ public class DirectionalUnloader extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             int id = read.s();
-            unloadItem = id == -1 ? null : content.items().get(id);
+            unloadItem = id == -1 ? null : content.item(id);
             offset = read.s();
         }
     }

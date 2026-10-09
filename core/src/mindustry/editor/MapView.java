@@ -18,7 +18,7 @@ import mindustry.ui.*;
 import static mindustry.Vars.*;
 
 public class MapView extends Element implements GestureListener{
-    EditorTool tool = EditorTool.pencil;
+    EditorTool tool = EditorTool.zoom;
     private float offsetx, offsety;
     private float zoom = 1f;
     private boolean grid = false;
@@ -196,7 +196,7 @@ public class MapView extends Element implements GestureListener{
 
         if(Core.scene.getScrollFocus() != this) return;
 
-        zoom += Core.input.axis(Binding.zoom) / 10f * zoom;
+        if(!ui.consolefrag.shown()) zoom += Core.input.axis(Binding.zoom) / 10f * zoom;
         clampZoom();
     }
 
@@ -204,7 +204,7 @@ public class MapView extends Element implements GestureListener{
         zoom = Mathf.clamp(zoom, 0.2f, 20f);
     }
 
-    Point2 project(float x, float y){
+    public Point2 project(float x, float y){
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;
@@ -232,6 +232,9 @@ public class MapView extends Element implements GestureListener{
 
     @Override
     public void draw(){
+        //can cause NaN
+        if(editor.width() == 0 || editor.height() == 0) return;
+
         float ratio = 1f / ((float)editor.width() / editor.height());
         float size = Math.min(width, height);
         float sclwidth = size * zoom;

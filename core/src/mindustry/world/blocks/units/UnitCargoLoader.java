@@ -36,7 +36,7 @@ public class UnitCargoLoader extends Block{
         update = true;
         hasItems = true;
         itemCapacity = 200;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
     }
 
     @Override

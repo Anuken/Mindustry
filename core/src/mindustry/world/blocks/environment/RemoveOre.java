@@ -44,7 +44,7 @@ public class RemoveOre extends OverlayFloor{
     }
 
     @Override
-    public void placeEnded(Tile tile, @Nullable Unit builder){
+    public void placeEnded(Tile tile, @Nullable Unit builder, int rotation, Object config){
         tile.setOverlay(Blocks.air);
     }
 

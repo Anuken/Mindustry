@@ -13,14 +13,14 @@ public class BlankPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public void generate(Tiles tiles, Sector sec, int seed){
+    public void generate(Tiles tiles, Sector sec, WorldParams params){
         this.tiles = tiles;
         this.sector = sec;
-        this.rand.setSeed(sec.id + seed + baseSeed);
+        this.rand.setSeed(sec.id + params.seedOffset + baseSeed);
 
         tiles.fill();
 
-        generate(tiles);
+        generate(tiles, params);
     }
 
 }

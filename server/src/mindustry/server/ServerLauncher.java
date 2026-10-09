@@ -54,6 +54,7 @@ public class ServerLauncher implements ApplicationListener{
         mods.loadScripts();
         content.createModContent();
         content.init();
+        mods.loadModPatches();
 
         if(mods.hasContentErrors()){
             err("Error occurred loading mod content:");
