@@ -128,7 +128,6 @@ public class GifRecorder{
                                 exportDirectory.mkdirs();
                                 String outputFile = exportDirectory.absolutePath()  + "/" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault()).format(new Date()) + (outputMp4 ? ".mp4" : ".gif");
 
-                                //pix_fmt yuv420p -profile:v baseline -level 3.0 -vcodec libx264 -crf 18 -
                                 String args = Strings.format(
                                 "@ -r @ -s @x@ -f rawvideo -pix_fmt rgba -i - -frames:v @ -filter:v vflip@ @@",
                                 OS.isLinux ? "/usr/bin/ffmpeg" : "ffmpeg",

@@ -669,6 +669,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
                 tools.row();
 
+                addTool.get(EditorTool.copy);
+
+                tools.row();
+
                 tools.image(Tex.whiteui, Pal.gray).colspan(3).height(4f).width(size * 3f + 3f).row();
 
                 ButtonGroup<ImageButton> teamgroup = new ButtonGroup<>();
@@ -731,6 +735,39 @@ public class MapEditorDialog extends Dialog implements Disposable{
             cont.table(this::addBlockSelection).right().growY();
 
         }).grow();
+
+        if(mobile){
+            addPastePanel();
+        }
+    }
+
+    private void addPastePanel(){
+        Table root = new Table();
+        root.visible(view::isPasting);
+        root.bottom().left();
+        root.touchable = Touchable.childrenOnly;
+
+        Table panel = new Table(Tex.pane);
+        panel.margin(4f);
+
+        var style = Styles.clearNonei;
+        panel.button(Icon.ok, style, view::pasteNow).size(50f);
+        panel.button(Icon.cancel, style, view::cancelPaste).size(50f);
+        panel.row();
+        panel.button(Icon.flipX, style, () -> view.flipClipboard(true)).size(50f);
+        panel.button(Icon.flipY, style, () -> view.flipClipboard(false)).size(50f);
+        panel.row();
+        panel.button(Icon.rotate, style, view::rotateClipboard).size(50f).update(i -> {
+            var img = i.getCells().first().get();
+
+            img.setScale(-1f, 1f);
+            img.setTranslation(img.getWidth(), 0f);
+        });
+
+        //keep the panel clear of the tool column
+        root.add(panel).padLeft(170f);
+        addChild(root);
+        root.setFillParent(true);
     }
 
     private void doInput(){
@@ -744,7 +781,7 @@ public class MapEditorDialog extends Dialog implements Disposable{
             }
         }else{
             for(EditorTool tool : EditorTool.all){
-                if(Core.input.keyTap(tool.key)){
+                if(tool.key != KeyCode.unset && Core.input.keyTap(tool.key)){
                     view.setTool(tool);
                     break;
                 }
@@ -869,7 +906,10 @@ public class MapEditorDialog extends Dialog implements Disposable{
 
             ImageButton button = new ImageButton(Tex.whiteui, Styles.clearNoneTogglei);
             button.getStyle().imageUp = new TextureRegionDrawable(region);
-            button.clicked(() -> editor.drawBlock = block);
+            button.clicked(() -> {
+                editor.drawBlock = block;
+                view.cancelPaste();
+            });
             button.resizeImage(8 * 4f);
             button.update(() -> button.setChecked(editor.drawBlock == block));
             blockSelection.add(button).size(50f).tooltip(block.localizedName);

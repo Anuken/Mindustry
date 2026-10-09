@@ -29,6 +29,11 @@ public class EditorSpriteCache implements Disposable{
         this.packH = packH;
     }
 
+    /** @return the number of sprites added to this cache so far. */
+    public int sprites(){
+        return count / 6;
+    }
+
     /** @return whether anything was added to the cache. */
     public boolean isEmpty(){
         return index == 0;

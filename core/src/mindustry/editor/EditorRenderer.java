@@ -26,6 +26,10 @@ public class EditorRenderer implements Disposable{
 
     private Shader shader;
 
+    final EditorClipboardRenderer clipboard = new EditorClipboardRenderer();
+    @Nullable EditorClipboard pasteData;
+    float pasteX, pasteY;
+
     public void resize(int width, int height){
         dispose();
 
@@ -152,6 +156,9 @@ public class EditorRenderer implements Disposable{
             }
         }
 
+        if(pasteData != null && editor.showBuildings){
+            clipboard.render(pasteData, shader, Core.camera.mat, pasteX, pasteY);
+        }
 
         Core.camera.position.set(Tmp.v3);
         Draw.trans(Tmp.m4);
@@ -260,6 +267,8 @@ public class EditorRenderer implements Disposable{
 
     @Override
     public void dispose(){
+        clipboard.dispose();
+
         if(chunks == null) return;
 
         for(int x = 0; x < chunks.length; x++){
