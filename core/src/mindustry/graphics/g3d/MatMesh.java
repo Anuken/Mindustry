@@ -1,6 +1,6 @@
 package mindustry.graphics.g3d;
 
-import arc.math.geom.*;
+import arc.math.*;
 
 /** A GenericMesh that wraps and applies an additional transform to a generic mesh. */
 public class MatMesh implements GenericMesh{

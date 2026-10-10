@@ -5,15 +5,16 @@ import arc.Graphics.*;
 import arc.Graphics.Cursor.*;
 import arc.Input.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.io.*;
 import arc.util.pooling.*;
 import mindustry.core.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.mod.*;
 import mindustry.ui.*;
@@ -36,7 +37,7 @@ public class MessageBlock extends Block{
         destructible = true;
         group = BlockGroup.logic;
         drawDisabled = false;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
 
         config(String.class, (MessageBuild tile, String text) -> {
             if(text.length() > maxTextLength || !accessible()){
@@ -70,7 +71,7 @@ public class MessageBlock extends Block{
         return accessible();
     }
 
-    public class MessageBuild extends Building implements LReadable, LPrintable{
+    public class MessageBuild extends Building implements LogicReadable, LogicPrintable{
         public StringBuilder message = new StringBuilder();
 
         @Override
@@ -169,18 +170,18 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public boolean readable(LExecutor exec){
+        public boolean readable(LogicExecutor exec){
             return isValid();
         }
 
         @Override
-        public void read(LVar position, LVar output){
+        public void read(LogicVar position, LogicVar output){
             int address = position.numi();
             output.setnum(address < 0 || address >= message.length() ? Double.NaN : message.charAt(address));
         }
 
         @Override
-        public boolean printable(LExecutor exec) {
+        public boolean printable(LogicExecutor exec) {
             return isValid() && (exec.privileged || (team == exec.team && !privileged));
         }
 
@@ -191,7 +192,7 @@ public class MessageBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case bufferSize -> message.length();
                 default -> super.sense(sensor);

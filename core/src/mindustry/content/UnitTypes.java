@@ -5,7 +5,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
@@ -213,10 +213,6 @@ public class UnitTypes{
                 shrinkY = 0f;
                 shrinkInterp = Interp.slope;
 
-                trailChance = 10f / 60f;
-                trailColor = Pal.bulletYellowBack;
-                trailEffect = Fx.bulletSparkSmokeTrailSmall;
-                trailSpread = 12f;
                 shootEffect = Fx.shootScepterSecondary;
                 hitEffect = Fx.hitScepterSecondary;
             }};
@@ -253,7 +249,14 @@ public class UnitTypes{
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
                     despawnSound = Sounds.shockBullet;
-                    bulletInterval = 4f;
+                    intervalAngle = 180f;
+                    intervalRandomSpread = 15;
+                    bulletInterval = 45f;
+                    intervalBullets = 2;
+
+                    trailEffect = Fx.disperseTrail;
+                    trailChance = 0.44f;
+                    trailRotation = true;
 
                     intervalBullet = new LightningBulletType(){{
                         damage = 5f;
@@ -482,7 +485,7 @@ public class UnitTypes{
                 shootSound = Sounds.shootLancer;
 
                 bullet = new LaserBulletType(){{
-                    damage = 45f;
+                    damage = 55f;
                     recoil = 0f;
                     sideAngle = 45f;
                     sideWidth = 1f;
@@ -1308,6 +1311,7 @@ public class UnitTypes{
                     sideLength = 80f;
                     width = 25f;
                     length = 230f;
+                    shieldDamageMultiplier = 2f;
                     shootEffect = Fx.shockwave;
                     colors = new Color[]{Color.valueOf("ec7458aa"), Color.valueOf("ff9c5a"), Color.white};
                 }};
@@ -1583,6 +1587,7 @@ public class UnitTypes{
             accel = 0.4f;
             rotateSpeed = 3.3f;
             faceTarget = false;
+            crushDamage = 6f;
 
             trailLength = 20;
             waveTrailX = 4f;
@@ -1644,6 +1649,9 @@ public class UnitTypes{
             accel = 0.3f;
             rotateSpeed = 2.6f;
             faceTarget = false;
+            crushDamage = 8f;
+            crushRadX = 1;
+            crushRadY = 2;
 
             moveSoundVolume = 0.55f;
             moveSoundPitchMin = moveSoundPitchMax = 0.9f;
@@ -1706,6 +1714,9 @@ public class UnitTypes{
             hitSize = 20f;
             armor = 7f;
             faceTarget = false;
+            crushDamage = 12f;
+            crushRadX = 1;
+            crushRadY = 2;
 
             moveSoundVolume = 0.7f;
             moveSoundPitchMin = moveSoundPitchMax = 0.77f;
@@ -1805,6 +1816,9 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.3f;
             faceTarget = false;
+            crushDamage = 15f;
+            crushRadX = 2;
+            crushRadY = 3;
 
             moveSoundVolume = 1f;
             moveSound = Sounds.shipMoveBig;
@@ -1898,6 +1912,9 @@ public class UnitTypes{
             accel = 0.19f;
             rotateSpeed = 0.9f;
             faceTarget = false;
+            crushDamage = 17f;
+            crushRadX = 2;
+            crushRadY = 5;
 
             moveSoundVolume = 1.1f;
             moveSound = Sounds.shipMoveBig;
@@ -1953,6 +1970,7 @@ public class UnitTypes{
             faceTarget = false;
             range = 100f;
             armor = 3f;
+            crushDamage = 6f;
 
             moveSoundVolume = 0.4f;
             moveSound = Sounds.shipMove;
@@ -2057,6 +2075,7 @@ public class UnitTypes{
             accel = 0.4f;
             rotateSpeed = 4f;
             faceTarget = false;
+            crushDamage = 8f;
 
             moveSoundVolume = 0.55f;
             moveSoundPitchMin = moveSoundPitchMax = 0.9f;
@@ -2138,6 +2157,8 @@ public class UnitTypes{
             hitSize = 20f;
             armor = 6f;
             faceTarget = false;
+            crushDamage = 12f;
+            crushRadY = 2;
 
             moveSoundVolume = 0.7f;
             moveSoundPitchMin = moveSoundPitchMax = 0.77f;
@@ -2273,6 +2294,7 @@ public class UnitTypes{
         aegires = new UnitType("aegires"){{
             health = 12000;
             armor = 12f;
+            crushDamage = 15f;
 
             speed = 0.7f;
             drag = 0.17f;
@@ -2280,6 +2302,8 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.4f;
             faceTarget = false;
+            crushRadX = 2;
+            crushRadY = 3;
 
             moveSoundVolume = 1f;
             moveSound = Sounds.shipMoveBig;
@@ -2331,6 +2355,9 @@ public class UnitTypes{
             accel = 0.2f;
             rotateSpeed = 1.1f;
             faceTarget = false;
+            crushDamage = 17f;
+            crushRadX = 3;
+            crushRadY = 5;
 
             moveSoundVolume = 1.1f;
             moveSound = Sounds.shipMoveBig;
@@ -2616,8 +2643,8 @@ public class UnitTypes{
             weapons.add(new Weapon("small-mount-weapon"){{
                 top = false;
                 reload = 15f;
-                x = 1f;
-                y = 2f;
+                x = 0.93f;
+                y = 2.02f;
                 shoot = new ShootSpread(){{
                     shots = 2;
                     shotDelay = 3f;
@@ -3388,7 +3415,7 @@ public class UnitTypes{
                     moveRot = 40f - i * 25f;
                     mirror = true;
                     progress = PartProgress.warmup.delay(i * 0.2f);
-                    heatProgress = p -> Mathf.absin(Time.time + i * 14f, 7f, 1f);
+                    heatProgress = p -> Mathf.absin(Vars.state.time + i * 14f, 7f, 1f);
 
                     heatColor = Pal.techBlue;
                 }});
@@ -4043,7 +4070,7 @@ public class UnitTypes{
 
         quell = new ErekirUnitType("quell"){{
             aiController = FlyingFollowAI::new;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             lowAltitude = false;
             flying = true;
@@ -4148,7 +4175,7 @@ public class UnitTypes{
 
         disrupt = new ErekirUnitType("disrupt"){{
             aiController = FlyingFollowAI::new;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             lowAltitude = false;
             flying = true;
@@ -4355,7 +4382,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 60f;
             faceTarget = true;
@@ -4421,7 +4448,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 60f;
             targetPriority = -2;
@@ -4500,7 +4527,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 65f;
             faceTarget = true;
@@ -4577,6 +4604,7 @@ public class UnitTypes{
             itemCapacity = 0;
             hidden = true;
             internal = true;
+            packSprites = false;
         }};
 
         manifold = new ErekirUnitType("manifold"){{
@@ -4585,7 +4613,7 @@ public class UnitTypes{
             allowedInPayloads = false;
             logicControllable = false;
             playerControllable = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
             payloadCapacity = 0f;
 
             lowAltitude = false;
@@ -4628,15 +4656,15 @@ public class UnitTypes{
             playerControllable = false;
             allowedInPayloads = false;
             createWreck = false;
-            envEnabled = Env.any;
-            envDisabled = Env.none;
+            envEnabled = Environments.any;
+            envDisabled = Environments.none;
         }};
 
         dummy = new UnitType("dummy"){{
             controller = u -> new NoAI();
 
-            envEnabled = Env.any;
-            envDisabled = 0;
+            envEnabled = Environments.any;
+            envDisabled = Environments.none;
             isEnemy = false;
             allowedInPayloads = false;
             logicControllable = false;
@@ -4648,7 +4676,6 @@ public class UnitTypes{
             killable = false;
             physics = false;
             internal = true;
-            internalGenerateSprites = true;
 
             flyingLayer = Layer.flyingUnit - 1f;
             drag = 0.33f;

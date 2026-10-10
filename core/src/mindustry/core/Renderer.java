@@ -4,7 +4,6 @@ import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.gl.*;
 import arc.math.*;
@@ -13,6 +12,7 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.ai.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -20,6 +20,7 @@ import mindustry.graphics.g3d.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 import static arc.Core.*;
 import static mindustry.Vars.*;
@@ -34,12 +35,13 @@ public class Renderer implements ApplicationListener{
     public final OverlayRenderer overlays = new OverlayRenderer();
     public final LightRenderer lights = new LightRenderer();
     public final Pixelator pixelator = new Pixelator();
+    public final SMAA smaa = new SMAA();
     public PlanetRenderer planets;
 
     public @Nullable Bloom bloom;
     public @Nullable FrameBuffer backgroundBuffer;
     public FrameBuffer effectBuffer = new FrameBuffer();
-    public boolean animateShields, animateWater, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false, showPings = true, showOtherBuildPlans = true;
+    public boolean animateSurfaces, drawWeather = true, drawStatus, enableEffects, drawDisplays = true, drawLight = true, pixelate = false, showPings = true, showOtherBuildPlans = true;
     public float weatherAlpha;
     /** minZoom = zooming out, maxZoom = zooming in, used by cutscenes */
     public float minZoom = 1.5f, maxZoom = 6f;
@@ -88,7 +90,7 @@ public class Renderer implements ApplicationListener{
         shakeReduction = shakeIntensity / shakeTime;
     }
 
-    public void addEnvRenderer(int mask, Runnable render){
+    public void addEnvRenderer(Environments mask, Runnable render){
         envRenderers.add(new EnvRenderer(mask, render));
     }
 
@@ -165,8 +167,7 @@ public class Renderer implements ApplicationListener{
         unitLaserOpacity = settings.getInt("unitlaseropacity") / 100f;
         laserOpacity = settings.getInt("lasersopacity") / 100f;
         bridgeOpacity = settings.getInt("bridgeopacity") / 100f;
-        animateWater = settings.getBool("animatedwater"); //TODO: rename to animatedSurfaces or something
-        animateShields = animateWater; //vestigial: TODO, remove
+        animateSurfaces = settings.getBool("animatedwater");
         drawStatus = settings.getBool("blockstatus");
         enableEffects = settings.getBool("effects");
         drawDisplays = !settings.getBool("hidedisplays");
@@ -199,6 +200,7 @@ public class Renderer implements ApplicationListener{
         camera.height = graphics.getHeight() / camerascale;
 
         Lod.update();
+        content.items().each(Item::updateAnimation);
 
         if(state.isMenu()){
             landTime = 0f;
@@ -220,6 +222,10 @@ public class Renderer implements ApplicationListener{
 
             if(renderer.pixelate){
                 pixelator.drawPixelate();
+            }else if(smaa.enabled()){
+                smaa.begin();
+                draw();
+                smaa.end();
             }else{
                 draw();
             }
@@ -264,6 +270,7 @@ public class Renderer implements ApplicationListener{
 
     @Override
     public void dispose(){
+        smaa.dispose();
         Events.fire(new DisposeEvent());
     }
 
@@ -314,7 +321,7 @@ public class Renderer implements ApplicationListener{
         graphics.clear(clearColor);
         Draw.reset();
 
-        if(animateWater || animateShields){
+        if(animateSurfaces){
             effectBuffer.resize(graphics.getWidth(), graphics.getHeight());
         }
 
@@ -325,6 +332,7 @@ public class Renderer implements ApplicationListener{
 
         Draw.sort(true);
 
+        if(ControlPathfinder.showDebug) state.controlPath.drawDebug();
         Events.fire(Trigger.draw);
         MapPreviewLoader.checkPreviews();
 
@@ -344,7 +352,7 @@ public class Renderer implements ApplicationListener{
 
         //render all matching environments
         for(var renderer : envRenderers){
-            if((renderer.env & state.rules.env) == renderer.env){
+            if(state.rules.env.containsAll(renderer.env)){
                 renderer.renderer.run();
             }
         }
@@ -400,16 +408,21 @@ public class Renderer implements ApplicationListener{
 
         Draw.draw(Layer.plans, overlays::drawBottom);
 
-        if(animateShields && Shaders.shield != null){
-            //TODO would be nice if there were a way to detect if any shields or build beams actually *exist* before beginning/ending buffers, otherwise you're just blitting and swapping shaders for nothing
+        if(animateSurfaces && Shaders.shield != null){
             Draw.drawRange(Layer.shields, 1f, () -> effectBuffer.begin(Color.clear), () -> {
+                boolean drawn = batch.hasPending();
                 effectBuffer.end();
-                effectBuffer.blit(Shaders.shield);
+                if(drawn){
+                    Shaders.shield.render(effectBuffer);
+                }
             });
 
             Draw.drawRange(Layer.buildBeam, 1f, () -> effectBuffer.begin(Color.clear), () -> {
+                boolean drawn = batch.hasPending();
                 effectBuffer.end();
-                effectBuffer.blit(Shaders.buildBeam);
+                if(drawn){
+                    effectBuffer.blit(Shaders.buildBeam);
+                }
             });
         }
 
@@ -430,7 +443,7 @@ public class Renderer implements ApplicationListener{
         Events.fire(Trigger.drawOver);
         blocks.drawBlocks();
 
-        Groups.draw.draw(Drawc::draw);
+        state.entities.draw.draw(Drawc::draw);
 
         if(settings.getBool("drawhitboxes")){
             DebugCollisionRenderer.draw();
@@ -494,7 +507,7 @@ public class Renderer implements ApplicationListener{
                 backgroundBuffer = new FrameBuffer(size, size);
             }
 
-            if(resized || backgroundBuffer.resizeCheck(size, size)){
+            if(resized || backgroundBuffer.resize(size, size)){
                 backgroundBuffer.begin(Color.clear);
 
                 var params = state.rules.planetBackground;
@@ -504,6 +517,7 @@ public class Renderer implements ApplicationListener{
                 params.viewH = size;
                 params.alwaysDrawAtmosphere = true;
                 params.drawUi = false;
+                params.disableAA = true;
 
                 planets.render(params);
 
@@ -511,7 +525,7 @@ public class Renderer implements ApplicationListener{
             }
 
             float drawSize = Math.max(camera.width, camera.height);
-            Draw.rect(Draw.wrap(backgroundBuffer.getTexture()), camera.position.x, camera.position.y, drawSize, -drawSize);
+            Draw.rect(Draw.wrap(backgroundBuffer.texture), camera.position.x, camera.position.y, drawSize, -drawSize);
         }
 
         if(state.rules.customBackgroundCallback != null && customBackgrounds.containsKey(state.rules.customBackgroundCallback)){
@@ -586,7 +600,7 @@ public class Renderer implements ApplicationListener{
     }
 
     public void takeMapScreenshot(){
-        int w = world.width() * tilesize, h = world.height() * tilesize;
+        int w = state.world.width * tilesize, h = state.world.height * tilesize;
         int memory = w * h * 4 / 1024 / 1024;
 
         if(Vars.checkScreenshotMemory && memory >= (mobile ? 65 : 120)){
@@ -638,12 +652,12 @@ public class Renderer implements ApplicationListener{
     }
 
     public static class EnvRenderer{
-        /** Environment bitmask; must match env exactly when and-ed. */
-        public final int env;
+        /** The rules env must contain all of these for this renderer to run. */
+        public final Environments env;
         /** Rendering callback. */
         public final Runnable renderer;
 
-        public EnvRenderer(int env, Runnable renderer){
+        public EnvRenderer(Environments env, Runnable renderer){
             this.env = env;
             this.renderer = renderer;
         }

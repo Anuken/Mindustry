@@ -6,15 +6,15 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -53,8 +53,8 @@ public class Conveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         //have to add a custom calculated speed, since the actual movement speed is apparently not linear
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
@@ -142,7 +142,7 @@ public class Conveyor extends Block implements Autotiler{
 
         @Override
         public void draw(){
-            int frame = enabled && clogHeat <= 0.5f && !state.rules.editor ? (int)(((Time.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
+            int frame = enabled && clogHeat <= 0.5f && !state.rules.editor ? (int)(((Vars.state.time * speed * 8f * timeScale * efficiency)) % 4) : 0;
 
             //draw extra conveyors facing this one for non-square tiling purposes
             Draw.z(Layer.blockUnder);
@@ -160,7 +160,7 @@ public class Conveyor extends Block implements Autotiler{
             Draw.rect(regions[blendbits][frame], x, y, tilesize * blendsclx, tilesize * blendscly, rotation * 90);
 
             Draw.z(Layer.block - 0.1f);
-            float layer = Layer.block - 0.1f, wwidth = world.unitWidth(), wheight = world.unitHeight(), scaling = 0.01f;
+            float layer = Layer.block - 0.1f, wwidth = state.world.unitWidth, wheight = state.world.unitHeight, scaling = 0.01f;
 
             for(int i = 0; i < len; i++){
                 Item item = ids[i];
@@ -422,7 +422,7 @@ public class Conveyor extends Block implements Autotiler{
                 }
 
                 if(i < capacity){
-                    ids[i] = content.item(id);
+                    ids[i] = read.content(ContentType.item, id);
                     xs[i] = x;
                     ys[i] = y;
                 }
@@ -433,8 +433,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress){
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress){
                 if(len == 0) return 0;
                 return ys[len - 1];
             }
@@ -442,8 +442,8 @@ public class Conveyor extends Block implements Autotiler{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem && len > 0) return ids[len - 1];
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.firstItem && len > 0) return ids[len - 1];
             return super.senseObject(sensor);
         }
 

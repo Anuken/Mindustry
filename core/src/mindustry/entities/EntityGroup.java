@@ -5,19 +5,15 @@ import arc.func.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.Time.*;
-import arc.util.pooling.*;
+import mindustry.*;
+import mindustry.core.GameState.*;
 import mindustry.gen.*;
 
 import java.util.*;
 
-import static mindustry.Vars.*;
-
 /** Represents a group of a certain type of entity.*/
 @SuppressWarnings("unchecked")
 public class EntityGroup<T extends Entityc> implements Iterable<T>{
-    private static int lastId = 0;
-
     private final Seq<T> array;
     private final Seq<T> intersectArray = new Seq<>();
     private final Rect viewport = new Rect();
@@ -31,17 +27,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
 
     private double fixedCounter, timeCounter;
     private long lastTimeAccess = -1;
-    private Seq<DelayRun> timeRuns = new Seq<>();
-
-    public static int nextId(){
-        if(lastId >= Integer.MAX_VALUE - 2) lastId = 0;
-        return lastId++;
-    }
-
-    /** Makes sure the next ID counter is higher than this number, so future entities cannot possibly use this ID. */
-    public static void checkNextId(int id){
-        lastId = Math.max(lastId, id + 1);
-    }
+    private TimeRuns timeRuns = new TimeRuns();
 
     public EntityGroup(Class<T> type, boolean spatial, boolean mapping){
         this(type, spatial, mapping, null);
@@ -78,11 +64,11 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     }
 
     public void collide(){
-        collisions.collide((EntityGroup<? extends Hitboxc>)this);
+        EntityCollisions.collide((EntityGroup<? extends Hitboxc>)this);
     }
 
     public void updatePhysics(){
-        collisions.updatePhysics((EntityGroup<? extends Hitboxc>)this);
+        EntityCollisions.updatePhysics((EntityGroup<? extends Hitboxc>)this);
     }
 
     public void update(){
@@ -111,35 +97,35 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
     public void fixedUpdate(int targetUps, int maxUpdatesPerFrame){
         //if fixedUpdate isn't called, e.g. when the game is paused or map is reloaded, the time counter needs to 'sync' with the actual proper time
         if(lastTimeAccess != Core.graphics.getFrameId()){
-            timeCounter = Time.getInternalTime();
+            timeCounter = Vars.state.timePrecise;
         }
 
         double targetDelta = 1.0 / targetUps;
         float timeDelta = (float)targetDelta * 60f;
         float prevDelta = Time.delta;
-        double prevTime = Time.getInternalTime();
-        var oldRuns = Time.getRuns();
+        double prevTime = Vars.state.timePrecise;
+        var oldRuns = Vars.state.runs;
 
-        //since some logic (incorrectly!) relies on Time.time, it has to be passed like this across several variables.
+        //since some logic (incorrectly!) relies on Vars.state.time, it has to be passed like this across several variables.
         Time.delta = timeDelta;
-        Time.setInternalTime(timeCounter);
-        Time.setRuns(timeRuns);
+        Vars.state.setTime(timeCounter);
+        Vars.state.runs = timeRuns;
         int updates = 0;
 
         fixedCounter += Core.graphics.getDeltaTime();
 
         while(fixedCounter >= targetDelta && updates++ < maxUpdatesPerFrame){
             //this executes any pending tasks (manually reassigned), and increments internal time, which is local to this group
-            Time.update();
+            Vars.logic.updateTime();
             update();
             fixedCounter -= targetDelta;
         }
 
-        timeCounter = Time.getInternalTime();
+        timeCounter = Vars.state.timePrecise;
 
         Time.delta = prevDelta;
-        Time.setInternalTime(prevTime);
-        Time.setRuns(oldRuns);
+        Vars.state.setTime(prevTime);
+        Vars.state.runs = oldRuns;
 
         lastTimeAccess = Core.graphics.getFrameId();
     }
@@ -332,8 +318,7 @@ public class EntityGroup<T extends Entityc> implements Iterable<T>{
         array.each(Entityc::remove);
         array.clear();
         if(map != null) map.clear();
-        Pools.freeAll(timeRuns, true);
-        timeRuns.clear();
+        timeRuns = new TimeRuns();
 
         clearing = false;
     }

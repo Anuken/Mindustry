@@ -46,12 +46,12 @@ public class Wall extends Block{
         priority = TargetPriority.wall;
 
         //it's a wall of course it's supported everywhere
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         if(chanceDeflect > 0f) stats.add(Stat.baseDeflectChance, chanceDeflect, StatUnit.none);
         if(lightningChance > 0f){
@@ -129,7 +129,7 @@ public class Wall extends Block{
         public void onProximityAdded(){
             super.onProximityAdded();
 
-            if(autotile && !world.isGenerating()) updateOtherBits();
+            if(autotile && !state.generating) updateOtherBits();
         }
 
         @Override

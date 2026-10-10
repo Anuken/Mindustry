@@ -4,13 +4,13 @@ import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.noise.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -41,9 +41,9 @@ public class MenuRenderer implements Disposable{
 
     private void generate(){
         //suppress tile change events.
-        world.setGenerating(true);
+        state.generating = true;
 
-        Tiles tiles = world.resize(width, height);
+        World tiles = state.resizeWorld(width, height);
         //only uses base game ores now, mod ones usually contrast too much with the floor
         Seq<Block> ores = Seq.with(Blocks.oreCopper, Blocks.oreLead, Blocks.oreScrap, Blocks.oreCoal, Blocks.oreTitanium, Blocks.oreThorium);
         shadows = new FrameBuffer(width, height);
@@ -164,17 +164,17 @@ public class MenuRenderer implements Disposable{
         }
 
         //don't fire a world load event, it just causes lag and confusion
-        world.setGenerating(false);
+        state.generating = false;
     }
 
     private void cache(){
 
         //draw shadows
-        Draw.proj().setOrtho(0, 0, shadows.getWidth(), shadows.getHeight());
+        Draw.proj().setOrtho(0, 0, shadows.width, shadows.height);
         shadows.begin(Color.clear);
         Draw.color(Color.black);
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(tile.block() != Blocks.air){
                 Fill.rect(tile.x + 0.5f, tile.y + 0.5f, 1, 1);
             }
@@ -188,18 +188,18 @@ public class MenuRenderer implements Disposable{
         Core.batch = batch = new CacheBatch(new SpriteCache(width * height * 6, false));
         batch.beginCache();
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             tile.floor().drawBase(tile);
         }
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             tile.overlay().drawBase(tile);
         }
 
         cacheFloor = batch.endCache();
         batch.beginCache();
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             tile.block().drawBase(tile);
         }
 
@@ -223,7 +223,7 @@ public class MenuRenderer implements Disposable{
         batch.drawCache(cacheFloor);
         batch.endDraw();
         Draw.color();
-        Draw.rect(Draw.wrap(shadows.getTexture()),
+        Draw.rect(Draw.wrap(shadows.texture),
         width * tilesize / 2f - 4f, height * tilesize / 2f - 4f,
         width * tilesize, -height * tilesize);
         Draw.flush();

@@ -12,12 +12,12 @@ public class SolarGenerator extends PowerGenerator{
         super(name);
         //remove the BlockFlag.generator flag to make this a lower priority target than other generators.
         flags = EnumSet.of();
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.remove(generationType);
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }

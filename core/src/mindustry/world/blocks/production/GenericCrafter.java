@@ -4,13 +4,12 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
-import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.mod.*;
 import mindustry.type.*;
@@ -54,7 +53,6 @@ public class GenericCrafter extends Block{
         super(name);
         update = true;
         solid = true;
-        hasItems = true;
         ambientSound = Sounds.loopMachine;
         sync = true;
         ambientSoundVolume = 0.03f;
@@ -63,9 +61,9 @@ public class GenericCrafter extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = craftTime;
-        super.setStats();
+        super.setStats(stats);
         if((hasItems && itemCapacity > 0) || outputItems != null){
             stats.add(Stat.productionTime, craftTime / 60f, StatUnit.seconds);
         }
@@ -99,7 +97,7 @@ public class GenericCrafter extends Block{
     public boolean rotatedOutput(int fromX, int fromY, Tile destination){
         if(!(destination.build instanceof ConduitBuild)) return false;
 
-        Building crafter = world.build(fromX, fromY);
+        Building crafter = state.world.build(fromX, fromY);
         if(crafter == null) return false;
         int relative = Mathf.mod(crafter.relativeTo(destination) - crafter.rotation, 4);
         for(int dir : liquidOutputDirections){
@@ -185,6 +183,7 @@ public class GenericCrafter extends Block{
     }
 
     public class GenericCrafterBuild extends Building{
+        public float dumpTimer;
         public float progress;
         public float totalProgress;
         public float warmup;
@@ -333,13 +332,14 @@ public class GenericCrafter extends Block{
         }
 
         public void dumpOutputs(){
-            if(outputItems != null && timer(timerDump, dumpTime / timeScale)){
+            if(outputItems != null && (dumpTimer += timeScale * Time.delta) >= dumpTime){
                 for(ItemStack output : outputItems){
                     int amount = Math.max(1, Mathf.round(scaleOutput(output.amount)));
                     for(int i = 0; i < amount; i++){
                         if(!dump(output.item)) break;
                     }
                 }
+                dumpTimer %= dumpTime;
             }
 
             if(outputLiquids != null){
@@ -352,10 +352,10 @@ public class GenericCrafter extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress();
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress();
             //attempt to prevent wild total liquid fluctuation, at least for crafters
-            if(sensor == LAccess.totalLiquids && outputLiquid != null) return liquids.get(outputLiquid.liquid);
+            if(sensor == LogicProp.totalLiquids && outputLiquid != null) return liquids.get(outputLiquid.liquid);
             return super.sense(sensor);
         }
 

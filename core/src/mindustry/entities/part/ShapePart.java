@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 
 public class ShapePart extends DrawPart{
     public boolean circle = false, hollow = false;
@@ -28,7 +29,7 @@ public class ShapePart extends DrawPart{
         Draw.z(Draw.z() + layerOffset);
 
         float prog = progress.getClamp(params, clampProgress),
-        baseRot = Time.time * rotateSpeed,
+        baseRot = Vars.state.time * rotateSpeed,
         rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog),
         str = strokeTo < 0 ? stroke : Mathf.lerp(stroke, strokeTo, prog);
 

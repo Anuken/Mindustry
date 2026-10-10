@@ -12,7 +12,6 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.editor.*;
 import mindustry.game.*;
 import mindustry.game.Rules.*;
@@ -41,7 +40,7 @@ public class CustomRulesDialog extends BaseDialog{
     public Seq<String> categoryNames;
     public String currentName = "";
     public String ruleSearch = "";
-    public Seq<Runnable> additionalSetup; // for modding to easily add new rules
+    public static Seq<Runnable> additionalSetup = new Seq<>(); // for modding to easily add new rules
 
     public CustomRulesDialog(){
         this(false);
@@ -58,7 +57,6 @@ public class CustomRulesDialog extends BaseDialog{
         shown(this::setup);
         addCloseButton();
 
-        additionalSetup = new Seq<>();
         categories = new Seq<>();
         categoryNames = new Seq<>();
 
@@ -140,6 +138,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     void setupMain(){
         categories.clear();
+        categoryNames.clear();
         main.clear();
         main.left().defaults().fillX().left();
         main.row();
@@ -256,7 +255,7 @@ public class CustomRulesDialog extends BaseDialog{
         Boolp allowMusic = () -> !rules.disableMusic;
         Func<String, Seq<MusicContainer>> parser = str -> {
             try{
-                return Seq.map(new JsonReader().parse("[" + str + "]").asStringArray(), MusicContainer::new);
+                return Jval.read("[" + str + "]").asArray().map( j -> new MusicContainer(j.asString()));
             }catch(Throwable e){
                 return null;
             }
@@ -338,8 +337,8 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.rtsminattackweight", f -> teams.rtsMinWeight = f, () -> teams.rtsMinWeight, () -> teams.rtsAi);
 
                 //disallow on Erekir (this is broken for mods I'm sure, but whatever)
-                check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
-                number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && rules.env != Planets.erekir.defaultEnv && !rules.pvp, 0, 1);
+                check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && !rules.env.equals(Planets.erekir.defaultEnv) && !rules.pvp);
+                number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && !rules.env.equals(Planets.erekir.defaultEnv) && !rules.pvp, 0, 1);
 
                 check("@rules.protectcores", b -> teams.protectCores = b, () -> teams.protectCores);
                 number("@rules.extracorebuildradius", f -> teams.extraCoreBuildRadius = f * tilesize, () -> Math.min(teams.extraCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection && teams.protectCores);

@@ -9,8 +9,8 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Tooltip.*;
-import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.Stack;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
@@ -130,7 +130,7 @@ public class PlacementFragment{
     }
 
     boolean updatePick(InputHandler input){
-        Tile tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+        Tile tile = state.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
         if(tile != null && Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
             var build = tile.build;
 
@@ -261,7 +261,7 @@ public class PlacementFragment{
             if(hovered() instanceof Unit unit && unit.type.unlockedNow()){
                 ui.content.show(unit.type());
             }else{
-                var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+                var build = state.world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
                 Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
                 if(displayBlock != null && displayBlock.unlockedNow()){
@@ -799,7 +799,7 @@ public class PlacementFragment{
         if(unit != null) return unit;
 
         //check tile being hovered over
-        Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Tile hoverTile = state.world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null && hoverTile.inMapArea()){
             //if the tile has a building, display it
             if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team()) && hoverTile.build.inMapArea()){

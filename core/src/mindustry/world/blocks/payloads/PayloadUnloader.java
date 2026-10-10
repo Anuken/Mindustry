@@ -1,5 +1,6 @@
 package mindustry.world.blocks.payloads;
 
+import arc.util.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -69,7 +70,8 @@ public class PayloadUnloader extends PayloadLoader{
 
                 //unload items
                 if(payload.block().hasItems && !full()){
-                    if(efficiency > 0.01f && timer(timerLoad, loadTime / efficiency)){
+                    if(efficiency > 0.01f && (loadTimer += Time.delta * efficiency) >= loadTime){
+                        loadTimer %= loadTime;
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && !full(); j++){
                             for(int i = 0; i < items.length(); i++){

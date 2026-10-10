@@ -8,8 +8,10 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -17,7 +19,6 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -26,26 +27,21 @@ public class Damage{
     private static final UnitDamageEvent bulletDamageEvent = new UnitDamageEvent();
     private static final Rect rect = new Rect();
     private static final Rect hitrect = new Rect();
-    private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2();
+    private static final Vec2 vec = new Vec2(), seg1 = new Vec2(), seg2 = new Vec2(), polyHit = new Vec2();
     private static final IntSet collidedBlocks = new IntSet();
     private static final IntFloatMap damages = new IntFloatMap();
-    private static final Seq<Collided> collided = new Seq<>();
+    private static final Seq<Collided> collided = new Seq<>(), shieldHits = new Seq<>();
     private static final Pool<Collided> collidePool = Pools.get(Collided.class, Collided::new);
     private static final Seq<Building> builds = new Seq<>();
     private static final FloatSeq distances = new FloatSeq();
 
-    private static Tile furthest;
     private static float maxDst = 0f;
     private static Building tmpBuilding;
     private static Unit tmpUnit;
 
-    public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source){
-        applySuppression(team, x, y, range, reload, maxDelay, applyParticleChance, source, Pal.sapBullet);
-    }
-
     public static void applySuppression(Team team, float x, float y, float range, float reload, float maxDelay, float applyParticleChance, @Nullable Position source, Color effectColor){
         builds.clear();
-        indexer.eachBlock(null, x, y, range, build -> build.team != team, build -> {
+        state.indexer.eachBlock(null, x, y, range, build -> build.team != team, build -> {
             float prev = build.healSuppressionTime;
             build.applyHealSuppression(reload + 1f, effectColor);
 
@@ -53,7 +49,7 @@ public class Damage{
             if(build.wasRecentlyHealed(60f * 12f) || build.block.suppressable){
 
                 //add prev check so ability spam doesn't lead to particle spam (essentially, recently suppressed blocks don't get new particles)
-                if(!headless && prev - Time.time <= reload/2f){
+                if(!headless && prev - Vars.state.time <= reload/2f){
                     builds.add(build);
                 }
             }
@@ -63,7 +59,7 @@ public class Damage{
         float scaledChance = applyParticleChance / builds.size;
         for(var build : builds){
             if(Mathf.chance(scaledChance)){
-                Time.run(Mathf.random(maxDelay), () -> {
+                Vars.state.run(Mathf.random(maxDelay), () -> {
                     Fx.regenSuppressSeek.at(build.x + Mathf.range(build.block.size * tilesize / 2f), build.y + Mathf.range(build.block.size * tilesize / 2f), 0f, effectColor, source);
                 });
             }
@@ -94,12 +90,12 @@ public class Damage{
         if(damage){
             for(int i = 0; i < Mathf.clamp(power / 700, 0, 8); i++){
                 int length = 5 + Mathf.clamp((int)(Mathf.pow(power, 0.98f) / 500), 1, 18);
-                Time.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3 + Mathf.pow(power, 0.35f), x, y, Mathf.random(360f), length + Mathf.range(2)));
+                Vars.state.run(i * 0.8f + Mathf.random(4f), () -> Lightning.create(Team.derelict, Pal.power, 3 + Mathf.pow(power, 0.35f), x, y, Mathf.random(360f), length + Mathf.range(2)));
             }
 
             if(fire){
                 for(int i = 0; i < Mathf.clamp(flammability / 4, 0, 30); i++){
-                    Time.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
+                    Vars.state.run(i / 2f, () -> Call.createBullet(Bullets.fireball, Team.derelict, x, y, Mathf.random(360f), Bullets.fireball.damage, 1, 1));
                 }
             }
 
@@ -108,10 +104,10 @@ public class Damage{
 
             for(int i = 0; i < waves; i++){
                 int f = i;
-                Time.run(i * 2f, () -> {
-                    var shields = ignoreTeam == null ? null : indexer.getEnemy(ignoreTeam, BlockFlag.shield);
-                    if(shields == null || shields.isEmpty() || !shields.contains(b -> b instanceof ExplosionShield s && s.absorbExplosion(x, y, damagePerWave))){
-                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave, false);
+                Vars.state.run(i * 2f, () -> {
+                    float absorbed = absorbExplosion(ignoreTeam, x, y, damagePerWave);
+                    if(absorbed < damagePerWave){
+                        damage(ignoreTeam, x, y, Mathf.clamp(radius + explosiveness, 0, 50f) * ((f + 1f) / waves), damagePerWave - absorbed, false);
                     }
 
                     Fx.blockExplosionSmoke.at(x + Mathf.range(radius), y + Mathf.range(radius));
@@ -136,48 +132,79 @@ public class Damage{
         for(int i = 0; i < amount; i++){
             float cx = x + Mathf.range(range);
             float cy = y + Mathf.range(range);
-            Tile tile = world.tileWorld(cx, cy);
+            Tile tile = state.world.tileWorld(cx, cy);
             if(tile != null){
                 Fires.create(tile);
             }
         }
     }
 
+    /**
+     * Applies an explosion at a point to the enemy shields covering it, one after another, until all of its damage is absorbed.
+     * @return how much of the damage was absorbed.
+     */
+    public static float absorbExplosion(@Nullable Team team, float x, float y, float damage){
+        if(team == null) return 0f;
+
+        float remaining = damage;
+
+        var shields = state.indexer.getEnemyShields(team, x, y, 0f, 0f);
+        for(int i = 0; i < shields.size && remaining > 0f; i++){
+            if(shields.get(i) instanceof ShieldProvider shield){
+                remaining -= shield.absorbExplosion(x, y, remaining);
+            }
+        }
+
+        var units = Units.enemyShields(team, x, y, 0f, 0f);
+        for(int i = 0; i < units.size && remaining > 0f; i++){
+            Unit unit = units.get(i);
+            if(unit.dead) continue;
+
+            for(Ability ability : unit.abilities){
+                if(remaining > 0f && ability instanceof UnitShieldProvider shield){
+                    remaining -= shield.absorbExplosion(unit, x, y, remaining);
+                }
+            }
+        }
+
+        return damage - remaining;
+    }
+
     public static @Nullable Building findAbsorber(Team team, float x1, float y1, float x2, float y2){
         tmpBuilding = null;
 
         boolean found = World.raycast(World.toTile(x1), World.toTile(y1), World.toTile(x2), World.toTile(y2),
-        (x, y) -> (tmpBuilding = world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.block.absorbLasers);
+        (x, y) -> (tmpBuilding = state.world.build(x, y)) != null && tmpBuilding.team != team && tmpBuilding.block.absorbLasers);
 
         return found ? tmpBuilding : null;
     }
 
     public static float findLength(Bullet b, float length, boolean laser, int pierceCap){
+        return findLength(b, length, laser, pierceCap, false);
+    }
+
+    private static float findLength(Bullet b, float length, boolean laser, int pierceCap, boolean absorb){
         if(pierceCap > 0){
-            length = findPierceLength(b, pierceCap, laser, length);
-        }else if(laser){
-            length = findLaserLength(b, length);
+            length = findPierceLength(b, pierceCap, laser, length, absorb);
+        }else{
+            length = findLaserLength(b, length, absorb);
         }
 
         return length;
     }
 
-    public static float findLaserLength(Bullet b, float length){
+    private static float findLaserLength(Bullet b, float length, boolean absorb){
         vec.trnsExact(b.rotation(), length);
 
-        furthest = null;
+        int found = World.raycastHit(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
+            Building furthest = state.world.build(x, y);
+            return furthest != null && furthest.team != b.team && furthest.absorbLasers();
+        });
 
-        boolean found = World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y),
-        (x, y) -> (furthest = world.tile(x, y)) != null && furthest.team() != b.team && (furthest.build != null && furthest.build.absorbLasers()));
-
-        return found && furthest != null ? Math.max(6f, b.dst(furthest.worldx(), furthest.worldy())) : length;
+        return findShieldLength(b, found != -1 ? Math.max(6f, b.dst(Point2.x(found) * tilesize, Point2.y(found) * tilesize)) : length, absorb);
     }
 
-    public static float findPierceLength(Bullet b, int pierceCap, float length){
-        return findPierceLength(b, pierceCap, b.type.laserAbsorb, length);
-    }
-
-    public static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length){
+    private static float findPierceLength(Bullet b, int pierceCap, boolean laser, float length, boolean absorb){
         vec.trnsExact(b.rotation(), length);
         rect.setPosition(b.x, b.y).setSize(vec.x, vec.y).normalize().grow(3f);
 
@@ -188,7 +215,7 @@ public class Damage{
         if(b.type.collidesGround && b.type.collidesTiles){
             World.raycast(b.tileX(), b.tileY(), World.toTile(b.x + vec.x), World.toTile(b.y + vec.y), (x, y) -> {
                 //add distance to list so it can be processed
-                var build = world.build(x, y);
+                var build = state.world.build(x, y);
 
                 if(build != null && build.team != b.team && build.collide(b) && b.checkUnderBuild(build, x * tilesize, y * tilesize)){
                     distances.add(b.dst(build));
@@ -215,46 +242,121 @@ public class Damage{
 
         //return either the length when not enough things were pierced,
         //or the last pierced object if there were enough blockages
-        return Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+        float result = Math.min(distances.size < pierceCap || pierceCap <= 0 ? length : Math.max(6f, distances.get(pierceCap - 1)), maxDst);
+
+        return findShieldLength(b, result, absorb);
+    }
+
+    /** @return the first point where a segment enters a regular polygon, stored in a shared vector, or null if it doesn't. */
+    public static @Nullable Vec2 raycastRegularPolygon(int sides, float cx, float cy, float radius, float rotation, float x1, float y1, float x2, float y2){
+        if(radius <= 0f) return null;
+
+        if(Intersector.isInRegularPolygon(sides, cx, cy, radius, rotation, x1, y1)){
+            return polyHit.set(x1, y1);
+        }
+
+        float best = Float.MAX_VALUE;
+        for(int i = 0; i < sides; i++){
+            Tmp.v1.trns(rotation + i * 360f / sides, radius).add(cx, cy);
+            Tmp.v2.trns(rotation + (i + 1) * 360f / sides, radius).add(cx, cy);
+
+            if(Intersector.intersectSegments(x1, y1, x2, y2, Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y, Tmp.v3)){
+                float dst = Tmp.v3.dst2(x1, y1);
+                if(dst < best){
+                    best = dst;
+                    polyHit.set(Tmp.v3);
+                }
+            }
+        }
+
+        return best == Float.MAX_VALUE ? null : polyHit;
+    }
+
+    /**
+     * Finds the enemy shields hit by a laser, in order, until one absorbs the rest of its damage.
+     * @param absorb whether to actually apply the hits to the shields; otherwise the first shield is assumed to absorb everything.
+     * If the shields only absorb part of the damage, the bullet's damage is reduced accordingly.
+     * @return the length of the laser, cut short if a shield absorbed it.
+     */
+    public static float findShieldLength(Bullet b, float length, boolean absorb){
+        float damage = b.type.shieldDamage(b);
+        if(!b.type.absorbable || length <= 0f || damage <= 0f) return length;
+
+        seg1.set(b.x, b.y);
+        seg2.trnsExact(b.rotation(), length).add(seg1);
+        rect.setPosition(seg1.x, seg1.y).setSize(seg2.x - seg1.x, seg2.y - seg1.y).normalize();
+
+        var shields = state.indexer.getEnemyShields(b.team, rect.x, rect.y, rect.width, rect.height);
+        for(int i = 0; i < shields.size; i++){
+            Building build = shields.get(i);
+            if(build instanceof ShieldProvider shield){
+                Vec2 hit = shield.intersectLaser(seg1.x, seg1.y, seg2.x, seg2.y, damage);
+                if(hit != null){
+                    shieldHits.add(collidePool.obtain().set(hit.x, hit.y, build));
+                }
+            }
+        }
+
+        var units = Units.enemyShields(b.team, rect.x, rect.y, rect.width, rect.height);
+        for(int i = 0; i < units.size; i++){
+            Unit unit = units.get(i);
+            if(unit.dead) continue;
+
+            for(Ability ability : unit.abilities){
+                if(ability instanceof UnitShieldProvider shield){
+                    Vec2 hit = shield.intersectLaser(unit, seg1.x, seg1.y, seg2.x, seg2.y, damage);
+                    if(hit != null){
+                        shieldHits.add(collidePool.obtain().set(hit.x, hit.y, unit, shield));
+                    }
+                }
+            }
+        }
+
+        float result = length, remaining = damage;
+
+        shieldHits.sort(c -> Mathf.dst2(seg1.x, seg1.y, c.x, c.y));
+        for(int i = 0; i < shieldHits.size; i++){
+            Collided c = shieldHits.get(i);
+
+            float absorbed = remaining;
+            if(absorb){
+                absorbed = c.ability != null ? c.ability.absorbLaser((Unit)c.target, c.x, c.y, remaining) : ((ShieldProvider)c.target).absorbLaser(c.x, c.y, remaining);
+            }
+            remaining -= absorbed;
+
+            if(remaining <= 0f){
+                result = Mathf.dst(seg1.x, seg1.y, c.x, c.y);
+                break;
+            }
+        }
+
+        if(absorb && remaining > 0f && remaining < damage){
+            b.damage *= remaining / damage;
+        }
+
+        collidePool.freeAll(shieldHits);
+        shieldHits.clear();
+
+        return result;
     }
 
     /** Collides a bullet with blocks in a laser, taking into account absorption blocks. Resulting length is stored in the bullet's fdata. */
     public static float collideLaser(Bullet b, float length, boolean large, boolean laser, int pierceCap){
-        float resultLength = findPierceLength(b, pierceCap, laser, length);
+        float resultLength = findPierceLength(b, pierceCap, laser, length, true);
 
-        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap);
+        collideLine(b, b.team, b.x, b.y, b.rotation(), resultLength, large, laser, pierceCap, false);
 
         b.fdata = resultLength;
 
         return resultLength;
     }
 
-    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length){
-        collideLine(hitter, team, x, y, angle, length, false);
-    }
-
     /**
      * Damages entities in a line.
      * Only enemies of the specified team are damaged.
      */
-    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large){
-        collideLine(hitter, team, x, y, angle, length, large, true);
-    }
-
-    /**
-     * Damages entities in a line.
-     * Only enemies of the specified team are damaged.
-     */
-    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser){
-        collideLine(hitter, team, x, y, angle, length, large, laser, -1);
-    }
-
-    /**
-     * Damages entities in a line.
-     * Only enemies of the specified team are damaged.
-     */
-    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap){
-        length = findLength(hitter, length, laser, pierceCap);
+    public static void collideLine(Bullet hitter, Team team, float x, float y, float angle, float length, boolean large, boolean laser, int pierceCap, boolean absorb){
+        length = findLength(hitter, length, laser, pierceCap, absorb);
         hitter.fdata = length;
 
         collidedBlocks.clear();
@@ -264,14 +366,14 @@ public class Damage{
             seg1.set(x, y);
             seg2.set(seg1).add(vec);
             World.raycastEachNoDiagonalWorld(x, y, seg2.x, seg2.y, (cx, cy) -> {
-                Building tile = world.build(cx, cy);
+                Building tile = state.world.build(cx, cy);
                 boolean collide = tile != null && tile.collide(hitter) && hitter.checkUnderBuild(tile, cx * tilesize, cy * tilesize)
                 && ((tile.team != team && tile.collide(hitter)) || hitter.type.testCollision(hitter, tile)) && collidedBlocks.add(tile.pos());
                 if(collide){
                     collided.add(collidePool.obtain().set(cx * tilesize, cy * tilesize, tile));
 
                     for(Point2 p : Geometry.d4){
-                        Tile other = world.tile(p.x + cx, p.y + cy);
+                        Tile other = state.world.tile(p.x + cx, p.y + cy);
                         if(other != null && (large || Intersector.intersectSegmentRectangle(seg1, seg2, other.getBounds(Tmp.r1)))){
                             Building build = other.build;
                             if(build != null && hitter.checkUnderBuild(build, cx * tilesize, cy * tilesize) && collidedBlocks.add(build.pos())){
@@ -337,7 +439,7 @@ public class Damage{
     public static void collidePoint(Bullet hitter, Team team, Effect effect, float x, float y){
 
         if(hitter.type.collidesGround){
-            Building build = world.build(World.toTile(x), World.toTile(y));
+            Building build = state.world.build(World.toTile(x), World.toTile(y));
 
             if(build != null && hitter.damage > 0){
                 float health = build.health;
@@ -373,7 +475,7 @@ public class Damage{
 
         if(hitter.type.collidesGround){
             World.raycastEachWorld(x, y, x + vec.x, y + vec.y, (cx, cy) -> {
-                Building tile = world.build(cx, cy);
+                Building tile = state.world.build(cx, cy);
                 if(tile != null && tile.team != hitter.team){
                     tmpBuilding = tile;
                     return true;
@@ -490,6 +592,7 @@ public class Damage{
             Units.nearby(rect, cons);
         }
     }
+
     /** Damages all entities and blocks in a radius that are enemies of the team. */
     public static void damage(Team team, float x, float y, float radius, float damage, boolean complete){
         damage(team, x, y, radius, damage, complete, true, true);
@@ -554,13 +657,10 @@ public class Damage{
         }
     }
 
-    public static void tileDamage(Team team, int x, int y, float baseRadius, float damage){
-        tileDamage(team, x, y, baseRadius, damage, null);
-    }
-
     public static void tileDamage(Team team, int tx, int ty, float baseRadius, float damage, @Nullable Bullet source){
-        Time.run(0f, () -> {
-            int x = Mathf.clamp(tx, -100, world.width() + 100), y = Mathf.clamp(ty, -100, world.height() + 100);
+        var world = state.world;
+        Vars.state.post(() -> {
+            int x = Mathf.clamp(tx, -100, world.width + 100), y = Mathf.clamp(ty, -100, world.height + 100);
 
             var in = world.build(x, y);
             //spawned inside a multiblock. this means that damage needs to be dealt directly.
@@ -645,7 +745,7 @@ public class Damage{
         int trad = (int)(radius / tilesize);
         for(int dx = -trad; dx <= trad; dx++){
             for(int dy = -trad; dy <= trad; dy++){
-                Tile tile = world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
+                Tile tile = state.world.tile(Math.round(x / tilesize) + dx, Math.round(y / tilesize) + dy);
                 if(tile != null && tile.build != null && (team == null || team != tile.team()) && dx*dx + dy*dy <= trad*trad){
                     tile.build.damage(team, damage);
                 }
@@ -667,6 +767,8 @@ public class Damage{
     public static class Collided implements Pool.Poolable{
         public float x, y;
         public Teamc target;
+        /** Set when the target is a unit hit through one of its shield abilities. */
+        public @Nullable UnitShieldProvider ability;
 
         public Collided set(float x, float y, Teamc target){
             this.x = x;
@@ -675,9 +777,15 @@ public class Damage{
             return this;
         }
 
+        public Collided set(float x, float y, Teamc target, UnitShieldProvider ability){
+            this.ability = ability;
+            return set(x, y, target);
+        }
+
         @Override
         public void reset(){
             target = null;
+            ability = null;
         }
     }
 }

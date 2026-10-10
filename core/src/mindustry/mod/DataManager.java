@@ -3,20 +3,20 @@ package mindustry.mod;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.graphics.*;
 import mindustry.mod.data.*;
 import mindustry.net.*;
+import mindustry.type.*;
 
 public class DataManager{
     private DataPatcher patcher = new DataPatcher();
     private DataImagePacker packer = new DataImagePacker();
     private DataAudioLoader soundLoader = new DataAudioLoader();
     private DataBundleLoader bundleLoader = new DataBundleLoader();
+    private DataEmojiLoader emojiLoader = new DataEmojiLoader();
 
     private ObjectMap<DataAssetType, Seq<DataAsset>> assets = new ObjectMap<>();
     private Seq<DataAsset> orderedAssets = new Seq<>();
@@ -80,9 +80,14 @@ public class DataManager{
         String[] currentHash = {null};
         Fi serverGeneratedDir = Vars.dataDirectory.child("assets/sprites/generated");
 
-        MultiPacker saver = new MultiPacker(false){
+        PackContext saver = new PackContext(){
             @Override
-            public void add(PageType type, String name, PixmapRegion region, int[] splits, int[] pads){
+            public @Nullable PixmapRegion getOrNull(String name){
+                return get(name);
+            }
+
+            @Override
+            public void add(String name, PixmapRegion region, int[] splits, int[] pads, boolean noCrop){
                 try{
                     if(region.pixmap.width > 2000) throw new IllegalArgumentException("Max image size exceeded");
 
@@ -115,16 +120,6 @@ public class DataManager{
             }
 
             @Override
-            public boolean has(PageType type, String name){
-                return has(name);
-            }
-
-            @Override
-            public @Nullable PixmapRegion get(TextureRegion region){
-                return get(((AtlasRegion)region).name);
-            }
-
-            @Override
             public PixmapRegion get(String name){
                 var pix = imagePixmaps.get(name);
                 if(pix != null) return pix;
@@ -149,7 +144,7 @@ public class DataManager{
             currentHash[0] = hashes.get(content);
 
             try{
-               content.createIcons(saver);
+                content.packSprites(saver);
             }catch(Throwable e){
                 Log.err(e);
             }
@@ -161,12 +156,13 @@ public class DataManager{
         if(!Vars.headless && (packed[0] > 0 || forcePack)){
             reloadImages();
 
-            for(var cont : contentToPack){
-                try{
-                    cont.loadIcon();
-                    cont.load();
-                }catch(Exception e){
-                    Log.err("Failed to load icons for " + cont, e);
+            if(!Vars.headless){
+                for(var cont : contentToPack){
+                    try{
+                        cont.load();
+                    }catch(Exception e){
+                        Log.err("Failed to load icons for " + cont, e);
+                    }
                 }
             }
         }
@@ -185,7 +181,7 @@ public class DataManager{
         packer.unload();
         packer.pack(getImages());
 
-        rebuildOrderedAssets();
+        reloadEmojis();
     }
 
     public void reloadImages(Seq<ImageAsset> images){
@@ -213,6 +209,13 @@ public class DataManager{
         rebuildOrderedAssets();
     }
 
+    public void reloadEmojis(){
+        emojiLoader.unload();
+        emojiLoader.load(getEmojis());
+
+        rebuildOrderedAssets();
+    }
+
     public void load(Seq<DataAsset> newAssets){
         unload(); //if already loaded
 
@@ -230,6 +233,7 @@ public class DataManager{
         }
 
         patcher.apply(getPatches(), getContent());
+        emojiLoader.load(getEmojis());
 
         rebuildOrderedAssets();
     }
@@ -241,6 +245,7 @@ public class DataManager{
             packer.unload();
         }
         soundLoader.unload();
+        emojiLoader.unload();
 
         assets.clear();
         orderedAssets.clear();
@@ -326,5 +331,9 @@ public class DataManager{
 
     public Seq<ContentAsset> getContent(){
         return getAssets(DataAssetType.content);
+    }
+
+    public Seq<EmojiAsset> getEmojis(){
+        return getAssets(DataAssetType.emoji);
     }
 }

@@ -13,9 +13,7 @@ import arc.util.io.*;
 import mindustry.ai.*;
 import mindustry.async.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.editor.*;
-import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -23,11 +21,12 @@ import mindustry.graphics.*;
 import mindustry.input.*;
 import mindustry.io.*;
 import mindustry.logic.*;
-import mindustry.maps.Map;
 import mindustry.maps.*;
+import mindustry.maps.Map;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.service.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 import mindustry.world.*;
@@ -50,9 +49,9 @@ public class Vars implements Loadable{
     /** Name of current Steam player. */
     public static String steamPlayerName = "";
     /** Min game version for all mods. */
-    public static final int minModGameVersion = 136;
+    public static final int minModGameVersion = 161;
     /** Min game version for java mods specifically - this is higher, as Java mods have more breaking changes. */
-    public static final int minJavaModGameVersion = 154;
+    public static final int minJavaModGameVersion = 161;
     /** If true, a button to view sector submission threads is shown. */
     public static boolean showSectorSubmissions = false;
     /** If true, the BE server list is always used. */
@@ -62,7 +61,7 @@ public class Vars implements Loadable{
     /** Default accessible content types used for player-selectable icons. */
     public static final ContentType[] defaultContentIcons = {ContentType.item, ContentType.liquid, ContentType.block, ContentType.unit, ContentType.status};
     /** Default rule environment. */
-    public static final int defaultEnv = Env.terrestrial | Env.spores | Env.groundOil | Env.groundWater | Env.oxygen;
+    public static final Environments defaultEnv = Environments.of(Env.terrestrial, Env.spores, Env.groundOil, Env.groundWater, Env.oxygen);
     /** Wall darkness radius. */
     public static final int darkRadius = 4;
     /** Maximum extra padding around deployment schematics. */
@@ -269,7 +268,6 @@ public class Vars implements Loadable{
     public static Net net;
     public static ContentLoader content;
     public static GameState state;
-    public static EntityCollisions collisions;
     public static Waves waves;
     public static Platform platform = new Platform(){};
     public static Mods mods;
@@ -279,19 +277,10 @@ public class Vars implements Loadable{
     public static BaseRegistry bases;
     public static GlobalVars logicVars;
     public static MapEditor editor;
-    public static AvoidanceProcess avoidance;
-    public static PhysicsProcess unitPhysics = new PhysicsProcess();
     public static DataAssetCache assetCache;
     public static GameService service = new GameService();
-
     public static Universe universe;
-    public static World world;
     public static Maps maps;
-    public static WaveSpawner spawner;
-    public static BlockIndexer indexer;
-    public static Pathfinder pathfinder;
-    public static ControlPathfinder controlPath;
-    public static FogControl fogControl;
 
     public static Control control;
     public static Logic logic;
@@ -308,8 +297,24 @@ public class Vars implements Loadable{
         init();
     }
 
+    public static void initDirectories(){
+        if(dataDirectory != null) return;
+        settings.setAppName(appName);
+        dataDirectory = settings.getDataDirectory();
+        screenshotDirectory = dataDirectory.child("screenshots/");
+        customMapDirectory = dataDirectory.child("maps/");
+        mapPreviewDirectory = dataDirectory.child("previews/");
+        saveDirectory = dataDirectory.child("saves/");
+        tmpDirectory = dataDirectory.child("tmp/");
+        modDirectory = dataDirectory.child("mods/");
+        assetCacheDirectory = dataDirectory.child("assetCache");
+        schematicDirectory = dataDirectory.child("schematics/");
+        bebuildDirectory = dataDirectory.child("be_builds/");
+        serverCacheFile = dataDirectory.child("server_list.json");
+    }
+
     public static void init(){
-        Groups.init();
+        initDirectories();
 
         if(loadLocales){
             String[] stra = Core.files.internal("locales").readString().split("\n");
@@ -330,41 +335,23 @@ public class Vars implements Loadable{
         Version.init();
         CacheLayer.init();
 
+
         if(!headless){
             Log.info("[Mindustry] Version: @", Version.buildString());
         }
 
-        dataDirectory = settings.getDataDirectory();
-        screenshotDirectory = dataDirectory.child("screenshots/");
-        customMapDirectory = dataDirectory.child("maps/");
-        mapPreviewDirectory = dataDirectory.child("previews/");
-        saveDirectory = dataDirectory.child("saves/");
-        tmpDirectory = dataDirectory.child("tmp/");
-        modDirectory = dataDirectory.child("mods/");
-        assetCacheDirectory = dataDirectory.child("assetCache");
-        schematicDirectory = dataDirectory.child("schematics/");
-        bebuildDirectory = dataDirectory.child("be_builds/");
-        serverCacheFile = dataDirectory.child("server_list.json");
         emptyMap = new Map(new StringMap());
 
         if(tree == null) tree = new FileTree();
         if(mods == null) mods = new Mods();
 
         content = new ContentLoader();
-        waves = new Waves();
-        collisions = new EntityCollisions();
-        world = new World();
         universe = new Universe();
         becontrol = new BeControl();
         asyncCore = new AsyncCore();
         if(!headless) editor = new MapEditor();
 
         maps = new Maps();
-        spawner = new WaveSpawner();
-        indexer = new BlockIndexer();
-        pathfinder = new Pathfinder();
-        controlPath = new ControlPathfinder();
-        fogControl = new FogControl();
         bases = new BaseRegistry();
         logicVars = new GlobalVars();
         assetCache = new DataAssetCache();
@@ -498,23 +485,32 @@ public class Vars implements Loadable{
 
         //needed to make sure binding values are correct
         Vars.android = app.isAndroid();
-        settings.defaults("locale", "default", "blocksync", true);
-        settings.setAutosave(false);
-        settings.load();
 
-        //this should not be necessary, but in case Binding is initialized before Settings#load(), do that here
-        for(KeyBind bind : KeyBind.all){
-            bind.load();
+        if(!headless){
+            settings.defaults("locale", "default");
+            settings.setAutosave(false);
+            settings.load();
+
+            //this should not be necessary, but in case Binding is initialized before Settings#load(), do that here
+            for(KeyBind bind : KeyBind.all){
+                bind.load();
+            }
+
+            Binding.init();
         }
 
-        Binding.init();
-
         //https://github.com/Anuken/Mindustry/issues/8483
-        if(settings.getInt("uiscale") == 5){
+        if(!headless && settings.getInt("uiscale") == 5){
             settings.put("uiscale", 100);
         }
 
-        Scl.setProduct(Math.max(settings.getInt("uiscale", 100), 25) / 100f);
+        //when the backend reports raw pixels as the screen size (HdpiMode.pixels), everything must be scaled up by the pixel density, or the UI/world just gets smaller on hidpi displays
+        float density = 1f;
+        if(!headless && Core.graphics != null && app.isDesktop() && Core.graphics.getWidth() == Core.graphics.getBackBufferWidth()){
+            density = Math.max(Core.graphics.getDensity(), 1f);
+        }
+
+        Scl.setProduct(Math.max(settings.getInt("uiscale", 100), 25) / 100f * density);
 
         if(!loadLocales) return;
 
@@ -528,7 +524,7 @@ public class Vars implements Loadable{
             Log.info("NOTE: external translation bundle has been loaded.");
 
             if(!headless){
-                Time.run(10f, () -> ui.showInfo(Core.bundle.format("bundle.external", handle.absolutePath())));
+                Vars.state.run(10f, () -> ui.showInfo(Core.bundle.format("bundle.external", handle.absolutePath())));
             }
         }catch(Throwable e){
             //no external bundle found

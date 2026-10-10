@@ -6,6 +6,7 @@ import arc.Input.*;
 import arc.assets.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
@@ -165,7 +166,14 @@ public class UI implements ApplicationListener, Loadable{
         Events.fire(Trigger.uiDrawBegin);
 
         Core.scene.act();
+
+        //force linear filtering for UI
+        TextureFilter prevMin = Core.atlas.getTexture().getMinFilter(), prevMax = Core.atlas.getTexture().getMagFilter();
+        Core.atlas.getTexture().setFilter(TextureFilter.linear);
+
         Core.scene.draw();
+
+        Core.atlas.getTexture().setFilter(prevMin, prevMax);
 
         if(Core.input.keyTap(KeyCode.mouseLeft) && Core.scene.hasField()){
             Element e = Core.scene.getHoverElement();

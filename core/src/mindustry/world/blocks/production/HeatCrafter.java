@@ -33,8 +33,8 @@ public class HeatCrafter extends GenericCrafter{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
         stats.add(Stat.maxEfficiency, (int)(maxEfficiency * 100f), StatUnit.percent);
@@ -79,8 +79,8 @@ public class HeatCrafter extends GenericCrafter{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.heat) return heat;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return heat;
             return super.sense(sensor);
         }
 

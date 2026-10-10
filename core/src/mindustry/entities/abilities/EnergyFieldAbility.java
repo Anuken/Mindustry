@@ -8,6 +8,7 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -87,16 +88,16 @@ public class EnergyFieldAbility extends Ability{
         Draw.color(color);
         Tmp.v1.trns(unit.rotation - 90, x, y).add(unit.x, unit.y);
         float rx = Tmp.v1.x, ry = Tmp.v1.y;
-        float orbRadius = effectRadius * (1f + Mathf.absin(blinkScl, blinkSize));
+        float orbRadius = effectRadius * (1f + Mathf.absin(Vars.state.time, blinkScl, blinkSize));
 
         Fill.circle(rx, ry, orbRadius);
         Draw.color();
         Fill.circle(rx, ry, orbRadius / 2f);
 
-        Lines.stroke((0.7f + Mathf.absin(blinkScl, 0.7f)), color);
+        Lines.stroke((0.7f + Mathf.absin(Vars.state.time, blinkScl, 0.7f)), color);
 
         for(int i = 0; i < sectors; i++){
-            float rot = unit.rotation + i * 360f/sectors - Time.time * rotateSpeed;
+            float rot = unit.rotation + i * 360f/sectors - Vars.state.time * rotateSpeed;
             Lines.arc(rx, ry, orbRadius + 3f, sectorRad, rot);
         }
 
@@ -104,7 +105,7 @@ public class EnergyFieldAbility extends Ability{
 
         if(curStroke > 0){
             for(int i = 0; i < sectors; i++){
-                float rot = unit.rotation + i * 360f/sectors + Time.time * rotateSpeed;
+                float rot = unit.rotation + i * 360f/sectors + Vars.state.time * rotateSpeed;
                 Lines.arc(rx, ry, range, sectorRad, rot);
             }
         }

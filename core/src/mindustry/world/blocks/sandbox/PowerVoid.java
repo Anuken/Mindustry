@@ -8,13 +8,13 @@ public class PowerVoid extends PowerBlock{
     public PowerVoid(String name){
         super(name);
         consumePower(Float.MAX_VALUE);
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
         enableDrawStatus = false;
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.remove(Stat.powerUse);
     }
 }

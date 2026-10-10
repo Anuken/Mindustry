@@ -13,7 +13,7 @@ public class PowerSource extends PowerNode{
         consumesPower = false;
         drawDisabled = true;
         //TODO maybe don't?
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
     }
 
     public class PowerSourceBuild extends PowerNodeBuild{

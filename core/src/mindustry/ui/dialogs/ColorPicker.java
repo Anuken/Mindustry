@@ -2,7 +2,6 @@ package mindustry.ui.dialogs;
 
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.scene.*;
 import arc.scene.ui.*;

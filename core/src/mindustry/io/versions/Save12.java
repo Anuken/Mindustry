@@ -19,7 +19,7 @@ public class Save12 extends SaveVersion{
     }
 
     @Override
-    public void readDataPatches(DataInput stream, SaveReadState saveState) throws IOException{
+    public void readDataPatches(DataInput stream, SaveLoadContext saveState) throws IOException{
         stream.readInt(); //version - ignored for now
 
         Seq<DataAsset> assets = new Seq<>();

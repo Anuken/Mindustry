@@ -382,7 +382,7 @@ public class Menus{
     //internal use only
     @Remote(variants = Variant.both)
     public static void removeWorldLabel(int id){
-        var label = Groups.sync.getByID(id);
+        var label = state.entities.sync.getByID(id);
         if(label instanceof WorldLabelc){
             label.remove();
         }

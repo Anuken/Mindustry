@@ -3,6 +3,7 @@ package mindustry.ui.fragments;
 import arc.*;
 import arc.Input.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.*;
@@ -216,8 +217,8 @@ public class ConsoleFragment extends Table{
         "var team = Vars.player.team();" +
         "var core = Vars.player.core();" +
         "var items = Vars.player.team().items();" +
-        "var build = Vars.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
-        "var cursor = Vars.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var build = Vars.state.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
+        "var cursor = Vars.state.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());" +
         "var cursorUnit = Units.closestEnemy(null, Core.input.mouseWorldX(), Core.input.mouseWorldY(), 70, u => true);" +
         "\n";
     }

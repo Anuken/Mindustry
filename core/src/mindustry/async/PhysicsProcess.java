@@ -125,19 +125,9 @@ public class PhysicsProcess implements AsyncProcess{
     }
 
     @Override
-    public void reset(){
-        if(physics != null){
-            refs.clear();
-            futures.clear();
-            physics = null;
-        }
-    }
-
-    @Override
     public void init(){
-        reset();
 
-        Rect bounds = Vars.world.getQuadBounds(new Rect());
+        Rect bounds = Vars.state.world.getQuadBounds(new Rect());
         physics = new PhysicsWorld[layers];
         for(int i = 0; i < layers; i++){
             physics[i] = new PhysicsWorld(bounds);

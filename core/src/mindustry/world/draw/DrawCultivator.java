@@ -3,7 +3,7 @@ package mindustry.world.draw;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -28,7 +28,7 @@ public class DrawCultivator extends DrawBlock{
         rand.setSeed(build.pos());
         for(int i = 0; i < bubbles; i++){
             float rx = rand.range(spread), ry = rand.range(spread);
-            float life = 1f - ((Time.time / timeScl + rand.random(recurrence)) % recurrence);
+            float life = 1f - ((Vars.state.time / timeScl + rand.random(recurrence)) % recurrence);
 
             if(life > 0){
                 Lines.stroke(build.warmup() * (life + strokeMin));

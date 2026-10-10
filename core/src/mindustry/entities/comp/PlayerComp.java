@@ -2,6 +2,7 @@ package mindustry.entities.comp;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -373,7 +374,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
 
         Draw.z(Layer.playerName);
         float z = Drawf.text();
-        float hover = Mathf.absin(5f, 1f);
+        float hover = Mathf.absin(Vars.state.time, 5f, 1f);
         float scaling = 1f + Mathf.clamp(Interp.pow5In.apply(Mathf.map(pingTime, 1f, 0.96f, 1f, 0f))) * 3f;
 
         Drawf.square(pingX, pingY, 2f * scaling * s, 45f, Tmp.c1, Tmp.c3.set(Color.darkGray).mul(color).a(Tmp.c1.a), s);
@@ -429,7 +430,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
         }
 
         if(Core.settings.getBool("playerchat") && ((textFadeTime > 0 && lastText != null) || typing)){
-            String text = textFadeTime <= 0 || lastText == null ? "[lightgray]" + Strings.animated(Time.time, 4, 15f, ".") : lastText;
+            String text = textFadeTime <= 0 || lastText == null ? "[lightgray]" + Strings.animated(Vars.state.time, 4, 15f, ".") : lastText;
             float width = 100f;
             float visualFadeTime = 1f - Mathf.curve(1f - textFadeTime, 0.9f);
             font.setColor(1f, 1f, 1f, textFadeTime <= 0 || lastText == null ? 1f : visualFadeTime);

@@ -5,8 +5,8 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -17,7 +17,7 @@ import mindustry.world.meta.*;
 import static mindustry.entities.Puddles.*;
 
 /** A better name for this class would be "fluid", but it's too late for that. */
-public class Liquid extends UnlockableContent implements Senseable{
+public class Liquid extends UnlockableContent implements LogicSenseable{
     //must be static and global so conduits don't conflict - DO NOT INTERACT WITH THESE IN MODS OR I WILL PERSONALLY YELL AT YOU
     public static final int animationFrames = 50;
     public static float animationScaleGas = 190f, animationScaleLiquid = 230f;
@@ -104,7 +104,7 @@ public class Liquid extends UnlockableContent implements Senseable{
     }
 
     public int getAnimationFrame(){
-        return (int)(Time.time / (gas ? animationScaleGas : animationScaleLiquid) * animationFrames + id*5) % animationFrames;
+        return (int)(Vars.state.time / (gas ? animationScaleGas : animationScaleLiquid) * animationFrames + id*5) % animationFrames;
     }
 
     /** @return true if this liquid will boil in this global environment. */
@@ -127,7 +127,7 @@ public class Liquid extends UnlockableContent implements Senseable{
         float smag = puddle.tile.floor().isLiquid ? 0.8f : 0f, sscl = 25f;
 
         Draw.color(Tmp.c1.set(color).shiftValue(-0.05f));
-        Fill.circle(x + Mathf.sin(Time.time + id * 532, sscl, smag), y + Mathf.sin(Time.time + id * 53, sscl, smag), f * 8f);
+        Fill.circle(x + Mathf.sin(Vars.state.time + id * 532, sscl, smag), y + Mathf.sin(Vars.state.time + id * 53, sscl, smag), f * 8f);
 
         float length = f * 6f;
         rand.setSeed(id);
@@ -136,8 +136,8 @@ public class Liquid extends UnlockableContent implements Senseable{
             float vx = x + Tmp.v1.x, vy = y + Tmp.v1.y;
 
             Fill.circle(
-            vx + Mathf.sin(Time.time + i * 532, sscl, smag),
-            vy + Mathf.sin(Time.time + i * 53, sscl, smag),
+            vx + Mathf.sin(Vars.state.time + i * 532, sscl, smag),
+            vy + Mathf.sin(Vars.state.time + i * 53, sscl, smag),
             f * 5f);
         }
 
@@ -159,7 +159,7 @@ public class Liquid extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.addPercent(Stat.explosiveness, explosiveness);
         stats.addPercent(Stat.flammability, flammability);
         stats.addPercent(Stat.temperature, temperature);
@@ -168,15 +168,15 @@ public class Liquid extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
-        if(sensor == LAccess.color) return color.toDoubleBits();
-        if(sensor == LAccess.id) return getLogicId();
+    public double sense(LogicProp sensor){
+        if(sensor == LogicProp.color) return color.toDoubleBits();
+        if(sensor == LogicProp.id) return getLogicId();
         return Double.NaN;
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
         return noSensed;
     }
 

@@ -23,7 +23,7 @@ public class PowerDiode extends Block{
         group = BlockGroup.power;
         noUpdateDisabled = true;
         schematicPriority = 10;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
     }
 
     @Override

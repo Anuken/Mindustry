@@ -1,8 +1,9 @@
 package mindustry.world.blocks.distribution;
 
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -27,8 +28,8 @@ public class Junction extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         //(60f / speed * capacity) returns 13.84 which is not the actual value (non linear, depends on fps)
         stats.add(Stat.itemsMoved, displayedSpeed, StatUnit.itemsSecond);
@@ -59,7 +60,7 @@ public class Junction extends Block{
                     long l = buffer.buffers[i][0];
                     float time = BufferItem.time(l);
 
-                    if(Time.time >= time + speed / timeScale || Time.time < time){
+                    if(Vars.state.time >= time + speed / timeScale || Vars.state.time < time){
 
                         Item item = content.item(BufferItem.item(l));
                         Building dest = nearby(i);

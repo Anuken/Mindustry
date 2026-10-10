@@ -1,6 +1,6 @@
 package mindustry.graphics.g3d;
 
-import arc.graphics.gl.*;
+import arc.graphics.*;
 import arc.math.geom.*;
 import mindustry.graphics.*;
 import mindustry.type.*;

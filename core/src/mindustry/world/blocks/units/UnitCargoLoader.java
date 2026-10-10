@@ -5,7 +5,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -13,6 +12,7 @@ import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -96,7 +96,7 @@ public class UnitCargoLoader extends Block{
             }
 
             if(readUnitId != -1){
-                unit = Groups.unit.getByID(readUnitId);
+                unit = state.entities.unit.getByID(readUnitId);
                 if(unit != null || !net.client()){
                     readUnitId = -1;
                 }
@@ -154,7 +154,7 @@ public class UnitCargoLoader extends Block{
                 Draw.z(Layer.bullet - 0.01f);
                 Draw.color(polyColor);
                 Lines.stroke(polyStroke * readyness);
-                Lines.poly(x, y, polySides, polyRadius, Time.time * polyRotateSpeed);
+                Lines.poly(x, y, polySides, polyRadius, Vars.state.time * polyRotateSpeed);
                 Draw.reset();
                 Draw.z(Layer.block);
             }

@@ -27,7 +27,7 @@ public class Build{
             return;
         }
 
-        Tile tile = world.tileBuilding(x, y);
+        Tile tile = state.world.tileBuilding(x, y);
         //this should never happen, but it doesn't hurt to check for links
         float prevPercent = 1f;
 
@@ -73,7 +73,7 @@ public class Build{
             return;
         }
 
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
 
         //just in case
         if(tile == null) return;
@@ -103,11 +103,11 @@ public class Build{
             tile.build.checkAllowUpdate();
             tile.build.updateProximity();
             tile.build.onRepaired();
-            world.tileChanges ++; //repair should count as a tile change
+            state.world.tileChanges ++; //repair should count as a tile change
 
             if(unit != null && unit.getControllerName() != null) tile.build.lastAccessed = unit.getControllerName();
 
-            if(fogControl.isVisibleTile(team, tile.x, tile.y)){
+            if(state.fog.isVisibleTile(team, tile.x, tile.y)){
                 result.placeEffect.at(tile.drawx(), tile.drawy(), result.size);
                 Fx.rotateBlock.at(tile.build.x, tile.build.y, tile.build.block.size);
                 ConstructBlock.playRepairSound(team, tile);
@@ -176,7 +176,10 @@ public class Build{
 
     /** @return whether a tile can be placed at this location by this team. */
     public static boolean checkNoUnitOverlap(Block type, int x, int y){
-        return (!type.solid && !type.solidifes) || !Units.anyEntities(x * tilesize + type.offset - type.size * tilesize / 2f, y * tilesize + type.offset - type.size * tilesize / 2f, type.size * tilesize, type.size * tilesize);
+        //TODO: no clean way of checking "does this unit consider this block type impassable"
+        return !Units.anyEntities(x * tilesize + type.offset - type.size * tilesize / 2f, y * tilesize + type.offset - type.size * tilesize / 2f, type.size * tilesize, type.size * tilesize, unit ->
+            unit.isGrounded() && (unit instanceof WaterMovec || unit instanceof WaterCrawlc || (!unit.type.allowLegStep && !(unit instanceof Crawlc) && (type.solid || type.solidifes)))
+        );
     }
 
     /** @return whether a tile can be placed at this location by this team. Ignores units at this location. */
@@ -212,7 +215,7 @@ public class Build{
             }
         }
 
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
 
         if(tile == null) return false;
 
@@ -226,7 +229,7 @@ public class Build{
         }
 
         //campaign darkness check
-        if(!type.ignoreBuildDarkness && world.getDarkness(x, y) >= 3){
+        if(!type.ignoreBuildDarkness && state.world.getDarkness(x, y) >= 3){
             return false;
         }
 
@@ -244,12 +247,12 @@ public class Build{
             for(int dy = 0; dy < type.size; dy++){
                 int wx = dx + offsetx + tile.x, wy = dy + offsety + tile.y;
 
-                Tile check = world.tile(wx, wy);
+                Tile check = state.world.tile(wx, wy);
 
                 if(
                 check == null || //nothing there
-                (type.size == 2 && world.getDarkness(wx, wy) >= 3) ||
-                (state.rules.staticFog && state.rules.fog && !fogControl.isDiscovered(team, wx, wy)) ||
+                (type.size == 2 && state.world.getDarkness(wx, wy) >= 3) ||
+                (state.rules.staticFog && state.rules.fog && !state.fog.isDiscovered(team, wx, wy)) ||
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
                 (!state.rules.derelictRepair && check.team() == Team.derelict && check.build != null) ||
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate && !((type == check.block && team != Team.derelict && check.team() == Team.derelict))) || //same block, same rotation
@@ -273,18 +276,18 @@ public class Build{
     }
 
     public static @Nullable Building getEnemyOverlap(Block block, Team team, int x, int y){
-        return indexer.findEnemyTile(team, x * tilesize + block.size, y * tilesize + block.size, block.placeOverlapRange + 4f, b -> b.team.rules().checkPlacement);
+        return state.indexer.findEnemyTile(team, x * tilesize + block.size, y * tilesize + block.size, block.placeOverlapRange + 4f, b -> b.team.rules().checkPlacement);
     }
 
     public static boolean contactsGround(int x, int y, Block block){
         if(block.isMultiblock()){
             for(Point2 point : Edges.getEdges(block.size)){
-                Tile tile = world.tile(x + point.x, y + point.y);
+                Tile tile = state.world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isLiquid) return true;
             }
         }else{
             for(Point2 point : Geometry.d4){
-                Tile tile = world.tile(x + point.x, y + point.y);
+                Tile tile = state.world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isLiquid) return true;
             }
         }
@@ -294,20 +297,20 @@ public class Build{
     public static boolean contactsShallows(int x, int y, Block block){
         if(block.isMultiblock()){
             for(Point2 point : block.getInsideEdges()){
-                Tile tile = world.tile(x + point.x, y + point.y);
+                Tile tile = state.world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isDeep()) return true;
             }
 
             for(Point2 point : block.getEdges()){
-                Tile tile = world.tile(x + point.x, y + point.y);
+                Tile tile = state.world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isDeep()) return true;
             }
         }else{
             for(Point2 point : Geometry.d4){
-                Tile tile = world.tile(x + point.x, y + point.y);
+                Tile tile = state.world.tile(x + point.x, y + point.y);
                 if(tile != null && !tile.floor().isDeep()) return true;
             }
-            Tile tile = world.tile(x, y);
+            Tile tile = state.world.tile(x, y);
             return tile != null && !tile.floor().isDeep();
         }
         return false;
@@ -315,7 +318,7 @@ public class Build{
 
     /** @return whether the tile at this position is breakable by this team */
     public static boolean validBreak(Team team, int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         return tile != null && tile.block() != Blocks.air && (tile.block().canBreak(tile) && (tile.breakable() || state.rules.allowEnvironmentDeconstruct)) && tile.interactable(team);
     }
 }

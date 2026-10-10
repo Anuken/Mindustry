@@ -90,8 +90,8 @@ public class BaseTurret extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
         if(activationTime > 0) stats.add(Stat.activationTime, activationTime / 60f, StatUnit.seconds);

@@ -6,7 +6,6 @@ import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.type.*;
@@ -51,6 +50,14 @@ public class UnitStance extends MappableContent{
 
         for(var command : incompatibleCommands){
             incompatibleCommandBits.set(command.id);
+        }
+    }
+
+    @Override
+    public void removeContent(){
+        super.removeContent();
+        for(var stance : Vars.content.unitStances()){
+            stance.incompatibleStanceBits.clear(id);
         }
     }
 

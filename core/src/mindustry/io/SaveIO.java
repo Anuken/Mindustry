@@ -115,15 +115,15 @@ public class SaveIO{
         return file.sibling(file.name() + "-backup." + file.extension());
     }
 
-    public static void write(Fi file, SaveOptions options){
+    public static void write(Fi file, SaveOptions options) throws Throwable{
         write(new FastDeflaterOutputStream(file.write(false, bufferSize)), options);
     }
 
-    public static void write(Fi file){
+    public static void write(Fi file) throws Throwable{
         write(file, new SaveOptions());
     }
 
-    public static void write(OutputStream os, SaveOptions options){
+    public static void write(OutputStream os, SaveOptions options) throws Throwable{
         try(DataOutputStream stream = new DataOutputStream(os)){
             Events.fire(new SaveWriteEvent());
             SaveVersion ver = getVersion();
@@ -131,36 +131,34 @@ public class SaveIO{
             stream.write(header);
             stream.writeInt(ver.version);
             ver.write(stream, options);
-        }catch(Throwable e){
-            throw new RuntimeException(e);
         }
     }
 
-    public static void load(String saveName) throws SaveException{
+    public static void load(String saveName) throws SaveLoadException{
         load(saveDirectory.child(saveName + ".msav"));
     }
 
-    public static void load(Fi file) throws SaveException{
-        load(file, world.context);
+    public static void load(Fi file) throws SaveLoadException{
+        load(file, new DefaultWorldContext());
     }
 
-    public static void load(Fi file, WorldContext context) throws SaveException{
+    public static void load(Fi file, SaveLoadContext context) throws SaveLoadException{
         try{
             //try and load; if any exception at all occurs
             load(new InflaterInputStream(file.read(bufferSize)), context);
-        }catch(SaveException e){
+        }catch(SaveLoadException e){
             Log.err(e);
             Fi backup = file.sibling(file.name() + "-backup." + file.extension());
             if(backup.exists()){
                 load(new InflaterInputStream(backup.read(bufferSize)), context);
             }else{
-                throw new SaveException(e.getCause());
+                throw new SaveLoadException(e.getCause());
             }
         }
     }
 
     /** Loads from a deflated (!) input stream. */
-    public static void load(InputStream is, WorldContext context) throws SaveException{
+    public static void load(InputStream is, SaveLoadContext context) throws SaveLoadException{
         try(CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)){
             logic.reset();
             readHeader(stream);
@@ -169,7 +167,7 @@ public class SaveIO{
 
             if(ver == null) throw new IOException("Unknown save version: " + version + ". Are you trying to load a save from a newer version?");
 
-            ver.read(stream, counter, new SaveReadState(context));
+            ver.read(stream, counter, context);
             Events.fire(new SaveLoadEvent(context.isMap()));
 
             //this gets handled elsewhere when starting a new game or loading a sector
@@ -177,10 +175,7 @@ public class SaveIO{
                 Events.fire(new RulesLoadEvent(state.rules, true));
             }
         }catch(Throwable e){
-            throw new SaveException(e);
-        }finally{
-            world.setGenerating(false);
-            content.setTemporaryMapper(null);
+            throw new SaveLoadException(e);
         }
     }
 
@@ -196,9 +191,19 @@ public class SaveIO{
         }
     }
 
-    public static class SaveException extends RuntimeException{
-        public SaveException(Throwable throwable){
+    /** Thrown when map or save loading fails. This is a checked exception; failing a map load should not crash the game! */
+    public static class SaveLoadException extends Exception{
+
+        public SaveLoadException(Throwable throwable){
             super(throwable);
+        }
+
+        public SaveLoadException(String message){
+            super(message);
+        }
+
+        public SaveLoadException(String message, Throwable cause){
+            super(message, cause);
         }
     }
 }

@@ -31,15 +31,15 @@ public class OverflowDuct extends Block{
         rotate = true;
         underBullets = true;
         priority = TargetPriority.transport;
-        envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        envEnabled = Environments.of(Env.space, Env.terrestrial, Env.underwater);
         regionRotated1 = 1;
         drawCached = true;
         drawDynamic = false;
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
     }

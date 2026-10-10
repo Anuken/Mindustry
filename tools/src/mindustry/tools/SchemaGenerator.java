@@ -12,11 +12,10 @@ import com.github.javaparser.*;
 import com.github.javaparser.ast.body.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.game.Objectives.*;
 import mindustry.game.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -51,7 +50,7 @@ public class SchemaGenerator{
             }
         }
         root.put("mappings", mappings);
-        outputDir.child("allContent.json").writeString(root.toString(Jformat.formatted));
+        outputDir.child("allContent.json").writeString(root.toString(Jformat.jsonFormatted));
     }
 
     //called from ScriptMainGenerator
@@ -74,8 +73,8 @@ public class SchemaGenerator{
             val.put("superclass", type.getSuperclass().getCanonicalName());
         }
 
-        if(Objective.class.isAssignableFrom(type)){
-            val.put("superclass", Objective.class.getCanonicalName());
+        if(UnlockCondition.class.isAssignableFrom(type)){
+            val.put("superclass", UnlockCondition.class.getCanonicalName());
         }
 
         if(typeDec.getJavadoc().isPresent()){
@@ -113,7 +112,7 @@ public class SchemaGenerator{
             injector.get(val);
         }
 
-        outputDir.child(type.getCanonicalName() + ".json").writeString(val.toString(Jformat.formatted));
+        outputDir.child(type.getCanonicalName() + ".json").writeString(val.toString(Jformat.jsonFormatted));
     }
 
     //writes a schema for an enum type the first time it's encountered as a field value; subsequent calls are no-ops
@@ -134,7 +133,7 @@ public class SchemaGenerator{
         }
         val.put("values", values);
 
-        outputDir.child(enumType.getCanonicalName() + ".json").writeString(val.toString(Jformat.formatted));
+        outputDir.child(enumType.getCanonicalName() + ".json").writeString(val.toString(Jformat.jsonFormatted));
     }
 
     //registers an injector adding/overwriting fields on type's generated schema, for JSON keys with no real backing field

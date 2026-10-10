@@ -10,7 +10,7 @@ public class ErekirUnitType extends UnitType{
     public ErekirUnitType(String name){
         super(name);
         outlineColor = Pal.darkOutline;
-        envDisabled = Env.space;
+        envDisabled = Environments.of(Env.space);
         researchCostMultiplier = 10f;
     }
 }

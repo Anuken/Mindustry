@@ -66,7 +66,7 @@ public class OverlayRenderer{
         }
 
         //if this is laggy, it could be shoved in another thread.
-        var result = Voronoi.generate(pos.toArray(Vec2.class), 0, world.unitWidth(), 0, world.unitHeight());
+        var result = Voronoi.generate(pos.toArray(Vec2.class), 0, state.world.unitWidth, 0, state.world.unitHeight);
         for(var edge : result){
             cedges.add(new CoreEdge(edge.x1, edge.y1, edge.x2, edge.y2, teams.get(edge.site1).team, teams.get(edge.site2).team));
         }
@@ -92,7 +92,7 @@ public class OverlayRenderer{
 
         if(!player.dead() && ui.hudfrag.shown()){
             if(Core.settings.getBool("playerindicators")){
-                for(Player player : Groups.player){
+                for(Player player : state.entities.player){
                     if(Vars.player != player && Vars.player.team() == player.team()){
                         if(!rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                         .setCenter(Core.camera.position.x, Core.camera.position.y).contains(player.x, player.y)){
@@ -108,7 +108,7 @@ public class OverlayRenderer{
             }
 
             if(Core.settings.getBool("indicators") && !state.rules.fog){
-                Groups.unit.each(unit -> {
+                state.entities.unit.each(unit -> {
                     if(!unit.isLocal() && unit.team != player.team() && !rect.setSize(Core.camera.width * 0.9f, Core.camera.height * 0.9f)
                     .setCenter(Core.camera.position.x, Core.camera.position.y).contains(unit.x, unit.y)){
                         Tmp.v1.set(unit.x, unit.y).sub(player).setLength(indicatorLength);
@@ -142,7 +142,7 @@ public class OverlayRenderer{
             }
 
             for(int i = 0; i < 4; i++){
-                float rot = i * 90f + 45f + (-Time.time) % 360f;
+                float rot = i * 90f + 45f + (-Vars.state.time) % 360f;
                 float length = select.hitSize() * 1.5f + (unitFade * 2.5f);
                 Draw.rect("select-arrow", select.getX() + Angles.trnsx(rot, length), select.getY() + Angles.trnsy(rot, length), length / 1.9f, length / 1.9f, rot - 135f);
             }
@@ -176,7 +176,7 @@ public class OverlayRenderer{
                     for(CoreEdge edge : cedges){
                         Team displayed = edge.displayed();
                         if(displayed != null){
-                            Draw.color(i == 0 ? Color.darkGray : Tmp.c1.set(displayed.color).lerp(Pal.accent, Mathf.absin(Time.time, 10f, 0.2f)));
+                            Draw.color(i == 0 ? Color.darkGray : Tmp.c1.set(displayed.color).lerp(Pal.accent, Mathf.absin(Vars.state.time, 10f, 0.2f)));
                             Lines.line(edge.x1, edge.y1 + offset, edge.x2, edge.y2 + offset);
                         }
                     }
@@ -190,7 +190,7 @@ public class OverlayRenderer{
                     if(/*core.wasVisible && */br > 0f && Core.camera.bounds(Tmp.r1).overlaps(Tmp.r2.setCentered(core.x, core.y, br * 2f))){
                         Draw.color(Color.darkGray);
                         Lines.circle(core.x, core.y - 2,br);
-                        Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Time.time, 10f, 0.5f));
+                        Draw.color(Pal.accent, core.team.color, 0.5f + Mathf.absin(Vars.state.time, 10f, 0.5f));
                         Lines.circle(core.x, core.y, br);
                     }
                 });
@@ -198,10 +198,10 @@ public class OverlayRenderer{
         }
 
         Lines.stroke(2f);
-        Draw.color(Color.gray, Color.lightGray, Mathf.absin(Time.time, 8f, 1f));
+        Draw.color(Color.gray, Color.lightGray, Mathf.absin(Vars.state.time, 8f, 1f));
 
         if(state.hasSpawns()){
-            for(Tile tile : spawner.getSpawns()){
+            for(Tile tile : state.spawner.getSpawns()){
                 if(tile.within(player.x, player.y, state.rules.dropZoneRadius + spawnerMargin)){
                     Draw.alpha(Mathf.clamp(1f - (player.dst(tile) - state.rules.dropZoneRadius) / spawnerMargin));
                     Lines.dashCircle(tile.worldx(), tile.worldy(), state.rules.dropZoneRadius);
@@ -214,7 +214,7 @@ public class OverlayRenderer{
         //draw selected block
         if(input.block == null && !Core.scene.hasMouse()){
             Vec2 vec = Core.input.mouseWorld(input.getMouseX(), input.getMouseY());
-            Building build = world.buildWorld(vec.x, vec.y);
+            Building build = state.world.buildWorld(vec.x, vec.y);
 
             if(build != null && build.team == player.team()){
                 build.drawSelect();
@@ -224,7 +224,7 @@ public class OverlayRenderer{
 
                 if(Core.input.keyDown(Binding.rotatePlaced) && build.block.rotate && build.block.quickRotate && build.interactable(player.team())){
                     control.input.drawArrow(build.block, build.tileX(), build.tileY(), build.rotation, true);
-                    Draw.color(Pal.accent, 0.3f + Mathf.absin(4f, 0.2f));
+                    Draw.color(Pal.accent, 0.3f + Mathf.absin(Vars.state.time, 4f, 0.2f));
                     Fill.square(build.x, build.y, build.block.size * tilesize/2f);
                     Draw.color();
                 }
@@ -247,19 +247,19 @@ public class OverlayRenderer{
             float size = 8;
             Draw.rect(player.unit().item().fullIcon, v.x, v.y, size, size);
             Draw.color(Pal.accent);
-            Lines.circle(v.x, v.y, 6 + Mathf.absin(Time.time, 5f, 1f));
+            Lines.circle(v.x, v.y, 6 + Mathf.absin(Vars.state.time, 5f, 1f));
             Draw.reset();
 
-            Building build = world.buildWorld(v.x, v.y);
+            Building build = state.world.buildWorld(v.x, v.y);
             if(input.canDropItem() && build != null && build.interactable(player.team()) && build.acceptStack(player.unit().item(), player.unit().stack.amount, player.unit()) > 0 && player.within(build, itemTransferRange) &&
                 input.canDepositItem(build)){
 
                 boolean invalid = !build.allowDeposit();
 
                 Lines.stroke(3f, Pal.gray);
-                Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 3 + Mathf.absin(Time.time, 5f, 1f));
+                Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 3 + Mathf.absin(Vars.state.time, 5f, 1f));
                 Lines.stroke(1f, invalid ? Pal.remove : Pal.place);
-                Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 2 + Mathf.absin(Time.time, 5f, 1f));
+                Lines.square(build.x, build.y, build.block.size * tilesize / 2f + 2 + Mathf.absin(Vars.state.time, 5f, 1f));
                 Draw.reset();
 
                 if(invalid){

@@ -20,7 +20,6 @@ import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.GameState.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.abilities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
@@ -610,7 +609,7 @@ public class HudFragment{
                     });
                     co.addListener(new HandCursorListener());
                 })
-                .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Time.time, 2f, 1f))), true,
+                .update(label -> label.color.set(Color.orange).lerp(Color.scarlet, Mathf.absin(Vars.state.time, 2f, 1f))), true,
                 () -> {
                     if(state.isMenu() || !player.team().data().hasCore()){
                         coreAttackTime = 0f;
@@ -660,9 +659,9 @@ public class HudFragment{
             t.name = "nearpoint";
             t.touchable = Touchable.disabled;
             t.table(Styles.black6, c -> c.add("@nearpoint")
-            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Time.time, 10f, 1f))))
+            .update(l -> l.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(Vars.state.time, 10f, 1f))))
             .labelAlign(Align.center, Align.center))
-            .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(spawner.playerNear()), 0.1f)).get().color.a = 0f;
+            .margin(6).update(u -> u.color.a = Mathf.lerpDelta(u.color.a, Mathf.num(state.spawner.playerNear()), 0.1f)).get().color.a = 0f;
         });
 
         //'saving' indicator
@@ -1146,7 +1145,7 @@ public class HudFragment{
             }
 
             if(state.rules.waveTimer){
-                builder.append((logic.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : (waitingf.get((int)(state.wavetime/60)))));
+                builder.append((Vars.state.isWaitingWave() ? Core.bundle.get("wave.waveInProgress") : (waitingf.get((int)(state.wavetime/60)))));
             }else if(state.enemies == 0){
                 builder.append(Core.bundle.get("waiting"));
             }
@@ -1232,7 +1231,7 @@ public class HudFragment{
     }
 
     private boolean canSkipWave(){
-        return state.rules.waves && state.rules.waveSending && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !spawner.isSpawning();
+        return state.rules.waves && state.rules.waveSending && ((net.server() || player.admin) || !net.active()) && state.enemies == 0 && !state.spawner.isSpawning();
     }
 
     public boolean shown() {

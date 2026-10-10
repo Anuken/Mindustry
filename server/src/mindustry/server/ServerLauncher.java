@@ -5,12 +5,13 @@ import arc.backend.headless.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
+import mindustry.io.versions.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.Net;
 import mindustry.net.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.time.*;
@@ -40,9 +41,12 @@ public class ServerLauncher implements ApplicationListener{
 
     @Override
     public void init(){
-        Core.settings.setDataDirectory(Core.files.local("config"));
+        String dataDir = System.getProperty("mindustry.data.dir", OS.env("MINDUSTRY_DATA_DIR"));
+        Core.settings.setDataDirectory(dataDir != null ? Core.files.absolute(dataDir) : Core.files.local("config"));
         loadLocales = false;
         headless = true;
+
+        LegacyIO.migrateServerSettings();
 
         Vars.loadSettings();
         Vars.init();

@@ -11,7 +11,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
@@ -89,9 +88,9 @@ public class Reconstructor extends UnitBlock{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = constructTime;
-        super.setStats();
+        super.setStats(stats);
 
         stats.add(Stat.productionTime, constructTime / 60f, StatUnit.seconds);
         stats.add(Stat.output, table -> {
@@ -184,7 +183,7 @@ public class Reconstructor extends UnitBlock{
         public void onCommand(Vec2 target){
             commandPos = target;
             if(command != null && command.snapToBuilding){
-                var build = world.buildWorld(target.x, target.y);
+                var build = state.world.buildWorld(target.x, target.y);
                 if(build != null && build.team == this.team){
                     commandPos.set(build);
                 }
@@ -317,8 +316,8 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.config) return unit();
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.config) return unit();
             return super.senseObject(sensor);
         }
 
@@ -367,9 +366,9 @@ public class Reconstructor extends UnitBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
-            if(sensor == LAccess.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(fraction());
+            if(sensor == LogicProp.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));
             return super.sense(sensor);
         }
 

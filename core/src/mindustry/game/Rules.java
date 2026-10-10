@@ -8,13 +8,14 @@ import arc.util.serialization.Json.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
+import mindustry.game.objectives.*;
 import mindustry.graphics.g3d.*;
 import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 /**
  * Defines current rules on how the game should function.
@@ -162,7 +163,7 @@ public class Rules{
     /** Environment drag multiplier. */
     public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */
-    public int env = Vars.defaultEnv;
+    public Environments env = Vars.defaultEnv;
     /** Attributes of the environment. */
     public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
@@ -287,8 +288,8 @@ public class Rules{
         }
     }
 
-    public boolean hasEnv(int env){
-        return (this.env & env) != 0;
+    public boolean hasEnv(Env env){
+        return this.env.has(env);
     }
 
     public float buildRadius(Team team){
@@ -425,18 +426,18 @@ public class Rules{
         }
 
         @Override
-        public void write(Json json){
+        public void write(Json json, JsonWriter writer){
             for(Team team : Team.all){
                 if(values[team.id] != null){
-                    json.writeValue(team.id + "", values[team.id], TeamRule.class);
+                    json.writeValue(writer, team.id + "", values[team.id], TeamRule.class);
                 }
             }
         }
 
         @Override
-        public void read(Json json, JsonValue jsonData){
-            for(JsonValue value : jsonData){
-                values[Integer.parseInt(value.name)] = json.readValue(TeamRule.class, value);
+        public void read(Json json, Jval jsonData){
+            for(var entry : jsonData.asObject()){
+                values[Integer.parseInt(entry.key)] = json.readValue(TeamRule.class, entry.value);
             }
         }
     }

@@ -10,7 +10,6 @@ import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
-import mindustry.net.Administration.*;
 import mindustry.net.Packets.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
@@ -137,7 +136,7 @@ public class BeControl{
             }, () -> checkUpdates = false);
         }else{
             Log.info("&lcA new update is available: &lyBleeding Edge build @", updateBuild);
-            if(Config.autoUpdate.bool()){
+            if(netServer.config.autoUpdate){
                 Log.info("&lcAuto-downloading next version...");
 
                 try{

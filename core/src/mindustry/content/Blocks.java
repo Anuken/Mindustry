@@ -1143,7 +1143,7 @@ public class Blocks{
             size = 2;
             hasPower = true;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawWeave(), new DrawDefault());
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
 
             ambientSound = Sounds.loopTech;
             ambientSoundVolume = 0.02f;
@@ -1177,7 +1177,7 @@ public class Blocks{
             rotate = false;
             solid = true;
             outputsLiquid = true;
-            envEnabled = Env.any;
+            envEnabled = Environments.any;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawLiquidTile(Liquids.water), new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}}, new DrawDefault());
             liquidCapacity = 36f;
             craftTime = 120;
@@ -1193,7 +1193,7 @@ public class Blocks{
             hasItems = true;
             hasPower = true;
             outputItem = new ItemStack(Items.pyratite, 1);
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
 
             size = 2;
             ambientSound = Sounds.loopMachineSpin;
@@ -1209,7 +1209,7 @@ public class Blocks{
             hasPower = true;
             outputItem = new ItemStack(Items.blastCompound, 1);
             size = 2;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             ambientSound = Sounds.loopMachineSpin;
             ambientSoundVolume = 0.12f;
 
@@ -1326,7 +1326,7 @@ public class Blocks{
         incinerator = new Incinerator("incinerator"){{
             requirements(Category.crafting, with(Items.graphite, 5, Items.lead, 15));
             health = 90;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             consumePower(0.50f);
         }};
 
@@ -1340,8 +1340,8 @@ public class Blocks{
             size = 3;
             hasPower = true;
             hasLiquids = false;
-            envEnabled |= Env.space | Env.underwater;
-            envDisabled = Env.none;
+            envEnabled = envEnabled.with(Environments.of(Env.space, Env.underwater));
+            envDisabled = Environments.none;
             itemCapacity = 30;
             drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawArcSmelt(), new DrawDefault());
             fogRadius = 3;
@@ -2122,7 +2122,7 @@ public class Blocks{
             arrowTimeScl = 2.75f;
             hasPower = true;
             pulse = true;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             consumePower(0.30f);
         }};
 
@@ -2608,7 +2608,7 @@ public class Blocks{
             size = 2;
             powerProduction = 4.5f;
             itemDuration = 60 * 14f;
-            envEnabled = Env.any;
+            envEnabled = Environments.any;
             generateEffect = Fx.generatespark;
 
             itemDurationMultipliers.put(Items.phaseFabric, 210f / 14f);
@@ -2887,7 +2887,7 @@ public class Blocks{
             drillTime = 600;
             size = 2;
             //mechanical drill doesn't work in space
-            envEnabled ^= Env.space;
+            envEnabled = envEnabled.without(Env.space);
             researchCost = with(Items.copper, 10);
 
             consumeLiquid(Liquids.water, 0.05f).boost();
@@ -2919,13 +2919,11 @@ public class Blocks{
             requirements(Category.production, with(Items.copper, 65, Items.silicon, 60, Items.titanium, 50, Items.thorium, 75));
             drillTime = 280;
             size = 4;
-            drawRim = true;
             hasPower = true;
             tier = 5;
             updateEffect = Fx.pulverizeRed;
             updateEffectChance = 0.03f;
             drillEffect = Fx.mineHuge;
-            rotateSpeed = 6f;
             warmupSpeed = 0.01f;
             itemCapacity = 20;
 
@@ -2934,6 +2932,21 @@ public class Blocks{
 
             consumePower(3f);
             consumeLiquid(Liquids.water, 0.1f).boost();
+
+            drawer = new DrawMulti(new DrawDefault(), new DrawGlowRegion("-rim"){{
+                blending = Blending.additive;
+                color = Color.valueOf("ff5512");
+                layer = Layer.block;
+                glowIntensity = 0.35f;
+                glowScale = 4f;
+                alpha = 1f;
+            }}, new DrawRegion("-rotator"){{
+                spinSprite = true;
+                layer = Layer.block + 0.1f;
+                rotateSpeed = 6;
+            }}, new DrawRegion("-top"){{
+                layer = Layer.block + 0.2f;
+            }});
         }};
 
         waterExtractor = new SolidPump("water-extractor"){{
@@ -2944,7 +2957,7 @@ public class Blocks{
             liquidCapacity = 40f;
             rotateSpeed = 1.4f;
             attribute = Attribute.water;
-            envRequired |= Env.groundWater;
+            envRequired = envRequired.with(Env.groundWater);
 
             consumePower(1.5f);
         }};
@@ -2960,7 +2973,7 @@ public class Blocks{
             liquidCapacity = 80f;
 
             craftEffect = Fx.none;
-            envRequired |= Env.spores;
+            envRequired = envRequired.with(Env.spores);
             attribute = Attribute.spores;
 
             ambientSound = Sounds.loopCultivator;
@@ -3742,7 +3755,7 @@ public class Blocks{
             size = 2;
             scaledHealth = 300;
             shootSound = Sounds.shootMissile;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             rotateSpeed = 4f;
 
             limitRange(5f);
@@ -3866,7 +3879,7 @@ public class Blocks{
             shootLength = 5f;
             bulletDamage = 30f;
             reload = 8f;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
         }};
 
         tsunami = new LiquidTurret("tsunami"){{
@@ -3946,7 +3959,7 @@ public class Blocks{
 
             shootCone = 30;
             size = 3;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
 
             scaledHealth = 220;
             shootSound = Sounds.shootFuse;
@@ -4259,7 +4272,7 @@ public class Blocks{
             shootCone = 2f;
             shootSound = Sounds.shootForeshadow;
             unitSort = UnitSorts.strongest;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
 
             coolantMultiplier = 0.4f;
             liquidCapacity = 60f;
@@ -4352,7 +4365,7 @@ public class Blocks{
             shootSound = Sounds.shootMeltdown;
             loopSound = Sounds.beamMeltdown;
             loopSoundVolume = 2f;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             rotateSpeed = 1.5f;
 
             shootType = new ContinuousLaserBulletType(78){{
@@ -4473,7 +4486,7 @@ public class Blocks{
             shootY = -2;
             outlineColor = Pal.darkOutline;
             size = 3;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             reload = 40f;
             recoil = 2f;
             range = 190;
@@ -4565,7 +4578,7 @@ public class Blocks{
             shootY = 5f;
             outlineColor = Pal.darkOutline;
             size = 3;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             reload = 30f;
             recoil = 2f;
             range = 125;
@@ -5163,7 +5176,7 @@ public class Blocks{
             shootY = 4;
             outlineColor = Pal.darkOutline;
             size = 4;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             reload = 50f;
             cooldownTime = 100f;
             recoil = 3f;
@@ -5187,7 +5200,7 @@ public class Blocks{
             }};
 
             drawer = new DrawTurret("reinforced-"){{
-                var heatp = PartProgress.warmup.blend(p -> Mathf.absin(2f, 1f) * p.warmup, 0.2f);
+                var heatp = PartProgress.warmup.blend(p -> Mathf.absin(Vars.state.time, 2f, 1f) * p.warmup, 0.2f);
 
                 parts.add(new RegionPart("-blade"){{
                     progress = PartProgress.warmup;
@@ -5232,7 +5245,7 @@ public class Blocks{
             shootY = 0.5f;
             outlineColor = Pal.darkOutline;
             size = 4;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             range = 250f;
             scaledHealth = 210;
 
@@ -5595,7 +5608,7 @@ public class Blocks{
                 }},
                 new RegionPart("-mid"){{
                     progress = PartProgress.recoil;
-                    heatProgress = PartProgress.warmup.add(-0.2f).add(p -> Mathf.sin(9f, 0.2f) * p.warmup);
+                    heatProgress = PartProgress.warmup.add(-0.2f).add(p -> Mathf.sin(Vars.state.time, 9f, 0.2f) * p.warmup);
                     mirror = false;
                     under = true;
                     moveY = -5f;
@@ -5675,7 +5688,7 @@ public class Blocks{
             shootY = -1;
             outlineColor = Pal.darkOutline;
             size = 4;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             reload = 600f;
             range = 1350;
             shootCone = 1f;
@@ -5939,7 +5952,7 @@ public class Blocks{
             shootY = 15f;
             outlineColor = Pal.darkOutline;
             size = 5;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             warmupMaintainTime = 120f;
             reload = 100f;
             recoil = 2f;
@@ -6254,7 +6267,7 @@ public class Blocks{
                     parts.add(new RegionPart("-spine"){{
                         outline = false;
                         progress = PartProgress.warmup.delay(fi / 5f);
-                        heatProgress = PartProgress.warmup.add(p -> (Mathf.absin(3f, 0.2f) - 0.2f) * p.warmup);
+                        heatProgress = PartProgress.warmup.add(p -> (Mathf.absin(Vars.state.time, 3f, 0.2f) - 0.2f) * p.warmup);
                         mirror = true;
                         under = true;
                         layerOffset = -0.3f;
@@ -6284,7 +6297,7 @@ public class Blocks{
             shootY = circleY - 5f;
 
             outlineColor = Pal.darkOutline;
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
             reload = 3.5f;
             range = 410;
             trackingRange = range * 1.4f;

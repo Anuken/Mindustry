@@ -8,9 +8,8 @@ import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
-import mindustry.ctype.*;
-import mindustry.gen.*;
 import mindustry.game.*;
+import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.legacy.*;
@@ -28,11 +27,11 @@ public class GlobalVars{
     public static final Rand rand = new Rand();
 
     //non-constants that depend on state
-    private static LVar
+    private static LogicVar
         varTime, varTick, varSecond, varMinute, varWave, varWaveTime, varMapW, varMapH, varWait, varServer,
         varClient, varClientLocale, varClientUnit, varClientName, varClientTeam, varClientMobile, varClientMusicPlaying, varClientCurrentMusic;
 
-    private ObjectMap<String, LVar> vars = new ObjectMap<>();
+    private ObjectMap<String, LogicVar> vars = new ObjectMap<>();
     private Seq<VarEntry> varEntries = new Seq<>();
     private ObjectSet<String> privilegedNames = new ObjectSet<>();
     private UnlockableContent[][] logicIdToContent;
@@ -148,11 +147,11 @@ public class GlobalVars{
         }
 
         //store sensor constants
-        for(LAccess sensor : LAccess.all){
+        for(LogicProp sensor : LogicProp.all){
             put("@" + sensor.name(), sensor);
         }
 
-        LStatement.nameToAlign.each((name, align) -> put("@" + name, align));
+        LogicStatement.nameToAlign.each((name, align) -> put("@" + name, align));
 
         logicIdToContent = new UnlockableContent[ContentType.all.length][];
         contentIdToLogicId = new int[ContentType.all.length][];
@@ -203,8 +202,8 @@ public class GlobalVars{
         varWave.numval = state.wave;
         varWaveTime.numval = state.wavetime / 60f;
 
-        varMapW.numval = world.width();
-        varMapH.numval = world.height();
+        varMapW.numval = state.world.width;
+        varMapH.numval = state.world.height;
 
         //network
         varServer.numval = (net.server() || !net.active()) ? 1 : 0;
@@ -225,7 +224,7 @@ public class GlobalVars{
         }
     }
 
-    public LVar waitVar(){
+    public LogicVar waitVar(){
         return varWait;
     }
 
@@ -251,7 +250,7 @@ public class GlobalVars{
     }
 
     /** @return a constant variable if there is a constant with this name, or null. */
-    public @Nullable LVar get(String name){
+    public @Nullable LogicVar get(String name){
         return vars.get(name);
     }
 
@@ -259,7 +258,7 @@ public class GlobalVars{
      * @return a constant variable by name.
      * Attempting to get privileged variable from a non-privileged logic executor returns a null constant.
      */
-    public @Nullable LVar get(String name, boolean privileged){
+    public @Nullable LogicVar get(String name, boolean privileged){
         if(!privileged && privilegedNames.contains(name)) return vars.get("null");
         return vars.get(name);
     }
@@ -270,19 +269,19 @@ public class GlobalVars{
     }
 
     /** Adds a constant value by name. */
-    public LVar put(String name, Object value, boolean privileged){
+    public LogicVar put(String name, Object value, boolean privileged){
         return put(name, value, privileged, true);
     }
 
     /** Adds a constant value by name. */
-    public LVar put(String name, Object value, boolean privileged, boolean hidden){
-        LVar existingVar = vars.get(name);
+    public LogicVar put(String name, Object value, boolean privileged, boolean hidden){
+        LogicVar existingVar = vars.get(name);
         if(existingVar != null){ //don't overwrite existing vars (see #6910)
             Log.debug("Failed to add global logic variable '@', as it already exists.", name);
             return existingVar;
         }
 
-        LVar var = new LVar(name);
+        LogicVar var = new LogicVar(name);
         var.constant = true;
         if(value instanceof Number num){
             var.isobj = false;
@@ -302,8 +301,8 @@ public class GlobalVars{
     }
 
     /** Removes a global variable - used for data patch reset. This variable is assumed not to be privileged or have a documentation entry. */
-    public void remove(LVar lvar){
-        LVar match = vars.get(lvar.name);
+    public void remove(LogicVar lvar){
+        LogicVar match = vars.get(lvar.name);
         if(match == lvar){
             vars.remove(lvar.name);
         }
@@ -313,15 +312,15 @@ public class GlobalVars{
         vars.remove(name);
     }
 
-    public LVar put(String name, Object value){
+    public LogicVar put(String name, Object value){
         return put(name, value, false);
     }
 
-    public LVar putEntry(String name, Object value){
+    public LogicVar putEntry(String name, Object value){
         return put(name, value, false, false);
     }
 
-    public LVar putEntry(String name, Object value, boolean privileged){
+    public LogicVar putEntry(String name, Object value, boolean privileged){
         return put(name, value, privileged, false);
     }
 

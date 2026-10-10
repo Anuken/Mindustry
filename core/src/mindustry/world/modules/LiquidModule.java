@@ -3,7 +3,8 @@ package mindustry.world.modules;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.game.*;
+import mindustry.io.*;
 import mindustry.type.*;
 
 import java.util.*;
@@ -19,7 +20,7 @@ public class LiquidModule extends BlockModule{
     /** Visual refresh rate of the value, in ticks. Doesn't affect values, just reduces high-frequency flickering. */
     public static float flowVisualRefreshInterval = 15f;
 
-    private static final Interval flowTimer = new Interval(2);
+    private static final mindustry.game.Interval flowTimer = new Interval(2);
     private static @Nullable WindowedMean[] cacheFlow;
     private static @Nullable float[] cacheSums;
     private static @Nullable float[] displayFlow;
@@ -184,7 +185,7 @@ public class LiquidModule extends BlockModule{
         int count = legacy ? read.ub() : read.s();
 
         for(int j = 0; j < count; j++){
-            Liquid liq = content.liquid(legacy ? read.ub() : read.s());
+            Liquid liq = read.content(ContentType.liquid, legacy ? read.ub() : read.s());
             float amount = read.f();
             if(liq != null){
                 int liquidid = liq.id;

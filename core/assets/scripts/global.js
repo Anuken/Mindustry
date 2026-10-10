@@ -45,21 +45,20 @@ function extend(/*Base, ..., def*/){
 importPackage(Packages.java.lang)
 const Arrays = Packages.java.util.Arrays
 //commonly used inner classes that are moved out so JS mods can be more compatible with v8 and v9
-const TextureFilter = Packages.arc.graphics.Texture.TextureFilter
-const TextureWrap = Packages.arc.graphics.Texture.TextureWrap
+const TextureFilter = Packages.arc.graphics.TextureFilter
+const TextureWrap = Packages.arc.graphics.TextureWrap
 importPackage(Packages.arc)
 importPackage(Packages.arc.assets)
 importPackage(Packages.arc.assets.loaders)
 importPackage(Packages.arc.audio)
 importPackage(Packages.arc.backend.headless)
 importPackage(Packages.arc.files)
-importPackage(Packages.arc.flabel)
-importPackage(Packages.arc.freetype)
 importPackage(Packages.arc.func)
 importPackage(Packages.arc.fx)
 importPackage(Packages.arc.fx.filters)
 importPackage(Packages.arc.fx.util)
 importPackage(Packages.arc.graphics)
+importPackage(Packages.arc.graphics.font)
 importPackage(Packages.arc.graphics.g2d)
 importPackage(Packages.arc.graphics.g3d)
 importPackage(Packages.arc.graphics.gl)
@@ -73,6 +72,8 @@ importPackage(Packages.arc.packer)
 importPackage(Packages.arc.scene)
 importPackage(Packages.arc.scene.actions)
 importPackage(Packages.arc.scene.event)
+importPackage(Packages.arc.scene.flabel)
+importPackage(Packages.arc.scene.flabel.effects)
 importPackage(Packages.arc.scene.style)
 importPackage(Packages.arc.scene.ui)
 importPackage(Packages.arc.scene.ui.layout)
@@ -91,7 +92,6 @@ importPackage(Packages.mindustry.async)
 importPackage(Packages.mindustry.audio)
 importPackage(Packages.mindustry.content)
 importPackage(Packages.mindustry.core)
-importPackage(Packages.mindustry.ctype)
 importPackage(Packages.mindustry.editor)
 importPackage(Packages.mindustry.editor.data)
 importPackage(Packages.mindustry.entities)
@@ -102,19 +102,26 @@ importPackage(Packages.mindustry.entities.part)
 importPackage(Packages.mindustry.entities.pattern)
 importPackage(Packages.mindustry.entities.units)
 importPackage(Packages.mindustry.game)
+importPackage(Packages.mindustry.game.conditions)
+importPackage(Packages.mindustry.game.markers)
+importPackage(Packages.mindustry.game.objectives)
 importPackage(Packages.mindustry.gen)
 importPackage(Packages.mindustry.graphics)
 importPackage(Packages.mindustry.graphics.g3d)
+importPackage(Packages.mindustry.graphics.shaders)
 importPackage(Packages.mindustry.input)
 importPackage(Packages.mindustry.io)
 importPackage(Packages.mindustry.io.versions)
 importPackage(Packages.mindustry.logic)
+importPackage(Packages.mindustry.logic.instructions)
+importPackage(Packages.mindustry.logic.statements)
 importPackage(Packages.mindustry.maps)
 importPackage(Packages.mindustry.maps.filters)
 importPackage(Packages.mindustry.maps.generators)
 importPackage(Packages.mindustry.maps.planet)
 importPackage(Packages.mindustry.mod)
 importPackage(Packages.mindustry.mod.data)
+importPackage(Packages.mindustry.mod.patch)
 importPackage(Packages.mindustry.net)
 importPackage(Packages.mindustry.service)
 importPackage(Packages.mindustry.type)
@@ -126,6 +133,7 @@ importPackage(Packages.mindustry.ui.builder)
 importPackage(Packages.mindustry.ui.dialogs)
 importPackage(Packages.mindustry.ui.fragments)
 importPackage(Packages.mindustry.ui.layout)
+importPackage(Packages.mindustry.ui.style)
 importPackage(Packages.mindustry.world)
 importPackage(Packages.mindustry.world.blocks)
 importPackage(Packages.mindustry.world.blocks.campaign)
@@ -151,9 +159,9 @@ const PlayerIpUnbanEvent = Packages.mindustry.game.EventType.PlayerIpUnbanEvent
 const PlayerIpBanEvent = Packages.mindustry.game.EventType.PlayerIpBanEvent
 const PlayerUnbanEvent = Packages.mindustry.game.EventType.PlayerUnbanEvent
 const PlayerBanEvent = Packages.mindustry.game.EventType.PlayerBanEvent
-const PlayerLeave = Packages.mindustry.game.EventType.PlayerLeave
-const PlayerConnect = Packages.mindustry.game.EventType.PlayerConnect
-const PlayerJoin = Packages.mindustry.game.EventType.PlayerJoin
+const PlayerLeaveEvent = Packages.mindustry.game.EventType.PlayerLeaveEvent
+const PlayerConnectEvent = Packages.mindustry.game.EventType.PlayerConnectEvent
+const PlayerJoinEvent = Packages.mindustry.game.EventType.PlayerJoinEvent
 const PlayerConnectionConfirmed = Packages.mindustry.game.EventType.PlayerConnectionConfirmed
 const ConnectPacketEvent = Packages.mindustry.game.EventType.ConnectPacketEvent
 const ConnectionEvent = Packages.mindustry.game.EventType.ConnectionEvent

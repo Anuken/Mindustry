@@ -4,9 +4,9 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -26,7 +26,7 @@ public class ItemSource extends Block{
         configurable = true;
         saveConfig = true;
         noUpdateDisabled = true;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
         clearOnDoubleTap = true;
         drawCached = true;
         drawDynamic = false;
@@ -42,8 +42,8 @@ public class ItemSource extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.output, itemsPerSecond, StatUnit.itemsSecond);
     }
@@ -135,7 +135,7 @@ public class ItemSource extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            outputItem = content.item(read.s());
+            outputItem = read.item();
         }
     }
 }

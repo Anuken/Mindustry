@@ -18,7 +18,7 @@ public enum EditorTool{
     zoom(KeyCode.v),
     pick(KeyCode.i){
         public void touched(int x, int y){
-            if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
+            if(!Structs.inBounds(x, y, state.world.width, state.world.height)) return;
 
             Tile tile = editor.tile(x, y);
             editor.drawBlock = tile.block() == Blocks.air || !tile.block().inEditor ? tile.overlay() == Blocks.air ? tile.floor() : tile.overlay() : tile.block();
@@ -103,7 +103,7 @@ public enum EditorTool{
 
         @Override
         public void touched(int x, int y){
-            if(!Structs.inBounds(x, y, editor.width(), editor.height())) return;
+            if(!Structs.inBounds(x, y, state.world.width, state.world.height)) return;
             Tile tile = editor.tile(x, y);
 
             if(tile == null) return;
@@ -194,11 +194,11 @@ public enum EditorTool{
                 }
             }else if(mode == 3){ //cliff fill
                 if(!tile.block().isStatic() || tile.block() == Blocks.cliff) return;
-                Bits wasStatic = new Bits(editor.width() * editor.height());
+                Bits wasStatic = new Bits(state.world.width * state.world.height);
                 fill(x, y, false, t -> t.block().isStatic() && t.block() != Blocks.cliff, t -> {
                     int rotation = 0;
                     for(int i = 0; i < 8; i++){
-                        Tile other = world.tiles.get(t.x + Geometry.d8[i].x, t.y + Geometry.d8[i].y);
+                        Tile other = state.world.tile(t.x + Geometry.d8[i].x, t.y + Geometry.d8[i].y);
                         if(other != null && !other.block().isStatic() && !wasStatic.get(other.array())){
                             rotation |= (1 << i);
                         }
@@ -227,14 +227,14 @@ public enum EditorTool{
                             t.setOverlay(editor.drawBlock.asFloor());
                         }
                     };
-                    
+
                     fill(x, y, false, tester, setter);
                 }
             }
         }
 
         void fill(int x, int y, boolean replace, Boolf<Tile> tester, Cons<Tile> filler){
-            int width = editor.width(), height = editor.height();
+            int width = state.world.width, height = state.world.height;
 
             if(replace){
                 //just do it on everything

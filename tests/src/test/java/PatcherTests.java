@@ -84,6 +84,30 @@ public class PatcherTests{
     }
 
     @Test
+    void envArrays() throws Exception{
+        var prev = Blocks.duo.envEnabled;
+
+        apply("block.duo.envEnabled: [space, underwater]");
+
+        assertNoWarnings();
+        assertEquals(Environments.of(Env.space, Env.underwater), Blocks.duo.envEnabled);
+
+        resetAfter();
+
+        assertEquals(prev, Blocks.duo.envEnabled);
+    }
+
+    @Test
+    void envNumbersRejected() throws Exception{
+        var prev = Blocks.duo.envEnabled;
+
+        apply("block.duo.envEnabled: 3");
+
+        assertFalse(getPatches().first().warnings.isEmpty(), "A bare number must not be accepted for an env field.");
+        assertEquals(prev, Blocks.duo.envEnabled);
+    }
+
+    @Test
     void reconstructorPlans() throws Exception{
         var reconstructor = ((Reconstructor)Blocks.additiveReconstructor);
         var prev = reconstructor.upgrades.copy();
@@ -173,9 +197,6 @@ public class PatcherTests{
 
     @Test
     void unitWeapons() throws Exception{
-        UnitTypes.dagger.stats.add(Stat.charge, 999);
-        assertNotNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
-
         apply("""
         unit.dagger.weapons.+: {
             name: navanax-weapon
@@ -193,9 +214,6 @@ public class PatcherTests{
         assertEquals(999, UnitTypes.dagger.weapons.get(2).bullet.lightningLength);
 
         Vars.logic.reset();
-
-        UnitTypes.dagger.computeStats();
-        assertNull(UnitTypes.dagger.stats.toMap().get(StatCat.general).get(Stat.charge));
     }
 
     @Test

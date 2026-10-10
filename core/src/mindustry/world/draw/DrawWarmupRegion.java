@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -22,7 +23,7 @@ public class DrawWarmupRegion extends DrawBlock{
     @Override
     public void draw(Building build){
         Draw.color(color);
-        Draw.alpha(build.warmup() * (1f - sinMag) + Mathf.absin(Time.time, sinScl, sinMag) * build.warmup());
+        Draw.alpha(build.warmup() * (1f - sinMag) + Mathf.absin(Vars.state.time, sinScl, sinMag) * build.warmup());
         Draw.rect(region, build.x, build.y);
         Draw.reset();
     }

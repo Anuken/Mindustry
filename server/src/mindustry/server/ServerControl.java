@@ -5,23 +5,20 @@ import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.Timer;
 import arc.util.CommandHandler.*;
+import arc.util.Timer;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
-import arc.util.serialization.JsonValue.*;
-import arc.util.serialization.JsonWriter.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
-import mindustry.core.GameState.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
+import mindustry.core.GameState.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
+import mindustry.io.SaveIO.*;
 import mindustry.maps.Map;
-import mindustry.maps.*;
 import mindustry.maps.Maps.*;
 import mindustry.mod.Mods.*;
 import mindustry.mod.data.*;
@@ -34,6 +31,7 @@ import org.jline.reader.impl.completer.*;
 import org.jline.terminal.*;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.net.*;
 import java.time.*;
 import java.time.format.*;
@@ -56,6 +54,7 @@ public class ServerControl implements ApplicationListener{
 
     public final CommandHandler handler = new CommandHandler("");
     public final Fi logFolder = Core.settings.getDataDirectory().child("logs/");
+    public final Fi configFile = Core.settings.getDataDirectory().child("config.hjson");
 
     private final Interval autosaveCount = new Interval();
 
@@ -64,9 +63,6 @@ public class ServerControl implements ApplicationListener{
 
     /** Whether the server is currently waiting for the next map to be loaded. */
     public boolean inGameOverWait;
-
-    /** The last gamemode loaded on this server. */
-    public Gamemode lastMode;
 
     private Task lastTask;
     private Thread socketThread;
@@ -105,26 +101,26 @@ public class ServerControl implements ApplicationListener{
 
     public Cons<GameOverEvent> gameOverListener = event -> {
         if(state.rules.waves){
-            info("Game over! Reached wave @ with @ players online on map @.", state.wave, Groups.player.size(), Strings.capitalize(state.map.plainName()));
+            info("Game over! Reached wave @ with @ players online on map @.", state.wave, state.entities.player.size(), Strings.capitalize(state.map.plainName()));
         }else{
-            info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, Groups.player.size(), Strings.capitalize(state.map.plainName()));
+            info("Game over! Team @ is victorious with @ players online on map @.", event.winner.name, state.entities.player.size(), Strings.capitalize(state.map.plainName()));
         }
 
         //set the next map to be played
-        Map map = maps.getNextMap(lastMode, state.map);
+        Map map = maps.getNextMap(netServer.config.lastGamemode, state.map);
         if(map != null){
             Call.infoMessage((state.rules.pvp
                     ? "[accent]The " + event.winner.coloredName() + " team is victorious![]\n" : "[scarlet]Game over![]\n")
                     + "\nNext selected map: [accent]" + map.name() + "[white]"
                     + (map.hasTag("author") ? " by[accent] " + map.author() + "[white]" : "") + "." +
-                    "\nNew game begins in " + Config.roundExtraTime.num() + " seconds.");
+                    "\nNew game begins in " + netServer.config.roundExtraTime + " seconds.");
 
             state.gameOver = true;
             Call.updateGameOver(event.winner);
 
             info("Selected next map to be @.", map.plainName());
 
-            play(() -> world.loadMap(map, map.applyRules(lastMode)));
+            play(() -> GameState.loadMap(map, map.applyRules(netServer.config.lastGamemode)));
         }else{
             netServer.kickAll(KickReason.gameover);
             state.set(State.menu);
@@ -143,20 +139,9 @@ public class ServerControl implements ApplicationListener{
         lineReader = LineReaderBuilder.builder().completer(new StringsCompleter(handler.getCommandList().map(c -> c.text))).build();
         hasTerminal = !(Terminal.TYPE_DUMB.equals(lineReader.getTerminal().getType()) || Terminal.TYPE_DUMB_COLOR.equals(lineReader.getTerminal().getType()));
 
-        Core.settings.defaults(
-            "bans", "",
-            "admins", "",
-            "shufflemode", "custom"
-        );
-
+        loadServerConfig();
         //update log level
-        Config.debug.set(Config.debug.bool());
-
-        try{
-            lastMode = Gamemode.valueOf(Core.settings.getString("lastServerMode", "survival"));
-        }catch(Exception e){ //handle enum parse exception
-            lastMode = Gamemode.survival;
-        }
+        Log.level = netServer.config.debug ? LogLevel.debug : LogLevel.info;
 
         logger = (level1, text) -> {
             //err has red text instead of reset.
@@ -176,7 +161,7 @@ public class ServerControl implements ApplicationListener{
                 System.out.println(result);
             }
 
-            if(Config.logging.bool()){
+            if(netServer.config.logging){
                 logToFile("[" + dateTime.format(LocalDateTime.now()) + "] " + formatColors(tags[level1.ordinal()] + " " + text + "&fr", false));
             }
 
@@ -198,7 +183,7 @@ public class ServerControl implements ApplicationListener{
 
         Core.app.post(() -> {
             //try to load auto-update save if possible
-            if(Config.autoUpdate.bool()){
+            if(netServer.config.autoUpdate){
                 Fi fi = saveDirectory.child("autosavebe." + saveExtension);
                 if(fi.exists()){
                     try{
@@ -219,8 +204,8 @@ public class ServerControl implements ApplicationListener{
                 info("Found @ command-line arguments to parse.", commands.size);
             }
 
-            if(!Config.startCommands.string().isEmpty()){
-                String[] startup = Strings.join(" ", Config.startCommands.string()).split(",");
+            if(!netServer.config.startCommands.isEmpty()){
+                String[] startup = Strings.join(" ", netServer.config.startCommands).split(",");
                 info("Found @ startup commands.", startup.length);
                 commands.addAll(startup);
             }
@@ -243,36 +228,13 @@ public class ServerControl implements ApplicationListener{
 
         rulesFile = dataDirectory.child("rules.hjson");
 
-        if(!rulesFile.exists() && !Core.settings.has("globalrules")){
+        if(!rulesFile.exists()){
             rulesFile.writeString(defaultRuleString);
-        }
-
-        //load the old 'globalrules' value
-        if(Core.settings.has("globalrules")){
-            try{
-                Jval base = Jval.newObject();
-                if(rulesFile.exists()){
-                    base.asObject().putAll(Jval.read(rulesFile.readString()).asObject());
-                }
-                base.asObject().putAll(Jval.read(Core.settings.getString("globalrules")).asObject());
-                rulesFile.writeString(base.toString(Jformat.hjson));
-
-                Core.settings.remove("globalrules");
-            }catch(Exception e){
-                Log.err("Failed to load previous global rules: ", e);
-            }
         }
 
         dataAssetDirectory = dataDirectory.child("assets");
         dataAssetDirectory.mkdirs();
         loadDataAssets();
-
-        //set up default shuffle mode
-        try{
-            maps.setShuffleMode(ShuffleMode.valueOf(Core.settings.getString("shufflemode")));
-        }catch(Exception e){
-            maps.setShuffleMode(ShuffleMode.all);
-        }
 
         Events.on(GameOverEvent.class, event -> {
             if(!inGameOverWait && gameOverListener != null){
@@ -282,14 +244,14 @@ public class ServerControl implements ApplicationListener{
 
         //reset autosave on world load
         Events.on(WorldLoadEvent.class, e -> {
-            autosaveCount.reset(0, Config.autosaveSpacing.num() * 60);
+            autosaveCount.reset(0, netServer.config.autosaveSpacing * 60);
         });
 
         //autosave periodically
         Events.run(Trigger.update, () -> {
-            if(state.isPlaying() && Config.autosave.bool()){
-                if(autosaveCount.get(Config.autosaveSpacing.num() * 60)){
-                    int max = Config.autosaveAmount.num();
+            if(state.isPlaying() && netServer.config.autosave){
+                if(autosaveCount.get(netServer.config.autosaveSpacing * 60)){
+                    int max = netServer.config.autosaveAmount;
 
                     //use map file name to make sure it can be saved
                     String mapName = (state.map.file == null ? "unknown" : state.map.file.nameWithoutExtension()).replace(" ", "_");
@@ -319,8 +281,8 @@ public class ServerControl implements ApplicationListener{
             }
 
             if(state.isGame()){ //run this only if the server's actually hosting
-                if(Config.autoPause.bool()){
-                    if(Groups.player.isEmpty()){
+                if(netServer.config.autoPause){
+                    if(state.entities.player.isEmpty()){
                         autoPaused = true;
                         state.set(State.paused);
                     }else if(autoPaused){
@@ -332,11 +294,6 @@ public class ServerControl implements ApplicationListener{
                     autoPaused = false;
                 }
             }
-        });
-
-        Events.run(Trigger.socketConfigChanged, () -> {
-            toggleSocket(false);
-            toggleSocket(Config.socketInput.bool());
         });
 
         Events.on(ResetEvent.class, e -> {
@@ -351,12 +308,9 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        //autosave settings once a minute
+        //autosave admin data once a minute
         float saveInterval = 60;
-        Timer.schedule(() -> {
-            netServer.admins.forceSave();
-            Core.settings.forceSave();
-        }, saveInterval, saveInterval);
+        Timer.schedule(() -> netServer.admins.forceSave(), saveInterval, saveInterval);
 
         if(!mods.orderedMods().isEmpty()){
             info("@ mods loaded.", mods.orderedMods().size);
@@ -371,10 +325,11 @@ public class ServerControl implements ApplicationListener{
             }
         }
 
-        toggleSocket(Config.socketInput.bool());
+        toggleSocket(netServer.config.socketInput);
 
         Events.on(ServerLoadEvent.class, e -> {
-            if(serverInput != null){
+            //tests drive the server through the harness, not stdin
+            if(serverInput != null && System.getProperty("mindustry.test") == null){
                 Thread thread = new Thread(serverInput, "Server Controls");
                 thread.setDaemon(true);
                 thread.start();
@@ -396,8 +351,30 @@ public class ServerControl implements ApplicationListener{
         });
     }
 
-    JsonValue readRulesFile(){
-        return JsonIO.json.fromJson(null, Jval.read(rulesFile.readString()).toString(Jformat.plain));
+    Jval readRulesFile(){
+        return JsonIO.json.fromJson(null, rulesFile);
+    }
+
+    void loadServerConfig(){
+        if(configFile.exists()){
+            try{
+                netServer.config = JsonIO.read(ServerConfig.class, configFile.readString());
+            }catch(Throwable t){
+                throw new RuntimeException("Failed to read config.hjson! This is non-recoverable, fix the config before starting the server again.", t);
+            }
+            return; //even if reading fails, legacy configs shouldn't be read, don't overwrite
+        }
+
+        netServer.config = new ServerConfig();
+        saveServerConfig();
+    }
+
+    void saveServerConfig(){
+        try{
+            FileIO.atomicWrite(configFile, tmp -> JsonIO.write(netServer.config, Jformat.hjson, tmp));
+        }catch(Throwable t){
+            err("Failed to write config.hjson!", t);
+        }
     }
 
     void loadDataAssets(){
@@ -537,7 +514,7 @@ public class ServerControl implements ApplicationListener{
                     return;
                 }
             }else{
-                result = maps.getShuffleMode().next(preset, state.map);
+                result = netServer.config.shuffleMode.next(preset, state.map);
                 if(result != null){
                     info("Randomized next map to be @.", result.plainName());
                 }
@@ -547,10 +524,10 @@ public class ServerControl implements ApplicationListener{
 
             logic.reset();
             if(result != null){
-                lastMode = preset;
-                Core.settings.put("lastServerMode", lastMode.name());
+                netServer.config.lastGamemode = preset;
+                saveServerConfig();
                 try{
-                    world.loadMap(result, result.applyRules(lastMode));
+                    GameState.loadMap(result, result.applyRules(netServer.config.lastGamemode));
                     state.rules = result.applyRules(preset);
                     Events.fire(new RulesLoadEvent(state.rules));
                     logic.play();
@@ -558,8 +535,8 @@ public class ServerControl implements ApplicationListener{
                     info("Map loaded.");
 
                     netServer.openServer();
-                }catch(MapException e){
-                    err("@: @", e.map.plainName(), e.getMessage());
+                }catch(SaveLoadException e){
+                    err("@: @", state.map.plainName(), e.getMessage());
                 }
             }
         });
@@ -623,13 +600,13 @@ public class ServerControl implements ApplicationListener{
                 if(state.rules.waves){
                     info("  @ seconds until next wave.", (int)(state.wavetime / 60));
                 }
-                info("  @ units / @ enemies", Groups.unit.size(), state.enemies);
+                info("  @ units / @ enemies", state.entities.unit.size(), state.enemies);
 
                 info("  @ FPS, @ MB used.", Core.graphics.getFramesPerSecond(), Core.app.getJavaHeap() / 1024 / 1024);
 
-                if(Groups.player.size() > 0){
-                    info("  Players: @", Groups.player.size());
-                    for(Player p : Groups.player){
+                if(state.entities.player.size() > 0){
+                    info("  Players: @", state.entities.player.size());
+                    for(Player p : state.entities.player){
                         info("    @ @ / @", p.admin() ? "&r[A]&c" : "&b[P]&c", p.plainName(), p.uuid());
                     }
                 }else{
@@ -691,10 +668,10 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("rules", "[remove/add] [name] [value...]", "List, remove or add global rules. These will apply regardless of map.", arg -> {
-            JsonValue base = readRulesFile();
+            Jval base = readRulesFile();
 
             if(arg.length == 0){
-                info("Rules:\n@", Jval.read(base.toJson(OutputType.minimal)).toString(Jformat.hjson));
+                info("Rules:\n@", base.toString(Jformat.hjson));
             }else if(arg.length == 1){
                 err("Invalid usage. Specify which rule to remove or add.");
             }else{
@@ -719,53 +696,21 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     try{
-                        JsonValue value = new JsonReader().parse(arg[2]);
-                        value.name = arg[1];
+                        String name = arg[1];
+                        Jval value = Jval.read(arg[2]);
+                        base.put(name, value);
 
-                        JsonValue parent = new JsonValue(ValueType.object);
-                        parent.addChild(value);
+                        JsonIO.json.readField(state.rules, name, base);
 
-                        JsonIO.json.readField(state.rules, value.name, parent);
-                        if(base.has(value.name)){
-                            base.remove(value.name);
-                        }
-                        base.addChild(arg[1], value);
                         info("Changed rule: @", value.toString().replace("\n", " "));
                     }catch(Throwable e){
                         err("Error parsing rule JSON: @", e.getMessage());
+                        return; //don't update rules with invalid data if parsing fails
                     }
                 }
 
-                rulesFile.writeString(Jval.read(base.toString()).toString(Jformat.hjson));
+                rulesFile.writeString(base.toString(Jformat.hjson));
                 Call.setRules(state.rules);
-            }
-        });
-
-        handler.register("dumpsettings", "Print every settings value. Useful for debugging.", arg -> {
-            var allKeys = Seq.with(Core.settings.keys());
-            allKeys.sort();
-            int maxLength = allKeys.max(String::length).length();
-            Log.info("Total values: @ | @ bytes", allKeys.size, Strings.formatByteCount(Core.settings.getSettingsFile().length()));
-
-            for(String key : allKeys){
-                var value = Core.settings.get(key, null);
-
-                String valueToString;
-
-                if(value instanceof byte[] b) valueToString = "[" + b.length + " bytes]";
-                else valueToString = String.valueOf(value);
-
-                String typeName = switch(value == null ? "null" : value.getClass().getSimpleName()){
-                    case "Integer" -> "int   ";
-                    case "Boolean" -> "bool  ";
-                    case "Float"   -> "float ";
-                    case "Long"    -> "long  ";
-                    case "byte[]"  -> "byte[]";
-                    case "String"  -> "string";
-                    default -> value.getClass().getSimpleName();
-                };
-
-                Log.info("&lg@  &lg| @&lg |  &lg@", key + " ".repeat(maxLength - key.length()), typeName, valueToString);
             }
         });
 
@@ -794,60 +739,68 @@ public class ServerControl implements ApplicationListener{
             info("Core filled.");
         });
 
-        handler.register("playerlimit", "[off/somenumber]", "Set the server player limit.", arg -> {
-            if(arg.length == 0){
-                info("Player limit is currently @.", netServer.admins.getPlayerLimit() == 0 ? "off" : netServer.admins.getPlayerLimit());
-                return;
-            }
-            if(arg[0].equals("off")){
-                netServer.admins.setPlayerLimit(0);
-                info("Player limit disabled.");
-                return;
-            }
+        handler.register("config", "[name/reload] [value...]", "Configure server settings.", arg -> {
+            Field[] fields = ServerConfig.class.getFields();
 
-            if(Strings.canParsePositiveInt(arg[0]) && Strings.parseInt(arg[0]) > 0){
-                int lim = Strings.parseInt(arg[0]);
-                netServer.admins.setPlayerLimit(lim);
-                info("Player limit is now &lc@.", lim);
-            }else{
-                err("Limit must be a number above 0.");
-            }
-        });
-
-        handler.register("config", "[name] [value...]", "Configure server settings.", arg -> {
             if(arg.length == 0){
                 info("All config values:");
-                for(Config c : Config.all){
-                    info("&lk| @: @", c.name, "&lc&fi" + c.get());
-                    info("&lk| | &lw" + c.description);
-                    info("&lk|");
+                for(Field f : fields){
+                    try{
+                        info("&lk| @: @", f.getName(), "&lc&fi" + f.get(netServer.config));
+                        info("&lk| | &lw" + f.getAnnotation(ServerConfig.Desc.class).value());
+                        info("&lk|");
+                    }catch(Exception e){
+                        err("Failed to read config field: @", f.getName());
+                    }
                 }
+                return;
+            }else if("reload".equals(arg[0])){
+                loadServerConfig();
+
+                //note: socketInput isn't reloaded here, restart the server instead
+                Log.level = netServer.config.debug ? LogLevel.debug : LogLevel.info;
+                info("Config reloaded.");
                 return;
             }
 
-            Config c = Config.all.find(conf -> conf.name.equalsIgnoreCase(arg[0]));
+            Field field = Structs.find(fields, f -> f.getName().equalsIgnoreCase(arg[0]));
 
-            if(c != null){
-                if(arg.length == 1){
-                    info("'@' is currently @.", c.name, c.get());
-                }else{
-                    if(arg[1].equals("default")){
-                        c.set(c.defaultValue);
-                    }else if(c.isBool()){
-                        c.set(arg[1].equals("on") || arg[1].equals("true"));
-                    }else if(c.isNum()){
-                        try{
-                            c.set(Integer.parseInt(arg[1]));
-                        }catch(NumberFormatException e){
-                            err("Not a valid number: @", arg[1]);
-                            return;
+            if(field != null){
+                try{
+                    if(arg.length == 1){
+                        info("'@' is currently @.", field.getName(), field.get(netServer.config));
+                    }else{
+                        if(arg[1].equals("default")){
+                            field.set(netServer.config, field.get(new ServerConfig()));
+                        }else if(field.getType() == boolean.class){
+                            field.set(netServer.config, arg[1].equals("on") || arg[1].equals("true"));
+                        }else if(field.getType() == int.class){
+                            try{
+                                field.set(netServer.config, Integer.parseInt(arg[1]));
+                            }catch(NumberFormatException e){
+                                err("Not a valid number: @", arg[1]);
+                                return;
+                            }
+                        }else if(field.getType() == String.class){
+                            field.set(netServer.config, arg[1].replace("\\n", "\n"));
+                        }else{
+                            field.set(netServer.config, JsonIO.read(field.getType(), arg[1].replace("\\n", "\n")));
                         }
-                    }else if(c.isString()){
-                        c.set(arg[1].replace("\\n", "\n"));
-                    }
 
-                    info("@ set to @.", c.name, c.get());
-                    Core.settings.forceSave();
+                        //apply config change
+                        switch(field.getName()){
+                            case "debug" -> level = netServer.config.debug ? LogLevel.debug : LogLevel.info;
+                            case "socketInput", "socketInputPort", "socketInputAddress" -> {
+                                toggleSocket(false);
+                                toggleSocket(netServer.config.socketInput);
+                            }
+                        }
+
+                        saveServerConfig();
+                        info("@ set to @.", field.getName(), field.get(netServer.config));
+                    }
+                }catch(Exception e){
+                    err("Failed to set config field: " + field.getName(), e);
                 }
             }else{
                 err("Unknown config: '@'. Run the command with no arguments to get a list of valid configs.", arg[0]);
@@ -896,7 +849,7 @@ public class ServerControl implements ApplicationListener{
             }else if(arg.length == 1){
                 if(arg[0].equals("clear")){
                     names.clear();
-                    netServer.admins.save();
+                    netServer.admins.saveNameBans();
                 }else{
                     err("You must provide a name regex to add or remove.");
                 }
@@ -921,7 +874,7 @@ public class ServerControl implements ApplicationListener{
                     }
 
                     names.remove(target);
-                    netServer.admins.save();
+                    netServer.admins.saveNameBans();
                     info("Unbanned regex: @", arg[1]);
                 }else{
                     err("Incorrect usage. Provide add/remove as the second argument.");
@@ -962,22 +915,6 @@ public class ServerControl implements ApplicationListener{
             }
         });
 
-        //TODO should be a config, not a separate command.
-        handler.register("shuffle", "[none/all/custom/builtin]", "Set map shuffling mode.", arg -> {
-            if(arg.length == 0){
-                info("Shuffle mode current set to '@'.", maps.getShuffleMode());
-            }else{
-                try{
-                    ShuffleMode mode = ShuffleMode.valueOf(arg[0]);
-                    Core.settings.put("shufflemode", mode.name());
-                    maps.setShuffleMode(mode);
-                    info("Shuffle mode set to '@'.", arg[0]);
-                }catch(Exception e){
-                    err("Invalid shuffle mode.");
-                }
-            }
-        });
-
         handler.register("nextmap", "<mapname...>", "Set the next map to be played after a game-over. Overrides shuffling.", arg -> {
             Map res = maps.all().find(map -> map.plainName().replace('_', ' ').equalsIgnoreCase(Strings.stripColors(arg[0]).replace('_', ' ')));
             if(res != null){
@@ -994,7 +931,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Player target = Groups.player.find(p -> p.name().equals(arg[0]));
+            Player target = state.entities.player.find(p -> p.name().equals(arg[0]));
 
             if(target != null){
                 Call.sendMessage("[scarlet]" + target.name() + "[scarlet] has been kicked by the server.");
@@ -1010,7 +947,7 @@ public class ServerControl implements ApplicationListener{
                 netServer.admins.banPlayerID(arg[1]);
                 info("Banned.");
             }else if(arg[0].equals("name")){
-                Player target = Groups.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
+                Player target = state.entities.player.find(p -> p.name().equalsIgnoreCase(arg[1]));
                 if(target != null){
                     netServer.admins.banPlayer(target.uuid());
                     info("Banned.");
@@ -1024,7 +961,7 @@ public class ServerControl implements ApplicationListener{
                 err("Invalid type.");
             }
 
-            for(Player player : Groups.player){
+            for(Player player : state.entities.player){
                 if(netServer.admins.isIDBanned(player.uuid())){
                     Call.sendMessage("[scarlet]" + player.name + " has been banned.");
                     player.con.kick(KickReason.banned);
@@ -1095,12 +1032,12 @@ public class ServerControl implements ApplicationListener{
             boolean add = arg[0].equals("add");
 
             PlayerInfo target;
-            Player playert = Groups.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
+            Player playert = state.entities.player.find(p -> p.plainName().equalsIgnoreCase(Strings.stripColors(arg[1])));
             if(playert != null){
                 target = playert.getInfo();
             }else{
                 target = netServer.admins.getInfoOptional(arg[1]);
-                playert = Groups.player.find(p -> p.getInfo() == target);
+                playert = state.entities.player.find(p -> p.getInfo() == target);
             }
 
             if(target != null){
@@ -1130,11 +1067,11 @@ public class ServerControl implements ApplicationListener{
         });
 
         handler.register("players", "List all players currently in game.", arg -> {
-            if(Groups.player.size() == 0){
+            if(state.entities.player.size() == 0){
                 info("No players are currently in the server.");
             }else{
-                info("Players: @", Groups.player.size());
-                for(Player user : Groups.player){
+                info("Players: @", state.entities.player.size());
+                for(Player user : state.entities.player){
                     info(" @&lm @ / ID: @ / IP: @", user.admin ? "&r[A]&c" : "&b[P]&c", user.plainName(), user.uuid(), user.ip());
                 }
             }
@@ -1155,7 +1092,7 @@ public class ServerControl implements ApplicationListener{
                 return;
             }
 
-            Fi newestSave = saveDirectory.findAll(f -> f.name().startsWith("auto_")).min(Fi::lastModified);
+            Fi newestSave = saveDirectory.findAll(f -> f.name().startsWith("auto_")).max(Fi::lastModified);
 
             if(newestSave == null){
                 err("No auto-saves found! Type `config autosave true` to enable auto-saves.");
@@ -1366,16 +1303,16 @@ public class ServerControl implements ApplicationListener{
      * Resets the world state, starts a new game.
      * @param run What task to run to load a new world.
      */
-    public void play(Runnable run){
+    public void play(UnsafeRunnable run){
         play(true, run);
     }
 
     /**
      * Resets the world state, starts a new game.
-     * @param wait Whether to wait for {@link Config#roundExtraTime} seconds before starting a new game.
+     * @param wait Whether to wait for {@link ServerConfig#roundExtraTime} seconds before starting a new game.
      * @param run What task to run to load a new world.
      */
-    public void play(boolean wait, Runnable run){
+    public void play(boolean wait, UnsafeRunnable run){
         inGameOverWait = true;
         cancelPlayTask();
 
@@ -1386,27 +1323,28 @@ public class ServerControl implements ApplicationListener{
 
                 run.run();
 
-                state.rules = state.map.applyRules(lastMode);
+                state.rules = state.map.applyRules(netServer.config.lastGamemode);
                 Events.fire(new RulesLoadEvent(state.rules));
                 logic.play();
 
                 reloader.end();
                 inGameOverWait = false;
-            }catch(MapException e){
-                err("@: @", e.map.plainName(), e.getMessage());
+            }catch(Throwable e){
+                err("Error loading map @: @", state.map.plainName(), e.getMessage());
+                state.set(State.menu);
                 net.closeServer();
             }
         };
 
         if(wait){
-            lastTask = Timer.schedule(reload, Config.roundExtraTime.num());
+            lastTask = Timer.schedule(reload, netServer.config.roundExtraTime);
         }else{
             reload.run();
         }
     }
 
     public void logToFile(String text){
-        if(currentLogFile != null && currentLogFile.length() > Config.maxLogLength.num()){
+        if(currentLogFile != null && currentLogFile.length() > netServer.config.maxLogLength){
             currentLogFile.writeString("[End of log file. Date: " + dateTime.format(LocalDateTime.now()) + "]\n", true);
             currentLogFile = null;
         }
@@ -1417,7 +1355,7 @@ public class ServerControl implements ApplicationListener{
 
         if(currentLogFile == null){
             int i = 0;
-            while(logFolder.child("log-" + i + ".txt").length() >= Config.maxLogLength.num()){
+            while(logFolder.child("log-" + i + ".txt").length() >= netServer.config.maxLogLength){
                 i++;
             }
 
@@ -1432,7 +1370,7 @@ public class ServerControl implements ApplicationListener{
             socketThread = new Thread(() -> {
                 try{
                     serverSocket = new ServerSocket();
-                    serverSocket.bind(new InetSocketAddress(Config.socketInputAddress.string(), Config.socketInputPort.num()));
+                    serverSocket.bind(new InetSocketAddress(netServer.config.socketInputAddress, netServer.config.socketInputPort));
                     while(true){
                         Socket client = serverSocket.accept();
                         info("&lkReceived command socket connection: &fi@", serverSocket.getLocalSocketAddress());

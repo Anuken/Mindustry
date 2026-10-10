@@ -163,7 +163,7 @@ public class ParticleRenderer{
     }
 
     void uploadMeshData(Mesh mesh){
-        var buffer = mesh.getVerticesBuffer();
+        var buffer = mesh.getVertices();
 
         buffer.position(0);
         buffer.limit(vertexBufferLength);

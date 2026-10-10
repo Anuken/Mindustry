@@ -11,7 +11,7 @@ import mindustry.world.modules.ItemModule.*;
 import java.util.*;
 
 public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
-    protected final int[] values = new int[Vars.content.items().size];
+    protected int[] values = new int[Vars.content.items().size];
     public int total;
 
     public ItemSeq(){
@@ -112,7 +112,11 @@ public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
     }
 
     public void add(ItemSeq seq){
-        seq.each(this::add);
+        int len = Math.min(values.length, seq.values.length);
+        for(int i = 0; i < len; i++){
+            values[i] += seq.values[i];
+            total += seq.values[i];
+        }
     }
 
     public void add(ItemStack stack){
@@ -124,6 +128,7 @@ public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
     }
 
     public void add(Item item, int amount){
+        checkSize();
         if(item.id >= values.length) return; //data patches can change item array length
         values[item.id] += amount;
         total += amount;
@@ -141,17 +146,25 @@ public class ItemSeq implements Iterable<ItemStack>, JsonSerializable{
         add(item, -amount);
     }
 
+    public void checkSize(){
+        int target = Vars.content.items().size;
+        if(values.length != target){
+            values = Arrays.copyOf(values, target);
+        }
+    }
+
     @Override
-    public void write(Json json){
+    public void write(Json json, JsonWriter writer){
         for(Item item : Vars.content.items()){
             if(values[item.id] != 0){
-                json.writeValue(item.name, values[item.id]);
+                json.writeValue(writer, item.name, values[item.id]);
             }
         }
     }
 
     @Override
-    public void read(Json json, JsonValue jsonData){
+    public void read(Json json, Jval jsonData){
+        checkSize();
         total = 0;
         for(Item item : Vars.content.items()){
             values[item.id] = jsonData.getInt(item.name, 0);

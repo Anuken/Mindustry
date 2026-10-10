@@ -3,11 +3,11 @@ package mindustry.world.blocks.distribution;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -39,7 +39,7 @@ public class DirectionalUnloader extends Block{
         noUpdateDisabled = true;
         unloadable = false;
         isDuct = true;
-        envDisabled = Env.none;
+        envDisabled = Environments.none;
         clearOnDoubleTap = true;
         priority = TargetPriority.transport;
         drawCached = true;
@@ -56,8 +56,8 @@ public class DirectionalUnloader extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.add(Stat.speed, 60f / speed, StatUnit.itemsSecond);
     }
 
@@ -161,8 +161,7 @@ public class DirectionalUnloader extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            int id = read.s();
-            unloadItem = id == -1 ? null : content.item(id);
+            unloadItem = read.item();
             offset = read.s();
         }
     }

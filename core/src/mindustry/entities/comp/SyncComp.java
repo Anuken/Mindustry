@@ -1,10 +1,10 @@
 package mindustry.entities.comp;
 
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 
 import java.nio.*;
 

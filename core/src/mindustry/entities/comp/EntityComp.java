@@ -1,9 +1,8 @@
 package mindustry.entities.comp;
 
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.entities.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 
 import static mindustry.Vars.*;
 
@@ -11,7 +10,7 @@ import static mindustry.Vars.*;
 @BaseComponent
 abstract class EntityComp{
     private transient boolean added;
-    transient int id = EntityGroup.nextId();
+    transient int id = state.nextEntityId();
 
     boolean isAdded(){
         return added;

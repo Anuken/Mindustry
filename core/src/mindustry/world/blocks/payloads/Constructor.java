@@ -5,9 +5,9 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
-import mindustry.ctype.*;
+import mindustry.io.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.blocks.storage.*;
@@ -39,8 +39,8 @@ public class Constructor extends BlockProducer{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.output, "@x@ ~ @x@", minBlockSize, minBlockSize, maxBlockSize, maxBlockSize);
         stats.addPercent(Stat.buildSpeed, buildSpeed);
@@ -95,7 +95,7 @@ public class Constructor extends BlockProducer{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            recipe = Vars.content.block(read.s());
+            recipe = read.block();
         }
     }
 }

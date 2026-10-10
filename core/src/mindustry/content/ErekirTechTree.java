@@ -3,7 +3,7 @@ package mindustry.content;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.entities.bullet.*;
-import mindustry.game.Objectives.*;
+import mindustry.game.conditions.*;
 import mindustry.type.*;
 import mindustry.type.unit.*;
 import mindustry.world.blocks.defense.turrets.*;
@@ -51,7 +51,7 @@ public class ErekirTechTree{
         rebalance();
 
         //TODO might be unnecessary with no asteroids
-        Seq<Objective> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
+        Seq<UnlockCondition> erekirSector = Seq.with(new OnPlanet(Planets.erekir));
 
         var costMultipliers = new ObjectFloatMap<Item>();
         for(var item : content.items()) costMultipliers.put(item, 0.9f);

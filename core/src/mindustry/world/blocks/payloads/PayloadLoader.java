@@ -4,11 +4,11 @@ import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.PayloadUnloader.*;
@@ -17,8 +17,6 @@ import mindustry.world.blocks.sandbox.*;
 import static mindustry.Vars.*;
 
 public class PayloadLoader extends PayloadBlock{
-    public final int timerLoad = timers++;
-
     public float loadTime = 2f;
     public int itemsLoaded = 8;
     public float liquidsLoaded = 40f;
@@ -33,7 +31,7 @@ public class PayloadLoader extends PayloadBlock{
 
     public PayloadLoader(String name){
         super(name);
- 
+
         hasItems = true;
         hasLiquids = true;
         hasPower = true;
@@ -85,6 +83,7 @@ public class PayloadLoader extends PayloadBlock{
 
     public class PayloadLoaderBuild extends PayloadBlockBuild<BuildPayload>{
         public boolean exporting = false;
+        public float loadTimer;
 
         @Override
         public boolean acceptPayload(Building source, Payload payload){
@@ -154,7 +153,8 @@ public class PayloadLoader extends PayloadBlock{
                 //load up items
                 if(payload.block().hasItems && items.any()){
                     boolean acceptedAny = true;
-                    if(efficiency > 0.01f && timer(timerLoad, loadTime / efficiency)){
+                    if(efficiency > 0.01f && (loadTimer += Time.delta * efficiency) >= loadTime){
+                        loadTimer %= loadTime;
                         acceptedAny = false;
                         //load up items a set amount of times
                         for(int j = 0; j < itemsLoaded && items.any(); j++){

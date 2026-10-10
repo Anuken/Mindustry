@@ -7,7 +7,6 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
@@ -17,6 +16,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -43,7 +43,7 @@ public class ConstructBlock extends Block{
         health = 10;
         consumesTap = true;
         solidifes = true;
-        generateIcons = false;
+        packSprites = false;
         inEditor = false;
         consBlocks[size - 1] = this;
         sync = true;
@@ -60,7 +60,7 @@ public class ConstructBlock extends Block{
         if(tile == null) return;
 
         Team team = tile.team();
-        if(!headless && fogControl.isVisibleTile(Vars.player.team(), tile.x, tile.y)){
+        if(!headless && state.fog.isVisibleTile(Vars.player.team(), tile.x, tile.y)){
             block.breakEffect.at(tile.drawx(), tile.drawy(), block.size, block.mapColor);
             if(shouldPlay()) block.breakSound.at(tile, block.breakPitchChange ? calcPitch(false) : 1f);
         }
@@ -102,7 +102,7 @@ public class ConstructBlock extends Block{
             }
 
             //make sure block indexer knows it's damaged
-            indexer.notifyHealthChanged(tile.build);
+            state.indexer.notifyHealthChanged(tile.build);
 
             //last builder was this local client player, call placed()
             if(!headless && builder == player.unit()){
@@ -110,7 +110,7 @@ public class ConstructBlock extends Block{
             }
         }
 
-        if(fogControl.isVisibleTile(team, tile.x, tile.y)){
+        if(state.fog.isVisibleTile(team, tile.x, tile.y)){
             block.placeEffect.at(tile.drawx(), tile.drawy(), block.size);
             if(shouldPlay()) block.placeSound.at(tile, block.placePitchChange ? calcPitch(true) : 1f);
         }
@@ -145,7 +145,7 @@ public class ConstructBlock extends Block{
     }
 
     public static void playRepairSound(Team team, Tile tile){
-        if(!headless && shouldPlay() && fogControl.isVisibleTile(team, tile.x, tile.y)) Sounds.blockRepair.at(tile, calcPitch(true));
+        if(!headless && shouldPlay() && state.fog.isVisibleTile(team, tile.x, tile.y)) Sounds.blockRepair.at(tile, calcPitch(true));
     }
 
     public static void constructed(Tile tile, Block block, Unit builder, byte rotation, Team team, Object config){
@@ -211,7 +211,7 @@ public class ConstructBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case progress -> Mathf.clamp(progress);
                 case breaking -> activeDeconstruct ? 1 : 0;
@@ -220,7 +220,7 @@ public class ConstructBlock extends Block{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case building -> current;
                 default -> super.senseObject(sensor);
@@ -263,7 +263,7 @@ public class ConstructBlock extends Block{
 
                 for(TextureRegion region : current.getGeneratedIcons()){
                     Shaders.blockbuild.region = region;
-                    Shaders.blockbuild.time = Time.time;
+                    Shaders.blockbuild.time = Vars.state.time;
                     Shaders.blockbuild.progress = progress;
 
                     Draw.rect(region, x, y, current.rotate && (noOverrides || current.regionRotated2 == i || current.regionRotated1 == i) ? rotdeg() + current.visualRotationOffset : 0);
@@ -457,7 +457,7 @@ public class ConstructBlock extends Block{
             for(int i = 0; i < requirements.length; i++){
                 this.itemsLeft[i] = Mathf.round(requirements[i].amount * state.rules.buildCostMultiplier);
             }
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
         }
 
         public void setDeconstruct(Block previous){
@@ -472,7 +472,7 @@ public class ConstructBlock extends Block{
             this.itemsLeft = new int[previous.requirements.length];
             this.accumulator = new float[previous.requirements.length];
             this.totalAccumulator = new float[previous.requirements.length];
-            pathfinder.updateTile(tile);
+            state.pathfinder.updateTile(tile);
         }
 
         @Override
@@ -520,8 +520,8 @@ public class ConstructBlock extends Block{
                 }
             }
 
-            if(pid != -1) previous = content.block(pid);
-            if(rid != -1) current = content.block(rid);
+            if(pid != -1) previous = read.content(ContentType.block, pid);
+            if(rid != -1) current = read.content(ContentType.block, rid);
 
             if(previous == null) previous = Blocks.air;
             if(current == null) current = Blocks.air;

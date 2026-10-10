@@ -3,7 +3,6 @@ package mindustry.content;
 import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
-import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.game.*;
@@ -26,12 +25,12 @@ public class Planets{
     verilus;
 
     public static void load(){
-        sun = new Planet("sun", null, 4f){{
+        sun = new Planet("sun", null, 5f){{
             bloom = true;
             accessible = false;
 
             meshLoader = () -> new SunMesh(
-                this, 4,
+                this, 5,
                 5, 0.3, 1.7, 1.2, 1,
                 1.1f,
                 Color.valueOf("ff7a38"),
@@ -47,20 +46,22 @@ public class Planets{
             generator = new ErekirPlanetGenerator();
             meshLoader = () -> new HexMesh(this, 5);
             cloudMeshLoader = () -> new MultiMesh(
-                new HexSkyMesh(this, 2, 0.15f, 0.14f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
-                new HexSkyMesh(this, 3, 0.6f, 0.15f, 5, Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
+                new HexSkyMesh(this, 2, 0.15f, 0.17f, 5, Color.valueOf("eba768").a(0.75f), 2, 0.42f, 1f, 0.43f),
+                new HexSkyMesh(this, 3, 0.6f, 0.19f, 5, Color.valueOf("eea293").a(0.75f), 2, 0.42f, 1.2f, 0.45f)
             );
             alwaysUnlocked = true;
             landCloudColor = Color.valueOf("ed6542");
             atmosphereColor = Color.valueOf("f07218");
-            defaultEnv = Env.scorching | Env.terrestrial;
+            defaultEnv = Environments.of(Env.scorching, Env.terrestrial);
             startSector = 10;
             atmosphereRadIn = 0.02f;
-            atmosphereRadOut = 0.3f;
+            atmosphereRadOut = 0.5f;
             tidalLock = true;
             orbitSpacing = 2f;
+            outlineScale = 1.22f;
             totalRadius += 2.6f;
             lightSrcTo = 0.5f;
+            minZoom = 0.7f;
             lightDstFrom = 0.2f;
             clearSectorOnLose = true;
             defaultCore = Blocks.coreBastion;
@@ -114,7 +115,7 @@ public class Planets{
             startSector = 10;
             atmosphereRadIn = -0.01f;
             atmosphereRadOut = 0.3f;
-            defaultEnv = Env.underwater | Env.terrestrial;
+            defaultEnv = Environments.of(Env.underwater, Env.terrestrial);
             ruleSetter = r -> {
 
             };
@@ -179,8 +180,9 @@ public class Planets{
             drawOrbit = false;
             accessible = false;
             clipRadius = 2f;
-            defaultEnv = Env.space;
+            defaultEnv = Environments.of(Env.space);
             icon = "commandRally";
+            defaultCore = Blocks.coreBastion;
             generator = new AsteroidGenerator();
             cgen.get((AsteroidGenerator)generator);
 

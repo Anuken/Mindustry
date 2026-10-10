@@ -1,7 +1,6 @@
 package mindustry.type;
 
 import arc.scene.ui.layout.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 
 /** This class is only for displaying team lore in the content database. */

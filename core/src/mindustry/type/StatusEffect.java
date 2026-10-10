@@ -1,17 +1,16 @@
 package mindustry.type;
 
 import arc.graphics.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.world.meta.*;
 
 public class StatusEffect extends UnlockableContent{
@@ -67,6 +66,12 @@ public class StatusEffect extends UnlockableContent{
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
     public boolean outline = true;
+    /** Padding applied when outline is generated. */
+    public int outlinePadding = 0;
+    /** Color of generated outline. */
+    public Color outlineColor = Pal.gray;
+    /** True to tint the sprite by the color. Always applied in vanilla. */
+    public boolean applyTint = false;
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -90,12 +95,24 @@ public class StatusEffect extends UnlockableContent{
     }
 
     @Override
+    public void removeContent(){
+        super.removeContent();
+
+        //opposite() and affinity() also modify the other effect
+        for(var other : Vars.content.statusEffects()){
+            other.opposites.remove(this);
+            other.affinities.remove(this);
+            other.transitions.remove(this);
+        }
+    }
+
+    @Override
     public boolean isHidden(){
         return localizedName.equals(name) || !show;
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         if(damageMultiplier != 1) stats.addMultModifier(Stat.damageMultiplier, damageMultiplier);
         if(healthMultiplier != 1) stats.addMultModifier(Stat.healthMultiplier, healthMultiplier);
         if(speedMultiplier != 1) stats.addMultModifier(Stat.speedMultiplier, speedMultiplier);
@@ -232,11 +249,18 @@ public class StatusEffect extends UnlockableContent{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
+
+        if((isVanilla() || applyTint) && uiIcon instanceof AtlasRegion at && packer.has(at.name)){
+            Pixmap tinted = Pixmaps.tint(packer.get(uiIcon), color);
+            packer.add(at.name, tinted);
+            tinted.dispose();
+        }
 
         if(outline){
-            makeOutline(PageType.ui, packer, uiIcon, false, Pal.gray, 3);
+            //vanilla needs extra padding and I don't want to fix every sprite or set every outline padding value
+            makeOutline(packer, uiIcon, false, outlineColor, 3, isVanilla() ? 2 : outlinePadding);
         }
     }
 

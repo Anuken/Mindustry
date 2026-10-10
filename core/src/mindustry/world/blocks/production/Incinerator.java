@@ -3,7 +3,7 @@ package mindustry.world.blocks.production;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -44,7 +44,7 @@ public class Incinerator extends Block{
                 float g = 0.3f;
                 float r = 0.06f;
 
-                Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * heat);
+                Draw.alpha(((1f - g) + Mathf.absin(Vars.state.time, 8f, g) + Mathf.random(r) - r) * heat);
 
                 Draw.tint(flameColor);
                 Fill.circle(x, y, 2f);

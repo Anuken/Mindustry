@@ -10,7 +10,6 @@ import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.*;
@@ -18,6 +17,7 @@ import mindustry.game.Teams.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 
@@ -25,7 +25,7 @@ import static mindustry.Vars.*;
 
 @EntityDef(value = {Bulletc.class}, pooled = true, serialize = false)
 @Component(base = true)
-abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Bulletc, Timerc, Senseable, Settable{
+abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Drawc, Shielderc, Ownerc, Bulletc, Timerc, LogicSenseable, LogicSettable{
     @Import Team team;
     @Import Entityc owner;
     @Import float x, y, damage, lastX, lastY, time, lifetime;
@@ -81,7 +81,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
     @Override
     public void remove(){
-        if(Groups.isClearing) return;
+        if(state.entities.isClearing) return;
 
         //'despawned' only counts when the bullet is killed externally or reaches the end of life
         if(!hit){
@@ -230,13 +230,13 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
         int e2, err = dx - dy;
-        int ww = world.width(), wh = world.height();
+        int ww = state.world.width, wh = state.world.height;
 
         while(x >= 0 && y >= 0 && x < ww && y < wh){
-            Building build = world.build(x, y);
+            Building build = state.world.build(x, y);
 
             if(type.collideFloor || type.collideTerrain){
-                Tile tile = world.tile(x, y);
+                Tile tile = state.world.tile(x, y);
                 if(
                     type.collideFloor && (tile == null || tile.floor().hasSurface() || tile.block() != Blocks.air) ||
                     type.collideTerrain && tile != null && tile.block() instanceof StaticWall
@@ -351,7 +351,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
 
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case rotation -> rotation;
             case health -> damage;
@@ -375,7 +375,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     }
 
     @Override
-    public void setProp(LAccess prop, double value){
+    public void setProp(LogicProp prop, double value){
         switch(prop){
             case health -> damage = (float)value;
             case x -> x = World.unconv((float)value);
@@ -396,7 +396,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     }
 
     @Override
-    public void setProp(LAccess prop, Object value){
+    public void setProp(LogicProp prop, Object value){
         switch(prop){
             case team -> {
                 if(value instanceof Team t){

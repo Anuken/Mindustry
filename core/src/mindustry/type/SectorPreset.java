@@ -5,11 +5,9 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.maps.generators.*;
 import mindustry.mod.Mods.*;
 
@@ -20,8 +18,7 @@ public class SectorPreset extends UnlockableContent{
 
     public int captureWave = 0;
     public Cons<Rules> rules = rules -> rules.winWave = captureWave;
-    /** Difficulty, 0-10. */
-    public float difficulty;
+    public SectorThreat threat = SectorThreat.low;
     public float startWaveTimeMultiplier = 2f;
     public boolean addStartingItems = false;
     public boolean noLighting = false;
@@ -107,12 +104,20 @@ public class SectorPreset extends UnlockableContent{
         if(sector != null && sector.preset == this){
             sector.preset = null;
         }
+        for(var other : shieldSectors){
+            if(other.shieldTarget == sector){
+                other.shieldTarget = null;
+            }
+        }
     }
 
     @Override
     public void init(){
         super.init();
+        assignShieldTargets();
+    }
 
+    public void assignShieldTargets(){
         //note that sectors can only have one visual shield target
         for(var other : shieldSectors){
             other.shieldTarget = sector;
@@ -120,11 +125,11 @@ public class SectorPreset extends UnlockableContent{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(outline && Core.atlas.has("sector-" + name)){
-            makeOutline(PageType.ui, packer, Core.atlas.find("sector-" + name), false, outlineColor, outlineRadius, outlineRadius);
+            makeOutline(packer, Core.atlas.find("sector-" + name), false, outlineColor, outlineRadius, outlineRadius);
         }
     }
 

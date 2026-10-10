@@ -2,8 +2,8 @@ package mindustry.world.blocks.heat;
 
 import arc.math.*;
 import arc.struct.*;
-import arc.util.io.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.production.*;
@@ -27,8 +27,8 @@ public class HeatProducer extends GenericCrafter{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.output, heatOutput, StatUnit.heatUnits);
     }
@@ -62,8 +62,8 @@ public class HeatProducer extends GenericCrafter{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.heat) return heat;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return heat;
             return super.sense(sensor);
         }
 

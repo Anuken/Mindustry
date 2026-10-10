@@ -5,7 +5,6 @@ import arc.assets.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.scene.ui.*;
@@ -16,11 +15,9 @@ import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
 import mindustry.ai.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.mod.ContentParser.*;
 import mindustry.mod.data.*;
 import mindustry.type.*;
@@ -159,7 +156,7 @@ public class Mods implements Loadable{
         long startTime = Time.millis();
 
         //TODO this should estimate sprite sizes per page
-        MultiPacker packer = new MultiPacker();
+        ModPackContext packer = new ModPackContext(4096);
         var textureResize = new ObjectFloatMap<String>();
         int[] totalSprites = {0};
         //all packing tasks to await
@@ -216,140 +213,56 @@ public class Mods implements Loadable{
             }
         }
 
-        Seq<RegionEntry>[] entries = new Seq[PageType.all.length];
-        for(int i = 0; i < PageType.all.length; i++){
-            entries[i] = new Seq<>();
+        Seq<Pixmap> pageToPixmap = new Seq<>();
+        Seq<RegionEntry> entries = new Seq<>();
+        var pages = Core.atlas.getPages();
+
+        for(var page : pages){
+            pageToPixmap.add(new Pixmap(page.textureFile));
         }
 
-        ObjectMap<Texture, PageType> pageTypes = ObjectMap.of(
-        Core.atlas.find("white").texture, PageType.main,
-        Core.atlas.find("stone1").texture, PageType.environment,
-        Core.atlas.find("whiteui").texture, PageType.ui,
-        Core.atlas.find("rubble-1-0").texture, PageType.rubble
-        );
-
+        //TODO: handle aliases correctly
+        //TODO: for most mods, it is not necessary to load vanilla regions at all
         for(AtlasRegion region : Core.atlas.getRegions()){
-            PageType type = pageTypes.get(region.texture, PageType.main);
-
-            if(!packer.has(type, region.name)){
-                entries[type.ordinal()].add(new RegionEntry(region.name, Core.atlas.getPixmap(region), region.splits, region.pads));
+            if(!packer.has(region.name)){
+                entries.add(new RegionEntry(region.name, new PixmapRegion(pageToPixmap.get(region.texture.getDepth()), region.getX(), region.getY(), region.width, region.height), region.splits, region.pads));
             }
         }
 
-        //sort each page type by size first, for optimal packing
-        for(int i = 0; i < PageType.all.length; i++){
-            var rects = entries[i];
-            var type = PageType.all[i];
-            //TODO is this in reverse order?
-            rects.sort(Structs.comparingInt(o -> -Math.max(o.region.width, o.region.height)));
+        entries.sort(Structs.comparingInt(o -> -Math.max(o.region.width, o.region.height)));
 
-            for(var entry : rects){
-                packer.add(type, entry.name, entry.region, entry.splits, entry.pads);
-            }
+        for(var entry : entries){
+            packer.add(entry.name, entry.region, entry.splits, entry.pads, false);
         }
 
-        Pixmap[] whitePixmap = {null};
-        Texture[] whiteTex = {null};
+        TextureAtlas oldAtlas = Core.atlas;
 
-        waitForMain(() -> {
-            whitePixmap[0] = Pixmaps.blankPixmap();
-            whiteTex[0] = new Texture(whitePixmap[0]);
-            var whiteRegion = new AtlasRegion(whiteTex[0], 0, 0, 1, 1);
-
-            Core.atlas.dispose();
-
-            //dead shadow-atlas for getting regions, but not pixmaps
-            var shadow = Core.atlas;
-            //dummy texture atlas that returns the 'shadow' regions; used for mod loading
-            Core.atlas = new TextureAtlas(){
-
-                {
-                    //needed for the correct operation of the found() method in the TextureRegion
-                    error = shadow.find("error");
-                }
-
-                @Override
-                public AtlasRegion white(){
-                    return whiteRegion;
-                }
-
-                @Override
-                public AtlasRegion find(String name){
-                    var base = packer.getPacked(name);
-
-                    if(base != null){
-                        var reg = new AtlasRegion(shadow.find(name).texture, base.x, base.y, base.width, base.height);
-                        reg.name = name;
-                        reg.pixmapRegion = base;
-                        return reg;
-                    }
-
-                    return shadow.find(name);
-                }
-
-                @Override
-                public boolean isFound(TextureRegion region){
-                    return region != shadow.find("error");
-                }
-
-                @Override
-                public TextureRegion find(String name, TextureRegion def){
-                    return !has(name) ? def : find(name);
-                }
-
-                @Override
-                public boolean has(String s){
-                    return shadow.has(s) || packer.getPacked(s) != null;
-                }
-
-                //return the *actual* pixmap regions, not the disposed ones.
-                @Override
-                public PixmapRegion getPixmap(AtlasRegion region){
-                    PixmapRegion out = packer.getPacked(region.name);
-                    //this should not happen in normal situations
-                    if(out == null) return packer.getPacked("error");
-                    return out;
-                }
-            };
+        //pack content async (slow)
+        content.eachModdedUnlockable(u -> {
+            u.load();
+            u.packSprites(packer);
         });
 
-        //generate new icons
-        for(Seq<Content> arr : content.getContentMap()){
-            arr.each(c -> {
-                if(c instanceof UnlockableContent u && c.minfo.mod != null){
-                    u.load();
-                    u.loadIcon();
-                    if(u.generateIcons && !c.minfo.mod.meta.pregenerated){
-                        u.createIcons(packer);
-                    }
-                }
-            });
-        }
-
         waitForMain(() -> {
-            whitePixmap[0].dispose();
-            whiteTex[0].dispose();
-
             //replace old atlas data
-            Core.atlas = packer.flush(filter, new TextureAtlas(){
-
-                @Override
-                public PixmapRegion getPixmap(AtlasRegion region){
-                    var other = super.getPixmap(region);
-                    if(other.pixmap.isDisposed()){
-                        throw new RuntimeException("Calling getPixmap outside of createIcons is not supported!");
-                    }
-
-                    return other;
-                }
-            });
+            Core.atlas = packer.packer.generateTextureAtlas(filter, filter, false, true, 1);
 
             textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
+            renderer.loadFluidFrames();
 
             Core.atlas.setErrorRegion("error");
-            Log.debug("Total pages: @", Core.atlas.getTextures().size);
+            Log.debug("Total pages: @", Core.atlas.getPages().size);
 
             packer.printStats();
+
+            //TODO: if this is done during loading, it makes the font flash transparent for some reason, despite the fact that the texture should already be drawn at that point
+            Events.on(ClientLoadEvent.class, e -> {
+                //grab the font texture and overwrite the contents of its reference with the real font texture
+                ArraySliceTexture last = new ArraySliceTexture(Core.atlas.getTexture(), Core.atlas.getTexture().depth - 1);
+                ((ArraySliceTexture)UI.packer.getTargetTexture()).overwrite(last.array, last.index);
+
+                oldAtlas.dispose();
+            });
 
             Events.fire(new AtlasPackEvent(packer));
 
@@ -381,7 +294,7 @@ public class Mods implements Loadable{
         }
     }
 
-    private void packSprites(MultiPacker packer, Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks, ObjectFloatMap<String> textureResize){
+    private void packSprites(PackContext packer, Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks, ObjectFloatMap<String> textureResize){
         boolean bleed = Core.settings.getBool("linear", true) && !mod.meta.pregenerated;
         float textureScale = mod.meta.texturescale;
 
@@ -411,11 +324,17 @@ public class Mods implements Loadable{
                         int hyphen = baseName.indexOf('-');
                         String fullName = ((prefix && !(hyphen != -1 && baseName.substring(hyphen + 1).startsWith(mod.name + "-"))) ? mod.name + "-" : "") + baseName;
 
-                        packer.add(getPage(file), fullName, new PixmapRegion(pix));
+                        packer.add(fullName, new PixmapRegion(pix));
                         if(textureScale != 1.0f){
                             textureResize.put(fullName, textureScale);
                         }
                         pix.dispose();
+                        //in order for content regions in load() to resolve to a texture region with a real name (not error), regions that have been newly packed must be registered
+                        if(!Core.atlas.has(fullName)){
+                            AtlasRegion fake = new AtlasRegion();
+                            fake.name = fullName;
+                            Core.atlas.getRegionMap().put(fullName, fake);
+                        }
                     };
                 }catch(Exception e){
                     //rethrow exception with details about the cause of failure
@@ -441,15 +360,7 @@ public class Mods implements Loadable{
     @Override
     public void loadSync(){
         loadIcons();
-    }
 
-    private PageType getPage(Fi file){
-        String path = file.path();
-        return
-            path.contains("sprites/blocks/environment") || path.contains("sprites-override/blocks/environment") ? PageType.environment :
-            path.contains("sprites/rubble") || path.contains("sprites-override/rubble") ? PageType.rubble :
-            path.contains("sprites/ui") || path.contains("sprites-override/ui") ? PageType.ui :
-            PageType.main;
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -669,7 +580,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           ui.showErrorMessage("@mod.scripts.disable");
+            ui.showErrorMessage("@mod.scripts.disable");
         }
 
         //show list of errored content
@@ -1035,7 +946,7 @@ public class Mods implements Loadable{
             return null;
         }
 
-        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.plain));
+        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.json));
         meta.cleanup();
         return meta;
     }
@@ -1416,8 +1327,8 @@ public class Mods implements Loadable{
         /** Minimum game version that this mod requires, e.g. "140.1" */
         public String minGameVersion = "0";
         public @Nullable String displayName, author, description, subtitle, version, main, repo;
-        public Seq<String> dependencies = Seq.with();
-        public Seq<String> softDependencies = Seq.with();
+        public Seq<String> dependencies = arc.struct.Seq.with();
+        public Seq<String> softDependencies = arc.struct.Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
@@ -1512,6 +1423,52 @@ public class Mods implements Loadable{
         public ModDependency(String name, boolean required){
             this.name = name;
             this.required = required;
+        }
+    }
+
+    /** PackContext backed by a runtime PixmapPacker; used to build the mod-patched atlas. */
+    public static class ModPackContext extends PackContext implements Disposable{
+        public final PixmapPacker packer;
+
+        public ModPackContext(int size){
+            packer = new PixmapPacker(size, size, 2, true);
+        }
+
+        @Override
+        public @Nullable PixmapRegion getOrNull(String name){
+            return packer.getRegion(name);
+        }
+
+        @Override
+        public boolean has(String name){
+            return packer.getRect(name) != null;
+        }
+
+        @Override
+        public void add(String name, PixmapRegion region, int[] splits, int[] pads, boolean noCrop){
+            packer.pack(name, region, splits, pads);
+        }
+
+        public void printStats(){
+            if(Log.level != Log.LogLevel.debug) return;
+
+            Log.debug("[Atlas] " + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&r", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
+            int i = 0;
+            for(var page : packer.getPages()){
+                float totalArea = 0;
+                for(var region : page.getRects().values()){
+                    totalArea += region.area();
+                }
+
+                Log.debug("[Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
+
+                i ++;
+            }
+        }
+
+        @Override
+        public void dispose(){
+            packer.forceDispose();
         }
     }
 }

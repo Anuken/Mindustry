@@ -1,9 +1,9 @@
 package mindustry.world;
 
-import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 
 import static mindustry.Vars.*;
@@ -22,7 +22,7 @@ public class ItemBuffer{
 
     public void accept(Item item, short data){
         //if(!accepts()) return;
-        buffer[index++] = TimeItem.get(data, item.id, Time.time);
+        buffer[index++] = TimeItem.get(data, item.id, Vars.state.time);
     }
 
     public void accept(Item item){
@@ -34,7 +34,7 @@ public class ItemBuffer{
             long l = buffer[0];
             float time = TimeItem.time(l);
 
-            if(Time.time >= time + speed || Time.time < time){
+            if(Vars.state.time >= time + speed || Vars.state.time < time){
                 return content.item(TimeItem.item(l));
             }
         }
@@ -59,6 +59,9 @@ public class ItemBuffer{
         byte length = read.b();
         for(int i = 0; i < length; i++){
             long l = read.l();
+            //re-pack the item ID through the reader's content mapping
+            Item item = read.content(ContentType.item, TimeItem.item(l));
+            if(item != null) l = TimeItem.get(TimeItem.data(l), item.id, TimeItem.time(l));
             if(i < buffer.length){
                 buffer[i] = l;
             }

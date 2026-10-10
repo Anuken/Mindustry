@@ -12,7 +12,6 @@ import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.part.*;
@@ -151,7 +150,7 @@ public class BulletType extends Content implements Cloneable{
     public boolean hittable = true;
     /** Whether this bullet can be reflected. */
     public boolean reflectable = true;
-    /** Whether this projectile can be absorbed by shields. */
+    /** Whether this projectile/rail/laser can be absorbed by shields. */
     public boolean absorbable = true;
     /** If true, the angle param in create is ignored. */
     public boolean ignoreSpawnAngle = false;
@@ -567,7 +566,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(createFrags && fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Time.run(0f, () -> createFrags(b, x, y));
+                Vars.state.post(() -> createFrags(b, x, y));
             }else{
                 createFrags(b, x, y);
             }
@@ -597,7 +596,7 @@ public class BulletType extends Content implements Cloneable{
     public void createPuddles(Bullet b, float x, float y){
         if(puddleLiquid != null && puddles > 0){
             for(int i = 0; i < puddles; i++){
-                Tile tile = world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
+                Tile tile = state.world.tileWorld(x + Mathf.range(puddleRange), y + Mathf.range(puddleRange));
                 Puddles.deposit(tile, puddleLiquid, puddleAmount);
             }
         }
@@ -612,14 +611,14 @@ public class BulletType extends Content implements Cloneable{
             }
 
             if(heals()){
-                indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
+                state.indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
                     healEffect.at(other.x, other.y, 0f, healColor, other.block);
                     other.heal(healPercent / 100f * other.maxHealth() + healAmount);
                 });
             }
 
             if(makeFire){
-                indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> Fires.create(other.tile));
+                state.indexer.eachBlock(null, x, y, splashDamageRadius, other -> other.team != b.team, other -> Fires.create(other.tile));
             }
         }
     }
@@ -824,7 +823,7 @@ public class BulletType extends Content implements Cloneable{
                 b.trail = new Trail(trailLength);
             }
             b.trail.length = trailLength;
-            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Time.time, trailSinScl, trailSinMag) : 0f)));
+            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Vars.state.time, trailSinScl, trailSinMag) : 0f)));
         }
     }
 
@@ -969,7 +968,7 @@ public class BulletType extends Content implements Cloneable{
         bullet.originX = x;
         bullet.originY = y;
         if(!(aimX == -1f && aimY == -1f)){
-            bullet.aimTile = target instanceof Building b ? b.tile : world.tileWorld(aimX, aimY);
+            bullet.aimTile = target instanceof Building b ? b.tile : state.world.tileWorld(aimX, aimY);
         }
         bullet.aimX = aimX;
         bullet.aimY = aimY;

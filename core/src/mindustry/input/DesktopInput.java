@@ -24,6 +24,7 @@ import mindustry.ui.*;
 import mindustry.world.*;
 
 import static arc.Core.*;
+import static arc.Core.camera;
 import static mindustry.Vars.*;
 import static mindustry.input.PlaceMode.*;
 
@@ -383,7 +384,7 @@ public class DesktopInput extends InputHandler{
 
                     //remove invalid units
                     for(int j = 0; j < group.size; j++){
-                        Unit u = Groups.unit.getByID(group.get(j));
+                        Unit u = state.entities.unit.getByID(group.get(j));
                         if(u == null || !u.isCommandable() || !u.isValid()){
                             group.removeIndex(j);
                             j --;
@@ -396,7 +397,7 @@ public class DesktopInput extends InputHandler{
                         commandBuildings.clear();
 
                         group.each(id -> {
-                            var unit = Groups.unit.getByID(id);
+                            var unit = state.entities.unit.getByID(id);
                             if(unit != null){
                                 selectedUnits.addAll(unit);
                             }
@@ -481,7 +482,7 @@ public class DesktopInput extends InputHandler{
         }
 
         if(Core.input.keyTap(Binding.select) && !Core.scene.hasMouse()){
-            Tile selected = world.tileWorld(input.mouseWorldX(), input.mouseWorldY());
+            Tile selected = state.world.tileWorld(input.mouseWorldX(), input.mouseWorldY());
             if(selected != null){
                 Call.tileTap(player, selected);
             }

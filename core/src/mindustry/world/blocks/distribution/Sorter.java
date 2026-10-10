@@ -5,10 +5,10 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -166,7 +166,7 @@ public class Sorter extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            sortItem = content.item(read.s());
+            sortItem = read.item();
 
             if(revision == 1){
                 new DirectionalItemBuffer(20).read(read);

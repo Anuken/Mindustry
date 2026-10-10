@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
@@ -16,8 +17,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.units.UnitAssembler.*;
 
-import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.*;
@@ -116,6 +117,30 @@ public class Fx{
         reset();
 
         Draw.scl = p;
+    }),
+
+    //water equivalent of wreck decals - Effect.decal() doesn't render on liquids
+    unitDrown = new Effect(3600f, e -> {
+        if(!(e.data instanceof TextureRegion reg)) return;
+        //small ripples drifting over the debris, so the water still reads as moving on top of it
+        if(!state.isPaused() && Mathf.chanceDelta(0.0002f * (reg.width * reg.height) / (50f * 50f))){
+            float x = e.x + Mathf.range(reg.width * reg.scale / 4f / 3f), y = e.y + Mathf.range(reg.height * reg.scale / 4f / 3f);
+            Tile tile = state.world.tileWorld(x, y);
+            if(tile != null && tile.floor().isLiquid && tile.block() == Blocks.air){
+                Fx.rippleSlow.at(x, y, Mathf.random(0.4f, 1f), tile.floor().mapColor);
+            }
+        }
+
+        //capture position
+        float x = e.x, y = e.y, rotation = e.rotation, fin = e.fin();
+        float color = e.color.toFloatBits();
+        Drawf.underwater(() -> {
+            Draw.z(Layer.scorch);
+            mixcol(color);
+            alpha(0.85f * (1f - Mathf.curve(fin, 0.98f)));
+            rect(reg, x, y, rotation);
+            reset();
+        });
     }),
 
     unitSpirit = new Effect(17f, e -> {
@@ -1362,7 +1387,7 @@ public class Fx{
 
     forceShrink = new Effect(20, e -> {
         color(e.color, e.fout());
-        if(renderer.animateShields){
+        if(renderer.animateSurfaces){
             Fill.poly(e.x, e.y, 6, e.rotation * e.fout());
         }else{
             stroke(1.5f);
@@ -1409,7 +1434,7 @@ public class Fx{
         if(Fire.regions[0] == null) return;
         alpha(e.fout());
         rect(Fire.regions[((int)(e.rotation + e.fin() * Fire.frames)) % Fire.frames], e.x + Mathf.randomSeedRange((int)e.y, 2), e.y + Mathf.randomSeedRange((int)e.x, 2));
-        Drawf.light(e.x, e.y, 50f + Mathf.absin(5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
+        Drawf.light(e.x, e.y, 50f + Mathf.absin(Vars.state.time, 5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
     }),
 
     fire = new Effect(50f, e -> {
@@ -2730,6 +2755,12 @@ public class Fx{
         color(Tmp.c1.set(e.color).mul(1.5f));
         stroke(e.fout() * 1.4f);
         Lines.circle(e.x, e.y, (2f + e.fin() * 4f) * e.rotation);
+    }).layer(Layer.debris),
+
+    rippleSlow = new Effect(120, e -> {
+        color(Tmp.c1.set(e.color).mul(1.5f), 0.6f);
+        stroke(e.fout() * 1.4f);
+        Lines.circle(e.x, e.y, (e.fin() * 7f) * e.rotation);
     }).layer(Layer.debris),
 
     bubble = new Effect(20, e -> {

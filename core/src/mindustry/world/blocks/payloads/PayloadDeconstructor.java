@@ -1,16 +1,15 @@
 package mindustry.world.blocks.payloads;
 
-import arc.graphics.*;
 import arc.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 
@@ -247,15 +246,15 @@ public class PayloadDeconstructor extends PayloadBlock{
         }
 
         @Override
-        public double sense(Content content){
-            if(deconstructing instanceof UnitPayload up) return up.unit.type == content ? 1 : 0;
-            if(deconstructing instanceof BuildPayload bp) return bp.build.block == content ? 1 : 0;
-            return super.sense(content);
+        public double sense(Object object){
+            if(deconstructing instanceof UnitPayload up) return up.unit.type == object ? 1 : 0;
+            if(deconstructing instanceof BuildPayload bp) return bp.build.block == object ? 1 : 0;
+            return super.sense(object);
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress;
             return super.sense(sensor);
         }
 

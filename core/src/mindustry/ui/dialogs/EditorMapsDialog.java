@@ -105,7 +105,15 @@ public class EditorMapsDialog extends MapListDialog{
         float mapsize = Core.graphics.isPortrait() ? 160f : 300f;
         Table table = dialog.cont;
 
-        table.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize);
+        Texture[] cur = {map.safeTexture()};
+        table.stack(new Image(map.safeTexture()).setScaling(Scaling.fit), new BorderImage(map.safeTexture()).setScaling(Scaling.fit)).size(mapsize).update(st -> {
+            if(map.safeTexture() != cur[0]){
+                cur[0] = map.safeTexture();
+                st.clearChildren();
+                st.add(new Image(map.safeTexture()).setScaling(Scaling.fit));
+                st.add(new BorderImage(map.safeTexture()).setScaling(Scaling.fit));
+            }
+        });
 
         table.table(Styles.black, desc -> {
             desc.top();

@@ -3,7 +3,8 @@ package mindustry.world.modules;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.game.*;
+import mindustry.io.*;
 import mindustry.type.*;
 
 import java.util.*;
@@ -24,7 +25,7 @@ public class ItemModule extends BlockModule{
     private static float[] cacheSums;
     private static float[] displayFlow;
     private static final Bits cacheBits = new Bits();
-    private static final Interval flowTimer = new Interval(2);
+    private static final Interval flowTimer = new mindustry.game.Interval(2);
 
     protected int[] items = new int[content.items().size];
     protected int total;
@@ -325,7 +326,7 @@ public class ItemModule extends BlockModule{
         for(int j = 0; j < count; j++){
             int itemid = legacy ? read.ub() : read.s();
             int itemamount = read.i();
-            Item item = content.item(itemid);
+            Item item = read.content(ContentType.item, itemid);
             if(item != null){
                 items[item.id] = itemamount;
                 total += itemamount;
