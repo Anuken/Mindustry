@@ -42,9 +42,7 @@ public class CutsceneI implements LogicInstruction{
                 control.input.logicCutscene = false;
                 control.input.logicCutsceneInteract = false;
             }
-            case shake -> {
-                renderer.shake(p1.numf(), p2.numf() * 60);
-            }
+            case shake -> renderer.shake(p1.numf(), p2.numf() * 60);
             case getHud -> p1.setbool(!control.input.logicHideHud);
             case setHud -> control.input.logicHideHud = !p1.bool();
         }
