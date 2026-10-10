@@ -32,6 +32,7 @@ public class Conveyor extends Block implements Autotiler{
     public float speed = 0f;
     public float displayedSpeed = 0f;
     public boolean pushUnits = true;
+    public boolean armored = false;
 
     public @Nullable Block junctionReplacement, bridgeReplacement;
 
@@ -80,8 +81,22 @@ public class Conveyor extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        if(armored){
+            return (otherblock.outputsItems() && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock)) ||
+                (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems);
+        }
         return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
             && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
+    }
+
+    @Override
+    public boolean blendsArmored(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        if(!armored) return Autotiler.super.blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock);
+
+        return Point2.equals(tile.x + Geometry.d4(rotation).x, tile.y + Geometry.d4(rotation).y, otherx, othery)
+            || ((!otherblock.rotatedOutput(otherx, othery, tile) && Edges.getFacingEdge(otherblock, otherx, othery, tile) != null &&
+            Edges.getFacingEdge(otherblock, otherx, othery, tile).relativeTo(tile) == rotation) ||
+            (otherblock instanceof Conveyor && otherblock.rotatedOutput(otherx, othery, tile) && Point2.equals(otherx + Geometry.d4(otherrot).x, othery + Geometry.d4(otherrot).y, tile.x, tile.y)));
     }
 
     //stack conveyors should be bridged over, not replaced
@@ -354,6 +369,7 @@ public class Conveyor extends Block implements Autotiler{
             if(len >= capacity) return false;
             Tile facing = Edges.getFacingEdge(source.tile, tile);
             if(facing == null) return false;
+            if(armored && !(source.block instanceof Conveyor || facing.relativeTo(tile) == rotation)) return false;
             int direction = Math.abs(facing.relativeTo(tile.x, tile.y) - rotation);
             return (((direction == 0) && minitem >= itemSpace) || ((direction % 2 == 1) && minitem > 0.7f)) && !(source.block.rotate && next == source);
         }
