@@ -274,7 +274,7 @@ public class DesktopInput extends InputHandler{
         panning |= detached;
 
 
-        if(!logicCutscene && !locked){
+        if(!cameraLocked() && !locked){
             if(((player.dead() || state.isPaused() || detached) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
                 if(input.keyDown(Binding.mouseMove)){
                     panCam = true;
@@ -966,7 +966,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void panCamera(Vec2 position){
-        if(!locked()){
+        if(!locked() && !cameraLocked()){
             panning = true;
             camera.position.set(position);
         }

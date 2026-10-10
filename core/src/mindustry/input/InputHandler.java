@@ -915,6 +915,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
         return inputLocks.contains(Boolp::get);
     }
 
+    /** @return whether the camera is locked, for 'cutscenes' */
+    public boolean cameraLocked(){
+        return logicCutscene;
+    }
+
     public Eachable<BuildPlan> allPlans(){
         return allPlans;
     }

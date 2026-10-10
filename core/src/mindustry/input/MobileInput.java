@@ -805,7 +805,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         //zoom camera
-        if(!logicCutscene && !locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotatePlaced) && (Core.input.keyDown(Binding.diagonalPlacement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
+        if(!cameraLocked() && !locked  && !scene.hasKeyboard() && !scene.hasScroll() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0 && !Core.input.keyDown(Binding.rotatePlaced) && (Core.input.keyDown(Binding.diagonalPlacement) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
@@ -829,7 +829,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             }
         }
 
-        if(!player.dead() && !state.isPaused() && !locked && !logicCutscene){
+        if(!player.dead() && !state.isPaused() && !locked){
             updateMovement(player.unit());
         }
 
@@ -1022,7 +1022,8 @@ public class MobileInput extends InputHandler implements GestureListener{
             target = null;
         }
 
-        targetPos.set(Core.camera.position);
+        // Allows targeting/shooting without moving the unit
+        targetPos.set(logicCutscene ? player : Core.camera.position);
 
         float attractDst = 15f;
         float speed = unit.speed();
