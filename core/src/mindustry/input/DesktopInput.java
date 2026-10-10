@@ -274,12 +274,11 @@ public class DesktopInput extends InputHandler{
         panning |= detached;
 
 
-        if(!locked){
+        if(!cameraLocked() && !locked){
             if(((player.dead() || state.isPaused() || detached) && !ui.chatfrag.shown()) && !scene.hasField() && !scene.hasDialog()){
                 if(input.keyDown(Binding.mouseMove)){
                     panCam = true;
                 }
-
                 Core.camera.position.add(Tmp.v1.setZero().add(Core.input.axis(Binding.moveX), Core.input.axis(Binding.moveY)).nor().scl(camSpeed));
             }else if((!player.dead() || spectating != null) && !panning){
                 //TODO do not pan
@@ -476,7 +475,7 @@ public class DesktopInput extends InputHandler{
         }
 
         //zoom camera
-        if((!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonalPlacement)) && !ui.chatfrag.shown() && !ui.consolefrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
+        if(!cameraLocked() || (!Core.scene.hasScroll() || Core.input.keyDown(Binding.diagonalPlacement)) && !ui.chatfrag.shown() && !ui.consolefrag.shown() && Math.abs(Core.input.axisTap(Binding.zoom)) > 0
             && !Core.input.keyDown(Binding.rotatePlaced) && (Core.input.keyDown(Binding.diagonalPlacement) ||
                 !Binding.zoom.value.equals(Binding.rotate.value) || ((!player.isBuilder() || !isPlacing() || !block.rotate) && selectPlans.isEmpty()))){
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
@@ -967,7 +966,7 @@ public class DesktopInput extends InputHandler{
 
     @Override
     public void panCamera(Vec2 position){
-        if(!locked()){
+        if(!locked() && !cameraLocked()){
             panning = true;
             camera.position.set(position);
         }

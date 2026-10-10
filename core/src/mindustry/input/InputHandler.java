@@ -78,13 +78,14 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** If true, there is a cutscene currently occurring in logic. */
     public boolean logicCutscene;
+    public boolean logicCutsceneInteract;
     public boolean logicHideHud;
     public Vec2 logicCamPan = new Vec2();
     public float logicCamSpeed = 0.1f;
     public float logicCutsceneZoom = -1f;
 
     /** If any of these functions return true, input is locked. */
-    public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene(), () -> logicCutscene);
+    public Seq<Boolp> inputLocks = Seq.with(() -> renderer.isCutscene(), () -> logicCutscene && !logicCutsceneInteract);
     public Interval controlInterval = new Interval();
     public @Nullable Block block;
     public boolean overrideLineRotation;
@@ -912,6 +913,11 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     /** @return whether most input is locked, for 'cutscenes' */
     public boolean locked(){
         return inputLocks.contains(Boolp::get);
+    }
+
+    /** @return whether the camera is locked, for 'cutscenes' */
+    public boolean cameraLocked(){
+        return logicCutscene;
     }
 
     public Eachable<BuildPlan> allPlans(){
@@ -2130,7 +2136,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     /** Forces the camera to a position and enables panning on desktop. */
     public void panCamera(Vec2 position){
-        if(!locked()){
+        if(!locked() && !cameraLocked()){
             camera.position.set(position);
         }
     }
