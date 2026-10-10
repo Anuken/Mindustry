@@ -37,7 +37,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     static final float warpDst = 8f;
 
     @Import boolean dead, disarmed;
-    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, dragMultiplier, armorOverride, speedMultiplier;
+    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, dragMultiplier, armorOverride, armorMultiplier, speedMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
@@ -292,7 +292,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineY -> mining() ? mineTile.y : -1;
             case buildX -> isBuilding() ? buildPlan().x : -1;
             case buildY -> isBuilding() ? buildPlan().y : -1;
-            case armor -> armorOverride >= 0f ? armorOverride : armor;
+            case armor -> (armorOverride >= 0f ? armorOverride : armor) * armorMultiplier;
             case flag -> flag;
             case speed -> type.speed * 60f / tilesize * speedMultiplier;
             case controlled -> !isValid() ? 0 :

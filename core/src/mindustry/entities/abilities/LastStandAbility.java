@@ -19,7 +19,7 @@ public class LastStandAbility extends Ability{
     public StatusEffect statusEffect = StatusEffects.none;
     public float maxHealth;
     /** Has support for both <1 and >1 values. */
-    public float damageMultiplier = 1f, reloadMultiplier = 1f, speedMultiplier = 1f, rotateSpeedMultiplier = 1f;
+    public float damageMultiplier = 1f, reloadMultiplier = 1f, speedMultiplier = 1f, rotateSpeedMultiplier = 1f, buildSpeedMultiplier = 1f, armorMultiplier = 1f;
     /** % of max health for reaching the maximum multipliers. */
     public float minHealth = 0.2f;
     /** Applied slope steepness. Higher values equal harder to achieve max boost. */
@@ -37,11 +37,17 @@ public class LastStandAbility extends Ability{
 
     public static class StatEntry{
         public String name;
-        public float value;
-        public float effectValue;
+        public Stat stat;
+        public float value, effectValue;
 
         public StatEntry(String name, float value, float effectValue){
             this.name = name;
+            this.value = value;
+            this.effectValue = effectValue;
+        }
+
+        public StatEntry(Stat stat, float value, float effectValue){
+            this.stat = stat;
             this.value = value;
             this.effectValue = effectValue;
         }
@@ -59,19 +65,26 @@ public class LastStandAbility extends Ability{
 
         //consider boosteffect multiplier in stats
         var stats = Seq.with(
-            new StatEntry("maxdamagemultiplier", damageMultiplier, statusEffect.damageMultiplier),
-            new StatEntry("maxreloadmultiplier", reloadMultiplier, statusEffect.reloadMultiplier),
-            new StatEntry("maxspeedmultiplier", speedMultiplier, statusEffect.speedMultiplier),
-            new StatEntry("maxrotatespeedmultiplier", rotateSpeedMultiplier, statusEffect.rotateSpeedMultiplier)
+            new StatEntry(Stat.damageMultiplier, damageMultiplier, statusEffect.damageMultiplier),
+            new StatEntry(Stat.reloadMultiplier, reloadMultiplier, statusEffect.reloadMultiplier),
+            new StatEntry(Stat.speedMultiplier, speedMultiplier, statusEffect.speedMultiplier),
+            new StatEntry(Stat.rotateSpeedMultiplier, rotateSpeedMultiplier, statusEffect.rotateSpeedMultiplier),
+            new StatEntry(Stat.buildSpeedMultiplier, buildSpeedMultiplier, statusEffect.buildSpeedMultiplier),
+            new StatEntry(Stat.armorMultiplier, armorMultiplier, statusEffect.armorMultiplier)
         );
 
         for(StatEntry s : stats){
             if(s.value > 0f && s.value != 1f){
-                String text = StatValues.multStat(s.value, false);
+                String text = StatValues.multStat(s.value, false) + "%";
                 if(s.effectValue != 1f && statusEffect != StatusEffects.none){
-                    text += "%" + (s.effectValue > 1f ? "[stat] + " : "[negstat] ") + Strings.autoFixed((s.effectValue - 1f) * 100f, 2);
+                    text += (s.effectValue > 1f ? "[stat] + " : "[negstat] ") + Strings.autoFixed((s.effectValue - 1f) * 100f, 2);
                 }
-                t.add(abilityStat(s.name, text));
+
+                if(s.name != null){
+                    t.add(abilityStat(s.name, text));
+                }else if(s.stat != null){
+                    t.add(Core.bundle.format("ability.stat.multiplier", text, s.stat.localized().toLowerCase()));
+                }
                 t.row();
             }
         }
@@ -80,6 +93,7 @@ public class LastStandAbility extends Ability{
     @Override
     public void init(UnitType type){
         maxHealth = type.health;
+        shineRegion = Core.atlas.find(type.name + shineSuffix, type.region);
     }
 
     @Override
@@ -87,11 +101,13 @@ public class LastStandAbility extends Ability{
         if(unit.health <= unit.maxHealth){
             warmup = Mathf.pow(Mathf.clamp((1f - unit.health / unit.maxHealth) / (1f - minHealth), 0f, 1f), exponent);
 
-            //I am unsure if this is a good way to implement this...
+            //reflection cannot be used with annotations
             if(damageMultiplier != 1f) unit.damageMultiplier *= scaleMult(damageMultiplier, warmup);
             if(reloadMultiplier != 1f) unit.reloadMultiplier *= scaleMult(reloadMultiplier, warmup);
             if(speedMultiplier != 1f) unit.speedMultiplier *= scaleMult(speedMultiplier, warmup);
             if(rotateSpeedMultiplier != 1f) unit.rotateSpeedMultiplier *= scaleMult(rotateSpeedMultiplier, warmup);
+            if(buildSpeedMultiplier != 1f) unit.buildSpeedMultiplier *= scaleMult(buildSpeedMultiplier, warmup);
+            if(armorMultiplier != 1f) unit.armorMultiplier *= scaleMult(armorMultiplier, warmup);
 
             if(effect != null && Mathf.chanceDelta(warmup * 0.3f)){
                 Tmp.v1.rnd(Mathf.range(unit.type.hitSize * 0.75f));
@@ -110,17 +126,14 @@ public class LastStandAbility extends Ability{
 
     @Override
     public void draw(Unit unit){
-        if(drawShine){
-            shineRegion = Core.atlas.find(unit.type.name + shineSuffix, unit.type.region);
-
-            if(shineRegion.found() && warmup > 0.001f){
-                if(shineLayer > 0) Draw.z(shineLayer);
-                Draw.color(color, warmup);
-                Draw.blend(Blending.additive);
-                Draw.alpha(Mathf.absin(Vars.state.time, 2f / (warmup * shineSpeed), warmup / 2f + 0.5f));
-                Draw.rect(shineRegion, unit.x, unit.y, unit.rotation - 90f);
-                Draw.reset();
-            }
+        if(drawShine && shineRegion.found() && warmup > 0.001f){
+            if(shineLayer > 0) Draw.z(shineLayer);
+            Draw.color(color, warmup);
+            Draw.blend(Blending.additive);
+            Draw.alpha(Mathf.absin(Vars.state.time, 2f / (warmup * shineSpeed), warmup / 2f + 0.5f));
+            Draw.rect(shineRegion, unit.x, unit.y, unit.rotation - 90f);
+            Draw.reset();
+            Draw.blend();
         }
     }
 }
