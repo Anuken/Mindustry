@@ -809,7 +809,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             renderer.scaleCamera(Core.input.axisTap(Binding.zoom));
         }
 
-        if(!Core.settings.getBool("keyboard") && !logicCutscene && !locked && !scene.hasKeyboard()){
+        if(!Core.settings.getBool("keyboard") && !cameraLocked() && !locked && !scene.hasKeyboard()){
             //move camera around
             float camSpeed = 6f;
             Vec2 delta = Tmp.v1.setZero().add(Core.input.axis(Binding.moveX), Core.input.axis(Binding.moveY)).nor().scl(Time.delta * camSpeed);
@@ -912,6 +912,7 @@ public class MobileInput extends InputHandler implements GestureListener{
     }
 
     protected void autoPan(){
+        if(cameraLocked()) return;
         float screenX = Core.input.mouseX(), screenY = Core.input.mouseY();
 
         float panX = 0, panY = 0;
@@ -942,7 +943,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY){
-        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard") || locked() || logicCutscene || commandRect) return false;
+        if(Core.scene == null || Core.scene.hasDialog() || Core.settings.getBool("keyboard") || locked() || cameraLocked() || commandRect) return false;
 
         float scale = Core.camera.width / Core.graphics.getWidth();
         deltaX *= scale;
@@ -1023,7 +1024,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         }
 
         // Allows targeting/shooting without moving the unit
-        targetPos.set(logicCutscene ? player : Core.camera.position);
+        targetPos.set(cameraLocked() ? player : Core.camera.position);
 
         float attractDst = 15f;
         float speed = unit.speed();

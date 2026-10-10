@@ -29,8 +29,6 @@ public class CutsceneStatement extends LogicStatement{
 
                 if(action == CutsceneAction.zoom){
                     p2 = "false";
-                }else if(action == CutsceneAction.shake){
-                    p3 = "false";
                 }
                 rebuild(table);
             }, 3, cell -> cell.size(120f, 40f)));
@@ -60,9 +58,6 @@ public class CutsceneStatement extends LogicStatement{
             case shake -> {
                 fields(table, "amount", p1, str -> p1 = str);
                 fields(table, "duration", p2, str -> p2 = str);
-
-                table.add(" allow input ");
-                fields(table, p3, str -> p3 = str);
             }
             case setHud -> {
                 fields(table, "shown", p1, str -> p1 = str);
