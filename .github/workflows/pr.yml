@@ -20,10 +20,8 @@ jobs:
       uses: gradle/actions/setup-gradle@v6
     - name: Install client test dependencies
       run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
-    - name: Run unit tests
-      run: ./gradlew tests:test --stacktrace --rerun
-    - name: Run client tests
-      run: ./gradlew pack tests:clientTest
+    - name: Run tests
+      run: ./gradlew pack tests:testAll --stacktrace --rerun
     - name: Build JAR
       run: ./gradlew desktop:dist
     - name: Upload desktop JAR for testing

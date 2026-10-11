@@ -1343,7 +1343,7 @@ public class NetServer implements ApplicationListener{
             }
 
 
-            if(state.entities.player.size() > 0 && Core.settings.getBool("blocksync") && blockSyncTime.poll()){
+            if(state.entities.player.size() > 0 && blockSyncTime.poll()){
                 writeBlockSnapshots();
             }
 

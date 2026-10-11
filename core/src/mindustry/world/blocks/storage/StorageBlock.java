@@ -27,9 +27,10 @@ public class StorageBlock extends Block{
         group = BlockGroup.transportation;
         flags = EnumSet.of(BlockFlag.storage);
         allowResupply = true;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
         drawCached = true;
         drawDynamic = false;
+        drawTeamOverlay = false; //vaults/containers/cores already tint themselves
     }
 
     @Override

@@ -301,6 +301,7 @@ public class ContentParser{
             if(data.isArray()) return new Vec3(data.asFloatArray());
             return new Vec3(data.getFloat("x", 0f), data.getFloat("y", 0f), data.getFloat("z", 0f));
         });
+        put(Environments.class, (type, data) -> JsonIO.readEnvironments(data, false));
         put(Sound.class, (type, data) -> {
             if(data.isArray()) return new RandomSound(parser.readValue(Sound[].class, data));
 
@@ -434,18 +435,6 @@ public class ContentParser{
                         }
                         throw new RuntimeException(e);
                     }
-                }
-
-                //try to parse env bits
-                if((type == int.class || type == Integer.class) && jsonData instanceof JsonArray arr){
-                    int value = 0;
-                    for(var str : arr){
-                        if(!str.isString()) throw new SerializationException("Integer bitfield values must all be strings. Found: " + str);
-                        String field = str.asString();
-                        value |= Reflect.<Integer>get(Env.class, field);
-                    }
-
-                    return (T)(Integer)value;
                 }
 
                 //try to parse "item/amount" syntax

@@ -33,7 +33,7 @@ public class DuctJunction extends Block{
         hasItems = true;
 
         priority = TargetPriority.transport;
-        envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        envEnabled = Environments.of(Env.space, Env.terrestrial, Env.underwater);
     }
 
     @Override

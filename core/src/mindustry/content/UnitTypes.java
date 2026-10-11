@@ -213,10 +213,6 @@ public class UnitTypes{
                 shrinkY = 0f;
                 shrinkInterp = Interp.slope;
 
-                trailChance = 10f / 60f;
-                trailColor = Pal.bulletYellowBack;
-                trailEffect = Fx.bulletSparkSmokeTrailSmall;
-                trailSpread = 12f;
                 shootEffect = Fx.shootScepterSecondary;
                 hitEffect = Fx.hitScepterSecondary;
             }};
@@ -253,7 +249,14 @@ public class UnitTypes{
                     //standard bullet damage is far too much for lightning
                     lightningDamage = 20;
                     despawnSound = Sounds.shockBullet;
-                    bulletInterval = 4f;
+                    intervalAngle = 180f;
+                    intervalRandomSpread = 15;
+                    bulletInterval = 45f;
+                    intervalBullets = 2;
+
+                    trailEffect = Fx.disperseTrail;
+                    trailChance = 0.44f;
+                    trailRotation = true;
 
                     intervalBullet = new LightningBulletType(){{
                         damage = 5f;
@@ -4067,7 +4070,7 @@ public class UnitTypes{
 
         quell = new ErekirUnitType("quell"){{
             aiController = FlyingFollowAI::new;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             lowAltitude = false;
             flying = true;
@@ -4172,7 +4175,7 @@ public class UnitTypes{
 
         disrupt = new ErekirUnitType("disrupt"){{
             aiController = FlyingFollowAI::new;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             lowAltitude = false;
             flying = true;
@@ -4379,7 +4382,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 60f;
             faceTarget = true;
@@ -4445,7 +4448,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 60f;
             targetPriority = -2;
@@ -4524,7 +4527,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 65f;
             faceTarget = true;
@@ -4610,7 +4613,7 @@ public class UnitTypes{
             allowedInPayloads = false;
             logicControllable = false;
             playerControllable = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
             payloadCapacity = 0f;
 
             lowAltitude = false;
@@ -4653,15 +4656,15 @@ public class UnitTypes{
             playerControllable = false;
             allowedInPayloads = false;
             createWreck = false;
-            envEnabled = Env.any;
-            envDisabled = Env.none;
+            envEnabled = Environments.any;
+            envDisabled = Environments.none;
         }};
 
         dummy = new UnitType("dummy"){{
             controller = u -> new NoAI();
 
-            envEnabled = Env.any;
-            envDisabled = 0;
+            envEnabled = Environments.any;
+            envDisabled = Environments.none;
             isEnemy = false;
             allowedInPayloads = false;
             logicControllable = false;

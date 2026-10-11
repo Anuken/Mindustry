@@ -10,6 +10,7 @@ import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -96,6 +97,19 @@ public class ConsumeGenerator extends PowerGenerator{
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
         public float warmup, totalTime, efficiencyMultiplier = 1f, itemDurationMultiplier = 1;
+
+        @Override
+        public byte version(){
+            return block.heatOutput > 0f ? 2 : super.version();
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            //heat emitters saved their output here before version 2
+            if(revision < 2 && block.heatOutput > 0f) heatModule.output = read.f();
+        }
 
         @Override
         public void updateEfficiencyMultiplier(){

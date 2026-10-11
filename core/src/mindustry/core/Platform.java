@@ -2,9 +2,9 @@ package mindustry.core;
 
 import arc.*;
 import arc.files.*;
-import arc.math.*;
 import arc.struct.*;
 import arc.util.serialization.*;
+import mindustry.annotations.Annotations.*;
 import mindustry.mod.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
@@ -13,24 +13,38 @@ import mindustry.ui.FileChooser.*;
 import rhino.*;
 
 import java.net.*;
+import java.security.*;
 
 public interface Platform{
 
     /** Dynamically creates a class loader for a jar file. This loader must be child-first. */
+    @IgnoreAndroidApi
     default ClassLoader loadJar(Fi jar, ClassLoader parent) throws Exception{
         return new URLClassLoader(new URL[]{jar.file().toURI().toURL()}, parent){
+            static{
+                registerAsParallelCapable();
+            }
+
             @Override
             protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException{
                 //check for loaded state
-                Class<?> loadedClass = findLoadedClass(name);
-                if(loadedClass == null){
-                    try{
-                        //try to load own class first
-                        loadedClass = findClass(name);
-                    }catch(ClassNotFoundException e){
-                        //use parent if not found
-                        return parent.loadClass(name);
+                Class<?> loadedClass;
+                //lock per class name
+                synchronized(getClassLoadingLock(name)){
+                    //check for loaded state
+                    loadedClass = findLoadedClass(name);
+                    if(loadedClass == null){
+                        try{
+                            //try to load own class first
+                            loadedClass = findClass(name);
+                        }catch(ClassNotFoundException ignored){
+                        }
                     }
+                }
+
+                //use parent if not found
+                if(loadedClass == null){
+                    return parent.loadClass(name);
                 }
 
                 if(resolve){
@@ -89,8 +103,9 @@ public interface Platform{
     default String getUUID(){
         String uuid = Core.settings.getString("uuid", "");
         if(uuid.isEmpty()){
-            byte[] result = new byte[8];
-            new Rand().nextBytes(result);
+            //UUID is 16 bytes as of v9, used to be 8 bytes
+            byte[] result = new byte[16];
+            new SecureRandom().nextBytes(result);
             uuid = new String(Base64Coder.encode(result));
             Core.settings.put("uuid", uuid);
             return uuid;

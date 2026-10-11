@@ -45,7 +45,7 @@ public class SdlInput extends Input{
         }else if(type == SDLEvents.SDL_EVENT_MOUSE_BUTTON_DOWN || type == SDLEvents.SDL_EVENT_MOUSE_BUTTON_UP){
             boolean down = type == SDLEvents.SDL_EVENT_MOUSE_BUTTON_DOWN;
             int keycode = event.button().button();
-            int x = (int)event.button().x(), y = Core.graphics.getHeight() - (int)event.button().y();
+            int x = (int)((SdlGraphics)Core.graphics).scaleX(event.button().x()), y = Core.graphics.getHeight() - (int)((SdlGraphics)Core.graphics).scaleY(event.button().y());
 
             KeyCode key =
             keycode == SDLMouse.SDL_BUTTON_LEFT ? KeyCode.mouseLeft :
@@ -65,8 +65,8 @@ public class SdlInput extends Input{
             }
 
         }else if(type == SDLEvents.SDL_EVENT_MOUSE_MOTION){
-            int x = (int)event.motion().x();
-            int y = Core.graphics.getHeight() - (int)event.motion().y();
+            int x = (int)((SdlGraphics)Core.graphics).scaleX(event.motion().x());
+            int y = Core.graphics.getHeight() - (int)((SdlGraphics)Core.graphics).scaleY(event.motion().y());
 
             deltaX = x - mouseX;
             deltaY = y - mouseY;

@@ -8,6 +8,8 @@ public class SdlConfig{
     public int depth = 0, stencil = 0;
     public int samples = 0;
     public HdpiUtils.HdpiMode hdpiMode = HdpiUtils.HdpiMode.logical;
+    /** If true, the window requests a high pixel density (retina) backbuffer. Without this, macOS renders at 1x and upscales. */
+    public boolean highDpi = false;
 
     public int width = 640;
     public int height = 480;

@@ -53,9 +53,7 @@ jobs:
           git commit -m "Automatic class mapping and map name update"
           git push
         fi
-    - name: Run unit tests
-      run: ./gradlew tests:test --rerun --stacktrace
     - name: Install client test dependencies
       run: sudo apt-get update && sudo apt-get install -y xvfb libgl1-mesa-dri libglx-mesa0
     - name: Run client tests
-      run: ./gradlew pack tests:clientTest
+      run: ./gradlew pack tests:testAll

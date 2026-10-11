@@ -176,7 +176,10 @@ public class Build{
 
     /** @return whether a tile can be placed at this location by this team. */
     public static boolean checkNoUnitOverlap(Block type, int x, int y){
-        return (!type.solid && !type.solidifes) || !Units.anyEntities(x * tilesize + type.offset - type.size * tilesize / 2f, y * tilesize + type.offset - type.size * tilesize / 2f, type.size * tilesize, type.size * tilesize);
+        //TODO: no clean way of checking "does this unit consider this block type impassable"
+        return !Units.anyEntities(x * tilesize + type.offset - type.size * tilesize / 2f, y * tilesize + type.offset - type.size * tilesize / 2f, type.size * tilesize, type.size * tilesize, unit ->
+            unit.isGrounded() && (unit instanceof WaterMovec || unit instanceof WaterCrawlc || (!unit.type.allowLegStep && !(unit instanceof Crawlc) && (type.solid || type.solidifes)))
+        );
     }
 
     /** @return whether a tile can be placed at this location by this team. Ignores units at this location. */

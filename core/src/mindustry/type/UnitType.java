@@ -43,12 +43,12 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     private static final Vec2 legOffset = new Vec2();
     private static final Seq<UnitStance> tmpStances = new Seq<>();
 
-    /** Environmental flags that are *all* required for this unit to function. 0 = any environment */
-    public int envRequired = 0;
+    /** Environmental flags that are *all* required for this unit to function. Empty = any environment */
+    public Environments envRequired = Environments.none;
     /** The environment flags that this unit can function in. If the env matches any of these, it will be enabled. */
-    public int envEnabled = Env.terrestrial;
+    public Environments envEnabled = Environments.of(Env.terrestrial);
     /** The environment flags that this unit *cannot* function in. If the env matches any of these, it will explode or be disabled. */
-    public int envDisabled = Env.scorching;
+    public Environments envDisabled = Environments.of(Env.scorching);
 
     /** movement speed (world units/t) */
     public float speed = 1.1f,
@@ -774,8 +774,8 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     }
 
     /** @return whether this block supports a specific environment. */
-    public boolean supportsEnv(int env){
-        return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
+    public boolean supportsEnv(Environments env){
+        return envEnabled.containsAny(env) && !envDisabled.containsAny(env) && (envRequired.isEmpty() || env.containsAll(envRequired));
     }
 
     @Override
@@ -957,7 +957,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         initPathType();
 
         if(flying){
-            envEnabled |= Env.space;
+            envEnabled = envEnabled.with(Env.space);
         }
 
         if(deathSound == Sounds.unset){

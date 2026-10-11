@@ -4,6 +4,7 @@ import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
 import arc.files.*;
+import arc.graphics.HdpiUtils.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
@@ -28,6 +29,7 @@ import org.lwjgl.system.*;
 import steamworks.*;
 
 import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -85,8 +87,16 @@ public class DesktopLauncher extends ClientLauncher{
                                 }
                                 Log.err("Invalid GL version format string: '@'. GL version must be of the form <major>.<minor>", str);
                             }
+                            case "open" -> {
+                                Fi file = new Fi(arg[i + 1]);
+                                Events.on(ClientCreateEvent.class, e -> Core.app.getListeners().each(a -> a.fileDropped(file)));
+                            }
                             case "coreGl" -> coreProfile = true;
                             case "noAngle" -> useAngle = false;
+                            case "highdpi" -> {
+                                highDpi = true;
+                                hdpiMode = HdpiMode.pixels;
+                            }
                             case "compatibilityGl" -> coreProfile = false;
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
@@ -492,7 +502,7 @@ public class DesktopLauncher extends ClientLauncher{
                 new Rand(SVars.user.user.getSteamID().getAccountID()).nextBytes(result);
                 return new String(Base64Coder.encode(result));
             }catch(Exception e){
-                e.printStackTrace();
+                Log.err(e);
             }
         }
 

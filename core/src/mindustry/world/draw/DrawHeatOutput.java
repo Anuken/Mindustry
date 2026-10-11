@@ -10,7 +10,6 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.heat.*;
 
 public class DrawHeatOutput extends DrawBlock{
     public TextureRegion heat, glow, top1, top2;
@@ -33,10 +32,10 @@ public class DrawHeatOutput extends DrawBlock{
         float rotdeg = (build.rotation + rotOffset) * 90;
         Draw.rect(Mathf.mod((build.rotation + rotOffset), 4) > 1 ? top2 : top1, build.x, build.y, rotdeg);
 
-        if(build instanceof HeatBlock heater && heater.heat() > 0){
+        if(build.heatModule != null && build.heatModule.output > 0){
             Draw.z(Layer.blockAdditive);
             Draw.blend(Blending.additive);
-            Draw.color(heatColor, heater.heatFrac() * (heatColor.a * (1f - heatPulse + Mathf.absin(Vars.state.time, heatPulseScl, heatPulse))));
+            Draw.color(heatColor, build.heatModule.output / build.block.heatOutputMax() * (heatColor.a * (1f - heatPulse + Mathf.absin(Vars.state.time, heatPulseScl, heatPulse))));
             if(heat.found()) Draw.rect(heat, build.x, build.y, rotdeg);
             Draw.color(Draw.getColor().mul(glowMult));
             if(drawGlow && glow.found()) Draw.rect(glow, build.x, build.y);

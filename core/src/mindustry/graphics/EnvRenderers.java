@@ -26,7 +26,7 @@ public class EnvRenderers{
         float windSpeed = 0.03f, windAngle = 45f;
         float windx = Mathf.cosDeg(windAngle) * windSpeed, windy = Mathf.sinDeg(windAngle) * windSpeed;
 
-        renderer.addEnvRenderer(Env.underwater, () -> {
+        renderer.addEnvRenderer(Environments.of(Env.underwater), () -> {
             Draw.draw(Layer.light + 1, () -> {
                 Draw.color(waterColor, 0.4f);
                 Fill.rect(Core.camera.position.x, Core.camera.position.y, Core.camera.width, Core.camera.height);
@@ -95,7 +95,7 @@ public class EnvRenderers{
             genMipMaps = true;
         }});
 
-        renderer.addEnvRenderer(Env.scorching, () -> {
+        renderer.addEnvRenderer(Environments.of(Env.scorching), () -> {
             Texture tex = Core.assets.get("sprites/distortAlpha.png", Texture.class);
 
             //TODO layer looks better? should not be conditional

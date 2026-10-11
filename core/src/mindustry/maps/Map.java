@@ -80,7 +80,7 @@ public class Map implements Comparable<Map>, Publishable{
     }
 
     public Texture safeTexture(){
-        return texture == null ? Core.assets.get("sprites/error.png") : texture;
+        return texture == null ? Core.assets.get("sprites/nomap.png") : texture;
     }
 
     public Fi previewFile(){

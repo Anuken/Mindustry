@@ -15,6 +15,7 @@ import mindustry.type.*;
 import mindustry.type.Weather.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.meta.*;
 
 /**
  * Defines current rules on how the game should function.
@@ -162,7 +163,7 @@ public class Rules{
     /** Environment drag multiplier. */
     public float dragMultiplier = 1f;
     /** Environmental flags that dictate visuals & how blocks function. */
-    public int env = Vars.defaultEnv;
+    public Environments env = Vars.defaultEnv;
     /** Attributes of the environment. */
     public Attributes attributes = new Attributes();
     /** Sector for saves that have them. */
@@ -287,8 +288,8 @@ public class Rules{
         }
     }
 
-    public boolean hasEnv(int env){
-        return (this.env & env) != 0;
+    public boolean hasEnv(Env env){
+        return this.env.has(env);
     }
 
     public float buildRadius(Team team){

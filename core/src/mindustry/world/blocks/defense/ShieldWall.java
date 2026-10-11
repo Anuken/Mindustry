@@ -56,7 +56,7 @@ public class ShieldWall extends Wall{
                 Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
                 if(renderer.animateSurfaces){
-                    Fill.square(x, y, radius);
+                    Fill.square(x, y, radius + 0.001f);
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));

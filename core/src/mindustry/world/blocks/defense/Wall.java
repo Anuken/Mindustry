@@ -46,7 +46,7 @@ public class Wall extends Block{
         priority = TargetPriority.wall;
 
         //it's a wall of course it's supported everywhere
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
     }
 
     @Override

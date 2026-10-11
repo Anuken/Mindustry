@@ -60,7 +60,7 @@ public class LogicBlock extends Block{
         drawDynamic = false;
 
         //universal, no real requirements
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
 
         config(byte[].class, (LogicBuild build, byte[] data) -> {
             if(!accessible()) return;

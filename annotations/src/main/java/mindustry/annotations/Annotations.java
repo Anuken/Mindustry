@@ -162,6 +162,10 @@ public class Annotations{
     @Retention(RetentionPolicy.SOURCE)
     public @interface OverrideCallSuper{}
 
+    @Target({ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.TYPE})
+    @Retention(RetentionPolicy.CLASS)
+    public @interface IgnoreAndroidApi{}
+
     //endregion
     //region struct
 

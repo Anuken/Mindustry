@@ -47,10 +47,6 @@ public class Turret extends ReloadTurret{
     public int ammoPerShot = 1;
     /** If true, ammo is only consumed once per shot regardless of bullet count. */
     public boolean consumeAmmoOnce = true;
-    /** Minimum input heat required to fire. */
-    public float heatRequirement = -1f;
-    /** Maximum efficiency possible, if this turret uses heat. */
-    public float maxHeatEfficiency = 3f;
 
     /** Bullet angle randomness in degrees. */
     public float inaccuracy = 0f;
@@ -194,21 +190,6 @@ public class Turret extends ReloadTurret{
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(!notBulletUnitSort() && unitSort != UnitSorts.closest) stats.add(Stat.targetPriority, unitSort);
-        if(heatRequirement > 0) stats.add(Stat.input, heatRequirement, StatUnit.heatUnits);
-        if(heatRequirement > 0 && maxHeatEfficiency > 0) stats.add(Stat.maxEfficiency, (int)(maxHeatEfficiency * 100f), StatUnit.percent);
-    }
-
-    @Override
-    public void setBars(){
-        super.setBars();
-
-        if(heatRequirement > 0){
-            addBar("heat", (TurretBuild entity) ->
-            new Bar(() ->
-            Core.bundle.format("bar.heatpercent", (int)entity.heatReq, (int)(Math.min(entity.heatReq / heatRequirement, maxHeatEfficiency) * 100)),
-            () -> Pal.lightOrange,
-            () -> entity.heatReq / heatRequirement));
-        }
     }
 
     @Override
@@ -328,8 +309,6 @@ public class Turret extends ReloadTurret{
         public boolean wasShooting, isShooting;
         public int queuedBullets = 0;
 
-        public float heatReq;
-        public float[] sideHeat = new float[4];
 
         public @Nullable SoundLoop soundLoop = (loopSound == Sounds.none ? null : new SoundLoop(loopSound, loopSoundVolume));
 
@@ -571,10 +550,6 @@ public class Turret extends ReloadTurret{
                 logicControlTime -= Time.delta;
             }
 
-            if(heatRequirement > 0){
-                heatReq = calculateHeat(sideHeat);
-            }
-
             if(rotate){
                 //sync underlying rotation; 0-3 rotation is a shadowed field
                 ((Building)this).rotation = Mathf.mod(Mathf.round(rotation / 90f), 4);
@@ -654,14 +629,6 @@ public class Turret extends ReloadTurret{
             super.handleLiquid(source, liquid, amount);
         }
 
-        @Override
-        public boolean canConsume(){
-            if(heatRequirement > 0 && heatReq <= 0f){
-                return false;
-            }
-            return super.canConsume();
-        }
-
         protected boolean validateTarget(){
             return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || controlled() || logicControlled();
         }
@@ -703,13 +670,6 @@ public class Turret extends ReloadTurret{
 
         public boolean shouldTurn(){
             return moveWhileCharging || !charging();
-        }
-
-        @Override
-        public void updateEfficiencyMultiplier(){
-            if(heatRequirement > 0){
-                efficiency *= Math.min(Math.max(heatReq / heatRequirement, cheating() ? 1f : 0f), maxHeatEfficiency);
-            }
         }
 
         /** Consume ammo and return a type. */

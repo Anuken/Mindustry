@@ -44,7 +44,7 @@ public class MendProjector extends Block{
         emitLight = true;
         lightRadius = 50f;
         suppressable = true;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         flags = EnumSet.of(BlockFlag.blockRepair);
         drawCached = true;
     }

@@ -66,7 +66,8 @@ public final class ServerHarness{
         dataDir.deleteDirectory();
         dataDir.mkdirs();
 
-        serverPort = freePort();
+        int fixedPort = Integer.getInteger("servertest.port", 0);
+        serverPort = fixedPort != 0 ? fixedPort : freePort();
         baseConfig = "port: " + serverPort + "\nsocketInput: false\nautoUpdate: false\nautosave: false\nlogging: false\nroundExtraTime: 1\n"
             + String.join("\n", config) + "\n";
         dataDir.child("config.hjson").writeString(baseConfig);

@@ -136,9 +136,9 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         });
 
         assets.load("sprites/error.png", Texture.class);
+        assets.load("sprites/nomap.png", Texture.class);
         //TODO: this takes 300+ms to load, which means 300ms of black screen
         atlas = new TextureAtlas(Core.files.internal("sprites/sprites.aatls"));
-        Fonts.loadDefaultFont();
 
         Vars.net = new Net(platform.getNet());
         MapPreviewLoader.setupLoaders();
@@ -148,6 +148,8 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         Fonts.loadSystemCursors();
 
         assets.load(new Vars());
+        //TODO: looks bad because font isn't there immediately maybe?
+        Fonts.loadDefaultFont(); //must load after Vars inits so font scale is correct
 
         assets.loadRun("maps", Map.class, () -> maps.loadPreviews());
 
@@ -309,7 +311,7 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         if(OS.isIos || OS.isAndroid) return;
 
         if(file.extEquals(saveExtension) || file.extEquals(schematicExtension)){
-            handleFileImport(file);
+            runOnClientLoad(() -> handleFileImport(file));
         }
     }
 

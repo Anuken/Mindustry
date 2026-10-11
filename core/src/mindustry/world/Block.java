@@ -46,12 +46,18 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public @NoPatch boolean hasLiquids;
     /** If true, buildings have a PowerModule. */
     public @NoPatch boolean hasPower;
+    /** If true, buildings have a HeatModule. */
+    public @NoPatch boolean hasHeat;
     /** Flag for determining whether this block outputs liquid somewhere; used for connections. */
     public boolean outputsLiquid = false;
     /** Used by certain power blocks (nodes) to flag as non-consuming of power. True by default, even if this block has no power. */
     public boolean consumesPower = true;
     /** If true, this block is a generator that can produce power. */
     public boolean outputsPower = false;
+    /** Heat emitted to adjacent heat consumers at 100% efficiency. 0 means this block does not emit heat. */
+    public float heatOutput = 0f;
+    /** Rate at which emitted heat approaches its target, per tick. */
+    public float heatWarmupRate = 0.15f;
     /** If false, power nodes cannot connect to this block. */
     public boolean connectedPower = true;
     /** If true, this block can conduct power like a cable. */
@@ -81,7 +87,7 @@ public class Block extends UnlockableContent implements LogicSenseable{
     /** If true, this block outputs to its facing direction, when applicable.
      * Used for blending calculations. */
     public boolean outputFacing = true;
-    /** if true, this block does not accept input from the sides (used for armored conveyors) */
+    /** if true, this block does not accept input from the sides (used for armored conveyors/ducts/conduits) */
     public boolean noSideBlend = false;
     /** whether to display flow rate */
     public boolean displayFlow = true;
@@ -137,6 +143,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public boolean drawArrow = true;
     /** whether to draw the team corner by default */
     public boolean drawTeamOverlay = true;
+    /** whether to rotate the enemy-team overlay sprite (only applied to custom ones) */
+    public boolean rotateTeamOverlay = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
@@ -273,12 +281,12 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
     public boolean drawLiquidLight = true;
-    /** Environmental flags that are *all* required for this block to function. 0 = any environment */
-    public int envRequired = 0;
+    /** Environmental flags that are *all* required for this block to function. Empty = any environment */
+    public Environments envRequired = Environments.none;
     /** The environment flags that this block can function in. If the env matches any of these, it will be enabled. */
-    public int envEnabled = Env.terrestrial;
+    public Environments envEnabled = Environments.of(Env.terrestrial);
     /** The environment flags that this block *cannot* function in. If the env matches any of these, it will be *disabled*. */
-    public int envDisabled = 0;
+    public Environments envDisabled = Environments.none;
     /** Whether to periodically sync this block across the network. */
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode. */
@@ -413,6 +421,9 @@ public class Block extends UnlockableContent implements LogicSenseable{
     /** The single power consumer, if applicable. */
     @NoPatch
     public @Nullable ConsumePower consPower;
+    /** The single heat consumer, if applicable. */
+    @NoPatch
+    public @Nullable ConsumeHeat consHeat;
 
     /** Map of bars by name. */
     @NoPatch
@@ -428,6 +439,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public TextureRegion region;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
+    public @Load("@-team-overlay") TextureRegion teamOverlayRegion;
+    public @Load("block-border") TextureRegion defaultTeamOverlayRegion;
     public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
 
     protected static final Seq<Tile> tempTiles = new Seq<>();
@@ -612,7 +625,22 @@ public class Block extends UnlockableContent implements LogicSenseable{
     }
 
     public boolean rotatedOutput(int x, int y){
-        return rotate;
+        return rotate && heatOutput <= 0f;
+    }
+
+    /** @return whether adjacent heat consumers read this block's heat output. */
+    public boolean emitsHeat(){
+        return heatOutput > 0f;
+    }
+
+    /** @return the heat input that corresponds to a full fraction when drawing. */
+    public float heatInputMax(){
+        return consHeat != null ? consHeat.requirement : 0f;
+    }
+
+    /** @return the heat output that corresponds to a full fraction when drawing. */
+    public float heatOutputMax(){
+        return heatOutput;
     }
 
     public boolean rotatedOutput(int fromX, int fromY, Tile destination){
@@ -663,6 +691,10 @@ public class Block extends UnlockableContent implements LogicSenseable{
 
         for(var c : consumers){
             c.display(stats);
+        }
+
+        if(heatOutput > 0f){
+            stats.add(Stat.output, heatOutput, StatUnit.heatUnits);
         }
 
         //Note: Power stats are added by the consumers.
@@ -717,6 +749,18 @@ public class Block extends UnlockableContent implements LogicSenseable{
             );
         }
 
+        if(consHeat != null){
+            addBar("heat", entity -> new Bar(
+                () -> Core.bundle.format("bar.heatpercent", (int)(entity.heatModule.input + 0.01f), (int)(consHeat.efficiencyScale(entity) * 100 + 0.01f)),
+                () -> Pal.lightOrange,
+                () -> entity.heatModule.input / consHeat.requirement)
+            );
+        }
+
+        if(heatOutput > 0f){
+            addBar(consHeat != null ? "heat-output" : "heat", entity -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heatModule.output / heatOutput));
+        }
+
         if(hasItems && configurable){
             addBar("items", entity -> new Bar(
                 () -> Core.bundle.format("bar.items", entity.items.total()),
@@ -761,6 +805,7 @@ public class Block extends UnlockableContent implements LogicSenseable{
     @Override
     public void afterPatch(){
         super.afterPatch();
+        hasHeat = emitsHeat() || consHeat != null;
         barMap.clear();
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
@@ -1037,8 +1082,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     }
 
     /** @return whether this block supports a specific environment. */
-    public boolean supportsEnv(int env){
-        return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
+    public boolean supportsEnv(Environments env){
+        return envEnabled.containsAny(env) && !envDisabled.containsAny(env) && (envRequired.isEmpty() || env.containsAll(envRequired));
     }
 
     /** Called to set up configuration UI in the editor. {@link #editorConfigurable} must be true.
@@ -1130,6 +1175,9 @@ public class Block extends UnlockableContent implements LogicSenseable{
         if(!consumeBuilder.contains(c -> c instanceof ConsumePower)){
             consPower = null;
         }
+        if(!consumeBuilder.contains(c -> c instanceof ConsumeHeat)){
+            consHeat = null;
+        }
     }
 
     public ConsumeLiquid consumeLiquid(Liquid liquid, float amount){
@@ -1170,6 +1218,14 @@ public class Block extends UnlockableContent implements LogicSenseable{
      */
     public ConsumePower consumePowerBuffered(float powerCapacity){
         return consume(new ConsumePower(0f, powerCapacity, true));
+    }
+
+    /**
+     * Creates a consumer which requires heat from adjacent emitters.
+     * @param requirement The heat input required for 100% efficiency.
+     */
+    public ConsumeHeat consumeHeat(float requirement){
+        return consume(new ConsumeHeat(requirement));
     }
 
     public ConsumeItems consumeItem(Item item){
@@ -1442,6 +1498,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
 
         buildTime *= buildCostMultiplier;
 
+        if(heatOutput > 0f) hasHeat = true;
+
         consumers = consumeBuilder.toArray(Consume.class);
         optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
         nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
@@ -1479,6 +1537,7 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public void reinitializeConsumers(){
         consumers = consumeBuilder.toArray(Consume.class);
         consPower = (ConsumePower)Structs.find(consumers, c -> c instanceof ConsumePower);
+        consHeat = (ConsumeHeat)Structs.find(consumers, c -> c instanceof ConsumeHeat);
         optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
         nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
         updateConsumers = consumeBuilder.select(consume -> consume.update && !consume.ignore()).toArray(Consume.class);
@@ -1486,6 +1545,7 @@ public class Block extends UnlockableContent implements LogicSenseable{
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];
         if(outputsPower) hasPower = true;
+        if(heatOutput > 0f) hasHeat = true;
 
         for(Consume cons : consumers){
             cons.apply(this);

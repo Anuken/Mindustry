@@ -78,7 +78,7 @@ public class CoreBlock extends StorageBlock{
         drawDisabled = false;
         canOverdrive = false;
         commandable = true;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         drawCached = false;
         drawDynamic = true;
         allowedInPayloads = false;
@@ -285,7 +285,10 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void buildConfiguration(Table table){
-            if(!state.rules.coreBuildAndConfig) return;
+            if(!state.rules.coreBuildAndConfig || (team == state.rules.defaultTeam && team.cores().size == 1)){
+                deselect();
+                return;
+            }
 
             ButtonGroup<ImageButton> group = new ButtonGroup<>();
             group.setMinCheckCount(0);

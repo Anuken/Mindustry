@@ -5,6 +5,7 @@ import arc.files.*;
 import arc.func.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.annotations.Annotations.*;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -49,6 +50,7 @@ public class FileIO{
     }
 
     /** Moves tmp over dest, atomically where the platform supports it. */
+    @IgnoreAndroidApi
     public static void swap(Fi tmp, Fi dest){
         if(!OS.isMobile || (OS.isAndroid && Core.app.getVersion() >= 26)){
             try{

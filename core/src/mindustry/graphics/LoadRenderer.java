@@ -173,7 +173,7 @@ public class LoadRenderer implements Disposable{
         Lines.poly(w/2, h/2, 4, rad2);
 
         if(assets.isLoaded("tech") && renderStencil){
-            arc.graphics.font.Font font = assets.get("tech");
+            Font font = assets.get("tech");
             font.getData().markupEnabled = true;
 
             int panei = 0;

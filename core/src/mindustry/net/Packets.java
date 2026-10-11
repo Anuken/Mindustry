@@ -158,9 +158,12 @@ public class Packets{
 
             byte[] b = Base64Coder.decode(uuid);
             buffer.b(b);
-            CRC32 crc = new CRC32();
-            crc.update(Base64Coder.decode(uuid), 0, b.length);
-            buffer.l(crc.getValue());
+            //old UUIDs (<=v8) were 8 bytes, with 8 bytes of useless CRC sent in the connect packet; new UUIDs (generated in v9) use the full 16 bytes
+            if(b.length == 8){
+                CRC32 crc = new CRC32();
+                crc.update(Base64Coder.decode(uuid), 0, b.length);
+                buffer.l(crc.getValue());
+            }
 
             buffer.b(mobile ? (byte)1 : 0);
             buffer.i(color);

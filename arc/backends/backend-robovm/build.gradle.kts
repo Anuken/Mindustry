@@ -1,14 +1,16 @@
 import de.undercouch.gradle.tasks.download.*
 
+val robovmVersion = "2.3.26"
+
 sourceSets.main{
     java.setSrcDirs(listOf("src"))
     resources.setSrcDirs(listOf("res"))
 }
 
-val robovmVersion = "2.3.26"
-
 dependencies{
-    listOf("robovm-rt", "robovm-objc", "robovm-cocoatouch").forEach{ api("com.mobidevelop.robovm:$it:$robovmVersion") }
+    api("com.mobidevelop.robovm:robovm-rt:${robovmVersion}")
+    api("com.mobidevelop.robovm:robovm-objc:${robovmVersion}")
+    api("com.mobidevelop.robovm:robovm-cocoatouch:${robovmVersion}")
 }
 
 tasks.register<Download>("fetchMetalANGLEKit"){
