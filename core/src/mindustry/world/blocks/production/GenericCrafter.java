@@ -295,8 +295,20 @@ public class GenericCrafter extends Block{
             drawer.drawLight(this);
         }
 
+        boolean missingHeat(){
+            return block.consHeat != null && !block.consHeat.optional && block.consHeat.requirement > 0f && heatModule.input <= 0f && !cheating();
+        }
+
+        @Override
+        public BlockStatus status(){
+            if(missingHeat() && enabled) return BlockStatus.noInput;
+            return super.status();
+        }
+
         @Override
         public boolean shouldConsume(){
+            if(missingHeat()) return false;
+
             if(outputItems != null){
                 for(var output : outputItems){
                     if(items.get(output.item) + scaleOutput(output.amount) > itemCapacity){
@@ -389,7 +401,7 @@ public class GenericCrafter extends Block{
         }
 
         public float warmupTarget(){
-            return 1f;
+            return block.consHeat == null ? 1f : block.consHeat.fraction(this);
         }
 
         @Override
@@ -522,12 +534,21 @@ public class GenericCrafter extends Block{
         }
 
         @Override
+        public byte version(){
+            return (byte)(block.heatOutput > 0f ? 1 : 0);
+        }
+
+        @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            if(!saveProgress) return;
-            progress = read.f();
-            warmup = read.f();
-            if(legacyReadWarmup) read.f();
+            if(saveProgress){
+                progress = read.f();
+                warmup = read.f();
+                if(legacyReadWarmup) read.f();
+            }
+
+            //heat emitters saved their output here before version 1
+            if(revision < 1 && block.heatOutput > 0f) heatModule.output = read.f();
         }
     }
 }

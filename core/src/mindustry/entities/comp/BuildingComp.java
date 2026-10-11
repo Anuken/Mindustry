@@ -81,6 +81,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
     @Nullable PowerModule power;
     @Nullable ItemModule items;
     @Nullable LiquidModule liquids;
+    @Nullable HeatModule heatModule;
 
     /** Base efficiency. Takes the minimum value of all consumers. */
     transient float efficiency;
@@ -96,7 +97,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
     transient Color suppressColor = Pal.sapBullet;
 
     private transient float lastDamageTime = -recentDamageTime;
-    private transient float timeScale = 1f, timeScaleDuration;
+    transient float timeScale = 1f, timeScaleDuration;
     private transient float dumpAccum;
 
     private transient boolean sleeping;
@@ -148,6 +149,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
 
         if(block.hasItems) items = new ItemModule();
         if(block.hasLiquids) liquids = new LiquidModule();
+        if(block.hasHeat) heatModule = new HeatModule();
         if(block.hasPower){
             power = new PowerModule();
             power.graph.add(self());
@@ -194,6 +196,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         if(items != null) items.write(write);
         if(power != null) power.write(write);
         if(liquids != null) liquids.write(write);
+        if(heatModule != null) heatModule.write(write);
 
         //write timescale if relevant
         if(timeScale != 1f){
@@ -223,7 +226,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
 
         rotation = rot & 0b01111111;
 
-        int moduleBits = moduleBitmask();
+        //legacy saves have no module bitmask, and never contained a heat module
+        int moduleBits = moduleBitmask() & ~(1 << 6);
         boolean legacy = true;
         byte version = 0;
 
@@ -245,6 +249,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         if((moduleBits & 1) != 0) (items == null ? new ItemModule() : items).read(read, legacy);
         if((moduleBits & (1 << 1)) != 0) (power == null ? new PowerModule() : power).read(read, legacy);
         if((moduleBits & (1 << 2)) != 0) (liquids == null ? new LiquidModule() : liquids).read(read, legacy);
+        if((moduleBits & (1 << 6)) != 0) (heatModule == null ? new HeatModule() : heatModule).read(read, legacy);
         //1 << 3 is skipped (old consume module)
         if((moduleBits & (1 << 4)) != 0){
             timeScale = read.f();
@@ -276,7 +281,8 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         (liquids != null ? 1 << 2 : 0) |
         1 << 3 | //old consume module
         (timeScale != 1f ? 1 << 4 : 0) |
-        (lastDisabler != null && lastDisabler.isValid() ? 1 << 5 : 0);
+        (lastDisabler != null && lastDisabler.isValid() ? 1 << 5 : 0) |
+        (heatModule != null ? 1 << 6 : 0);
     }
 
     public void writeAll(Writes write){
@@ -418,8 +424,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         float heat = 0f;
 
         for(var build : proximity){
-            if(build != null && build.team == team && build instanceof HeatBlock heater){
-
+            if(build != null && build.team == team && build.heatModule != null && build.block.emitsHeat()){
 
                 boolean split = build.block instanceof HeatConductor cond && cond.splitHeat;
                 // non-routers must face us, routers must face away - next to a redirector, they're forced to face away due to cycles anyway
@@ -433,7 +438,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
                         int contactPoints = Math.min((int)(block.size/2f + build.block.size/2f - diff), Math.min(build.block.size, block.size));
 
                         //heat is distributed across building size
-                        float add = heater.heat() / build.block.size * contactPoints;
+                        float add = build.heatModule.output / build.block.size * contactPoints;
                         if(split){
                             //heat routers split heat across 3 surfaces
                             add /= 3f;
@@ -452,7 +457,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
                     }
 
                     //massive hack but I don't really care anymore
-                    if(heater instanceof HeatConductorBuild cond){
+                    if(build instanceof HeatConductorBuild cond){
                         cond.updateHeat();
                     }
                 }
@@ -1948,7 +1953,26 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
 
     /** Calculate your own efficiency multiplier. By default, this is applied in updateEfficiencyMultiplier. */
     public float efficiencyScale(){
-        return 1f;
+        return block.consHeat == null || block.consHeat.optional ? 1f : block.consHeat.efficiencyScale(self());
+    }
+
+    /** Called before consumption: computes the heat received from adjacent emitters. */
+    public void updateHeatInput(){
+        if(heatModule != null && block.consHeat != null){
+            heatModule.input = calculateHeat(heatModule.sides);
+        }
+    }
+
+    /** Called after the tile update: moves emitted heat toward its target, at the same speed regardless of efficiency. */
+    public void updateHeatOutput(){
+        if(heatModule != null && block.heatOutput > 0f){
+            heatModule.output = Mathf.approachDelta(heatModule.output, heatOutputTarget(), block.heatWarmupRate * delta());
+        }
+    }
+
+    /** @return the heat output this building is currently approaching. */
+    public float heatOutputTarget(){
+        return block.heatOutput * efficiency;
     }
 
     public void updateConsumption(){
@@ -2112,6 +2136,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
             case health -> health;
             case maxHealth -> maxHealth;
             case efficiency -> efficiency;
+            case heat -> heatModule == null ? Float.NaN : block.consHeat != null ? heatModule.input : block.emitsHeat() ? heatModule.output : Float.NaN;
             case timescale -> timeScale;
             case range -> this instanceof Ranged r ? r.range() / tilesize : 0;
             case rotation -> rotation;
@@ -2278,10 +2303,12 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
             timeScale = 1f;
         }
 
+        updateHeatInput();
         updateConsumption();
 
         if(enabled || !block.noUpdateDisabled){
             updateTile();
+            updateHeatOutput();
         }
     }
 

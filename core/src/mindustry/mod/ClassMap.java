@@ -285,12 +285,8 @@ public class ClassMap{
         classes.put("TiledWall", mindustry.world.blocks.environment.TiledWall.class);
         classes.put("TreeBlock", mindustry.world.blocks.environment.TreeBlock.class);
         classes.put("WobbleProp", mindustry.world.blocks.environment.WobbleProp.class);
-        classes.put("HeatBlock", mindustry.world.blocks.heat.HeatBlock.class);
         classes.put("HeatConductor", mindustry.world.blocks.heat.HeatConductor.class);
         classes.put("HeatConductorBuild", mindustry.world.blocks.heat.HeatConductor.HeatConductorBuild.class);
-        classes.put("HeatConsumer", mindustry.world.blocks.heat.HeatConsumer.class);
-        classes.put("HeatProducer", mindustry.world.blocks.heat.HeatProducer.class);
-        classes.put("HeatProducerBuild", mindustry.world.blocks.heat.HeatProducer.HeatProducerBuild.class);
         classes.put("Conduit", mindustry.world.blocks.liquid.Conduit.class);
         classes.put("ConduitBuild", mindustry.world.blocks.liquid.Conduit.ConduitBuild.class);
         classes.put("LiquidBlock", mindustry.world.blocks.liquid.LiquidBlock.class);
@@ -350,8 +346,6 @@ public class ClassMap{
         classes.put("BeamNodeBuild", mindustry.world.blocks.power.BeamNode.BeamNodeBuild.class);
         classes.put("ConsumeGenerator", mindustry.world.blocks.power.ConsumeGenerator.class);
         classes.put("ConsumeGeneratorBuild", mindustry.world.blocks.power.ConsumeGenerator.ConsumeGeneratorBuild.class);
-        classes.put("HeaterGenerator", mindustry.world.blocks.power.HeaterGenerator.class);
-        classes.put("HeaterGeneratorBuild", mindustry.world.blocks.power.HeaterGenerator.HeaterGeneratorBuild.class);
         classes.put("ImpactReactor", mindustry.world.blocks.power.ImpactReactor.class);
         classes.put("ImpactReactorBuild", mindustry.world.blocks.power.ImpactReactor.ImpactReactorBuild.class);
         classes.put("LightBlock", mindustry.world.blocks.power.LightBlock.class);
@@ -383,8 +377,6 @@ public class ClassMap{
         classes.put("DrillBuild", mindustry.world.blocks.production.Drill.DrillBuild.class);
         classes.put("GenericCrafter", mindustry.world.blocks.production.GenericCrafter.class);
         classes.put("GenericCrafterBuild", mindustry.world.blocks.production.GenericCrafter.GenericCrafterBuild.class);
-        classes.put("HeatCrafter", mindustry.world.blocks.production.HeatCrafter.class);
-        classes.put("HeatCrafterBuild", mindustry.world.blocks.production.HeatCrafter.HeatCrafterBuild.class);
         classes.put("Incinerator", mindustry.world.blocks.production.Incinerator.class);
         classes.put("IncineratorBuild", mindustry.world.blocks.production.Incinerator.IncineratorBuild.class);
         classes.put("ItemIncinerator", mindustry.world.blocks.production.ItemIncinerator.class);
@@ -438,6 +430,7 @@ public class ClassMap{
         classes.put("UnitPlan", mindustry.world.blocks.units.UnitFactory.UnitPlan.class);
         classes.put("Consume", mindustry.world.consumers.Consume.class);
         classes.put("ConsumeCoolant", mindustry.world.consumers.ConsumeCoolant.class);
+        classes.put("ConsumeHeat", mindustry.world.consumers.ConsumeHeat.class);
         classes.put("ConsumeItemCharged", mindustry.world.consumers.ConsumeItemCharged.class);
         classes.put("ConsumeItemDynamic", mindustry.world.consumers.ConsumeItemDynamic.class);
         classes.put("ConsumeItemEfficiency", mindustry.world.consumers.ConsumeItemEfficiency.class);

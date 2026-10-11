@@ -2,6 +2,7 @@ package mindustry.io;
 
 import arc.struct.*;
 import arc.struct.ObjectMap.*;
+import arc.util.*;
 import arc.util.io.*;
 
 import java.io.*;
@@ -78,12 +79,16 @@ public abstract class SaveFileReader{
     protected static final Writes writes1 = new Writes(dataBytes), writes2 = new Writes(dataBytes2);
     protected static boolean chunkNested = false;
 
+    /** Counts bytes read from the save being loaded, to validate chunk lengths. Null when reading outside of a counted save load. */
+    protected @Nullable CounterInputStream counter;
+
     public static String mapFallback(String name){
         return fallback.get(name, name);
     }
 
     //TODO: unify readRegion with readChunk, they do the same thing and both should have good error messages
     public void readRegion(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
+        this.counter = counter;
         counter.resetCount();
         int length;
         try{
@@ -131,9 +136,10 @@ public abstract class SaveFileReader{
 
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
     public int readChunk(DataInput input, IORunnerLength<DataInput> runner) throws IOException{
-        //TODO: it would be really nice to support counting here to detect serialization errors
         int length = input.readInt();
+        int start = counter == null ? 0 : counter.count;
         runner.accept(input, length);
+        checkChunkLength(start, length);
         return length;
     }
 
@@ -143,6 +149,16 @@ public abstract class SaveFileReader{
             reads.input = in;
             runner.accept(reads, length);
         });
+    }
+
+    /** Throws if the bytes read since the chunk started do not match the chunk's saved length. */
+    protected void checkChunkLength(int start, int length) throws IOException{
+        if(counter == null) return;
+
+        int read = counter.count - start;
+        if(read != length){
+            throw new IOException("Chunk length mismatch. Expected: " + length + "; Actual: " + read);
+        }
     }
 
     /** Skips exactly this many bytes, throwing if the stream ends early. */
@@ -155,7 +171,7 @@ public abstract class SaveFileReader{
 
     /** Skip a chunk completely, discarding the bytes. */
     public void skipChunk(DataInput input) throws IOException{
-        int length = readChunk(input, (t, len) -> {});
+        int length = input.readInt();
         int skipped = input.skipBytes(length);
         if(length != skipped){
             throw new IOException("Could not skip bytes. Expected length: " + length + "; Actual length: " + skipped);
@@ -165,8 +181,10 @@ public abstract class SaveFileReader{
     /** Reads a legacy chunk where the length is only 2 bytes. */
     public int readLegacyShortChunk(DataInput input, Reads reads, IORunnerLength<Reads> runner) throws IOException{
         int length = input.readUnsignedShort();
+        int start = counter == null ? 0 : counter.count;
         reads.input = input;
         runner.accept(reads, length);
+        checkChunkLength(start, length);
         return length;
     }
 
