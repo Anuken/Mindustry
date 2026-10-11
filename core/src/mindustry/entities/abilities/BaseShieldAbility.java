@@ -271,14 +271,11 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
     @Override
     public void addStats(Table t){
         super.addStats(t);
-        t.add(abilityStat("shield", Strings.autoFixed(max, 2)));
-        t.row();
-        t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2)));
-        t.row();
-        t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2)));
+        t.add(abilityStat("shield", Strings.autoFixed(max, 2))).row();
+        t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2))).row();
+        t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2))).row();
         if(chanceReflect > 0f){
-            t.row();
-            t.add(abilityStat("deflectchance", Strings.autoFixed(chanceReflect * 100f, 2)));
+            t.add(abilityStat("deflectchance", Strings.autoFixed(chanceReflect * 100f, 2))).row();
         }
     }
 

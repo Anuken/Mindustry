@@ -75,8 +75,8 @@ public class ForceFieldAbility extends BaseShieldAbility{
     @Override
     public void addStats(Table t){
         super.addStats(t);
-        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(radius / tilesize, 2)));
-        t.row();
+
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(radius / tilesize, 2))).row();
     }
 
     public float shieldRot(){
