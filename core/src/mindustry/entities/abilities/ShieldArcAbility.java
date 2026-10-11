@@ -6,6 +6,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 
@@ -25,11 +26,18 @@ public class ShieldArcAbility extends BaseShieldAbility{
 
     public ShieldArcAbility(){
         unitShield = false; //arc does not protect the unit itself
+        breakEffect = Fx.arcShieldBreak;
+        followUnitRot = true;
     }
 
     @Override
     public float shieldBounds(){
         return radius + width;
+    }
+
+    @Override
+    public void breakEffect(float x, float y){
+        breakEffect.at(x, y, 0, shieldColor(), paramUnit);
     }
 
     @Override
@@ -43,18 +51,20 @@ public class ShieldArcAbility extends BaseShieldAbility{
     }
 
     public boolean isPosInside(Posc p, float dx, float dy){
+        updateShieldPos(paramUnit);
+
         return !(p.within(paramPos, radius - width) && paramPos.within(p.getX() - dx, p.getY() - dy, radius - width)) &&
         (Tmp.v1.set(p).add(dx, dy).within(paramPos, radius + width) || p.within(paramPos, radius + width)) &&
-        (Angles.within(paramPos.angleTo(p), paramUnit.rotation + angleOffset, angle / 2f) || Angles.within(paramPos.angleTo(p.getX() + dx, p.getY() + dy), paramUnit.rotation + angleOffset, angle / 2f));
+        (Angles.within(paramPos.angleTo(p), shieldRot(paramUnit), angle / 2f) || Angles.within(paramPos.angleTo(p.getX() + dx, p.getY() + dy), shieldRot(paramUnit), angle / 2f));
     }
 
     @Override
     public @Nullable Vec2 intersectLaser(Unit unit, float x1, float y1, float x2, float y2, float damage){
         if(!active(unit)) return null;
 
-        Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
-        float cx = Tmp.v1.x, cy = Tmp.v1.y;
-        float rot = unit.rotation + angleOffset, half = angle / 2f;
+        updateShieldPos(unit);
+        float cx = paramPos.x, cy = paramPos.y;
+        float rot = shieldRot(unit), half = angle / 2f;
         float inner = Math.max(radius - width, 0f), outer = radius + width;
         float dx = x2 - x1, dy = y2 - y1, a = dx * dx + dy * dy;
         float fx = x1 - cx, fy = y1 - cy, start = fx * fx + fy * fy;
@@ -100,8 +110,8 @@ public class ShieldArcAbility extends BaseShieldAbility{
     public float absorbExplosion(Unit unit, float ex, float ey, float damage){
         if(!active(unit)) return 0f;
 
-        Tmp.v1.set(x, y).rotate(unit.rotation - 90f).add(unit);
-        if(!inBand(Tmp.v1.x, Tmp.v1.y, ex, ey, unit.rotation + angleOffset)) return 0f;
+        updateShieldPos(unit);
+        if(!inBand(paramPos.x, paramPos.y, ex, ey, shieldRot(unit))) return 0f;
 
         return absorb(unit, ex, ey, damage, false);
     }
@@ -122,14 +132,14 @@ public class ShieldArcAbility extends BaseShieldAbility{
         if(getShield(unit) > 0 || widthScale > 0.001f){
             Draw.z(Layer.shields);
             Draw.color(shieldColor(unit), Color.white, Mathf.clamp(alpha));
-            Vec2 pos = shieldPos(unit, paramPos);
+            updateShieldPos(unit);
 
             if(!Vars.renderer.animateSurfaces && (region != null || drawArc)){
                 Draw.alpha(0.4f);
             }
 
             if(region != null){
-                Vec2 rp = offsetRegion ? pos : Tmp.v1.set(unit);
+                Vec2 rp = offsetRegion ? paramPos : Tmp.v1.set(unit);
                 Draw.yscl = widthScale;
                 Draw.rect(region, rp.x, rp.y, unit.rotation - 90);
                 Draw.yscl = 1f;
@@ -137,7 +147,7 @@ public class ShieldArcAbility extends BaseShieldAbility{
 
             if(drawArc){
                 Lines.stroke(width * widthScale);
-                Lines.arc(pos.x, pos.y, radius, angle / 360f, unit.rotation + angleOffset - angle / 2f);
+                Lines.arc(paramPos.x, paramPos.y, radius, angle / 360f, shieldRot(unit) - angle / 2f);
             }
             Draw.reset();
         }

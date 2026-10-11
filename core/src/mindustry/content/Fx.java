@@ -3302,7 +3302,7 @@ public class Fx{
         color(e.color);
         stroke(3f * e.fout());
         int sides = e.data instanceof ForceProjector f ? f.sides : e.data instanceof ForceFieldAbility a ? a.sides : 6;
-        float rotation = e.data instanceof ForceProjector f ? f.shieldRotation : e.data instanceof ForceFieldAbility a ? a.rotation : 6;
+        float rotation = e.data instanceof ForceProjector f ? f.shieldRotation : e.data instanceof BaseShieldAbility a ? a.shieldRot() : 6;
 
         Lines.poly(e.x, e.y, sides, e.rotation + e.fin(), rotation);
     }).followParent(true),

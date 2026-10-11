@@ -20,6 +20,8 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
     public float radius = 60f;
     /** Offset parameters for shield. */
     public float angleOffset = 0f, x = 0f, y = 0f;
+    /** Whether the shield should follow the unit s rotation. */
+    public boolean followUnitRot = false;
     /** Shield regen speed in damage/tick. */
     public float regen = 0.1f;
     /** Maximum shield. */
@@ -111,16 +113,41 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
         return color == null ? unit.type.shieldColor(unit) : color;
     }
 
-    public Vec2 shieldPos(Unit unit, Vec2 out){
-        return out.set(x, y).rotate(unit.rotation - 90f).add(unit);
-    }
-
     public boolean active(Unit unit){
         return getShield(unit) > 0f && (unit.isShooting || !whenShooting);
     }
 
-    public abstract boolean isBulletInside(Bullet b);
+    /** Updates {@link #paramPos}. */
+    public void updateShieldPos(Unit unit){
+        if(followUnitRot){
+            paramPos.set(x, y).rotate(unit.rotation - 90f).add(unit);
+        }else{
+            paramPos.set(x, y).add(unit);
+        }
+    }
 
+    public float shieldRot(){
+        return shieldRot(paramUnit);
+    }
+
+    public float shieldRot(Unit unit){
+        return angleOffset + (followUnitRot ? unit.rotation : 0f);
+    }
+
+    public void breakEffect(float x, float y){
+        breakEffect.at(x, y, radius, shieldColor(), this);
+    }
+
+    public void breakShield(){
+        updateShieldPos(paramUnit);
+        addShield(paramUnit, -cooldown * regen);
+
+        breakEffect(paramPos.x, paramPos.y);
+        breakSound.at(paramPos.x, paramPos.y);
+        wasBroken = true;
+    }
+
+    public abstract boolean isBulletInside(Bullet b);
     public abstract boolean isUnitInside(Unit unit);
 
     public void checkBullets(Bullet b){
@@ -206,17 +233,8 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
     public float absorb(Unit unit, float lx, float ly, float damage, boolean hit){
         float absorbed = Math.min(damage, Math.max(getShield(unit), 0f));
         if(absorbed > 0f){
-            if(getShield(unit) <= damage){
-                Vec2 pos = shieldPos(unit, Tmp.v1);
-                addShield(unit, -cooldown * regen);
+            if(getShield(unit) <= damage) breakShield();
 
-                if(breakEffect == Fx.arcShieldBreak){
-                    breakEffect.at(pos.x, pos.y, 0, shieldColor(unit), unit);
-                }else{
-                    breakEffect.at(pos.x, pos.y, radius, shieldColor(unit), unit);
-                }
-                breakSound.at(pos.x, pos.y);
-            }
             if(hit){
                 hitSound.at(lx, ly, 1f + Mathf.range(0.1f), hitSoundVolume);
             }else{
@@ -282,16 +300,8 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
     @Override
     public void update(Unit unit){
         float shield = getShield(unit);
-        if(unitShield){
-            if(shield <= 0f && !wasBroken){
-                addShield(unit, -cooldown * regen);
+        if(unitShield && shield <= 0f && !wasBroken) breakShield();
 
-                breakEffect.at(unit.x, unit.y, radius, shieldColor(unit), this);
-                breakSound.at(unit.x, unit.y);
-            }
-
-            wasBroken = shield <= 0f;
-        }
 
         if(unitSlowdown > 0f){
             //slowdown changes are % based
@@ -312,7 +322,7 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
             paramUnit = unit;
             paramField = this;
             checkRadius();
-            shieldPos(unit, paramPos);
+            updateShieldPos(unit);
 
             float reach = shieldBounds();
             Vars.state.entities.bullet.intersect(paramPos.x - reach, paramPos.y - reach, reach * 2f, reach * 2f, shieldConsumer);
@@ -327,11 +337,9 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
 
     @Override
     public void death(Unit unit){
-
         //self-destructing units can have a shield on death
         if(getShield(unit) > 0f && !wasBroken){
-            Fx.shieldBreak.at(unit.x, unit.y, radius, shieldColor(unit), unit);
-            breakSound.at(unit.x, unit.y);
+            breakShield();
         }
     }
 

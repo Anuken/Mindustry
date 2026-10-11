@@ -16,10 +16,6 @@ import static mindustry.Vars.*;
 public class ForceFieldAbility extends BaseShieldAbility{
     /** Sides of shield polygon. */
     public int sides = 6;
-    /** Rotation of shield. */
-    public float rotation = 0f;
-    /** Whether the shield should follow the unit s rotation. */
-    public boolean followUnitRot = false;
 
     public ForceFieldAbility(){
     }
@@ -37,7 +33,7 @@ public class ForceFieldAbility extends BaseShieldAbility{
         this.max = max;
         this.cooldown = cooldown;
         this.sides = sides;
-        this.rotation = rotation;
+        this.angleOffset = rotation;
     }
 
     @Override
@@ -47,28 +43,28 @@ public class ForceFieldAbility extends BaseShieldAbility{
 
     @Override
     public boolean isBulletInside(Bullet b){
-        Vec2 pos = shieldPos(paramUnit, paramPos);
-        return Intersector.isInRegularPolygon(sides, pos.x, pos.y, realRad, rotation + angleOffset + (followUnitRot ? paramUnit.rotation : 0f), b.x(), b.y());
+        updateShieldPos(paramUnit);
+        return Intersector.isInRegularPolygon(sides, paramPos.x, paramPos.y, realRad, angleOffset + (followUnitRot ? paramUnit.rotation : 0f), b.x(), b.y());
     }
 
     @Override
     public boolean isUnitInside(Unit unit){
-        Vec2 pos = shieldPos(paramUnit, paramPos);
-        return Intersector.isInRegularPolygon(sides, pos.x, pos.y, realRad, rotation + angleOffset + (followUnitRot ? paramUnit.rotation : 0f), unit.x(), unit.y());
+        updateShieldPos(paramUnit);
+        return Intersector.isInRegularPolygon(sides, paramPos.x, paramPos.y, realRad, angleOffset + (followUnitRot ? paramUnit.rotation : 0f), unit.x(), unit.y());
     }
 
     @Override
     public @Nullable Vec2 intersectLaser(Unit unit, float x1, float y1, float x2, float y2, float damage){
         if(!active(unit)) return null;
-        Vec2 pos = shieldPos(unit, paramPos);
-        return Damage.raycastRegularPolygon(sides, pos.x, pos.y, radiusScale * radius, rotation + angleOffset + (followUnitRot ? unit.rotation : 0f), x1, y1, x2, y2);
+        updateShieldPos(unit);
+        return Damage.raycastRegularPolygon(sides, paramPos.x, paramPos.y, radiusScale * radius, angleOffset + (followUnitRot ? unit.rotation : 0f), x1, y1, x2, y2);
     }
 
     @Override
     public float absorbExplosion(Unit unit, float ex, float ey, float damage){
         if(!active(unit)) return 0f;
-        Vec2 pos = shieldPos(unit, paramPos);
-        if(!Intersector.isInRegularPolygon(sides, pos.x, pos.y, radiusScale * radius, rotation + angleOffset + (followUnitRot ? unit.rotation : 0f), ex, ey)) return 0f;
+        updateShieldPos(unit);
+        if(!Intersector.isInRegularPolygon(sides, paramPos.x, paramPos.y, radiusScale * radius, angleOffset + (followUnitRot ? unit.rotation : 0f), ex, ey)) return 0f;
         return absorb(unit, ex, ey, damage, false);
     }
 
@@ -79,10 +75,6 @@ public class ForceFieldAbility extends BaseShieldAbility{
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(radius / tilesize, 2))).row();
     }
 
-    public float shieldRot(){
-        return rotation + angleOffset + (followUnitRot ? paramUnit.rotation : 0f);
-    }
-
     @Override
     public void draw(Unit unit){
         checkRadius();
@@ -90,18 +82,18 @@ public class ForceFieldAbility extends BaseShieldAbility{
         if(getShield(unit) > 0 || widthScale > 0.001f){
             Draw.z(Layer.shields);
             Draw.color(shieldColor(unit), Color.white, Mathf.clamp(alpha));
-            Vec2 pos = shieldPos(unit, paramPos);
+            updateShieldPos(unit);
 
             if(renderer.animateSurfaces){
                 Draw.z(Layer.shields + 0.001f * alpha);
-                Fill.poly(pos.x, pos.y, sides, realRad, shieldRot());
+                Fill.poly(paramPos.x, paramPos.y, sides, realRad, shieldRot(unit));
             }else{
                 Draw.z(Layer.shields);
                 Lines.stroke(1.5f);
                 Draw.alpha(0.09f);
-                Fill.poly(pos.x, pos.y, sides, radius, shieldRot());
+                Fill.poly(paramPos.x, paramPos.y, sides, radius, shieldRot(unit));
                 Draw.alpha(1f);
-                Lines.poly(pos.x, pos.y, sides, radius, shieldRot());
+                Lines.poly(paramPos.x, paramPos.y, sides, radius, shieldRot(unit));
             }
             Draw.reset();
         }
