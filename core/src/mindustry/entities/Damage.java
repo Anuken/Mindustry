@@ -19,6 +19,8 @@ import mindustry.graphics.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
+import mindustry.world.blocks.defense.*;
+import mindustry.world.blocks.defense.BaseShield.*;
 
 import static mindustry.Vars.*;
 
@@ -280,7 +282,7 @@ public class Damage{
      */
     public static float findShieldLength(Bullet b, float length, boolean absorb){
         float damage = b.type.shieldDamage(b);
-        if(!b.type.absorbable || length <= 0f || damage <= 0f) return length;
+        if(length <= 0f || damage <= 0f) return length;
 
         seg1.set(b.x, b.y);
         seg2.trnsExact(b.rotation(), length).add(seg1);
@@ -290,6 +292,7 @@ public class Damage{
         for(int i = 0; i < shields.size; i++){
             Building build = shields.get(i);
             if(build instanceof ShieldProvider shield){
+                if(!b.type.absorbable && !(build instanceof BaseShieldBuild)) continue;
                 Vec2 hit = shield.intersectLaser(seg1.x, seg1.y, seg2.x, seg2.y, damage);
                 if(hit != null){
                     shieldHits.add(collidePool.obtain().set(hit.x, hit.y, build));
@@ -300,7 +303,7 @@ public class Damage{
         var units = Units.enemyShields(b.team, rect.x, rect.y, rect.width, rect.height);
         for(int i = 0; i < units.size; i++){
             Unit unit = units.get(i);
-            if(unit.dead) continue;
+            if(unit.dead || !b.type.absorbable) continue;
 
             for(Ability ability : unit.abilities){
                 if(ability instanceof UnitShieldProvider shield){
