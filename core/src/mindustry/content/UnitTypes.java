@@ -473,8 +473,6 @@ public class UnitTypes{
             mineSpeed = 4f;
             drawShields = false;
 
-            abilities.add(new ForceFieldAbility(60f, 0.4f, 500f, 60f * 6));
-
             weapons.add(new Weapon("beam-weapon"){{
                 top = false;
                 shake = 2f;
@@ -3561,6 +3559,8 @@ public class UnitTypes{
                 width = 8f;
                 whenShooting = false;
                 chanceDeflect = 1f;
+                reflectMissileTime = 0f;
+                missileUnitMultiplier = 0.8f;
             }});
 
             rotateSpeed = 2.1f;
