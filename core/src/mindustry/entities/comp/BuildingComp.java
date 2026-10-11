@@ -1,8 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.*;
-import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;

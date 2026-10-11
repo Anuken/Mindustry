@@ -1,7 +1,7 @@
 package arc.backend.robovm;
 
 import arc.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.backend.robovm.custom.*;
 import arc.graphics.*;
 import arc.graphics.HdpiUtils.*;

@@ -1,8 +1,7 @@
 package mindustry.world.blocks.logic;
 
 import arc.*;
-import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.Input.*;
 import arc.graphics.*;
 import arc.graphics.font.*;
