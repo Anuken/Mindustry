@@ -14,8 +14,7 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.Wall.*;
 import mindustry.world.blocks.defense.turrets.Turret.*;
 import mindustry.world.blocks.distribution.*;
-import mindustry.world.blocks.production.AttributeCrafter.*;
-import mindustry.world.blocks.production.SolidPump.*;
+import mindustry.world.blocks.production.GenericCrafter.*;
 import mindustry.world.blocks.storage.*;
 import mindustry.world.meta.*;
 
@@ -213,7 +212,7 @@ public class GameService{
                     buildGroundFactory.complete();
                 }
 
-                if((e.tile.build instanceof AttributeCrafterBuild a && a.attrsum > 0) || (e.tile.build instanceof SolidPumpBuild sp && sp.boost > 0)){
+                if(e.tile.build instanceof GenericCrafterBuild c && c.attrsum > 0){
                     boostBuildingFloor.complete();
                 }
 

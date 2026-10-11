@@ -131,6 +131,10 @@ public class Conduit extends LiquidBlock implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
+        if(noSideBlend){
+            return (otherblock.outputsLiquid && blendsArmored(tile, rotation, otherx, othery, otherrot, otherblock)) ||
+                (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasLiquids) || otherblock instanceof LiquidJunction;
+        }
         return otherblock.hasLiquids && (otherblock.outputsLiquid || (lookingAt(tile, rotation, otherx, othery, otherblock))) && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
     }
 
@@ -238,8 +242,11 @@ public class Conduit extends LiquidBlock implements Autotiler{
         @Override
         public boolean acceptLiquid(Building source, Liquid liquid){
             noSleep();
+            //TODO the proximity check is a super hacky solution for block-to-conduit through a junction...
             return (liquids.current() == liquid || liquids.currentAmount() < 0.2f)
-                && (tile == null || source == this || (source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation);
+                && (tile == null || source == this || (source.relativeTo(tile.x, tile.y) + 2) % 4 != rotation)
+                && (!noSideBlend || tile == null || source.block instanceof Conduit || source.block instanceof DirectionLiquidBridge || source.block instanceof LiquidJunction ||
+                source.tile.absoluteRelativeTo(tile.x, tile.y) == rotation || !source.proximity.contains(this));
         }
 
         @Override

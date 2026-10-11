@@ -1,5 +1,6 @@
 package mindustry.world.blocks.production;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -8,11 +9,14 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
+import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.mod.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.Conduit.*;
 import mindustry.world.draw.*;
@@ -47,6 +51,31 @@ public class GenericCrafter extends Block{
     @NoPatch
     public boolean legacyReadWarmup = false;
 
+    /** Floor attribute that boosts this crafter. Null disables all attribute behavior. */
+    public @Nullable Attribute attribute;
+    /** Base efficiency of the crafter. */
+    public float baseEfficiency = 1f;
+    /** Maximum efficiency/output boost from attributes. */
+    public float maxBoost = 1f;
+    /** Minimum efficiency required to place this block. */
+    public float minEfficiency = -1f;
+    /** Whether to show this bar in the UI. */
+    public boolean displayEfficiency = true, displayScaledOutput = true;
+    /** Whether liquid consumption scales with efficiency. */
+    public boolean scaleLiquidConsumption = false;
+    /** Scaled output (yield) multiplier, scales with attribute. <=0 to disable. */
+    public float outputScale = 0f;
+    /** Scaled efficiency (speed) multiplier, scales with attribute. <=0 to disable. */
+    public float boostScale = 1f;
+    /** If true, baseEfficiency is counted per tile that is not liquid instead of being a flat value. */
+    public boolean solidFloorOnly = false;
+    /** If false, the attribute multiplier only scales liquid output and not crafting progress. */
+    public boolean attributeScalesProgress = true;
+    /** If true, a bar showing the current liquid output rate replaces the efficiency bar. */
+    public boolean displayOutputRate = false;
+    /** If false, progress and warmup are not saved. Keeps the old save format for blocks that were not crafters before. */
+    public boolean saveProgress = true;
+
     public DrawBlock drawer = new DrawDefault();
 
     public GenericCrafter(String name){
@@ -75,6 +104,47 @@ public class GenericCrafter extends Block{
         if(outputLiquids != null){
             stats.add(Stat.output, StatValues.liquids(1f, outputLiquids));
         }
+
+        if(attribute != null){
+            Stat affinityStat = baseEfficiency <= 0.0001f ? Stat.tiles : Stat.affinities;
+            boolean startZero = !displayEfficiency || baseEfficiency <= 0.0001f;
+
+            if(outputScale > 0f){
+                stats.add(affinityStat, attribute, floating, boostScale * size * size, outputScale * size * size, Seq.with(outputItems), craftTime, startZero);
+            }else{
+                stats.add(affinityStat, attribute, floating, boostScale * size * size, startZero);
+            }
+        }
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        super.drawPlace(x, y, rotation, valid);
+
+        if(attribute == null) return;
+        if((!displayEfficiency || boostScale <= 0f) && (!displayScaledOutput || outputScale <= 0f)) return;
+
+        float sum = sumAttribute(attribute, x, y);
+        float base = baseEfficiency * (solidFloorOnly ? percentSolid(x, y) : 1f);
+
+        drawPlaceText(
+        (displayEfficiency && boostScale > 0f ?
+        Core.bundle.format("bar.efficiency", Math.round(Math.max(base + Math.min(maxBoost, boostScale * sum), 0f) * 100f))
+        : "") +
+        (displayScaledOutput && outputScale > 0f ?
+        "\n" + Core.bundle.format("bar.yield", (int)((1f + Math.min(maxBoost, outputScale * sum)) * 100f))
+        : ""), x, y, valid);
+    }
+
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        if(attribute == null) return super.canPlaceOn(tile, team, rotation);
+
+        float sum = solidFloorOnly ?
+            tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().isLiquid ? 0f : baseEfficiency + other.floor().attributes.get(attribute)) :
+            baseEfficiency + tile.getLinkedTilesAs(this, tempTiles).sumf(other -> other.floor().attributes.get(attribute));
+
+        return sum >= minEfficiency;
     }
 
     @Override
@@ -90,6 +160,28 @@ public class GenericCrafter extends Block{
             for(var stack : outputLiquids){
                 addLiquidBar(stack.liquid);
             }
+        }
+
+        if(displayOutputRate){
+            addBar("efficiency", (GenericCrafterBuild entity) -> new Bar(
+                () -> Core.bundle.formatFloat("bar.pumpspeed", entity.lastOutput * 60f, 1),
+                () -> Pal.ammo,
+                () -> entity.warmup * entity.efficiency
+            ));
+        }else if(attribute != null && displayEfficiency && boostScale > 0f){
+            addBar("efficiency", (GenericCrafterBuild entity) -> new Bar(
+                () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyMultiplier() * 100)),
+                () -> Pal.lightOrange,
+                entity::efficiencyMultiplier
+            ));
+        }
+
+        if(attribute != null && displayScaledOutput && outputScale > 0f){
+            addBar("yield", (GenericCrafterBuild entity) -> new Bar(
+                () -> Core.bundle.format("bar.yield", (int)(entity.outputMultiplier() * 100)),
+                () -> Pal.lightOrange,
+                entity::outputMultiplier
+            ));
         }
     }
 
@@ -187,6 +279,9 @@ public class GenericCrafter extends Block{
         public float progress;
         public float totalProgress;
         public float warmup;
+        public float attrsum;
+        public float solidFraction = 1f;
+        public float lastOutput;
         public @Nullable float[] outputAccumulator = outputItems != null && outputItems.length > 0 ? new float[outputItems.length] : null;
 
         @Override
@@ -234,6 +329,8 @@ public class GenericCrafter extends Block{
 
         @Override
         public void updateTile(){
+            lastOutput = 0f;
+
             if(efficiency > 0){
 
                 progress += getProgressIncrease(craftTime);
@@ -241,9 +338,11 @@ public class GenericCrafter extends Block{
 
                 //continuously output based on efficiency
                 if(outputLiquids != null){
-                    float inc = getProgressIncrease(1f);
+                    float inc = getProgressIncrease(1f) * (attributeScalesProgress ? 1f : attributeScale());
                     for(var output : outputLiquids){
-                        handleLiquid(this, output.liquid, Math.min(output.amount * inc, liquidCapacity - liquids.get(output.liquid)));
+                        float added = Math.min(output.amount * inc, liquidCapacity - liquids.get(output.liquid));
+                        handleLiquid(this, output.liquid, added);
+                        lastOutput += added / Time.delta;
                     }
                 }
 
@@ -266,6 +365,10 @@ public class GenericCrafter extends Block{
 
         @Override
         public float getProgressIncrease(float baseTime){
+            return baseProgressIncrease(baseTime) * (attributeScalesProgress ? attributeScale() : 1f);
+        }
+
+        float baseProgressIncrease(float baseTime){
             if(ignoreLiquidFullness){
                 return super.getProgressIncrease(baseTime);
             }
@@ -301,7 +404,42 @@ public class GenericCrafter extends Block{
 
         /** Allows scaling the crafter's output dynamically. */
         public float scaleOutput(float amount){
-            return amount;
+            return attribute != null && outputScale > 0f ? amount * outputMultiplier() : amount;
+        }
+
+        public float outputMultiplier(){
+            return baseEfficiency + Math.min(maxBoost, outputScale * attrsum) + attribute.env();
+        }
+
+        public float efficiencyMultiplier(){
+            return Math.max(baseEfficiency * solidFraction + Math.min(maxBoost, boostScale * attrsum) + attribute.env(), 0f);
+        }
+
+        public float attributeScale(){
+            return attribute == null ? 1f : efficiencyMultiplier();
+        }
+
+        @Override
+        public float efficiencyScale(){
+            return attribute != null && scaleLiquidConsumption ? efficiencyMultiplier() : super.efficiencyScale();
+        }
+
+        @Override
+        public void pickedUp(){
+            if(attribute != null){
+                attrsum = 0f;
+                warmup = 0f;
+            }
+        }
+
+        @Override
+        public void onProximityUpdate(){
+            super.onProximityUpdate();
+
+            if(attribute != null){
+                attrsum = sumAttribute(attribute, tile.x, tile.y);
+                solidFraction = solidFloorOnly ? percentSolid(tile.x, tile.y) : 1f;
+            }
         }
 
         public void craft(){
@@ -377,6 +515,7 @@ public class GenericCrafter extends Block{
         @Override
         public void write(Writes write){
             super.write(write);
+            if(!saveProgress) return;
             write.f(progress);
             write.f(warmup);
             if(legacyReadWarmup) write.f(0f);
@@ -385,6 +524,7 @@ public class GenericCrafter extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
+            if(!saveProgress) return;
             progress = read.f();
             warmup = read.f();
             if(legacyReadWarmup) read.f();

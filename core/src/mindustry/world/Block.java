@@ -81,7 +81,7 @@ public class Block extends UnlockableContent implements LogicSenseable{
     /** If true, this block outputs to its facing direction, when applicable.
      * Used for blending calculations. */
     public boolean outputFacing = true;
-    /** if true, this block does not accept input from the sides (used for armored conveyors) */
+    /** if true, this block does not accept input from the sides (used for armored conveyors/ducts/conduits) */
     public boolean noSideBlend = false;
     /** whether to display flow rate */
     public boolean displayFlow = true;

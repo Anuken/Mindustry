@@ -1083,7 +1083,7 @@ public class Blocks{
             consumePower(0.50f);
         }};
 
-        siliconCrucible = new AttributeCrafter("silicon-crucible"){{
+        siliconCrucible = new GenericCrafter("silicon-crucible"){{
             requirements(Category.crafting, with(Items.titanium, 120, Items.metaglass, 80, Items.plastanium, 35, Items.silicon, 60));
             craftEffect = Fx.smeltsmoke;
             outputItem = new ItemStack(Items.silicon, 8);
@@ -1092,6 +1092,7 @@ public class Blocks{
             hasPower = true;
             hasLiquids = false;
             itemCapacity = 30;
+            attribute = Attribute.heat;
             boostScale = 0.15f;
             outputScale = 0.15f;
             drawer = new DrawMulti(new DrawDefault(), new DrawFlame(Color.valueOf("ffef99")));
@@ -2089,8 +2090,9 @@ public class Blocks{
             itemCapacity = 10;
         }};
 
-        armoredConveyor = new ArmoredConveyor("armored-conveyor"){{
+        armoredConveyor = new Conveyor("armored-conveyor"){{
             requirements(Category.distribution, with(Items.plastanium, 1, Items.thorium, 1, Items.metaglass, 1));
+            noSideBlend = true;
             health = 280;
             speed = 0.08f;
             displayedSpeed = 10f;
@@ -2187,7 +2189,7 @@ public class Blocks{
             requirements(Category.distribution, with(Items.beryllium, 2, Items.tungsten, 1));
             health = 140;
             speed = 4f;
-            armored = true;
+            noSideBlend = true;
             researchCost = with(Items.beryllium, 300, Items.tungsten, 100);
         }};
 
@@ -2335,8 +2337,10 @@ public class Blocks{
             explosivenessScale = flammabilityScale = 16f/40f;
         }};
 
-        platedConduit = new ArmoredConduit("plated-conduit"){{
+        platedConduit = new Conduit("plated-conduit"){{
             requirements(Category.liquid, with(Items.thorium, 2, Items.metaglass, 1, Items.plastanium, 1));
+            noSideBlend = true;
+            leaks = false;
             liquidCapacity = 50f;
             liquidPressure = 1.025f;
             health = 220;
@@ -2410,8 +2414,9 @@ public class Blocks{
             size = 2;
         }};
 
-        reinforcedConduit = new ArmoredConduit("reinforced-conduit"){{
+        reinforcedConduit = new Conduit("reinforced-conduit"){{
             requirements(Category.liquid, with(Items.beryllium, 2));
+            noSideBlend = true;
             botColor = Pal.darkestMetal;
             leaks = true;
             liquidCapacity = 50f;
@@ -2949,20 +2954,30 @@ public class Blocks{
             }});
         }};
 
-        waterExtractor = new SolidPump("water-extractor"){{
+        waterExtractor = new GenericCrafter("water-extractor"){{
             requirements(Category.production, with(Items.metaglass, 30, Items.graphite, 30, Items.lead, 30, Items.copper, 30));
-            result = Liquids.water;
-            pumpAmount = 0.11f;
+            outputLiquid = new LiquidStack(Liquids.water, 0.11f);
             size = 2;
             liquidCapacity = 40f;
-            rotateSpeed = 1.4f;
+            group = BlockGroup.liquids;
+            floating = true;
+            flags = EnumSet.of();
+            ambientSound = Sounds.none;
             attribute = Attribute.water;
+            boostScale = 1f / 4f;
+            maxBoost = Float.MAX_VALUE;
+            minEfficiency = 0.00001f;
+            solidFloorOnly = true;
+            attributeScalesProgress = false;
+            displayOutputRate = true;
+            saveProgress = false;
             envRequired = envRequired.with(Env.groundWater);
+            drawer = new DrawMulti(new DrawDefault(), new DrawLiquidRegion(Liquids.water), new DrawRegion("-rotator", 1.4f, true), new DrawRegion("-top"));
 
             consumePower(1.5f);
         }};
 
-        cultivator = new AttributeCrafter("cultivator"){{
+        cultivator = new GenericCrafter("cultivator"){{
             requirements(Category.production, with(Items.copper, 25, Items.lead, 25, Items.silicon, 10));
             outputItem = new ItemStack(Items.sporePod, 1);
             craftTime = 100;
@@ -2993,24 +3008,38 @@ public class Blocks{
             consumeLiquid(Liquids.water, 18f / 60f);
         }};
 
-        oilExtractor = new Fracker("oil-extractor"){{
+        oilExtractor = new GenericCrafter("oil-extractor"){{
             requirements(Category.production, with(Items.copper, 150, Items.graphite, 175, Items.lead, 115, Items.thorium, 115, Items.silicon, 75));
-            result = Liquids.oil;
+            outputLiquid = new LiquidStack(Liquids.oil, 0.25f);
             updateEffect = Fx.pulverize;
             updateEffectChance = 0.05f;
-            pumpAmount = 0.25f;
+            updateEffectSpread = 2f;
             size = 3;
             liquidCapacity = 40f;
+            group = BlockGroup.liquids;
+            floating = true;
+            flags = EnumSet.of();
+            ambientSound = Sounds.loopDrill;
+            ambientSoundVolume = 0.03f;
             attribute = Attribute.oil;
             baseEfficiency = 0f;
-            itemUseTime = 60f;
+            boostScale = 1f / 9f;
+            maxBoost = Float.MAX_VALUE;
+            minEfficiency = 0.00001f;
+            solidFloorOnly = true;
+            attributeScalesProgress = false;
+            displayOutputRate = true;
+            saveProgress = false;
+            craftTime = 60f;
+            envRequired = envRequired.with(Env.groundOil);
+            drawer = new DrawMulti(new DrawDefault(), new DrawLiquidRegion(Liquids.oil), new DrawRegion("-rotator", 1f, true), new DrawRegion("-top"));
 
             consumeItem(Items.sand);
             consumePower(3f);
             consumeLiquid(Liquids.water, 0.15f);
         }};
 
-        ventCondenser = new AttributeCrafter("vent-condenser"){{
+        ventCondenser = new GenericCrafter("vent-condenser"){{
             requirements(Category.production, with(Items.graphite, 20, Items.beryllium, 60));
             attribute = Attribute.steam;
             group = BlockGroup.liquids;

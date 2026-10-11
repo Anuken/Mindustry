@@ -74,7 +74,7 @@ public class StackConveyor extends Block implements Autotiler{
             int state = b.state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
-            }else if(state == stateUnload && !outputRouter){ //router mode
+            }else if(state == stateUnload){ //router mode
                 return otherblock.acceptsItems &&
                     (!otherblock.noSideBlend || lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock)) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||

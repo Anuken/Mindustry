@@ -25,7 +25,6 @@ import static mindustry.Vars.*;
 
 public class Duct extends Block implements Autotiler{
     public float speed = 5f;
-    public boolean armored = false;
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
@@ -46,7 +45,6 @@ public class Duct extends Block implements Autotiler{
         noUpdateDisabled = true;
         underBullets = true;
         rotate = true;
-        noSideBlend = true;
         isDuct = true;
         priority = TargetPriority.transport;
         envEnabled = Environments.of(Env.space, Env.terrestrial, Env.underwater);
@@ -95,7 +93,7 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(!armored){
+        if(!noSideBlend){
             return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
             && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
         }else{
@@ -218,7 +216,7 @@ public class Duct extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Building source, Item item){
             return current == null && items.total() == 0 &&
-                (armored ?
+                (noSideBlend ?
                     //armored acceptance
                     ((source.block.rotate && source.front() == this && source.block.hasItems && source.block.isDuct) ||
                     Edges.getFacingEdge(source.tile, tile).relativeTo(tile) == rotation) :

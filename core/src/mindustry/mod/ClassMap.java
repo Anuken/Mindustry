@@ -219,8 +219,6 @@ public class ClassMap{
         classes.put("AmmoEntry", mindustry.world.blocks.defense.turrets.Turret.AmmoEntry.class);
         classes.put("BulletEntry", mindustry.world.blocks.defense.turrets.Turret.BulletEntry.class);
         classes.put("TurretBuild", mindustry.world.blocks.defense.turrets.Turret.TurretBuild.class);
-        classes.put("ArmoredConveyor", mindustry.world.blocks.distribution.ArmoredConveyor.class);
-        classes.put("ArmoredConveyorBuild", mindustry.world.blocks.distribution.ArmoredConveyor.ArmoredConveyorBuild.class);
         classes.put("BufferedItemBridge", mindustry.world.blocks.distribution.BufferedItemBridge.class);
         classes.put("BufferedItemBridgeBuild", mindustry.world.blocks.distribution.BufferedItemBridge.BufferedItemBridgeBuild.class);
         classes.put("ChainedBuilding", mindustry.world.blocks.distribution.ChainedBuilding.class);
@@ -293,8 +291,6 @@ public class ClassMap{
         classes.put("HeatConsumer", mindustry.world.blocks.heat.HeatConsumer.class);
         classes.put("HeatProducer", mindustry.world.blocks.heat.HeatProducer.class);
         classes.put("HeatProducerBuild", mindustry.world.blocks.heat.HeatProducer.HeatProducerBuild.class);
-        classes.put("ArmoredConduit", mindustry.world.blocks.liquid.ArmoredConduit.class);
-        classes.put("ArmoredConduitBuild", mindustry.world.blocks.liquid.ArmoredConduit.ArmoredConduitBuild.class);
         classes.put("Conduit", mindustry.world.blocks.liquid.Conduit.class);
         classes.put("ConduitBuild", mindustry.world.blocks.liquid.Conduit.ConduitBuild.class);
         classes.put("LiquidBlock", mindustry.world.blocks.liquid.LiquidBlock.class);
@@ -379,16 +375,12 @@ public class ClassMap{
         classes.put("ThermalGeneratorBuild", mindustry.world.blocks.power.ThermalGenerator.ThermalGeneratorBuild.class);
         classes.put("VariableReactor", mindustry.world.blocks.power.VariableReactor.class);
         classes.put("VariableReactorBuild", mindustry.world.blocks.power.VariableReactor.VariableReactorBuild.class);
-        classes.put("AttributeCrafter", mindustry.world.blocks.production.AttributeCrafter.class);
-        classes.put("AttributeCrafterBuild", mindustry.world.blocks.production.AttributeCrafter.AttributeCrafterBuild.class);
         classes.put("BeamDrill", mindustry.world.blocks.production.BeamDrill.class);
         classes.put("BeamDrillBuild", mindustry.world.blocks.production.BeamDrill.BeamDrillBuild.class);
         classes.put("BurstDrill", mindustry.world.blocks.production.BurstDrill.class);
         classes.put("BurstDrillBuild", mindustry.world.blocks.production.BurstDrill.BurstDrillBuild.class);
         classes.put("Drill", mindustry.world.blocks.production.Drill.class);
         classes.put("DrillBuild", mindustry.world.blocks.production.Drill.DrillBuild.class);
-        classes.put("Fracker", mindustry.world.blocks.production.Fracker.class);
-        classes.put("FrackerBuild", mindustry.world.blocks.production.Fracker.FrackerBuild.class);
         classes.put("GenericCrafter", mindustry.world.blocks.production.GenericCrafter.class);
         classes.put("GenericCrafterBuild", mindustry.world.blocks.production.GenericCrafter.GenericCrafterBuild.class);
         classes.put("HeatCrafter", mindustry.world.blocks.production.HeatCrafter.class);
@@ -403,8 +395,6 @@ public class ClassMap{
         classes.put("SeparatorBuild", mindustry.world.blocks.production.Separator.SeparatorBuild.class);
         classes.put("SingleBlockProducer", mindustry.world.blocks.production.SingleBlockProducer.class);
         classes.put("SingleBlockProducerBuild", mindustry.world.blocks.production.SingleBlockProducer.SingleBlockProducerBuild.class);
-        classes.put("SolidPump", mindustry.world.blocks.production.SolidPump.class);
-        classes.put("SolidPumpBuild", mindustry.world.blocks.production.SolidPump.SolidPumpBuild.class);
         classes.put("WallCrafter", mindustry.world.blocks.production.WallCrafter.class);
         classes.put("WallCrafterBuild", mindustry.world.blocks.production.WallCrafter.WallCrafterBuild.class);
         classes.put("ItemSource", mindustry.world.blocks.sandbox.ItemSource.class);
