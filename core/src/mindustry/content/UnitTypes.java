@@ -473,15 +473,7 @@ public class UnitTypes{
             mineSpeed = 4f;
             drawShields = false;
 
-            abilities.add(new ForceFieldAbility(){{
-                radius = 60f;
-                regen = 0.4f;
-                max = 500f;
-                cooldown = 60f * 6;
-                x = 20;
-                chanceReflect = 1f;
-                pushUnits = true;
-            }});
+            abilities.add(new ForceFieldAbility(60f, 0.4f, 500f, 60f * 6));
 
             weapons.add(new Weapon("beam-weapon"){{
                 top = false;

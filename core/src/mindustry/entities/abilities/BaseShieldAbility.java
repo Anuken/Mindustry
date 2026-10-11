@@ -41,7 +41,7 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
     public int shotThreshold = 5;
 
     /** Bullet/target reflection chance. <= 0 to disable. */
-    public float chanceReflect = -1f;
+    public float chanceDeflect = -1f;
     /** Whether to reflect missile units instead of absorbing them. */
     public boolean reflectMissiles = true;
     /** Multiplier for shield damage taken by missile units. <= 0 to disable missile mechanics entirely. */
@@ -153,7 +153,7 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
     public void checkBullets(Bullet b){
         if(b.team != paramUnit.team && b.type.absorbable && getShield(paramUnit) > 0 && isBulletInside(b)){
             boolean reflected = false;
-            if(b.vel.len() >= 0.1f && b.type.reflectable && chanceReflect > 0f){
+            if(b.vel.len() >= 0.1f && b.type.reflectable && chanceDeflect > 0f){
                 reflected = true;
                 reflect(b, b.vel, b.type.clipSize() * 4f + b.type.speed * 2f, len -> {
                     b.owner = paramUnit;
@@ -252,7 +252,7 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
     }
 
     public void reflect(Posc pos, Vec2 vel, float size, Cons<Float> reflect){
-        if(!Mathf.chance(chanceReflect)) return;
+        if(!Mathf.chance(chanceDeflect)) return;
 
         float ux = paramPos.x, uy = paramPos.y;
         //we cannot trust source position or rotation for fx
@@ -292,8 +292,8 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
         t.add(abilityStat("shield", Strings.autoFixed(max, 2))).row();
         t.add(abilityStat("repairspeed", Strings.autoFixed(regen * 60f, 2))).row();
         t.add(abilityStat("cooldown", Strings.autoFixed(cooldown / 60f, 2))).row();
-        if(chanceReflect > 0f){
-            t.add(abilityStat("deflectchance", Strings.autoFixed(chanceReflect * 100f, 2))).row();
+        if(chanceDeflect > 0f){
+            t.add(abilityStat("deflectchance", Strings.autoFixed(chanceDeflect * 100f, 2))).row();
         }
     }
 
@@ -301,7 +301,6 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
     public void update(Unit unit){
         float shield = getShield(unit);
         if(unitShield && shield <= 0f && !wasBroken) breakShield();
-
 
         if(unitSlowdown > 0f){
             //slowdown changes are % based

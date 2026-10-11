@@ -3317,10 +3317,10 @@ public class Fx{
                 Lines.arc(pos.x, pos.y, ab.radius - ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
                 for(int i : Mathf.signs){
                     float
-                            px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
-                            py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
-                            px1 = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2),
-                            py1 = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2);
+                    px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                    py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                    px1 = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2),
+                    py1 = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2);
                     Lines.line(px, py, px1, py1);
                 }
             }
