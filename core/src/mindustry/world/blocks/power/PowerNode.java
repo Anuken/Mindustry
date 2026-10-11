@@ -51,7 +51,7 @@ public class PowerNode extends PowerBlock{
         swapDiagonalPlacement = true;
         schematicPriority = -10;
         drawDisabled = false;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         destructible = true;
         delayLandingConfig = true;
         drawCached = true;

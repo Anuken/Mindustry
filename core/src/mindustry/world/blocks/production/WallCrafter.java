@@ -58,7 +58,7 @@ public class WallCrafter extends Block{
        ignoreLineRotation = true;
         regionRotated1 = 1;
 
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         flags = EnumSet.of(BlockFlag.drill);
     }
 

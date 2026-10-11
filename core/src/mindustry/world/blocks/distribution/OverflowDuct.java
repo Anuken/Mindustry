@@ -31,7 +31,7 @@ public class OverflowDuct extends Block{
         rotate = true;
         underBullets = true;
         priority = TargetPriority.transport;
-        envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        envEnabled = Environments.of(Env.space, Env.terrestrial, Env.underwater);
         regionRotated1 = 1;
         drawCached = true;
         drawDynamic = false;

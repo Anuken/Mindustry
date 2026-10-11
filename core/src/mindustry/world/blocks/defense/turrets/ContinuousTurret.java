@@ -21,7 +21,7 @@ public class ContinuousTurret extends Turret{
         super(name);
 
         coolantMultiplier = 1f;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         displayAmmoMultiplier = false;
     }
 

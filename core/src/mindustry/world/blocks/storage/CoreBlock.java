@@ -78,7 +78,7 @@ public class CoreBlock extends StorageBlock{
         drawDisabled = false;
         canOverdrive = false;
         commandable = true;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         drawCached = false;
         drawDynamic = true;
         allowedInPayloads = false;

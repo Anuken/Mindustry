@@ -1009,6 +1009,89 @@ public class ApplicationTests{
         checkPayloads();
     }
 
+    @Test
+    void allBlockSaveLoadTest() throws Throwable{
+        World tiles = state.resizeWorld(80, 80);
+
+        state.beginMapLoad();
+        for(int x = 0; x < tiles.width; x++){
+            for(int y = 0; y < tiles.height; y++){
+                tiles.set(x, y, new Tile(x, y, Blocks.stone, Blocks.air, Blocks.air));
+            }
+        }
+        state.rules.canGameOver = false;
+        state.rules.borderDarkness = false;
+
+        int maxHeight = 0;
+        for(int x = 0, y = 0, i = 0; i < content.blocks().size; i++){
+            Block block = content.block(i);
+            if(block.canBeBuilt()){
+                int offset = Math.max(block.size % 2 == 0 ? block.size/2 - 1 : block.size/2, 0);
+
+                if(x + block.size + 1 >= state.world.width){
+                    y += maxHeight;
+                    maxHeight = 0;
+                    x = 0;
+                }
+
+                tiles.tile(x + offset, y + offset).setBlock(block, Team.sharded, block.rotate ? 1 : 0);
+                x += block.size;
+                maxHeight = Math.max(maxHeight, block.size);
+            }
+        }
+        state.endMapLoad();
+
+        IntMap<byte[]> before = new IntMap<>();
+        IntMap<Block> blocks = new IntMap<>();
+        for(int x = 0; x < tiles.width; x++){
+            for(int y = 0; y < tiles.height; y++){
+                Tile tile = state.world.rawTile(x, y);
+                if(tile.build != null && tile.isCenter()){
+                    if(tile.build.heatModule != null && tile.block().emitsHeat()){
+                        tile.build.heatModule.output = 2f;
+                    }
+                    before.put(tile.pos(), writeBuild(tile.build));
+                    blocks.put(tile.pos(), tile.block());
+                }
+            }
+        }
+
+        SaveIO.write(saveDirectory.child("allblocks.msav"));
+        logic.reset();
+        SaveIO.load(saveDirectory.child("allblocks.msav"));
+
+        Seq<String> problems = new Seq<>();
+        for(IntMap.Entry<byte[]> entry : before){
+            Block block = blocks.get(entry.key);
+            Tile tile = state.world.tile(entry.key);
+
+            if(tile == null || tile.build == null || tile.block() != block){
+                problems.add(block.name + ": not restored at " + Point2.x(entry.key) + ", " + Point2.y(entry.key));
+                continue;
+            }
+
+            //processors compile their code on load, which adds default variables to the saved data
+            if(tile.build instanceof mindustry.world.blocks.logic.LogicBlock.LogicBuild) continue;
+
+            byte[] after = writeBuild(tile.build);
+            if(!java.util.Arrays.equals(entry.value, after)){
+                problems.add(block.name + ": saved data changed after loading (" + entry.value.length + " -> " + after.length + " bytes)");
+            }
+
+            if(tile.build.heatModule != null && block.emitsHeat() && Math.abs(tile.build.heatModule.output - 2f) > 0.001f){
+                problems.add(block.name + ": heat output not restored, got " + tile.build.heatModule.output);
+            }
+        }
+
+        assertTrue(problems.isEmpty(), problems.toString("\n"));
+    }
+
+    static byte[] writeBuild(Building build){
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        build.writeAll(new mindustry.io.Writes(new DataOutputStream(out)));
+        return out.toByteArray();
+    }
+
     @TestFactory
     DynamicTest[] testSectorValidity(){
         Seq<DynamicTest> out = new Seq<>();

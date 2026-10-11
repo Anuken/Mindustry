@@ -114,7 +114,7 @@ public class MenuFragment{
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
             float width = Core.graphics.getWidth(), height = Core.graphics.getHeight() - Core.scene.marginTop;
-            float logoscl = Scl.scl(1) * logo.scale;
+            float logoscl = Scl.scl(1) * logo.scale * 768f / logo.width; //logo used to be 768 pixels
             float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
             float logoh = logow * (float)logo.height / logo.width;
 
@@ -202,7 +202,7 @@ public class MenuFragment{
         Drawable background = Styles.black6;
 
         container.left();
-        container.add().width(Core.graphics.getWidth()/10f);
+        container.add().width(Core.graphics.getWidth() / 10f / Scl.scl(1f));
         container.table(background, t -> {
             t.defaults().width(width).height(70f);
             t.name = "buttons";

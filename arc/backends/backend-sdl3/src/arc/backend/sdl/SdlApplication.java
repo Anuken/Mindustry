@@ -58,12 +58,7 @@ public class SdlApplication implements Application{
 
         initIcon();
 
-        try(MemoryStack ms = MemoryStack.stackPush()){
-            IntBuffer x = ms.mallocInt(1);
-            IntBuffer y = ms.mallocInt(1);
-            check(SDL_GetWindowSizeInPixels(window, x, y));
-            graphics.updateSize(x.get(0), y.get(0));
-        }
+        graphics.updateSize();
 
         addTextInputListener();
 
@@ -100,10 +95,11 @@ public class SdlApplication implements Application{
                 if(lastFocus != null){
                     Vec2 pos = lastFocus.localToStageCoordinates(Tmp.v1.setZero());
                     try(MemoryStack stack = MemoryStack.stackPush()){
+                        //SDL expects window points, not pixels
                         SDL_Rect rect = SDL_Rect.malloc(stack)
-                        .set((int)pos.x,
-                        Core.graphics.getHeight() - 1 - (int)(pos.y + lastFocus.getHeight()),
-                        (int)lastFocus.getWidth(), (int)lastFocus.getHeight());
+                        .set((int)graphics.toWindowX(pos.x),
+                        (int)graphics.toWindowY(Core.graphics.getHeight() - 1 - (pos.y + lastFocus.getHeight())),
+                        (int)graphics.toWindowX(lastFocus.getWidth()), (int)graphics.toWindowY(lastFocus.getHeight()));
 
                         SDLKeyboard.nSDL_SetTextInputArea(window, rect.address(), 0);
                     }
@@ -190,6 +186,7 @@ public class SdlApplication implements Application{
         if(config.resizable) flags |= SDL_WINDOW_RESIZABLE;
         if(config.maximized) flags |= SDL_WINDOW_MAXIMIZED;
         if(config.fullscreen) flags |= SDL_WINDOW_FULLSCREEN;
+        if(config.highDpi) flags |= SDL_WINDOW_HIGH_PIXEL_DENSITY;
 
         window = SDL_CreateWindow(config.title, config.width, config.height, flags);
         if(window == 0) throw new SdlError();
@@ -242,7 +239,7 @@ public class SdlApplication implements Application{
 
     private void loop(){
 
-        graphics.updateSize(config.width, config.height);
+        graphics.updateSize();
         listen(ApplicationListener::init);
         try(MemoryStack stack = MemoryStack.stackPush()){
             SDL_Event event = SDL_Event.malloc(stack);
@@ -256,8 +253,9 @@ public class SdlApplication implements Application{
                             break;
 
                         case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
-                            int w = event.window().data1(), h = event.window().data2();
-                            graphics.updateSize(w, h);
+                        case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED: //moved to a monitor with a different scale
+                            graphics.updateSize();
+                            int w = graphics.getWidth(), h = graphics.getHeight();
                             listen(l -> l.resize(w, h));
                             break;
 

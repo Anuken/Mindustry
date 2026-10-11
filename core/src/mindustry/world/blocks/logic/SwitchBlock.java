@@ -23,7 +23,7 @@ public class SwitchBlock extends Block{
         autoResetEnabled = false;
         configureSound = Sounds.none;
         group = BlockGroup.logic;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
 
         config(Boolean.class, (SwitchBuild entity, Boolean b) -> entity.enabled = b);
     }

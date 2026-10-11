@@ -49,7 +49,7 @@ public class ObjectNode extends KeyedNode<FieldMetadata>{
 
     void setConsumers(Block block, Jval json){
         Seq<Consume> prevBuilder = Reflect.<Seq<Consume>>get(Block.class, block, "consumeBuilder").copy();
-        boolean hadItems = block.hasItems, hadLiquids = block.hasLiquids, hadPower = block.hasPower, acceptedItems = block.acceptsItems;
+        boolean hadItems = block.hasItems, hadLiquids = block.hasLiquids, hadPower = block.hasPower, hadHeat = block.hasHeat, acceptedItems = block.acceptsItems;
         Runnable revert = () -> {
             if(block.isPatchContent()) return; //useless
             Reflect.set(Block.class, block, "consumeBuilder", prevBuilder);
@@ -57,12 +57,14 @@ public class ObjectNode extends KeyedNode<FieldMetadata>{
             block.hasItems = hadItems;
             block.hasLiquids = hadLiquids;
             block.hasPower = hadPower;
+            block.hasHeat = hadHeat;
             block.acceptsItems = acceptedItems;
         };
         context.reset(revert);
 
         try{
             block.hasPower = false; //if a block doesn't have a power consumer, hasPower should be false. if it does, it will get set to true in reinitializeConsumers
+            block.hasHeat = block.emitsHeat(); //same for heat, unless the block emits it
             context.parser.readBlockConsumers(block, json);
             block.reinitializeConsumers();
         }catch(Throwable e){

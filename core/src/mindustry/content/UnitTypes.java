@@ -4085,7 +4085,7 @@ public class UnitTypes{
 
         quell = new ErekirUnitType("quell"){{
             aiController = FlyingFollowAI::new;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             lowAltitude = false;
             flying = true;
@@ -4190,7 +4190,7 @@ public class UnitTypes{
 
         disrupt = new ErekirUnitType("disrupt"){{
             aiController = FlyingFollowAI::new;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             lowAltitude = false;
             flying = true;
@@ -4397,7 +4397,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 60f;
             faceTarget = true;
@@ -4463,7 +4463,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 60f;
             targetPriority = -2;
@@ -4542,7 +4542,7 @@ public class UnitTypes{
             coreUnitDock = true;
             controller = u -> new BuilderAI(true, coreFleeRange);
             isEnemy = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
 
             range = 65f;
             faceTarget = true;
@@ -4628,7 +4628,7 @@ public class UnitTypes{
             allowedInPayloads = false;
             logicControllable = false;
             playerControllable = false;
-            envDisabled = 0;
+            envDisabled = Environments.none;
             payloadCapacity = 0f;
             unitCapMultiplier = 1.5f;
 
@@ -4672,15 +4672,15 @@ public class UnitTypes{
             playerControllable = false;
             allowedInPayloads = false;
             createWreck = false;
-            envEnabled = Env.any;
-            envDisabled = Env.none;
+            envEnabled = Environments.any;
+            envDisabled = Environments.none;
         }};
 
         dummy = new UnitType("dummy"){{
             controller = u -> new NoAI();
 
-            envEnabled = Env.any;
-            envDisabled = 0;
+            envEnabled = Environments.any;
+            envDisabled = Environments.none;
             isEnemy = false;
             allowedInPayloads = false;
             logicControllable = false;

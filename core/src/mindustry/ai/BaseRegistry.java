@@ -76,7 +76,7 @@ public class BaseRegistry{
                     }
 
                     //calculate averages
-                    if(tile.block instanceof Drill || tile.block instanceof Pump){
+                    if(tile.block instanceof Drill || tile.block instanceof Pump || (tile.block instanceof GenericCrafter crafter && crafter.solidFloorOnly)){
                         Tmp.v1.add(tile.x*tilesize + tile.block.offset, tile.y*tilesize + tile.block.offset);
                         drills ++;
                     }
