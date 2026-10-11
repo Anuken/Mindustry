@@ -3575,7 +3575,7 @@ public class UnitTypes{
                 y = -20f;
                 width = 8f;
                 whenShooting = false;
-                chanceReflect = 1f;
+                chanceDeflect = 1f;
                 reflectMissileTime = 0f;
                 missileUnitMultiplier = 0.8f;
             }});
