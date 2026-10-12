@@ -3,11 +3,10 @@ package mindustry.world.blocks.defense.turrets;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.io.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
@@ -48,8 +47,8 @@ public class PayloadAmmoTurret extends Turret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.remove(Stat.itemCapacity);
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, true));

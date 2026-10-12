@@ -5,10 +5,12 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
@@ -80,9 +82,9 @@ public class ConsumeGenerator extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = itemDuration;
-        super.setStats();
+        super.setStats(stats);
 
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
@@ -95,6 +97,19 @@ public class ConsumeGenerator extends PowerGenerator{
 
     public class ConsumeGeneratorBuild extends GeneratorBuild{
         public float warmup, totalTime, efficiencyMultiplier = 1f, itemDurationMultiplier = 1;
+
+        @Override
+        public byte version(){
+            return block.heatOutput > 0f ? 2 : super.version();
+        }
+
+        @Override
+        public void read(Reads read, byte revision){
+            super.read(read, revision);
+
+            //heat emitters saved their output here before version 2
+            if(revision < 2 && block.heatOutput > 0f) heatModule.output = read.f();
+        }
 
         @Override
         public void updateEfficiencyMultiplier(){
@@ -168,7 +183,7 @@ public class ConsumeGenerator extends PowerGenerator{
             //???
             drawer.drawLight(this);
             //TODO hard coded
-            Drawf.light(x, y, (60f + Mathf.absin(10f, 5f)) * size, Color.orange, 0.5f * warmup);
+            Drawf.light(x, y, (60f + Mathf.absin(Vars.state.time, 10f, 5f)) * size, Color.orange, 0.5f * warmup);
         }
     }
 }

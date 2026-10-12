@@ -6,7 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -14,14 +14,15 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.consumers.*;
-import mindustry.world.meta.*;
 import mindustry.world.draw.*;
+import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
@@ -91,7 +92,7 @@ public class Drill extends Block{
         ambientSound = Sounds.loopDrill;
         ambientSoundVolume = 0.019f;
         //drills work in space I guess
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         flags = EnumSet.of(BlockFlag.drill);
     }
 
@@ -121,6 +122,7 @@ public class Drill extends Block{
         Draw.tint(returnItem.color);
         Draw.rect(itemRegion, plan.drawx(), plan.drawy());
         Draw.color();
+        Drawf.planEfficiency(this, tile.x, tile.y, returnItem.color, returnCount + "/" + (size * size));
     }
 
     @Override
@@ -153,14 +155,18 @@ public class Drill extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return;
 
         countOre(tile);
 
         if(returnItem != null){
-            float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / getDrillTime(returnItem) * returnCount, 2), x, y, valid);
-            float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
+            float rate = 60f / getDrillTime(returnItem) * returnCount;
+            ConsumeLiquid boost = findConsumer(f -> f.booster && f instanceof ConsumeLiquid);
+            String boostedRate = liquidBoostIntensity != 1 ? " ([white]" + (boost == null || !boost.liquid.hasEmoji() ? Liquids.water.emoji() : boost.liquid.emoji()) + "[]" + Strings.autoFixed(rate * liquidBoostIntensity * liquidBoostIntensity, 2) + ")" : "";
+
+            float width = drawPlaceText(Core.bundle.format("bar.drillspeed", Strings.autoFixed(rate, 2) + boostedRate), x, y, valid);
+            float dx = x * tilesize + offset - width / 2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
             Draw.mixcol(Color.darkGray, 1f);
             Draw.rect(returnItem.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
@@ -185,11 +191,11 @@ public class Drill extends Block{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.drillTier, StatValues.drillables(drillTime, hardnessDrillMultiplier, size * size, drillMultipliers, b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null &&
-            f.itemDrop.hardness <= tier && (blockedItems == null || !blockedItems.contains(f.itemDrop)) && (indexer.isBlockPresent(f) || state.isMenu())));
+            f.itemDrop.hardness <= tier && (blockedItems == null || !blockedItems.contains(f.itemDrop)) && (state.indexer.isBlockPresent(f) || state.isMenu())));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
 
@@ -251,6 +257,7 @@ public class Drill extends Block{
         public float progress;
         public float totalProgress;
         public float consTimer;
+        public float dumpTimer;
         public float warmup;
         public float lastDrillSpeed;
 
@@ -292,8 +299,8 @@ public class Drill extends Block{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem) return dominantItem;
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.firstItem) return dominantItem;
             return super.senseObject(sensor);
         }
 
@@ -305,8 +312,9 @@ public class Drill extends Block{
                 consTimer %= consumeTime;
             }
 
-            if(timer(timerDump, dumpTime / timeScale)){
+            if((dumpTimer += timeScale * Time.delta) >= dumpTime){
                 dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
+                dumpTimer %= dumpTime;
             }
 
             if(dominantItem == null){
@@ -345,8 +353,8 @@ public class Drill extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress && dominantItem != null) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress && dominantItem != null) return progress;
             return super.sense(sensor);
         }
 
@@ -367,7 +375,7 @@ public class Drill extends Block{
             Draw.z(Layer.block + 0.1f);
             if(drawRim){
                 Draw.color(heatColor);
-                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Time.time, 3f, s)));
+                Draw.alpha(warmup * ts * (1f - s + Mathf.absin(Vars.state.time, 3f, s)));
                 Draw.blend(Blending.additive);
                 Draw.rect(rimRegion, x, y);
                 Draw.blend();

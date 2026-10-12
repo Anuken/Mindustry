@@ -52,7 +52,7 @@ public class UnitGroup{
             int maxPhysicsIterations = Math.min(1 + (int)(Math.pow(units.size, 0.65) / 10), 6);
 
             //yep, new allocations, because this is a new thread.
-            IntQuadTree tree = new IntQuadTree(new Rect(0f, 0f, Vars.world.unitWidth(), Vars.world.unitHeight()),
+            IntQuadTree tree = new IntQuadTree(new Rect(0f, 0f, Vars.state.world.unitWidth, Vars.state.world.unitHeight),
                 (index, hitbox) -> hitbox.setCentered(positions[index * 2], positions[index * 2 + 1], units.get(index).hitSize));
             IntSeq tmpseq = new IntSeq();
             Vec2 v1 = new Vec2();
@@ -168,7 +168,7 @@ public class UnitGroup{
             Unit unit = units.get(index);
 
             PathCost cost = unit.type.pathCost;
-            int res = ControlPathfinder.raycastFastAvoid(unit.team.id, cost, World.toTile(dest.x), World.toTile(dest.y), World.toTile(x), World.toTile(y));
+            int res = Vars.state.controlPath.raycastFastAvoid(unit.team.id, cost, World.toTile(dest.x), World.toTile(dest.y), World.toTile(x), World.toTile(y));
 
             //collision found, make the destination the point right before the collision
             if(res != 0){

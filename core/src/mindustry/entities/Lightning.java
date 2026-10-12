@@ -56,7 +56,7 @@ public class Lightning{
                 Vec2 to = lines.get(lines.size - 1);
                 World.raycastEach(World.toTile(from.getX()), World.toTile(from.getY()), World.toTile(to.getX()), World.toTile(to.getY()), (wx, wy) -> {
 
-                    Tile tile = world.tile(wx, wy);
+                    Tile tile = state.world.tile(wx, wy);
                     if(tile != null && (tile.build != null && tile.build.isInsulated()) && tile.team() != team){
                         bhit = true;
                         //snap it instead of removing

@@ -1,20 +1,22 @@
 package mindustry.logic;
 
 import arc.util.*;
+import arc.util.serialization.*;
+import arc.util.serialization.Json.*;
 
 //TODO: this isn't used in the game yet
-public class LogicScript{
+public class LogicScript implements JsonSerializable{
     public static final int defaultTimeoutMs = 200, maxTimeoutMs = 2000;
 
     /** Timeout in milliseconds. 0 = default timeout. */
     int timeout = 0;
-    LExecutor executor = new LExecutor();
+    LogicExecutor executor = new LogicExecutor();
     boolean resetVars = false;
     String script = "";
 
     public LogicScript(String script){
         this.script = script;
-        LAssembler assembler = LAssembler.assemble(script, true);
+        LogicAssembler assembler = LogicAssembler.assemble(script, true);
         executor.load(assembler);
     }
 
@@ -54,7 +56,6 @@ public class LogicScript{
         }
     }
 
-    /*
     @Override
     public void write(Json json, JsonWriter writer){
         json.writeValue(writer, "script", script);
@@ -71,5 +72,5 @@ public class LogicScript{
         }else{
             script = jsonData.asString();
         }
-    }*/
+    }
 }

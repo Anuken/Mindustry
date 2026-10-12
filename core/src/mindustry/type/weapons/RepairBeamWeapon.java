@@ -129,7 +129,7 @@ public class RepairBeamWeapon extends Weapon{
             if(targetBuildings){
                 //snap to closest building
                 World.raycastEachWorld(wx, wy, heal.lastEnd.x, heal.lastEnd.y, (x, y) -> {
-                    var build = Vars.world.build(x, y);
+                    var build = Vars.state.world.build(x, y);
                     if(build != null && build.team == unit.team && build.damaged()){
                         heal.target = build;
                         heal.lastEnd.set(x * tilesize, y * tilesize);
@@ -170,7 +170,7 @@ public class RepairBeamWeapon extends Weapon{
                 wy = unit.y + Angles.trnsy(weaponRotation, x, y),
                 z = Draw.z();
             RepairTurret.drawBeam(wx, wy, unit.rotation + mount.rotation, shootY, unit.id, mount.target == null || controllable ? null : (Sized)mount.target, unit.team, heal.strength,
-            pulseStroke, pulseRadius, beamWidth + Mathf.absin(widthSinScl, widthSinMag), heal.lastEnd, heal.offset, laserColor, laserTopColor,
+            pulseStroke, pulseRadius, beamWidth + Mathf.absin(Vars.state.time, widthSinScl, widthSinMag), heal.lastEnd, heal.offset, laserColor, laserTopColor,
             laser, laserEnd, laserTop, laserTopEnd);
             Draw.z(z);
         }

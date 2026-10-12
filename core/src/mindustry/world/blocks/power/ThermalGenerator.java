@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
@@ -53,8 +54,8 @@ public class ThermalGenerator extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.tiles, attribute, floating, size * size * displayEfficiencyScale, !displayEfficiency);
         stats.remove(generationType);
@@ -111,7 +112,7 @@ public class ThermalGenerator extends PowerGenerator{
 
         @Override
         public void drawLight(){
-            Drawf.light(x, y, (40f + Mathf.absin(10f, 5f)) * Math.min(productionEfficiency, 2f) * size, Color.scarlet, 0.4f);
+            Drawf.light(x, y, (40f + Mathf.absin(Vars.state.time, 10f, 5f)) * Math.min(productionEfficiency, 2f) * size, Color.scarlet, 0.4f);
         }
 
         @Override

@@ -4,14 +4,13 @@ import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -46,8 +45,8 @@ public class ItemTurret extends Turret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.remove(Stat.itemCapacity);
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
@@ -112,7 +111,7 @@ public class ItemTurret extends Turret{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case currentAmmoType -> ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
                 default -> super.senseObject(sensor);
@@ -211,7 +210,7 @@ public class ItemTurret extends Turret{
             totalAmmo = 0;
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
+                Item item = read.content(ContentType.item, revision < 2 ? read.ub() : read.s());
                 int itemAmount = Math.min(read.s(), maxAmmo);
 
                 //only add ammo if this is a valid ammo type

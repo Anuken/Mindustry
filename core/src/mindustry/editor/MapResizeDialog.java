@@ -19,8 +19,8 @@ public class MapResizeDialog extends BaseDialog{
         closeOnBack();
         shown(() -> {
             cont.clear();
-            width = editor.width();
-            height = editor.height();
+            width = state.world.width;
+            height = state.world.height;
 
             Table table = new Table();
 

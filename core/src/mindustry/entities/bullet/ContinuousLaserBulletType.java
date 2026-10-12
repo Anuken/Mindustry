@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -47,11 +48,11 @@ public class ContinuousLaserBulletType extends ContinuousBulletType{
         float rot = b.rotation();
 
         for(int i = 0; i < colors.length; i++){
-            Draw.color(Tmp.c1.set(colors[i]).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
+            Draw.color(Tmp.c1.set(colors[i]).mul(1f + Mathf.absin(Vars.state.time, 1f, 0.1f)));
 
             float colorFin = i / (float)(colors.length - 1);
             float baseStroke = Mathf.lerp(strokeFrom, strokeTo, colorFin);
-            float stroke = (width + Mathf.absin(Time.time, oscScl, oscMag)) * fout * baseStroke;
+            float stroke = (width + Mathf.absin(Vars.state.time, oscScl, oscMag)) * fout * baseStroke;
             float ellipseLenScl = Mathf.lerp(1 - i / (float)(colors.length), 1f, pointyScaling);
 
             Lines.stroke(stroke);

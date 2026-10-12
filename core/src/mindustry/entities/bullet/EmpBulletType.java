@@ -19,7 +19,7 @@ public class EmpBulletType extends BasicBulletType{
         super.hit(b, x, y, createFrags);
 
         if(!b.absorbed){
-            Vars.indexer.allBuildings(x, y, radius, other -> {
+            Vars.state.indexer.allBuildings(x, y, radius, other -> {
                 if(other.team == b.team){
                     if(other.block.hasPower && other.block.canOverdrive && other.timeScale() < timeIncrease){
                         other.applyBoost(timeIncrease, timeDuration);

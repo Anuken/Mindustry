@@ -14,8 +14,8 @@ public class ReloadTurret extends BaseTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         if(coolant != null){
             stats.replace(Stat.booster, StatValues.boosters(reload, coolant.amount, coolantMultiplier, true, coolant::consumes));

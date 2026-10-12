@@ -2,7 +2,6 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.struct.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -29,8 +28,8 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         //mirror stats onto each bullet (purely visual)
         ammoTypes.each((l, b) -> b.statLiquidConsumed = liquidConsumed);
 
@@ -92,7 +91,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case currentAmmoType -> liquids.current();
                 default -> super.senseObject(sensor);

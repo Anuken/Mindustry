@@ -6,11 +6,11 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
 
-import static mindustry.Vars.*;
 import static mindustry.maps.filters.FilterOption.*;
 
 /** Selects X spawns from the spawn pool.*/
@@ -32,11 +32,11 @@ public class SpawnPathFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(Tiles tiles, GenerateInput in){
+    public void apply(World world, GenerateInput in){
         var cores = new Seq<Tile>();
         var spawns = new Seq<Tile>();
 
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if(tile.overlay() == Blocks.spawn){
                 spawns.add(tile);
             }
@@ -52,8 +52,8 @@ public class SpawnPathFilter extends GenerateFilter{
                     for(int x = -radius; x <= radius; x++){
                         for(int y = -radius; y <= radius; y++){
                             int wx = tile.x + x, wy = tile.y + y;
-                            if(Structs.inBounds(wx, wy, world.width(), world.height()) && Mathf.within(x, y, radius)){
-                                Tile other = tiles.getn(wx, wy);
+                            if(Structs.inBounds(wx, wy, Vars.state.world.width, Vars.state.world.height) && Mathf.within(x, y, radius)){
+                                Tile other = world.getn(wx, wy);
                                 if(!other.synthetic()){
                                     other.setBlock(block);
                                 }

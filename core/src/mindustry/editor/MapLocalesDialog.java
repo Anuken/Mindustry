@@ -1,6 +1,6 @@
 package mindustry.editor;
 
-import arc.Core;
+import arc.*;
 import arc.func.*;
 import arc.graphics.*;
 import arc.scene.style.*;
@@ -9,7 +9,6 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;

@@ -16,25 +16,25 @@ public class EntityCollisions{
     private static final float seg = 1f, maxDelta = 1000f;
 
     //tile collisions
-    private Vec2 vector = new Vec2(), l1 = new Vec2();
-    private Rect r1 = new Rect(), r2 = new Rect(), tmp = new Rect();
+    private static Vec2 vector = new Vec2(), l1 = new Vec2();
+    private static Rect r1 = new Rect(), r2 = new Rect(), tmp = new Rect();
 
     //entity collisions
-    private Seq<Hitboxc> arrOut = new Seq<>(Hitboxc.class);
-    private Cons<Hitboxc> hitCons = this::updateCollision;
-    private Cons<QuadTree> treeCons = tree -> tree.intersect(r2, arrOut);
+    private static Seq<Hitboxc> arrOut = new Seq<>(Hitboxc.class);
+    private static Cons<Hitboxc> hitCons = EntityCollisions::updateCollision;
+    private static Cons<QuadTree> treeCons = tree -> tree.intersect(r2, arrOut);
 
-    public void moveCheck(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
+    public static void moveCheck(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
         if(!solidCheck.solid(entity.tileX(), entity.tileY())){
             move(entity, deltax, deltay, solidCheck);
         }
     }
 
-    public void move(Hitboxc entity, float deltax, float deltay){
+    public static void move(Hitboxc entity, float deltax, float deltay){
         move(entity, deltax, deltay, EntityCollisions::solid);
     }
 
-    public void move(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
+    public static void move(Hitboxc entity, float deltax, float deltay, SolidPred solidCheck){
         //check for NaN
         if((Math.abs(deltax) < 0.0001f && Math.abs(deltay) < 0.0001f) || deltax != deltax || deltay != deltay) return;
 
@@ -70,7 +70,7 @@ public class EntityCollisions{
         }
     }
 
-    public void moveDelta(Hitboxc entity, float deltax, float deltay, int r, boolean x, SolidPred solidCheck){
+    public static void moveDelta(Hitboxc entity, float deltax, float deltay, int r, boolean x, SolidPred solidCheck){
         entity.hitboxTile(r1);
         entity.hitboxTile(r2);
         r1.x += deltax;
@@ -96,7 +96,7 @@ public class EntityCollisions{
         entity.trns(r1.x - r2.x, r1.y - r2.y);
     }
 
-    public boolean overlapsTile(Rect rect, @Nullable SolidPred solidChecker){
+    public static boolean overlapsTile(Rect rect, @Nullable SolidPred solidChecker){
         if(solidChecker == null) return false;
 
         rect.getCenter(vector);
@@ -121,30 +121,30 @@ public class EntityCollisions{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Hitboxc> void updatePhysics(EntityGroup<T> group){
+    public static <T extends Hitboxc> void updatePhysics(EntityGroup<T> group){
         group.tree().fill(group.rawSeq());
 
         group.each(Hitboxc::updateLastPosition);
     }
 
     public static boolean legsSolid(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         return tile == null || tile.legSolid();
     }
 
     public static boolean waterSolid(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         return tile == null || tile.solid() || !tile.floor().isLiquid || (tile.block() != Blocks.air && !tile.block().solidifes);
     }
 
     public static boolean solid(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         return tile == null || tile.solid();
     }
 
-    private void checkCollide(Hitboxc a, Hitboxc b){
-        a.hitbox(this.r1);
-        b.hitbox(this.r2);
+    private static void checkCollide(Hitboxc a, Hitboxc b){
+        a.hitbox(r1);
+        b.hitbox(r2);
 
         r1.x += (a.lastX() - a.getX());
         r1.y += (a.lastY() - a.getY());
@@ -214,11 +214,11 @@ public class EntityCollisions{
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Hitboxc> void collide(EntityGroup<T> groupa){
+    public static <T extends Hitboxc> void collide(EntityGroup<T> groupa){
         groupa.each((Cons<T>)hitCons);
     }
 
-    private void updateCollision(Hitboxc solid){
+    private static void updateCollision(Hitboxc solid){
         solid.hitbox(r1);
         r1.x += (solid.lastX() - solid.getX());
         r1.y += (solid.lastY() - solid.getY());

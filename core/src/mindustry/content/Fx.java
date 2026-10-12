@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.*;
 import mindustry.entities.abilities.*;
 import mindustry.gen.*;
@@ -16,8 +17,8 @@ import mindustry.world.*;
 import mindustry.world.blocks.defense.*;
 import mindustry.world.blocks.units.UnitAssembler.*;
 
-import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Draw.*;
+import static arc.graphics.g2d.Draw.rect;
 import static arc.graphics.g2d.Lines.*;
 import static arc.math.Angles.*;
 import static mindustry.Vars.*;
@@ -124,7 +125,7 @@ public class Fx{
         //small ripples drifting over the debris, so the water still reads as moving on top of it
         if(!state.isPaused() && Mathf.chanceDelta(0.0002f * (reg.width * reg.height) / (50f * 50f))){
             float x = e.x + Mathf.range(reg.width * reg.scale / 4f / 3f), y = e.y + Mathf.range(reg.height * reg.scale / 4f / 3f);
-            Tile tile = world.tileWorld(x, y);
+            Tile tile = state.world.tileWorld(x, y);
             if(tile != null && tile.floor().isLiquid && tile.block() == Blocks.air){
                 Fx.rippleSlow.at(x, y, Mathf.random(0.4f, 1f), tile.floor().mapColor);
             }
@@ -1433,7 +1434,7 @@ public class Fx{
         if(Fire.regions[0] == null) return;
         alpha(e.fout());
         rect(Fire.regions[((int)(e.rotation + e.fin() * Fire.frames)) % Fire.frames], e.x + Mathf.randomSeedRange((int)e.y, 2), e.y + Mathf.randomSeedRange((int)e.x, 2));
-        Drawf.light(e.x, e.y, 50f + Mathf.absin(5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
+        Drawf.light(e.x, e.y, 50f + Mathf.absin(Vars.state.time, 5f, 5f), Pal.lightFlame, 0.6f  * e.fout());
     }),
 
     fire = new Effect(50f, e -> {

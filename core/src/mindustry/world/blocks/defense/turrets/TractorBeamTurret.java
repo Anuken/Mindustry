@@ -5,19 +5,19 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class TractorBeamTurret extends BaseTurret{
-    public final int timerTarget = timers++;
     public float retargetTime = 5f;
 
     public float shootCone = 6f;
@@ -45,7 +45,7 @@ public class TractorBeamTurret extends BaseTurret{
 
         rotateSpeed = 10f;
         coolantMultiplier = 1f;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class TractorBeamTurret extends BaseTurret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
@@ -74,7 +74,7 @@ public class TractorBeamTurret extends BaseTurret{
 
     public class TractorBeamBuild extends BaseTurretBuild{
         public @Nullable Unit target;
-        public float lastX, lastY, strength;
+        public float lastX, lastY, strength, retargetTimer;
         public boolean any;
         public float coolantMultiplier = 1f;
 
@@ -88,7 +88,8 @@ public class TractorBeamTurret extends BaseTurret{
             float eff = efficiency * coolantMultiplier, edelta = eff * delta();
 
             //retarget
-            if(timer(timerTarget, retargetTime)){
+            if((retargetTimer += Time.delta) >= retargetTime){
+                retargetTimer %= retargetTime;
                 target = Units.closestEnemy(team, x, y, range, u -> u.checkTarget(targetAir, targetGround));
             }
 
@@ -163,7 +164,7 @@ public class TractorBeamTurret extends BaseTurret{
                 Draw.z(Layer.bullet);
                 float ang = angleTo(lastX, lastY);
 
-                Draw.mixcol(laserColor, Mathf.absin(4f, 0.6f));
+                Draw.mixcol(laserColor, Mathf.absin(Vars.state.time, 4f, 0.6f));
 
                 Drawf.laser(laser, laserStart, laserEnd,
                 x + Angles.trnsx(ang, shootLength), y + Angles.trnsy(ang, shootLength),

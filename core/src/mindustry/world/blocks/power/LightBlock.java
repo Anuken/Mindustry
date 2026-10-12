@@ -6,11 +6,11 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -29,7 +29,7 @@ public class LightBlock extends Block{
         update = true;
         configurable = true;
         saveConfig = true;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         swapDiagonalPlacement = true;
 
         config(Integer.class, (LightBuild tile, Integer value) -> tile.color = value);
@@ -76,8 +76,8 @@ public class LightBlock extends Block{
         }
 
         @Override
-        public void control(LExecutor executor, LAccess type, double p1, double p2, double p3, double p4){
-            if(type == LAccess.color){
+        public void control(LogicExecutor executor, LogicProp type, double p1, double p2, double p3, double p4){
+            if(type == LogicProp.color){
                 color = Tmp.c1.fromDouble(p1).rgba8888();
 
                 if(!headless) renderer.minimap.update(tile);
@@ -87,8 +87,8 @@ public class LightBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.color) return Tmp.c1.set(color).toDoubleBits();
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.color) return Tmp.c1.set(color).toDoubleBits();
             return super.sense(sensor);
         }
 

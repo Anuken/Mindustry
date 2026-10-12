@@ -3,7 +3,6 @@ package mindustry.world.blocks.defense.turrets;
 import arc.struct.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -34,8 +33,8 @@ public class LiquidTurret extends Turret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
     }
@@ -80,7 +79,7 @@ public class LiquidTurret extends Turret{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case currentAmmoType -> liquids.current();
                 default -> super.senseObject(sensor);
@@ -96,7 +95,7 @@ public class LiquidTurret extends Turret{
                 int tr = (int)(range / tilesize);
                 for(int x = -tr; x <= tr; x++){
                     for(int y = -tr; y <= tr; y++){
-                        Tile other = world.tile(x + tx, y + ty);
+                        Tile other = state.world.tile(x + tx, y + ty);
                         var fire = Fires.get(x + tx, y + ty);
                         float dst = fire == null ? 0 : dst2(fire);
                         //do not extinguish fires on other team blocks

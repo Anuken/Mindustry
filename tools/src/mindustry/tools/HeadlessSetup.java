@@ -25,7 +25,7 @@ public class HeadlessSetup{
                 net = new Net(null);
                 tree = new FileTree();
                 Vars.init();
-                world = new World();
+                state = new GameState();
                 content.createBaseContent();
                 mods.loadScripts();
                 content.createModContent();

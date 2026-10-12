@@ -15,11 +15,11 @@ import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
 import mindustry.ai.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.ContentParser.*;
+import mindustry.mod.data.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 
@@ -156,7 +156,7 @@ public class Mods implements Loadable{
         long startTime = Time.millis();
 
         //TODO this should estimate sprite sizes per page
-        MultiPacker packer = new MultiPacker(4096);
+        ModPackContext packer = new ModPackContext(4096);
         var textureResize = new ObjectFloatMap<String>();
         int[] totalSprites = {0};
         //all packing tasks to await
@@ -232,27 +232,20 @@ public class Mods implements Loadable{
         entries.sort(Structs.comparingInt(o -> -Math.max(o.region.width, o.region.height)));
 
         for(var entry : entries){
-            packer.add(entry.name, entry.region, entry.splits, entry.pads);
+            packer.add(entry.name, entry.region, entry.splits, entry.pads, false);
         }
 
         TextureAtlas oldAtlas = Core.atlas;
 
-        //generate new icons
-        for(Seq<Content> arr : content.getContentMap()){
-            arr.each(c -> {
-                if(c instanceof UnlockableContent u && c.minfo.mod != null){
-                    u.load();
-                    u.loadIcon();
-                    if(u.generateIcons && !c.minfo.mod.meta.pregenerated){
-                        u.createIcons(packer);
-                    }
-                }
-            });
-        }
+        //pack content async (slow)
+        content.eachModdedUnlockable(u -> {
+            u.load();
+            u.packSprites(packer);
+        });
 
         waitForMain(() -> {
             //replace old atlas data
-            Core.atlas = packer.create(filter);
+            Core.atlas = packer.packer.generateTextureAtlas(filter, filter, false, true, 1);
 
             textureResize.each(e -> Core.atlas.find(e.key).scale = e.value);
             renderer.loadFluidFrames();
@@ -301,7 +294,7 @@ public class Mods implements Loadable{
         }
     }
 
-    private void packSprites(MultiPacker packer, Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks, ObjectFloatMap<String> textureResize){
+    private void packSprites(PackContext packer, Seq<Fi> sprites, LoadedMod mod, boolean prefix, Seq<Future<Runnable>> tasks, ObjectFloatMap<String> textureResize){
         boolean bleed = Core.settings.getBool("linear", true) && !mod.meta.pregenerated;
         float textureScale = mod.meta.texturescale;
 
@@ -336,6 +329,12 @@ public class Mods implements Loadable{
                             textureResize.put(fullName, textureScale);
                         }
                         pix.dispose();
+                        //in order for content regions in load() to resolve to a texture region with a real name (not error), regions that have been newly packed must be registered
+                        if(!Core.atlas.has(fullName)){
+                            AtlasRegion fake = new AtlasRegion();
+                            fake.name = fullName;
+                            Core.atlas.getRegionMap().put(fullName, fake);
+                        }
                     };
                 }catch(Exception e){
                     //rethrow exception with details about the cause of failure
@@ -361,6 +360,7 @@ public class Mods implements Loadable{
     @Override
     public void loadSync(){
         loadIcons();
+
     }
 
     /** Removes a mod file and marks it for requiring a restart. */
@@ -580,7 +580,7 @@ public class Mods implements Loadable{
     private void checkWarnings(){
         //show 'scripts have errored' info
         if(scripts != null && scripts.hasErrored()){
-           ui.showErrorMessage("@mod.scripts.disable");
+            ui.showErrorMessage("@mod.scripts.disable");
         }
 
         //show list of errored content
@@ -848,6 +848,24 @@ public class Mods implements Loadable{
         Events.fire(new ModContentLoadEvent());
     }
 
+    public void loadModPatches(){
+        for(LoadedMod mod : orderedMods()){
+            if(mod.root.child("patches").exists()){
+                try{
+                    Seq<Fi> patches = mod.root.child("patches").findAll(f -> f.extEquals("json") || f.extEquals("hjson"));
+                    if(patches.size > 0){
+                        //create a new patcher per mod so the fields don't get reset
+                        DataPatcher patcher = new DataPatcher();
+                        patches.sort();
+                        patcher.apply(patches.map(f -> new PatchAsset(f.readString())), new Seq<>());
+                    }
+                }catch(Exception e){
+                    Log.err("Failed to apply patches from mod " + mod.meta.name, e);
+                }
+            }
+        }
+    }
+
     public void handleContentError(Content content, Throwable error){
         parser.markError(content, error);
     }
@@ -928,7 +946,7 @@ public class Mods implements Loadable{
             return null;
         }
 
-        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.plain));
+        ModMeta meta = json.fromJson(ModMeta.class, Jval.read(metaFile.readString()).toString(Jformat.json));
         meta.cleanup();
         return meta;
     }
@@ -1309,8 +1327,8 @@ public class Mods implements Loadable{
         /** Minimum game version that this mod requires, e.g. "140.1" */
         public String minGameVersion = "0";
         public @Nullable String displayName, author, description, subtitle, version, main, repo;
-        public Seq<String> dependencies = Seq.with();
-        public Seq<String> softDependencies = Seq.with();
+        public Seq<String> dependencies = arc.struct.Seq.with();
+        public Seq<String> softDependencies = arc.struct.Seq.with();
         /** Hidden mods are only server-side or client-side, and do not support adding new content. */
         public boolean hidden;
         /** If true, this mod should be loaded as a Java class mod. This is technically optional, but highly recommended. */
@@ -1405,6 +1423,52 @@ public class Mods implements Loadable{
         public ModDependency(String name, boolean required){
             this.name = name;
             this.required = required;
+        }
+    }
+
+    /** PackContext backed by a runtime PixmapPacker; used to build the mod-patched atlas. */
+    public static class ModPackContext extends PackContext implements Disposable{
+        public final PixmapPacker packer;
+
+        public ModPackContext(int size){
+            packer = new PixmapPacker(size, size, 2, true);
+        }
+
+        @Override
+        public @Nullable PixmapRegion getOrNull(String name){
+            return packer.getRegion(name);
+        }
+
+        @Override
+        public boolean has(String name){
+            return packer.getRect(name) != null;
+        }
+
+        @Override
+        public void add(String name, PixmapRegion region, int[] splits, int[] pads, boolean noCrop){
+            packer.pack(name, region, splits, pads);
+        }
+
+        public void printStats(){
+            if(Log.level != Log.LogLevel.debug) return;
+
+            Log.debug("[Atlas] " + (packer.getPages().size > 1 ? "&fb&lr" : "&lg") + "@ page@&r", packer.getPages().size, packer.getPages().size > 1 ? "s" : "");
+            int i = 0;
+            for(var page : packer.getPages()){
+                float totalArea = 0;
+                for(var region : page.getRects().values()){
+                    totalArea += region.area();
+                }
+
+                Log.debug("[Atlas] - [@] @x@ (&lk@% used&fr)", i, page.getPixmap().width, page.getPixmap().height, (int)(totalArea / (page.getPixmap().width * page.getPixmap().height) * 100f));
+
+                i ++;
+            }
+        }
+
+        @Override
+        public void dispose(){
+            packer.forceDispose();
         }
     }
 }

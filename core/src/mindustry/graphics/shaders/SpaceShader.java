@@ -3,7 +3,7 @@ package mindustry.graphics.shaders;
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.graphics.*;
-import arc.util.*;
+import mindustry.*;
 
 import static mindustry.Vars.*;
 
@@ -27,7 +27,7 @@ public class SpaceShader extends SurfaceShader{
         setUniformf("u_campos", Core.camera.position.x, Core.camera.position.y);
         setUniformf("u_ccampos", Core.camera.position);
         setUniformf("u_resolution", Core.graphics.getWidth(), Core.graphics.getHeight());
-        setUniformf("u_time", Time.time);
+        setUniformf("u_time", Vars.state.time);
 
         texture.bind(1);
         renderer.effectBuffer.texture.bind(0);

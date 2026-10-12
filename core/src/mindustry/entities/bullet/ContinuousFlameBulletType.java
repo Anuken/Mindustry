@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -50,7 +51,7 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
         hitColor = colors[1].cpy().a(1f);
         lightColor = hitColor;
         lightOpacity = 0.7f;
-        laserAbsorb = false;
+        laserAbsorb = true;
         ammoMultiplier = 1f;
         pierceArmor = true;
     }
@@ -60,10 +61,10 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
         float mult = b.fin(lengthInterp);
         float realLength = Damage.findLength(b, length * mult, laserAbsorb, pierceCap);
 
-        float sin = Mathf.sin(Time.time, oscScl, oscMag);
+        float sin = Mathf.sin(Vars.state.time, oscScl, oscMag);
 
         for(int i = 0; i < colors.length; i++){
-            Draw.color(colors[i].write(Tmp.c1).mul(0.9f).mul(1f + Mathf.absin(Time.time, 1f, 0.1f)));
+            Draw.color(colors[i].write(Tmp.c1).mul(0.9f).mul(1f + Mathf.absin(Vars.state.time, 1f, 0.1f)));
             Drawf.flame(b.x, b.y, divisions, b.rotation(),
                 realLength * lengthWidthPans[i * 3] * (1f - sin),
                 width * lengthWidthPans[i * 3 + 1] * mult * (1f + sin),
@@ -75,7 +76,7 @@ public class ContinuousFlameBulletType extends ContinuousBulletType{
             color(flareColor);
             Draw.z(flareLayer);
 
-            float angle = Time.time * flareRotSpeed + (rotateFlare ? b.rotation() : 0f);
+            float angle = Vars.state.time * flareRotSpeed + (rotateFlare ? b.rotation() : 0f);
 
             for(int i = 0; i < 4; i++){
                 Drawf.tri(b.x, b.y, flareWidth, flareLength * (mult + sin), i*90 + 45 + angle);

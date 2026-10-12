@@ -18,12 +18,12 @@ import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Jval.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.*;
 import mindustry.mod.Mods.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.util.*;

@@ -6,13 +6,14 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -61,8 +62,8 @@ public class StackConveyor extends Block implements Autotiler{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.itemsMoved, Mathf.round(itemCapacity * speed * 60), StatUnit.itemsSecond);
     }
@@ -73,13 +74,13 @@ public class StackConveyor extends Block implements Autotiler{
             int state = b.state;
             if(state == stateLoad){ //standard conveyor mode
                 return otherblock.outputsItems() && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
-            }else if(state == stateUnload && !outputRouter){ //router mode
+            }else if(state == stateUnload){ //router mode
                 return otherblock.acceptsItems &&
                     (!otherblock.noSideBlend || lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock)) &&
                     (notLookingAt(tile, rotation, otherx, othery, otherrot, otherblock) ||
                     (otherblock instanceof StackConveyor && facing(otherx, othery, otherrot, tile.x, tile.y))) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorBuild s && s.state == stateUnload) &&
-                    !(world.build(otherx, othery) instanceof StackConveyorBuild s2 && s2.state == stateMove &&
+                    !(Vars.state.world.build(otherx, othery) instanceof StackConveyorBuild s && s.state == stateUnload) &&
+                    !(Vars.state.world.build(otherx, othery) instanceof StackConveyorBuild s2 && s2.state == stateMove &&
                         !facing(otherx, othery, otherrot, tile.x, tile.y));
             }
         }
@@ -104,7 +105,7 @@ public class StackConveyor extends Block implements Autotiler{
 
     @Override
     public boolean rotatedOutput(int x, int y){
-        Building tile = world.build(x, y);
+        Building tile = state.world.build(x, y);
         if(tile instanceof StackConveyorBuild s){
             return s.state != stateUnload;
         }
@@ -151,7 +152,7 @@ public class StackConveyor extends Block implements Autotiler{
         public void draw(){
             Draw.z(Layer.block - 0.1f);
 
-            Tile from = world.tile(link);
+            Tile from = Vars.state.world.tile(link);
 
             if(glowRegion.found() && power != null && power.status > 0f){
                 Draw.z(Layer.blockAdditive);

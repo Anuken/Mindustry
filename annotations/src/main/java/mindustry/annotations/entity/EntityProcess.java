@@ -503,10 +503,10 @@ public class EntityProcess extends BaseProcessor{
                         for(GroupDefinition def : groups){
                             if(first.name().equals("add")){
                                 //remove/add from each group, assume imported
-                                mbuilder.addStatement("index__$L = Groups.$L.addIndex(this)", def.name, def.name);
+                                mbuilder.addStatement("index__$L = mindustry.Vars.state.entities.$L.addIndex(this)", def.name, def.name);
                             }else{
                                 //remove/add from each group, assume imported
-                                mbuilder.addStatement("Groups.$L.removeIndex(this, index__$L);", def.name, def.name);
+                                mbuilder.addStatement("mindustry.Vars.state.entities.$L.removeIndex(this, index__$L);", def.name, def.name);
 
                                 mbuilder.addStatement("index__$L = -1", def.name);
                             }
@@ -604,7 +604,7 @@ public class EntityProcess extends BaseProcessor{
                     //add free code to remove methods - always at the end
                     //this only gets called next frame.
                     if(first.name().equals("remove") && ann.pooled()){
-                        mbuilder.addStatement("mindustry.gen.Groups.queueFree(($T)this)", Poolable.class);
+                        mbuilder.addStatement("mindustry.Vars.state.entities.queueFree(($T)this)", Poolable.class);
                     }
 
                     if(!legacy || specialIO){
@@ -660,17 +660,17 @@ public class EntityProcess extends BaseProcessor{
                 definitions.add(new EntityDefinition(packageName + "." + name, builder, type, typeIsBase ? null : baseClass, components, groups, allFieldSpecs, legacy));
             }
 
-            //generate groups
-            TypeSpec.Builder groupsBuilder = TypeSpec.classBuilder("Groups").addModifiers(Modifier.PUBLIC);
-            MethodSpec.Builder groupInit = MethodSpec.methodBuilder("init").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            //generate entities, the per-state container of all groups
+            TypeSpec.Builder groupsBuilder = TypeSpec.classBuilder("Entities").addModifiers(Modifier.PUBLIC);
+            MethodSpec.Builder groupInit = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
             for(GroupDefinition group : groupDefs){
                 //class names for interface/group
                 ClassName itype =  group.baseType;
                 ClassName groupc = ClassName.bestGuess("mindustry.entities.EntityGroup");
+                TypeName groupType = ParameterizedTypeName.get(groupc, itype);
 
                 //add field...
-                groupsBuilder.addField(ParameterizedTypeName.get(
-                    ClassName.bestGuess("mindustry.entities.EntityGroup"), itype), group.name, Modifier.PUBLIC, Modifier.STATIC);
+                groupsBuilder.addField(groupType, group.name, Modifier.PUBLIC);
 
                 groupInit.addStatement("$L = new $T<>($L.class, $L, $L, (e, pos) -> { if(e instanceof $L.IndexableEntity__$L ix) ix.setIndex__$L(pos); })", group.name, groupc, itype, group.spatial, group.mapping, packageName, group.name, group.name);
             }
@@ -678,9 +678,9 @@ public class EntityProcess extends BaseProcessor{
             //write the groups
             groupsBuilder.addMethod(groupInit.build());
 
-            groupsBuilder.addField(boolean.class, "isClearing", Modifier.PUBLIC, Modifier.STATIC);
+            groupsBuilder.addField(boolean.class, "isClearing", Modifier.PUBLIC);
 
-            MethodSpec.Builder groupClear = MethodSpec.methodBuilder("clear").addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            MethodSpec.Builder groupClear = MethodSpec.methodBuilder("clear").addModifiers(Modifier.PUBLIC);
             groupClear.addStatement("isClearing = true");
             for(GroupDefinition group : groupDefs){
                 groupClear.addStatement("$L.clear()", group.name);
@@ -691,11 +691,11 @@ public class EntityProcess extends BaseProcessor{
             groupsBuilder.addMethod(groupClear.build());
 
             //add method for pool storage
-            groupsBuilder.addField(FieldSpec.builder(ParameterizedTypeName.get(Seq.class, Poolable.class), "freeQueue", Modifier.PRIVATE, Modifier.STATIC).initializer("new Seq<>()").build());
+            groupsBuilder.addField(FieldSpec.builder(ParameterizedTypeName.get(Seq.class, Poolable.class), "freeQueue", Modifier.PRIVATE).initializer("new Seq<>()").build());
 
             //method for freeing things
             MethodSpec.Builder groupFreeQueue = MethodSpec.methodBuilder("queueFree")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC)
                 .addParameter(Poolable.class, "obj")
                 .addStatement("freeQueue.add(obj)");
 
@@ -704,13 +704,13 @@ public class EntityProcess extends BaseProcessor{
             //add method for resizing all necessary groups
             MethodSpec.Builder groupResize = MethodSpec.methodBuilder("resize")
                 .addParameter(TypeName.FLOAT, "x").addParameter(TypeName.FLOAT, "y").addParameter(TypeName.FLOAT, "w").addParameter(TypeName.FLOAT, "h")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                .addModifiers(Modifier.PUBLIC);
 
             MethodSpec.Builder groupUpdate = MethodSpec.methodBuilder("update")
-            .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+            .addModifiers(Modifier.PUBLIC);
 
             MethodSpec.Builder groupPoolUpdate = MethodSpec.methodBuilder("updatePooling")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+                .addModifiers(Modifier.PUBLIC);
 
             //free everything pooled at the start of each updaet
             groupPoolUpdate

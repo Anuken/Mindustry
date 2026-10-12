@@ -27,9 +27,10 @@ public class StorageBlock extends Block{
         group = BlockGroup.transportation;
         flags = EnumSet.of(BlockFlag.storage);
         allowResupply = true;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
         drawCached = true;
         drawDynamic = false;
+        drawTeamOverlay = false; //vaults/containers/cores already tint themselves
     }
 
     @Override
@@ -110,8 +111,8 @@ public class StorageBlock extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.itemCapacity && linkedCore != null) return linkedCore.sense(sensor);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.itemCapacity && linkedCore != null) return linkedCore.sense(sensor);
             return super.sense(sensor);
         }
 

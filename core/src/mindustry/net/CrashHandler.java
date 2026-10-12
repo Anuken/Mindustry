@@ -64,7 +64,9 @@ public class CrashHandler{
 
             //try saving game data
             try{
-                settings.manualSave();
+                if(!headless) synchronized(settings){
+                    settings.forceSave();
+                }
             }catch(Throwable ignored){}
 
             //don't create crash logs for custom builds, as it's expected

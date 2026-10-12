@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 
@@ -43,7 +44,7 @@ public class ParticleWeather extends Weather{
         if(speed > 0.001f){
             float windx = state.windVector.x * speed, windy = state.windVector.y * speed;
 
-            for(Unit unit : Groups.unit){
+            for(Unit unit : Vars.state.entities.unit){
                 unit.impulse(windx, windy);
             }
         }

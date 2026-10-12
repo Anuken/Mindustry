@@ -25,7 +25,7 @@ public class LogicStatementProcessor extends BaseProcessor{
 
         MethodSpec.Builder reader = MethodSpec.methodBuilder("read")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-            .returns(tname("mindustry.logic.LStatement"))
+            .returns(tname("mindustry.logic.LogicStatement"))
             .addParameter(String[].class, "tokens")
             .addParameter(int.class, "length");
 
@@ -35,8 +35,8 @@ public class LogicStatementProcessor extends BaseProcessor{
             ParameterizedTypeName.get(
             ClassName.get(Seq.class),
             ParameterizedTypeName.get(ClassName.get(Prov.class),
-                tname("mindustry.logic.LStatement"))), "allStatements", Modifier.PUBLIC, Modifier.STATIC)
-            .initializer("Seq.with(" + types.toString(", ", t -> "" + t.toString() + "::new") + ")").build());
+                tname("mindustry.logic.LogicStatement"))), "allStatements", Modifier.PUBLIC, Modifier.STATIC)
+            .initializer("Seq.with(" + types.toString(", ", t -> t.toString() + "::new") + ")").build());
 
         boolean beganWrite = false, beganRead = false;
 

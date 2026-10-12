@@ -17,7 +17,7 @@ public class LogicAI extends AIController{
     /** Time after which the unit resets its controlled and reverts to a normal unit. */
     public static final float logicControlTimeout = 60f * 10f;
 
-    public LUnitControl control = LUnitControl.idle;
+    public LogicUnitControl control = LogicUnitControl.idle;
     public float moveX, moveY, moveRad;
     public float controlTimer = logicControlTimeout, targetTimer;
     public @Nullable Building controller;
@@ -27,7 +27,7 @@ public class LogicAI extends AIController{
     public ObjectMap<Object, Object> execCache = new ObjectMap<>();
 
     //type of aiming to use
-    public LUnitControl aimControl = LUnitControl.stop;
+    public LogicUnitControl aimControl = LogicUnitControl.stop;
 
     //whether to use the boost (certain units only)
     public boolean boost;
@@ -74,7 +74,7 @@ public class LogicAI extends AIController{
                 if(unit.isFlying()){
                     moveTo(Tmp.v1.set(moveX, moveY), 1f, 30f);
                 }else{
-                    var result = controlPath.getPathPosition(unit, Tmp.v2.set(moveX, moveY));
+                    var result = state.controlPath.getPathPosition(unit, Tmp.v2.set(moveX, moveY));
                     if(result.move){
                         moveTo(result.dest, 1f, Tmp.v2.epsilonEquals(result.dest, 4.1f) ? 30f : 0f);
                     }

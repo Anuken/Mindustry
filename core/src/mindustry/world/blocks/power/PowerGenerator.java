@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -15,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -77,8 +77,8 @@ public class PowerGenerator extends PowerDistributor{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.add(generationType, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
@@ -146,7 +146,7 @@ public class PowerGenerator extends PowerDistributor{
 
             if(explosionIgnitionChance > 0 || explosionBreaksProps){
                 Geometry.circle(tileX(), tileY(), explosionRadius, (tx, ty) -> {
-                    Tile t = Vars.world.tile(tx, ty);
+                    Tile t = Vars.state.world.tile(tx, ty);
                     float dst = Mathf.dst(tileX(), tileY(), tx, ty);
 
                     //Create fires
@@ -154,7 +154,7 @@ public class PowerGenerator extends PowerDistributor{
                         Mathf.chance(explosionIgnitionChance *
                             (explosionScaleIgnitionChance ? 1 - Mathf.sqrt(dst / explosionRadius) : 1))
                     ){
-                        Time.run(dst / explosionSpeed, () -> {
+                        Vars.state.run(dst / explosionSpeed, () -> {
                             Fires.create(t);
                         });
                     }
@@ -179,7 +179,7 @@ public class PowerGenerator extends PowerDistributor{
             if(explosionPuddleLiquid != null){
                 for(int i = 0; i < explosionPuddles; i++){
                     Tmp.v1.trns(Mathf.random(360f), Mathf.random(explosionPuddleRange));
-                    Tile tile = world.tileWorld(x + Tmp.v1.x, y + Tmp.v1.y);
+                    Tile tile = state.world.tileWorld(x + Tmp.v1.x, y + Tmp.v1.y);
                     Puddles.deposit(tile, explosionPuddleLiquid, explosionPuddleAmount);
                 }
             }

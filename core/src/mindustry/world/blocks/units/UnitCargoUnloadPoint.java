@@ -4,10 +4,10 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -98,7 +98,7 @@ public class UnitCargoUnloadPoint extends Block{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            item = Vars.content.item(read.s());
+            item = read.item();
             stale = read.bool();
         }
     }

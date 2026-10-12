@@ -30,9 +30,7 @@ public class ShallowLiquid extends Floor{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        //TODO might not be necessary at all, but I am not sure yet
-        //super.createIcons(packer);
+    public void packSprites(PackContext packer){
 
         if(liquidBase != null && floorBase != null){
             var overlay = packer.get(liquidBase.region);
@@ -50,5 +48,7 @@ public class ShallowLiquid extends Floor{
                 res.dispose();
             }
         }
+
+        super.packSprites(packer);
     }
 }

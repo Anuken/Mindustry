@@ -6,6 +6,7 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -76,7 +77,7 @@ public class AboutDialog extends BaseDialog{
             in.add(table).size(w, h).padTop(5).row();
         }
 
-        shown(() -> Time.run(1f, () -> Core.scene.setScrollFocus(pane)));
+        shown(() -> Vars.state.run(1f, () -> Core.scene.setScrollFocus(pane)));
 
         cont.add(pane).growX();
 

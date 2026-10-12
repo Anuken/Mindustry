@@ -1,7 +1,7 @@
 package mindustry.tools;
 
 import arc.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -11,6 +11,7 @@ import arc.struct.*;
 import arc.util.*;
 import com.google.common.reflect.*;
 import mindustry.game.*;
+import mindustry.game.Interval;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.net.*;
