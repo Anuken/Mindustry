@@ -2,6 +2,7 @@ package mindustry.world.blocks.production;
 
 import arc.*;
 import arc.func.*;
+import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -126,14 +127,80 @@ public class WallCrafter extends Block{
     }
 
     @Override
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+        if(!plan.worldContext) return;
+        Tile tile = plan.tile();
+        if(tile == null) return;
+
+        int count = countWalls(tile.x, tile.y, plan.rotation);
+        if(count == 0) return;
+
+        //does not show up before plan placement
+        Drawf.planEfficiency(this, tile.x, tile.y, output.color, count + "/" + size);
+    }
+
+    @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         float eff = getEfficiency(x, y, rotation, null, null);
+        if(eff <= 0) return;
 
-        drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / drillTime * eff, 2), x, y, valid);
+        float rate = 60f / drillTime * eff;
+        boolean consItems = itemConsumer != null;
+        String boostedRate = "";
+
+        if(consItems && itemConsumer instanceof ConsumeItems coni && itemBoostIntensity != 1){
+            //only uses the first booster icon
+            boostedRate = " ([white]" + (coni.items[0].item.hasEmoji() ? coni.items[0].item.emoji() : "") + "[]" + Strings.autoFixed(rate * itemBoostIntensity, 2) + ")";
+        }else if(hasLiquidBooster && liquidBoostIntensity != 1){
+            ConsumeLiquid boost = findConsumer(f -> f.booster && f instanceof ConsumeLiquid);
+            boostedRate = " ([white]" + (boost == null || !boost.liquid.hasEmoji() ? Liquids.water.emoji() : boost.liquid.emoji()) + "[]" + Strings.autoFixed(rate * liquidBoostIntensity, 2) + ")";
+        }
+
+        float width = drawPlaceText(Core.bundle.format("bar.drillspeed", Strings.autoFixed(rate, 2) + boostedRate), x, y, valid);
+        float dx = x * tilesize + offset - width / 2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
+        Draw.mixcol(Color.darkGray, 1f);
+        Draw.rect(output.fullIcon, dx, dy - 1, s, s);
+        Draw.reset();
+        Draw.rect(output.fullIcon, dx, dy, s, s);
     }
+
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         return getEfficiency(tile.x, tile.y, rotation, null, null) > 0;
+    }
+
+    public int countWalls(int tx, int ty, int rotation){
+        int count = 0;
+        int cornerX = tx - (size - 1) / 2, cornerY = ty - (size - 1) / 2, s = size;
+
+        for(int i = 0; i < size; i++){
+            int rx = 0, ry = 0;
+
+            switch(rotation){
+                case 0 -> {
+                    rx = cornerX + s;
+                    ry = cornerY + i;
+                }
+                case 1 -> {
+                    rx = cornerX + i;
+                    ry = cornerY + s;
+                }
+                case 2 -> {
+                    rx = cornerX - 1;
+                    ry = cornerY + i;
+                }
+                case 3 -> {
+                    rx = cornerX + i;
+                    ry = cornerY - 1;
+                }
+            }
+
+            Tile other = state.world.tile(rx, ry);
+            if(other != null && other.solid() && other.block().attributes.get(attribute) > 0){
+                count++;
+            }
+        }
+        return count;
     }
 
     float getEfficiency(int tx, int ty, int rotation, @Nullable Cons<Tile> ctile, @Nullable Intc2 cpos){

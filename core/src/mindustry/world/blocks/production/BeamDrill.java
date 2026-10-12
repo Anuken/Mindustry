@@ -9,6 +9,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
+import mindustry.content.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -60,6 +61,11 @@ public class BeamDrill extends Block{
     public Color boostHeatColor = Color.sky.cpy().mul(0.87f);
     public Color heatColor = new Color(1f, 0.35f, 0.35f, 0.9f);
     public float heatPulse = 0.3f, heatPulseScl = 7f;
+
+    //return variables for countOre
+    protected @Nullable Item returnItem, returnInvalid;
+    protected int returnCount;
+    protected boolean returnMultiple;
 
     public BeamDrill(String name){
         super(name);
@@ -121,8 +127,7 @@ public class BeamDrill extends Block{
         super.setStats(stats);
 
         stats.add(Stat.drillTier, StatValues.drillables(drillTime, 0f, size, drillMultipliers, b ->
-            (b instanceof Floor f && f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier && (blockedItems == null || !blockedItems.contains(f.itemDrop))) ||
-            (b instanceof StaticWall w && w.itemDrop != null && w.itemDrop.hardness <= tier && (blockedItems == null || !blockedItems.contains(w.itemDrop)))
+            (b instanceof Floor f && f.wallOre && canMine(f.itemDrop)) || (b instanceof StaticWall w && canMine(w.itemDrop))
         ));
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size, StatUnit.itemsSecond);
@@ -137,85 +142,102 @@ public class BeamDrill extends Block{
 
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
-        Item item = null, invalidItem = null;
-        boolean multiple = false;
-        int count = 0;
+        super.drawPlace(x, y, rotation, valid);
+
+        countOre(x, y, rotation);
 
         for(int i = 0; i < size; i++){
             nearbySide(x, y, rotation, i, Tmp.p1);
+            Tile target = laneTarget(Tmp.p1.x, Tmp.p1.y, rotation);
 
-            int j = 0;
-            Item found = null;
-            for(; j < range; j++){
-                int rx = Tmp.p1.x + Geometry.d4x(rotation)*j, ry = Tmp.p1.y + Geometry.d4y(rotation)*j;
-                Tile other = state.world.tile(rx, ry);
-                if(other != null && other.solid()){
-                    Item drop = other.wallDrop();
-                    if(drop != null){
-                        if(drop.hardness <= tier && (blockedItems == null || !blockedItems.contains(drop))){
-                            found = drop;
-                            count++;
-                        }else{
-                            invalidItem = drop;
-                        }
-                    }
-                    break;
-                }
-            }
-
-            if(found != null){
-                //check if multiple items will be drilled
-                if(item != found && item != null){
-                    multiple = true;
-                }
-                item = found;
-            }
-
-            int len = Math.min(j, range - 1);
-            Drawf.dashLine(found == null ? Pal.remove : Pal.placing,
+            int len = target == null ? range - 1 : Math.abs(target.x - Tmp.p1.x) + Math.abs(target.y - Tmp.p1.y);
+            Drawf.dashLine(canMine(target) ? Pal.placing : Pal.remove,
             Tmp.p1.x * tilesize,
-            Tmp.p1.y *tilesize,
-            (Tmp.p1.x + Geometry.d4x(rotation)*len) * tilesize,
-            (Tmp.p1.y + Geometry.d4y(rotation)*len) * tilesize
+            Tmp.p1.y * tilesize,
+            (Tmp.p1.x + Geometry.d4x(rotation) * len) * tilesize,
+            (Tmp.p1.y + Geometry.d4y(rotation) * len) * tilesize
             );
         }
 
-        if(item != null){
-            float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / getDrillTime(item) * count, 2), x, y, valid);
-            if(!multiple){
-                float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
+        if(returnItem != null){
+            float rate = 60f / getDrillTime(returnItem) * returnCount;
+            ConsumeLiquid boost = findConsumer(f -> f.booster && f instanceof ConsumeLiquid);
+            String boostedRate = optionalBoostIntensity != 1f ? " ([white]" + (boost != null && boost.liquid.hasEmoji() ? boost.liquid.emoji() : "") + "[]" + Strings.autoFixed(rate * optionalBoostIntensity, 2) + ")" : "";
+
+            float width = drawPlaceText(Core.bundle.format("bar.drillspeed", Strings.autoFixed(rate, 2) + boostedRate), x, y, valid);
+            if(!returnMultiple){
+                float dx = x * tilesize + offset - width / 2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
                 Draw.mixcol(Color.darkGray, 1f);
-                Draw.rect(item.fullIcon, dx, dy - 1, s, s);
+                Draw.rect(returnItem.fullIcon, dx, dy - 1, s, s);
                 Draw.reset();
-                Draw.rect(item.fullIcon, dx, dy, s, s);
+                Draw.rect(returnItem.fullIcon, dx, dy, s, s);
             }
-        }else if(invalidItem != null){
+        }else if(returnInvalid != null){
             drawPlaceText(Core.bundle.get("bar.drilltierreq"), x, y, false);
         }
+    }
 
+    @Override
+    public void drawPlanConfigTop(BuildPlan plan, Eachable<BuildPlan> list){
+        if(!plan.worldContext) return;
+        Tile tile = plan.tile();
+        if(tile == null) return;
+
+        countOre(tile.x, tile.y, plan.rotation);
+        if(returnItem == null || returnMultiple) return;
+
+        //does not show up before plan placement
+        Drawf.planEfficiency(this, tile.x, tile.y, returnItem.color, returnCount + "/" + size);
     }
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         for(int i = 0; i < size; i++){
             nearbySide(tile.x, tile.y, rotation, i, Tmp.p1);
-            for(int j = 0; j < range; j++){
-                Tile other = state.world.tile(Tmp.p1.x + Geometry.d4x(rotation)*j, Tmp.p1.y + Geometry.d4y(rotation)*j);
-                if(other != null && other.solid()){
-                    Item drop = other.wallDrop();
-                    if(drop != null && drop.hardness <= tier && (blockedItems == null || !blockedItems.contains(drop))){
-                        return true;
-                    }
-                    break;
-                }
-            }
+            if(canMine(laneTarget(Tmp.p1.x, Tmp.p1.y, rotation))) return true;
         }
-
         return false;
     }
 
     public float getDrillTime(Item item){
         return drillTime / drillMultipliers.get(item, 1f);
+    }
+
+    public boolean canMine(@Nullable Item drop){
+        return drop != null && drop.hardness <= tier && (blockedItems == null || !blockedItems.contains(drop));
+    }
+
+    public boolean canMine(@Nullable Tile tile){
+        return tile != null && canMine(tile.wallDrop());
+    }
+
+    protected @Nullable Tile laneTarget(int startX, int startY, int rotation){
+        for(int j = 0; j < range; j++){
+            Tile other = state.world.tile(startX + Geometry.d4x(rotation) * j, startY + Geometry.d4y(rotation) * j);
+            if(other != null && other.solid()) return other;
+        }
+        return null;
+    }
+
+    protected void countOre(int x, int y, int rotation){
+        returnItem = returnInvalid = null;
+        returnCount = 0;
+        returnMultiple = false;
+
+        for(int i = 0; i < size; i++){
+            nearbySide(x, y, rotation, i, Tmp.p1);
+
+            Tile target = laneTarget(Tmp.p1.x, Tmp.p1.y, rotation);
+            Item drop = target == null ? null : target.wallDrop();
+
+            if(canMine(drop)){
+                returnCount++;
+                if(returnItem != null && returnItem != drop) returnMultiple = true;
+                returnItem = drop;
+            }else if(drop != null){
+                returnInvalid = drop;
+            }
+        }
     }
 
     public class BeamDrillBuild extends Building{
