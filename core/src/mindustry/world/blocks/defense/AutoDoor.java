@@ -19,7 +19,7 @@ import static mindustry.Vars.*;
 public class AutoDoor extends Wall{
     protected final static Rect rect = new Rect();
     protected final static Seq<Unit> units = new Seq<>();
-    protected final static Boolf<Unit> groundCheck = u -> u.isGrounded() && !u.type.allowLegStep;
+    protected final static Boolf<Unit> groundCheck = u -> u.isGrounded() && !u.type.allowLegStep && !(u instanceof TargetDummyUnit);
 
     public final int timerToggle = timers++;
 
