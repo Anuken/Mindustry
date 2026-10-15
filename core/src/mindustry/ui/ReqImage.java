@@ -14,6 +14,25 @@ public class ReqImage extends Stack{
     public ReqImage(Element image, Boolp valid){
         this.valid = valid;
         add(image);
+        reqDraw();
+    }
+
+    public ReqImage(Element image, Boolp valid, String text){
+        this.valid = valid;
+        add(new Table(t -> {
+            t.center();
+            t.add(image).size(32f).scaling(Scaling.fit);
+        }));
+
+        reqDraw(); //do not hide the text
+        add(new Table(t -> {
+            t.center().bottom();
+            t.add(new Label(text)).style(Styles.outlineLabel);
+            t.pack();
+        }));
+    }
+
+    public void reqDraw(){
         add(new Element(){
             {
                 visible(() -> !valid.get());
