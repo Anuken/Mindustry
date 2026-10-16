@@ -110,12 +110,14 @@ tasks.register<JavaExec>("serverSpike"){
     systemProperty("servertest.port", (findProperty("servertest.port") ?: "6567").toString())
 }
 
-//Graphical tasks run on a private Xvfb, never on the user's desktop. -PclientTest.hostDisplay uses the real display instead. Linux only.
+//Graphical tasks run on a private Xvfb, never on the user's desktop. -PclientTest.hostDisplay uses the real display instead. Linux only; on other systems a real window is opened.
 val virtualDisplays = mutableListOf<Process>()
 
 fun useVirtualDisplay(options: ProcessForkOptions){
+    //Xvfb only exists on Linux: elsewhere the client opens a real, controllable window on the user's desktop
     if(!System.getProperty("os.name").lowercase().contains("linux")){
-        throw GradleException("The graphical client tools are only supported on Linux.")
+        logger.lifecycle("Not on Linux: the client will open a real window on this desktop.")
+        return
     }
 
     options.environment("LIBGL_ALWAYS_SOFTWARE", "1")
@@ -151,7 +153,9 @@ tasks.register("virtualDisplayStop"){
     }
 }
 
-val clientJvmArgs = listOf("-XX:+HeapDumpOnOutOfMemoryError", "-XX:+ShowCodeDetailsInExceptionMessages", "--enable-native-access=ALL-UNNAMED")
+//macOS needs the window system on the first thread, as in desktop/build.gradle.kts
+val clientJvmArgs = listOf("-XX:+HeapDumpOnOutOfMemoryError", "-XX:+ShowCodeDetailsInExceptionMessages", "--enable-native-access=ALL-UNNAMED") +
+    (if(System.getProperty("os.name").lowercase().contains("mac")) listOf("-XstartOnFirstThread") else emptyList())
 
 //Boots the real graphical client and serves commands on 127.0.0.1:8765, see driver/CLIENT_TESTING.md
 //Run with: gradle tests:clientDriver --console=plain   (or driver/client-driver.sh start)
