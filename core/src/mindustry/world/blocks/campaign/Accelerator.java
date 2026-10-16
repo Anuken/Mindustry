@@ -1,8 +1,7 @@
 package mindustry.world.blocks.campaign;
 
 import arc.*;
-import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.audio.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;

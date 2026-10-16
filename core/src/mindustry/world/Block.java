@@ -267,8 +267,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
     public boolean commandable;
-    /** If true, the building inventory can be shown with the config. */
-    public boolean allowConfigInventory = true;
+    /** If false, the inventory is never shown for this block, even if it has items. */
+    public boolean showInventory = true;
     /** If true, the building inventory will be placed diagonally on the top right. */
     public boolean diagonalConfigInventory = false;
     /** Defines how large selection menus, such as that of sorters, should be. */

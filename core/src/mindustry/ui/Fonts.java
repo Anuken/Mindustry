@@ -1,7 +1,7 @@
 package mindustry.ui;
 
 import arc.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.assets.*;
 import arc.files.*;
 import arc.graphics.*;
