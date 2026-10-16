@@ -7,7 +7,7 @@ import android.os.*;
 import android.util.*;
 import android.view.*;
 import arc.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.backend.android.surfaceview.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;

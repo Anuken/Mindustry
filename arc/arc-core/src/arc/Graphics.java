@@ -1,6 +1,6 @@
 package arc;
 
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
 import arc.graphics.gl.GLVersion.*;
@@ -251,12 +251,12 @@ public abstract class Graphics implements Disposable{
         return newCursor(new Pixmap(Core.files.internal("cursors/" + filename + ".png")), scaling, outlineColor, outlineScaling);
     }
 
-    /**Sets the cursor to the default value, e.g. {@link SystemCursor#arrow}.*/
+    /** Sets the cursor to the default value, e.g. {@link SystemCursor#arrow}. */
     public void restoreCursor(){
         cursor(SystemCursor.arrow);
     }
 
-    /**Sets the display cursor.*/
+    /** Sets the display cursor. */
     public void cursor(Cursor cursor){
         if(lastCursor == cursor) return;
 
@@ -274,9 +274,8 @@ public abstract class Graphics implements Disposable{
     }
 
     /**
-     * Only viable on desktop and web. Browsers that support cursor:url() and support the png format (the
-     * pixmap is converted to a data-url of type image/png) should also support custom cursors. Will set the mouse cursor image to
-     * the image represented by the {@link Cursor}. It is recommended to call this function in the main render thread, and maximum one time per frame.
+     * Only viable on desktop and web. Will set the mouse cursor image to the image represented by the {@link Cursor}.
+     * It is recommended to call this function in the main render thread, and maximum one time per frame.
      * Internal use only!
      * @param cursor the mouse cursor as a {@link Cursor}
      */
@@ -321,39 +320,4 @@ public abstract class Graphics implements Disposable{
         }
     }
 
-    /**
-     * <p>
-     * Represents a mouse cursor. Create a cursor via
-     * {@link Graphics#newCursor(Pixmap, int, int)}. To
-     * set the cursor use {@link Graphics#setCursor(Cursor)}.
-     * To use one of the system cursors, call Graphics#setSystemCursor
-     * </p>
-     **/
-    public interface Cursor extends arc.util.Disposable{
-
-        enum SystemCursor implements Cursor{
-            arrow,
-            ibeam,
-            crosshair,
-            hand,
-            horizontalResize,
-            verticalResize;
-
-            /** The override cursor to use when setting this cursor.*/
-            @Nullable Cursor cursor;
-
-            /** Sets the alias for this cursor. */
-            public void set(Cursor cursor){
-                this.cursor = cursor;
-            }
-
-            @Override
-            public void dispose(){
-                if(cursor != null && !(cursor instanceof SystemCursor)){
-                    cursor.dispose();
-                    cursor = null;
-                }
-            }
-        }
-    }
 }
