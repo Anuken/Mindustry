@@ -44,13 +44,16 @@ public class ClientDriver extends ClientTestBase{
     pixel coordinates are screenshot pixels, origin top-left""";
 
     public static void main(String[] args){
-        try{
-            serve();
-        }catch(Throwable t){
-            t.printStackTrace();
-            //the render thread is a daemon, so this also ends the JVM
-            System.exit(1);
-        }
+        //on macOS the window has to live on this (the main) thread, so the driver itself runs on another one
+        ClientHarness.runWithMainThreadWindow(() -> {
+            try{
+                serve();
+            }catch(Throwable t){
+                t.printStackTrace();
+                //the render thread is a daemon, so this also ends the JVM
+                System.exit(1);
+            }
+        });
     }
 
     static void serve() throws Exception{
