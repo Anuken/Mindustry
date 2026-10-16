@@ -1,8 +1,7 @@
 package mindustry.input;
 
 import arc.*;
-import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;

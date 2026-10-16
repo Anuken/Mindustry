@@ -1,7 +1,6 @@
 package mindustry.core;
 
 import arc.*;
-import arc.Graphics.*;
 import arc.Input.*;
 import arc.assets.*;
 import arc.func.*;

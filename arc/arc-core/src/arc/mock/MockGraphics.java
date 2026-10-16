@@ -1,7 +1,7 @@
 package arc.mock;
 
 import arc.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
 
