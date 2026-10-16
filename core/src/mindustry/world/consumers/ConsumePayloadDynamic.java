@@ -66,9 +66,16 @@ public class ConsumePayloadDynamic extends Consume{
         table.table(c -> {
             int i = 0;
             for(var stack : pay){
-                int amount = Math.round(stack.amount * multiplier.get(build));
+                int amount = Math.round(stack.amount * multiplier.get(build)), stored = inv.get(stack.item);
+                String color = "";
+                if(stored == 0){
+                    color = "[negstat]";
+                }else if(stored < amount){
+                    color = "[accent]";
+                }
+
                 c.add(new ReqImage(new Image(stack.item.uiIcon).setScaling(Scaling.fit),
-                () -> inv.contains(stack.item, amount), inv.get(stack.item) + "/" + amount)).padRight(8);
+                () -> inv.contains(stack.item, amount), color + stored + "/" + amount)).padRight(8);
                 if(++i % 4 == 0) c.row();
             }
         }).left();
