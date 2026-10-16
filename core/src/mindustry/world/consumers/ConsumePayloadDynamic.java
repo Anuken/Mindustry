@@ -75,7 +75,7 @@ public class ConsumePayloadDynamic extends Consume{
                 }
 
                 c.add(new ReqImage(new Image(stack.item.uiIcon).setScaling(Scaling.fit),
-                () -> inv.contains(stack.item, amount), color + stored + "/" + amount)).padRight(8);
+                () -> inv.contains(stack.item, amount), color + stored + "/" + amount)).padRight(4f).padLeft(4f);
                 if(++i % 4 == 0) c.row();
             }
         }).left();
