@@ -676,6 +676,17 @@ public class Fx{
         }
     }).layer(Layer.bullet - 1f),
 
+    missileReflect = new Effect(15f, 80f, e -> {
+        if(!(e.data instanceof Float size)) return;
+
+        color(Color.white, e.color, e.fin());
+        Lines.stroke(e.fout() * 1.5f);
+        Angles.randLenVectors(e.id, Math.min(6, Math.max(Math.round(size / 30), 1)),
+        6f + e.finpow() * 26f, e.rotation + 180f, Math.min(15f, 5f + size * 0.5f), (x, y) -> { //moves to the oposite side
+            Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 5f + 1f);
+        });
+    }),
+
     neoplasmSplat = new Effect(400f, 300f, b -> {
         float intensity = 3f;
 
@@ -2847,7 +2858,7 @@ public class Fx{
         color(e.color);
         stroke(3f * e.fout());
         int sides = e.data instanceof ForceProjector f ? f.sides : e.data instanceof ForceFieldAbility a ? a.sides : 6;
-        float rotation = e.data instanceof ForceProjector f ? f.shieldRotation : e.data instanceof ForceFieldAbility a ? a.rotation : 6;
+        float rotation = e.data instanceof ForceProjector f ? f.shieldRotation : e.data instanceof BaseShieldAbility a ? a.shieldRot() : 6;
 
         Lines.poly(e.x, e.y, sides, e.rotation + e.fin(), rotation);
     }).followParent(true),
@@ -2862,15 +2873,48 @@ public class Fx{
                 Lines.arc(pos.x, pos.y, ab.radius - ab.width/2, ab.angle / 360f, u.rotation + ab.angleOffset - ab.angle / 2f);
                 for(int i : Mathf.signs){
                     float
-                            px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
-                            py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
-                            px1 = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2),
-                            py1 = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2);
+                    px = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                    py = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius + ab.width / 2),
+                    px1 = pos.x + Angles.trnsx(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2),
+                    py1 = pos.y + Angles.trnsy(u.rotation + ab.angleOffset - ab.angle / 2f * i, ab.radius - ab.width / 2);
                     Lines.line(px, py, px1, py1);
                 }
             }
         }
     }).followParent(true),
+
+    shieldReflect = new Effect(16f, 80f, e -> {
+        if(!(e.data instanceof Float size)) return;
+        float sizeL = size / 13f;
+
+        //squished hexagon
+        z(Layer.effect + 1);
+        Tmp.c1.set(e.color);
+        color(e.color, Tmp.c1.add(Color.white), e.fout());
+        if(Mathf.absin(e.fin() * 40f, 1f, 1f) > e.fin() * 0.7f){
+            Lines.stroke(1f + e.fout() * 1.2f);
+            float hexSize = size * 0.25f * e.finpow() + 2f;
+            float radX = hexSize * 0.4f, radY = hexSize;
+
+            for(int i = 0; i < 6; i++){
+                float a1 = i * 60f * Mathf.degRad;
+                float a2 = (i + 1) * 60f * Mathf.degRad;
+
+                Tmp.v1.set(Mathf.cos(a1) * radX, Mathf.sin(a1) * radY).rotate(e.rotation).add(e.x, e.y);
+                Tmp.v2.set(Mathf.cos(a2) * radX, Mathf.sin(a2) * radY).rotate(e.rotation).add(e.x, e.y);
+
+                Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+            }
+        }
+
+        color(Color.white, e.color, e.fin());
+        alpha(0.6f);
+        for(int i : Mathf.signs){
+            float angle = e.rotation + 90f * i;
+            float offX = Angles.trnsx(angle, sizeL), offY = Angles.trnsy(angle, sizeL);
+            Drawf.tri(e.x + offX, e.y + offY, 2.5f * e.fout(), 2f + 0.4f * e.fout() * size, e.rotation + 160f * i);
+        }
+    }),
 
     coreLandDust = new Effect(100f, e -> {
         color(e.color, e.fout(0.1f));
