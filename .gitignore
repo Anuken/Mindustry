@@ -13,17 +13,14 @@ ios/libs/
 /desktop/mindustry-maps/
 /desktop/gifexport/
 /gifs/
-/core/lib/
 /ios/assets/
 /core/assets-raw/sprites/generated/
 /core/assets-raw/sprites_out/
 /annotations/build/
 /annotations/out/
-/net/build/
 /tools/build/
 /tests/build/
 /server/build/
-ios/libs/
 changelog
 saves/
 /core/assets-raw/fontgen/out/
@@ -32,7 +29,6 @@ saves/
 core/assets/saves/
 /core/assets/saves/
 steam_appid.txt
-/test_files/
 /android/assets/mindustry-maps/
 /android/assets/mindustry-saves/
 /core/assets/gifexport/
@@ -45,9 +41,9 @@ steam_appid.txt
 ios/robovm.properties
 packr-out/
 config/
-buildSrc/
 *.gif
 /tests/out
+docs/
 
 /core/assets/basepartnames
 version.properties
