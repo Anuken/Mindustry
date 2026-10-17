@@ -26,7 +26,6 @@ public class ContinuousBulletType extends BulletType{
         collides = false;
         pierce = true;
         hittable = false;
-        absorbable = false;
     }
 
     @Override

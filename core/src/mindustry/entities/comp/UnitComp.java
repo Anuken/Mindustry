@@ -37,7 +37,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     static final float warpDst = 8f;
 
     @Import boolean dead, disarmed;
-    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, dragMultiplier, armorOverride, speedMultiplier;
+    @Import float x, y, rotation, maxHealth, drag, armor, hitSize, health, shield, dragMultiplier, armorOverride, armorMultiplier, speedMultiplier;
     @Import Team team;
     @Import int id;
     @Import @Nullable Tile mineTile;
@@ -60,6 +60,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     transient int lastFogPos;
     /** Only used in suicide units */
     transient boolean hasTarget;
+    transient float lastRotation;
     private transient float resupplyTime = Mathf.random(10f);
     private transient boolean wasPlayer;
     private transient boolean wasHealed;
@@ -146,6 +147,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         moveAt(Tmp.v2.trns(rotation, vec.len()));
 
         if(!vec.isZero()){
+            lastRotation = rotation;
             rotation = Angles.moveToward(rotation, vec.angle(), type.rotateSpeed * Time.delta * speedMultiplier);
         }
     }
@@ -290,7 +292,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             case mineY -> mining() ? mineTile.y : -1;
             case buildX -> isBuilding() ? buildPlan().x : -1;
             case buildY -> isBuilding() ? buildPlan().y : -1;
-            case armor -> armorOverride >= 0f ? armorOverride : armor;
+            case armor -> (armorOverride >= 0f ? armorOverride : armor) * armorMultiplier;
             case flag -> flag;
             case speed -> type.speed * 60f / tilesize * speedMultiplier;
             case controlled -> !isValid() ? 0 :
@@ -486,7 +488,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public void lookAt(float angle){
-        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta * speedMultiplier());
+        rotation = Angles.moveToward(rotation, angle, type.rotateSpeed * Time.delta * speedMultiplier() * rotateSpeedMultiplier());
     }
 
     public void lookAt(Position pos){
@@ -599,7 +601,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         team.data().updateCount(type, 1);
 
         //check if over unit cap
-        if(type.useUnitCap && count() > cap() && !spawnedByCore && !dead && !state.rules.editor){
+        if(type.useUnitCap && count() > Mathf.ceil(cap() * type.unitCapMultiplier) && !spawnedByCore && !dead && !state.rules.editor){
             Call.unitCapDeath(self());
             team.data().updateCount(type, -1);
         }

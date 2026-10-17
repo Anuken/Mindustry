@@ -78,8 +78,6 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     descentSpeed = 0.08f,
     /** how fast this unit falls upon death */
     fallSpeed = 0.018f,
-    /** how many ticks it takes this missile to accelerate to full speed */
-    missileAccelTime = 0f,
     /** raw health amount */
     health = 200f,
     /** incoming damage is reduced by this amount */
@@ -100,6 +98,8 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     wreckHealthMultiplier = 0.25f,
     /** a VERY ROUGH estimate of unit DPS; initialized in init() */
     dpsEstimate = -1,
+    /** a VERY ROUGH estimate of total unit damage; initialized in init() */
+    damageEstimate = -1,
     /** graphics clipping size; <0 to calculate automatically */
     clipSize = -1,
     /** multiplier for how slowly this unit drowns - higher numbers, slower drowning. */
@@ -110,6 +110,8 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     researchCostMultiplier = 50,
     /** multiplier for knockback this unit receives */
     knockbackMultiplier = 1f,
+    /** multiplier for this unit's unit cap */
+    unitCapMultiplier = 1f,
 
     /** for ground units, the layer upon which this unit is drawn */
     groundLayer = Layer.groundUnit,
@@ -505,8 +507,12 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
     /** lifetime of this missile. */
     public float lifetime = 60f * 5f;
+    /** range of this missile. Overrides lifetime. */
+    public float missileRange = -1f;
     /** ticks that must pass before this missile starts homing. */
     public float homingDelay = 10f;
+    /** how many ticks it takes this missile to accelerate to full speed */
+    public float missileAccelTime = 0f;
 
     //REGIONS
 
@@ -871,6 +877,10 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         if(immunities.size > 0){
             stats.add(Stat.immunities, StatValues.statusEffects(immunities.toSeq().sort()));
         }
+
+        if(unitCapMultiplier != 1){
+            stats.add(Stat.unitCapMultiplier, Strings.autoFixed(unitCapMultiplier, 4) + "x");
+        }
     }
 
     protected void checkEntityMapping(Unit example){
@@ -1007,14 +1017,17 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
             }
         }
 
-        if(fogRadius < 0){
-            //TODO depend on range?
-            fogRadius = Math.max(58f * 3f, hitSize * 2f) / 8f;
+        if(missileRange > 0){
+            lifetime = getMissileLife(missileRange);
         }
 
         if(!weapons.contains(w -> w.useAttackRange)){
             if(range < 0 || range == Float.MAX_VALUE) range = mineRange;
             if(maxRange < 0 || maxRange == Float.MAX_VALUE) maxRange = mineRange;
+        }
+
+        if(fogRadius < 0){
+            fogRadius = Math.max(58f * 3f, Math.min(maxRange * 0.75f, 500f)) / 8f;
         }
 
         if(mechStride < 0){
@@ -1144,6 +1157,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         }
 
         estimateDps();
+        estimateDamage();
 
         //only do this after everything else was initialized
         sample = constructor.get();
@@ -1160,8 +1174,23 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
                 dpsEstimate /= 15f;
             }
         }
+        if(damageEstimate < 0){
+            damageEstimate = weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f);
+        }
 
         return dpsEstimate;
+    }
+
+    public float estimateDamage(){
+        return damageEstimate < 0 ? weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f) : damageEstimate;
+    }
+
+    public float getMissileLife(float range){
+        float life = range / speed;
+        if(missileAccelTime <= 0) return life;
+        //if MissileAI accel formula ever changes integrate to get these 2 again
+        if(life > missileAccelTime) return life + missileAccelTime * 2f / 3f;
+        return Mathf.pow(3f * life * Mathf.sqr(missileAccelTime), 1f / 3f);
     }
 
     @CallSuper
