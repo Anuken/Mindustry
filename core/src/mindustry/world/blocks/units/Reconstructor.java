@@ -1,8 +1,8 @@
 package mindustry.world.blocks.units;
 
 import arc.*;
-import arc.Graphics.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.*;
+import arc.graphics.Cursor.*;
 import arc.audio.*;
 import arc.graphics.g2d.*;
 import arc.math.*;

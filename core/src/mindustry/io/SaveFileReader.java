@@ -80,7 +80,7 @@ public abstract class SaveFileReader{
     protected static boolean chunkNested = false;
 
     /** Counts bytes read from the save being loaded, to validate chunk lengths. Null when reading outside of a counted save load. */
-    protected @Nullable CounterInputStream counter;
+    private final ThreadLocal<CounterInputStream> activeCounter = new ThreadLocal<>();
 
     public static String mapFallback(String name){
         return fallback.get(name, name);
@@ -88,13 +88,15 @@ public abstract class SaveFileReader{
 
     //TODO: unify readRegion with readChunk, they do the same thing and both should have good error messages
     public void readRegion(String name, DataInput stream, CounterInputStream counter, IORunner<DataInput> cons) throws IOException{
-        this.counter = counter;
+        activeCounter.set(counter);
         counter.resetCount();
         int length;
         try{
             length = readChunk(stream, (chunkStream, len) -> cons.accept(chunkStream));
         }catch(Throwable e){
             throw new IOException("Error reading region \"" + name + "\".", e);
+        }finally{
+            activeCounter.remove();
         }
 
         if(length != counter.count - 4){
@@ -137,7 +139,7 @@ public abstract class SaveFileReader{
     /** Reads a chunk of some length. Use the runner for reading to catch more descriptive errors. */
     public int readChunk(DataInput input, IORunnerLength<DataInput> runner) throws IOException{
         int length = input.readInt();
-        int start = counter == null ? 0 : counter.count;
+        int start = currentCount();
         runner.accept(input, length);
         checkChunkLength(start, length);
         return length;
@@ -151,8 +153,14 @@ public abstract class SaveFileReader{
         });
     }
 
+    private int currentCount(){
+        CounterInputStream counter = activeCounter.get();
+        return counter == null ? 0 : counter.count;
+    }
+
     /** Throws if the bytes read since the chunk started do not match the chunk's saved length. */
     protected void checkChunkLength(int start, int length) throws IOException{
+        CounterInputStream counter = activeCounter.get();
         if(counter == null) return;
 
         int read = counter.count - start;
@@ -181,7 +189,7 @@ public abstract class SaveFileReader{
     /** Reads a legacy chunk where the length is only 2 bytes. */
     public int readLegacyShortChunk(DataInput input, Reads reads, IORunnerLength<Reads> runner) throws IOException{
         int length = input.readUnsignedShort();
-        int start = counter == null ? 0 : counter.count;
+        int start = currentCount();
         reads.input = input;
         runner.accept(reads, length);
         checkChunkLength(start, length);

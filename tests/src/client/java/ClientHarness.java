@@ -45,6 +45,9 @@ public final class ClientHarness{
     private static volatile boolean loaded;
     private static boolean booted;
     private static Thread renderThread;
+    /** Set by {@link #runWithMainThreadWindow}. On macOS the window system must be used from the main thread. */
+    private static Thread mainThread;
+    private static final CompletableFuture<Runnable> mainThreadTask = new CompletableFuture<>();
     private static Seq<String> bootErrors = new Seq<>();
     private static Fi outputDir;
 
@@ -86,16 +89,23 @@ public final class ClientHarness{
 
         Events.on(ClientLoadEvent.class, e -> loaded = true);
 
-        renderThread = new Thread(() -> {
+        Runnable app = () -> {
             try{
                 //blocks until the application exits
                 new SdlApplication(new TestLauncher(), config());
             }catch(Throwable t){
                 crash = t;
             }
-        }, "client-render");
-        renderThread.setDaemon(true);
-        renderThread.start();
+        };
+
+        if(mainThread != null){
+            renderThread = mainThread;
+            mainThreadTask.complete(app);
+        }else{
+            renderThread = new Thread(app, "client-render");
+            renderThread.setDaemon(true);
+            renderThread.start();
+        }
 
         long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(loadTimeoutSeconds);
         while(!loaded){
@@ -119,11 +129,37 @@ public final class ClientHarness{
         bootErrors = drainErrors();
     }
 
+    /**
+     * Runs {@code body} (which boots and uses the harness) and, on macOS, hosts the client window on the calling thread,
+     * which has to be the JVM's main thread: Cocoa refuses to create windows anywhere else.
+     * Elsewhere this just calls {@code body}. Returns once both body and the client have finished.
+     */
+    public static void runWithMainThreadWindow(Runnable body){
+        if(!OS.isMac){
+            body.run();
+            return;
+        }
+
+        mainThread = Thread.currentThread();
+        Thread driver = new Thread(body, "client-harness-body");
+        driver.start();
+
+        try{
+            //booting the harness hands over the application to run here, blocking until it exits
+            mainThreadTask.get().run();
+            driver.join();
+        }catch(InterruptedException | ExecutionException e){
+            throw new RuntimeException(e);
+        }
+    }
+
     /** Asks the client to exit and waits for the render thread to finish. */
     public static void shutdown(){
         if(!booted || renderThread == null || !renderThread.isAlive()) return;
 
         Core.app.post(() -> Core.app.exit());
+        //the main thread is waiting for the caller of this method, joining it would only time out
+        if(renderThread == mainThread) return;
         try{
             renderThread.join(15_000);
         }catch(InterruptedException ignored){

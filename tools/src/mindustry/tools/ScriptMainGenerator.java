@@ -1,7 +1,7 @@
 package mindustry.tools;
 
 import arc.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.files.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;

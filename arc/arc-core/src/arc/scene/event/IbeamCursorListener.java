@@ -1,7 +1,7 @@
 package arc.scene.event;
 
 import arc.Core;
-import arc.Graphics.Cursor.SystemCursor;
+import arc.graphics.Cursor.SystemCursor;
 import arc.scene.Element;
 
 public class IbeamCursorListener extends ClickListener{

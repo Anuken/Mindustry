@@ -1,7 +1,7 @@
 package arc.scene.event;
 
 import arc.*;
-import arc.Graphics.Cursor.*;
+import arc.graphics.Cursor.*;
 import arc.func.*;
 import arc.scene.*;
 import arc.scene.utils.*;
