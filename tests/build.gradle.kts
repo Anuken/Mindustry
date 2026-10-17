@@ -326,7 +326,7 @@ tasks.register("clientTestStopXvfb"){
 }
 
 //Times a fixed number of ticks of a save on the real headless server. Not part of testAll: it is slow, and only meaningful when compared to another run on the same machine.
-//Run with: gradle tests:benchmark   (-Pbenchmark.map=name -Pbenchmark.ticks=N -Pbenchmark.warmup=N -Pbenchmark.runs=N)
+//Run with: gradle tests:benchmark   (-Pbenchmark.map=name -Pbenchmark.ticks=N -Pbenchmark.warmup=N -Pbenchmark.runs=N -Pbenchmark.jfr)
 //Saves are read from src/test/resources, results are written to tests/build/benchmark
 tasks.register<Test>("benchmark"){
     group = "verification"
@@ -344,6 +344,10 @@ tasks.register<Test>("benchmark"){
 
     //a fixed heap, so that runs only differ in what the code does
     jvmArgs = listOf("-XX:+HeapDumpOnOutOfMemoryError", "-Xms4g", "-Xmx4g")
+    //-Pbenchmark.jfr records a profile of the measured runs to tests/build/benchmark/benchmark.jfr, for JDK Mission Control or "jfr print"
+    if(project.hasProperty("benchmark.jfr")){
+        systemProperty("benchmark.jfr", layout.buildDirectory.file("benchmark/benchmark.jfr").get().asFile.absolutePath)
+    }
     systemProperty("servertest.data.dir", layout.buildDirectory.dir("benchmark_server_data").get().asFile.absolutePath)
     systemProperty("benchmark.out.dir", layout.buildDirectory.dir("benchmark").get().asFile.absolutePath)
     for(name in listOf("map", "ticks", "warmup", "runs")){

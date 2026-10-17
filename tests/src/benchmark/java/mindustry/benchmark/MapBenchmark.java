@@ -10,8 +10,12 @@ import mindustry.core.*;
 import mindustry.server.*;
 import org.junit.jupiter.api.*;
 
+import jdk.jfr.*;
+
 import java.io.*;
 import java.lang.management.*;
+import java.nio.file.*;
+import java.text.*;
 import java.util.*;
 
 import static mindustry.Vars.*;
@@ -24,13 +28,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * so two runs simulate exactly the same game time no matter how fast they are. The JIT is warmed up on the same save first,
  * then the save is reloaded before every measured run so that each run starts from the same state.
  * <p>
- * Run with: gradle tests:benchmark   (-Pbenchmark.map=name -Pbenchmark.ticks=N -Pbenchmark.warmup=N -Pbenchmark.runs=N)
- * Results are printed and written to tests/build/benchmark.
+ * The map is a save in the test resources, or a built-in map like erekir/origin.
+ * Run with: gradle tests:benchmark   (-Pbenchmark.map=name -Pbenchmark.ticks=N -Pbenchmark.warmup=N -Pbenchmark.runs=N -Pbenchmark.jfr)
+ * Results are printed and written to tests/build/benchmark. With -Pbenchmark.jfr, the measured runs are also profiled with Java Flight Recorder.
  */
 public class MapBenchmark{
     static final String slot = "benchmark";
 
     static final String map = System.getProperty("benchmark.map", "transcendence");
+    static final @Nullable String jfrFile = System.getProperty("benchmark.jfr");
     static final int
         ticks = Integer.getInteger("benchmark.ticks", 2 * 60 * 60),
         warmupTicks = Integer.getInteger("benchmark.warmup", 60 * 60),
@@ -67,9 +73,12 @@ public class MapBenchmark{
     }
 
     @Test
-    void benchmark() throws IOException{
-        InputStream stream = MapBenchmark.class.getClassLoader().getResourceAsStream(map + "." + saveExtension);
-        assertNotNull(stream, "No save named '" + map + "." + saveExtension + "' in the test resources.");
+    void benchmark() throws IOException, ParseException{
+        //saves in the test resources, or built-in maps such as erekir/origin
+        InputStream resource = MapBenchmark.class.getClassLoader().getResourceAsStream(map + "." + saveExtension);
+        Fi builtin = Core.files.internal("maps/" + map + "." + mapExtension);
+        InputStream stream = resource == null && builtin.exists() ? builtin.read() : resource;
+        assertNotNull(stream, "No save named '" + map + "." + saveExtension + "' in the test resources, and no built-in map at " + builtin.path() + ".");
         Fi save = saveDirectory.child(slot + "." + saveExtension);
         try(stream){
             save.write(stream, false);
@@ -84,6 +93,12 @@ public class MapBenchmark{
         long warmupStart = Time.millis();
         ServerHarness.ticks(warmupTicks);
         Log.info("[Benchmark] Warmup took @ms.", Time.timeSinceMillis(warmupStart));
+
+        Recording recording = null;
+        if(jfrFile != null){
+            recording = new Recording(Configuration.getConfiguration("profile"));
+            recording.start();
+        }
 
         Seq<RunResult> results = new Seq<>();
         for(int i = 0; i < runs; i++){
@@ -101,13 +116,21 @@ public class MapBenchmark{
             results.add(result);
         }
 
+        if(recording != null){
+            recording.stop();
+            new Fi(jfrFile).parent().mkdirs();
+            recording.dump(Paths.get(jfrFile));
+            recording.close();
+            Log.info("[Benchmark] Profile written to @", jfrFile);
+        }
+
         ServerHarness.command("stop");
         ServerHarness.assertNoErrors();
 
         String report = report(version, mapName, results);
         Log.info("\n" + report);
 
-        Fi out = new Fi(System.getProperty("benchmark.out.dir", "benchmark")).child(map + "-" + version.replace('/', '_').replace(' ', '_') + ".txt");
+        Fi out = new Fi(System.getProperty("benchmark.out.dir", "benchmark")).child(map.replace('/', '_') + "-" + version.replace('/', '_').replace(' ', '_') + ".txt");
         out.writeString(report);
         Log.info("[Benchmark] Written to @", out.absolutePath());
     }
