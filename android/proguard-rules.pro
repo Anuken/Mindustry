@@ -9,5 +9,6 @@
 -keepattributes Signature,*Annotation*,InnerClasses,EnclosingMethod
 
 -dontwarn javax.naming.**
+-dontwarn mindustry.annotations.**
 
 #-printusage out.txt
