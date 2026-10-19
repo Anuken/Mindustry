@@ -3,10 +3,10 @@ package mindustry.world.blocks.defense.turrets;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
 
@@ -21,7 +21,7 @@ public class ContinuousTurret extends Turret{
         super(name);
 
         coolantMultiplier = 1f;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         displayAmmoMultiplier = false;
     }
 

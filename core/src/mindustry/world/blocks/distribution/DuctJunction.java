@@ -4,7 +4,6 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -34,7 +33,7 @@ public class DuctJunction extends Block{
         hasItems = true;
 
         priority = TargetPriority.transport;
-        envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        envEnabled = Environments.of(Env.space, Env.terrestrial, Env.underwater);
     }
 
     @Override

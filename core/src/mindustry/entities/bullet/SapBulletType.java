@@ -42,7 +42,7 @@ public class SapBulletType extends BulletType{
         lightOpacity = 0.6f;
         statusDuration = 60f * 3f;
         impact = true;
-        shieldAbsorb = true;
+        absorbable = true;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class SapBulletType extends BulletType{
         super.init(b);
 
         float len = Mathf.random(length, length + lengthRand);
-        len = Math.min(len, Damage.findShieldLength(b, len, false, true));
+        len = Math.min(len, Damage.findShieldLength(b, len, true));
 
         Healthc target = Damage.linecast(b, b.x, b.y, b.rotation(), len);
 

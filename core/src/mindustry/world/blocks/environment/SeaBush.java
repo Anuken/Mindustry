@@ -2,7 +2,7 @@ package mindustry.world.blocks.environment;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.world.*;
 
@@ -29,7 +29,7 @@ public class SeaBush extends Prop{
         float offset = rand.random(180f);
         int lobes = rand.random(lobesMin, lobesMax);
         for(int i = 0; i < lobes; i++){
-            float ba =  i / (float)lobes * 360f + offset + rand.range(spread), angle = ba + Mathf.sin(Time.time + rand.random(0, timeRange), rand.random(sclMin, sclMax), rand.random(magMin, magMax));
+            float ba =  i / (float)lobes * 360f + offset + rand.range(spread), angle = ba + Mathf.sin(Vars.state.time + rand.random(0, timeRange), rand.random(sclMin, sclMax), rand.random(magMin, magMax));
             float w = region.width * region.scl(), h = region.height * region.scl();
             var region = Angles.angleDist(ba, 225f) <= botAngle ? botRegion : this.region;
 

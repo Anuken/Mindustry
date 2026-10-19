@@ -1,6 +1,5 @@
 package mindustry.ai;
 
-import arc.*;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -9,7 +8,6 @@ import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
-import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;
@@ -27,13 +25,15 @@ public class BlockIndexer{
     /** Size of one quadrant. */
     private static final int quadrantSize = 20;
     private static final Rect rect = new Rect();
+    /** Array used for returning and reusing. */
+    private static Seq<Building> breturn = new Seq<>(Building.class);
     private static boolean returnBool = false;
 
     private int quadWidth, quadHeight;
 
     //TODO: refactor to be field of state, and also refactor such that data is stored in teams when appropriate
     /** Stores all ore quadrants on the map. Maps ID to qX to qY to a list of tiles with that ore. */
-    private IntSeq[][][] ores, wallOres;
+    private IntSeq[][][] ores = {}, wallOres = {};
     /** All ores present on the map - can be wall or floor. */
     private Seq<Item> allPresentOres = new Seq<>();
     /** All ores available on this map. */
@@ -44,78 +44,59 @@ public class BlockIndexer{
     /** Maps teams to a map of flagged tiles by flag. */
     private Seq<Building>[][] flagMap = new Seq[Team.all.length][BlockFlag.all.length];
     /** Counts whether a certain floor is present in the world upon load. */
-    private boolean[] blocksPresent;
-    /** Array used for returning and reusing. */
-    private Seq<Building> breturn = new Seq<>(Building.class);
+    private boolean[] blocksPresent = {};
     /** Maps block flag to a list of floor tiles that have it. */
-    private Seq<Tile>[] floorMap;
+    private Seq<Tile>[] floorMap = new Seq[BlockFlag.all.length];
 
-    public BlockIndexer(){
-        clearFlags();
-
-        Events.on(TilePreChangeEvent.class, event -> {
-            removeIndex(event.tile);
-        });
-
-        Events.on(TileChangeEvent.class, event -> {
-            addIndex(event.tile);
-        });
-
-        Events.on(TileFloorChangeEvent.class, event -> {
-            removeFloorIndex(event.tile, event.previous);
-            addFloorIndex(event.tile, event.floor);
-        });
-
-        Events.on(WorldLoadEvent.class, event -> {
-            flagMap = new Seq[Team.all.length][BlockFlag.all.length];
-            floorMap = new Seq[BlockFlag.all.length];
-            activeTeams = new Seq<>(Team.class);
-
-            clearFlags();
-
-            allOres.clear();
-            allWallOres.clear();
-            ores = new IntSeq[content.items().size][][];
-            wallOres = new IntSeq[content.items().size][][];
-            quadWidth = Mathf.ceil(world.width() / (float)quadrantSize);
-            quadHeight = Mathf.ceil(world.height() / (float)quadrantSize);
-            blocksPresent = new boolean[content.blocks().size];
-
-            //so WorldLoadEvent gets called twice sometimes... ugh
-            for(Team team : Team.all){
-                var data = state.teams.get(team);
-                if(data != null){
-                    if(data.buildingTree != null) data.buildingTree.clear();
-                    if(data.turretTree != null) data.turretTree.clear();
-                }
+    {
+        for(int i = 0; i < flagMap.length; i++){
+            for(int j = 0; j < BlockFlag.all.length; j++){
+                flagMap[i][j] = new Seq();
             }
+        }
+    }
 
-            for(Tile tile : world.tiles){
-                process(tile);
+    public void init(){
+        ores = new IntSeq[content.items().size][][];
+        wallOres = new IntSeq[content.items().size][][];
+        quadWidth = Mathf.ceil(state.world.width / (float)quadrantSize);
+        quadHeight = Mathf.ceil(state.world.height / (float)quadrantSize);
+        blocksPresent = new boolean[content.blocks().size];
 
-                addFloorIndex(tile, tile.floor());
+        //so WorldLoadEvent gets called twice sometimes... ugh
+        for(Team team : Team.all){
+            var data = state.teams.get(team);
+            if(data != null){
+                if(data.buildingTree != null) data.buildingTree.clear();
+                if(data.turretTree != null) data.turretTree.clear();
+            }
+        }
 
-                Item drop;
-                int qx = tile.x / quadrantSize, qy = tile.y / quadrantSize;
-                if(tile.block() == Blocks.air){
-                    if((drop = tile.drop()) != null && ores.length > drop.id){
-                        //add position of quadrant to list
-                        if(ores[drop.id] == null) ores[drop.id] = new IntSeq[quadWidth][quadHeight];
-                        if(ores[drop.id][qx][qy] == null) ores[drop.id][qx][qy] = new IntSeq(false, 16);
-                        ores[drop.id][qx][qy].add(tile.pos());
-                        allOres.increment(drop);
-                    }
-                }else if((drop = tile.wallDrop()) != null && wallOres.length > drop.id){
+        for(Tile tile : state.world){
+            process(tile);
+
+            addFloorIndex(tile, tile.floor());
+
+            Item drop;
+            int qx = tile.x / quadrantSize, qy = tile.y / quadrantSize;
+            if(tile.block() == Blocks.air){
+                if((drop = tile.drop()) != null && ores.length > drop.id){
                     //add position of quadrant to list
-                    if(wallOres[drop.id] == null) wallOres[drop.id] = new IntSeq[quadWidth][quadHeight];
-                    if(wallOres[drop.id][qx][qy] == null) wallOres[drop.id][qx][qy] = new IntSeq(false, 16);
-                    wallOres[drop.id][qx][qy].add(tile.pos());
-                    allWallOres.increment(drop);
+                    if(ores[drop.id] == null) ores[drop.id] = new IntSeq[quadWidth][quadHeight];
+                    if(ores[drop.id][qx][qy] == null) ores[drop.id][qx][qy] = new IntSeq(false, 16);
+                    ores[drop.id][qx][qy].add(tile.pos());
+                    allOres.increment(drop);
                 }
+            }else if((drop = tile.wallDrop()) != null && wallOres.length > drop.id){
+                //add position of quadrant to list
+                if(wallOres[drop.id] == null) wallOres[drop.id] = new IntSeq[quadWidth][quadHeight];
+                if(wallOres[drop.id][qx][qy] == null) wallOres[drop.id][qx][qy] = new IntSeq(false, 16);
+                wallOres[drop.id][qx][qy].add(tile.pos());
+                allWallOres.increment(drop);
             }
+        }
 
-            updatePresentOres();
-        });
+        updatePresentOres();
     }
 
     public Seq<Item> getAllPresentOres(){
@@ -131,7 +112,7 @@ public class BlockIndexer{
         }
     }
 
-    private void removeFloorIndex(Tile tile, Floor floor){
+    public void removeFloorIndex(Tile tile, Floor floor){
         if(floor.flags.size == 0 || floorMap == null) return;
 
         for(var flag : floor.flags.array){
@@ -139,7 +120,7 @@ public class BlockIndexer{
         }
     }
 
-    private void addFloorIndex(Tile tile, Floor floor){
+    public void addFloorIndex(Tile tile, Floor floor){
         if(floor.flags.size == 0 || !floor.shouldIndex(tile) || floorMap == null) return;
 
         for(var flag : floor.flags.array){
@@ -270,14 +251,6 @@ public class BlockIndexer{
     /** @return whether a certain block is anywhere on this map. */
     public boolean isBlockPresent(Block block){
         return blocksPresent != null && block.id < blocksPresent.length && blocksPresent[block.id];
-    }
-
-    private void clearFlags(){
-        for(int i = 0; i < flagMap.length; i++){
-            for(int j = 0; j < BlockFlag.all.length; j++){
-                flagMap[i][j] = new Seq();
-            }
-        }
     }
 
     private Seq<Building>[] getFlagged(Team team){
@@ -549,7 +522,7 @@ public class BlockIndexer{
                 for(int qy = 0; qy < quadHeight; qy++){
                     var arr = ores[item.id][qx][qy];
                     if(arr != null && arr.size > 0){
-                        Tile tile = world.tile(arr.first());
+                        Tile tile = state.world.tile(arr.first());
                         if(tile.block() == Blocks.air){
                             float dst = Mathf.dst2(xp, yp, tile.worldx(), tile.worldy());
                             if(closest == null || dst < minDst){
@@ -576,7 +549,7 @@ public class BlockIndexer{
                 for(int qy = 0; qy < quadHeight; qy++){
                     var arr = wallOres[item.id][qx][qy];
                     if(arr != null && arr.size > 0){
-                        Tile tile = world.tile(arr.first());
+                        Tile tile = state.world.tile(arr.first());
                         if(tile.block() != Blocks.air){
                             float dst = Mathf.dst2(xp, yp, tile.worldx(), tile.worldy());
                             if(closest == null || dst < minDst){
@@ -636,13 +609,13 @@ public class BlockIndexer{
 
             //insert the new tile into the quadtree for targeting
             if(data.buildingTree == null){
-                data.buildingTree = new QuadTree<>(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                data.buildingTree = new QuadTree<>(new Rect(0, 0, state.world.unitWidth, state.world.unitHeight));
             }
             data.buildingTree.insert(tile.build);
 
             if(tile.block().attacks && tile.build instanceof Ranged){
                 if(data.turretTree == null){
-                    data.turretTree = new TurretQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                    data.turretTree = new TurretQuadtree(new Rect(0, 0, state.world.unitWidth, state.world.unitHeight));
                 }
 
                 data.turretTree.insert(tile.build);
@@ -650,7 +623,7 @@ public class BlockIndexer{
 
             if(tile.build instanceof ShieldProvider){
                 if(data.shieldTree == null){
-                    data.shieldTree = new ShieldQuadtree(new Rect(0, 0, world.unitWidth(), world.unitHeight()));
+                    data.shieldTree = new ShieldQuadtree(new Rect(0, 0, state.world.unitWidth, state.world.unitHeight));
                 }
 
                 data.shieldTree.insert(tile.build);

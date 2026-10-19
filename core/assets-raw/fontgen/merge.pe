@@ -1,3 +1,0 @@
-Open($2)
-MergeFonts($1)
-Generate($1)

@@ -4,6 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.world.*;
 
@@ -26,7 +27,7 @@ public class DrawMultiWeave extends DrawBlock{
 
         Draw.blend(Blending.additive);
 
-        Draw.color(glowColor, build.warmup() * (glowColor.a * (1f - pulse + Mathf.absin(pulseScl, pulse))));
+        Draw.color(glowColor, build.warmup() * (glowColor.a * (1f - pulse + Mathf.absin(Vars.state.time, pulseScl, pulse))));
 
         Draw.rect(glow, build.x, build.y, build.totalProgress() * rotateSpeed);
         Draw.rect(glow, build.x, build.y, build.totalProgress() * rotateSpeed * rotateSpeed2);

@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.graphics.*;
 
 public class FlarePart extends DrawPart{
@@ -30,7 +31,7 @@ public class FlarePart extends DrawPart{
         float
         rx = params.x + Tmp.v1.x,
         ry = params.y + Tmp.v1.y,
-        rot = (followRotation ? params.rotation : 0f) + rotMove * prog + rotation + Time.time * spinSpeed,
+        rot = (followRotation ? params.rotation : 0f) + rotMove * prog + rotation + Vars.state.time * spinSpeed,
         rad = radiusTo < 0 ? radius : Mathf.lerp(radius, radiusTo, prog);
 
         Draw.color(color1);

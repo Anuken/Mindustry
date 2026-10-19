@@ -5,11 +5,11 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.heat.*;
 
 public class DrawHeatInput extends DrawBlock{
     public String suffix = "-heat";
@@ -33,12 +33,13 @@ public class DrawHeatInput extends DrawBlock{
     public void draw(Building build){
 
         Draw.z(Layer.blockAdditive);
-        if(build instanceof HeatConsumer hc){
-            float[] side = hc.sideHeat();
+        if(build.heatModule != null){
+            float[] side = build.heatModule.sides;
+            float max = build.block.heatInputMax();
             for(int i = 0; i < 4; i++){
                 if(side[i] > 0){
                     Draw.blend(Blending.additive);
-                    Draw.color(heatColor, side[i] / hc.heatRequirement() * (heatColor.a * (1f - heatPulse + Mathf.absin(heatPulseScl, heatPulse))));
+                    Draw.color(heatColor, side[i] / max * (heatColor.a * (1f - heatPulse + Mathf.absin(Vars.state.time, heatPulseScl, heatPulse))));
                     Draw.rect(heat, build.x, build.y, i * 90f);
                     Draw.blend();
                     Draw.color();

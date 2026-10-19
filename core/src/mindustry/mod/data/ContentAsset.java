@@ -3,8 +3,8 @@ package mindustry.mod.data;
 import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.mod.*;
+import mindustry.type.*;
 
 import java.io.*;
 

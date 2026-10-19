@@ -9,14 +9,12 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import arc.util.io.Streams.*;
 import arc.util.pooling.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.Schematic.*;
@@ -26,6 +24,7 @@ import mindustry.input.*;
 import mindustry.input.Placement.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
+import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
 import mindustry.world.blocks.distribution.*;
@@ -401,7 +400,7 @@ public class Schematics implements Loadable{
         boolean found = false;
         for(int cx = x; cx <= x2; cx++){
             for(int cy = y; cy <= y2; cy++){
-                Building linked = world.build(cx, cy);
+                Building linked = state.world.build(cx, cy);
                 if(linked != null && (!linked.isDiscovered(team) || !linked.wasVisible)) continue;
 
                 Block realBlock = linked == null ? null : linked instanceof ConstructBuild cons ? cons.current : linked.block;
@@ -432,7 +431,7 @@ public class Schematics implements Loadable{
         IntSet counted = new IntSet();
         for(int cx = ox; cx <= ox2; cx++){
             for(int cy = oy; cy <= oy2; cy++){
-                Building tile = world.build(cx, cy);
+                Building tile = state.world.build(cx, cy);
                 if(tile != null && (!tile.isDiscovered(team) || !tile.wasVisible)) continue;
                 Block realBlock = tile == null ? null : tile instanceof ConstructBuild cons ? cons.current : tile.block;
 
@@ -463,8 +462,8 @@ public class Schematics implements Loadable{
     /** Places the last launch loadout at the coordinates and fills it with the launch resources. */
     public static void placeLaunchLoadout(int x, int y){
         placeLoadout(universe.getLastLoadout(), x, y, state.rules.defaultTeam);
-        if(world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
-        world.tile(x, y).build.items.add(universe.getLaunchResources());
+        if(state.world.tile(x, y).build == null) throw new RuntimeException("No core at loadout coordinates!");
+        state.world.tile(x, y).build.items.add(universe.getLaunchResources());
     }
 
     public static void placeLoadout(Schematic schem, int x, int y){
@@ -481,7 +480,7 @@ public class Schematics implements Loadable{
         if(coreTile == null) throw new IllegalArgumentException("Loadout schematic has no core tile!");
         int ox = x - coreTile.x, oy = y - coreTile.y;
         schem.tiles.copy().sort(s -> -s.block.schematicPriority).each(st -> {
-            Tile tile = world.tile(st.x + ox, st.y + oy);
+            Tile tile = state.world.tile(st.x + ox, st.y + oy);
             if(tile == null) return;
 
             //check for blocks that are in the way.
@@ -519,7 +518,7 @@ public class Schematics implements Loadable{
     public static void place(Schematic schem, int x, int y, Team team, boolean overwrite){
         int ox = x - schem.width/2, oy = y - schem.height/2;
         schem.tiles.each(st -> {
-            Tile tile = world.tile(st.x + ox, st.y + oy);
+            Tile tile = state.world.tile(st.x + ox, st.y + oy);
             if(tile == null || (!overwrite && !Build.validPlace(st.block, team, tile.x, tile.y, st.rotation))) return;
 
             tile.setBlock(st.block, team, st.rotation);
@@ -588,7 +587,7 @@ public class Schematics implements Loadable{
                 map.put(stream.readUTF(), stream.readUTF());
             }
 
-            ContentMapper mapper = null;
+            Reads read = new Reads(stream);
 
             //set up content mapping if found
             if(map.containsKey("contentMap")){
@@ -601,7 +600,13 @@ public class Schematics implements Loadable{
                         inner.put(ce.value, content.getByName(ContentType.all[entry.key], ce.key));
                     }
                 }
-                mapper = (type, id) -> contentMap.get(type.ordinal(), IntMap::new).get(id);
+                read = new Reads(stream){
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public <T extends Content> T content(ContentType type, int id){
+                        return (T)contentMap.get(type.ordinal(), IntMap::new).get(id);
+                    }
+                };
             }
 
             String[] labels = Jval.read(map.get("labels", "[]")).asStringArray();
@@ -618,13 +623,11 @@ public class Schematics implements Loadable{
 
             if(limitSchematicSize && total > 128 * 128) throw new IOException("Invalid schematic: Too many blocks.");
 
-            Reads read = new Reads(stream);
-
             Seq<Stile> tiles = new Seq<>(total);
             for(int i = 0; i < total; i++){
                 Block block = blocks.get(stream.readByte());
                 int position = stream.readInt();
-                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(read, false, mapper);
+                Object config = ver == 0 ? mapConfig(block, stream.readInt(), position) : TypeIO.readObject(read);
                 byte rotation = stream.readByte();
                 if(block != Blocks.air){
                     tiles.add(new Stile(block, Point2.x(position), Point2.y(position), config, rotation));

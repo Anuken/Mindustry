@@ -5,20 +5,19 @@ import arc.graphics.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.TechTree.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
+import mindustry.game.markers.*;
+import mindustry.game.objectives.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
 import mindustry.net.Administration.*;
@@ -122,7 +121,7 @@ public class TypeIO{
         }else if(object instanceof BuildingBox b){
             write.b(buildingType);
             write.i(b.pos);
-        }else if(object instanceof LAccess l){
+        }else if(object instanceof LogicProp l){
             write.b(lAccessType);
             write.s(l.ordinal());
         }else if(object instanceof byte[] b){
@@ -195,27 +194,23 @@ public class TypeIO{
 
     /** Reads an object, but optionally boxes buildings. */
     public static @Nullable Object readObjectBoxed(Reads read, boolean box){
-        return readObject(read, box, null);
-    }
-
-    public static @Nullable Object readObject(Reads read, boolean box, @Nullable ContentMapper mapper){
-        return readObject(read, box, mapper, false);
+        return readObject(read, box, false);
     }
 
     public static @Nullable Object readObjectSafe(Reads read){
-        return readObject(read, false, null, true);
+        return readObject(read, false, true);
     }
 
-    public static @Nullable Object readObject(Reads read, boolean box, @Nullable ContentMapper mapper, boolean safe){
-        return readObject(read, box, mapper, safe, true);
+    public static @Nullable Object readObject(Reads read, boolean box, boolean safe){
+        return readObject(read, box, safe, true);
     }
 
-    public static @Nullable Object readObject(Reads read, boolean box, @Nullable ContentMapper mapper, boolean safe, boolean allowArrays){
+    public static @Nullable Object readObject(Reads read, boolean box, boolean safe, boolean allowArrays){
         byte type = read.b();
-        return readObject(read, box, mapper, safe, allowArrays, type);
+        return readObject(read, box, safe, allowArrays, type);
     }
 
-    public static @Nullable Object readObject(Reads read, boolean box, @Nullable ContentMapper mapper, boolean safe, boolean allowArrays, byte type){
+    public static @Nullable Object readObject(Reads read, boolean box, boolean safe, boolean allowArrays, byte type){
         //use a much lower array size limit for build plans
         int maxArraySize = safe ? TypeIO.maxArraySize : 200;
 
@@ -233,7 +228,7 @@ public class TypeIO{
                     yield null;
                 }
             }
-            case contentType -> mapper == null ? content.getByID(ContentType.all[read.b()], read.s()) : mapper.get(ContentType.all[read.b()], read.s());
+            case contentType -> read.content(ContentType.all[read.b()]);
             case intSeqType -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 short len = read.s();
@@ -250,11 +245,11 @@ public class TypeIO{
                 for(int i = 0; i < len; i ++) out[i] = Point2.unpack(read.i());
                 yield out;
             }
-            case techNodeType -> content.<UnlockableContent>getByID(ContentType.all[read.b()], read.s()).techNode;
+            case techNodeType -> read.<UnlockableContent>content(ContentType.all[read.b()]).techNode;
             case booleanType -> read.bool();
             case doubleType -> read.d();
-            case buildingType -> !box ? world.build(read.i()) : new BuildingBox(read.i());
-            case lAccessType -> LAccess.all[read.s()];
+            case buildingType -> !box ? state.world.build(read.i()) : new BuildingBox(read.i());
+            case lAccessType -> LogicProp.all[read.s()];
             case byteArrayType -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.i();
@@ -278,7 +273,7 @@ public class TypeIO{
                 for(int i = 0; i < len; i ++) bools[i] = read.bool();
                 yield bools;
             }
-            case unitType -> !box ? Groups.unit.getByID(read.i()) : new UnitBox(read.i());
+            case unitType -> !box ? state.entities.unit.getByID(read.i()) : new UnitBox(read.i());
             case vec2ArrayType -> {
                 if(!allowArrays) throw new RuntimeException("Nested arrays are not allowed");
                 int len = read.s();
@@ -298,11 +293,11 @@ public class TypeIO{
 
                 Object[] objs = new Object[len];
                 for(int i = 0; i < len; i++){
-                    objs[i] = readObject(read, box, mapper, safe, false);
+                    objs[i] = readObject(read, box, safe, false);
                 }
                 yield objs;
             }
-            case unitCommandType -> content.unitCommand(read.us());
+            case unitCommandType -> read.content(ContentType.unitCommand, read.us());
             default -> throw new IllegalArgumentException("Unknown object type: " + type);
         };
     }
@@ -468,7 +463,7 @@ public class TypeIO{
         int id = read.i();
         int typeID = read.ub();
 
-        Unit entity = Groups.unit.getByID(id);
+        Unit entity = state.entities.unit.getByID(id);
         boolean add = false, created = false;
 
         if(entity == null){
@@ -516,9 +511,9 @@ public class TypeIO{
         //nothing
         if(type == 0) return null;
         if(type == 2){ //standard unit
-            return Groups.unit.getByID(id);
+            return state.entities.unit.getByID(id);
         }else if(type == 1){ //block
-            Building tile = world.build(id);
+            Building tile = state.world.build(id);
             return tile instanceof ControlBlock cont ? cont.unit() : null;
         }
         return null;
@@ -530,7 +525,7 @@ public class TypeIO{
 
     public static @Nullable UnitCommand readCommand(Reads read){
         int val = read.ub();
-        return val == 255 ? null : content.unitCommand(val);
+        return val == 255 ? null : read.content(ContentType.unitCommand, val);
     }
 
     public static void writeStance(Writes write, @Nullable UnitStance stance){
@@ -540,7 +535,8 @@ public class TypeIO{
     public static UnitStance readStance(Reads read){
         int val = read.ub();
         //never returns null
-        return val == 255 || val >= content.unitStances().size ? UnitStance.stop : content.unitStance(val);
+        UnitStance stance = val == 255 ? null : read.content(ContentType.unitStance, val);
+        return stance == null ? UnitStance.stop : stance;
     }
 
     public static void writePosEntity(Writes write, Posc entity){
@@ -548,7 +544,7 @@ public class TypeIO{
     }
 
     public static Posc readPosEntity(Reads read){
-        return (Posc)Groups.sync.getByID(read.i());
+        return (Posc)state.entities.sync.getByID(read.i());
     }
 
     public static void writeEntity(Writes write, Entityc entity){
@@ -556,7 +552,7 @@ public class TypeIO{
     }
 
     public static <T extends Entityc> T readEntity(Reads read){
-        return (T)Groups.sync.getByID(read.i());
+        return (T)state.entities.sync.getByID(read.i());
     }
 
     public static void writeBuilding(Writes write, Building tile){
@@ -564,7 +560,7 @@ public class TypeIO{
     }
 
     public static Building readBuilding(Reads read){
-        return world.build(read.i());
+        return state.world.build(read.i());
     }
 
     public static void writeTile(Writes write, Tile tile){
@@ -572,7 +568,7 @@ public class TypeIO{
     }
 
     public static Tile readTile(Reads read){
-        return world.tile(read.i());
+        return state.world.tile(read.i());
     }
 
     public static void writeBlock(Writes write, Block block){
@@ -580,8 +576,7 @@ public class TypeIO{
     }
 
     public static Block readBlock(Reads read){
-        short id = read.s();
-        return id == -1 ? null : content.block(id);
+        return read.block();
     }
 
     /** @return the maximum acceptable amount of plans to send over the network */
@@ -664,18 +659,18 @@ public class TypeIO{
         byte type = read.b();
         int position = read.i();
 
-        if(world.tile(position) == null){
+        if(state.world.tile(position) == null){
             return null;
         }
 
         if(type == 1){ //remove
             current = new BuildPlan(Point2.x(position), Point2.y(position));
         }else{ //place
-            short block = read.s();
+            Block block = read.block();
             byte rotation = read.b();
             boolean hasConfig = read.b() == 1;
             Object config = readObjectSafe(read);
-            current = new BuildPlan(Point2.x(position), Point2.y(position), rotation, content.block(block));
+            current = new BuildPlan(Point2.x(position), Point2.y(position), rotation, block);
             //should always happen, but is kept for legacy reasons just in case
             if(hasConfig){
                 current.config = config;
@@ -743,7 +738,7 @@ public class TypeIO{
         for(int i = 0; i < amount; i++){
             int x = read.us();
             int y = read.us();
-            Block block = Vars.content.block(read.us());
+            Block block = read.content(ContentType.block, read.us());
             if(block == null) throw new ArcRuntimeException("Invalid block ID in block plans! Client is likely using an incorrectly configured mod.");
             int rotation = (block.rotate ? read.b() : 0);
             Object config = readClientPlanConfig(read);
@@ -761,7 +756,7 @@ public class TypeIO{
             case 1 -> read.i();
             case 2 -> read.l();
             case 3 -> read.f();
-            case 5 -> content.getByID(ContentType.all[read.b()], read.s());
+            case 5 -> read.content(ContentType.all[read.b()]);
             case 10 -> read.bool();
             case 11 -> read.d();
             default -> throw new IllegalArgumentException("Unknown plan config object type: " + type);
@@ -839,7 +834,7 @@ public class TypeIO{
         byte type = read.b();
         if(type == 0){ //is player
             int id = read.i();
-            Player player = Groups.player.getByID(id);
+            Player player = state.entities.player.getByID(id);
             //make sure player exists
             if(player == null) return prev;
             return player;
@@ -849,14 +844,14 @@ public class TypeIO{
         }else if(type == 3){
             int pos = read.i();
             if(prev instanceof LogicAI pai){
-                pai.controller = world.build(pos);
+                pai.controller = state.world.build(pos);
                 return pai;
             }else{
                 //create new AI for assignment
                 LogicAI out = new LogicAI();
                 //instantly time out when updated.
                 out.controlTimer = LogicAI.logicControlTimeout;
-                out.controller = world.build(pos);
+                out.controller = state.world.build(pos);
                 return out;
             }
             //type 4 is the old CommandAI with no commandIndex, type 6 is the new one with the index as a single byte, type 7 is the one with the command queue, 8 adds a stance, 9 adds multiple stances
@@ -876,9 +871,9 @@ public class TypeIO{
             if(hasAttack){
                 byte entityType = read.b();
                 if(entityType == 1){
-                    ai.attackTarget = world.build(read.i());
+                    ai.attackTarget = state.world.build(read.i());
                 }else{
-                    ai.attackTarget = Groups.unit.getByID(ai.readAttackTarget = read.i());
+                    ai.attackTarget = state.entities.unit.getByID(ai.readAttackTarget = read.i());
                 }
             }else{
                 ai.attackTarget = null;
@@ -886,7 +881,7 @@ public class TypeIO{
 
             if(type == 6 || type == 7 || type == 8 || type == 9){
                 byte id = read.b();
-                ai.command = id < 0 ? null : content.unitCommand(id);
+                ai.command = id < 0 ? null : read.content(ContentType.unitCommand, id);
                 if(ai.command == null) ai.command = UnitCommand.moveCommand;
             }
 
@@ -898,11 +893,11 @@ public class TypeIO{
                     int commandType = read.b();
                     switch(commandType){
                         case 0 -> {
-                            var build = world.build(read.i());
+                            var build = state.world.build(read.i());
                             if(build != null) ai.commandQueue.add(build);
                         }
                         case 1 -> {
-                            var unit = Groups.unit.getByID(read.i());
+                            var unit = state.entities.unit.getByID(read.i());
                             if(unit != null) ai.commandQueue.add(unit);
                         }
                         case 2 -> {
@@ -944,12 +939,12 @@ public class TypeIO{
         return KickReason.all[read.b()];
     }
 
-    public static void writeMarkerControl(Writes write, LMarkerControl reason){
+    public static void writeMarkerControl(Writes write, LogicMarkerControl reason){
         write.b((byte)reason.ordinal());
     }
 
-    public static LMarkerControl readMarkerControl(Reads read){
-        return LMarkerControl.all[read.ub()];
+    public static LogicMarkerControl readMarkerControl(Reads read){
+        return LogicMarkerControl.all[read.ub()];
     }
 
     public static void writeRules(Writes write, Rules rules){
@@ -982,7 +977,7 @@ public class TypeIO{
     }
 
     public static void writeObjectiveMarker(Writes write, ObjectiveMarker marker){
-        String string = JsonIO.json.toJson(marker, MapObjectives.ObjectiveMarker.class);
+        String string = JsonIO.json.toJson(marker, ObjectiveMarker.class);
         byte[] bytes = string.getBytes(charset);
         write.i(bytes.length);
         write.b(bytes);
@@ -992,7 +987,7 @@ public class TypeIO{
         int length = read.i();
         if(length > maxByteArraySize) throw new ArcRuntimeException("Objective marker too long");
         String string = new String(read.b(new byte[length]), charset);
-        return JsonIO.read(MapObjectives.ObjectiveMarker.class, string);
+        return JsonIO.read(ObjectiveMarker.class, string);
     }
 
     public static void writeVecNullable(Writes write, @Nullable Vec2 v){
@@ -1056,10 +1051,10 @@ public class TypeIO{
     }
 
     public static StatusEntry readStatus(Reads read){
-        short id = read.s();
+        StatusEffect effect = read.status();
         float time = read.f();
 
-        StatusEntry result = new StatusEntry().set(content.getByID(ContentType.status, id), time);
+        StatusEntry result = new StatusEntry().set(effect, time);
 
         if(result.effect.dynamic){
             //read flags that store which fields are set
@@ -1144,7 +1139,7 @@ public class TypeIO{
     }
 
     public static UnitType readUnitType(Reads read){
-        return content.getByID(ContentType.unit, read.s());
+        return read.unit();
     }
 
     public static void writeEffect(Writes write, Effect effect){
@@ -1190,8 +1185,7 @@ public class TypeIO{
     }
 
     public static Content readContent(Reads read){
-        byte id = read.b();
-        return content.getByID(ContentType.all[id], read.s());
+        return read.content(ContentType.all[read.b()]);
     }
 
     public static void writeLiquid(Writes write, Liquid liquid){
@@ -1199,8 +1193,7 @@ public class TypeIO{
     }
 
     public static Liquid readLiquid(Reads read){
-        short id = read.s();
-        return id == -1 ? null : content.liquid(id);
+        return read.liquid();
     }
 
     public static void writeBulletType(Writes write, BulletType type){
@@ -1208,7 +1201,7 @@ public class TypeIO{
     }
 
     public static BulletType readBulletType(Reads read){
-        return content.getByID(ContentType.bullet, read.s());
+        return read.bullet();
     }
 
     public static void writeItem(Writes write, Item item){
@@ -1216,8 +1209,7 @@ public class TypeIO{
     }
 
     public static Item readItem(Reads read){
-        short id = read.s();
-        return id == -1 ? null : content.item(id);
+        return read.item();
     }
 
     //note that only the standard sound constants in Sounds are supported; modded sounds are not.
@@ -1234,8 +1226,7 @@ public class TypeIO{
     }
 
     public static Weather readWeather(Reads read){
-        short id = read.s();
-        return id == -1 ? null : content.getByID(ContentType.weather, id);
+        return read.weather();
     }
 
     public static void writeString(Writes write, String string){
@@ -1416,11 +1407,6 @@ public class TypeIO{
         }
     }
 
-    /** Converter of an ID to a content instance. */
-    public interface ContentMapper{
-        Content get(ContentType type, int id);
-    }
-
     public interface Boxed<T> {
         T unbox();
     }
@@ -1435,7 +1421,7 @@ public class TypeIO{
 
         @Override
         public Building unbox(){
-            return world.build(pos);
+            return state.world.build(pos);
         }
 
         @Override
@@ -1456,7 +1442,7 @@ public class TypeIO{
 
         @Override
         public Unit unbox(){
-            return Groups.unit.getByID(id);
+            return state.entities.unit.getByID(id);
         }
 
         @Override

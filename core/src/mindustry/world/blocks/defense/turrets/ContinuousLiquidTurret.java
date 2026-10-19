@@ -2,7 +2,6 @@ package mindustry.world.blocks.defense.turrets;
 
 import arc.struct.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.logic.*;
@@ -92,7 +91,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case currentAmmoType -> liquids.current();
                 default -> super.senseObject(sensor);

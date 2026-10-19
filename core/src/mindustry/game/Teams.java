@@ -3,8 +3,8 @@ package mindustry.game;
 import arc.func.*;
 import arc.math.*;
 import arc.math.geom.*;
-import arc.struct.Queue;
 import arc.struct.*;
+import arc.struct.Queue;
 import arc.util.*;
 import mindustry.*;
 import mindustry.ai.*;
@@ -214,7 +214,7 @@ public class Teams{
         }
 
         //TODO this is slow and dumb
-        for(Unit unit : Groups.unit){
+        for(Unit unit : state.entities.unit){
             if(unit.type == null) continue;
             TeamData data = unit.team.data();
             data.tree().insert(unit);
@@ -241,7 +241,7 @@ public class Teams{
             count(unit);
         }
 
-        for(var player : Groups.player){
+        for(var player : state.entities.player){
             player.team().data().players.add(player);
         }
 
@@ -365,7 +365,7 @@ public class Teams{
             finishScheduleDerelict();
 
             //kill all units randomly
-            units.each(u -> Time.run(Mathf.random(0f, 60f * 5f), () -> {
+            units.each(u -> Vars.state.run(Mathf.random(0f, 60f * 5f), () -> {
                 //ensure unit hasn't switched teams for whatever reason
                 if(u.team == team){
                     u.kill();
@@ -392,13 +392,13 @@ public class Teams{
             if(sector != null){
                 boolean any = false;
                 for(var entry : sector.planet.sectorCaptureReplacements){
-                    if(indexer.isBlockPresent(entry.key)){
+                    if(state.indexer.isBlockPresent(entry.key)){
                         any = true;
                     }
                 }
                 if(any){
-                    Geometry.circle(World.toTile(x), World.toTile(y), world.width(), world.height(), Mathf.round(range / tilesize), (tx, ty) -> {
-                        Tile t = world.rawTile(tx, ty);
+                    Geometry.circle(World.toTile(x), World.toTile(y), state.world.width, state.world.height, Mathf.round(range / tilesize), (tx, ty) -> {
+                        Tile t = state.world.rawTile(tx, ty);
                         Block result = sector.planet.sectorCaptureReplacements.get(t.floor());
                         if(result != null && !cores.contains(c -> c.within(t, range))){
                             t.setFloor(result.asFloor());
@@ -417,7 +417,7 @@ public class Teams{
             }
 
             if(Mathf.chance(0.2)){
-                Time.run(Mathf.random(0f, 60f * 6f), build::kill);
+                Vars.state.run(Mathf.random(0f, 60f * 6f), build::kill);
             }
             //don't bother checking previous for performance reasons
             build.addPlan(false, true);
@@ -450,12 +450,12 @@ public class Teams{
         }
 
         public QuadTree<Unit> tree(){
-            if(unitTree == null) unitTree = new QuadTree<>(Vars.world.getQuadBounds(new Rect()));
+            if(unitTree == null) unitTree = new QuadTree<>(Vars.state.world.getQuadBounds(new Rect()));
             return unitTree;
         }
 
         public QuadTree<Unit> unitShieldTree(){
-            if(unitShieldTree == null) unitShieldTree = new UnitShieldQuadtree(Vars.world.getQuadBounds(new Rect()));
+            if(unitShieldTree == null) unitShieldTree = new UnitShieldQuadtree(Vars.state.world.getQuadBounds(new Rect()));
             return unitShieldTree;
         }
 
@@ -493,8 +493,8 @@ public class Teams{
         /** @return approximate number of clustered ground units at a specific position */
         public int getClustered(float x, float y){
             //update based on ticks passed (no increment)
-            if(Time.time > lastClusterUpdateTimer + 10f){
-                lastClusterUpdateTimer = Time.time;
+            if(Vars.state.time > lastClusterUpdateTimer + 10f){
+                lastClusterUpdateTimer = Vars.state.time;
                 clusteredCounts.clear();
                 units.each(u -> {
                     //clusters are for artillery, which can't hit flying units

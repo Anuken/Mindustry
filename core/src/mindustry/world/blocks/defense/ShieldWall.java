@@ -4,9 +4,10 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
@@ -55,7 +56,7 @@ public class ShieldWall extends Wall{
                 Draw.color(team.color, Color.white, Mathf.clamp(hit));
 
                 if(renderer.animateSurfaces){
-                    Fill.square(x, y, radius);
+                    Fill.square(x, y, radius + 0.001f);
                 }else{
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
@@ -67,7 +68,7 @@ public class ShieldWall extends Wall{
 
                 Draw.reset();
 
-                Drawf.additive(glowRegion, glowColor, (1f - glowMag + Mathf.absin(glowScl, glowMag)) * shieldRadius, x, y, 0f, Layer.blockAdditive);
+                Drawf.additive(glowRegion, glowColor, (1f - glowMag + Mathf.absin(Vars.state.time, glowScl, glowMag)) * shieldRadius, x, y, 0f, Layer.blockAdditive);
             }
         }
 

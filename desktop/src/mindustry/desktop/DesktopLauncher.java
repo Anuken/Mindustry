@@ -3,20 +3,19 @@ package mindustry.desktop;
 import arc.*;
 import arc.Files.*;
 import arc.backend.sdl.*;
-import arc.discord.*;
-import arc.discord.DiscordRPC.*;
 import arc.files.*;
+import arc.graphics.HdpiUtils.*;
 import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.util.DiscordRPC.*;
 import arc.util.Log.*;
 import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.core.Version;
 import mindustry.desktop.steam.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.*;
 import mindustry.mod.Mods.*;
 import mindustry.net.*;
 import mindustry.net.Net.*;
@@ -24,12 +23,13 @@ import mindustry.service.*;
 import mindustry.type.*;
 import mindustry.ui.FileChooser.*;
 import mindustry.ui.dialogs.*;
-import steamworks.*;
 import org.lwjgl.*;
 import org.lwjgl.sdl.*;
 import org.lwjgl.system.*;
+import steamworks.*;
 
 import java.io.*;
+import java.util.*;
 
 import static mindustry.Vars.*;
 
@@ -60,10 +60,10 @@ public class DesktopLauncher extends ClientLauncher{
 
                 if(OS.isMac){
                     //MacOS supports 4.1 at most
-                    glVersions = new int[][]{{4, 1}, {3, 2}};
+                    glVersions = new int[][]{{4, 1}, {3, 3}};
                 }else{
                     //try essentially every OpenGL version
-                    glVersions = new int[][]{{4, 6}, {4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
+                    glVersions = new int[][]{{4, 5}, {4, 4}, {4, 1}, {3, 3}, {3, 2}, {3, 1}, {3, 0}};
                 }
 
                 for(int i = 0; i < arg.length; i++){
@@ -87,8 +87,16 @@ public class DesktopLauncher extends ClientLauncher{
                                 }
                                 Log.err("Invalid GL version format string: '@'. GL version must be of the form <major>.<minor>", str);
                             }
+                            case "open" -> {
+                                Fi file = new Fi(arg[i + 1]);
+                                Events.on(ClientCreateEvent.class, e -> Core.app.getListeners().each(a -> a.fileDropped(file)));
+                            }
                             case "coreGl" -> coreProfile = true;
                             case "noAngle" -> useAngle = false;
+                            case "highdpi" -> {
+                                highDpi = true;
+                                hdpiMode = HdpiMode.pixels;
+                            }
                             case "compatibilityGl" -> coreProfile = false;
                             case "antialias" -> samples = 16;
                             case "debug" -> Log.level = LogLevel.debug;
@@ -108,7 +116,9 @@ public class DesktopLauncher extends ClientLauncher{
                         }
                     }
                 }
-                setWindowIcon(FileType.internal, "icons/icon_64.png");
+                if(!(OS.isMac && Version.build != -1)){
+                    setWindowIcon(FileType.internal, "icons/icon.png");
+                }
             }});
         }catch(Throwable e){
             handleCrash(e);
@@ -439,8 +449,8 @@ public class DesktopLauncher extends ClientLauncher{
                 gameMapWithWave += " | Wave " + state.wave;
             }
             gameMode = state.rules.pvp ? "PvP" : state.rules.attackMode ? "Attack" : state.rules.infiniteResources ? "Sandbox" : "Survival";
-            if(net.active() && Groups.player.size() > 1){
-                gamePlayersSuffix = " | " + Groups.player.size() + " Players";
+            if(net.active() && Vars.state.entities.player.size() > 1){
+                gamePlayersSuffix = " | " + Vars.state.entities.player.size() + " Players";
             }
         }else{
             if(ui.editor != null && ui.editor.isShown()){
@@ -492,7 +502,7 @@ public class DesktopLauncher extends ClientLauncher{
                 new Rand(SVars.user.user.getSteamID().getAccountID()).nextBytes(result);
                 return new String(Base64Coder.encode(result));
             }catch(Exception e){
-                e.printStackTrace();
+                Log.err(e);
             }
         }
 

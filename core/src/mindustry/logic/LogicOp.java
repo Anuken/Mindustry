@@ -102,15 +102,15 @@ public enum LogicOp{
         return symbol;
     }
 
-    interface OpObjLambda2{
+    public interface OpObjLambda2{
         double get(Object a, Object b);
     }
 
-    interface OpLambda2{
+    public interface OpLambda2{
         double get(double a, double b);
     }
 
-    interface OpLambda1{
+    public interface OpLambda1{
         double get(double a);
     }
 }

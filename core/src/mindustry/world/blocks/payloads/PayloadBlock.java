@@ -5,9 +5,9 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
@@ -26,7 +26,7 @@ public class PayloadBlock extends Block{
         sync = true;
         group = BlockGroup.payloads;
         acceptsUnitPayloads = true;
-        envEnabled |= Env.space | Env.underwater;
+        envEnabled = envEnabled.with(Environments.of(Env.space, Env.underwater));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class PayloadBlock extends Block{
             boolean legStep = payload instanceof UnitPayload u && u.unit.type.allowLegStep;
             float size = payload.size(), radius = size/2f, x = payload.x(), y = payload.y(), scl = Mathf.clamp(((progress - thresh) / (1f - thresh)) * 1.1f);
 
-            Groups.unit.intersect(x - size/2f, y - size/2f, size, size, u -> {
+            state.entities.unit.intersect(x - size/2f, y - size/2f, size, size, u -> {
                 float dst = u.dst(payload);
                 float rs = radius + u.hitSize/2f;
                 if(u.isGrounded() && u.type.allowLegStep == legStep && dst < rs){
@@ -146,7 +146,7 @@ public class PayloadBlock extends Block{
         }
 
         @Override
-        public void drawTeamTop(){
+        public void dropped(){
             carried = false;
         }
 

@@ -1,5 +1,6 @@
 package mindustry.maps.generators;
 
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -13,8 +14,8 @@ public class BlankPlanetGenerator extends PlanetGenerator{
     }
 
     @Override
-    public void generate(Tiles tiles, Sector sec, WorldParams params){
-        this.tiles = tiles;
+    public void generate(World tiles, Sector sec, WorldParams params){
+        this.world = tiles;
         this.sector = sec;
         this.rand.setSeed(sec.id + params.seedOffset + baseSeed);
 

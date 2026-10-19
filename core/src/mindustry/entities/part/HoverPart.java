@@ -3,6 +3,7 @@ package mindustry.entities.part;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.util.*;
+import mindustry.*;
 
 public class HoverPart extends DrawPart{
     public float radius = 4f;
@@ -26,7 +27,7 @@ public class HoverPart extends DrawPart{
 
 
         for(int c = 0; c < circles; c++){
-            float fin = ((Time.time / phase + (float)c / circles) % 1f);
+            float fin = ((Vars.state.time / phase + (float)c / circles) % 1f);
             Lines.stroke((1f-fin) * stroke + minStroke);
 
             for(int s = 0; s < len; s++){

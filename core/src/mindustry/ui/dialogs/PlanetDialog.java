@@ -20,11 +20,10 @@ import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
-import mindustry.game.Objectives.*;
 import mindustry.game.SectorInfo.*;
 import mindustry.game.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.graphics.g3d.PlanetGrid.*;
@@ -458,7 +457,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                     Color color =
                     sec.hasBase() ? Tmp.c2.set(Team.sharded.color).lerp(Team.crux.color, sec.hasEnemyBase() ? 0.5f : 0f) :
                     sec.preset != null && sec.preset.requireUnlock ?
-                        sec.preset.unlocked() ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Time.time, 10f, 1f)) :
+                        sec.preset.unlocked() ? Tmp.c2.set(Team.derelict.color).lerp(Color.white, Mathf.absin(Vars.state.time, 10f, 1f)) :
                         Color.gray :
                     sec.hasEnemyBase() ? Team.crux.color :
                     null;
@@ -480,7 +479,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
         Sector current = Vars.state.getSector() != null && Vars.state.getSector().isBeingPlayed() && Vars.state.getSector().planet == state.planet ? Vars.state.getSector() : null;
 
         if(current != null){
-            planets.fill(current, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.001f);
+            planets.fill(current, hoverColor.write(Tmp.c1).mulA(state.uiAlpha), -0.005f);
         }
 
         //draw hover border
@@ -584,7 +583,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
 
         if(hovered != null && state.uiAlpha > 0.01f){
             planets.drawPlane(hovered, () -> {
-                Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(5f, 1f));
+                Draw.color(hovered.isAttacked() ? Pal.remove : Color.white, Pal.accent, Mathf.absin(Vars.state.time, 5f, 1f));
                 Draw.alpha(state.uiAlpha);
 
                 var icon =
@@ -1072,7 +1071,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             }
 
             if(sector.isAttacked() || !sector.hasBase()){
-                c.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).left().row();
+                c.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.threat.localized()).left().row();
             }
 
             if(sector.save != null && sector.info.resources.any()){
@@ -1286,7 +1285,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
             stable.table(r -> {
                 r.add("@complete").colspan(2).left();
                 r.row();
-                for(Objective o : sector.preset.techNode.objectives){
+                for(UnlockCondition o : sector.preset.techNode.objectives){
                     if(o.complete()) continue;
 
                     r.add("> " + o.display()).color(Color.lightGray).left();
@@ -1295,7 +1294,7 @@ public class PlanetDialog extends BaseDialog implements PlanetInterfaceRenderer{
                 }
             }).row();
         }else if(!sector.hasBase()){
-            stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.displayThreat()).row();
+            stable.add(Core.bundle.get("sectors.threat") + " [accent]" + sector.threat.localized()).row();
         }
 
         if(sector.isAttacked()){

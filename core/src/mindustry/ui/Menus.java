@@ -74,11 +74,11 @@ public class Menus{
         });
 
         dialog.originalListener = result -> {
-            dialog.wasHidden = true; //don't trigger the hidden listener
             result.token = token;
             if(net.client()) Call.menuBuilderChoose(player, id, result);
 
             if(hideOnClick){
+                dialog.wasHidden = true; //don't trigger the hidden listener
                 dialog.hide();
             }
         };
@@ -382,7 +382,7 @@ public class Menus{
     //internal use only
     @Remote(variants = Variant.both)
     public static void removeWorldLabel(int id){
-        var label = Groups.sync.getByID(id);
+        var label = state.entities.sync.getByID(id);
         if(label instanceof WorldLabelc){
             label.remove();
         }

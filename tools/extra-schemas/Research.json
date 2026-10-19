@@ -1,6 +1,6 @@
 {
   "doc": "Tech tree placement for this content. Also accepts a plain string, treated as 'parent'.",
-  "parent": {"type": "mindustry.ctype.UnlockableContent", "doc": "Name of the parent tech tree node; required unless 'root' is true."},
+  "parent": {"type": "mindustry.type.UnlockableContent", "doc": "Name of the parent tech tree node; required unless 'root' is true."},
   "requirements": {"type": "mindustry.type.ItemStack[]", "doc": "Overrides the default research cost, which is this content's build cost."},
   "objectives": {"type": "mindustry.game.Objectives.Objective[]", "doc": "Extra objectives to complete; items/liquids get a Produce objective automatically."},
   "planet": {"type": "mindustry.type.Planet", "doc": "Name of the planet this node belongs to; inherited from the parent otherwise."},

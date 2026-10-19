@@ -10,11 +10,10 @@ import mindustry.type.*;
 import static mindustry.content.UnitTypes.*;
 
 public class Waves{
-    public static final int waveVersion = 7;
+    private static Seq<SpawnGroup> spawns;
 
-    private Seq<SpawnGroup> spawns;
-
-    public Seq<SpawnGroup> get(){
+    /** @return lazily computed default waves for all maps */
+    public static Seq<SpawnGroup> defaults(){
         if(spawns == null && dagger != null){
             spawns = Seq.with(
             new SpawnGroup(dagger){{

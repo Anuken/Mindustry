@@ -6,23 +6,21 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class NuclearReactor extends PowerGenerator{
-    public final int timerFuel = timers++;
-
     public Color lightColor = Color.valueOf("7f19ea");
     public Color coolColor = new Color(1, 1, 1, 0f);
     public Color hotColor = Color.valueOf("ff9575a3");
@@ -30,10 +28,6 @@ public class NuclearReactor extends PowerGenerator{
     public float itemDuration = 120;
     /** heating per frame * fullness */
     public float heating = 0.01f;
-    /** max heat this block can output per side */
-    public float heatOutput = 8f;
-    /** rate at which heat progress increases */
-    public float heatWarmupRate = 1f;
     /** rate at which fuel consumption scales with heat */
     public float heatConsumeRate = 10f;
     /** time taken to cool down if no fuel is inputted even if coolant is not present*/
@@ -61,7 +55,10 @@ public class NuclearReactor extends PowerGenerator{
         emitLight = true;
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
         schematicPriority = -5;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
+        //heat output per side
+        heatOutput = 8f;
+        heatWarmupRate = 1f;
 
         explosionShake = 6f;
         explosionShakeDuration = 16f;
@@ -91,6 +88,7 @@ public class NuclearReactor extends PowerGenerator{
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
         }
+        stats.remove(Stat.output);
         if(heatOutput > 0f && (ui != null && (ui.planet.isShown() ? ui.planet.state.planet : state.isGame() ? state.getPlanet() : null) == Planets.erekir)){
             //using StatUnit.localized() strips the icon
             stats.add(Stat.output, table -> table.add(Core.bundle.format("bar.upto", "[red]" + Iconc.waves + "[] " + Strings.fixed(heatOutput, 0) + " " + Core.bundle.get("unit.heatunitsperside"))));
@@ -103,12 +101,12 @@ public class NuclearReactor extends PowerGenerator{
         addBar("heat", (NuclearReactorBuild entity) -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heat));
     }
 
-    public class NuclearReactorBuild extends GeneratorBuild implements HeatBlock{
+    public class NuclearReactorBuild extends GeneratorBuild{
         public float heat;
         public float heatLastFrame;
-        public float heatProgress;
         public float flash;
         public float smoothLight;
+        public float fuelTimer;
 
         @Override
         public void updateTile(){
@@ -119,8 +117,9 @@ public class NuclearReactor extends PowerGenerator{
             if(fuel > 0 && enabled){
                 heat += heatLastFrame = fullness * heating * Math.min(delta(), 4f);
 
-                if(timer(timerFuel, itemDuration / (timeScale + (heat > heatLastFrame ? 1f * heat * heatConsumeRate : 0f)))){
+                if((fuelTimer += Time.delta * (timeScale + (heat > heatLastFrame ? 1f * heat * heatConsumeRate : 0f))) >= itemDuration){
                     consume();
+                    fuelTimer %= itemDuration;
                 }
             }else{
                 productionEfficiency = 0f;
@@ -142,8 +141,6 @@ public class NuclearReactor extends PowerGenerator{
             }
 
             heat = Mathf.clamp(heat);
-            heatProgress = heatOutput > 0f ? Mathf.approachDelta(heatProgress, heat * heatOutput * ((enabled && productionEfficiency > 0) ? 1f : 0f), heatWarmupRate * delta()) : 0f;
-
             if(heat >= 0.999f){
                 Events.fire(Trigger.thoriumReactorOverheat);
                 kill();
@@ -151,18 +148,13 @@ public class NuclearReactor extends PowerGenerator{
         }
 
         @Override
-        public float heatFrac(){
-            return heatProgress / heatOutput;
+        public float heatOutputTarget(){
+            return heat * heatOutput * ((enabled && productionEfficiency > 0) ? 1f : 0f);
         }
 
         @Override
-        public float heat(){
-            return heatProgress;
-        }
-
-        @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.heat) return heat;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return heat;
             return super.sense(sensor);
         }
 
@@ -175,7 +167,7 @@ public class NuclearReactor extends PowerGenerator{
         public void drawLight(){
             float fract = productionEfficiency;
             smoothLight = Mathf.lerpDelta(smoothLight, fract, 0.08f);
-            Drawf.light(x, y, (90f + Mathf.absin(5, 5f)) * smoothLight, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * smoothLight);
+            Drawf.light(x, y, (90f + Mathf.absin(Vars.state.time, 5, 5f)) * smoothLight, Tmp.c1.set(lightColor).lerp(Color.scarlet, heat), 0.6f * smoothLight);
         }
 
         @Override

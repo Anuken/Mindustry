@@ -17,7 +17,6 @@ import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.input.*;
@@ -557,7 +556,11 @@ public class SettingsMenuDialog extends BaseDialog{
             Core.settings.put("swapdiagonal", false);
         }
 
-        dev.checkPref("console", false);
+        dev.checkPref("console", false, val -> {
+            if(val == false && ui.consolefrag != null){
+                ui.consolefrag.close();
+            }
+        });
         dev.checkPref("drawhitboxes", false);
         dev.checkPref("showperformance", false);
 

@@ -34,7 +34,7 @@ public class LiquidExplodeAbility extends Ability{
                 if(x*x + y*y <= rad*rad - Simplex.noise2d(0, 2, 0.5f, 1f / noiseScl, x + tx, y + ty) * realNoise * realNoise){
                     float scaling = (1f - Mathf.dst(x, y) / rad) * radAmountScale;
 
-                    Tile tile = world.tile(tx + x, ty + y);
+                    Tile tile = state.world.tile(tx + x, ty + y);
                     if(tile != null){
                         Puddles.deposit(tile, liquid, amount * scaling);
                     }

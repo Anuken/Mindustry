@@ -19,6 +19,8 @@ import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
+import mindustry.game.markers.*;
+import mindustry.game.objectives.*;
 import mindustry.gen.*;
 import mindustry.io.*;
 import mindustry.io.TypeIO.*;
@@ -335,7 +337,7 @@ public class NetClient implements ApplicationListener{
         if(net.server() && player != null && player.con != null && (Time.timeSinceMillis(player.con.connectTime) < 500 || !player.con.hasConnected || !player.isAdded())) return;
 
         //detect and kick for foul play
-        if(player != null && player.con != null && !player.con.chatRate.allow(2000, Config.chatSpamLimit.num())){
+        if(player != null && player.con != null && !player.con.chatRate.allow(2000, netServer.config.chatSpamLimit)){
             player.con.kick(KickReason.kick);
             player.con.blacklist();
             return;
@@ -352,7 +354,7 @@ public class NetClient implements ApplicationListener{
         Events.fire(new PlayerChatEvent(player, message));
 
         //log commands before they are handled
-        if(message.startsWith(netServer.clientCommands.getPrefix()) && Config.logCommands.bool()){
+        if(message.startsWith(netServer.clientCommands.getPrefix()) && netServer.config.logCommands){
             //log with brackets
             Log.info("<&fi@: @&fr>", "&lk" + player.plainName(), "&lw" + message);
         }
@@ -443,6 +445,42 @@ public class NetClient implements ApplicationListener{
         ui.loadfrag.hide();
     }
 
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void createMarker(int id, ObjectiveMarker marker){
+        state.markers.add(id, marker);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void removeMarker(int id){
+        state.markers.remove(id);
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarker(int id, LogicMarkerControl control, double p1, double p2, double p3){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.control(control, p1, p2, p3);
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerText(int id, LogicMarkerControl type, boolean fetch, String text){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            if(type == LogicMarkerControl.flushText){
+                marker.setText(text, fetch);
+            }
+        }
+    }
+
+    @Remote(called = Loc.server, variants = Variant.both, unreliable = true)
+    public static void updateMarkerTexture(int id, Object texture){
+        var marker = state.markers.get(id);
+        if(marker != null){
+            marker.setTexture(texture);
+        }
+    }
+
     @Remote(variants = Variant.both)
     public static void setRules(Rules rules){
         state.rules = rules;
@@ -481,7 +519,7 @@ public class NetClient implements ApplicationListener{
 
     @Remote(variants = Variant.both)
     public static void worldDataBegin(){
-        Groups.clear();
+        state.entities.clear();
         netClient.removed.clear();
         logic.reset();
         netClient.connecting = true;
@@ -516,14 +554,14 @@ public class NetClient implements ApplicationListener{
         if(netClient != null){
             netClient.addRemovedEntity(playerid);
         }
-        Groups.player.removeByID(playerid);
+        state.entities.player.removeByID(playerid);
     }
 
     public static void readSyncEntity(DataInputStream input, Reads read) throws IOException{
         int id = input.readInt();
         byte typeID = input.readByte();
 
-        Syncc entity = Groups.sync.getByID(id);
+        Syncc entity = state.entities.sync.getByID(id);
         boolean add = false, created = false;
 
         if(entity == null && id == player.id()){
@@ -576,7 +614,7 @@ public class NetClient implements ApplicationListener{
     public static void hiddenSnapshot(IntSeq ids){
         for(int i = 0; i < ids.size; i++){
             int id = ids.items[i];
-            var entity = Groups.sync.getByID(id);
+            var entity = state.entities.sync.getByID(id);
             if(entity != null){
                 entity.handleSyncHidden();
             }
@@ -593,7 +631,7 @@ public class NetClient implements ApplicationListener{
             for(int i = 0; i < amount; i++){
                 int pos = input.readInt();
                 short block = input.readShort();
-                Tile tile = world.tile(pos);
+                Tile tile = state.world.tile(pos);
                 if(tile == null || tile.build == null){
                     Log.warn("Missing entity at @. Skipping block snapshot.", tile);
                     break;
@@ -719,7 +757,7 @@ public class NetClient implements ApplicationListener{
         lastSent = 0;
         lastSnapshotTimestamp = 0;
 
-        Groups.clear();
+        state.entities.clear();
         ui.chatfrag.clearMessages();
     }
 

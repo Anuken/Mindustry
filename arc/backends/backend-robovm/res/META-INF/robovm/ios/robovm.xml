@@ -1,0 +1,15 @@
+<config>
+    <frameworks>
+        <framework>MetalANGLEKit</framework>
+        <framework>libGLESv2</framework>
+        <framework>libEGL</framework>
+        <framework>libfeature_support</framework>
+        <framework>CoreAudio</framework>
+        <framework>AudioToolbox</framework>
+        <framework>AVFoundation</framework>
+        <framework>Metal</framework>
+    </frameworks>
+    <frameworkPaths>
+        <path>libs/</path>
+    </frameworkPaths>
+</config>

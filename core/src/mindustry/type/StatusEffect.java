@@ -1,12 +1,12 @@
 package mindustry.type;
 
 import arc.graphics.*;
+import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -66,6 +66,12 @@ public class StatusEffect extends UnlockableContent{
     public ObjectSet<StatusEffect> affinities = new ObjectSet<>(), opposites = new ObjectSet<>();
     /** Set to false to disable outline generation. */
     public boolean outline = true;
+    /** Padding applied when outline is generated. */
+    public int outlinePadding = 0;
+    /** Color of generated outline. */
+    public Color outlineColor = Pal.gray;
+    /** True to tint the sprite by the color. Always applied in vanilla. */
+    public boolean applyTint = false;
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */
@@ -86,6 +92,18 @@ public class StatusEffect extends UnlockableContent{
 
     public void init(Runnable run){
         this.initblock = run;
+    }
+
+    @Override
+    public void removeContent(){
+        super.removeContent();
+
+        //opposite() and affinity() also modify the other effect
+        for(var other : Vars.content.statusEffects()){
+            other.opposites.remove(this);
+            other.affinities.remove(this);
+            other.transitions.remove(this);
+        }
     }
 
     @Override
@@ -234,8 +252,15 @@ public class StatusEffect extends UnlockableContent{
     public void packSprites(PackContext packer){
         super.packSprites(packer);
 
+        if((isVanilla() || applyTint) && uiIcon instanceof AtlasRegion at && packer.has(at.name)){
+            Pixmap tinted = Pixmaps.tint(packer.get(uiIcon), color);
+            packer.add(at.name, tinted);
+            tinted.dispose();
+        }
+
         if(outline){
-            makeOutline(packer, uiIcon, false, Pal.gray, 3);
+            //vanilla needs extra padding and I don't want to fix every sprite or set every outline padding value
+            makeOutline(packer, uiIcon, false, outlineColor, 3, isVanilla() ? 2 : outlinePadding);
         }
     }
 

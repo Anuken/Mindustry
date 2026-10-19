@@ -2,6 +2,7 @@ package mindustry.maps.filters;
 
 import arc.math.*;
 import arc.struct.*;
+import mindustry.core.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.storage.*;
@@ -16,8 +17,8 @@ public class RandomItemFilter extends GenerateFilter{
     }
 
     @Override
-    public void apply(Tiles tiles, GenerateInput in){
-        for(Tile tile : tiles){
+    public void apply(World world, GenerateInput in){
+        for(Tile tile : world){
             if(tile.block() instanceof StorageBlock && !(tile.block() instanceof CoreBlock)){
                 for(ItemStack stack : drops){
                     if(Mathf.chance(chance)){

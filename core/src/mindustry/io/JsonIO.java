@@ -1,17 +1,18 @@
 package mindustry.io;
 
+import arc.files.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
 import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
+import mindustry.game.objectives.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -44,6 +45,23 @@ public class JsonIO{
 
     public static <T> T readBytes(Class<T> type, Class<?> elementType, DataInputStream input) throws IOException{
         return json.readValue(type, elementType, UBJson.read(input));
+    }
+
+    public static String write(Object object, Jformat format){
+        StringWriter buffer = new StringWriter();
+        JsonWriter jsonWriter = new StringJsonWriter(buffer, format);
+        try{
+            json.writeValue(jsonWriter, object, object.getClass(), null);
+        }finally{
+            Streams.close(jsonWriter);
+        }
+        return buffer.toString();
+    }
+
+    public static void write(Object object, Jformat format, Fi file) throws IOException{
+        try(JsonWriter writer = new StringJsonWriter(file.writer(false), format)){
+            json.writeValue(writer, object, object.getClass(), null);
+        }
     }
 
     public static String write(Object object){
@@ -79,6 +97,36 @@ public class JsonIO{
     static{
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
+
+        json.setSerializer(Difficulty.class, new JsonSerializer<>(){
+            @Override
+            public void write(Json json, JsonWriter writer, Difficulty object, Class knownType){
+                json.writeValue(writer, object.name);
+            }
+
+            @Override
+            public Difficulty read(Json json, Jval jsonData, Class type){
+                return Difficulty.get(jsonData.asString());
+            }
+        });
+
+        json.setSerializer(Environments.class, new JsonSerializer<>(){
+            @Override
+            public void write(Json json, JsonWriter writer, Environments object, Class knownType){
+                writer.writeArrayStart();
+                if(object.isAny()){
+                    writer.value("any");
+                }else{
+                    object.each(env -> writer.value(env.name));
+                }
+                writer.writeArrayEnd();
+            }
+
+            @Override
+            public Environments read(Json json, Jval jsonData, Class type){
+                return readEnvironments(jsonData, true);
+            }
+        });
 
         json.setSerializer(MusicContainer.class, new JsonSerializer<>(){
             @Override
@@ -339,5 +387,38 @@ public class JsonIO{
             var i = filter.get();
             json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Filter", "")), i.getClass());
         }
+    }
+
+    /** Parses an {@link Environments} from an array of env names. Legacy int bitmasks are only accepted if legacyNumbers is true. */
+    public static Environments readEnvironments(Jval data, boolean legacyNumbers){
+        if(data.isNumber()){
+            if(!legacyNumbers) throw new SerializationException("Environments must be an array of env names, e.g. [\"space\"]. Found: " + data);
+
+            int bits = (int)data.asLong();
+            if(bits != -1 && Env.all.size < 32 && (bits >>> Env.all.size) != 0){
+                Log.warn("Legacy env bitmask @ contains bits with no matching Env; ignoring them.", bits);
+            }
+            return Environments.fromBits(bits);
+        }
+
+        //a bare string is accepted as shorthand for a single-element array
+        if(data.isString()) data = new JsonArray().add(data);
+        if(!data.isArray()) throw new SerializationException("Environments must be an array of env names, e.g. [\"space\"]. Found: " + data);
+
+        Environments result = Environments.none;
+        for(Jval entry : data.asArray()){
+            if(!entry.isString()) throw new SerializationException("Environment names must all be strings. Found: " + entry);
+
+            String name = entry.asString();
+            if(name.equals("any")) return Environments.any;
+
+            Env env = Env.get(name);
+            if(env == null){
+                Log.warn("Unknown env '@', skipping.", name);
+            }else{
+                result = result.with(env);
+            }
+        }
+        return result;
     }
 }

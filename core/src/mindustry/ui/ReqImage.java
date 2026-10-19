@@ -14,7 +14,28 @@ public class ReqImage extends Stack{
     public ReqImage(Element image, Boolp valid){
         this.valid = valid;
         add(image);
-        add(new Element(){
+        add(reqDraw());
+    }
+
+    public ReqImage(Element image, Boolp valid, String text){
+        this.valid = valid;
+        add(new Table(t -> {
+            t.center();
+            t.add(image).size(32f).scaling(Scaling.fit);
+        }));
+        add(new Table(t -> {
+            t.center();
+            t.add(reqDraw()).size(32f);
+        }));
+        add(new Table(t -> {
+            t.center().bottom();
+            t.add(new Label(text)).style(Styles.outlineLabel);
+            t.pack();
+        }));
+    }
+
+    public Element reqDraw(){
+        return new Element(){
             {
                 visible(() -> !valid.get());
             }
@@ -27,7 +48,7 @@ public class ReqImage extends Stack{
                 Lines.line(x, y + height, x + width, y);
                 Draw.reset();
             }
-        });
+        };
     }
 
     public ReqImage(TextureRegion region, Boolp valid){

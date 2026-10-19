@@ -5,12 +5,12 @@ import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
-import arc.util.pooling.*;
 import arc.util.pooling.Pool.*;
+import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -306,7 +306,7 @@ public class Unloader extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             int id = revision == 1 ? read.s() : read.b();
-            sortItem = id == -1 ? null : content.item(id);
+            sortItem = read.content(ContentType.item, id);
         }
     }
 }

@@ -1,14 +1,13 @@
 package mindustry.world.blocks.distribution;
 
-import arc.util.io.*;
+import arc.util.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
 
 public class BufferedItemBridge extends ItemBridge{
-    public final int timerAccept = timers++;
-
     public float speed = 40f;
     public int bufferCapacity = 50;
     public float displayedSpeed = 11f;
@@ -31,6 +30,7 @@ public class BufferedItemBridge extends ItemBridge{
 
     public class BufferedItemBridgeBuild extends ItemBridgeBuild{
         ItemBuffer buffer = new ItemBuffer(bufferCapacity);
+        float acceptTimer;
 
         @Override
         public void updateTransport(Building other){
@@ -39,10 +39,13 @@ public class BufferedItemBridge extends ItemBridge{
             }
 
             Item item = buffer.poll(speed / timeScale);
-            if(timer(timerAccept, 4 / timeScale) && item != null && other.acceptItem(this, item)){
-                moved = true;
-                other.handleItem(this, item);
-                buffer.remove();
+            if((acceptTimer += timeScale * Time.delta) >= 4f){
+                acceptTimer %= 4f;
+                if(item != null && other.acceptItem(this, item)){
+                    moved = true;
+                    other.handleItem(this, item);
+                    buffer.remove();
+                }
             }
         }
 

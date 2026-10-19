@@ -6,14 +6,14 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -64,7 +64,7 @@ public class LogicDisplay extends Block{
         canOverdrive = false;
         group = BlockGroup.logic;
         drawDisabled = false;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class LogicDisplay extends Block{
         clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
     }
 
-    public class LogicDisplayBuild extends Building implements LDrawable{
+    public class LogicDisplayBuild extends Building implements LogicDrawable{
         //The root display (bottom left corner of display for tileable displays)
         public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
@@ -113,7 +113,7 @@ public class LogicDisplay extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> displaySize;
                 case bufferSize -> rootDisplay.commands.size;
@@ -123,13 +123,13 @@ public class LogicDisplay extends Block{
         }
 
         @Override
-        public boolean drawable(LExecutor exec){
+        public boolean drawable(LogicExecutor exec){
             return isValid() && (exec.privileged || (team == exec.team && !privileged));
         }
 
         @Override
         public void draw(LongSeq graphicsBuffer){
-            int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
+            int added = Math.min(graphicsBuffer.size, LogicExecutor.maxDisplayBuffer - commands.size);
 
             for(int i = 0; i < added; i++){
                 commands.addLast(graphicsBuffer.items[i]);

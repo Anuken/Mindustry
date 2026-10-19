@@ -1,11 +1,11 @@
 package mindustry.core;
 
 import arc.*;
-import arc.Graphics.*;
 import arc.Input.*;
 import arc.assets.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;

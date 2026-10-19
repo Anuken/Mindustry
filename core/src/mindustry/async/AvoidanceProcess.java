@@ -35,17 +35,8 @@ public class AvoidanceProcess implements AsyncProcess{
 
     @Override
     public void init(){
-        wwidth = Vars.world.width();
-        wheight = Vars.world.height();
-    }
-
-    @Override
-    public void reset(){
-        buffer1 = buffer2 = avoidance = null;
-        swap = false;
-        modified = false;
-        active = false;
-        requests.clear();
+        wwidth = Vars.state.world.width;
+        wheight = Vars.state.world.height;
     }
 
     @Override

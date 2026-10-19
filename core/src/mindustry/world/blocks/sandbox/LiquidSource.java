@@ -3,10 +3,10 @@ package mindustry.world.blocks.sandbox;
 import arc.graphics.g2d.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -31,7 +31,7 @@ public class LiquidSource extends Block{
         noUpdateDisabled = true;
         displayFlow = false;
         group = BlockGroup.liquids;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
         clearOnDoubleTap = true;
 
         config(Liquid.class, (LiquidSourceBuild tile, Liquid l) -> tile.source = l.removed ? null :l);
@@ -114,7 +114,7 @@ public class LiquidSource extends Block{
         public void read(Reads read, byte revision){
             super.read(read, revision);
             int id = revision == 1 ? read.s() : read.b();
-            source = id == -1 ? null : content.liquid(id);
+            source = read.content(ContentType.liquid, id);
         }
     }
 }

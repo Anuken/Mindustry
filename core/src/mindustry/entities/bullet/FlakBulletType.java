@@ -1,6 +1,7 @@
 package mindustry.entities.bullet;
 
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
@@ -35,7 +36,7 @@ public class FlakBulletType extends BasicBulletType{
                 if(unit.within(b, explodeRange + unit.hitSize/2f)){
                     //mark as primed
                     b.fdata = -1f;
-                    Time.run(explodeDelay, () -> {
+                    Vars.state.run(explodeDelay, () -> {
                         //explode
                         if(b.fdata < 0){
                             b.time = b.lifetime;

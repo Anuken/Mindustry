@@ -11,10 +11,8 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.ai.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
@@ -261,7 +259,7 @@ public class UnitFactory extends UnitBlock{
         public void onCommand(Vec2 target){
             commandPos = target;
             if(command != null && command.snapToBuilding){
-                var build = world.buildWorld(target.x, target.y);
+                var build = state.world.buildWorld(target.x, target.y);
                 if(build != null && build.team == this.team){
                     commandPos.set(build);
                 }
@@ -269,15 +267,15 @@ public class UnitFactory extends UnitBlock{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
+        public Object senseObject(LogicProp sensor){
+            if(sensor == LogicProp.config) return currentPlan == -1 ? null : plans.get(currentPlan).unit;
             return super.senseObject(sensor);
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(fraction());
-            if(sensor == LAccess.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(fraction());
+            if(sensor == LogicProp.itemCapacity) return Mathf.round(itemCapacity * state.rules.unitCost(team));
             return super.sense(sensor);
         }
 

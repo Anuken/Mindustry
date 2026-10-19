@@ -14,7 +14,7 @@ import mindustry.world.modules.*;
 
 import static mindustry.Vars.*;
 
-public class Team implements Comparable<Team>, Senseable{
+public class Team implements Comparable<Team>, LogicSenseable{
     public final int id;
     public final Color color = new Color();
     public final Color[] palette = {new Color(), new Color(), new Color()};
@@ -166,7 +166,7 @@ public class Team implements Comparable<Team>, Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case id -> id;
             case color -> color.toDoubleBits();
@@ -175,8 +175,8 @@ public class Team implements Comparable<Team>, Senseable{
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
-        return Senseable.noSensed;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
+        return LogicSenseable.noSensed;
     }
 }

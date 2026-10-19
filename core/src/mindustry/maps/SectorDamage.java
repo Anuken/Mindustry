@@ -5,6 +5,7 @@ import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.ai.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -16,13 +17,13 @@ public class SectorDamage{
     private static final boolean rubble = true;
 
     public static void apply(float fraction){
-        Tiles tiles = world.tiles;
+        World world = state.world;
 
         Queue<Tile> frontier = new Queue<>();
-        float[][] values = new float[tiles.width][tiles.height];
+        float[][] values = new float[world.width][world.height];
 
         //phase one: find all spawnpoints
-        for(Tile tile : tiles){
+        for(Tile tile : world){
             if((tile.block() instanceof CoreBlock && tile.team() == state.rules.waveTeam) || tile.overlay() == Blocks.spawn){
                 frontier.add(tile);
                 values[tile.x][tile.y] = fraction * 24;
@@ -44,7 +45,7 @@ public class SectorDamage{
                     for(int dx = -radius; dx <= radius; dx++){
                         for(int dy = -radius; dy <= radius; dy++){
                             int wx = dx + t.x, wy = dy + t.y;
-                            if(wx >= 0 && wy >= 0 && wx < world.width() && wy < world.height() && Mathf.within(dx, dy, radius)){
+                            if(wx >= 0 && wy >= 0 && wx < world.width && wy < world.height && Mathf.within(dx, dy, radius)){
                                 Tile other = world.rawTile(wx, wy);
                                 if(!(other.block() instanceof CoreBlock)){
                                     s += other.team() == state.rules.defaultTeam ? other.build.health / (other.block().size * other.block().size) : 0f;
@@ -64,7 +65,7 @@ public class SectorDamage{
                     for(int dx = -radius; dx <= radius; dx++){
                         for(int dy = -radius; dy <= radius; dy++){
                             int wx = dx + t.x, wy = dy + t.y;
-                            if(wx >= 0 && wy >= 0 && wx < world.width() && wy < world.height() && Mathf.within(dx, dy, radius)){
+                            if(wx >= 0 && wy >= 0 && wx < world.width && wy < world.height && Mathf.within(dx, dy, radius)){
                                 Tile other = world.rawTile(wx, wy);
 
                                 //just remove all the buildings in the way - as long as they're not cores
@@ -103,7 +104,7 @@ public class SectorDamage{
             }
         }
 
-        float falloff = (fraction) / (Math.max(tiles.width, tiles.height) * Mathf.sqrt2);
+        float falloff = (fraction) / (Math.max(world.width, world.height) * Mathf.sqrt2);
         int peak = 0;
 
         if(fraction > 0.15f){
@@ -117,8 +118,8 @@ public class SectorDamage{
                     int cx = tile.x + Geometry.d4x[i], cy = tile.y + Geometry.d4y[i];
 
                     //propagate to new tiles
-                    if(tiles.in(cx, cy) && values[cx][cy] < currDamage){
-                        Tile other = tiles.getn(cx, cy);
+                    if(world.in(cx, cy) && values[cx][cy] < currDamage){
+                        Tile other = world.getn(cx, cy);
                         float resultDamage = currDamage;
 
                         //damage the tile if it's the player team (derelict blocks get ignored)
@@ -139,7 +140,7 @@ public class SectorDamage{
                                 other.build.addPlan(false);
                                 other.remove();
                             }else{
-                                indexer.notifyHealthChanged(other.build);
+                                state.indexer.notifyHealthChanged(other.build);
                             }
 
                         }else if(other.solid() && !other.synthetic()){ //skip damage propagation through solid blocks

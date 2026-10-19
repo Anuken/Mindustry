@@ -3,11 +3,8 @@ package mindustry.net;
 import arc.*;
 import arc.files.*;
 import arc.struct.*;
-import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.io.*;
@@ -15,8 +12,8 @@ import mindustry.logic.*;
 import mindustry.maps.Map;
 import mindustry.mod.*;
 import mindustry.mod.data.*;
-import mindustry.net.Administration.*;
 import mindustry.type.*;
+import mindustry.world.*;
 
 import java.io.*;
 import java.nio.*;
@@ -78,8 +75,7 @@ public class NetworkIO{
 
         try(DataInputStream stream = new DataInputStream(is)){
             var writer = SaveIO.getSaveWriter();
-            Time.clear();
-            writer.readDataPatches(stream, new SaveReadState(world.context));
+            writer.readDataPatches(stream, new DefaultWorldContext());
 
             state.rules = JsonIO.read(Rules.class, stream.readUTF());
             state.mapLocales = JsonIO.read(MapLocales.class, stream.readUTF());
@@ -93,27 +89,25 @@ public class NetworkIO{
 
             Reads read = new Reads(stream);
 
-            Groups.clear();
+            state.entities.clear();
             int id = stream.readInt();
             player.reset();
             player.read(read);
             player.id = id;
             player.add();
 
-            var state = new SaveReadState(world.context);
+            var context = new DefaultWorldContext();
 
-            writer.readContentHeader(stream);
-            writer.readMap(stream, state);
-            writer.readEntities(stream, state);
+            writer.readContentHeader(stream, context);
+            writer.readMap(stream, context);
+            writer.readEntities(stream, context);
             writer.readMarkers(stream);
             writer.readCustomChunks(stream);
 
-            Groups.all.each(e -> netClient.addRemovedEntity(e.id()));
-            Groups.unit.each(e -> netClient.addRemovedEntity(e.id()));
+            state.entities.all.each(e -> netClient.addRemovedEntity(e.id()));
+            state.entities.unit.each(e -> netClient.addRemovedEntity(e.id()));
         }catch(IOException e){
             throw new RuntimeException(e);
-        }finally{
-            content.setTemporaryMapper(null);
         }
     }
 
@@ -186,8 +180,8 @@ public class NetworkIO{
     }
 
     public static ByteBuffer writeServerData(){
-        String name = (headless ? Config.serverName.string() : player.name);
-        String description = headless && !Config.desc.string().equals("off") ? Config.desc.string() : "";
+        String name = (headless ? netServer.config.name : player.name);
+        String description = headless && !netServer.config.desc.equals("off") ? netServer.config.desc : "";
         String map = state.map.name();
 
         ByteBuffer buffer = ByteBuffer.allocate(500);
@@ -195,7 +189,7 @@ public class NetworkIO{
         writeString(buffer, name, 100);
         writeString(buffer, map, 64);
 
-        buffer.putInt(Core.settings.getInt("totalPlayers", Groups.player.size()));
+        buffer.putInt(Vars.netServer != null && Vars.netServer.playerCountOverride >= 0 ? Vars.netServer.playerCountOverride : state.entities.player.size());
         buffer.putInt(state.wave);
         buffer.putInt(Version.build);
         writeString(buffer, Version.type);
@@ -205,7 +199,7 @@ public class NetworkIO{
 
         writeString(buffer, description, 100);
         writeString(buffer, state.rules.modeName == null ? "" : state.rules.modeName, 50);
-        buffer.putShort((short)Core.settings.getInt("port", port));
+        buffer.putShort(headless ? (short)netServer.config.port : (short)Core.settings.getInt("port", port));
         return buffer;
     }
 

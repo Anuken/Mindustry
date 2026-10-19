@@ -1,8 +1,9 @@
 package mindustry.world.blocks.distribution;
 
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -59,7 +60,7 @@ public class Junction extends Block{
                     long l = buffer.buffers[i][0];
                     float time = BufferItem.time(l);
 
-                    if(Time.time >= time + speed / timeScale || Time.time < time){
+                    if(Vars.state.time >= time + speed / timeScale || Vars.state.time < time){
 
                         Item item = content.item(BufferItem.item(l));
                         Building dest = nearby(i);

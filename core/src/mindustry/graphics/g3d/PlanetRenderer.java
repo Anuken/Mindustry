@@ -56,7 +56,7 @@ public class PlanetRenderer implements Disposable{
 
     /** Render the entire planet scene to the screen. */
     public void render(PlanetParams params){
-        boolean aa = Vars.renderer.smaa.enabled();
+        boolean aa = Vars.renderer.smaa.enabled() && !params.disableAA;
         if(aa) Vars.renderer.smaa.begin();
         Draw.flush();
         Gl.clear(Gl.depthBufferBit);

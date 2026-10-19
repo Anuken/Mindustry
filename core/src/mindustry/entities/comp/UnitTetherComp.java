@@ -1,6 +1,7 @@
 package mindustry.entities.comp;
 
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -18,13 +19,13 @@ abstract class UnitTetherComp implements Unitc{
 
     @Override
     public void afterRead(){
-        if(spawnerUnitId != -1) spawner = Groups.unit.getByID(spawnerUnitId);
+        if(spawnerUnitId != -1) spawner = Vars.state.entities.unit.getByID(spawnerUnitId);
         spawnerUnitId = -1;
     }
 
     @Override
     public void afterSync(){
-        if(spawnerUnitId != -1) spawner = Groups.unit.getByID(spawnerUnitId);
+        if(spawnerUnitId != -1) spawner = Vars.state.entities.unit.getByID(spawnerUnitId);
         spawnerUnitId = -1;
     }
 

@@ -53,12 +53,12 @@ abstract class PosComp implements Position{
 
     @Nullable
     Building buildOn(){
-        return world.buildWorld(x, y);
+        return state.world.buildWorld(x, y);
     }
 
     @Nullable
     Tile tileOn(){
-        return world.tileWorld(x, y);
+        return state.world.tileWorld(x, y);
     }
 
     boolean onSolid(){

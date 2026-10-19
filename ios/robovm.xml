@@ -35,7 +35,6 @@
     </forceLinkClasses>
     <libs>
         <lib>z</lib>
-        <lib>libs/libarc-freetype.a</lib>
     </libs>
     <frameworks>
         <framework>arc</framework>
