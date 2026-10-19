@@ -553,7 +553,7 @@ public class StatValues{
                     if(!filter.get(liquid)) continue;
 
                     c.table(Styles.grayPanel, b -> {
-                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));;
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
                             info.add(Strings.autoFixed(maxUsed * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
@@ -711,26 +711,22 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, false, false, null);
-    }
-
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
-        return ammo(map, false, showUnit, null);
-    }
-
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, String blockName){
-        return ammo(map, false, false, blockName);
-    }
-
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit, String blockName){
-        return ammo(map, false, showUnit, blockName);
+        return ammo(map, false, false, null, null);
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit){
-        return ammo(map, nested, showUnit, null);
+        return ammo(map, nested, showUnit, null, null);
     }
 
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit, @Nullable String blockName){
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, Turret turret){
+        return ammo(map, turret, false);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, Turret turret, boolean showUnit){
+        return ammo(map, false, showUnit, turret != null ? turret.name : null, turret);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit, @Nullable String blockName, @Nullable Turret turret){
         return table -> {
 
             table.row();
@@ -740,11 +736,9 @@ public class StatValues{
 
             for(T t : orderedKeys){
                 boolean compact = t instanceof UnitType && !showUnit || nested;
-
                 BulletType type = map.get(t);
-                Turret turret = blockName != null && Vars.content.block(blockName) instanceof Turret tur ? tur : null; //not ideal but there s enough overloads already
-
                 int patternShots;
+
                 if(type.shootPattern != null){
                     patternShots = type.shootPattern.shots;
                 }else if(turret != null){
@@ -754,7 +748,7 @@ public class StatValues{
                 }
 
                 if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false, blockName).display(table);
+                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false, blockName, null).display(table);
                     continue;
                 }
 
@@ -773,9 +767,9 @@ public class StatValues{
                                 if(type.statLiquidConsumed > 0f){
                                     title.add("[stat]" + fixValue(once * type.statLiquidConsumed / type.ammoMultiplier * 60f) +
                                         "[lightgray]" + StatUnit.perSecond.localized());
-                                }else if(!(t instanceof Turret tt) || tt.displayAmmoMultiplier){
+                                }else{
                                     title.add("[stat]" + fixValue(once * turret.ammoPerShot / type.ammoMultiplier) +
-                                        "[lightgray]" + (patternShots > 1 ? StatUnit.perBurst.localized() : StatUnit.perShot.localized()));
+                                    "[lightgray]" + (patternShots > 1 ? StatUnit.perBurst.localized() : StatUnit.perShot.localized()));
                                 }
                             }
                         });

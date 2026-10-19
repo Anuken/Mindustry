@@ -24,7 +24,6 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
@@ -152,7 +151,7 @@ public class Turret extends ReloadTurret{
     public float shake = 0f;
 
     /** Map of ammo types. */
-    public ObjectMap<?, BulletType> ammoTypes = new OrderedMap<>();
+    private ObjectMap<?, BulletType> turretAmmoTypes = new OrderedMap<>();
 
     /** Defines drawing behavior for this turret. */
     public DrawBlock drawer = new DrawTurret();
@@ -184,7 +183,7 @@ public class Turret extends ReloadTurret{
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         stats.add(Stat.reload, t -> {
-            t.add(Strings.autoFixed(reloadInterval(), 3) +
+            t.add(Strings.autoFixed(shotsPerSecond(), 3) +
             StatUnit.perSecond.localized() + (!notBulletPatternShots() && shoot.shots > 1 ? " x " + shoot.shots + " " + StatUnit.bullets.localized() : ""));
         });
         stats.add(Stat.targetsAir, targetAir);
@@ -239,8 +238,8 @@ public class Turret extends ReloadTurret{
         }
     }
 
-    public float reloadInterval(){
-        return 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f)); //in seconds
+    public float shotsPerSecond(){
+        return 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f));
     }
 
     public void limitRange(BulletType bullet, float margin){
@@ -257,12 +256,12 @@ public class Turret extends ReloadTurret{
 
     /** Initializes accepted ammo map. Format: [Object, bullet1, Object, bullet2...] */
     public void ammo(Object... objects){
-        ammoTypes = OrderedMap.of(objects);
+        turretAmmoTypes = OrderedMap.of(objects);
     }
 
     /** Return whether the number of shots from any {@link BulletType} differ from {@link #shoot} shots. */
     public boolean notBulletPatternShots(){
-        for(var entry : ammoTypes.entries()){
+        for(var entry : turretAmmoTypes.entries()){
             var p = entry.value.shootPattern;
             if(p != null && p.shots != shoot.shots) return true;
         }
@@ -271,7 +270,7 @@ public class Turret extends ReloadTurret{
 
     /** Return whether the {@link #unitSort} from any {@link BulletType} differ from this turret. */
     public boolean notBulletUnitSort(){
-        for(var entry : ammoTypes.entries()){
+        for(var entry : turretAmmoTypes.entries()){
             var p = entry.value.unitSort;
             if(p != null && p != unitSort) return true;
         }

@@ -54,7 +54,7 @@ public class PayloadAmmoTurret extends Turret{
         super.setStats(stats);
 
         stats.remove(Stat.itemCapacity);
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, true));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, this, true));
     }
 
     @Override

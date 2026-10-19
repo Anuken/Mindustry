@@ -29,7 +29,7 @@ public class ContinuousTurret extends Turret{
     public void setStats(Stats stats){
         super.setStats(stats);
 
-        stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
+        stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType), this));
         stats.remove(Stat.reload);
         stats.remove(Stat.inaccuracy);
     }
