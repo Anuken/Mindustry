@@ -52,7 +52,7 @@ public class Lightning{
 
         for(int i = 0; i < length / 2; i++){
             if(hitter == null || hitter.type.lightningHits < 0 || hitCount < hitter.type.lightningHits){
-                nodeType.create(null, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, null);
+                nodeType.create(hitter == null ? null : hitter.owner, team, x, y, rotation, damage * (hitter == null ? 1f : hitter.damageMultiplier()), 1f, 1f, null);
                 hitCount++;
             }
             lines.add(new Vec2(x + Mathf.range(3f), y + Mathf.range(3f))); //visuals are added regardless of bullet node (what actually deals damage)
