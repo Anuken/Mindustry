@@ -186,9 +186,12 @@ public class StatValues{
     public static String unitSort(Sortf value){
         String name = null;
         for(var field : UnitSorts.class.getFields()){  //should probably be cached
-            if(Reflect.<Sortf>get(field) == value){
-                name = field.getName().toLowerCase();
-                break;
+            try{
+                if(field.get(null) == value){
+                    name = field.getName().toLowerCase();
+                    break;
+                }
+            }catch(Exception ignored){
             }
         }
         return name != null ? Core.bundle.get("sort." + name) : "unknown";
