@@ -1432,9 +1432,11 @@ public class ServerControl implements ApplicationListener{
             socketThread = new Thread(() -> {
                 try{
                     serverSocket = new ServerSocket();
+                    serverSocket.setReuseAddress(true);
                     serverSocket.bind(new InetSocketAddress(Config.socketInputAddress.string(), Config.socketInputPort.num()));
                     while(true){
                         Socket client = serverSocket.accept();
+                        client.setTcpNoDelay(true);
                         info("&lkReceived command socket connection: &fi@", serverSocket.getLocalSocketAddress());
                         BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                         socketOutput = new PrintWriter(client.getOutputStream(), true);
