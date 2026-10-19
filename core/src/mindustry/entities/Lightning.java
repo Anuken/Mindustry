@@ -5,6 +5,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.entities.bullet.*;
@@ -90,7 +91,7 @@ public class Lightning{
                     });
                 }
                 if(nodeType.collidesGround && hitter != null && hitter.type.lightningHomingTiles){
-                    indexer.allBuildings(x, y, hitRange, b -> {
+                    Vars.state.indexer.allBuildings(x, y, hitRange, b -> {
                         if(b.team != team && !hit.contains(b.id())){
                             buildings.add(b);
                         }
