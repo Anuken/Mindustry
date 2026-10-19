@@ -101,8 +101,8 @@ public class Blocks{
     scrapWall, scrapWallLarge, scrapWallHuge, scrapWallGigantic, thruster, //ok, these names are getting ridiculous, but at least I don't have humongous walls yet
 
     //walls - erekir
-    berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, blastDoor, reinforcedSurgeWall, reinforcedSurgeWallLarge, carbideWall, carbideWallLarge,
-    shieldedWall,
+    berylliumWall, berylliumWallLarge, tungstenWall, tungstenWallLarge, blastDoorSmall, blastDoor, reinforcedSurgeWall, reinforcedSurgeWallLarge, carbideWall, carbideWallLarge,
+    shieldedWallSmall, shieldedWall,
 
     //defense
     mender, mendProjector, overdriveProjector, overdriveDome, forceProjector, shockMine, targetDummy,
@@ -1883,6 +1883,13 @@ public class Blocks{
             size = 2;
         }};
 
+        blastDoorSmall = new AutoDoor("blast-door-small"){{
+            requirements(Category.defense, with(Items.tungsten, 6, Items.silicon, 6));
+            health = 175 * wallHealthMultiplier;
+            armor = 14f;
+            size = 1;
+        }};
+
         blastDoor = new AutoDoor("blast-door"){{
             requirements(Category.defense, with(Items.tungsten, 24, Items.silicon, 24));
             health = 175 * wallHealthMultiplier * 4;
@@ -1920,6 +1927,22 @@ public class Blocks{
             health = 270 * wallHealthMultiplier * 4;
             armor = 16f;
             size = 2;
+        }};
+
+        shieldedWallSmall = new ShieldWall("shielded-wall-small"){{
+            requirements(Category.defense, ItemStack.with(Items.phaseFabric, 5, Items.surgeAlloy, 3, Items.beryllium, 3));
+            consumePower(0.75f / 60f);
+
+            outputsPower = false;
+            hasPower = true;
+            consumesPower = true;
+            conductivePower = true;
+
+            chanceDeflect = 8f;
+
+            health = 260 * wallHealthMultiplier;
+            armor = 15f;
+            size = 1;
         }};
 
         shieldedWall = new ShieldWall("shielded-wall"){{
