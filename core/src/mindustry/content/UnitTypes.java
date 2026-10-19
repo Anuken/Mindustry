@@ -2700,6 +2700,7 @@ public class UnitTypes{
                 shootY = 4.5f;
                 recoil = 1f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 2.2f;
                 mirror = false;
                 x = 0f;
@@ -2747,6 +2748,7 @@ public class UnitTypes{
                 shootY = 10f;
                 recoil = 1f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1.4f;
                 mirror = false;
                 shootCone = 2f;
@@ -2760,6 +2762,7 @@ public class UnitTypes{
                 bullet = new RailBulletType(){{
                     length = 160f;
                     damage = 48f;
+                    shieldDamageMultiplier = 2;
                     hitColor = Color.valueOf("feb380");
                     hitEffect = endEffect = Fx.hitBulletColor;
                     pierceDamageFactor = 0.8f;
@@ -2829,6 +2832,7 @@ public class UnitTypes{
                 shootY = 16f;
                 recoil = 3f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1.625f;
                 mirror = false;
                 shootCone = 2f;
@@ -2889,6 +2893,7 @@ public class UnitTypes{
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
+            rotateSpeed = 1.2f;
             floorMultiplier = 0.5f;
             drownTimeMultiplier = 1.25f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
@@ -2898,14 +2903,22 @@ public class UnitTypes{
             tankMoveVolume *= 1.25f;
             tankMoveSound = Sounds.tankMoveHeavy;
 
+            abilities.add(new LastStandAbility(){{
+                speedMultiplier = 1.5f;
+                rotateSpeedMultiplier = 2.5f;
+                exponent = 1.5f;
+                minHealth = 0.3f;
+            }});
+
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.shootTank;
-                layerOffset = 0.0001f;
+                layerOffset = 0.01f;
                 reload = 80f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1f;
                 mirror = false;
                 x = 0f;
@@ -2970,6 +2983,7 @@ public class UnitTypes{
                     shootY = 5.5f;
                     recoil = 2f;
                     rotate = true;
+                    rotateSpeedMoveAdd = true;
                     rotateSpeed = 2f;
                     shootSound = Sounds.shootStell;
 
@@ -3019,6 +3033,7 @@ public class UnitTypes{
                 shake = 5f;
                 recoil = 5f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 0.6f;
                 mirror = false;
                 x = 0f;
@@ -3182,7 +3197,7 @@ public class UnitTypes{
             drag = 0.11f;
             hitSize = 9f;
             rotateSpeed = 3f;
-            health = 680;
+            health = 690;
             armor = 4f;
             legStraightness = 0.3f;
             stepShake = 0f;
@@ -3239,8 +3254,9 @@ public class UnitTypes{
                     knockback = 0.8f;
                     lifetime = 46f;
                     width = height = 9f;
-                    splashDamageRadius = 19f;
+                    splashDamageRadius = 23f;
                     splashDamage = 30f;
+                    scaledSplashDamage = true;
 
                     trailLength = 27;
                     trailWidth = 2.5f;
@@ -3380,7 +3396,6 @@ public class UnitTypes{
             rotateSpeed = 3f;
             health = 2700;
             armor = 7f;
-            fogRadius = 40f;
             stepShake = 0f;
 
             stepSound = Sounds.walkerStepSmall;
@@ -3535,7 +3550,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 30f;
-            health = 6500;
+            health = 6000;
             armor = 5f;
 
             lockLegBase = true;
@@ -3561,6 +3576,8 @@ public class UnitTypes{
                 width = 8f;
                 whenShooting = false;
                 chanceDeflect = 1f;
+                reflectMissileTime = 0f;
+                missileUnitMultiplier = 0.8f;
             }});
 
             rotateSpeed = 2.1f;
@@ -3719,7 +3736,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new ArtilleryBulletType(5.5f, 260){{
+                bullet = new ArtilleryBulletType(5.5f, 500){{
                     collidesTiles = collides = true;
                     lifetime = 60f;
                     shootEffect = Fx.shootBigColor;
@@ -3755,7 +3772,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    splashDamage = 120f;
+                    splashDamage = 300f;
                     splashDamageRadius = 36f;
 
                     fragBullets = 15;
@@ -3893,7 +3910,6 @@ public class UnitTypes{
             armor = 3f;
             hitSize = 12f;
             engineSize = 0;
-            fogRadius = 25;
             itemCapacity = 0;
 
             setEnginesMirror(
@@ -3958,7 +3974,6 @@ public class UnitTypes{
             hitSize = 25f;
             engineSize = 4.3f;
             engineOffset = 54f / 4f;
-            fogRadius = 25;
             itemCapacity = 0;
             lowAltitude = true;
 
@@ -4615,6 +4630,7 @@ public class UnitTypes{
             playerControllable = false;
             envDisabled = Environments.none;
             payloadCapacity = 0f;
+            unitCapMultiplier = 1.5f;
 
             lowAltitude = false;
             flying = true;

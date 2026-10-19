@@ -71,6 +71,8 @@ public class Weapon implements Cloneable{
     public float targetInterval = 40f, targetSwitchInterval = 70f;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
     public float rotateSpeed = 20f;
+    /** whether to add additional rotation speed to this weapon while its unit is rotating */
+    public boolean rotateSpeedMoveAdd = false;
     /** weapon reload in frames */
     public float reload = 1;
     /** inaccuracy of degrees of each shot */
@@ -358,10 +360,12 @@ public class Weapon implements Cloneable{
             axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
 
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
-            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
+
+            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, unit.rotateSpeedMultiplier * Time.delta * (rotateSpeed +
+                (rotateSpeedMoveAdd && !Mathf.equal(unit.lastRotation, unit.rotation, 0.01f) ? Angles.angleDist(unit.rotation, unit.lastRotation) / 60f : 0f)));
             if(rotationLimit < 360){
                 float dst = Angles.angleDist(mount.rotation, baseRotation);
-                if(dst > rotationLimit/2f){
+                if(dst > rotationLimit / 2f){
                     mount.rotation = Angles.moveToward(mount.rotation, baseRotation, dst - rotationLimit/2f);
                 }
             }

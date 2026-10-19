@@ -42,6 +42,7 @@ public class PayloadLoader extends PayloadBlock{
         size = 3;
         rotate = true;
         canOverdrive = false;
+        conductivePower = true;
     }
 
     @Override
