@@ -35,6 +35,8 @@ public class ArcNetProvider implements NetProvider{
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
     Thread serverThread;
+    @Nullable Future<?> serverStopTask;
+    volatile Thread clientThread;
 
     private static final LZ4SafeDecompressor decompressor = LZ4Factory.fastestInstance().safeDecompressor();
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
@@ -220,7 +222,13 @@ public class ArcNetProvider implements NetProvider{
                 //just in case
                 client.stop();
 
-                Threads.daemon("Net Client", () -> {
+                //the old update thread has to exit first, otherwise the new thread's run() resets the shutdown flag and both keep running
+                Thread lastThread = clientThread;
+                if(lastThread != null){
+                    lastThread.join(5000);
+                }
+
+                clientThread = Threads.daemon("Net Client", () -> {
                     try{
                         client.run();
                     }catch(Exception e){
@@ -379,6 +387,25 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void hostServer(int port) throws IOException{
         connections.clear();
+
+        //closeServer() stops the server asynchronously; make sure the old server thread is gone before starting a new one,
+        //otherwise the new thread's run() resets the shutdown flag and both keep running (or a late stop() kills the new server)
+        if(serverStopTask != null){
+            try{
+                serverStopTask.get(5, TimeUnit.SECONDS);
+            }catch(Exception ignored){
+            }
+            serverStopTask = null;
+        }
+
+        if(serverThread != null && serverThread.isAlive()){
+            server.stop();
+            try{
+                serverThread.join(5000);
+            }catch(InterruptedException ignored){
+            }
+        }
+
         server.bind(port, port);
 
         serverThread = new Thread(() -> {
@@ -395,7 +422,7 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void closeServer(){
         connections.clear();
-        mainExecutor.submit(server::stop);
+        serverStopTask = mainExecutor.submit(server::stop);
     }
 
     public class ArcConnection extends NetConnection{

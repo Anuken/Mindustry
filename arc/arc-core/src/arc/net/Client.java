@@ -132,6 +132,8 @@ public class Client extends Connection implements EndPoint{
             long endTime;
             synchronized(updateLock){
                 tcpRegistered = false;
+                //reset now rather than after TCP registration, so a stale value from the last connection is never seen
+                udpRegistered = false;
                 selector.wakeup();
                 endTime = System.currentTimeMillis() + timeout;
                 tcp.connect(selector, new InetSocketAddress(host, tcpPort),
