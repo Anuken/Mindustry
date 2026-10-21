@@ -374,7 +374,7 @@ project(":core"){
     dependencies{
         compileJava.dependsOn(preGen)
 
-        api "at.yawk.lz4:lz4-java:1.10.2"
+        api "at.yawk.lz4:lz4-java:1.12.0"
         api arcModule("arc-core")
         api arcModule("extensions:flabel")
         api arcModule("extensions:freetype")
