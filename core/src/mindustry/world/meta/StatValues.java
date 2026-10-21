@@ -726,14 +726,16 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean compact = t instanceof UnitType && !showUnit || nested;
+                BulletType ammoType = map.get(t), shown = ammoType;
 
-                BulletType type = map.get(t);
-
-                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false, blockName).display(table);
-                    continue;
+                //unit-spawning ammo displays the spawned unit's bullet, but keeps the ammo's own usage
+                while(shown.spawnUnit != null && shown.spawnUnit.weapons.size > 0){
+                    shown = shown.spawnUnit.weapons.first().bullet;
                 }
+
+                BulletType type = shown;
+
+                boolean compact = t instanceof UnitType && (!showUnit || type != ammoType) || nested;
 
                 table.table(Styles.grayPanel, bt -> {
                     bt.left().top().defaults().padRight(3).left();
@@ -744,8 +746,8 @@ public class StatValues{
 
                             title.add(t.localizedName).padRight(10).left().top();
 
-                            if(type.displayAmmoMultiplier && type.statLiquidConsumed > 0f){
-                                title.add("[stat]" + fixValue(type.statLiquidConsumed / type.ammoMultiplier * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
+                            if(type.displayAmmoUsed && type.statLiquidConsumed > 0f){
+                                title.add("[stat]" + fixValue(type.statLiquidConsumed * type.ammoUsed * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
                             }
                         });
                         bt.row();
@@ -777,8 +779,8 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                     }
 
-                    if(type.statLiquidConsumed <= 0f && !compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
-                        sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
+                    if(t instanceof Item && !compact && ammoType.displayAmmoUsed){
+                        sep(bt, Core.bundle.format("bullet.ammoused", fixValue(ammoType.ammoUsed)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
