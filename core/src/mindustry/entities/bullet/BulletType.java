@@ -371,7 +371,7 @@ public class BulletType extends Content implements Cloneable{
 
     /** Whether to display the ammo used per shot for this bullet type in its stats. */
     public boolean displayAmmoUsed = true;
-    /** If >0, this is displayed multiplied by ammoUsed. */
+    /** Liquid ammo uses per tick, set by liquid turrets for stats. If >0, this is displayed multiplied by ammoUsed, as liquid/second. */
     public float statLiquidConsumed;
 
     /** Radius of light emitted by this bullet; <0 to use defaults. */

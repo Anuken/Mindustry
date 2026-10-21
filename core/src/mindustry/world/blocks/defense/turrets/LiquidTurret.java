@@ -35,6 +35,11 @@ public class LiquidTurret extends Turret{
     @Override
     public void setStats(Stats stats){
         super.setStats(stats);
+        //mirror displayed stats onto each bullet
+        ammoTypes.each((l, b) -> {
+            int uses = consumeAmmoOnce ? 1 : (b.shootPattern != null ? b.shootPattern : shoot).shots;
+            b.statLiquidConsumed = uses * b.reloadMultiplier / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f));
+        });
 
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
     }

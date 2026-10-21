@@ -746,8 +746,8 @@ public class StatValues{
 
                             title.add(t.localizedName).padRight(10).left().top();
 
-                            if(type.displayAmmoUsed && type.statLiquidConsumed > 0f){
-                                title.add("[stat]" + fixValue(type.statLiquidConsumed * type.ammoUsed * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
+                            if(ammoType.displayAmmoUsed && ammoType.statLiquidConsumed > 0f){
+                                title.add("[stat]" + fixValue(ammoType.statLiquidConsumed * ammoType.ammoUsed * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
                             }
                         });
                         bt.row();

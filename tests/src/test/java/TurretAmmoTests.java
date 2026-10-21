@@ -2,6 +2,7 @@ import mindustry.io.*;
 import mindustry.content.*;
 import mindustry.core.*;
 import mindustry.core.GameState.*;
+import mindustry.world.blocks.defense.turrets.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret.*;
 import org.junit.jupiter.api.*;
 
@@ -92,5 +93,16 @@ public class TurretAmmoTests{
         duo.readAll(new Reads(new DataInputStream(new ByteArrayInputStream(out.toByteArray()))), duo.version());
         assertEquals(Blocks.duo.itemCapacity, duo.totalAmmo);
         assertEquals(1, duo.ammo.size);
+    }
+
+    @Test
+    void liquidStatConsumption(){
+        for(var turret : new LiquidTurret[]{(LiquidTurret)Blocks.wave, (LiquidTurret)Blocks.tsunami}){
+            turret.computeStats();
+            turret.ammoTypes.each((liquid, type) -> {
+                float perSecond = type.statLiquidConsumed * type.ammoUsed * 60f;
+                assertEquals(type.ammoUsed * type.reloadMultiplier * 60f / turret.reload, perSecond, 0.0001f, turret.name + " " + liquid.name);
+            });
+        }
     }
 }
