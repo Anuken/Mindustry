@@ -1101,6 +1101,11 @@ public class NetServer implements ApplicationListener{
 
     /** Sends a block snapshot to all players. */
     public void writeBlockSnapshots() throws IOException{
+        tempConnections.clear();
+        Groups.player.each(player -> !player.isLocal() && player.con.hasConnected,
+            player -> tempConnections.add(player.con));
+        if(tempConnections.size == 0) return;
+
         syncStream.reset();
 
         short sent = 0;
@@ -1114,7 +1119,10 @@ public class NetServer implements ApplicationListener{
 
                 if(syncStream.size() > maxSnapshotSize){
                     dataStream.close();
-                    Call.blockSnapshot(sent, syncStream.toByteArray());
+                    BlockSnapshotCallPacket packet = new BlockSnapshotCallPacket();
+                    packet.amount = sent;
+                    packet.data = syncStream.toByteArray();
+                    net.send(packet, tempConnections, false);
                     sent = 0;
                     syncStream.reset();
                 }
@@ -1123,11 +1131,19 @@ public class NetServer implements ApplicationListener{
 
         if(sent > 0){
             dataStream.close();
-            Call.blockSnapshot(sent, syncStream.toByteArray());
+            BlockSnapshotCallPacket packet = new BlockSnapshotCallPacket();
+            packet.amount = sent;
+            packet.data = syncStream.toByteArray();
+            net.send(packet, tempConnections, false);
         }
     }
 
     public void writeStateSnapshot() throws IOException{
+        tempConnections.clear();
+        Groups.player.each(player -> !player.isLocal() && player.con.hasConnected,
+            player -> tempConnections.add(player.con));
+        if(tempConnections.size == 0) return;
+
         byte tps = (byte)Math.min(Core.graphics.getFramesPerSecond(), 255);
         syncStream.reset();
         int activeTeams = (byte)state.teams.present.count(t -> t.cores.size > 0);
@@ -1145,15 +1161,30 @@ public class NetServer implements ApplicationListener{
 
         dataStream.close();
 
-        Call.stateSnapshot(state.wavetime, state.wave, state.enemies, state.isPaused(), state.gameOver,
-        universe.seconds(), tps, GlobalVars.rand.seed0, GlobalVars.rand.seed1, syncStream.toByteArray());
+        StateSnapshotCallPacket packet = new StateSnapshotCallPacket();
+        packet.waveTime = state.wavetime;
+        packet.wave     = state.wave;
+        packet.enemies  = state.enemies;
+        packet.paused   = state.isPaused();
+        packet.gameOver = state.gameOver;
+        packet.timeData = universe.seconds();
+        packet.tps      = tps;
+        packet.rand0    = GlobalVars.rand.seed0;
+        packet.rand1    = GlobalVars.rand.seed1;
+        packet.coreData = syncStream.toByteArray();
+        net.send(packet, tempConnections, false);
     }
 
     /** Does not check isSyncHidden. Call this if no entities are hidden. */
     public void writeEntitySnapshotsAll() throws IOException{
+        tempConnections.clear();
+        Groups.player.each(player -> !player.isLocal() && player.con.hasConnected,
+            player -> tempConnections.add(player.con));
+        if(tempConnections.size == 0) return;
+
         syncStream.reset();
 
-        int sent = 0;
+        short sent = 0;
 
         for(Syncc entity : Groups.sync){
             writeEntity(entity, dataStream);
@@ -1162,7 +1193,10 @@ public class NetServer implements ApplicationListener{
 
             if(syncStream.size() > maxSnapshotSize){
                 dataStream.close();
-                Call.entitySnapshot((short)sent, syncStream.toByteArray());
+                EntitySnapshotCallPacket packet = new EntitySnapshotCallPacket();
+                packet.amount = sent;
+                packet.data = syncStream.toByteArray();
+                net.send(packet, tempConnections, false);
                 sent = 0;
                 syncStream.reset();
             }
@@ -1171,7 +1205,10 @@ public class NetServer implements ApplicationListener{
         if(sent > 0){
             dataStream.close();
 
-            Call.entitySnapshot((short)sent, syncStream.toByteArray());
+            EntitySnapshotCallPacket packet = new EntitySnapshotCallPacket();
+            packet.amount = sent;
+            packet.data = syncStream.toByteArray();
+            net.send(packet, tempConnections, false);
         }
     }
 
