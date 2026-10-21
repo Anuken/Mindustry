@@ -25,7 +25,6 @@ public class ItemTurret extends Turret{
     public ItemTurret(String name){
         super(name);
         hasItems = true;
-        itemCapacity = 15;
     }
 
     /** Initializes accepted ammo map. Format: [item1, bullet1, item2, bullet2...] */
