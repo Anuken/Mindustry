@@ -4,6 +4,7 @@ import arc.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.entities.Units.*;
 import mindustry.mod.*;
 import mindustry.type.*;
 
@@ -83,6 +84,11 @@ public class Stats{
 
     public void add(Stat stat, Attribute attr, boolean floating, float scale1, float scale2, @Nullable Seq<ItemStack> outputs, float timePeriod, boolean startZero){
         add(stat, StatValues.blocks(attr, floating, scale1, scale2, outputs, timePeriod, startZero));
+    }
+
+    /** Adds a sort value. */
+    public void add(Stat stat, Sortf value){
+        add(stat, StatValues.unitSort(value));
     }
 
     /** Adds a single string value with this stat. */

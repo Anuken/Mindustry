@@ -15,6 +15,8 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
+import mindustry.entities.*;
+import mindustry.entities.Units.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -179,6 +181,20 @@ public class StatValues{
                 }
             }
         };
+    }
+
+    public static String unitSort(Sortf value){
+        String name = null;
+        for(var field : UnitSorts.class.getFields()){  //should probably be cached
+            try{
+                if(field.get(null) == value){
+                    name = field.getName().toLowerCase();
+                    break;
+                }
+            }catch(Exception ignored){
+            }
+        }
+        return name != null ? Core.bundle.get("sort." + name) : "unknown";
     }
 
     public static Table displayLiquid(Liquid liquid, float amount, boolean perSecond){
@@ -540,7 +556,7 @@ public class StatValues{
                     if(!filter.get(liquid)) continue;
 
                     c.table(Styles.grayPanel, b -> {
-                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));;
+                        b.image(liquid.uiIcon).size(40).pad(10f).left().scaling(Scaling.fit).with(i -> withTooltip(i, liquid, false));
                         b.table(info -> {
                             info.add(liquid.localizedName).left().row();
                             info.add(Strings.autoFixed(maxUsed * 60f, 2) + StatUnit.perSecond.localized()).left().color(Color.lightGray);
@@ -698,26 +714,22 @@ public class StatValues{
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map){
-        return ammo(map, false, false, null);
-    }
-
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit){
-        return ammo(map, false, showUnit, null);
-    }
-
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, String blockName){
-        return ammo(map, false, false, blockName);
-    }
-
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean showUnit, String blockName){
-        return ammo(map, false, showUnit, blockName);
+        return ammo(map, false, false, null, null);
     }
 
     public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit){
-        return ammo(map, nested, showUnit, null);
+        return ammo(map, nested, showUnit, null, null);
     }
 
-    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit, @Nullable String blockName){
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, Turret turret){
+        return ammo(map, turret, false);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, Turret turret, boolean showUnit){
+        return ammo(map, false, showUnit, turret != null ? turret.name : null, turret);
+    }
+
+    public static <T extends UnlockableContent> StatValue ammo(ObjectMap<T, BulletType> map, boolean nested, boolean showUnit, @Nullable String blockName, @Nullable Turret turret){
         return table -> {
 
             table.row();
@@ -732,8 +744,16 @@ public class StatValues{
                 while(shown.spawnUnit != null && shown.spawnUnit.weapons.size > 0){
                     shown = shown.spawnUnit.weapons.first().bullet;
                 }
-
                 BulletType type = shown;
+                int patternShots;
+
+                if(type.shootPattern != null){
+                    patternShots = type.shootPattern.shots;
+                }else if(turret != null){
+                    patternShots = turret.shoot.shots;
+                }else{
+                    patternShots = 1;
+                }
 
                 boolean compact = t instanceof UnitType && (!showUnit || type != ammoType) || nested;
 
@@ -746,16 +766,26 @@ public class StatValues{
 
                             title.add(t.localizedName).padRight(10).left().top();
 
-                            if(ammoType.displayAmmoUsed && ammoType.statLiquidConsumed > 0f){
-                                title.add("[stat]" + fixValue(ammoType.statLiquidConsumed * ammoType.ammoUsed * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
+                            if(ammoType.displayAmmoUsed && turret != null){
+                                float uses = !turret.consumeAmmoOnce ? patternShots : 1f;
+
+                                if(ammoType.statLiquidConsumed > 0f){
+                                    title.add("[stat]" + fixValue(ammoType.statLiquidConsumed * ammoType.ammoUsed * 60f) + "[lightgray]" + StatUnit.perSecond.localized());
+                                }else{
+                                    title.add("[stat]" + fixValue(uses * ammoType.ammoUsed) + "[lightgray]" + (patternShots > 1 ? StatUnit.perBurst.localized() : StatUnit.perShot.localized()));
+                                }
                             }
                         });
-                        bt.row();
+                        bt.row().marginBottom(6f);
                     }
 
                     if(blockName != null && t != null){
                         tableInfo(bt, "block." + blockName + "." + t.name + ".info");
                         bt.row();
+                    }
+
+                    if(patternShots != 1 && (turret == null || turret.notBulletPatternShots())){
+                        sep(bt, "[stat]" + patternShots + " [lightgray]" + StatUnit.bullets.localized());
                     }
 
                     if(type.damage > 0 && (type.collides || type.splashDamage <= 0)){
@@ -777,10 +807,6 @@ public class StatValues{
 
                     if(type.splashDamage > 0){
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
-                    }
-
-                    if(t instanceof Item && !compact && ammoType.displayAmmoUsed){
-                        sep(bt, Core.bundle.format("bullet.ammoused", fixValue(ammoType.ammoUsed)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
@@ -897,6 +923,19 @@ public class StatValues{
 
                     if(!type.targetBlocks){
                         sep(bt, "@bullet.notargetsbuildings");
+                    }
+
+                    Sortf unitSort;
+                    if(type.unitSort != null){
+                        unitSort = type.unitSort;
+                    }else if(turret != null){
+                        unitSort = turret.unitSort;
+                    }else{
+                        unitSort = null;
+                    }
+
+                    if(unitSort != null && (turret == null || turret.notBulletUnitSort())){
+                        sep(bt, "[stat]" + unitSort(unitSort) + " [lightgray]" + Stat.targetPriority.localized().toLowerCase());
                     }
 
                     if(type.intervalBullet != null){

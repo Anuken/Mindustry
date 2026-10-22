@@ -9,7 +9,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
 import mindustry.core.*;
@@ -25,7 +24,6 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
@@ -147,6 +145,9 @@ public class Turret extends ReloadTurret{
     /** How much the screen shakes per shot. */
     public float shake = 0f;
 
+    /** Map of ammo types. */
+    private ObjectMap<?, BulletType> turretAmmoTypes = new OrderedMap<>();
+
     /** Defines drawing behavior for this turret. */
     public DrawBlock drawer = new DrawTurret();
 
@@ -177,13 +178,14 @@ public class Turret extends ReloadTurret{
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         float shotsPerSecond = 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f));
-        stats.add(Stat.reload, shoot.shots != 1 ?
+        stats.add(Stat.reload, !notBulletPatternShots() && shoot.shots != 1 ?
             //shots X trigger pulls/second
-            StatValues.string("@[lightgray]×[] @ @", shoot.shots, StatValues.fixValue(shotsPerSecond), StatUnit.perSecond.localized()) :
+        StatValues.string("@[lightgray]×[] @ @", shoot.shots, StatValues.fixValue(shotsPerSecond), StatUnit.perSecond.localized()) :
             //shots per pull is 1, so just display shots/sec
             StatValues.number(shotsPerSecond, StatUnit.perSecond));
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
+        if(!notBulletUnitSort() && unitSort != UnitSorts.closest) stats.add(Stat.targetPriority, unitSort);
     }
 
     @Override
@@ -224,12 +226,6 @@ public class Turret extends ReloadTurret{
         drawer.getRegionsToOutline(this, out);
     }
 
-    public void limitRange(BulletType bullet, float margin){
-        float realRange = bullet.rangeChange + range;
-        //doesn't handle drag
-        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin + 10f) / bullet.speed;
-    }
-
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
@@ -237,6 +233,12 @@ public class Turret extends ReloadTurret{
         if(drawMinRange){
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, minRange, Pal.placing);
         }
+    }
+
+    public void limitRange(BulletType bullet, float margin){
+        float realRange = bullet.rangeChange + range;
+        //doesn't handle drag
+        bullet.lifetime = (realRange + margin + bullet.extraRangeMargin + 10f) / bullet.speed;
     }
 
     public static abstract class AmmoEntry{
@@ -249,6 +251,28 @@ public class Turret extends ReloadTurret{
         }
     }
 
+    /** Initializes accepted ammo map. Format: [Object, bullet1, Object, bullet2...] */
+    public void ammo(Object... objects){
+        turretAmmoTypes = OrderedMap.of(objects);
+    }
+
+    /** Return whether the number of shots from any {@link BulletType} differ from {@link #shoot} shots. */
+    public boolean notBulletPatternShots(){
+        for(var entry : turretAmmoTypes.entries()){
+            var p = entry.value.shootPattern;
+            if(p != null && p.shots != shoot.shots) return true;
+        }
+        return false;
+    }
+
+    /** Return whether the {@link #unitSort} from any {@link BulletType} differ from this turret. */
+    public boolean notBulletUnitSort(){
+        for(var entry : turretAmmoTypes.entries()){
+            var p = entry.value.unitSort;
+            if(p != null && p != unitSort) return true;
+        }
+        return false;
+    }
 
     @Override
     public boolean rotatedOutput(int x, int y){
@@ -610,7 +634,7 @@ public class Turret extends ReloadTurret{
 
         protected Posc findEnemy(float range){
             var ammo = peekAmmo();
-            Sortf sort = ammo.unitSort != UnitSorts.closest ? ammo.unitSort : unitSort;
+            Sortf sort = ammo.unitSort != null ? ammo.unitSort : unitSort;
             if(targetAir && !targetGround){
                 return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), sort);
             }else{
@@ -724,13 +748,12 @@ public class Turret extends ReloadTurret{
             }
 
             ShootPattern pattern = type.shootPattern != null ? type.shootPattern : shoot;
-
             pattern.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
                 int barrel = barrelCounter;
 
                 if(delay > 0f){
-                    Vars.state.run(delay, () -> {
+                    state.run(delay, () -> {
                         //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
                         int prev = barrelCounter;
                         barrelCounter = barrel;
