@@ -766,17 +766,13 @@ public class StatValues{
 
                             title.add(t.localizedName).padRight(10).left().top();
 
-                            if(ammoType.displayAmmoUsed && ammoType.statLiquidConsumed > 0f){
-                                title.add("[stat]" + fixValue(ammoType.statLiquidConsumed * ammoType.ammoUsed * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
                             if(ammoType.displayAmmoUsed && turret != null){
-                                float once = !turret.consumeAmmoOnce ? patternShots : 1f;
+                                float uses = !turret.consumeAmmoOnce ? patternShots : 1f;
 
-                                if(type.statLiquidConsumed > 0f){
-                                    title.add("[stat]" + fixValue(once * ammoType.statLiquidConsumed / ammoType.ammoMultiplier * 60f) +
-                                        "[lightgray]" + StatUnit.perSecond.localized());
+                                if(ammoType.statLiquidConsumed > 0f){
+                                    title.add("[stat]" + fixValue(ammoType.statLiquidConsumed * ammoType.ammoUsed * 60f) + "[lightgray]" + StatUnit.perSecond.localized());
                                 }else{
-                                    title.add("[stat]" + fixValue(once * turret.ammoPerShot / type.ammoMultiplier) +
-                                    "[lightgray]" + (patternShots > 1 ? StatUnit.perBurst.localized() : StatUnit.perShot.localized()));
+                                    title.add("[stat]" + fixValue(uses * ammoType.ammoUsed) + "[lightgray]" + (patternShots > 1 ? StatUnit.perBurst.localized() : StatUnit.perShot.localized()));
                                 }
                             }
                         });
@@ -788,7 +784,7 @@ public class StatValues{
                         bt.row();
                     }
 
-                    if(patternShots > 1 && (turret == null || turret.notBulletPatternShots())){
+                    if(patternShots != 1 && (turret == null || turret.notBulletPatternShots())){
                         sep(bt, "[stat]" + patternShots + " [lightgray]" + StatUnit.bullets.localized());
                     }
 
@@ -811,10 +807,6 @@ public class StatValues{
 
                     if(type.splashDamage > 0){
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
-                    }
-
-                    if(t instanceof Item && !compact && ammoType.displayAmmoUsed){
-                        sep(bt, Core.bundle.format("bullet.ammoused", fixValue(ammoType.ammoUsed)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){

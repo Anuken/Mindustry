@@ -178,15 +178,11 @@ public class Turret extends ReloadTurret{
 
         stats.add(Stat.inaccuracy, (int)inaccuracy, StatUnit.degrees);
         float shotsPerSecond = 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f));
-        stats.add(Stat.reload, shoot.shots != 1 ?
+        stats.add(Stat.reload, !notBulletPatternShots() && shoot.shots != 1 ?
             //shots X trigger pulls/second
-            StatValues.string("@[lightgray]×[] @ @", shoot.shots, StatValues.fixValue(shotsPerSecond), StatUnit.perSecond.localized()) :
+        StatValues.string("@[lightgray]×[] @ @", shoot.shots, StatValues.fixValue(shotsPerSecond), StatUnit.perSecond.localized()) :
             //shots per pull is 1, so just display shots/sec
             StatValues.number(shotsPerSecond, StatUnit.perSecond));
-        stats.add(Stat.reload, t -> {
-            t.add(Strings.autoFixed(shotsPerSecond(), 3) +
-            StatUnit.perSecond.localized() + (!notBulletPatternShots() && shoot.shots > 1 ? " x " + shoot.shots + " " + StatUnit.bullets.localized() : ""));
-        });
         stats.add(Stat.targetsAir, targetAir);
         stats.add(Stat.targetsGround, targetGround);
         if(!notBulletUnitSort() && unitSort != UnitSorts.closest) stats.add(Stat.targetPriority, unitSort);
@@ -237,10 +233,6 @@ public class Turret extends ReloadTurret{
         if(drawMinRange){
             Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, minRange, Pal.placing);
         }
-    }
-
-    public float shotsPerSecond(){
-        return 60f / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f));
     }
 
     public void limitRange(BulletType bullet, float margin){

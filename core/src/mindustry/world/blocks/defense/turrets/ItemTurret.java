@@ -51,7 +51,7 @@ public class ItemTurret extends Turret{
     public void setStats(Stats stats){
         super.setStats(stats);
 
-        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
+        stats.add(Stat.ammo, StatValues.ammo(ammoTypes, this));
     }
 
     @Override
