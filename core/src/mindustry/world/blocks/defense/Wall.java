@@ -115,21 +115,21 @@ public class Wall extends Block{
         public void onProximityUpdate(){
             super.onProximityUpdate();
 
-            if(autotile) updateAutotileBits();
+            if(autotile && !headless) updateAutotileBits();
         }
 
         @Override
         public void onProximityRemoved(){
             super.onProximityRemoved();
 
-            if(autotile) updateOtherBits();
+            if(autotile && !headless) updateOtherBits();
         }
 
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();
 
-            if(autotile && !state.generating) updateOtherBits();
+            if(autotile && !headless && !state.generating) updateOtherBits();
         }
 
         @Override
