@@ -16,7 +16,7 @@ import static mindustry.Vars.*;
 public class LightRenderer{
     private static final int scaling = 4;
 
-    private float[] vertices = new float[24];
+    private float[] vertices = new float[28];
     private FrameBuffer buffer = new FrameBuffer();
     private Seq<Runnable> lights = new Seq<>();
     private Seq<CircleLight> circles = new Seq<>(CircleLight.class);
@@ -44,7 +44,7 @@ public class LightRenderer{
 
         circleIndex ++;
     }
-    
+
     public void add(float x, float y, TextureRegion region, Color color, float opacity){
         add(x, y, region, 0f, color, opacity);
     }
@@ -71,6 +71,7 @@ public class LightRenderer{
 
             float rot = Mathf.angleExact(x2 - x, y2 - y);
             TextureRegion ledge = Core.atlas.find("circle-end"), lmid = Core.atlas.find("circle-mid");
+            float depth = lmid.getDepth();
 
             float color = Draw.getColorPacked();
             float u = lmid.u;
@@ -86,36 +87,41 @@ public class LightRenderer{
 
             vertices[0] = lx1;
             vertices[1] = ly1;
-            vertices[2] = color;
-            vertices[3] = u;
-            vertices[4] = v;
-            vertices[5] = 0;
+            vertices[2] = u;
+            vertices[3] = v;
+            vertices[4] = depth;
+            vertices[5] = color;
+            vertices[6] = 0;
 
-            vertices[6] = lx2;
-            vertices[7] = ly2;
-            vertices[8] = color;
+            vertices[7] = lx2;
+            vertices[8] = ly2;
             vertices[9] = u;
             vertices[10] = v2;
-            vertices[11] = 0;
+            vertices[11] = depth;
+            vertices[12] = color;
+            vertices[13] = 0;
 
-            vertices[12] = lx3;
-            vertices[13] = ly3;
-            vertices[14] = color;
-            vertices[15] = u2;
-            vertices[16] = v2;
-            vertices[17] = 0;
+            vertices[14] = lx3;
+            vertices[15] = ly3;
+            vertices[16] = u2;
+            vertices[17] = v2;
+            vertices[18] = depth;
+            vertices[19] = color;
+            vertices[20] = 0;
 
-            vertices[18] = lx4;
-            vertices[19] = ly4;
-            vertices[20] = color;
-            vertices[21] = u2;
-            vertices[22] = v;
-            vertices[23] = 0;
+            vertices[21] = lx4;
+            vertices[22] = ly4;
+            vertices[23] = u2;
+            vertices[24] = v;
+            vertices[25] = depth;
+            vertices[26] = color;
+            vertices[27] = 0;
 
             Draw.vert(ledge.texture, vertices, 0, vertices.length);
 
             Vec2 v3 = Tmp.v2.trnsExact(rot, stroke);
 
+            depth = ledge.getDepth();
             u = ledge.u;
             v = ledge.v2;
             u2 = ledge.u2;
@@ -123,61 +129,69 @@ public class LightRenderer{
 
             vertices[0] = lx4;
             vertices[1] = ly4;
-            vertices[2] = color;
-            vertices[3] = u;
-            vertices[4] = v;
-            vertices[5] = 0;
+            vertices[2] = u;
+            vertices[3] = v;
+            vertices[4] = depth;
+            vertices[5] = color;
+            vertices[6] = 0;
 
-            vertices[6] = lx3;
-            vertices[7] = ly3;
-            vertices[8] = color;
+            vertices[7] = lx3;
+            vertices[8] = ly3;
             vertices[9] = u;
             vertices[10] = v2;
-            vertices[11] = 0;
+            vertices[11] = depth;
+            vertices[12] = color;
+            vertices[13] = 0;
 
-            vertices[12] = lx3 + v3.x;
-            vertices[13] = ly3 + v3.y;
-            vertices[14] = color;
-            vertices[15] = u2;
-            vertices[16] = v2;
-            vertices[17] = 0;
+            vertices[14] = lx3 + v3.x;
+            vertices[15] = ly3 + v3.y;
+            vertices[16] = u2;
+            vertices[17] = v2;
+            vertices[18] = depth;
+            vertices[19] = color;
+            vertices[20] = 0;
 
-            vertices[18] = lx4 + v3.x;
-            vertices[19] = ly4 + v3.y;
-            vertices[20] = color;
-            vertices[21] = u2;
-            vertices[22] = v;
-            vertices[23] = 0;
+            vertices[21] = lx4 + v3.x;
+            vertices[22] = ly4 + v3.y;
+            vertices[23] = u2;
+            vertices[24] = v;
+            vertices[25] = depth;
+            vertices[26] = color;
+            vertices[27] = 0;
 
             Draw.vert(ledge.texture, vertices, 0, vertices.length);
 
             vertices[0] = lx2;
             vertices[1] = ly2;
-            vertices[2] = color;
-            vertices[3] = u;
-            vertices[4] = v;
-            vertices[5] = 0;
+            vertices[2] = u;
+            vertices[3] = v;
+            vertices[4] = depth;
+            vertices[5] = color;
+            vertices[6] = 0;
 
-            vertices[6] = lx1;
-            vertices[7] = ly1;
-            vertices[8] = color;
+            vertices[7] = lx1;
+            vertices[8] = ly1;
             vertices[9] = u;
             vertices[10] = v2;
-            vertices[11] = 0;
+            vertices[11] = depth;
+            vertices[12] = color;
+            vertices[13] = 0;
 
-            vertices[12] = lx1 - v3.x;
-            vertices[13] = ly1 - v3.y;
-            vertices[14] = color;
-            vertices[15] = u2;
-            vertices[16] = v2;
-            vertices[17] = 0;
+            vertices[14] = lx1 - v3.x;
+            vertices[15] = ly1 - v3.y;
+            vertices[16] = u2;
+            vertices[17] = v2;
+            vertices[18] = depth;
+            vertices[19] = color;
+            vertices[20] = 0;
 
-            vertices[18] = lx2 - v3.x;
-            vertices[19] = ly2 - v3.y;
-            vertices[20] = color;
-            vertices[21] = u2;
-            vertices[22] = v;
-            vertices[23] = 0;
+            vertices[21] = lx2 - v3.x;
+            vertices[22] = ly2 - v3.y;
+            vertices[23] = u2;
+            vertices[24] = v;
+            vertices[25] = depth;
+            vertices[26] = color;
+            vertices[27] = 0;
 
             Draw.vert(ledge.texture, vertices, 0, vertices.length);
         });

@@ -2,6 +2,7 @@ package mindustry.world.blocks.distribution;
 
 import arc.math.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.type.*;
@@ -37,6 +38,7 @@ public class Router extends Block{
     }
 
     public class RouterBuild extends Building implements ControlBlock{
+        protected byte[] cycles = new byte[Vars.content.items().size];
         public Item lastItem;
         public Tile lastInput;
         public float time;
@@ -160,7 +162,7 @@ public class Router extends Block{
                 int angle = Mathf.mod((int)((angleTo(unit.aimX(), unit.aimY()) + 45) / 90), 4);
 
                 if(unit.isShooting()){
-                    Building other = proximityEdge(rotation = angle, build -> canBackflow(build, src) && canChain(build) && build.team == team && build.acceptItem(this, item));
+                    Building other = proximityEdge(angle, build -> canBackflow(build, src) && canChain(build) && build.team == team && build.acceptItem(this, item));
                     if(other != null){
                         return other;
                     }
@@ -169,13 +171,15 @@ public class Router extends Block{
                 return null;
             }
 
-            int counter = rotation;
+            //keep track of target offsets per-item to fix https://github.com/Anuken/Mindustry/issues/12471
+            int id = item.id;
+            int counter = cycles[id];
             for(int i = 0; i < proximity.size; i++){
                 Building other = proximity.get((i + counter) % proximity.size);
 
-                if(set) rotation = ((byte)((rotation + 1) % proximity.size)); 
+                if(set) cycles[id] = ((byte)((cycles[id] + 1) % proximity.size));
                 if((from != null && other.tile == from && from.block() == Blocks.overflowGate)
-                    || !canBackflow(other, src) 
+                    || !canBackflow(other, src)
                     || (!allowChaining && other.block instanceof Router)) continue;
                 if(!canChain(other)) continue;
                 if(other.team == team && other.acceptItem(this, item)){

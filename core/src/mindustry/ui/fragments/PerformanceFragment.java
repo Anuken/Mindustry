@@ -77,7 +77,9 @@ public class PerformanceFragment{
         @Override
         public void draw(){
             Vec2 mouse = screenToLocalCoordinates(Core.input.mouse()).add(x, y);
-            float total = frame.valueMs();
+            float sum = 0;
+            for(var counter : displayedCounters) sum += counter.valueMs();
+            float total = Math.max(sum, frame.valueMs());
             float accumulator = 0f;
             PerfCounter hoveredCounter = null;
 

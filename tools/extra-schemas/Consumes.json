@@ -1,0 +1,20 @@
+{
+  "doc": "Things that the block consumes.",
+  "remove": {"type": "java.lang.String[]", "doc": "Removes consumers instead of adding one: 'all', or a type name from this list, e.g. 'items'."},
+  "item": {"type": "mindustry.type.Item", "doc": "Adds a single-item consumer; shorthand for consumeItem(item)."},
+  "itemCharged": {"type": "mindustry.world.consumers.ConsumeItemCharged"},
+  "itemFlammable": {"type": "mindustry.world.consumers.ConsumeItemFlammable"},
+  "itemRadioactive": {"type": "mindustry.world.consumers.ConsumeItemRadioactive"},
+  "itemExplosive": {"type": "mindustry.world.consumers.ConsumeItemExplosive"},
+  "itemList": {"type": "mindustry.world.consumers.ConsumeItemList"},
+  "itemExplode": {"type": "mindustry.world.consumers.ConsumeItemExplode"},
+  "items": {"type": "mindustry.type.ItemStack[]", "doc": "Also accepts a single ItemStack, or a full ConsumeItems object."},
+  "itemsBoost": {"type": "mindustry.type.ItemStack[]", "doc": "Like 'items', but marked as a boost input (Consume#booster)."},
+  "liquidFlammable": {"type": "mindustry.world.consumers.ConsumeLiquidFlammable"},
+  "liquid": {"type": "mindustry.world.consumers.ConsumeLiquid"},
+  "liquids": {"type": "mindustry.type.LiquidStack[]", "doc": "Also accepts a full ConsumeLiquids object."},
+  "coolant": {"type": "mindustry.world.consumers.ConsumeCoolant"},
+  "liquidsBoost": {"type": "mindustry.type.LiquidStack[]", "doc": "Like 'liquids', but marked as a boost input (Consume#booster)."},
+  "power": {"type": "float", "doc": "Also accepts a full ConsumePower object, e.g. for buffered power."},
+  "powerBuffered": {"type": "float", "doc": "Shorthand for a buffered power consumer with this capacity."}
+}

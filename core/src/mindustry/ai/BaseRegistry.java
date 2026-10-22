@@ -4,7 +4,6 @@ import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.game.Schematic.*;
 import mindustry.type.*;
@@ -36,6 +35,8 @@ public class BaseRegistry{
         cores.clear();
         parts.clear();
         reqParts.clear();
+        ores.clear();
+        oreFloors.clear();
 
         //load ore types and corresponding items
         for(Block block : content.blocks()){
@@ -75,7 +76,7 @@ public class BaseRegistry{
                     }
 
                     //calculate averages
-                    if(tile.block instanceof Drill || tile.block instanceof Pump){
+                    if(tile.block instanceof Drill || tile.block instanceof Pump || (tile.block instanceof GenericCrafter crafter && crafter.solidFloorOnly)){
                         Tmp.v1.add(tile.x*tilesize + tile.block.offset, tile.y*tilesize + tile.block.offset);
                         drills ++;
                     }

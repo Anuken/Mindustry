@@ -6,11 +6,11 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.serialization.*;
+import mindustry.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
-import mindustry.entities.*;
 import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
@@ -31,6 +31,25 @@ public abstract class SaveVersion extends SaveFileReader{
     protected static OrderedMap<String, CustomChunk> customChunks = new OrderedMap<>();
 
     public final int version;
+
+    static{
+        addCustomChunk("static-fog-data", new CustomChunk(){
+            @Override
+            public void write(DataOutput stream) throws IOException{
+                state.fog.write(stream);
+            }
+
+            @Override
+            public void read(DataInput stream) throws IOException{
+                state.fog.read(stream);
+            }
+
+            @Override
+            public boolean shouldWrite(){
+                return state.fog.shouldWrite();
+            }
+        });
+    }
 
     /**
      * Registers a custom save chunk reader/writer by name. This is mostly used for mods that need to save extra data.
@@ -60,21 +79,18 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     @Override
-    public void read(DataInputStream stream, CounterInputStream counter, WorldContext context) throws IOException{
-        readRegion("meta", stream, counter, in -> readMeta(in, context));
-        if(version >= 12) readRegion("patches", stream, counter, this::readDataPatches);
+    public void read(DataInputStream stream, CounterInputStream counter, SaveLoadContext saveState) throws IOException{
+        readRegion("meta", stream, counter, in -> readMeta(in, saveState));
+        if(version >= 12) readRegion("patches", stream, counter, in -> readDataPatches(in, saveState));
 
-        try{
-            readRegion("content", stream, counter, this::readContentHeader);
-            readRegion("map", stream, counter, in -> readMap(in, context));
-            readRegion("entities", stream, counter, this::readEntities);
-            if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
-            readRegion("custom", stream, counter, this::readCustomChunks);
-        }finally{
-            content.setTemporaryMapper(null);
-        }
+        readRegion("content", stream, counter, in -> readContentHeader(in, saveState));
+        readRegion("map", stream, counter, in -> readMap(in, saveState));
+        readRegion("entities", stream, counter, stream1 -> readEntities(stream1, saveState));
+        if(version >= 8) readRegion("markers", stream, counter, this::readMarkers);
+        readRegion("custom", stream, counter, this::readCustomChunks);
     }
 
+    @Override
     public void write(DataOutputStream stream, SaveOptions options) throws IOException{
         writeRegion("meta", stream, out -> writeMeta(out, options.extraTags));
         writeRegion("patches", stream, out -> writeDataPatches(out, options.embedAssets));
@@ -138,37 +154,32 @@ public abstract class SaveVersion extends SaveFileReader{
             "locales", JsonIO.write(state.mapLocales),
             "mods", JsonIO.write(mods.getModStrings().toArray(String.class)),
             "controlGroups", headless || control == null ? "null" : JsonIO.write(control.input.controlGroups),
-            "width", world.width(),
-            "height", world.height(),
+            "width", state.world.width,
+            "height", state.world.height,
             "viewpos", Tmp.v1.set(player == null ? Vec2.ZERO : player).toString(),
             "controlledType", headless || control.input.controlledType == null ? "null" : control.input.controlledType.name,
             "nocores", state.rules.defaultTeam.cores().isEmpty(),
             "playerteam", player == null ? state.rules.defaultTeam.id : player.team().id,
+            "teamCount", state.teams.active.size,
+            "spawns", state.spawner.countSpawns(),
             "hasExternalAssets", state.data.getAllExternalAssets().size > 0
         )));
     }
 
-    public void readMeta(DataInput stream, WorldContext context) throws IOException{
+    public void readMeta(DataInput stream, SaveLoadContext saveState) throws IOException{
         StringMap map = readStringMap(stream);
 
         state.wave = map.getInt("wave");
         state.wavetime = map.getFloat("wavetime", state.rules.waveSpacing);
         state.tick = map.getFloat("tick");
         state.stats = JsonIO.read(GameStats.class, map.get("stats", "{}"));
-        state.rules = JsonIO.read(Rules.class, map.get("rules", "{}"));
         state.mapLocales = JsonIO.read(MapLocales.class, map.get("locales", "{}"));
-        if(state.rules.spawns.isEmpty()) state.rules.spawns = waves.get();
 
-        if(context.getSector() != null){
-            state.rules.sector = context.getSector();
-            if(state.rules.sector != null){
-                state.rules.sector.planet.applyRules(state.rules);
-            }
-        }
+        saveState.ruleString = map.get("rules", "{}");
 
-        //replace the default serpulo env with erekir
-        if(state.rules.planet == Planets.serpulo && state.rules.hasEnv(Env.scorching)){
-            state.rules.planet = Planets.erekir;
+        //for versions >= 13, rules are parsed after data patches are loaded
+        if(version < 13){
+            readRules(saveState);
         }
 
         if(!headless){
@@ -196,20 +207,40 @@ public abstract class SaveVersion extends SaveFileReader{
         )) : worldmap;
     }
 
+    public void readRules(SaveLoadContext saveState){
+        if(saveState.ruleString == null) return; //in NetworkIO, rules are null, not read here
+        state.rules = JsonIO.read(Rules.class, saveState.ruleString);
+
+        if(state.rules.spawns.isEmpty()) state.rules.spawns = Waves.defaults();
+
+        if(saveState.getSector() != null){
+            state.rules.sector = saveState.getSector();
+            if(state.rules.sector != null){
+                state.rules.sector.planet.applyRules(state.rules);
+            }
+        }
+
+        //replace the default serpulo env with erekir
+        if(state.rules.planet == Planets.serpulo && state.rules.hasEnv(Env.scorching)){
+            state.rules.planet = Planets.erekir;
+        }
+    }
+
     public void writeMap(DataOutput stream) throws IOException{
+        var world = state.world;
         //write world size
-        stream.writeShort(world.width());
-        stream.writeShort(world.height());
+        stream.writeShort(world.width);
+        stream.writeShort(world.height);
 
         //floor + overlay
-        for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tiles.geti(i);
+        for(int i = 0; i < world.width * world.height; i++){
+            Tile tile = state.world.geti(i);
             stream.writeShort(tile.floorID());
             stream.writeShort(tile.overlayID());
             int consecutives = 0;
 
-            for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                Tile nextTile = world.rawTile(j % world.width(), j / world.width());
+            for(int j = i + 1; j < world.width * world.height && consecutives < 255; j++){
+                Tile nextTile = world.rawTile(j % world.width, j / world.width);
 
                 if(nextTile.floorID() != tile.floorID() || nextTile.overlayID() != tile.overlayID()){
                     break;
@@ -223,8 +254,8 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         //blocks
-        for(int i = 0; i < world.width() * world.height(); i++){
-            Tile tile = world.tiles.geti(i);
+        for(int i = 0; i < world.width * world.height; i++){
+            Tile tile = state.world.geti(i);
             stream.writeShort(tile.blockID());
 
             boolean savedata = tile.shouldSaveData();
@@ -259,8 +290,8 @@ public abstract class SaveVersion extends SaveFileReader{
                 //write consecutive non-entity blocks
                 int consecutives = 0;
 
-                for(int j = i + 1; j < world.width() * world.height() && consecutives < 255; j++){
-                    Tile nextTile = world.rawTile(j % world.width(), j / world.width());
+                for(int j = i + 1; j < world.width * world.height && consecutives < 255; j++){
+                    Tile nextTile = world.rawTile(j % world.width, j / world.width);
 
                     if(nextTile.blockID() != tile.blockID() || savedata != nextTile.shouldSaveData()){
                         break;
@@ -275,30 +306,31 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readMap(DataInput stream, WorldContext context) throws IOException{
+    public void readMap(DataInput stream, SaveLoadContext state) throws IOException{
         int width = stream.readUnsignedShort();
         int height = stream.readUnsignedShort();
 
-        boolean generating = context.isGenerating();
+        boolean generating = state.isGenerating();
 
-        if(!generating) context.begin();
+        if(!generating) state.begin();
         try{
 
-            context.resize(width, height);
+            state.resize(width, height);
 
             //read floor and create tiles first
             for(int i = 0; i < width * height; i++){
                 int x = i % width, y = i / width;
-                short floorid = stream.readShort();
-                short oreid = stream.readShort();
+                Block floor = state.reads.content(ContentType.block, stream.readShort());
+                Block overlay = state.reads.content(ContentType.block, stream.readShort());
                 int consecutives = stream.readUnsignedByte();
-                if(content.block(floorid) == Blocks.air) floorid = Blocks.stone.id;
+                if(floor == Blocks.air) floor = Blocks.stone;
+                int floorid = floor == null ? Blocks.stone.id : floor.id, oreid = overlay == null ? Blocks.air.id : overlay.id;
 
-                context.create(x, y, floorid, oreid, (short)0);
+                state.create(x, y, floorid, oreid, (short)0);
 
                 for(int j = i + 1; j < i + 1 + consecutives; j++){
                     int newx = j % width, newy = j / width;
-                    context.create(newx, newy, floorid, oreid, (short)0);
+                    state.create(newx, newy, floorid, oreid, (short)0);
                 }
 
                 i += consecutives;
@@ -306,8 +338,8 @@ public abstract class SaveVersion extends SaveFileReader{
 
             //read blocks
             for(int i = 0; i < width * height; i++){
-                Block block = content.block(stream.readShort());
-                Tile tile = context.tile(i);
+                Block block = state.reads.content(ContentType.block, stream.readShort());
+                Tile tile = state.tile(i);
                 if(block == null) block = Blocks.air;
                 boolean isCenter = true;
                 byte packedCheck = stream.readByte();
@@ -332,7 +364,10 @@ public abstract class SaveVersion extends SaveFileReader{
                 //set block only if this is the center; otherwise, it's handled elsewhere
                 if(isCenter){
                     tile.setBlock(block);
-                    if(tile.build != null) tile.build.enabled = true;
+                    if(tile.build != null){
+                        if(!state.preview) state.allBuildings.add(tile.build);
+                        tile.build.enabled = true;
+                    }
                 }
 
                 //must be assigned after setBlock, because that can reset data
@@ -341,14 +376,19 @@ public abstract class SaveVersion extends SaveFileReader{
                     tile.floorData = floorData;
                     tile.overlayData = overlayData;
                     tile.extraData = extraData;
-                    context.onReadTileData();
+                    state.onReadTileData();
                 }
 
                 if(hadEntity){
                     if(isCenter){ //only read entity for center blocks
                         if(block.hasBuilding()){
                             try{
-                                readChunkReads(stream, (in, len) -> {
+                                readChunkReads(stream, state.reads, (in, len) -> {
+                                    if(state.preview){
+                                        readPreviewBuilding(in, len, state);
+                                        return;
+                                    }
+
                                     byte revision = in.b();
                                     tile.build.readAll(in, revision);
                                 });
@@ -359,22 +399,30 @@ public abstract class SaveVersion extends SaveFileReader{
                             //skip the entity region, as the entity and its IO code are now gone
                             skipChunk(stream);
                         }
-
-                        context.onReadBuilding();
                     }
                 }else if(!hadData){ //never read consecutive blocks if there's data
                     int consecutives = stream.readUnsignedByte();
 
                     for(int j = i + 1; j < i + 1 + consecutives; j++){
-                        context.tile(j).setBlock(block);
+                        state.tile(j).setBlock(block);
                     }
 
                     i += consecutives;
                 }
             }
         }finally{
-            if(!generating) context.end();
+            if(!generating) state.end();
         }
+    }
+
+    /** Previews never create buildings: reads only the team from a building chunk (revision, health, rotation, team) and skips the rest. */
+    protected void readPreviewBuilding(Reads in, int len, SaveLoadContext context) throws IOException{
+        in.b(); //revision
+        in.f(); //health
+        in.b(); //rotation
+        byte team = in.b();
+        skipBytes(in.input, len - 7);
+        context.onReadPreviewBuilding(Team.get(team));
     }
 
     public void writeTeamBlocks(DataOutput stream) throws IOException{
@@ -399,16 +447,22 @@ public abstract class SaveVersion extends SaveFileReader{
     }
 
     public void writeWorldEntities(DataOutput stream) throws IOException{
-        //units are not included in Groups.all
-        stream.writeInt(Groups.all.count(Entityc::serialize) + Groups.unit.size());
+        writeWorldEntities(stream, null);
+    }
 
-        for(Entityc entity : Groups.all){
+    public void writeWorldEntities(DataOutput stream, @Nullable Boolf<Unit> unitFilter) throws IOException{
+        //units are not included in Vars.state.entities.all
+        stream.writeInt(Vars.state.entities.all.count(Entityc::serialize) + (unitFilter == null ? Vars.state.entities.unit.size() : Vars.state.entities.unit.count(unitFilter)));
+
+        for(Entityc entity : Vars.state.entities.all){
             if(!entity.serialize()) continue;
 
             writeEntity(entity, stream);
         }
 
-        for(Entityc entity : Groups.unit){
+        for(Unit entity : Vars.state.entities.unit){
+            if(unitFilter != null && !unitFilter.get(entity)) continue;
+
             writeEntity(entity, stream);
         }
     }
@@ -444,10 +498,11 @@ public abstract class SaveVersion extends SaveFileReader{
         state.markers.read(stream);
     }
 
-    public void readTeamBlocks(DataInput stream) throws IOException{
+    public void readTeamBlocks(DataInput stream, SaveLoadContext context) throws IOException{
         int teamc = stream.readInt();
 
-        var reads = new Reads(stream);
+        var reads = context.reads;
+        reads.input = stream;
 
         for(int i = 0; i < teamc; i++){
             Team team = Team.get(stream.readInt());
@@ -462,19 +517,19 @@ public abstract class SaveVersion extends SaveFileReader{
                 var obj = TypeIO.readObject(reads);
                 //cannot have two in the same position
                 if(set.add(Point2.pack(x, y))){
-                    data.plans.addLast(new BlockPlan(x, y, rot, content.block(bid), obj));
+                    data.plans.addLast(new BlockPlan(x, y, rot, reads.content(ContentType.block, bid), obj));
                 }
             }
         }
     }
 
-    public void readWorldEntities(DataInput stream, Prov[] mapping) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveLoadContext state) throws IOException{
         IntSet used = new IntSet();
         Seq<Entityc> reassign = new Seq<>();
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
-            readChunkReads(stream, (in, len) -> {
+            readChunkReads(stream, state.reads, (in, len) -> {
                 int typeid = in.ub();
                 if(mapping[typeid] == null){
                     in.skip(len - 1);
@@ -484,7 +539,7 @@ public abstract class SaveVersion extends SaveFileReader{
                 int id = in.i();
 
                 Entityc entity = (Entityc)mapping[typeid].get();
-                EntityGroup.checkNextId(id);
+                Vars.state.checkNextEntityId(id);
                 entity.id(id);
                 entity.read(in);
                 if(used.add(id)){
@@ -497,17 +552,18 @@ public abstract class SaveVersion extends SaveFileReader{
         }
 
         for(var ent : reassign){
-            ent.id(EntityGroup.nextId());
+            ent.id(Vars.state.nextEntityId());
             ent.add();
         }
 
-        Groups.all.each(Entityc::afterReadAll);
-        Groups.unit.each(Entityc::afterReadAll);
+        Vars.state.entities.all.each(Entityc::afterReadAll);
+        Vars.state.entities.unit.each(Entityc::afterReadAll);
+        state.allBuildings.each(Buildingc::afterReadAll);
     }
 
     public Prov[] readEntityMapping(DataInput stream) throws IOException{
         //copy entityMapping for further mutation; will be used in readWorldEntities
-        Prov[] entityMapping = Arrays.copyOf(EntityMapping.idMap, EntityMapping.idMap.length);
+        var entityMapping = Arrays.copyOf(EntityMapping.idMap, EntityMapping.idMap.length);
 
         short amount = stream.readShort();
         for(int i = 0; i < amount; i++){
@@ -521,21 +577,29 @@ public abstract class SaveVersion extends SaveFileReader{
         return entityMapping;
     }
 
-    public void readEntities(DataInput stream) throws IOException{
+    public void readEntities(DataInput stream, SaveLoadContext state) throws IOException{
         var mapping = readEntityMapping(stream);
-        readTeamBlocks(stream);
-        readWorldEntities(stream, mapping);
+        readTeamBlocks(stream, state);
+        readWorldEntities(stream, mapping, state);
     }
 
-    public void readDataPatches(DataInput stream) throws IOException{
+    public void readDataPatches(DataInput stream, SaveLoadContext saveState) throws IOException{
         stream.readInt(); //version - ignored for now
+
+        //the requiredPlanets filter needs this, since the rules aren't read yet
+        if(headless){
+            try{
+                Planet planet = content.planet(Jval.read(saveState.ruleString).getString("planet", Planets.serpulo.name));
+                state.rules.planet = planet == null ? Planets.serpulo : planet;
+            }catch(Exception ignored){}
+        }
 
         int total = stream.readInt();
         Seq<DataAsset> assets = new Seq<>(total);
 
         for(int i = 0; i < total; i++){
             byte typeId = stream.readByte();
-            if(typeId < 0 || typeId >= DataAssetType.all.length) throw new IOException("Invalid asset type ID: " + typeId);
+            if(typeId < 0 || typeId >= DataAssetType.all.length) throw new IOException("Invalid asset type ID: " + typeId + ". You are likely loading trying to load a save from a newer version of the game, possibly a beta.");
 
             String path = stream.readUTF();
             boolean embedded = stream.readBoolean();
@@ -563,6 +627,9 @@ public abstract class SaveVersion extends SaveFileReader{
         Events.fire(new DataPatchLoadEvent(assets));
 
         state.data.load(assets);
+
+        //now that patches are loaded, the rules can actually be read
+        readRules(saveState);
     }
 
     public void writeDataPatches(DataOutput stream, boolean forceEmbed) throws IOException{
@@ -588,7 +655,7 @@ public abstract class SaveVersion extends SaveFileReader{
         }
     }
 
-    public void readContentHeader(DataInput stream) throws IOException{
+    public void readContentHeader(DataInput stream, SaveLoadContext context) throws IOException{
         int mapped = stream.readUnsignedByte();
 
         MappableContent[][] map = new MappableContent[ContentType.all.length][0];
@@ -605,7 +672,7 @@ public abstract class SaveVersion extends SaveFileReader{
             }
         }
 
-        content.setTemporaryMapper(map);
+        context.reads = new MappedReads(null, map);
 
         //HACK: versions below 11 don't read the patch chunk, which means the event for reading patches is never triggered.
         //manually fire the event here for older versions.

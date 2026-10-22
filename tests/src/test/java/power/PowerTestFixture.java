@@ -26,7 +26,6 @@ public class PowerTestFixture{
     static void initializeDependencies(){
         headless = true;
         Core.files = new MockFiles();
-        Groups.init();
 
         boolean make = content == null;
 

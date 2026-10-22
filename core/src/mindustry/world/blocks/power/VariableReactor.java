@@ -5,21 +5,20 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.ui.*;
-import mindustry.world.blocks.heat.*;
 import mindustry.world.meta.*;
 
 import static mindustry.Vars.*;
 
 public class VariableReactor extends PowerGenerator{
-    public float maxHeat = 100f;
     /** How quickly instability moves towards 1, per frame. */
     public float unstableSpeed = 1f / 60f / 3f;
     public float warmupSpeed = 0.1f;
@@ -57,27 +56,24 @@ public class VariableReactor extends PowerGenerator{
 
         addBar("heat", (VariableReactorBuild entity) ->
             new Bar(() ->
-            Core.bundle.format("bar.heatpercent", (int)entity.heat, (int)(Mathf.clamp(entity.heat / maxHeat) * 100)),
+            Core.bundle.format("bar.heatpercent", (int)entity.heatModule.input, (int)(consHeat.fraction(entity) * 100)),
             () -> Pal.lightOrange,
-            () -> entity.heat / maxHeat));
+            () -> entity.heatModule.input / consHeat.requirement));
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
-        stats.add(Stat.input, maxHeat, StatUnit.heatUnits);
+        stats.remove(Stat.maxEfficiency);
     }
 
     //TODO: draw warmup fraction on block?
-    public class VariableReactorBuild extends GeneratorBuild implements HeatConsumer{
-        public float[] sideHeat = new float[4];
-        public float heat = 0f, instability, totalProgress, warmup, flash;
+    public class VariableReactorBuild extends GeneratorBuild{
+        public float instability, totalProgress, warmup, flash;
 
         @Override
         public void updateTile(){
-            heat = calculateHeat(sideHeat);
-
             productionEfficiency = efficiency;
             warmup = Mathf.lerpDelta(warmup, productionEfficiency > 0 ? 1f : 0f, warmupSpeed);
 
@@ -94,7 +90,7 @@ public class VariableReactor extends PowerGenerator{
 
         @Override
         public boolean shouldExplode(){
-            return heat > 0f;
+            return heatModule.input > 0f;
         }
 
         @Override
@@ -127,7 +123,7 @@ public class VariableReactor extends PowerGenerator{
             //at this stage efficiency = how much coolant is provided
 
             //target efficiency value
-            float target = Mathf.clamp(heat / maxHeat);
+            float target = consHeat.fraction(this);
 
             //fraction of coolant provided (from what is needed)
             float efficiencyMet = Mathf.clamp(Mathf.zero(target) ? 1f : efficiency / target);
@@ -142,20 +138,19 @@ public class VariableReactor extends PowerGenerator{
         }
 
         @Override
-        public float[] sideHeat(){
-            return sideHeat;
+        public float efficiencyScale(){
+            return 1f;
         }
 
         @Override
-        public float heatRequirement(){
-            return maxHeat;
+        public byte version(){
+            return 2;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
 
-            write.f(heat);
             write.f(instability);
             write.f(warmup);
         }
@@ -164,7 +159,8 @@ public class VariableReactor extends PowerGenerator{
         public void read(Reads read, byte revision){
             super.read(read, revision);
 
-            heat = read.f();
+            //heat was saved here before version 2
+            if(revision < 2) read.f();
             instability = read.f();
             warmup = read.f();
         }

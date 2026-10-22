@@ -18,6 +18,7 @@ import mindustry.game.EventType.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.input.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -42,7 +43,7 @@ public class HintsFragment{
     public void build(Group parent){
         group.setFillParent(true);
         group.touchable = Touchable.childrenOnly;
-        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown;
+        group.visibility = () -> Core.settings.getBool("hints", true) && ui.hudfrag.shown();
         group.update(() -> {
             if(current != null){
                 //current got completed
@@ -60,7 +61,7 @@ public class HintsFragment{
                     display(hint);
                 }else{
                     //moused over a derelict structure
-                    var build = world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+                    var build = state.world.buildWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
                     if(build != null && build.team == Team.derelict){
                         events.add("derelictmouse");
                     }
@@ -82,6 +83,7 @@ public class HintsFragment{
         });
 
         Events.run(Trigger.cannotUpgrade, () -> events.add("cannotupgrade"));
+        Events.run(Trigger.fireCreate, () -> events.add("fire"));
 
         Events.on(ResetEvent.class, e -> {
             placedBlocks.clear();
@@ -248,8 +250,8 @@ public class HintsFragment{
         ),
 
         waveFire(
-            () -> Groups.fire.size() > 0 && Blocks.wave.unlockedNow(),
-            () -> indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
+            () -> ui.hints.events.contains("fire") && Blocks.wave.unlockedNow(),
+            () -> state.indexer.getFlagged(state.rules.defaultTeam, BlockFlag.extinguisher).size > 0
         ),
 
         rebuildSelect(
@@ -280,7 +282,7 @@ public class HintsFragment{
         ),
 
         serpuloCoreZone(
-            () -> state.isCampaign() && state.getPlanet() == Planets.serpulo && Vars.indexer.isBlockPresent(Blocks.coreZone) &&
+            () -> state.isCampaign() && state.getPlanet() == Planets.serpulo && Vars.state.indexer.isBlockPresent(Blocks.coreZone) &&
                 (!state.rules.attackMode || state.stats.getDestroyed(Blocks.coreShard) + state.stats.getDestroyed(Blocks.coreFoundation) + state.stats.getDestroyed(Blocks.coreNucleus) > 0),
             () -> state.rules.defaultTeam.cores().size > 1
         ),
@@ -292,7 +294,7 @@ public class HintsFragment{
 
         presetDifficulty(() -> state.isCampaign()
             && state.getSector().preset == null
-            && state.getSector().threat >= 0.5f
+            && state.getSector().threat.ordinal() >= SectorThreat.high.ordinal()
             && !SectorPresets.tarFields.sector.isCaptured(), //appear only when the player hasn't progressed much in the game yet
             () -> state.isCampaign() && state.getSector().preset != null
         ),

@@ -10,7 +10,8 @@ public enum DataAssetType{
     bundle("bundles", Seq.with("properties"), BundleAsset::new, false),
     image("sprites", Seq.with("png"), ImageAsset::new, false),
     sound("sounds", Seq.with("mp3", "ogg"), SoundAsset::new, false),
-    music("music", Seq.with("mp3", "ogg"), MusicAsset::new, false)
+    music("music", Seq.with("mp3", "ogg"), MusicAsset::new, false),
+    emoji("emojis", Seq.with(""), EmojiAsset::new, true)
     ;
 
     public final String folder;

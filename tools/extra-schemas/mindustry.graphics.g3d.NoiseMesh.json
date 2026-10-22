@@ -1,0 +1,66 @@
+{
+  "superclass": "mindustry.graphics.g3d.HexMesh",
+  "seed": {
+    "type": "int",
+    "default": "0"
+  },
+  "divisions": {
+    "type": "int",
+    "default": "1"
+  },
+  "radius": {
+    "type": "float",
+    "default": "1"
+  },
+  "octaves": {
+    "type": "int",
+    "default": "1"
+  },
+  "persistence": {
+    "type": "float",
+    "default": "0.5"
+  },
+  "scale": {
+    "type": "float",
+    "default": "1"
+  },
+  "mag": {
+    "type": "float",
+    "default": "0.5"
+  },
+  "color": {
+    "type": "arc.graphics.Color",
+    "nullable": true,
+    "doc": "Fallback used for 'color1'/'color2' when they aren't set individually. Defaults to white if this is also unset."
+  },
+  "color1": {
+    "type": "arc.graphics.Color",
+    "doc": "First color. Falls back to 'color', then white, if unset.",
+    "default": "\"ffffff\""
+  },
+  "color2": {
+    "type": "arc.graphics.Color",
+    "doc": "Second color, used for the two-color variant. Falls back to 'color', then white, if unset.",
+    "default": "\"ffffff\""
+  },
+  "colorOct": {
+    "type": "int",
+    "doc": "Octaves for the color-selection noise, used for the two-color variant.",
+    "default": "1"
+  },
+  "colorPersistence": {
+    "type": "float",
+    "doc": "Persistence for the color-selection noise, used for the two-color variant.",
+    "default": "0.5"
+  },
+  "colorScale": {
+    "type": "float",
+    "doc": "Scale for the color-selection noise, used for the two-color variant.",
+    "default": "1"
+  },
+  "colorThreshold": {
+    "type": "float",
+    "doc": "Noise threshold above which 'color2' is used instead of 'color1'.",
+    "default": "0.5"
+  }
+}

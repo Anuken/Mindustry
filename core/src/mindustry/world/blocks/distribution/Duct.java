@@ -7,7 +7,6 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -15,6 +14,7 @@ import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -25,10 +25,10 @@ import static mindustry.Vars.*;
 
 public class Duct extends Block implements Autotiler{
     public float speed = 5f;
-    public boolean armored = false;
 
     public @Load(value = "@-top-#", length = 5) TextureRegion[] topRegions;
     public @Load(value = "@-bottom-#", length = 5, fallback = "duct-bottom-#") TextureRegion[] botRegions;
+    public @Load("@-cap") TextureRegion capRegion;
 
     public @Nullable Block bridgeReplacement, junctionReplacement;
 
@@ -45,18 +45,17 @@ public class Duct extends Block implements Autotiler{
         noUpdateDisabled = true;
         underBullets = true;
         rotate = true;
-        noSideBlend = true;
         isDuct = true;
         priority = TargetPriority.transport;
-        envEnabled = Env.space | Env.terrestrial | Env.underwater;
+        envEnabled = Environments.of(Env.space, Env.terrestrial, Env.underwater);
 
         drawCached = true;
         buildingCacheLayer = BuildingCacheLayer.under;
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.itemsMoved, 60f / speed, StatUnit.itemsSecond);
     }
@@ -94,7 +93,7 @@ public class Duct extends Block implements Autotiler{
 
     @Override
     public boolean blends(Tile tile, int rotation, int otherx, int othery, int otherrot, Block otherblock){
-        if(!armored){
+        if(!noSideBlend){
             return (otherblock.outputsItems() || (lookingAt(tile, rotation, otherx, othery, otherblock) && otherblock.hasItems))
             && lookingAtEither(tile, rotation, otherx, othery, otherrot, otherblock);
         }else{
@@ -132,8 +131,9 @@ public class Duct extends Block implements Autotiler{
         public @Nullable Item current;
         public int recDir = 0;
         public int blendbits, xscl, yscl, blending;
-        public @Nullable Building next;
+        public @Nullable Building next, prev;
         public @Nullable DuctBuild nextc;
+        public boolean capped, backCapped = false;
 
         @Override
         public void draw(){
@@ -174,6 +174,11 @@ public class Duct extends Block implements Autotiler{
             Draw.z(Layer.blockUnder + 0.2f);
             drawAt(x, y, blendbits, rotation, SliceMode.none, under);
             Draw.reset();
+
+            if(!under) return;
+
+            if(capped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg());
+            if(backCapped && capRegion.found()) Draw.rect(capRegion, x, y, rotdeg() + 180);
         }
 
         @Override
@@ -211,7 +216,7 @@ public class Duct extends Block implements Autotiler{
         @Override
         public boolean acceptItem(Building source, Item item){
             return current == null && items.total() == 0 &&
-                (armored ?
+                (noSideBlend ?
                     //armored acceptance
                     ((source.block.rotate && source.front() == this && source.block.hasItems && source.block.isDuct) ||
                     Edges.getFacingEdge(source.tile, tile).relativeTo(tile) == rotation) :
@@ -254,6 +259,10 @@ public class Duct extends Block implements Autotiler{
             blending = bits[4];
             next = front();
             nextc = next instanceof DuctBuild d ? d : null;
+
+            prev = back();
+            capped = next == null || next.team != team || !next.block.hasItems;
+            backCapped = blendbits == 0 && (prev == null || prev.team != team || !prev.block.hasItems);
         }
 
         @Override
@@ -277,8 +286,8 @@ public class Duct extends Block implements Autotiler{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress;
             return super.sense(sensor);
         }
     }

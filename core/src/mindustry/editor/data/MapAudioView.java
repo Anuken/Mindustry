@@ -38,10 +38,15 @@ public class MapAudioView implements AssetView{
             Fi file = asset.getCacheFile();
             var audioSource = (AudioSource)Core.assets.getOrNull(DataAudioLoader.prefix + asset.name, (Class<?>)(type == DataAssetType.music ? Music.class : Sound.class));
 
-            if(file == null || audioSource == null || !audioSource.valid()){
+            if(file == null || audioSource == null || (!audioSource.valid() && !audioSource.isLazy())){
                 list.button(Icon.warning, Styles.graySquarei, iconMed, () -> ui.showInfo(file == null ? "@asset.broken" : "@asset.audio.invalid")).size(h);
             }else{
                 list.button(Icon.play, Styles.graySquarei, iconMed, () -> {
+                    if(!audioSource.valid() && !audioSource.isLazy()){
+                        ui.showInfo("@asset.audio.invalid");
+                        return;
+                    }
+
                     if(lastPlaying != null && lastPlaying.countPlaying() > 0){
                         lastPlaying.stop();
                         if(lastPlaying == audioSource){
@@ -54,16 +59,30 @@ public class MapAudioView implements AssetView{
                         m.play();
                     }else if(audioSource instanceof Sound s){
                         lastPlaying = s;
-                        var bus = s.bus;
-                        s.bus = control.sound.uiBus;
-                        s.play();
-                        s.bus = bus;
+                        s.play(control.sound.uiBus);
                     }
-                }).update(i -> i.getStyle().imageUp = audioSource != null && audioSource.countPlaying() > 0 ? Icon.pause : Icon.play).size(h);
+                }).update(i -> i.getStyle().imageUp = (!audioSource.isLazy() && !audioSource.valid()) ? Icon.warning : audioSource.countPlaying() > 0 ? Icon.pause : Icon.play).size(h);
             }
 
+            float w = (mobile ? 390f : 450f);
             list.table(Styles.grayPanel, in -> {
-                in.add("[accent]" + asset.name + "\n" + "[lightgray][[" + (audioSource == null ? "?" : UI.formatTime(audioSource.getLength() * 60f)) + "]").labelAlign(Align.left).grow();
+                in.left();
+                in.table(v -> {
+                    v.left();
+                    v.add("[accent]" + asset.name).labelAlign(Align.left).left().ellipsis(true).width(audioSource instanceof Music ? w / 2f : w * 0.8f);
+                    v.row();
+                    if(audioSource != null){
+                        Runnable addTime = () -> v.add("[lightgray][[" + UI.formatTime(audioSource.getLength() * 60f) + "]").left();
+
+                        if(audioSource.valid()){
+                            addTime.run();
+                        }else if(audioSource instanceof Sound s){
+                            //force-load sounds when viewing so that length/invalid status is shown
+                            s.checkLazyLoad(addTime);
+                        }
+                    }
+                }).width(w / 2f).tooltip("dp-" + asset.name.replace(' ', '_'));
+
                 if(audioSource instanceof Music m){
                     var slider = new Slider(0f, m.getLength(), 0.1f, false);
                     slider.moved(value -> {
@@ -71,8 +90,6 @@ public class MapAudioView implements AssetView{
                             m.setPosition(value);
                         }
                     });
-                    //only ogg can seek
-                    slider.touchable = asset.path.endsWith(".ogg") ? Touchable.enabled : Touchable.disabled;
                     slider.visible(() -> {
                         boolean valid = lastPlaying == m && m.isPlaying();
                         if(valid){
@@ -88,16 +105,14 @@ public class MapAudioView implements AssetView{
 
                     in.stack(slider, label).growX().height(42f);
                 }
-            }).size(mobile ? 390f : 450f, h).margin(10f);
+            }).size(w, h).margin(10f);
 
             list.button(Icon.export, Styles.graySquarei, Vars.iconMed, () -> FileChooser.export(asset.name, Strings.getFileExtension(asset.path), file::copyTo)).size(h).disabled(file == null);
 
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
                 ui.showConfirm("@asset.delete.confirm",  () -> {
-                    if(audioSource != null){
-                        audioSource.dispose();
-                    }
                     assets.remove(asset);
+                    state.data.reloadAudio();
                     diag.rebuild();
                 });
             }).size(h);
@@ -106,7 +121,7 @@ public class MapAudioView implements AssetView{
         }
 
         if(list.getChildren().isEmpty()){
-            list.add("@patch.none");
+            list.add("@none.found");
         }
 
         list.add(new Element(){
@@ -141,6 +156,9 @@ public class MapAudioView implements AssetView{
                         var other = state.data.getAssets(type).find(p -> (p.path.equalsIgnoreCase(path) || p.name.equalsIgnoreCase(name)));
                         if(other != null){
                             ui.showErrorMessage(Core.bundle.format("asset.exists", other.name + " (" + other.path + ")"));
+                            return;
+                        }else if(Core.assets.getOrNull("dp-" + name, Music.class) != null || Core.assets.getOrNull("dp-" + name, Sound.class) != null){
+                            ui.showErrorMessage(Core.bundle.format("asset.exists.audio", name));
                             return;
                         }
 

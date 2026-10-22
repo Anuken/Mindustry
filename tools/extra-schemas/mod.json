@@ -1,0 +1,7 @@
+{
+  "doc": "Wraps progress modulo a fixed amount. Applied via PartProgress's 'op'/'operation' field (e.g. `op: mod`), NOT 'type' - its parameter fields (if any) are written flat alongside 'op', on the same object.",
+  "amount": {
+    "type": "float",
+    "doc": "Modulus to wrap progress by."
+  }
+}

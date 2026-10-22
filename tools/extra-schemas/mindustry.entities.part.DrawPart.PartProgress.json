@@ -1,0 +1,19 @@
+{
+  "doc": "Base class for progress functions used to animate part transforms. This is NOT a normal polymorphic class: 'type' does not choose an operation - it chooses the progress SOURCE (a 'sensor': warmup, life, heat, time, reload, charge, recoil, smoothReload; see each for details). Separately, an object may apply an operation to that sensor value by naming it in 'op' (alias 'operation'), with the operation's own parameter fields (e.g. 'start'/'end' for compress) written flat alongside 'op' on the SAME object - not nested inside it. To chain several operations, use 'ops' (alias 'operations'): an array where each entry is its own flat {op, ...params} spec, applied in order to the sensor value. 'op'/'operation' and 'ops'/'operations' are mutually exclusive. Operations: inv, slope, clamp, delay, sustain, shorten, compress, add, blend, mul, min, sin, absin, mod, loop, curve (see each for its parameters).",
+  "op": {
+    "type": "String",
+    "doc": "Name of a single operation to apply to the sensor value (alias: 'operation'). Write that operation's own parameter fields directly alongside this one, at the same level - not nested. Mutually exclusive with 'ops'/'operations'. One of: inv, slope, clamp, delay, sustain, shorten, compress, add, blend, mul, min, sin, absin, mod, loop, curve."
+  },
+  "operation": {
+    "type": "String",
+    "doc": "Alias for 'op'."
+  },
+  "ops": {
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress$Op>",
+    "doc": "Chain of operations applied in sequence to the sensor value (alias: 'operations'). Each array entry is its own flat object: an 'op'/'operation' name plus that operation's own parameter fields - not a nested PartProgress. Mutually exclusive with a single 'op'/'operation'."
+  },
+  "operations": {
+    "type": "Seq<mindustry.entities.part.DrawPart$PartProgress$Op>",
+    "doc": "Alias for 'ops'."
+  }
+}

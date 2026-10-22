@@ -5,13 +5,12 @@ import arc.math.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -103,9 +102,9 @@ public class PayloadRouter extends PayloadConveyor{
         }
 
         @Override
-        public void control(LAccess type, double p1, double p2, double p3, double p4){
-            super.control(type, p1, p2, p3, p4);
-            if(type == LAccess.config){
+        public void control(LogicExecutor executor, LogicProp type, double p1, double p2, double p3, double p4){
+            super.control(executor, type, p1, p2, p3, p4);
+            if(type == LogicProp.config){
                 int prev = rotation;
                 rotation = Mathf.mod((int)p1, 4);
                 //when manually controlled, routers do not turn automatically for a while, same as turrets
@@ -211,7 +210,7 @@ public class PayloadRouter extends PayloadConveyor{
             if(revision >= 1){
                 byte ctype = read.b();
                 short sort = read.s();
-                sorted = ctype == -1 ? null : Vars.content.getByID(ContentType.all[ctype], sort);
+                sorted = ctype == -1 ? null : read.content(ContentType.all[ctype], sort);
                 recDir = read.b();
                 checkMatch();
             }

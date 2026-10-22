@@ -45,20 +45,11 @@ public class Maps{
 
     /** All maps stored in an ordered array. */
     private Seq<Map> maps = new Seq<>();
-    private ShuffleMode shuffleMode = ShuffleMode.all;
 
     private @Nullable MapProvider shuffler;
     private @Nullable Map nextMapOverride;
 
     private ObjectSet<Map> previewList = new ObjectSet<>();
-
-    public ShuffleMode getShuffleMode(){
-        return shuffleMode;
-    }
-
-    public void setShuffleMode(ShuffleMode mode){
-        this.shuffleMode = mode;
-    }
 
     /** Set the provider for the map(s) to be played on. Will override the default shuffle mode setting.*/
     public void setMapProvider(MapProvider provider){
@@ -79,7 +70,7 @@ public class Maps{
         }
 
         if(shuffler != null) return shuffler.next(mode, previous);
-        return shuffleMode.next(mode, previous);
+        return Vars.netServer.config.shuffleMode.next(mode, previous);
     }
 
     /** Returns a list of all maps, including custom ones. */
@@ -221,8 +212,8 @@ public class Maps{
             }
 
             //create map, write it, etc etc etc
-            Map map = new Map(file, world.width(), world.height(), tags, true);
-            fogControl.resetFog();
+            Map map = new Map(file, state.world.width, state.world.height, tags, true);
+            state.fog.resetFog();
             MapIO.writeMap(file, map, embedAssets);
 
             if(!headless){
@@ -232,7 +223,7 @@ public class Maps{
 
                 for(int x = 0; x < map.width; x++){
                     for(int y = 0; y < map.height; y++){
-                        Tile tile = world.rawTile(x, y);
+                        Tile tile = state.world.rawTile(x, y);
 
                         if(tile.block() instanceof CoreBlock){
                             map.teams.add(tile.getTeamID());
@@ -248,7 +239,7 @@ public class Maps{
                     Core.assets.unload(map.previewFile().path() + "." + mapExtension);
                 }
 
-                Pixmap pix = MapIO.generatePreview(world.tiles);
+                Pixmap pix = MapIO.generatePreview(state.world);
                 writeCache(map);
 
                 map.texture = new Texture(pix);
@@ -262,13 +253,13 @@ public class Maps{
 
             return map;
 
-        }catch(IOException e){
+        }catch(Throwable e){
             throw new RuntimeException(e);
         }
     }
 
-    /** Import a map, then save it. This updates all values and stored data necessary. */
-    public void importMap(Fi file) throws IOException{
+    /** Imports a map, then saves it. This updates all values and stored data necessary. */
+    public Map importMap(Fi file) throws IOException{
         Fi dest = findFile(file.name());
         file.copyTo(dest);
 
@@ -288,6 +279,8 @@ public class Maps{
         if(error[0] != null){
             throw new IOException(error[0]);
         }
+
+        return map;
     }
 
     /** Attempts to run the following code;
@@ -364,15 +357,17 @@ public class Maps{
         if(groups == null) return "[]";
 
         StringWriter buffer = new StringWriter();
-        JsonIO.json.setWriter(new JsonWriter(buffer));
+        StringJsonWriter writer = new StringJsonWriter(buffer);
 
-        JsonIO.json.writeArrayStart();
+        writer.writeArrayStart();
+
         for(int i = 0; i < groups.size; i++){
-            JsonIO.json.writeObjectStart(SpawnGroup.class, SpawnGroup.class);
-            groups.get(i).write(JsonIO.json);
-            JsonIO.json.writeObjectEnd();
+            JsonIO.json.writeObjectStart(writer, SpawnGroup.class, SpawnGroup.class);
+            groups.get(i).write(JsonIO.json, writer);
+            JsonIO.json.writeObjectEnd(writer);
         }
-        JsonIO.json.writeArrayEnd();
+
+        writer.writeArrayEnd();
         return buffer.toString();
     }
 
@@ -414,25 +409,30 @@ public class Maps{
     }
 
     private void createNewPreview(Map map, Cons<Exception> failed){
-        try{
-            //if it's here, then the preview failed to load or doesn't exist, make it
-            //this has to be done synchronously!
-            Pixmap pix = MapIO.generatePreview(map);
-            map.texture = new Texture(pix);
-            mainExecutor.submit(() -> {
-                try{
-                    map.previewFile().writePng(pix);
-                    writeCache(map);
-                }catch(Exception e){
-                    e.printStackTrace();
-                }finally{
-                    pix.dispose();
-                }
-            });
-        }catch(Exception e){
-            failed.get(e);
-            Log.err("Failed to generate preview!", e);
-        }
+        mainExecutor.submit(() -> {
+            try{
+                //generatePreview is (almost) thread safe
+                Pixmap pix = MapIO.generatePreview(map);
+
+                Core.app.post(() -> {
+                    //texture must be generated on main thread
+                    map.texture = new Texture(pix);
+                    mainExecutor.submit(() -> {
+                        try{
+                            map.previewFile().writePng(pix);
+                            writeCache(map);
+                        }catch(Exception e){
+                            Log.err(e);
+                        }finally{
+                            pix.dispose();
+                        }
+                    });
+                });
+            }catch(Exception e){
+                failed.get(e);
+                Log.err("Failed to generate preview!", e);
+            }
+        });
     }
 
     private void writeCache(Map map) throws IOException{

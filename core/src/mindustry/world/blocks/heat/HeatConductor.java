@@ -22,14 +22,33 @@ public class HeatConductor extends Block{
         update = solid = rotate = true;
         rotateDraw = false;
         size = 3;
+        noUpdateDisabled = true;
+        hasHeat = true;
     }
 
     @Override
     public void setBars(){
         super.setBars();
 
-        //TODO show number
-        addBar("heat", (HeatConductorBuild entity) -> new Bar(() -> Core.bundle.format("bar.heatamount", (int)(entity.heat + 0.001f)), () -> Pal.lightOrange, () -> entity.heat / visualMaxHeat));
+        addBar("heat", (HeatConductorBuild entity) ->
+            new Bar(
+                () -> Core.bundle.format("bar.heatamount", Strings.autoFixed(entity.heatModule.output + 0.001f, 1)),
+                () -> Pal.lightOrange, () -> entity.heatModule.output / visualMaxHeat));
+    }
+
+    @Override
+    public boolean emitsHeat(){
+        return true;
+    }
+
+    @Override
+    public float heatInputMax(){
+        return visualMaxHeat;
+    }
+
+    @Override
+    public float heatOutputMax(){
+        return visualMaxHeat * (splitHeat ? 3f : 1f);
     }
 
     @Override
@@ -49,9 +68,7 @@ public class HeatConductor extends Block{
         return drawer.finalIcons(this);
     }
 
-    public class HeatConductorBuild extends Building implements HeatBlock, HeatConsumer{
-        public float heat = 0f;
-        public float[] sideHeat = new float[4];
+    public class HeatConductorBuild extends Building{
         public IntSet cameFrom = new IntSet();
         public long lastHeatUpdate = -1;
 
@@ -67,16 +84,6 @@ public class HeatConductor extends Block{
         }
 
         @Override
-        public float[] sideHeat(){
-            return sideHeat;
-        }
-
-        @Override
-        public float heatRequirement(){
-            return visualMaxHeat;
-        }
-
-        @Override
         public void updateTile(){
             updateHeat();
         }
@@ -85,22 +92,13 @@ public class HeatConductor extends Block{
             if(lastHeatUpdate == Vars.state.updateId) return;
 
             lastHeatUpdate = Vars.state.updateId;
-            heat = calculateHeat(sideHeat, cameFrom);
+            heatModule.input = enabled ? calculateHeat(heatModule.sides, cameFrom) : 0f;
+            heatModule.output = heatModule.input;
         }
 
         @Override
         public float warmup(){
-            return heat;
-        }
-
-        @Override
-        public float heat(){
-            return heat;
-        }
-
-        @Override
-        public float heatFrac(){
-            return (heat / visualMaxHeat) / (splitHeat ? 3f : 1);
+            return heatModule.output;
         }
     }
 }

@@ -14,6 +14,7 @@ import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -105,7 +106,7 @@ public class MenuFragment{
                     }
                 });
             }).size(200, 60).name("becheck").update(t -> {
-                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(5f, 1f)) : Color.white);
+                t.getLabel().setColor(becontrol.isUpdateAvailable() ? Tmp.c1.set(Color.white).lerp(Pal.accent, Mathf.absin(Vars.state.time, 5f, 1f)) : Color.white);
             }));
         }
 
@@ -113,7 +114,7 @@ public class MenuFragment{
         parent.fill((x, y, w, h) -> {
             TextureRegion logo = Core.atlas.find("logo");
             float width = Core.graphics.getWidth(), height = Core.graphics.getHeight() - Core.scene.marginTop;
-            float logoscl = Scl.scl(1) * logo.scale;
+            float logoscl = Scl.scl(1) * logo.scale * 768f / logo.width; //logo used to be 768 pixels
             float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
             float logoh = logow * (float)logo.height / logo.width;
 
@@ -201,7 +202,7 @@ public class MenuFragment{
         Drawable background = Styles.black6;
 
         container.left();
-        container.add().width(Core.graphics.getWidth()/10f);
+        container.add().width(Core.graphics.getWidth() / 10f / Scl.scl(1f));
         container.table(background, t -> {
             t.defaults().width(width).height(70f);
             t.name = "buttons";

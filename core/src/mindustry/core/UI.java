@@ -1,11 +1,11 @@
 package mindustry.core;
 
 import arc.*;
-import arc.Graphics.*;
 import arc.Input.*;
 import arc.assets.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
@@ -34,7 +34,6 @@ import static arc.scene.actions.Actions.*;
 import static mindustry.Vars.*;
 
 public class UI implements ApplicationListener, Loadable{
-
     private static final StringBuilder buffer = new StringBuilder();
     public static String billions, millions, thousands;
 
@@ -81,8 +80,6 @@ public class UI implements ApplicationListener, Loadable{
     public CampaignCompleteDialog campaignComplete;
     public CampaignRulesDialog campaignRules;
 
-    public IntMap<Dialog> followUpMenus;
-
     public Cursor drillCursor, unloadCursor, targetCursor, repairCursor;
 
     private @Nullable Element lastAnnouncement;
@@ -93,6 +90,11 @@ public class UI implements ApplicationListener, Loadable{
     private final IntMap<WorldLabel> labels = new IntMap<>();
 
     public UI(){
+        Events.on(ResetEvent.class, e -> {
+            labels.clear();
+            popups.clear();
+        });
+
         Fonts.loadFonts();
     }
 
@@ -163,7 +165,14 @@ public class UI implements ApplicationListener, Loadable{
         Events.fire(Trigger.uiDrawBegin);
 
         Core.scene.act();
+
+        //force linear filtering for UI
+        TextureFilter prevMin = Core.atlas.getTexture().getMinFilter(), prevMax = Core.atlas.getTexture().getMagFilter();
+        Core.atlas.getTexture().setFilter(TextureFilter.linear);
+
         Core.scene.draw();
+
+        Core.atlas.getTexture().setFilter(prevMin, prevMax);
 
         if(Core.input.keyTap(KeyCode.mouseLeft) && Core.scene.hasField()){
             Element e = Core.scene.getHoverElement();
@@ -224,7 +233,6 @@ public class UI implements ApplicationListener, Loadable{
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
         campaignRules = new CampaignRulesDialog();
-        followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
 
@@ -321,9 +329,11 @@ public class UI implements ApplicationListener, Loadable{
             }});
         }else{
             new Dialog(titleText){{
-                cont.margin(30).add(text).padRight(6f);
+                cont.image().width(400f).pad(2).height(4f).color(Pal.accent);
+                cont.row();
+                cont.add(text).row();
                 TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
-                TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
+                TextField field = cont.field(def, t -> {}).size(400f, 50f).get();
                 field.setMaxLength(textLength);
                 field.setFilter(filter);
                 buttons.defaults().size(120, 54).pad(4);
@@ -405,8 +415,9 @@ public class UI implements ApplicationListener, Loadable{
         table.touchable = Touchable.disabled;
         table.setFillParent(true);
         if(cinfo.visible && !state.isMenu()) table.marginTop(cinfo.getPrefHeight() / Scl.scl() / 2);
-        table.update(() -> {
+        table.visible(() -> {
             if(state.isMenu()) table.remove();
+            return ui.hudfrag.shown;
         });
         table.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interp.fade), Actions.remove());
         table.top().table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).padTop(10);
@@ -428,11 +439,12 @@ public class UI implements ApplicationListener, Loadable{
         }
         table.setFillParent(true);
         table.touchable = Touchable.disabled;
-        table.update(() -> {
+        table.visible(() -> {
             if(state.isMenu()){
                 table.remove();
                 if(id != null) popups.remove(id);
             }
+            return ui.hudfrag.shown;
         });
         table.actions(Actions.delay(duration), Actions.remove(), Actions.run(() -> { if(id != null) popups.remove(id); }));
         table.align(align).table(Styles.black3, t -> t.margin(4).add(info).style(Styles.outlineLabel)).pad(top, left, bottom, right);
@@ -447,12 +459,14 @@ public class UI implements ApplicationListener, Loadable{
             return;
         }
 
-        var label = labels.get(id, WorldLabel::create); // todo: pool?
+        var label = id == -1 ? WorldLabel.create() : labels.get(id, WorldLabel::create); // todo: pool?
+        label.id = Integer.MIN_VALUE; //arbitrary value that won't be synced to, it's fine if IDs conflict
         label.x = worldx;
         label.y = worldy;
         label.text = info;
         label.flags = (byte)flags; // flag | flag2 at call site turns it into an int so the flags param here has to be int or casting has to be done at every call site
-        label.duration = duration;
+        label.duration = duration == Float.MAX_VALUE ? -1 : duration; // prefer -1 to Float.MAX_VALUE so that the update() function isn't called every tick
+        if(id != -1 && label.duration >= 0 && label.expired == null) label.expired = () -> labels.remove(id); // only set once to prevent extra garbage for updated labels
         label.add();
     }
 
@@ -655,81 +669,6 @@ public class UI implements ApplicationListener, Loadable{
             confirmed.run();
         });
         dialog.show();
-    }
-
-    // TODO REPLACE INTEGER WITH arc.fun.IntCons(int, T) or something like that.
-    public Dialog newMenuDialog(String title, String message, String[][] options, Cons2<Integer, Dialog> buttonListener){
-        return new Dialog(title){{
-            setFillParent(true);
-            removeChild(titleTable);
-            cont.add(titleTable).width(400f);
-
-            cont.row();
-            cont.image().width(400f).pad(2).colspan(2).height(4f).color(Pal.accent).bottom();
-            cont.row();
-            cont.pane(table -> {
-                table.add(message).width(400f).wrap().get().setAlignment(Align.center);
-                table.row();
-
-                int option = 0;
-                for(var optionsRow : options){
-                    if(optionsRow.length == 0) continue;
-                    Table buttonRow = table.row().table().get().row();
-                    int fullWidth = 400 - (optionsRow.length - 1) * 8; // adjust to count padding as well
-                    int width = fullWidth / optionsRow.length;
-                    int lastWidth = fullWidth - width * (optionsRow.length - 1); // take the rest of space for uneven table
-
-                    for(int i = 0; i < optionsRow.length; i++){
-                        if(optionsRow[i] == null) continue;
-
-                        String optionName = optionsRow[i];
-                        int finalOption = option;
-                        buttonRow.button(optionName, () -> buttonListener.get(finalOption, this))
-                                .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
-                        option++;
-                    }
-                }
-            }).growX();
-        }};
-    }
-
-    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
-    public void showMenu(String title, String message, String[][] options, Intc callback){
-        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
-            callback.get(option);
-            myself.hide();
-        });
-        dialog.closeOnBack(() -> callback.get(-1));
-        dialog.show();
-    }
-
-    /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
-     * @see UI#showMenu(String, String, String[][], Intc) */
-    public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
-        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
-            callback.get(option);
-            if(!state.isGame()){
-                myself.hide();
-            }
-        });
-        dialog.closeOnBack(() -> {
-            followUpMenus.remove(menuId);
-            callback.get(-1);
-        });
-
-        Dialog oldDialog = followUpMenus.remove(menuId);
-        if(oldDialog != null){
-            dialog.show(Core.scene, null);
-            oldDialog.hide(null);
-        }else{
-            dialog.show();
-        }
-        followUpMenus.put(menuId, dialog);
-    }
-
-    public void hideFollowUpMenu(int menuId) {
-        if(!followUpMenus.containsKey(menuId)) return;
-        followUpMenus.remove(menuId).hide();
     }
 
     /**

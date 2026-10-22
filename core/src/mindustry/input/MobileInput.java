@@ -96,7 +96,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             player.unit().mineTile = null;
             target = unit;
         }else{
-            Building tile = world.buildWorld(x, y);
+            Building tile = state.world.buildWorld(x, y);
 
             if((tile != null && (player.team() != tile.team && (tile.team != Team.derelict || state.rules.coreCapture)) && player.unit().type.canAttack) || (tile != null && player.unit().type.canHeal && tile.team == player.team() && tile.damaged())){
                 player.unit().mineTile = null;
@@ -130,7 +130,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
         if(!player.dead()){
             for(var plan : player.unit().plans()){
-                Tile other = world.tile(plan.x, plan.y);
+                Tile other = state.world.tile(plan.x, plan.y);
 
                 if(other == null || plan.breaking) continue;
 
@@ -312,7 +312,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     rebuildMode = false;
                     mode = none;
                 }
-            }).width(155f).height(48f).margin(12f).checked(b -> commandMode).row();
+            }).width(155f).height(48f).margin(12f).checked(b -> commandMode).visible(() -> !control.input.logicHideHud).row();
 
             t.spacerY(() -> showCancel() ? 50f : 0f).row();
 
@@ -629,7 +629,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     if(target != null){
                         payloadTarget = target;
                     }else{
-                        Building build = world.buildWorld(pos.x, pos.y);
+                        Building build = state.world.buildWorld(pos.x, pos.y);
 
                         if(build != null && build.team == player.team() && (pay.canPickup(build) || build.getPayload() != null && pay.canPickupPayload(build.getPayload()))){
                             payloadTarget = build;
@@ -980,7 +980,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             spectating = null;
         }
 
-        camera.position.clamp(-camera.width/4f, -camera.height/4f, world.unitWidth() + camera.width/4f, world.unitHeight() + camera.height/4f);
+        camera.position.clamp(-camera.width/4f, -camera.height/4f, state.world.unitWidth + camera.width/4f, state.world.unitHeight + camera.height/4f);
 
         return false;
     }
@@ -1046,7 +1046,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             attractDst = 0f;
 
             if(unit.within(payloadTarget, 3f * Time.delta)){
-                if(payloadTarget instanceof Vec2 && pay.hasPayload()){
+                if(pay.hasPayload() && (payloadTarget instanceof Vec2 || (payloadTarget instanceof Building b && b.team == player.team() && b.acceptPayload(b, pay.payloads().peek())))){
                     //vec -> dropping something
                     tryDropPayload();
                 }else if(payloadTarget instanceof Building build && build.team == unit.team){
@@ -1074,7 +1074,7 @@ public class MobileInput extends InputHandler implements GestureListener{
         unit.hitbox(rect);
         rect.grow(4f);
 
-        player.boosting = collisions.overlapsTile(rect, EntityCollisions::solid) || !unit.within(targetPos, 85f);
+        player.boosting = EntityCollisions.overlapsTile(rect, EntityCollisions::solid) || !unit.within(targetPos, 85f);
 
         unit.movePref(movement);
 
@@ -1084,7 +1084,7 @@ public class MobileInput extends InputHandler implements GestureListener{
             //autofire targeting
             if(manualShooting){
                 player.shooting = !boosted;
-                unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY());
+                unit.aim(player.mouseX = Core.input.mouseWorldX(), player.mouseY = Core.input.mouseWorldY(), true);
             }else if(target == null){
                 player.shooting = false;
                 if(Core.settings.getBool("autotarget") && !(player.unit() instanceof BlockUnitUnit u && u.tile() instanceof ControlBlock c && !c.shouldAutoTarget())){
@@ -1093,7 +1093,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                     }
 
                     if(allowHealing && target == null){
-                        target = Geometry.findClosest(unit.x, unit.y, indexer.getDamaged(player.team()));
+                        target = Geometry.findClosest(unit.x, unit.y, state.indexer.getDamaged(player.team()));
                         if(target != null && !unit.within(target, range)){
                             target = null;
                         }
@@ -1102,7 +1102,7 @@ public class MobileInput extends InputHandler implements GestureListener{
 
                 //when not shooting, aim at mouse cursor
                 //this may be a bad idea, aiming for a point far in front could work better, test it out
-                unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+                unit.aim(Core.input.mouseWorldX(), Core.input.mouseWorldY(), true);
             }else{
                 Vec2 intercept = player.unit().type.weapons.contains(w -> w.predictTarget) ? Predict.intercept(unit, target, type.weapons.first().bullet) : Tmp.v1.set(target);
 
@@ -1110,7 +1110,7 @@ public class MobileInput extends InputHandler implements GestureListener{
                 player.mouseY = intercept.y;
                 player.shooting = !boosted;
 
-                unit.aim(player.mouseX, player.mouseY);
+                unit.aim(player.mouseX, player.mouseY, true);
             }
         }
 

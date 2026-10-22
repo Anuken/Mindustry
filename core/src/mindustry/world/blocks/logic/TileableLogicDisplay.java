@@ -3,7 +3,6 @@ package mindustry.world.blocks.logic;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
@@ -135,7 +134,7 @@ public class TileableLogicDisplay extends LogicDisplay{
         private final Runnable drawTile = this::drawTile;
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case displayWidth -> tilesWidth * 32f - frameSize * 2;    // accounts for display frame (2 * 6 pixels)
                 case displayHeight -> tilesHeight * 32f - frameSize * 2;
@@ -184,13 +183,13 @@ public class TileableLogicDisplay extends LogicDisplay{
 
                         Tmp.m1.set(Draw.proj());
                         Tmp.m2.set(Draw.trans());
-                        Draw.proj(0, 0, root.buffer.getWidth(), root.buffer.getHeight());
+                        Draw.proj(0, 0, root.buffer.width, root.buffer.height);
 
                         //clear the buffer - some OSs leave garbage in it
-                        root.buffer.begin(Pal.darkerMetal);
+                        root.buffer.begin(backgroundColor);
                         if(root.prevBuffers != null){
                             for(var other : root.prevBuffers){
-                                Draw.rect(Draw.wrap(other.buffer.getTexture()), (other.x - originX) * 32 + other.buffer.getWidth() / 2f, (other.y - originY) * 32 + other.buffer.getHeight() / 2f, other.buffer.getWidth(), -other.buffer.getHeight());
+                                Draw.rect(Draw.wrap(other.buffer.texture), (other.x - originX) * 32 + other.buffer.width / 2f, (other.y - originY) * 32 + other.buffer.height / 2f, other.buffer.width, -other.buffer.height);
                                 Draw.flush();
                             }
                         }
@@ -241,8 +240,8 @@ public class TileableLogicDisplay extends LogicDisplay{
         private void drawFull() {
             if(rootDisplay.buffer != null){
                 float cx = x + tilesize * (tilesWidth - 1 - 2 * (tile.x - originX)) / 2f, cy = y + tilesize * (tilesHeight - 1 - 2 * (tile.y - originY)) / 2f;
-                Draw.rect(Draw.wrap(rootDisplay.buffer.getTexture()), cx, cy,
-                rootDisplay.buffer.getWidth() * scaleFactor * Draw.scl, -rootDisplay.buffer.getHeight() * scaleFactor * Draw.scl);
+                Draw.rect(Draw.wrap(rootDisplay.buffer.texture), cx, cy,
+                rootDisplay.buffer.width * scaleFactor * Draw.scl, -rootDisplay.buffer.height * scaleFactor * Draw.scl);
             }
         }
 
@@ -251,7 +250,7 @@ public class TileableLogicDisplay extends LogicDisplay{
                 int rtx = (tile.x - originX), rty = (tile.y - originY);
 
                 // Offset the region to account for the display frame (6 pixels)
-                Tmp.tr1.set(rootDisplay.buffer.getTexture(), rtx * 32 - frameSize, rty * 32 - frameSize, 32, 32);
+                Tmp.tr1.set(rootDisplay.buffer.texture, rtx * 32 - frameSize, rty * 32 - frameSize, 32, 32);
                 Draw.rect(Tmp.tr1, x, y, tilesize, -tilesize);
             }else{
                 Draw.rect(backRegion, x, y);
@@ -259,11 +258,21 @@ public class TileableLogicDisplay extends LogicDisplay{
         }
 
         @Override
-        public void flushCommands(LongSeq graphicsBuffer){
+        public void draw(LongSeq graphicsBuffer){
             if(isRoot()){
-                super.flushCommands(graphicsBuffer);
+                super.draw(graphicsBuffer);
             }else{
-                rootDisplay.flushCommands(graphicsBuffer);
+                rootDisplay.draw(graphicsBuffer);
+            }
+        }
+
+        @Override
+        public void ensureBuffer() {
+            if(rootDisplay.buffer == null){
+                rootDisplay.buffer = new FrameBuffer(32 * tilesWidth - 2 * frameSize, 32 * tilesHeight - 2 * frameSize);
+                //clear the buffer - some OSs leave garbage in it
+                rootDisplay.buffer.begin(backgroundColor);
+                rootDisplay.buffer.end();
             }
         }
 

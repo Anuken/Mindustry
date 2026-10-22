@@ -4,10 +4,10 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
-import mindustry.world.blocks.production.HeatCrafter.*;
 
 public class DrawHeatRegion extends DrawBlock{
     public Color color = new Color(1f, 0.22f, 0.22f, 0.8f);
@@ -31,12 +31,12 @@ public class DrawHeatRegion extends DrawBlock{
     @Override
     public void draw(Building build){
         Draw.z(Layer.blockAdditive);
-        if(build instanceof HeatCrafterBuild hc && hc.heat > 0){
+        if(build.heatModule != null && build.heatModule.input > 0){
 
             float z = Draw.z();
             if(layer > 0) Draw.z(layer);
             Draw.blend(Blending.additive);
-            Draw.color(color, Mathf.clamp(hc.heat / hc.heatRequirement()) * (color.a * (1f - pulse + Mathf.absin(pulseScl, pulse))));
+            Draw.color(color, Mathf.clamp(build.heatModule.input / build.block.heatInputMax()) * (color.a * (1f - pulse + Mathf.absin(Vars.state.time, pulseScl, pulse))));
             Draw.rect(heat, build.x, build.y);
             Draw.blend();
             Draw.color();

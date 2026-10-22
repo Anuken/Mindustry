@@ -13,6 +13,7 @@ public class EmptyFloor extends Floor{
         placeableOn = false;
         solid = true;
         drawEdgeOut = false;
+        supportsBeingOverlaid = false;
     }
 
     @Override

@@ -83,7 +83,7 @@ public class SteamVent extends Floor{
     //note that only the top right tile works for this; render order reasons.
     public boolean checkAdjacent(Tile tile){
         for(var point : offsets){
-            Tile other = Vars.world.tile(tile.x + point.x, tile.y + point.y);
+            Tile other = Vars.state.world.tile(tile.x + point.x, tile.y + point.y);
             if(other == null || other.floor() != this){
                 return false;
             }

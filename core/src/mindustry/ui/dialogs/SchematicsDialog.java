@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;
@@ -13,10 +12,8 @@ import arc.scene.ui.*;
 import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
-import arc.scene.utils.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -41,15 +38,32 @@ public class SchematicsDialog extends BaseDialog{
 
     public SchematicsDialog(){
         super("@schematics");
-        Core.assets.load("sprites/schematic-background.png", Texture.class).loaded = t -> t.setWrap(TextureWrap.repeat);
 
         tags = Core.settings.getJson("schematic-tags", Seq.class, String.class, Seq::new);
+
+        searchField = new TextField();
+        searchField.changed(() -> {
+            search = searchField.getText();
+            rebuildPane.run();
+        });
+
+        searchField.setMessageText("@schematic.search");
+        searchField.clicked(KeyCode.mouseRight, () -> {
+            if(!search.isEmpty()){
+                search = "";
+                searchField.clearText();
+                rebuildPane.run();
+            }
+        });
 
         shouldPause = true;
         addCloseButton();
         buttons.button("@schematic.import", Icon.download, this::showImport);
         makeButtonOverlay();
-        shown(this::setup);
+        shown(() -> {
+            searchField.setText(search = "");
+            setup();
+        });
         onResize(this::setup);
     }
 
@@ -59,26 +73,13 @@ public class SchematicsDialog extends BaseDialog{
             checkedTags = true;
         }
 
-        search = "";
-
         cont.top();
         cont.clear();
 
         cont.table(s -> {
             s.left();
             s.image(Icon.zoom);
-            searchField = s.field(search, res -> {
-                search = res;
-                rebuildPane.run();
-            }).growX().get();
-            searchField.setMessageText("@schematic.search");
-            searchField.clicked(KeyCode.mouseRight, () -> {
-                if(!search.isEmpty()){
-                    search = "";
-                    searchField.clearText();
-                    rebuildPane.run();
-                }
-            });
+            s.add(searchField).growX();
         }).fillX().padBottom(4);
 
         cont.row();
@@ -227,7 +228,7 @@ public class SchematicsDialog extends BaseDialog{
                 TextButtonStyle style = Styles.flatt;
                 t.defaults().size(280f, 60f).left();
                 t.row();
-                t.button("@import.clipboard", Icon.copy, style, () -> {
+                t.button("@load.clipboard", Icon.copy, style, () -> {
                     dialog.hide();
                     try{
                         Schematic s = Schematics.readBase64(Core.app.getClipboardText());
@@ -277,6 +278,20 @@ public class SchematicsDialog extends BaseDialog{
 
         dialog.addCloseButton();
         dialog.show();
+    }
+
+    public void importAndShow(Fi file){
+        try{
+            Schematic s = Schematics.read(file);
+            s.removeSteamID();
+            schematics.add(s);
+            checkTags(s);
+
+            setup();
+            showInfo(s);
+        }catch(Exception e){
+            ui.showException(e);
+        }
     }
 
     public void showExport(Schematic s){
@@ -635,7 +650,8 @@ public class SchematicsDialog extends BaseDialog{
                 for(var tag : tags){
                     if(schem.labels.contains(tag)) continue;
 
-                    var next = Elem.newButton(tag, () -> {
+                    TextButton next = new TextButton(tag);
+                    next.changed(() -> {
                         addTag(schem, tag);
                         buildTags(schem, t, name);
                         dialog.hide();

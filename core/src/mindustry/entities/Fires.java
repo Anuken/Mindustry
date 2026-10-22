@@ -26,6 +26,7 @@ public class Fires{
             fire.set(tile.worldx(), tile.worldy());
             fire.add();
             set(tile, fire);
+            Events.fire(Trigger.fireCreate);
         }else{
             fire.lifetime = baseLifetime;
             fire.time = 0f;
@@ -33,19 +34,19 @@ public class Fires{
     }
 
     public static @Nullable Fire get(Tile tile){
-        return tile == null ? null : world.tiles.getFire(tile.array());
+        return tile == null ? null : state.world.getFire(tile.array());
     }
 
     public static @Nullable Fire get(int x, int y){
-        return Structs.inBounds(x, y, world.width(), world.height()) ? world.tiles.getFire(world.packArray(x, y)) : null;
+        return Structs.inBounds(x, y, state.world.width, state.world.height) ? state.world.getFire(state.world.packArray(x, y)) : null;
     }
 
     private static void set(Tile tile, Fire fire){
-        world.tiles.setFire(tile.array(), fire);
+        state.world.setFire(tile.array(), fire);
     }
 
     public static boolean has(int x, int y){
-        if(!Structs.inBounds(x, y, world.width(), world.height())){
+        if(!Structs.inBounds(x, y, state.world.width, state.world.height)){
             return false;
         }
         Fire fire = get(x, y);

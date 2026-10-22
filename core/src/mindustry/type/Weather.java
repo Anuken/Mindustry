@@ -9,9 +9,10 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import arc.util.noise.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
+import mindustry.entities.effect.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -67,7 +68,7 @@ public class Weather extends UnlockableContent{
 
     @Nullable
     public WeatherState instance(){
-        return Groups.weather.find(w -> w.weather() == this);
+        return Vars.state.entities.weather.find(w -> w.weather() == this);
     }
 
     public boolean isActive(){
@@ -88,7 +89,7 @@ public class Weather extends UnlockableContent{
             if(state.effectTimer <= 0){
                 state.effectTimer = statusDuration - 5f;
 
-                Groups.unit.each(u -> {
+                Vars.state.entities.unit.each(u -> {
                     if(u.checkTarget(statusAir, statusGround)){
                         u.apply(status, statusDuration);
                     }
@@ -99,7 +100,7 @@ public class Weather extends UnlockableContent{
         }
 
         if(!headless && sound != Sounds.none){
-            float noise = soundVolOscMag > 0 ? (float)Math.abs(Noise.rawNoise(Time.time / soundVolOscScl)) * soundVolOscMag : 0;
+            float noise = soundVolOscMag > 0 ? (float)Math.abs(Noise.rawNoise(Vars.state.time / soundVolOscScl)) * soundVolOscMag : 0;
             control.sound.loop(sound, Math.max((soundVol + noise) * state.opacity, soundVolMin));
         }
     }
@@ -130,8 +131,8 @@ public class Weather extends UnlockableContent{
             float scl = rand.random(0.5f, 1f);
             float scl2 = rand.random(0.5f, 1f);
             float size = rand.random(sizeMin, sizeMax);
-            float x = (rand.random(0f, boundMax) + Time.time * windx * scl2);
-            float y = (rand.random(0f, boundMax) + Time.time * windy * scl);
+            float x = (rand.random(0f, boundMax) + Vars.state.time * windx * scl2);
+            float y = (rand.random(0f, boundMax) + Vars.state.time * windy * scl);
             float alpha = rand.random(minAlpha, maxAlpha);
             float rotation = randomParticleRotation ? rand.random(0f, 360f) : 0f;
 
@@ -169,8 +170,8 @@ public class Weather extends UnlockableContent{
             float scl = rand.random(0.5f, 1f);
             float scl2 = rand.random(0.5f, 1f);
             float size = rand.random(sizeMin, sizeMax);
-            float x = (rand.random(0f, boundMax) + Time.time * xspeed * scl2);
-            float y = (rand.random(0f, boundMax) - Time.time * yspeed * scl);
+            float x = (rand.random(0f, boundMax) + Vars.state.time * xspeed * scl2);
+            float y = (rand.random(0f, boundMax) - Vars.state.time * yspeed * scl);
             float tint = rand.random(1f) * alpha;
 
             x -= Tmp.r1.x;
@@ -195,7 +196,7 @@ public class Weather extends UnlockableContent{
         Lines.stroke(stroke);
         rand.setSeed(0);
 
-        float t = Time.time / timeScale;
+        float t = Vars.state.time / timeScale;
 
         for(int i = 0; i < total; i++){
             float offset = rand.random(0f, 1f);
@@ -214,7 +215,7 @@ public class Weather extends UnlockableContent{
             y += Tmp.r1.y;
 
             if(Tmp.r3.setCentered(x, y, life * 4f).overlaps(Tmp.r2)){
-                Tile tile = world.tileWorld(x, y);
+                Tile tile = state.world.tileWorld(x, y);
 
                 //only create splashes on specific liquid.
                 if(tile != null && tile.floor().liquidDrop == splasher){
@@ -235,33 +236,12 @@ public class Weather extends UnlockableContent{
     }
 
     public static void drawNoiseLayers(Texture noise, Color color, float noisescl, float opacity, float baseSpeed, float intensity, float vwindx, float vwindy,
-                                       int layers, float layerSpeedM , float layerAlphaM, float layerSclM, float layerColorM){
-        float sspeed = 1f, sscl = 1f, salpha = 1f, offset = 0f;
-        Color col = Tmp.c1.set(color);
-        for(int i = 0; i < layers; i++){
-            drawNoise(noise, col, noisescl * sscl, salpha * opacity, sspeed * baseSpeed, intensity, vwindx, vwindy, offset);
-            sspeed *= layerSpeedM;
-            salpha *= layerAlphaM;
-            sscl *= layerSclM;
-            offset += 0.29f;
-            col.mul(layerColorM);
-        }
+                                    int layers, float layerSpeedM, float layerAlphaM, float layerSclM, float layerColorM){
+        NoiseEffect.drawNoiseLayers(noise, color, noisescl, opacity, baseSpeed, intensity, vwindx, vwindy, layers, layerSpeedM, layerAlphaM, layerSclM, layerColorM);
     }
 
     public static void drawNoise(Texture noise, Color color, float noisescl, float opacity, float baseSpeed, float intensity, float vwindx, float vwindy, float offset){
-        Draw.alpha(opacity);
-        Draw.tint(color);
-
-        float speed = baseSpeed * intensity;
-        float windx = vwindx * speed, windy = vwindy * speed;
-
-        float scale = 1f / noisescl;
-        float scroll = Time.time * scale + offset;
-        Tmp.tr1.texture = noise;
-        Core.camera.bounds(Tmp.r1);
-        Tmp.tr1.set(Tmp.r1.x*scale, Tmp.r1.y*scale, (Tmp.r1.x + Tmp.r1.width)*scale, (Tmp.r1.y + Tmp.r1.height)*scale);
-        Tmp.tr1.scroll(-windx * scroll, -windy * scroll);
-        Draw.rect(Tmp.tr1, Core.camera.position.x, Core.camera.position.y, Core.camera.width, -Core.camera.height);
+        NoiseEffect.drawNoise(noise, color, noisescl, opacity, baseSpeed, intensity, vwindx, vwindy, offset);
     }
 
     @Override

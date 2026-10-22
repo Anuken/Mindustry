@@ -31,7 +31,7 @@ public class MissileAI extends AIController{
         var build = unit.buildOn();
 
         //kill instantly on enemy building contact
-        if(build != null && build.team != unit.team && (build == target || !build.block.underBullets)){
+        if(build != null && unit.type.targetGround && build.team != unit.team && (build == target || !build.block.underBullets)){
             unit.hasTarget = true;
             unit.kill();
         }
@@ -39,7 +39,7 @@ public class MissileAI extends AIController{
 
     @Override
     public Teamc target(float x, float y, float range, boolean air, boolean ground){
-        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground) && !u.isMissile(), t -> ground && (!t.block.underBullets || (shooter != null && t == Vars.world.buildWorld(shooter.aimX, shooter.aimY))));
+        return Units.closestTarget(unit.team, x, y, range, u -> u.checkTarget(air, ground) && !u.isMissile(), t -> ground && (!t.block.underBullets || (shooter != null && t == Vars.state.world.buildWorld(shooter.aimX, shooter.aimY))));
     }
 
     @Override

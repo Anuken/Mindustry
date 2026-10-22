@@ -3,10 +3,9 @@ package mindustry.world.blocks.payloads;
 import arc.graphics.g2d.*;
 import arc.math.geom.*;
 import arc.util.*;
-import arc.util.io.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
 import mindustry.gen.*;
+import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 
@@ -40,6 +39,11 @@ public interface Payload extends Position{
 
     /** update this payload inside a container unit or building. either can be null. */
     default void update(@Nullable Unit unitHolder, @Nullable Building buildingHolder){}
+
+    /** @return if this payload died for whatever reason (e.g. reactor/combustion generator exploding itself) */
+    default boolean isDead(){
+        return false;
+    }
 
     /** @return whether this payload was dumped. */
     default boolean dump(){
@@ -96,7 +100,7 @@ public interface Payload extends Position{
 
         byte type = read.b();
         if(type == payloadBlock){
-            Block block = content.block(read.s());
+            Block block = read.block();
             BuildPayload payload = new BuildPayload(block, Team.derelict);
             byte version = read.b();
             payload.build.readAll(read, version);

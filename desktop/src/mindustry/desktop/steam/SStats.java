@@ -2,8 +2,8 @@ package mindustry.desktop.steam;
 
 import arc.*;
 import arc.util.*;
-import com.codedisaster.steamworks.*;
 import mindustry.game.EventType.*;
+import steamworks.*;
 
 import static mindustry.Vars.*;
 
@@ -11,10 +11,10 @@ public class SStats implements SteamUserStatsCallback{
     public final SteamUserStats stats = new SteamUserStats(this);
 
     private boolean updated = false;
-    private int statSavePeriod = 4; //in minutes
+    private int statSavePeriod = 2; //in minutes
 
     public SStats(){
-        stats.requestCurrentStats();
+        service.init();
 
         Events.on(ClientLoadEvent.class, e -> {
             Timer.schedule(() -> {
@@ -30,22 +30,11 @@ public class SStats implements SteamUserStatsCallback{
     }
 
     @Override
-    public void onUserStatsReceived(long gameID, SteamID steamID, SteamResult result){
-        service.init();
-
-        if(result != SteamResult.OK){
-            Log.err("Failed to receive steam stats: @", result);
-        }else{
-            Log.info("Received steam stats.");
-        }
-    }
-
-    @Override
     public void onUserStatsStored(long gameID, SteamResult result){
         Log.info("Stored stats: @", result);
 
         if(result == SteamResult.OK){
-            updated = true;
+            updated = false;
         }
     }
 }

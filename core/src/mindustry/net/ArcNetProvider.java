@@ -13,7 +13,7 @@ import arc.util.Log.*;
 import arc.util.io.*;
 import mindustry.*;
 import mindustry.game.EventType.*;
-import mindustry.net.Administration.*;
+import mindustry.io.*;
 import mindustry.net.Net.*;
 import mindustry.net.Packets.*;
 import net.jpountz.lz4.*;
@@ -27,15 +27,20 @@ import java.util.concurrent.*;
 import static mindustry.Vars.*;
 
 public class ArcNetProvider implements NetProvider{
+    public static final int clientReadBufferSize = 25_000;
+
     final Client client;
     final Prov<DatagramPacket> packetSupplier = () -> new DatagramPacket(new byte[512], 512);
 
     final Server server;
     final CopyOnWriteArrayList<ArcConnection> connections = new CopyOnWriteArrayList<>();
     Thread serverThread;
+    @Nullable Future<?> serverStopTask;
+    volatile Thread clientThread;
 
     private static final LZ4SafeDecompressor decompressor = LZ4Factory.fastestInstance().safeDecompressor();
     private static final LZ4Compressor compressor = LZ4Factory.fastestInstance().fastCompressor();
+    private static final ThreadLocal<Seq<Connection>> writeConnections = Threads.local(Seq::new);
 
     private volatile int playerLimitCache, packetSpamLimit;
     private Ratekeeper clientUdpErrorRate = new Ratekeeper();
@@ -55,10 +60,10 @@ public class ArcNetProvider implements NetProvider{
         //fetch this in the main thread to prevent threading issues
         Events.run(Trigger.update, () -> {
             playerLimitCache = netServer.admins.getPlayerLimit();
-            packetSpamLimit = Config.packetSpamLimit.num();
+            packetSpamLimit = netServer.config.packetSpamLimit;
         });
 
-        client = new Client(16384, 16384, new PacketSerializer()){
+        client = new Client(16384, clientReadBufferSize, new PacketSerializer()){
             @Override
             public void handleNetException(ArcNetException e){
                 //allow occasional UDP network errors
@@ -106,7 +111,8 @@ public class ArcNetProvider implements NetProvider{
             }
         });
 
-        server = new Server(32768, 16384, new PacketSerializer());
+        //include extra 16kb headroom for when the write buffer is full
+        server = new Server(clientReadBufferSize + 16_000, 16384, new PacketSerializer());
         server.setMulticast(multicastGroup, multicastPort);
         server.setDiscoveryHandler((address, handler) -> {
             ByteBuffer buffer = NetworkIO.writeServerData();
@@ -162,7 +168,7 @@ public class ArcNetProvider implements NetProvider{
                 if(packetSpamLimit > 0 && !k.packetRate.allow(3000, packetSpamLimit)){
                     Log.warn("Blacklisting IP '@' as potential DOS attack - packet spam.", k.address);
                     connection.close(DcReason.closed);
-                    netServer.admins.blacklistDos(k.address);
+                    k.blacklist();
                     return;
                 }
 
@@ -216,7 +222,13 @@ public class ArcNetProvider implements NetProvider{
                 //just in case
                 client.stop();
 
-                Threads.daemon("Net Client", () -> {
+                //the old update thread has to exit first, otherwise the new thread's run() resets the shutdown flag and both keep running
+                Thread lastThread = clientThread;
+                if(lastThread != null){
+                    lastThread.join(5000);
+                }
+
+                clientThread = Threads.daemon("Net Client", () -> {
                     try{
                         client.run();
                     }catch(Exception e){
@@ -330,8 +342,70 @@ public class ArcNetProvider implements NetProvider{
     }
 
     @Override
+    public void sendAllServer(Object object, Iterable<NetConnection> connections, boolean reliable){
+        //build up list of underlying arcnet connections for faster bulk transfer
+        var cons = writeConnections.get();
+        cons.clear();
+        for(var con : connections){
+            if(con instanceof ArcConnection ac){
+                cons.add(ac.connection);
+            }
+        }
+
+        if(reliable){
+            server.sendToAllTCP(object, cons);
+        }else{
+            server.sendToAllUDP(object, cons);
+        }
+
+        cons.clear();
+    }
+
+    @Override
+    public void sendAllServer(Object object, boolean reliable){
+        if(reliable){
+            server.sendToAllTCP(object);
+        }else{
+            server.sendToAllUDP(object);
+        }
+    }
+
+    @Override
+    public void sendExceptServer(NetConnection except, Object object, boolean reliable){
+        if(!(except instanceof ArcConnection con)){
+            NetProvider.super.sendExceptServer(except, object, reliable);
+            return;
+        }
+
+        if(reliable){
+            server.sendToAllExceptTCP(con.connection.getID(), object);
+        }else{
+            server.sendToAllExceptUDP(con.connection.getID(), object);
+        }
+    }
+
+    @Override
     public void hostServer(int port) throws IOException{
         connections.clear();
+
+        //closeServer() stops the server asynchronously; make sure the old server thread is gone before starting a new one,
+        //otherwise the new thread's run() resets the shutdown flag and both keep running (or a late stop() kills the new server)
+        if(serverStopTask != null){
+            try{
+                serverStopTask.get(5, TimeUnit.SECONDS);
+            }catch(Exception ignored){
+            }
+            serverStopTask = null;
+        }
+
+        if(serverThread != null && serverThread.isAlive()){
+            server.stop();
+            try{
+                serverThread.join(5000);
+            }catch(InterruptedException ignored){
+            }
+        }
+
         server.bind(port, port);
 
         serverThread = new Thread(() -> {
@@ -348,10 +422,10 @@ public class ArcNetProvider implements NetProvider{
     @Override
     public void closeServer(){
         connections.clear();
-        mainExecutor.submit(server::stop);
+        serverStopTask = mainExecutor.submit(server::stop);
     }
 
-    class ArcConnection extends NetConnection{
+    public class ArcConnection extends NetConnection{
         public final Connection connection;
 
         long lastErrorTime;
@@ -367,7 +441,19 @@ public class ArcNetProvider implements NetProvider{
         }
 
         @Override
+        public void blacklist(){
+            //Blacklist TCP address
+            super.blacklist();
+            //Blacklist UDP address
+            var address = connection.getRemoteAddressUDP();
+            if(address != null){
+                netServer.admins.blacklistDos(address.getAddress().getHostAddress());
+            }
+        }
+
+        @Override
         public void sendStream(Streamable stream){
+            //listeners are processed in the order they're added and each reads into the buffer greedily before the next gets a turn, so concurrent streams are sent in FIFO order
             connection.addListener(new InputStreamSender(stream.stream, 1024){
                 int id;
 
@@ -402,8 +488,7 @@ public class ArcNetProvider implements NetProvider{
                     }
                 }
             }catch(Exception e){
-                Log.err(e);
-                Log.info("Error sending packet. Disconnecting invalid client!");
+                Log.err("Error sending packet. Disconnecting invalid client!", e);
                 connection.close(DcReason.error);
 
                 if(connection.getArbitraryData() instanceof ArcConnection k){
@@ -423,8 +508,8 @@ public class ArcNetProvider implements NetProvider{
         private static final boolean debug = false;
 
         ThreadLocal<ByteBuffer> decompressBuffer = Threads.local(() -> ByteBuffer.allocate(32768));
-        ThreadLocal<Reads> reads = Threads.local(() -> new Reads(new ByteBufferInput(decompressBuffer.get())));
-        ThreadLocal<Writes> writes = Threads.local(() -> new Writes(new ByteBufferOutput(decompressBuffer.get())));
+        ThreadLocal<mindustry.io.Reads> reads = Threads.local(() -> new Reads(new ByteBufferInput(decompressBuffer.get())));
+        ThreadLocal<mindustry.io.Writes> writes = Threads.local(() -> new mindustry.io.Writes(new ByteBufferOutput(decompressBuffer.get())));
 
         //for debugging network write counts
         static WindowedMean upload = new WindowedMean(5), download = new WindowedMean(5);

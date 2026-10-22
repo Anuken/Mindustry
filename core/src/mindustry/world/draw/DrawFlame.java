@@ -4,7 +4,7 @@ import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -42,12 +42,12 @@ public class DrawFlame extends DrawBlock{
             Draw.alpha(build.warmup());
             Draw.rect(top, build.x, build.y);
 
-            Draw.alpha(((1f - g) + Mathf.absin(Time.time, 8f, g) + Mathf.random(r) - r) * build.warmup());
+            Draw.alpha(((1f - g) + Mathf.absin(Vars.state.time, 8f, g) + Mathf.random(r) - r) * build.warmup());
 
             Draw.tint(flameColor);
-            Fill.circle(build.x + flameX, build.y + flameY, flameRadius + Mathf.absin(Time.time, flameRadiusScl, flameRadiusMag) + cr);
+            Fill.circle(build.x + flameX, build.y + flameY, flameRadius + Mathf.absin(Vars.state.time, flameRadiusScl, flameRadiusMag) + cr);
             Draw.color(1f, 1f, 1f, build.warmup());
-            Fill.circle(build.x + flameX, build.y + flameY, flameRadiusIn + Mathf.absin(Time.time, flameRadiusScl, flameRadiusInMag) + cr);
+            Fill.circle(build.x + flameX, build.y + flameY, flameRadiusIn + Mathf.absin(Vars.state.time, flameRadiusScl, flameRadiusInMag) + cr);
 
             Draw.color();
         }
@@ -55,6 +55,6 @@ public class DrawFlame extends DrawBlock{
 
     @Override
     public void drawLight(Building build){
-        Drawf.light(build.x + flameX, build.y + flameY, (lightRadius + Mathf.absin(lightSinScl, lightSinMag)) * build.warmup() * build.block.size, flameColor, lightAlpha);
+        Drawf.light(build.x + flameX, build.y + flameY, (lightRadius + Mathf.absin(Vars.state.time, lightSinScl, lightSinMag)) * build.warmup() * build.block.size, flameColor, lightAlpha);
     }
 }

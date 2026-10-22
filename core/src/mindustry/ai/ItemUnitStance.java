@@ -31,6 +31,13 @@ public class ItemUnitStance extends UnitStance{
     }
 
     @Override
+    public void removeContent(){
+        super.removeContent();
+        if(itemToStance.get(item) == this) itemToStance.remove(item);
+        all.remove(this, true);
+    }
+
+    @Override
     public String localized(){
         return Core.bundle.format("stance.mine", item.localizedName);
     }

@@ -57,13 +57,13 @@ public class WaveInfoDialog extends BaseDialog{
                 var style = Styles.cleart;
                 t.defaults().size(280f, 64f).pad(2f);
 
-                t.button("@waves.copy", Icon.copy, style, () -> {
+                t.button("@copy.clipboard", Icon.copy, style, () -> {
                     ui.showInfoFade("@waves.copied");
                     Core.app.setClipboardText(maps.writeWaves(groups));
                     dialog.hide();
                 }).disabled(b -> groups == null || groups.isEmpty()).marginLeft(12f).row();
 
-                t.button("@waves.load", Icon.download, style, () -> {
+                t.button("@load.clipboard", Icon.download, style, () -> {
                     try{
                         groups = maps.readWaves(Core.app.getClipboardText());
                         buildGroups();
@@ -81,7 +81,7 @@ public class WaveInfoDialog extends BaseDialog{
                 })).marginLeft(12f).row();
 
                 t.button("@settings.reset", Icon.refresh, style, () -> ui.showConfirm("@confirm", "@settings.clear.confirm", () -> {
-                    groups = JsonIO.copy(waves.get());
+                    groups = JsonIO.copy(waves.defaults());
                     buildGroups();
                     dialog.hide();
                 })).marginLeft(12f);
@@ -98,7 +98,7 @@ public class WaveInfoDialog extends BaseDialog{
     }
 
     void setup(){
-        groups = JsonIO.copy(state.rules.spawns.isEmpty() ? waves.get() : state.rules.spawns);
+        groups = JsonIO.copy(state.rules.spawns.isEmpty() ? waves.defaults() : state.rules.spawns);
         if(groups == null) groups = new Seq<>();
 
         cont.clear();
@@ -301,7 +301,7 @@ public class WaveInfoDialog extends BaseDialog{
                             a.button("", () -> {
                                 if(!checkedSpawns){
                                     //recalculate waves when changed
-                                    Vars.spawner.reset();
+                                    Vars.state.spawner.init();
                                     checkedSpawns = true;
                                 }
 
@@ -312,11 +312,11 @@ public class WaveInfoDialog extends BaseDialog{
                                     int cols = 4;
                                     int max = 20;
 
-                                    if(spawner.getSpawns().size >= max){
+                                    if(state.spawner.getSpawns().size >= max){
                                         p.add(Core.bundle.format("waves.spawn.first", max)).colspan(cols).padBottom(4).row();
                                     }
 
-                                    for(var spawn : spawner.getSpawns()){
+                                    for(var spawn : state.spawner.getSpawns()){
                                         p.button(spawn.x + ", " + spawn.y, Styles.flatTogglet, () -> {
                                             group.spawn = Point2.pack(spawn.x, spawn.y);
                                             dialog.hide();
@@ -332,7 +332,7 @@ public class WaveInfoDialog extends BaseDialog{
                                         }
                                     }
 
-                                    if(spawner.getSpawns().isEmpty()){
+                                    if(state.spawner.getSpawns().isEmpty()){
                                         p.add("@waves.spawn.none");
                                     }else{
                                         p.button("@waves.spawn.all", Styles.flatTogglet, () -> {

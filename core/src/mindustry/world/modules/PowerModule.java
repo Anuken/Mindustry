@@ -1,7 +1,7 @@
 package mindustry.world.modules;
 
 import arc.struct.*;
-import arc.util.io.*;
+import mindustry.io.*;
 import mindustry.world.blocks.power.*;
 
 public class PowerModule extends BlockModule{

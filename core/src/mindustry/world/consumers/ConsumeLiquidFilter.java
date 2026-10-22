@@ -26,7 +26,9 @@ public class ConsumeLiquidFilter extends ConsumeLiquidBase{
     @Override
     public void apply(Block block){
         block.hasLiquids = true;
-        content.liquids().each(filter, item -> block.liquidFilter[item.id] = true);
+        content.liquids().each(filter, item -> {
+            if(item.id < block.liquidFilter.length) block.liquidFilter[item.id] = true;
+        });
     }
 
     @Override

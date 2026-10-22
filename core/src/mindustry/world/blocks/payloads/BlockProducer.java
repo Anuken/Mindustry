@@ -1,14 +1,15 @@
 package mindustry.world.blocks.payloads;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -71,13 +72,21 @@ public abstract class BlockProducer extends PayloadBlock{
     public void setBars(){
         super.setBars();
 
-        addBar("progress", (BlockProducerBuild entity) -> new Bar("bar.progress", Pal.ammo, () -> entity.recipe() == null ? 0f : (entity.progress / entity.recipe().buildTime)));
+        addBar("progress", (BlockProducerBuild e) -> new Bar(
+            () -> Core.bundle.format("bar.progress", Strings.autoFixed(e.fraction() * 100f, 0)),
+            () -> Pal.ammo,
+            e::fraction
+        ));
     }
 
     public abstract class BlockProducerBuild extends PayloadBlockBuild<BuildPayload>{
         public float progress, time, heat;
 
         public abstract @Nullable Block recipe();
+
+        public float fraction(){
+            return recipe() == null ? 0f : (progress / recipe().buildTime);
+        }
 
         @Override
         public boolean acceptItem(Building source, Item item){
@@ -100,7 +109,7 @@ public abstract class BlockProducer extends PayloadBlock{
 
         @Override
         public boolean shouldConsume(){
-            return super.shouldConsume() && recipe() != null;
+            return super.shouldConsume() && recipe() != null && payload == null;
         }
 
         @Override
@@ -164,8 +173,8 @@ public abstract class BlockProducer extends PayloadBlock{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return progress;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return progress;
             return super.sense(sensor);
         }
 

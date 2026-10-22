@@ -10,8 +10,8 @@ import arc.scene.*;
 import arc.scene.actions.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
-import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.Stack;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
@@ -233,7 +233,7 @@ public class BlockInventoryFragment{
     private void updateTablePosition(){
         Vec2 v = Core.input.mouseScreen(build.x + build.block.size * tilesize / 2f, build.y + build.block.size * tilesize / 2f);
         table.pack();
-        table.setPosition(v.x, v.y, Align.topLeft);
+        table.setPosition(v.x - Core.scene.marginLeft, v.y - Core.scene.marginBottom, build.block.diagonalConfigInventory ? Align.bottomLeft : Align.topLeft);
     }
 
     private Element itemImage(TextureRegion region, Prov<CharSequence> text){

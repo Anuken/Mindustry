@@ -23,8 +23,8 @@ public class MissileUnitType extends UnitType{
         controller = u -> new MissileAI();
         flying = true;
         constructor = TimedKillUnit::create;
-        envEnabled = Env.any;
-        envDisabled = Env.none;
+        envEnabled = Environments.any;
+        envDisabled = Environments.none;
         physics = false;
         bounded = false;
         trailLength = 7;

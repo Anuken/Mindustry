@@ -5,7 +5,6 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.type.*;
 import mindustry.ui.*;
 
 import java.util.*;

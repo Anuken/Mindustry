@@ -3,6 +3,8 @@ package mindustry.editor;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.input.*;
+import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
@@ -11,9 +13,10 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
+import mindustry.game.markers.*;
+import mindustry.game.objectives.*;
+import mindustry.game.objectives.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -140,10 +143,10 @@ public class MapObjectivesDialog extends BaseDialog{
         setInterpreter(Team.class, (cont, name, type, field, remover, indexer, get, set) -> {
             name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
-                b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(get.get().color)),
+                b -> b.image(Tex.whiteui).update(i -> i.setColor(get.get().color)).grow(),
                 Styles.squarei,
                 () -> showTeamSelect(set)
-            ).fill().pad(4f)).growX().fillY();
+            ).margin(4f).pad(4f).size(50f)).growX().fillY();
         });
 
         setProvider(Color.class, (type, cons) -> cons.get(Pal.accent.cpy()));
@@ -289,8 +292,8 @@ public class MapObjectivesDialog extends BaseDialog{
             Alignment align = field.getAnnotation(Alignment.class);
             name(cont, name, remover, indexer);
             cont.button(b -> {
-                b.label(() -> LStatement.alignToName.get(get.get(), "center"));
-                b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
+                b.label(() -> LogicStatement.alignToName.get(get.get(), "center"));
+                b.clicked(() -> LogicStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
             }, () -> {});
         });
 
@@ -320,6 +323,11 @@ public class MapObjectivesDialog extends BaseDialog{
                 t.check("@marker.outline", (value & out) == out, res -> set.get((byte)(res ? value | out : value & ~out)))
                     .growX().fillY().get().getLabelCell().growX();
             }).growX().fillY();
+        });
+
+
+        setInterpreter(IndexBool.class, int.class, (cont, name, type, field, remover, indexer, get, set) -> {
+            getInterpreter(Boolean.class).build(cont, name, type, field, remover, indexer, () -> get.get() != -1, v -> set.get(v ? +1 : -1));
         });
 
         // Special data structure interpreters.
@@ -414,7 +422,7 @@ public class MapObjectivesDialog extends BaseDialog{
                 t.left();
                 t.margin(10f);
 
-                if(name.length() > 0) t.add(name + ":").color(Pal.accent);
+                if(name.length() > 0) t.add(name).color(Pal.accent);
                 t.add().growX();
 
                 Cell<ImageButton> remove = null;
@@ -494,13 +502,13 @@ public class MapObjectivesDialog extends BaseDialog{
                         var style = Styles.cleart;
                         t.defaults().size(280f, 64f).pad(2f);
 
-                        t.button("@waves.copy", Icon.copy, style, () -> {
+                        t.button("@copy.clipboard", Icon.copy, style, () -> {
                             ui.showInfoFade("@copied");
                             Core.app.setClipboardText(JsonIO.write(new MapObjectives(canvas.objectives)));
                             dialog.hide();
                         }).disabled(b -> canvas.objectives.isEmpty()).marginLeft(12f).row();
 
-                        t.button("@waves.load", Icon.download, style, () -> {
+                        t.button("@load.clipboard", Icon.download, style, () -> {
                             try{
                                 rebuildObjectives(new Seq<>(JsonIO.read(MapObjectives.class, Core.app.getClipboardText()).all));
                             }catch(Exception e){
@@ -538,6 +546,46 @@ public class MapObjectivesDialog extends BaseDialog{
             out.get(canvas.objectives);
             out = arr -> {};
         });
+
+        update(() -> {
+            if(hasKeyboard()){
+                doInput();
+            }
+        });
+    }
+
+    private void doInput(){
+        if(Core.input.ctrl() && Core.input.keyTap(KeyCode.c)){
+            Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
+            int pasteX = Mathf.round((pos.x - objWidth * canvas.unitSize / 2f) / canvas.unitSize);
+            int pasteY = Mathf.floor((pos.y - canvas.unitSize) / canvas.unitSize);
+            Tmp.r1.set(pasteX, pasteY, 1, 1).grow(-0.001f);
+            for(var obj : canvas.objectives){
+                if(Tmp.r2.set(obj.editorX - 2, obj.editorY - 1, objWidth, objHeight).overlaps(Tmp.r1)){
+                    Core.app.setClipboardText(JsonIO.json.toJson(obj, Object.class));
+                    break;
+                }
+            }
+        }
+
+        if(Core.input.ctrl() && Core.input.keyTap(KeyCode.v)){
+            String text = Core.app.getClipboardText();
+            if(text == null) return;
+
+            try{
+                MapObjective obj = JsonIO.read(MapObjective.class, text);
+                Vec2 pos = screenToLocalCoordinates(Core.input.mouse());
+                int tx = Mathf.round((pos.x - objWidth * canvas.unitSize / 2f) / canvas.unitSize);
+                int ty = Mathf.floor((pos.y - canvas.unitSize) / canvas.unitSize);
+                if(obj != null && canvas.tilemap.validPlace(tx, ty, null)){
+                    obj.editorX = tx;
+                    obj.editorY = ty;
+                    canvas.tilemap.createTile(tx, ty, obj, true);
+                    canvas.objectives.add(obj);
+                }
+            }catch(Exception e){ //in case serialization fails
+            }
+        }
     }
 
     public void show(Seq<MapObjective> objectives, Cons<Seq<MapObjective>> out){

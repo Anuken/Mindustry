@@ -3,10 +3,9 @@ package mindustry.graphics;
 import arc.*;
 import arc.assets.loaders.TextureLoader.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.type.*;
 import mindustry.world.meta.*;
 
@@ -27,7 +26,7 @@ public class EnvRenderers{
         float windSpeed = 0.03f, windAngle = 45f;
         float windx = Mathf.cosDeg(windAngle) * windSpeed, windy = Mathf.sinDeg(windAngle) * windSpeed;
 
-        renderer.addEnvRenderer(Env.underwater, () -> {
+        renderer.addEnvRenderer(Environments.of(Env.underwater), () -> {
             Draw.draw(Layer.light + 1, () -> {
                 Draw.color(waterColor, 0.4f);
                 Fill.rect(Core.camera.position.x, Core.camera.position.y, Core.camera.width, Core.camera.height);
@@ -46,7 +45,7 @@ public class EnvRenderers{
 
             Draw.blend(Blending.additive);
 
-            float t = Time.time / timeScale;
+            float t = Vars.state.time / timeScale;
             Texture tex = Core.assets.get("sprites/rays.png", Texture.class);
 
             for(int i = 0; i < rays; i++){
@@ -56,8 +55,8 @@ public class EnvRenderers{
                 int pos = (int)time;
                 float life = time % 1f;
                 float opacity = rand.random(0.2f, 0.7f) * Mathf.slope(life) * 0.7f;
-                float x = (rand.random(0f, world.unitWidth()) + (pos % 100)*753) % world.unitWidth();
-                float y = (rand.random(0f, world.unitHeight()) + (pos % 120)*453) % world.unitHeight();
+                float x = (rand.random(0f, state.world.unitWidth) + (pos % 100)*753) % state.world.unitWidth;
+                float y = (rand.random(0f, state.world.unitHeight) + (pos % 120)*453) % state.world.unitHeight;
                 float rot = rand.range(7f);
                 float sizeScale = 1f + rand.range(0.3f);
 
@@ -96,7 +95,7 @@ public class EnvRenderers{
             genMipMaps = true;
         }});
 
-        renderer.addEnvRenderer(Env.scorching, () -> {
+        renderer.addEnvRenderer(Environments.of(Env.scorching), () -> {
             Texture tex = Core.assets.get("sprites/distortAlpha.png", Texture.class);
 
             //TODO layer looks better? should not be conditional

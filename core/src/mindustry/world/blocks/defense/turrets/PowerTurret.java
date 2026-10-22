@@ -14,8 +14,8 @@ public class PowerTurret extends Turret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
     }
 
@@ -31,7 +31,7 @@ public class PowerTurret extends Turret{
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case ammo -> power == null ? 0f : power.status;
                 case ammoCapacity -> 1;

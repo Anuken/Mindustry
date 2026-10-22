@@ -1,7 +1,7 @@
 package mindustry.graphics;
 
 import arc.*;
-import arc.graphics.*;
+import arc.graphics.gl.*;
 
 /** Nvidia-specific utility class for querying GPU VRAM information. */
 public class NvGpuInfo{

@@ -121,6 +121,10 @@ public class LoadingFragment{
         table.toFront();
     }
 
+    public boolean shown(){
+        return table.visible;
+    }
+
     public void hide(){
         table.clearActions();
         table.toFront();

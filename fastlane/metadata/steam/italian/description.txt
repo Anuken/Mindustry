@@ -1,0 +1,62 @@
+Mindustry è un gioco di gestione industriale con elementi tower defense e RTS. Crea catene di approvvigionamento elaborate per alimentare le tue torrette con le munizioni, produci materiali per la costruzione e progetta unità. Comanda le tue unità per catturare le basi nemiche ed espandi la tua produzione. Difendi il tuo Nucleo dalle ondate di nemici.
+
+Gioca la campagna da solo o con i tuoi amici in multiplayer cooperativo cross-platform, oppure sfidali in match PvP a squadre.
+
+[img]{STEAM_APP_IMAGE}/extras/factory.gif[/img]
+
+[h2]Gestione Industriale[/h2]
+
+[list]
+[*] Crea elaborate catene di approvvigionamento con nastri trasportatori per rifornire le torrette di munizioni e produrre materiali da costruzione
+[*] Usa blocchi di produzione per creare un'ampia varietà di materiali avanzati
+[*] Distribuisci liquidi e affronta sfide costanti, come incendi improvvisi o incursioni aeree nemiche
+[*] Ottieni il massimo dalla tua produzione fornendo liquidi refrigeranti e lubrificanti opzionali
+[*] Produci una vasta gamma di unità per la gestione automatica della base o per l'assalto alle basi nemiche
+[/list]
+
+[h2]Tower Defense[/h2]
+
+[list]
+[*] Difendi le tue strutture dalle ondate di nemici
+[*] Posiziona strategicamente le tue torrette per distruggerli prima che raggiungano il tuo Nucleo
+[*] Rifornisci le tue torrette con munizioni, refrigerante ed energia
+[*] Rafforza le tue difese con scudi energetici, proiettori di riparazione e altri edifici di supporto
+[/list]
+
+[img]{STEAM_APP_IMAGE}/extras/rts3.png[/img]
+
+[h2]Strategia in Tempo Reale (RTS)[/h2]
+
+[list]
+[*] Allestisci linee di assemblaggio per costruire eserciti di unità meccanizzate
+[*] Usa le tue unità per scontrarti con basi nemiche completamente funzionali
+[*] Conquista nuovi territori per piazzare altri Nuclei e ottenere l'accesso a risorse aggiuntive per l'espansione
+[/list]
+
+[h2]Campagna[/h2]
+
+[list]
+[*] Gioca attraverso due distinte campagne planetarie
+[*] Conquista i pianeti Serpulo ed Erekir avanzando tra 35 mappe realizzate a mano e oltre 250 settori generati proceduralmente
+[*] Cattura territori e installa fabbriche per produrre risorse mentre giochi in altri settori
+[*] Difendi i tuoi settori da invasioni periodiche
+[*] Coordina la distribuzione delle risorse tra i settori tramite le piattaforme di lancio
+[*] Ricerca nuovi blocchi per alimentare i tuoi progressi
+[*] Invita i tuoi amici per completare le missioni insieme
+[*] Oltre 250 blocchi tecnologici da padroneggiare
+[*] Più di 50 tipi diversi di droni, mech e navi
+[*] Oltre 80 obiettivi da completare
+[/list]
+
+[h2]Community e Modding[/h2]
+
+[list]
+[*] Usa lo Steam Workshop per sfogliare mappe e schematiche create dalla community
+[*] Unisciti ai server pubblici della community per giocare con altri utenti su diverse piattaforme
+[*] Gioca in modalità cooperativa, PvP o sandbox
+[*] I server della community supportano plugin per mappe e modalità di gioco personalizzate
+[*] Crea il tuo server dedicato pubblico o invita gli amici in una sessione privata
+[*] Regole di gioco personalizzabili: modifica il costo dei blocchi, le statistiche dei nemici, gli oggetti iniziali, il tempo tra le ondate e molto altro
+[*] L'editor di mappe integrato ti permette di creare le tue mappe per giocare e condividerle con la community
+[*] Sfoglia le mod create dalla community per aggiungere o rimescolare ancora più contenuti
+[/list]

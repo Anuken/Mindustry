@@ -1,0 +1,34 @@
+Mindustry è un gioco di gestione industriale con elementi tower defense e RTS. Crea catene di approvvigionamento elaborate per alimentare le tue torrette con le munizioni, produci materiali per la costruzione e progetta unità meccanizzate. Comanda le tue unità per catturare le basi nemiche ed espandi la tua produzione. Difendi il tuo Nucleo dalle ondate di nemici.
+
+<h2>Caratteristiche del Gameplay</h2>
+
+- Usa blocchi di produzione per creare un'ampia varietà di materiali avanzati
+- Difendi le tue strutture dalle ondate di nemici
+- Gioca con i tuoi amici in partite cooperative multiplayer cross-platform, o sfidali in match PvP a squadre
+- Distribuisci liquidi e affronta sfide costanti, come incendi improvvisi o incursioni aeree nemiche
+- Ottieni il massimo dalla tua produzione fornendo liquidi refrigeranti e lubrificanti opzionali
+- Produci una vasta gamma di unità per la gestione automatica della base o per l'assalto alle basi nemiche
+- Allestisci linee di assemblaggio per costruire eserciti di unità meccanizzate
+- Usa le tue unità per scontrarti con basi nemiche completamente funzionali
+
+
+<h2>Campagna</h2>
+
+- Conquista i pianeti Serpulo ed Erekir avanzando attraverso 35 mappe realizzate a mano e oltre 250 settori generati proceduralmente
+- Cattura territori e installa fabbriche per produrre risorse mentre giochi in altri settori
+- Difendi i tuoi settori da invasioni periodiche
+- Coordina la distribuzione delle risorse tra i settori tramite le piattaforme di lancio
+- Ricerca nuovi blocchi per alimentare i tuoi progressi
+- Invita i tuoi amici per completare le missioni insieme
+- Oltre 250 blocchi tecnologici da padroneggiare
+- Più di 50 tipi diversi di droni, mech e navi
+
+
+<h2>Partite Personalizzate e Multiplayer Cross-Platform</h2>
+
+- Oltre 16 mappe integrate per le partite personalizzate, in aggiunta a due intere campagne
+- Gioca in modalità cooperativa, PvP o sandbox
+- Unisciti a un server pubblico dedicato o invita gli amici in una sessione privata
+- Regole di gioco personalizzabili: modifica il costo dei blocchi, le statistiche dei nemici, gli oggetti iniziali, il tempo tra le ondate e molto altro
+- Editor di mappe completo con supporto per lo scripting
+- Browser di mod integrato e supporto completo per le mod

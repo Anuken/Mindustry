@@ -1,6 +1,6 @@
 package mindustry.graphics.g3d;
 
-import arc.math.geom.*;
+import arc.math.*;
 
 public class MultiMesh implements GenericMesh{
     GenericMesh[] meshes;

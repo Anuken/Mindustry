@@ -28,7 +28,7 @@ public abstract class Mod{
     }
 
     /** Called during sprite packing to allow adding custom textures */
-    public void packSprites(MultiPacker packer){
+    public void packSprites(PackContext packer){
 
     }
 

@@ -3,6 +3,7 @@ package mindustry.world.blocks.environment;
 import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.world.*;
@@ -46,7 +47,7 @@ public class TiledFloor extends Floor{
     }
 
     long state(Tile tile){
-        return world.tiles.getTmpFloorState(tile.array());
+        return state.world.getTmpFloorState(tile.array());
     }
 
     @Override
@@ -55,7 +56,7 @@ public class TiledFloor extends Floor{
         //either way, this wouldn't be called on map load on servers, so it's broken there
         if(headless) return;
 
-        if(!world.isGenerating() && TiledState.changes(state(tile)) != world.floorChanges){
+        if(!state.generating && TiledState.changes(state(tile)) != state.world.floorChanges){
             scan(tile);
         }
     }
@@ -63,7 +64,7 @@ public class TiledFloor extends Floor{
     void scan(Tile tile){
         //max size possible
         int size = maxSize;
-        int changes = world.floorChanges;
+        int changes = state.world.floorChanges;
         boolean isOverlay = tile.overlay() == this;
 
         //scan to the top right for the biggest size possible
@@ -93,7 +94,7 @@ public class TiledFloor extends Floor{
                     }
 
                     //mark as updated
-                    world.tiles.setTmpFloorState(other.array(), TiledState.get(cx, cy, size, changes));
+                    state.world.setTmpFloorState(other.array(), TiledState.get(cx, cy, size, changes));
                     if(!headless && otherState != 0){
                         Core.app.post(() -> renderer.blocks.floor.recacheTile(other));
                     }
@@ -106,7 +107,7 @@ public class TiledFloor extends Floor{
     public void drawMain(Tile tile){
         long state = state(tile);
         //stale state, start scanning.
-        if(TiledState.changes(state) != world.floorChanges){
+        if(TiledState.changes(state) != Vars.state.world.floorChanges){
             scan(tile);
             //state has most likely updated
             state = state(tile);

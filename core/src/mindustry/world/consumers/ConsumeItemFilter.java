@@ -25,7 +25,11 @@ public class ConsumeItemFilter extends Consume{
     public void apply(Block block){
         block.hasItems = true;
         block.acceptsItems = true;
-        content.items().each(filter, item -> block.itemFilter[item.id] = true);
+        content.items().each(filter, item -> {
+            if(item.id < block.itemFilter.length){
+                block.itemFilter[item.id] = true;
+            }
+        });
     }
 
     @Override

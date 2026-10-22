@@ -6,9 +6,6 @@ import arc.func.*;
 import arc.scene.ui.*;
 import arc.struct.*;
 import arc.util.*;
-import com.codedisaster.steamworks.*;
-import com.codedisaster.steamworks.SteamRemoteStorage.*;
-import com.codedisaster.steamworks.SteamUGC.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -17,6 +14,9 @@ import mindustry.mod.Mods.*;
 import mindustry.service.*;
 import mindustry.type.*;
 import mindustry.ui.dialogs.*;
+import steamworks.*;
+import steamworks.SteamRemoteStorage.*;
+import steamworks.SteamUGC.*;
 
 import static mindustry.Vars.*;
 

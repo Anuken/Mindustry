@@ -4,26 +4,25 @@ import arc.*;
 import arc.audio.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.graphics.g2d.TextureAtlas.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
-import arc.struct.EnumSet;
 import arc.struct.*;
+import arc.struct.EnumSet;
 import arc.util.*;
 import arc.util.pooling.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
-import mindustry.graphics.MultiPacker.*;
 import mindustry.input.InputHandler.*;
 import mindustry.logic.*;
 import mindustry.mod.*;
@@ -40,26 +39,32 @@ import java.util.*;
 
 import static mindustry.Vars.*;
 
-public class Block extends UnlockableContent implements Senseable{
+public class Block extends UnlockableContent implements LogicSenseable{
     /** If true, buildings have an ItemModule. */
     public @NoPatch boolean hasItems;
     /** If true, buildings have a LiquidModule. */
     public @NoPatch boolean hasLiquids;
     /** If true, buildings have a PowerModule. */
     public @NoPatch boolean hasPower;
+    /** If true, buildings have a HeatModule. */
+    public @NoPatch boolean hasHeat;
     /** Flag for determining whether this block outputs liquid somewhere; used for connections. */
     public boolean outputsLiquid = false;
     /** Used by certain power blocks (nodes) to flag as non-consuming of power. True by default, even if this block has no power. */
     public boolean consumesPower = true;
     /** If true, this block is a generator that can produce power. */
     public boolean outputsPower = false;
+    /** Heat emitted to adjacent heat consumers at 100% efficiency. 0 means this block does not emit heat. */
+    public float heatOutput = 0f;
+    /** Rate at which emitted heat approaches its target, per tick. */
+    public float heatWarmupRate = 0.15f;
     /** If false, power nodes cannot connect to this block. */
     public boolean connectedPower = true;
     /** If true, this block can conduct power like a cable. */
     public boolean conductivePower = false;
     /** If true, this block can output payloads; affects blending. */
     public boolean outputsPayload = false;
-    /** If true, this block can input payloads; affects unit payload enter behavior. */
+    /** If true, this block can input payloads. Affects unit payload enter and pathfinding behaviors. */
     public boolean acceptsUnitPayloads = false;
     /** If true, payloads will attempt to move into this block. */
     public boolean acceptsPayload = false;
@@ -67,6 +72,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean acceptsItems = false;
     /** If true, this block won't be affected by the onlyDepositCore rule. */
     public boolean alwaysAllowDeposit = false;
+    /** If false, this block cannot be placed in payloads. */
+    public boolean allowedInPayloads = true;
     /** Cooldown, in seconds, applied to player item depositing when any item is deposited to this block. Overrides the itemDepositCooldown if non-negative. */
     public float depositCooldown = -1f;
     /** If true, all item capacities of this block are separate instead of pooled as one number. */
@@ -80,7 +87,7 @@ public class Block extends UnlockableContent implements Senseable{
     /** If true, this block outputs to its facing direction, when applicable.
      * Used for blending calculations. */
     public boolean outputFacing = true;
-    /** if true, this block does not accept input from the sides (used for armored conveyors) */
+    /** if true, this block does not accept input from the sides (used for armored conveyors/ducts/conduits) */
     public boolean noSideBlend = false;
     /** whether to display flow rate */
     public boolean displayFlow = true;
@@ -136,6 +143,8 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean drawArrow = true;
     /** whether to draw the team corner by default */
     public boolean drawTeamOverlay = true;
+    /** whether to rotate the enemy-team overlay sprite (only applied to custom ones) */
+    public boolean rotateTeamOverlay = true;
     /** for static blocks only: if true, tile data() is saved in world data. */
     public boolean saveData;
     /** whether you can break this with rightclick */
@@ -172,8 +181,6 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean updateInUnits = true;
     /** if true, this block updates in payloads in units regardless of the experimental game rule */
     public boolean alwaysUpdateInUnits = false;
-    /** if true, this block can be picked up in payloads */
-    public boolean canPickup = true;
     /** if false, only incinerable liquids are dropped when deconstructing; otherwise, all liquids are dropped. */
     public boolean deconstructDropAllLiquid = false;
     /** Whether to use this block's color in the minimap. Only used for overlays. */
@@ -182,7 +189,7 @@ public class Block extends UnlockableContent implements Senseable{
     public @Nullable Item itemDrop = null;
     /** if true, this block cannot be mined by players. useful for annoying things like sand. */
     public boolean playerUnmineable = false;
-    /** Array of affinities to certain things. */
+    /** Affinities for floors. */
     public Attributes attributes = new Attributes();
     /** Health per square tile that this block occupies; essentially, this is multiplied by size * size. Overridden if health is > 0. If <0, the default is 40. */
     public float scaledHealth = -1;
@@ -227,8 +234,6 @@ public class Block extends UnlockableContent implements Senseable{
     public float crushDamageMultiplier = 1f;
     /** If true, this block is instantly destroyed by tanks with crushFragile set to true. */
     public boolean crushFragile = false;
-    /** Max of timers used. */
-    public int timers = 0;
     /** Cache layer. Only used for 'cached' rendering of blocks (not buildings). */
     public CacheLayer cacheLayer = CacheLayer.normal;
     /** If true, draw() will be called on the building. */
@@ -262,8 +267,10 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean ignoreResizeConfig;
     /** If true, this building can be selected like a unit when commanding. */
     public boolean commandable;
-    /** If true, the building inventory can be shown with the config. */
-    public boolean allowConfigInventory = true;
+    /** If false, the inventory is never shown for this block, even if it has items. */
+    public boolean showInventory = true;
+    /** If true, the building inventory will be placed diagonally on the top right. */
+    public boolean diagonalConfigInventory = false;
     /** Defines how large selection menus, such as that of sorters, should be. */
     public int selectionRows = 5, selectionColumns = 4;
     /** If true, this block can be configured by logic. */
@@ -274,12 +281,12 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean consumesTap;
     /** Whether to draw the glow of the liquid for this block, if it has one. */
     public boolean drawLiquidLight = true;
-    /** Environmental flags that are *all* required for this block to function. 0 = any environment */
-    public int envRequired = 0;
+    /** Environmental flags that are *all* required for this block to function. Empty = any environment */
+    public Environments envRequired = Environments.none;
     /** The environment flags that this block can function in. If the env matches any of these, it will be enabled. */
-    public int envEnabled = Env.terrestrial;
+    public Environments envEnabled = Environments.of(Env.terrestrial);
     /** The environment flags that this block *cannot* function in. If the env matches any of these, it will be *disabled*. */
-    public int envDisabled = 0;
+    public Environments envDisabled = Environments.none;
     /** Whether to periodically sync this block across the network. */
     public boolean sync;
     /** Whether this block uses conveyor-type placement mode. */
@@ -301,7 +308,7 @@ public class Block extends UnlockableContent implements Senseable{
     public boolean hasColor = false;
     /** Whether units target this block. */
     public boolean targetable = true;
-    /** If true, this block attacks and is considered a turret in the indexer. Building must implement Ranged. */
+    /** If true, this block attacks and is considered a turret in the state.indexer. Building must implement Ranged. */
     public boolean attacks = false;
     /** If true, this block is mending-related and can be suppressed with special units/missiles. */
     public boolean suppressable = false;
@@ -414,6 +421,9 @@ public class Block extends UnlockableContent implements Senseable{
     /** The single power consumer, if applicable. */
     @NoPatch
     public @Nullable ConsumePower consPower;
+    /** The single heat consumer, if applicable. */
+    @NoPatch
+    public @Nullable ConsumeHeat consHeat;
 
     /** Map of bars by name. */
     @NoPatch
@@ -429,13 +439,13 @@ public class Block extends UnlockableContent implements Senseable{
     public TextureRegion region;
     public @Load("@-shadow") TextureRegion customShadowRegion;
     public @Load("@-team") TextureRegion teamRegion;
+    public @Load("@-team-overlay") TextureRegion teamOverlayRegion;
+    public @Load("block-border") TextureRegion defaultTeamOverlayRegion;
     public TextureRegion[] teamRegions, variantRegions, variantShadowRegions;
 
     protected static final Seq<Tile> tempTiles = new Seq<>();
     protected static final Seq<Building> tempBuilds = new Seq<>();
 
-    /** Dump timer ID.*/
-    protected final int timerDump = timers++;
     /** How often to try dumping items in ticks, e.g. 5 = 12 times/sec*/
     public int dumpTime = 5;
 
@@ -479,7 +489,7 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public float percentSolid(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
             .sumf(other -> !other.floor().isLiquid ? 1f : 0f) / size / size;
@@ -509,7 +519,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     public void drawPotentialLinks(int x, int y){
         if((consumesPower || outputsPower) && hasPower && connectedPower){
-            Tile tile = world.tile(x, y);
+            Tile tile = state.world.tile(x, y);
             if(tile != null){
                 PowerNode.getNodeLinks(tile, this, player.team(), other -> {
                     PowerNode node = (PowerNode)other.block;
@@ -576,7 +586,7 @@ public class Block extends UnlockableContent implements Senseable{
 
     public float sumAttribute(@Nullable Attribute attr, int x, int y){
         if(attr == null) return 0;
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         if(tile == null) return 0;
         return tile.getLinkedTilesAs(this, tempTiles)
             .sumf(other -> !floating && !placeableLiquid && other.floor().isDeep() ? 0 : other.floor().attributes.get(attr));
@@ -595,9 +605,9 @@ public class Block extends UnlockableContent implements Senseable{
         return 0;
     }
 
-    public Color getColor(Tile tile){
+    public int getColor(Tile tile){
         int mc = minimapColor(tile);
-        return mc == 0 ? mapColor : Tmp.c3.set(mc);
+        return mc == 0 ? mapColor.rgba() : mc;
     }
 
     public boolean outputsItems(){
@@ -615,7 +625,22 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     public boolean rotatedOutput(int x, int y){
-        return rotate;
+        return rotate && heatOutput <= 0f;
+    }
+
+    /** @return whether adjacent heat consumers read this block's heat output. */
+    public boolean emitsHeat(){
+        return heatOutput > 0f;
+    }
+
+    /** @return the heat input that corresponds to a full fraction when drawing. */
+    public float heatInputMax(){
+        return consHeat != null ? consHeat.requirement : 0f;
+    }
+
+    /** @return the heat output that corresponds to a full fraction when drawing. */
+    public float heatOutputMax(){
+        return heatOutput;
     }
 
     public boolean rotatedOutput(int fromX, int fromY, Tile destination){
@@ -636,10 +661,16 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
+
+        stats.useCategories = true;
 
         stats.add(Stat.size, "@x@", size, size);
+
+        if(unitCapModifier != 0){
+            stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
+        }
 
         if(synthetic()){
             stats.add(Stat.health, health, StatUnit.none);
@@ -660,6 +691,10 @@ public class Block extends UnlockableContent implements Senseable{
 
         for(var c : consumers){
             c.display(stats);
+        }
+
+        if(heatOutput > 0f){
+            stats.add(Stat.output, heatOutput, StatUnit.heatUnits);
         }
 
         //Note: Power stats are added by the consumers.
@@ -714,16 +749,24 @@ public class Block extends UnlockableContent implements Senseable{
             );
         }
 
+        if(consHeat != null){
+            addBar("heat", entity -> new Bar(
+                () -> Core.bundle.format("bar.heatpercent", (int)(entity.heatModule.input + 0.01f), (int)(consHeat.efficiencyScale(entity) * 100 + 0.01f)),
+                () -> Pal.lightOrange,
+                () -> entity.heatModule.input / consHeat.requirement)
+            );
+        }
+
+        if(heatOutput > 0f){
+            addBar(consHeat != null ? "heat-output" : "heat", entity -> new Bar("bar.heat", Pal.lightOrange, () -> entity.heatModule.output / heatOutput));
+        }
+
         if(hasItems && configurable){
             addBar("items", entity -> new Bar(
                 () -> Core.bundle.format("bar.items", entity.items.total()),
                 () -> Pal.items,
                 () -> (float)entity.items.total() / itemCapacity)
             );
-        }
-
-        if(unitCapModifier != 0){
-            stats.add(Stat.maxUnits, (unitCapModifier < 0 ? "-" : "+") + Math.abs(unitCapModifier));
         }
 
         //liquids added last
@@ -753,7 +796,7 @@ public class Block extends UnlockableContent implements Senseable{
             }
 
             //nothing was added, so it's safe to add a dynamic liquid bar (probably?)
-            if(!added){
+            if(!added && liquidCapacity > 0f){
                 addLiquidBar(build -> build.liquids.current());
             }
         }
@@ -762,6 +805,7 @@ public class Block extends UnlockableContent implements Senseable{
     @Override
     public void afterPatch(){
         super.afterPatch();
+        hasHeat = emitsHeat() || consHeat != null;
         barMap.clear();
         setBars();
         offset = ((size + 1) % 2) * tilesize / 2f;
@@ -974,11 +1018,6 @@ public class Block extends UnlockableContent implements Senseable{
         }
     }
 
-    /** @return special icons to outline and save with an -outline variant. Vanilla only. */
-    public TextureRegion[] makeIconRegions(){
-        return new TextureRegion[0];
-    }
-
     protected TextureRegion[] icons(){
         //use team region in vanilla team blocks
         TextureRegion r = variants > 0 ? Core.atlas.find(name + "1") : region;
@@ -1034,9 +1073,17 @@ public class Block extends UnlockableContent implements Senseable{
         return state.rules.isBanned(this);
     }
 
+    public boolean isOverPlacementLimit(Team team){
+        if(!state.rules.editor && !team.isAI()){
+            int limit = state.rules.blockLimits.get(this, 0);
+            return limit > 0 && team.data().getBuildings(this).size >= limit;
+        }
+        return false;
+    }
+
     /** @return whether this block supports a specific environment. */
-    public boolean supportsEnv(int env){
-        return (envEnabled & env) != 0 && (envDisabled & env) == 0 && (envRequired == 0 || (envRequired & env) == envRequired);
+    public boolean supportsEnv(Environments env){
+        return envEnabled.containsAny(env) && !envDisabled.containsAny(env) && (envRequired.isEmpty() || env.containsAll(envRequired));
     }
 
     /** Called to set up configuration UI in the editor. {@link #editorConfigurable} must be true.
@@ -1128,6 +1175,9 @@ public class Block extends UnlockableContent implements Senseable{
         if(!consumeBuilder.contains(c -> c instanceof ConsumePower)){
             consPower = null;
         }
+        if(!consumeBuilder.contains(c -> c instanceof ConsumeHeat)){
+            consHeat = null;
+        }
     }
 
     public ConsumeLiquid consumeLiquid(Liquid liquid, float amount){
@@ -1170,6 +1220,14 @@ public class Block extends UnlockableContent implements Senseable{
         return consume(new ConsumePower(0f, powerCapacity, true));
     }
 
+    /**
+     * Creates a consumer which requires heat from adjacent emitters.
+     * @param requirement The heat input required for 100% efficiency.
+     */
+    public ConsumeHeat consumeHeat(float requirement){
+        return consume(new ConsumeHeat(requirement));
+    }
+
     public ConsumeItems consumeItem(Item item){
         return consumeItem(item, 1);
     }
@@ -1198,14 +1256,6 @@ public class Block extends UnlockableContent implements Senseable{
         }
         consumeBuilder.add(consume);
         return consume;
-    }
-
-    public void setupRequirements(Category cat, ItemStack[] stacks){
-        requirements(cat, stacks);
-    }
-
-    public void setupRequirements(Category cat, BuildVisibility visible, ItemStack[] stacks){
-        requirements(cat, visible, stacks);
     }
 
     public void requirements(Category cat, ItemStack[] stacks, boolean unlocked){
@@ -1448,6 +1498,8 @@ public class Block extends UnlockableContent implements Senseable{
 
         buildTime *= buildCostMultiplier;
 
+        if(heatOutput > 0f) hasHeat = true;
+
         consumers = consumeBuilder.toArray(Consume.class);
         optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
         nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
@@ -1461,8 +1513,6 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         setBars();
-
-        stats.useCategories = true;
 
         //TODO check for double power consumption
 
@@ -1487,6 +1537,7 @@ public class Block extends UnlockableContent implements Senseable{
     public void reinitializeConsumers(){
         consumers = consumeBuilder.toArray(Consume.class);
         consPower = (ConsumePower)Structs.find(consumers, c -> c instanceof ConsumePower);
+        consHeat = (ConsumeHeat)Structs.find(consumers, c -> c instanceof ConsumeHeat);
         optionalConsumers = consumeBuilder.select(consume -> consume.optional && !consume.ignore()).toArray(Consume.class);
         nonOptionalConsumers = consumeBuilder.select(consume -> !consume.optional && !consume.ignore()).toArray(Consume.class);
         updateConsumers = consumeBuilder.select(consume -> consume.update && !consume.ignore()).toArray(Consume.class);
@@ -1494,6 +1545,7 @@ public class Block extends UnlockableContent implements Senseable{
         itemFilter = new boolean[content.items().size];
         liquidFilter = new boolean[content.liquids().size];
         if(outputsPower) hasPower = true;
+        if(heatOutput > 0f) hasHeat = true;
 
         for(Consume cons : consumers){
             cons.apply(this);
@@ -1542,8 +1594,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public void createIcons(MultiPacker packer){
-        super.createIcons(packer);
+    public void packSprites(PackContext packer){
+        super.packSprites(packer);
 
         if(!synthetic()){
             PixmapRegion image = packer.get(fullIcon);
@@ -1551,12 +1603,18 @@ public class Block extends UnlockableContent implements Senseable{
         }
 
         Seq<Pixmap> toDispose = new Seq<>();
+        PixmapRegion shardTeamTop = null;
 
         //generate paletted team regions
         if(teamRegion != null && teamRegion.found()){
             for(Team team : Team.all){
+                if(!team.hasPalette) continue;
+
+                String teamName = name + "-team-" + team.name;
+                PixmapRegion result;
+
                 //if there's an override, don't generate anything
-                if(team.hasPalette && !Core.atlas.has(name + "-team-" + team.name)){
+                if(!Core.atlas.has(teamName)){
                     var base = packer.get(teamRegion);
                     Pixmap out = new Pixmap(base.width, base.height);
 
@@ -1575,9 +1633,14 @@ public class Block extends UnlockableContent implements Senseable{
 
                     Drawf.checkBleed(out);
 
-                    packer.add(PageType.main, name + "-team-" + team.name, out);
+                    packer.add(teamName, out);
                     toDispose.add(out);
+                    result = new PixmapRegion(out);
+                }else{
+                    result = packer.get(Core.atlas.find(teamName));
                 }
+
+                if(team == Team.sharded) shardTeamTop = result;
             }
 
             teamRegions = new TextureRegion[Team.all.length];
@@ -1591,43 +1654,72 @@ public class Block extends UnlockableContent implements Senseable{
         var gen = icons();
 
         if(outlineIcon){
-            AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length -1];
-            PixmapRegion region = packer.get(atlasRegion);
-            Pixmap out = last = Pixmaps.outline(region, outlineColor, outlineRadius);
-            Drawf.checkBleed(out);
-            packer.add(PageType.main, atlasRegion.name, out);
-            toDispose.add(out);
+            int outlinedIdx = outlinedIcon >= 0 ? Math.min(outlinedIcon, gen.length - 1) : gen.length - 1;
+            AtlasRegion atlasRegion = (AtlasRegion)gen[outlinedIdx];
+            if(packer.has(atlasRegion.name)){
+                PixmapRegion region = packer.get(atlasRegion);
+
+                //unpadded, with any layers above the outlined one composited in; used only for the full icon substitution below
+                last = Pixmaps.outline(region, outlineColor, outlineRadius);
+                for(int i = outlinedIdx + 1; i < gen.length; i++){
+                    if(gen[i] instanceof AtlasRegion above && packer.has(above.name)){
+                        last.draw(packer.get(above), true);
+                    }
+                }
+                toDispose.add(last);
+
+                //padded, replaces the region actually used in-game so the outline isn't clipped at tile edges
+                Pixmap padded = Pixmaps.outline(region, outlineColor, outlineRadius, 1);
+                Drawf.checkBleed(padded);
+                packer.add(atlasRegion.name, padded);
+                toDispose.add(padded);
+            }
         }
 
         var toOutline = new Seq<TextureRegion>();
         getRegionsToOutline(toOutline);
 
         for(var region : toOutline){
-            if(region instanceof AtlasRegion atlas){
+            if(region instanceof AtlasRegion atlas && packer.has(atlas.name)){
                 String regionName = atlas.name;
                 Pixmap outlined = Pixmaps.outline(packer.get(region), outlineColor, outlineRadius);
 
                 Drawf.checkBleed(outlined);
 
-                packer.add(PageType.main, regionName + "-outline", outlined);
+                packer.add(regionName + "-outline", outlined);
                 toDispose.add(outlined);
             }
         }
 
-        if(gen.length > 1){
+        if(gen.length > 0 && gen[0] != null && gen[0].found()){
             Pixmap base = packer.get(gen[0]).crop();
+            if(teamRegions != null && gen[0] == teamRegions[Team.sharded.id] && shardTeamTop != null){
+                base.draw(shardTeamTop, true);
+            }
+
             for(int i = 1; i < gen.length; i++){
                 if(i == gen.length - 1 && last != null){
                     base.draw(last, 0, 0, true);
                 }else{
                     base.draw(packer.get(gen[i]), true);
                 }
+
+                if(teamRegions != null && gen[i] == teamRegions[Team.sharded.id] && shardTeamTop != null){
+                    base.draw(shardTeamTop, true);
+                }
             }
-            packer.add(PageType.main, "block-" + name + "-full", base);
+
+            //a single-region block with no team overlay just reuses its own region, no need for a redundant "-full" copy
+            boolean trivial = gen.length == 1 && gen[0] == Core.atlas.find(name) && shardTeamTop == null;
+            if(!trivial){
+                packer.add("block-" + name + "-full", base);
+            }
+
+            if(isVanilla()){
+                saveScaled(packer, base, "block-" + name + "-ui", Math.min(base.width, maxUiIcon));
+            }
 
             toDispose.add(base);
-        }else{
-            if(gen[0] != null) packer.add(PageType.main, "block-" + name + "-full", packer.get(gen[0]));
         }
 
         toDispose.each(Pixmap::dispose);
@@ -1654,10 +1746,11 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(LAccess sensor){
+    public double sense(LogicProp sensor){
         return switch(sensor){
             case color -> mapColor.toDoubleBits();
             case health, maxHealth -> health;
+            case armor -> armor;
             case solid -> solid ? 1 : 0;
             case size -> size;
             case itemCapacity -> itemCapacity;
@@ -1669,8 +1762,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public double sense(Content content){
-        if(content instanceof Item item){
+    public double sense(Object object){
+        if(object instanceof Item item){
             if(state.rules.infiniteResources) return 0;
 
             for(ItemStack r : requirements){
@@ -1684,8 +1777,8 @@ public class Block extends UnlockableContent implements Senseable{
     }
 
     @Override
-    public Object senseObject(LAccess sensor){
-        if(sensor == LAccess.name) return name;
+    public Object senseObject(LogicProp sensor){
+        if(sensor == LogicProp.name) return name;
         return noSensed;
     }
 }

@@ -6,10 +6,11 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -40,7 +41,7 @@ public class OverdriveProjector extends Block{
         canOverdrive = false;
         emitLight = true;
         lightRadius = 50f;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         ambientSound = Sounds.loopCircuit;
         ambientSoundVolume = 0.13f;
     }
@@ -56,13 +57,13 @@ public class OverdriveProjector extends Block{
 
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
-        indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+        state.indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f))));
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = useTime;
-        super.setStats();
+        super.setStats(stats);
 
         stats.add(Stat.speedIncrease, "+" + (int)(speedBoost * 100f - 100) + "%");
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
@@ -107,7 +108,7 @@ public class OverdriveProjector extends Block{
                 float realRange = range + phaseHeat * phaseRangeBoost;
 
                 charge = 0f;
-                indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 1f));
+                state.indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> other.applyBoost(realBoost(), reload + 1f));
             }
 
             if(efficiency > 0){
@@ -128,7 +129,7 @@ public class OverdriveProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+            state.indexer.eachBlock(this, realRange, other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f))));
 
             Drawf.dashCircle(x, y, realRange, baseColor);
         }
@@ -139,10 +140,10 @@ public class OverdriveProjector extends Block{
 
             if(!Lod.l2) return;
 
-            float f = 1f - (Time.time / 100f) % 1f;
+            float f = 1f - (Vars.state.time / 100f) % 1f;
 
             Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f * Lod.alpha2);
+            Draw.alpha(heat * Mathf.absin(Vars.state.time, 50f / Mathf.PI2, 1f) * 0.5f * Lod.alpha2);
             Draw.rect(topRegion, x, y);
             Draw.alpha(Lod.alpha2);
             Lines.stroke((2f * f + 0.1f) * heat);

@@ -21,7 +21,7 @@ public class WorldReloader{
         if(wasServer = net.server()){
             players.clear();
 
-            for(Player p : Groups.player){
+            for(Player p : state.entities.player){
                 if(p.isLocal()) continue;
 
                 players.add(p);

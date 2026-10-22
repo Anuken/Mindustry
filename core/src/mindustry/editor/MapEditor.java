@@ -7,6 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
@@ -47,7 +48,7 @@ public class MapEditor{
         loading = false;
     }
 
-    public void beginEdit(Map map){
+    public void beginEdit(Map map) throws Throwable{
         reset();
 
         loading = true;
@@ -55,21 +56,25 @@ public class MapEditor{
         if(map.file.parent().parent().name().equals("1127400") && steam){
             tags.put("steamid",  map.file.parent().name());
         }
-        load(() -> MapIO.loadMap(map, context));
-        renderer.resize(width(), height());
-        loading = false;
+        loading = true;
+        try{
+            MapIO.loadMap(map, context);
+        }finally{
+            loading = false;
+        }
+        if(!headless) renderer.resize(state.world.width, state.world.height);
     }
 
     public void beginEdit(Pixmap pixmap){
         reset();
 
         createTiles(pixmap.width, pixmap.height);
-        load(() -> MapIO.readImage(pixmap, tiles()));
-        renderer.resize(width(), height());
+        load(() -> MapIO.readImage(pixmap, state.world));
+        if(!headless) renderer.resize(state.world.width, state.world.height);
     }
 
     public void updateRenderer(){
-        Tiles tiles = world.tiles;
+        World tiles = state.world;
         Seq<Building> builds = new Seq<>();
 
         for(int i = 0; i < tiles.width * tiles.height; i++){
@@ -78,14 +83,18 @@ public class MapEditor{
             if(build != null && tile.isCenter()){
                 builds.add(build);
             }
-            tiles.seti(i, new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0));
+
+            var newTile = new EditorTile(tile.x, tile.y, tile.floorID(), tile.overlayID(), build == null ? tile.blockID() : 0);
+            newTile.floorData = tile.floorData;
+            newTile.extraData = tile.extraData;
+            tiles.seti(i, newTile);
         }
 
         for(var build : builds){
-            tiles.get(build.tileX(), build.tileY()).setBlock(build.block, build.team, build.rotation, () -> build);
+            tiles.tile(build.tileX(), build.tileY()).setBlock(build.block, build.team, build.rotation, () -> build);
         }
 
-        renderer.resize(width(), height());
+        renderer.resize(state.world.width, state.world.height);
     }
 
     public void load(Runnable r){
@@ -96,7 +105,7 @@ public class MapEditor{
 
     /** Creates a 2-D array of EditorTiles with stone as the floor block. */
     private void createTiles(int width, int height){
-        Tiles tiles = world.resize(width, height);
+        World tiles = state.resizeWorld(width, height);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -106,7 +115,7 @@ public class MapEditor{
     }
 
     public Map createMap(Fi file){
-        return new Map(file, width(), height(), new StringMap(tags), true);
+        return new Map(file, state.world.width, state.world.height, new StringMap(tags), true);
     }
 
     private void reset(){
@@ -116,20 +125,8 @@ public class MapEditor{
         tags = new StringMap();
     }
 
-    public Tiles tiles(){
-        return world.tiles;
-    }
-
     public Tile tile(int x, int y){
-        return world.rawTile(x, y);
-    }
-
-    public int width(){
-        return world.width();
-    }
-
-    public int height(){
-        return world.height();
+        return state.world.rawTile(x, y);
     }
 
     public void drawBlocksReplace(int x, int y){
@@ -146,8 +143,8 @@ public class MapEditor{
 
     public void drawBlocks(int x, int y, boolean square, boolean forceOverlay, Boolf<Tile> tester){
         if(drawBlock.isMultiblock()){
-            x = Mathf.clamp(x, (drawBlock.size - 1) / 2, width() - drawBlock.size / 2 - 1);
-            y = Mathf.clamp(y, (drawBlock.size - 1) / 2, height() - drawBlock.size / 2 - 1);
+            x = Mathf.clamp(x, (drawBlock.size - 1) / 2, state.world.width - drawBlock.size / 2 - 1);
+            y = Mathf.clamp(y, (drawBlock.size - 1) / 2, state.world.height - drawBlock.size / 2 - 1);
             if(!hasOverlap(x, y)){
                 tile(x, y).setBlock(drawBlock, drawTeam, rotation);
                 addTileOp(TileOp.get((short)x, (short)y, DrawOperation.opTeam, (byte)drawTeam.id));
@@ -218,7 +215,7 @@ public class MapEditor{
     }
 
     boolean hasOverlap(int x, int y){
-        Tile tile = world.tile(x, y);
+        Tile tile = state.world.tile(x, y);
         //allow direct replacement of blocks of the same size
         if(tile != null && tile.isCenter() && tile.block() != drawBlock && tile.block().size == drawBlock.size && tile.x == x && tile.y == y){
             return false;
@@ -231,7 +228,7 @@ public class MapEditor{
             for(int dy = 0; dy < drawBlock.size; dy++){
                 int worldx = dx + offsetx + x;
                 int worldy = dy + offsety + y;
-                Tile other = world.tile(worldx, worldy);
+                Tile other = state.world.tile(worldx, worldy);
 
                 if(other != null && other.block().isMultiblock()){
                     return true;
@@ -243,12 +240,12 @@ public class MapEditor{
     }
 
     public void addCliffs(){
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(!tile.block().isStatic() || tile.block() == Blocks.cliff) continue;
 
             int rotation = 0;
             for(int i = 0; i < 8; i++){
-                Tile other = world.tiles.get(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
+                Tile other = state.world.tile(tile.x + Geometry.d8[i].x, tile.y + Geometry.d8[i].y);
                 if(other != null && !other.block().isStatic()){
                     rotation |= (1 << i);
                 }
@@ -261,7 +258,7 @@ public class MapEditor{
             tile.data = (byte)rotation;
         }
 
-        for(Tile tile : world.tiles){
+        for(Tile tile : state.world){
             if(tile.block() != Blocks.cliff && tile.block().isStatic()){
                 tile.setBlock(Blocks.air);
             }
@@ -276,7 +273,7 @@ public class MapEditor{
                 if(Mathf.within(rx, ry, brushSize - 0.5f + 0.0001f)){
                     int wx = x + rx, wy = y + ry;
 
-                    if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
+                    if(wx < 0 || wy < 0 || wx >= state.world.width || wy >= state.world.height){
                         continue;
                     }
 
@@ -292,7 +289,7 @@ public class MapEditor{
             for(int ry = -clamped; ry <= clamped; ry++){
                 int wx = x + rx, wy = y + ry;
 
-                if(wx < 0 || wy < 0 || wx >= width() || wy >= height()){
+                if(wx < 0 || wy < 0 || wx >= state.world.width || wy >= state.world.height){
                     continue;
                 }
 
@@ -304,13 +301,13 @@ public class MapEditor{
     public void resize(int width, int height, int shiftX, int shiftY){
         clearOp();
 
-        Tiles previous = world.tiles;
-        int offsetX = (width() - width) / 2 - shiftX, offsetY = (height() - height) / 2 - shiftY;
+        World previous = state.world;
+        int offsetX = (state.world.width - width) / 2 - shiftX, offsetY = (state.world.height - height) / 2 - shiftY;
         loading = true;
 
-        world.clearBuildings();
+        previous.clearBuildings();
 
-        Tiles tiles = world.tiles = new Tiles(width, height);
+        World tiles = state.world = new World(width, height);
 
         for(int x = 0; x < width; x++){
             for(int y = 0; y < height; y++){
@@ -409,37 +406,37 @@ public class MapEditor{
         currentOp.remove(amount);
     }
 
-    class Context implements WorldContext{
+    class Context extends SaveLoadContext{
         @Override
         public Tile tile(int index){
-            return world.tiles.geti(index);
+            return state.world.geti(index);
         }
 
         @Override
         public void resize(int width, int height){
-            world.resize(width, height);
+            state.resizeWorld(width, height);
         }
 
         @Override
         public Tile create(int x, int y, int floorID, int overlayID, int wallID){
             Tile tile = new EditorTile(x, y, floorID, overlayID, wallID);
-            tiles().set(x, y, tile);
+            state.world.set(x, y, tile);
             return tile;
         }
 
         @Override
         public boolean isGenerating(){
-            return world.isGenerating();
+            return state.generating;
         }
 
         @Override
         public void begin(){
-            world.beginMapLoad();
+            state.generating = true;
         }
 
         @Override
         public void end(){
-            world.endMapLoad();
+            state.generating = false;
         }
     }
 }

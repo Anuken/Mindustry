@@ -73,7 +73,7 @@ public class EffectsDialog extends BaseDialog{
 
                 t.stack(
                 new EffectCell(entry, cl),
-                new Table(af -> af.add(entry.name).grow().labelAlign(Align.bottomLeft).style(Styles.outlineLabel).bottom().left())
+                new Table(af -> af.add(LogicStatement.bundle(entry.name)).grow().labelAlign(Align.bottomLeft).style(Styles.outlineLabel).bottom().left())
                 ).size(size).with(a -> {
                     a.clicked(() -> {
                         if(listener != null){
@@ -142,7 +142,7 @@ public class EffectsDialog extends BaseDialog{
 
         @Override
         protected void draw(Texture texture, float[] spriteVertices, int offset, int count){
-            for(int i = offset; i < count; i += SpriteBatch.VERTEX_SIZE){
+            for(int i = offset; i < count; i += SpriteBatch.vertexSize){
                 max(spriteVertices[i], spriteVertices[i + 1]);
             }
         }

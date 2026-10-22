@@ -14,6 +14,7 @@ public class StatUnit{
 
     blocks = new StatUnit("blocks"),
     blocksSquared = new StatUnit("blocksSquared"),
+    worldUnits = new StatUnit("worldUnits"),
     tilesSecond = new StatUnit("tilesSecond"),
     powerSecond = new StatUnit("powerSecond", "[accent]" + Iconc.power + "[]"),
     liquidSecond = new StatUnit("liquidSecond", "[sky]" + Iconc.liquid + "[]"),
