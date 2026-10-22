@@ -177,38 +177,38 @@ public class BlockIndexer{
             }
 
             {
-                int buildIndex = build.indexerBuildIndex & 0xffff;
+                int buildIndex = build.indexerBuildIndex;
 
                 //remove from building list based on cached index
                 if(buildIndex < data.buildings.size && data.buildings.get(buildIndex) == build){
                     data.buildings.remove(buildIndex);
                     //update index of the building placed in the new position
-                    if(buildIndex < data.buildings.size) data.buildings.get(buildIndex).indexerBuildIndex = (short)buildIndex;
+                    if(buildIndex < data.buildings.size) data.buildings.get(buildIndex).indexerBuildIndex = buildIndex;
                 }else{
                     int index = data.buildings.indexOf(build);
                     if(index != -1){
                         data.buildings.remove(index);
                         //update index of the building placed in the new position
-                        if(index < data.buildings.size) data.buildings.get(index).indexerBuildIndex = (short)index;
+                        if(index < data.buildings.size) data.buildings.get(index).indexerBuildIndex = index;
                     }
                 }
             }
 
             {
                 var targetTypes = data.buildingTypes.get(build.block, () -> new Seq<>(false));
-                int buildTypeIndex = build.indexerBuildTypeIndex & 0xffff;
+                int buildTypeIndex = build.indexerBuildTypeIndex;
 
                 //remove from building list based on cached index
                 if(buildTypeIndex < targetTypes.size && targetTypes.get(buildTypeIndex) == build){
                     targetTypes.remove(buildTypeIndex);
                     //update index of the building placed in the new position
-                    if(buildTypeIndex < targetTypes.size) targetTypes.get(buildTypeIndex).indexerBuildTypeIndex = (short)buildTypeIndex;
+                    if(buildTypeIndex < targetTypes.size) targetTypes.get(buildTypeIndex).indexerBuildTypeIndex = buildTypeIndex;
                 }else{
                     int index = targetTypes.indexOf(build);
                     if(index != -1){
                         targetTypes.remove(index);
                         //update index of the building placed in the new position
-                        if(index < targetTypes.size) targetTypes.get(index).indexerBuildTypeIndex = (short)index;
+                        if(index < targetTypes.size) targetTypes.get(index).indexerBuildTypeIndex = index;
                     }
                 }
             }
@@ -607,8 +607,8 @@ public class BlockIndexer{
             targetTypes.add(tile.build);
 
             //save indices for fast lookup
-            tile.build.indexerBuildIndex = (short)(data.buildings.size - 1);
-            tile.build.indexerBuildTypeIndex = (short)(targetTypes.size - 1);
+            tile.build.indexerBuildIndex = data.buildings.size - 1;
+            tile.build.indexerBuildTypeIndex = targetTypes.size - 1;
 
             //update the unit cap when new tile is registered
             data.unitCap += tile.block().unitCapModifier;

@@ -106,7 +106,7 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, Timerc, 
 
     //used only by the indexer
     transient boolean wasDamaged;
-    transient short indexerBuildIndex, indexerBuildTypeIndex;
+    transient int indexerBuildIndex, indexerBuildTypeIndex;
 
     /** Sets this tile entity data to this and adds it if necessary. */
     public Building init(Tile tile, Team team, boolean shouldAdd, int rotation){
