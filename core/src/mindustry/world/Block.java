@@ -626,8 +626,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
         return true;
     }
 
-    public float constructHealthMultiplier(){
-    return constructHealthMultiplier > 0f ? health * constructHealthMultiplier : 10f;
+    public float constructHealth(){
+    return constructHealthMultiplier > 0f ? health * constructHealthMultiplier : 10;
     }
 
     public boolean rotatedOutput(int x, int y){
