@@ -141,6 +141,8 @@ public class ControlPathfinder implements Runnable{
 
     //PATHFINDING THREAD - requests that should be recomputed
     final ObjectSet<PathRequest> invalidRequests = new ObjectSet<>();
+    //PATHFINDING THREAD - requests to recompute after checking for invalid ones. a set, as invalid requests with the same destination all add each other
+    final ObjectSet<PathRequest> requestsToRecalculate = new ObjectSet<>();
 
     /** Current pathfinding thread */
     @Nullable Thread thread;
@@ -1312,6 +1314,10 @@ public class ControlPathfinder implements Runnable{
             FieldCache previousField = null;
             if(request != null){
                 request.lastUpdateId = -1000;
+                //it's replaced in unitRequests below, so the update check would never invalidate or remove it
+                request.invalidated = true;
+                PathRequest old = request;
+                queue.post(() -> threadPathRequests.remove(old));
 
                 FieldCache current = null;
                 try{
@@ -1351,6 +1357,9 @@ public class ControlPathfinder implements Runnable{
     }
 
     private void recalculatePath(ControlPathfinder.PathRequest request){
+        //the unit stopped using this request after it was queued
+        if(request.invalidated) return;
+
         initializePathRequest(request, request.team, request.costId, request.unit.tileX(), request.unit.tileY(), request.destination % wwidth, request.destination / wwidth);
     }
 
@@ -1600,23 +1609,25 @@ public class ControlPathfinder implements Runnable{
                                     for(var otherRequest : threadPathRequests){
                                         if(otherRequest.destination == request.destination){
                                             otherRequest.oldCache = field;
-
-                                            if(otherRequest != request){
-                                                queue.post(() -> recalculatePath(otherRequest));
-                                            }
+                                            requestsToRecalculate.add(otherRequest);
                                         }
                                     }
 
-                                    //the recalculation is done next update, so multiple path requests in the same batch don't end up removing and recalculating the field multiple times.
-                                    queue.post(() -> recalculatePath(request));
+                                    requestsToRecalculate.add(request);
                                     //it has been processed.
                                     it.remove();
                                 }
                             }else{ //there's no field, presumably because a previous request already invalidated it.
-                                queue.post(() -> recalculatePath(request));
+                                requestsToRecalculate.add(request);
                                 it.remove();
                             }
                         }
+
+                        //the recalculation is done next update, so multiple path requests in the same batch don't end up removing and recalculating the field multiple times.
+                        for(var request : requestsToRecalculate){
+                            queue.post(() -> recalculatePath(request));
+                        }
+                        requestsToRecalculate.clear();
                     }
 
                     //each update time (not total!) no longer than maxUpdate
