@@ -15,7 +15,6 @@ import arc.util.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.core.*;
-import mindustry.ctype.*;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
@@ -362,7 +361,7 @@ public class StatValues{
 
                 if(state.isGame()){
                     var blocks = Vars.content.blocks()
-                    .select(block -> (!checkFloors || block instanceof Floor) && indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
+                    .select(block -> (!checkFloors || block instanceof Floor) && state.indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
                     .with(s -> s.sort(f -> f.attributes.get(attr)));
 
                     if(blocks.any()){
@@ -400,33 +399,33 @@ public class StatValues{
         return table -> {
             if(table.getCells().size > 0) table.getCells().peek().growX();
             table.row();
-    
+
             table.table(c -> {
                 Runnable[] rebuild = {null};
                 Map[] lastMap = {null};
-    
+
                 rebuild[0] = () -> {
                     c.clearChildren();
                     c.left();
-    
+
                     if(state.isGame()){
                         var blocks = Vars.content.blocks()
-                        .select(block -> (!checkFloors || block instanceof Floor) && indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
+                        .select(block -> (!checkFloors || block instanceof Floor) && state.indexer.isBlockPresent(block) && block.attributes.get(attr) != 0 && !((block instanceof Floor f && f.isDeep()) && !floating))
                         .with(s -> s.sort(f -> f.attributes.get(attr)));
-    
+
                         if(blocks.any()){
                             for(var block : blocks){
                                 c.table(Styles.grayPanel, b -> {
                                     float efficiency = 1f + block.attributes.get(attr) * scaleEff;
-    
+
                                     b.image(block.uiIcon).size(40f).pad(10f).left().scaling(Scaling.fit);
                                     b.table(center -> {
                                         center.left();
-    
+
                                         if(outputs != null && outputs.any()){
                                             for(ItemStack output : outputs){
                                                 float scaled = output.amount * (1f + block.attributes.get(attr) * scaleAmount);
-    
+
                                                 center.table(it -> {
                                                 it.left();
                                                 it.add(displayItem(output.item, scaled, timePeriod / efficiency , true)).left().padLeft(6f);
@@ -437,7 +436,7 @@ public class StatValues{
                                         }
                                     }).left().grow();
                                     b.add((efficiency < 1f ? "[negstat]" : "[stat]") + Core.bundle.format("stat.efficiency", fixValue(efficiency * 100f))).right().pad(10f).padRight(15f);
-    
+
                                 }).growX().pad(5).row();
                             }
                         }else{
@@ -447,13 +446,13 @@ public class StatValues{
                         c.add("@stat.showinmap");
                     }
                 };
-    
+
                 rebuild[0].run();
-    
+
                 //rebuild when map changes.
                 c.update(() -> {
                     Map current = state.isGame() ? state.map : null;
-    
+
                     if(current != lastMap[0]){
                         rebuild[0].run();
                         lastMap[0] = current;
@@ -727,14 +726,16 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean compact = t instanceof UnitType && !showUnit || nested;
+                BulletType ammoType = map.get(t), shown = ammoType;
 
-                BulletType type = map.get(t);
-
-                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false, blockName).display(table);
-                    continue;
+                //unit-spawning ammo displays the spawned unit's bullet, but keeps the ammo's own usage
+                while(shown.spawnUnit != null && shown.spawnUnit.weapons.size > 0){
+                    shown = shown.spawnUnit.weapons.first().bullet;
                 }
+
+                BulletType type = shown;
+
+                boolean compact = t instanceof UnitType && (!showUnit || type != ammoType) || nested;
 
                 table.table(Styles.grayPanel, bt -> {
                     bt.left().top().defaults().padRight(3).left();
@@ -745,8 +746,8 @@ public class StatValues{
 
                             title.add(t.localizedName).padRight(10).left().top();
 
-                            if(type.displayAmmoMultiplier && type.statLiquidConsumed > 0f){
-                                title.add("[stat]" + fixValue(type.statLiquidConsumed / type.ammoMultiplier * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
+                            if(ammoType.displayAmmoUsed && ammoType.statLiquidConsumed > 0f){
+                                title.add("[stat]" + fixValue(ammoType.statLiquidConsumed * ammoType.ammoUsed * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
                             }
                         });
                         bt.row();
@@ -778,8 +779,8 @@ public class StatValues{
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
                     }
 
-                    if(type.statLiquidConsumed <= 0f && !compact && !Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier && (!(t instanceof Turret turret) || turret.displayAmmoMultiplier)){
-                        sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
+                    if(t instanceof Item && !compact && ammoType.displayAmmoUsed){
+                        sep(bt, Core.bundle.format("bullet.ammoused", fixValue(ammoType.ammoUsed)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){

@@ -30,7 +30,8 @@ public class DataAudioLoader{
             }
 
             Fi file = asset.getCacheFile();
-            Sound sound = Vars.headless || file == null ? new Sound() : Sound.createStream(file);
+            //large sounds become streams, standard ones don't
+            Sound sound = Vars.headless || file == null ? new Sound() : file.length() > 100_000 ? Sound.createStream(file) : Sound.createLazy(file);
             loadedSounds.add(sound);
 
             Sounds.registerSound(sound, nextSoundId ++);

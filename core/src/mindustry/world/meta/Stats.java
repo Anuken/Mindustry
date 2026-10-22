@@ -2,7 +2,6 @@ package mindustry.world.meta;
 
 import arc.*;
 import arc.scene.ui.layout.*;
-import arc.struct.ObjectMap.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.mod.*;
@@ -15,9 +14,6 @@ import java.util.*;
 public class Stats{
     /** Whether to display stats with categories. If false, categories are completely ignored during display. */
     public boolean useCategories = false;
-    /** @deprecated does nothing, will be removed in v9 */
-    @Deprecated
-    public boolean intialized = false;
     /** Production time period in ticks. Used for crafters. **/
     public float timePeriod = -1;
 
@@ -132,7 +128,7 @@ public class Stats{
         //sort stats by index if they've been modified
         if(dirty){
             map.orderedKeys().sort();
-            for(Entry<StatCat, OrderedMap<Stat, Seq<StatValue>>> entry : map.entries()){
+            for(var entry : map.entries()){
                 entry.value.orderedKeys().sort();
             }
 

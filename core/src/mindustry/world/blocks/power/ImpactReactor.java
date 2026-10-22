@@ -4,18 +4,17 @@ import arc.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.content.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
 public class ImpactReactor extends PowerGenerator{
-    public final int timerUse = timers++;
     public float warmupSpeed = 0.001f;
     public float itemDuration = 60f;
 
@@ -29,7 +28,7 @@ public class ImpactReactor extends PowerGenerator{
         flags = EnumSet.of(BlockFlag.reactor, BlockFlag.generator);
         lightRadius = 115f;
         emitLight = true;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
 
         drawer = new DrawMulti(new DrawRegion("-bottom"), new DrawPlasma(), new DrawDefault());
 
@@ -43,7 +42,6 @@ public class ImpactReactor extends PowerGenerator{
 
     @Override
     public void setBars(){
-        stats.timePeriod = itemDuration;
         super.setBars();
 
         addBar("power", (GeneratorBuild entity) -> new Bar(() ->
@@ -54,9 +52,9 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = itemDuration;
-        super.setStats();
+        super.setStats(stats);
 
         if(hasItems){
             stats.add(Stat.productionTime, itemDuration / 60f, StatUnit.seconds);
@@ -81,7 +79,7 @@ public class ImpactReactor extends PowerGenerator{
     }
 
     public class ImpactReactorBuild extends GeneratorBuild{
-        public float warmup, totalProgress;
+        public float warmup, totalProgress, useTimer;
 
         @Override
         public void updateTile(){
@@ -97,8 +95,9 @@ public class ImpactReactor extends PowerGenerator{
                     Events.fire(Trigger.impactPower);
                 }
 
-                if(timer(timerUse, itemDuration / timeScale)){
+                if((useTimer += timeScale * Time.delta) >= itemDuration){
                     consume();
+                    useTimer %= itemDuration;
                 }
             }else{
                 warmup = Mathf.lerpDelta(warmup, 0f, 0.01f);
@@ -125,8 +124,8 @@ public class ImpactReactor extends PowerGenerator{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.heat) return warmup;
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.heat) return warmup;
             return super.sense(sensor);
         }
 

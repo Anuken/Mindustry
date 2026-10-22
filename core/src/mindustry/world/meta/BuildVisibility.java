@@ -11,7 +11,7 @@ public class BuildVisibility{
     shown = new BuildVisibility(() -> true),
     debugOnly = new BuildVisibility(() -> false),
     editorOnly = new BuildVisibility(() -> Vars.state.rules.editor),
-    coreZoneOnly = new BuildVisibility(() -> Vars.indexer.isBlockPresent(Blocks.coreZone) || !Vars.state.isGame()),
+    coreZoneOnly = new BuildVisibility(() -> Vars.state.indexer.isBlockPresent(Blocks.coreZone) || !Vars.state.isGame()),
     worldProcessorOnly = new BuildVisibility(() -> Vars.state.rules.editor || Vars.state.rules.allowEditWorldProcessors),
     sandboxOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.rules.infiniteResources),
     campaignOnly = new BuildVisibility(() -> Vars.state == null || Vars.state.isCampaign() || !Vars.state.isGame()),

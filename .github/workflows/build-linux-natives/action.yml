@@ -1,0 +1,5 @@
+name: 'Build Linux Natives in Docker Container'
+description: 'Build Linux Natives in Ubuntu 18.04 docker container'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

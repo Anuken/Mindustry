@@ -87,9 +87,9 @@ public class ParticleEffect extends Effect{
         float rawfin = e.fin();
         float fin = e.fin(interp);
         float colFin = e.fin(colorInterp);
-        float rad = sizeInterp.apply(sizeFrom, sizeTo, Mathf.curve(rawfin, sizeChangeStart / lifetime, 1f)) * 2;
-        float width = rad * (widthInterp.apply(widthFrom, widthTo, Mathf.curve(rawfin, widthChangeStart / lifetime, 1f)) * 2);
-        float height = rad * (heightInterp.apply(heightFrom, heightTo, Mathf.curve(rawfin, heightChangeStart / lifetime, 1f)) * 2);
+        float rad = sizeInterp.apply(sizeFrom, sizeTo, Mathf.curve(rawfin, sizeChangeStart / lifetime, 1f)) * 2f;
+        float width = rad * widthInterp.apply(widthFrom, widthTo, Mathf.curve(rawfin, widthChangeStart / lifetime, 1f));
+        float height = rad * heightInterp.apply(heightFrom, heightTo, Mathf.curve(rawfin, heightChangeStart / lifetime, 1f));
         float ox = e.x + Angles.trnsx(realRotation, offsetX * flip, offsetY), oy = e.y + Angles.trnsy(realRotation, offsetX * flip, offsetY);
 
         Draw.color(colorFrom, colorTo, colFin);

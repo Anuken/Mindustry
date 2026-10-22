@@ -3,18 +3,17 @@ package mindustry.world.blocks.logic;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.annotations.Annotations.*;
-import mindustry.ctype.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.meta.*;
@@ -65,12 +64,12 @@ public class LogicDisplay extends Block{
         canOverdrive = false;
         group = BlockGroup.logic;
         drawDisabled = false;
-        envEnabled = Env.any;
+        envEnabled = Environments.any;
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
         stats.add(Stat.displaySize, "@x@", displaySize, displaySize);
     }
@@ -82,7 +81,7 @@ public class LogicDisplay extends Block{
         clipSize = Math.max(clipSize, scaleFactor * Draw.scl * displaySize);
     }
 
-    public class LogicDisplayBuild extends Building implements LDrawable{
+    public class LogicDisplayBuild extends Building implements LogicDrawable{
         //The root display (bottom left corner of display for tileable displays)
         public LogicDisplayBuild rootDisplay = this;
         public @Nullable FrameBuffer buffer;
@@ -107,14 +106,14 @@ public class LogicDisplay extends Block{
             Draw.blend(Blending.disabled);
             Draw.draw(Draw.z(), () -> {
                 if(buffer != null){
-                    Draw.rect(Draw.wrap(buffer.getTexture()), x, y, buffer.getWidth() * scaleFactor * Draw.scl, -buffer.getHeight() * scaleFactor * Draw.scl);
+                    Draw.rect(Draw.wrap(buffer.texture), x, y, buffer.width * scaleFactor * Draw.scl, -buffer.height * scaleFactor * Draw.scl);
                 }
             });
             Draw.blend();
         }
 
         @Override
-        public double sense(LAccess sensor){
+        public double sense(LogicProp sensor){
             return switch(sensor){
                 case displayWidth, displayHeight -> displaySize;
                 case bufferSize -> rootDisplay.commands.size;
@@ -124,13 +123,13 @@ public class LogicDisplay extends Block{
         }
 
         @Override
-        public boolean drawable(LExecutor exec){
+        public boolean drawable(LogicExecutor exec){
             return isValid() && (exec.privileged || (team == exec.team && !privileged));
         }
 
         @Override
         public void draw(LongSeq graphicsBuffer){
-            int added = Math.min(graphicsBuffer.size, LExecutor.maxDisplayBuffer - commands.size);
+            int added = Math.min(graphicsBuffer.size, LogicExecutor.maxDisplayBuffer - commands.size);
 
             for(int i = 0; i < added; i++){
                 commands.addLast(graphicsBuffer.items[i]);
@@ -150,8 +149,8 @@ public class LogicDisplay extends Block{
 
         public void getBufferRegion(TextureRegion region){
             if(rootDisplay.buffer != null){
-                region.set(rootDisplay.buffer.getTexture(), 0, rootDisplay.buffer.getTexture().height,
-                rootDisplay.buffer.getTexture().width, -rootDisplay.buffer.getTexture().height);
+                region.set(rootDisplay.buffer.texture, 0, rootDisplay.buffer.texture.height,
+                rootDisplay.buffer.texture.width, -rootDisplay.buffer.texture.height);
             }
         }
 
@@ -182,7 +181,7 @@ public class LogicDisplay extends Block{
 
                     Tmp.m1.set(Draw.proj());
                     Tmp.m2.set(Draw.trans());
-                    Draw.proj(0, 0, buffer.getWidth(), buffer.getHeight());
+                    Draw.proj(0, 0, buffer.width, buffer.height);
                     if(transform != null){
                         Draw.trans(transform);
                     }

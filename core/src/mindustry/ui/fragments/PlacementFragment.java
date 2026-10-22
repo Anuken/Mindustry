@@ -9,8 +9,8 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.Tooltip.*;
-import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.*;
+import arc.scene.ui.layout.Stack;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.ai.*;
@@ -130,7 +130,7 @@ public class PlacementFragment{
     }
 
     boolean updatePick(InputHandler input){
-        Tile tile = world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
+        Tile tile = state.world.tileWorld(Core.input.mouseWorldX(), Core.input.mouseWorldY());
         if(tile != null && Core.input.keyTap(Binding.pick) && player.isBuilder() && !Core.scene.hasDialog()){ //mouse eyedropper select
             var build = tile.build;
 
@@ -261,7 +261,7 @@ public class PlacementFragment{
             if(hovered() instanceof Unit unit && unit.type.unlockedNow()){
                 ui.content.show(unit.type());
             }else{
-                var build = world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+                var build = state.world.buildWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
                 Block hovering = build == null ? null : build instanceof ConstructBuild c ? c.current : build.block;
                 Block displayBlock = menuHoverBlock != null ? menuHoverBlock : input.block != null ? input.block : hovering;
                 if(displayBlock != null && displayBlock.unlockedNow()){
@@ -312,7 +312,7 @@ public class PlacementFragment{
 
                         button.update(() -> { //color unplacable things gray
                             Building core = player.core();
-                            Color color = (state.rules.infiniteResources || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
+                            Color color = (state.rules.isInfiniteResources(player.team()) || (core != null && (core.items.has(block.requirements, state.rules.buildCostMultiplier) || state.rules.infiniteResources))) && player.isBuilder() ? Color.white : Color.gray;
                             button.forEach(elem -> elem.setColor(color));
                             button.setChecked(control.input.block == block);
 
@@ -404,16 +404,16 @@ public class PlacementFragment{
                                         line.left();
                                         line.image(stack.item.uiIcon).size(8 * 2);
                                         line.add(stack.item.localizedName).maxWidth(140f).fillX().color(Color.lightGray).padLeft(2).left().get().setEllipsis(true);
-                                        line.labelWrap(() -> {
+                                        line.label(() -> {
                                             Building core = player.core();
                                             int stackamount = Math.round(stack.amount * state.rules.buildCostMultiplier);
-                                            if(core == null || state.rules.infiniteResources) return "*/" + stackamount;
+                                            if(core == null || state.rules.isInfiniteResources(player.team())) return "*/" + stackamount;
 
                                             int amount = core.items.get(stack.item);
                                             String color = (amount < stackamount / 2f ? "[scarlet]" : amount < stackamount ? "[accent]" : "[white]");
 
                                             return color + UI.formatAmount(amount) + "[white]/" + stackamount;
-                                        }).padLeft(5);
+                                        }).padLeft(5).wrap(true); //TODO: in practice wrapping does nothing and items will go offscreen, is this fine?
                                     }).left();
                                     req.row();
                                 }
@@ -577,7 +577,7 @@ public class PlacementFragment{
                                         int scol = 0;
                                         for(var command : commands){
                                             coms.button(Icon.icons.get(command.icon, Icon.cancel), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitCommand(player, units.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)).toArray(), command);
+                                                InputHandler.setUnitCommandChunked(units.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)), command);
                                             }).checked(i -> activeCommands.get(command.id)).size(50f).tooltip(command.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
@@ -600,7 +600,7 @@ public class PlacementFragment{
                                         for(var stance : stances){
 
                                             coms.button(stance.getIcon(), Styles.clearNoneTogglei, () -> {
-                                                Call.setUnitStance(player, units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
+                                                InputHandler.setUnitStanceChunked(units.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)), stance, !activeStances.get(stance.id));
                                             }).checked(i -> activeStances.get(stance.id)).size(50f).tooltip(stance.localized(), true);
 
                                             if(++scol % 6 == 0) coms.row();
@@ -656,14 +656,14 @@ public class PlacementFragment{
                                 for(UnitStance stance : stances){
                                     //first stance must always be the stop stance
                                     if(stance.keybind != null && Core.input.keyTap(stance.keybind)){
-                                        Call.setUnitStance(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)).toArray(), stance, !activeStances.get(stance.id));
+                                        InputHandler.setUnitStanceChunked(control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowStance(un, stance)), stance, !activeStances.get(stance.id));
                                     }
                                 }
 
                                 for(UnitCommand command : commands){
                                     //first stance must always be the stop stance
                                     if(command.keybind != null && Core.input.keyTap(command.keybind)){
-                                        Call.setUnitCommand(player, control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)).toArray(), command);
+                                        InputHandler.setUnitCommandChunked(control.input.selectedUnits.mapInt(un -> un.id, un -> un.type.allowCommand(un, command)), command);
                                     }
                                 }
                             }
@@ -799,7 +799,7 @@ public class PlacementFragment{
         if(unit != null) return unit;
 
         //check tile being hovered over
-        Tile hoverTile = world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
+        Tile hoverTile = state.world.tileWorld(Core.input.mouseWorld().x, Core.input.mouseWorld().y);
         if(hoverTile != null && hoverTile.inMapArea()){
             //if the tile has a building, display it
             if(hoverTile.build != null && hoverTile.build.displayable() && !hoverTile.build.inFogTo(player.team()) && hoverTile.build.inMapArea()){

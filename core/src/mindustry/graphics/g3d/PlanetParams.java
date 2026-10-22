@@ -29,6 +29,8 @@ public class PlanetParams{
     public boolean drawUi = false;
     /** If true, a space skybox is drawn. */
     public boolean drawSkybox = true;
+    /** If true, this is being rendered inside the world and shouldn't have extra AA applied. */
+    public boolean disableAA = false;
 
     /** Handles drawing details. */
     public @Nullable transient PlanetInterfaceRenderer renderer;

@@ -60,9 +60,9 @@ public class Edges{
     }
 
     public static Tile getFacingEdge(Block block, int tilex, int tiley, Tile other){
-        if(!block.isMultiblock()) return world.tile(tilex, tiley);
+        if(!block.isMultiblock()) return state.world.tile(tilex, tiley);
         int size = block.size;
-        return world.tile(tilex + Mathf.clamp(other.x - tilex, -(size - 1) / 2, (size / 2)),
+        return state.world.tile(tilex + Mathf.clamp(other.x - tilex, -(size - 1) / 2, (size / 2)),
          tiley + Mathf.clamp(other.y - tiley, -(size - 1) / 2, (size / 2)));
     }
 

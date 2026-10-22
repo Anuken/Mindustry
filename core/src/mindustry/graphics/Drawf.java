@@ -2,14 +2,16 @@ package mindustry.graphics;
 
 import arc.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
+import mindustry.*;
 import mindustry.gen.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 
@@ -144,7 +146,7 @@ public class Drawf{
         x2 = close.x, y2 = close.y,
         x3 = vecs[1].x, y3 = vecs[1].y;
 
-        if(renderer.animateShields){
+        if(renderer.animateSurfaces){
             if(close != vecs[0] && close != vecs[1]){
                 Fill.tri(x, y, x1, y1, x2, y2);
                 Fill.tri(x, y, x3, y3, x2, y2);
@@ -279,12 +281,12 @@ public class Drawf{
     public static void target(float x, float y, float rad, float alpha, Color color){
         Lines.stroke(3f);
         Draw.color(Pal.gray, alpha);
-        Lines.poly(x, y, 4, rad, Time.time * 1.5f);
-        Lines.spikes(x, y, 3f/7f * rad, 6f/7f * rad, 4, Time.time * 1.5f);
+        Lines.poly(x, y, 4, rad, Vars.state.time * 1.5f);
+        Lines.spikes(x, y, 3f/7f * rad, 6f/7f * rad, 4, Vars.state.time * 1.5f);
         Lines.stroke(1f);
         Draw.color(color, alpha);
-        Lines.poly(x, y, 4, rad, Time.time * 1.5f);
-        Lines.spikes(x, y, 3f/7f * rad, 6f/7f * rad, 4, Time.time * 1.5f);
+        Lines.poly(x, y, 4, rad, Vars.state.time * 1.5f);
+        Lines.spikes(x, y, 3f/7f * rad, 6f/7f * rad, 4, Vars.state.time * 1.5f);
         Draw.reset();
     }
 

@@ -38,10 +38,15 @@ public class MapAudioView implements AssetView{
             Fi file = asset.getCacheFile();
             var audioSource = (AudioSource)Core.assets.getOrNull(DataAudioLoader.prefix + asset.name, (Class<?>)(type == DataAssetType.music ? Music.class : Sound.class));
 
-            if(file == null || audioSource == null || !audioSource.valid()){
+            if(file == null || audioSource == null || (!audioSource.valid() && !audioSource.isLazy())){
                 list.button(Icon.warning, Styles.graySquarei, iconMed, () -> ui.showInfo(file == null ? "@asset.broken" : "@asset.audio.invalid")).size(h);
             }else{
                 list.button(Icon.play, Styles.graySquarei, iconMed, () -> {
+                    if(!audioSource.valid() && !audioSource.isLazy()){
+                        ui.showInfo("@asset.audio.invalid");
+                        return;
+                    }
+
                     if(lastPlaying != null && lastPlaying.countPlaying() > 0){
                         lastPlaying.stop();
                         if(lastPlaying == audioSource){
@@ -56,16 +61,26 @@ public class MapAudioView implements AssetView{
                         lastPlaying = s;
                         s.play(control.sound.uiBus);
                     }
-                }).update(i -> i.getStyle().imageUp = audioSource != null && audioSource.countPlaying() > 0 ? Icon.pause : Icon.play).size(h);
+                }).update(i -> i.getStyle().imageUp = (!audioSource.isLazy() && !audioSource.valid()) ? Icon.warning : audioSource.countPlaying() > 0 ? Icon.pause : Icon.play).size(h);
             }
 
             float w = (mobile ? 390f : 450f);
             list.table(Styles.grayPanel, in -> {
+                in.left();
                 in.table(v -> {
                     v.left();
-                    v.add("[accent]" + asset.name).labelAlign(Align.left).left().ellipsis(true).width(w / 2f);
+                    v.add("[accent]" + asset.name).labelAlign(Align.left).left().ellipsis(true).width(audioSource instanceof Music ? w / 2f : w * 0.8f);
                     v.row();
-                    v.add("[lightgray][[" + (audioSource == null ? "?" : UI.formatTime(audioSource.getLength() * 60f)) + "]").left();
+                    if(audioSource != null){
+                        Runnable addTime = () -> v.add("[lightgray][[" + UI.formatTime(audioSource.getLength() * 60f) + "]").left();
+
+                        if(audioSource.valid()){
+                            addTime.run();
+                        }else if(audioSource instanceof Sound s){
+                            //force-load sounds when viewing so that length/invalid status is shown
+                            s.checkLazyLoad(addTime);
+                        }
+                    }
                 }).width(w / 2f).tooltip("dp-" + asset.name.replace(' ', '_'));
 
                 if(audioSource instanceof Music m){

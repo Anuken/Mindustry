@@ -1,16 +1,18 @@
 package mindustry.io;
 
+import arc.files.*;
 import arc.graphics.*;
 import arc.math.geom.*;
 import arc.util.*;
+import arc.util.io.*;
 import arc.util.serialization.*;
 import arc.util.serialization.Json.*;
+import arc.util.serialization.Jval.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
+import mindustry.game.objectives.*;
 import mindustry.maps.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -22,15 +24,11 @@ import java.io.*;
 public class JsonIO{
     public static final Json json = new Json(){
         @Override
-        public void writeValue(Object value, Class knownType, Class elementType){
+        public void writeValue(JsonWriter writer, Object value, Class knownType, Class elementType){
             if(value instanceof MappableContent c){
-                try{
-                    getWriter().value(c.name);
-                }catch(IOException e){
-                    throw new RuntimeException(e);
-                }
+                writer.value(c.name);
             }else{
-                super.writeValue(value, knownType, elementType);
+                super.writeValue(writer, value, knownType, elementType);
             }
         }
 
@@ -42,12 +40,28 @@ public class JsonIO{
     };
 
     public static void writeBytes(Object value, Class<?> elementType, DataOutputStream output){
-        json.setWriter(new UBJsonWriter(output));
-        json.writeValue(value, value == null ? null : value.getClass(), elementType);
+        json.toUBJson(value, value == null ? null : value.getClass(), elementType, output);
     }
 
     public static <T> T readBytes(Class<T> type, Class<?> elementType, DataInputStream input) throws IOException{
-        return json.readValue(type, elementType, new UBJsonReader().parseWihoutClosing(input));
+        return json.readValue(type, elementType, UBJson.read(input));
+    }
+
+    public static String write(Object object, Jformat format){
+        StringWriter buffer = new StringWriter();
+        JsonWriter jsonWriter = new StringJsonWriter(buffer, format);
+        try{
+            json.writeValue(jsonWriter, object, object.getClass(), null);
+        }finally{
+            Streams.close(jsonWriter);
+        }
+        return buffer.toString();
+    }
+
+    public static void write(Object object, Jformat format, Fi file) throws IOException{
+        try(JsonWriter writer = new StringJsonWriter(file.writer(false), format)){
+            json.writeValue(writer, object, object.getClass(), null);
+        }
     }
 
     public static String write(Object object){
@@ -68,12 +82,12 @@ public class JsonIO{
     }
 
     public static <T> T read(T base, String string){
-        json.readFields(base, new JsonReader().parse(string.replace("io.anuke.", "")));
+        json.readFields(base, Jval.read(string.replace("io.anuke.", "")));
         return base;
     }
 
     public static String print(String in){
-        return json.prettyPrint(in);
+        return Jval.read(in).toString(Jformat.hjson);
     }
 
     public static void classTag(String tag, Class<?> type){
@@ -84,26 +98,56 @@ public class JsonIO{
         json.setElementType(Rules.class, "spawns", SpawnGroup.class);
         json.setElementType(Rules.class, "loadout", ItemStack.class);
 
-        json.setSerializer(MusicContainer.class, new Serializer<>(){
+        json.setSerializer(Difficulty.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, MusicContainer object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, Difficulty object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public MusicContainer read(Json json, JsonValue jsonData, Class type){
+            public Difficulty read(Json json, Jval jsonData, Class type){
+                return Difficulty.get(jsonData.asString());
+            }
+        });
+
+        json.setSerializer(Environments.class, new JsonSerializer<>(){
+            @Override
+            public void write(Json json, JsonWriter writer, Environments object, Class knownType){
+                writer.writeArrayStart();
+                if(object.isAny()){
+                    writer.value("any");
+                }else{
+                    object.each(env -> writer.value(env.name));
+                }
+                writer.writeArrayEnd();
+            }
+
+            @Override
+            public Environments read(Json json, Jval jsonData, Class type){
+                return readEnvironments(jsonData, true);
+            }
+        });
+
+        json.setSerializer(MusicContainer.class, new JsonSerializer<>(){
+            @Override
+            public void write(Json json, JsonWriter writer, MusicContainer object, Class knownType){
+                json.writeValue(writer, object.name);
+            }
+
+            @Override
+            public MusicContainer read(Json json, Jval jsonData, Class type){
                 return new MusicContainer(jsonData.isString() ? jsonData.asString() : "");
             }
         });
 
-        json.setSerializer(Color.class, new Serializer<>(){
+        json.setSerializer(Color.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Color object, Class knownType){
-                json.writeValue(object.toString());
+            public void write(Json json, JsonWriter writer, Color object, Class knownType){
+                json.writeValue(writer, object.toString());
             }
 
             @Override
-            public Color read(Json json, JsonValue jsonData, Class type){
+            public Color read(Json json, Jval jsonData, Class type){
                 if(jsonData.isString()){
                     return Color.valueOf(jsonData.asString());
                 }
@@ -113,106 +157,106 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Sector.class, new Serializer<>(){
+        json.setSerializer(Sector.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Sector object, Class knownType){
-                json.writeValue(object.planet.name + "-" + object.id);
+            public void write(Json json, JsonWriter writer, Sector object, Class knownType){
+                json.writeValue(writer, object.planet.name + "-" + object.id);
             }
 
             @Override
-            public Sector read(Json json, JsonValue jsonData, Class type){
+            public Sector read(Json json, Jval jsonData, Class type){
                 String name = jsonData.asString();
                 int idx = name.lastIndexOf('-');
                 return Vars.content.<Planet>getByName(ContentType.planet, name.substring(0, idx)).sectors.get(Integer.parseInt(name.substring(idx + 1)));
             }
         });
 
-        json.setSerializer(SectorPreset.class, new Serializer<>(){
+        json.setSerializer(SectorPreset.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, SectorPreset object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, SectorPreset object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public SectorPreset read(Json json, JsonValue jsonData, Class type){
+            public SectorPreset read(Json json, Jval jsonData, Class type){
                 return Vars.content.getByName(ContentType.sector, jsonData.asString());
             }
         });
 
-        json.setSerializer(Liquid.class, new Serializer<>(){
+        json.setSerializer(Liquid.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Liquid object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, Liquid object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public Liquid read(Json json, JsonValue jsonData, Class type){
+            public Liquid read(Json json, Jval jsonData, Class type){
                 if(jsonData.asString() == null) return Liquids.water;
                 Liquid i = Vars.content.getByName(ContentType.liquid, jsonData.asString());
                 return i == null ? Liquids.water : i;
             }
         });
 
-        json.setSerializer(Attribute.class, new Serializer<>(){
+        json.setSerializer(Attribute.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Attribute object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, Attribute object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public Attribute read(Json json, JsonValue jsonData, Class type){
+            public Attribute read(Json json, Jval jsonData, Class type){
                 return Attribute.get(jsonData.asString());
             }
         });
 
-        json.setSerializer(Item.class, new Serializer<>(){
+        json.setSerializer(Item.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Item object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, Item object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public Item read(Json json, JsonValue jsonData, Class type){
+            public Item read(Json json, Jval jsonData, Class type){
                 if(jsonData.asString() == null) return Items.copper;
                 Item i = Vars.content.getByName(ContentType.item, jsonData.asString());
                 return i == null ? Items.copper : i;
             }
         });
 
-        json.setSerializer(Team.class, new Serializer<>(){
+        json.setSerializer(Team.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Team object, Class knownType){
-                json.writeValue(object.id);
+            public void write(Json json, JsonWriter writer, Team object, Class knownType){
+                json.writeValue(writer, object.id);
             }
 
             @Override
-            public Team read(Json json, JsonValue jsonData, Class type){
+            public Team read(Json json, Jval jsonData, Class type){
                 return Team.get(jsonData.asInt());
             }
         });
 
-        json.setSerializer(Block.class, new Serializer<>(){
+        json.setSerializer(Block.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Block object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, Block object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public Block read(Json json, JsonValue jsonData, Class type){
+            public Block read(Json json, Jval jsonData, Class type){
                 Block block = Vars.content.getByName(ContentType.block, jsonData.asString());
                 if(block == null) block = Vars.content.getByName(ContentType.block, SaveVersion.fallback.get(jsonData.asString(), ""));
                 return block == null ? Blocks.air : block;
             }
         });
 
-        json.setSerializer(Planet.class, new Serializer<>(){
+        json.setSerializer(Planet.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Planet object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, Planet object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public Planet read(Json json, JsonValue jsonData, Class type){
+            public Planet read(Json json, Jval jsonData, Class type){
                 if(jsonData.asString() == null){
                     return null;
                 }
@@ -221,55 +265,55 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(Weather.class, new Serializer<>(){
+        json.setSerializer(Weather.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, Weather object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, Weather object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public Weather read(Json json, JsonValue jsonData, Class type){
+            public Weather read(Json json, Jval jsonData, Class type){
                 return Vars.content.getByName(ContentType.weather, jsonData.asString());
             }
         });
 
-        json.setSerializer(UnitType.class, new Serializer<>(){
+        json.setSerializer(UnitType.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, UnitType object, Class knownType){
-                json.writeValue(object.name);
+            public void write(Json json, JsonWriter writer, UnitType object, Class knownType){
+                json.writeValue(writer, object.name);
             }
 
             @Override
-            public UnitType read(Json json, JsonValue jsonData, Class type){
+            public UnitType read(Json json, Jval jsonData, Class type){
                 if(jsonData.asString() == null) return UnitTypes.dagger;
                 UnitType u = Vars.content.getByName(ContentType.unit, jsonData.asString());
                 return u == null ? UnitTypes.dagger : u;
             }
         });
 
-        json.setSerializer(ItemStack.class, new Serializer<>(){
+        json.setSerializer(ItemStack.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, ItemStack object, Class knownType){
-                json.writeObjectStart();
-                json.writeValue("item", object.item);
-                json.writeValue("amount", object.amount);
-                json.writeObjectEnd();
+            public void write(Json json, JsonWriter writer, ItemStack object, Class knownType){
+                writer.writeObjectStart();
+                json.writeValue(writer, "item", object.item);
+                json.writeValue(writer, "amount", object.amount);
+                writer.writeObjectEnd();
             }
 
             @Override
-            public ItemStack read(Json json, JsonValue jsonData, Class type){
+            public ItemStack read(Json json, Jval jsonData, Class type){
                 return new ItemStack(json.getSerializer(Item.class).read(json, jsonData.get("item"), Item.class), jsonData.getInt("amount"));
             }
         });
 
-        json.setSerializer(UnlockableContent.class, new Serializer<>(){
+        json.setSerializer(UnlockableContent.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, UnlockableContent object, Class knownType){
-                json.writeValue(object == null ? null : object.name);
+            public void write(Json json, JsonWriter writer, UnlockableContent object, Class knownType){
+                json.writeValue(writer, object == null ? null : object.name);
             }
 
             @Override
-            public UnlockableContent read(Json json, JsonValue jsonData, Class type){
+            public UnlockableContent read(Json json, Jval jsonData, Class type){
                 if(jsonData.isNull()) return null;
                 String str = jsonData.asString();
                 var map = Vars.content.byName(str);
@@ -277,33 +321,33 @@ public class JsonIO{
             }
         });
 
-        json.setSerializer(MapObjectives.class, new Serializer<>(){
+        json.setSerializer(MapObjectives.class, new JsonSerializer<>(){
             @Override
-            public void write(Json json, MapObjectives exec, Class knownType){
-                json.writeArrayStart();
+            public void write(Json json, JsonWriter writer, MapObjectives exec, Class knownType){
+                writer.writeArrayStart();
                 for(var obj : exec){
-                    json.writeObjectStart(obj.getClass().isAnonymousClass() ? obj.getClass().getSuperclass() : obj.getClass(), null);
-                    json.writeFields(obj);
+                    json.writeObjectStart(writer, obj.getClass().isAnonymousClass() ? obj.getClass().getSuperclass() : obj.getClass(), null);
+                    json.writeFields(writer, obj);
 
-                    json.writeArrayStart("parents");
+                    writer.writeArrayStart("parents");
                     for(var parent : obj.parents){
-                        json.writeValue(exec.all.indexOf(parent));
+                        json.writeValue(writer, exec.all.indexOf(parent));
                     }
 
-                    json.writeArrayEnd();
+                    writer.writeArrayEnd();
 
-                    json.writeValue("editorPos", Point2.pack(obj.editorX, obj.editorY));
-                    json.writeObjectEnd();
+                    json.writeValue(writer, "editorPos", Point2.pack(obj.editorX, obj.editorY));
+                    json.writeObjectEnd(writer);
                 }
 
-                json.writeArrayEnd();
+                writer.writeArrayEnd();
             }
 
             @Override
-            public MapObjectives read(Json json, JsonValue data, Class type){
+            public MapObjectives read(Json json, Jval data, Class type){
                 var exec = new MapObjectives();
                 // First iteration to instantiate the objectives.
-                for(var value = data.child; value != null; value = value.next){
+                for(var value : data.asArray()){
                     //glenn why did you implement this in the least backwards compatible way possible
                     //the old objectives had lowercase class tags, now they're uppercase and either way I can't deserialize them without errors
                     if(value.has("class") && Character.isLowerCase(value.getString("class").charAt(0))){
@@ -324,13 +368,14 @@ public class JsonIO{
 
                 // Second iteration to map the parents.
                 int i = 0;
-                for(var value = data.child; value != null; value = value.next, i++){
-                    for(var parent = value.get("parents").child; parent != null; parent = parent.next){
+                for(var entry : data.asArray()){
+                    for(var parent : entry.get("parents").asArray()){
                         int val = parent.asInt();
                         if(val >= 0 && val < exec.all.size){
                             exec.all.get(i).parents.add(exec.all.get(val));
                         }
                     }
+                    i++;
                 }
 
                 return exec;
@@ -342,5 +387,38 @@ public class JsonIO{
             var i = filter.get();
             json.addClassTag(Strings.camelize(i.getClass().getSimpleName().replace("Filter", "")), i.getClass());
         }
+    }
+
+    /** Parses an {@link Environments} from an array of env names. Legacy int bitmasks are only accepted if legacyNumbers is true. */
+    public static Environments readEnvironments(Jval data, boolean legacyNumbers){
+        if(data.isNumber()){
+            if(!legacyNumbers) throw new SerializationException("Environments must be an array of env names, e.g. [\"space\"]. Found: " + data);
+
+            int bits = (int)data.asLong();
+            if(bits != -1 && Env.all.size < 32 && (bits >>> Env.all.size) != 0){
+                Log.warn("Legacy env bitmask @ contains bits with no matching Env; ignoring them.", bits);
+            }
+            return Environments.fromBits(bits);
+        }
+
+        //a bare string is accepted as shorthand for a single-element array
+        if(data.isString()) data = new JsonArray().add(data);
+        if(!data.isArray()) throw new SerializationException("Environments must be an array of env names, e.g. [\"space\"]. Found: " + data);
+
+        Environments result = Environments.none;
+        for(Jval entry : data.asArray()){
+            if(!entry.isString()) throw new SerializationException("Environment names must all be strings. Found: " + entry);
+
+            String name = entry.asString();
+            if(name.equals("any")) return Environments.any;
+
+            Env env = Env.get(name);
+            if(env == null){
+                Log.warn("Unknown env '@', skipping.", name);
+            }else{
+                result = result.with(env);
+            }
+        }
+        return result;
     }
 }

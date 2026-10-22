@@ -7,9 +7,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
 import mindustry.*;
-import mindustry.ctype.*;
 import mindustry.entities.units.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
@@ -17,7 +15,6 @@ import mindustry.io.*;
 import mindustry.type.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
-import mindustry.world.blocks.storage.*;
 
 import static mindustry.Vars.*;
 
@@ -87,7 +84,7 @@ public class PayloadSource extends PayloadBlock{
     }
 
     public boolean canProduce(Block b){
-        return !b.removed && b.isVisible() && b.size < size && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable();
+        return !b.removed && b.isVisible() && b.size < size && b.allowedInPayloads && !state.rules.isBanned(b) && b.environmentBuildable();
     }
 
     public boolean canProduce(UnitType t){
@@ -180,8 +177,8 @@ public class PayloadSource extends PayloadBlock{
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            unit = Vars.content.unit(read.s());
-            configBlock = Vars.content.block(read.s());
+            unit = read.unit();
+            configBlock = read.block();
             if(revision >= 1){
                 commandPos = TypeIO.readVecNullable(read);
             }

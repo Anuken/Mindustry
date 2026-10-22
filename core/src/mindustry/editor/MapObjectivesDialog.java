@@ -13,9 +13,10 @@ import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.game.*;
-import mindustry.game.MapObjectives.*;
+import mindustry.game.markers.*;
+import mindustry.game.objectives.*;
+import mindustry.game.objectives.MapObjectives.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
@@ -142,10 +143,10 @@ public class MapObjectivesDialog extends BaseDialog{
         setInterpreter(Team.class, (cont, name, type, field, remover, indexer, get, set) -> {
             name(cont, name, remover, indexer);
             cont.table(t -> t.left().button(
-                b -> b.image(Tex.whiteui).size(iconSmall).update(i -> i.setColor(get.get().color)),
+                b -> b.image(Tex.whiteui).update(i -> i.setColor(get.get().color)).grow(),
                 Styles.squarei,
                 () -> showTeamSelect(set)
-            ).fill().pad(4f)).growX().fillY();
+            ).margin(4f).pad(4f).size(50f)).growX().fillY();
         });
 
         setProvider(Color.class, (type, cons) -> cons.get(Pal.accent.cpy()));
@@ -291,8 +292,8 @@ public class MapObjectivesDialog extends BaseDialog{
             Alignment align = field.getAnnotation(Alignment.class);
             name(cont, name, remover, indexer);
             cont.button(b -> {
-                b.label(() -> LStatement.alignToName.get(get.get(), "center"));
-                b.clicked(() -> LStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
+                b.label(() -> LogicStatement.alignToName.get(get.get(), "center"));
+                b.clicked(() -> LogicStatement.showAlignSelect(b, get.get(), set::get, align.hor(), align.ver()));
             }, () -> {});
         });
 

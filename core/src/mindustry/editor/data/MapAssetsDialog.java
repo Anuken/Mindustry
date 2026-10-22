@@ -8,11 +8,11 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.mod.*;
 import mindustry.mod.data.*;
+import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.ui.dialogs.*;
 
@@ -29,7 +29,8 @@ public class MapAssetsDialog extends BaseDialog{
         Icon.fileText,
         Icon.image,
         Icon.volumeUp,
-        Icon.music
+        Icon.music,
+        Icon.players
     };
 
     private AssetView[] views = {
@@ -39,6 +40,7 @@ public class MapAssetsDialog extends BaseDialog{
         new MapImagesView(),
         new MapAudioView(DataAssetType.sound),
         new MapAudioView(DataAssetType.music),
+        new MapEmojisView(),
     };
 
     TextField searchField;

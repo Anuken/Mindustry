@@ -4,7 +4,6 @@ import arc.*;
 import arc.files.*;
 import arc.func.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.scene.ui.*;
@@ -63,6 +62,11 @@ public class ModBrowserDialog extends BaseDialog{
         onResize(this::rebuildBrowser);
 
         shown(this::rebuildBrowser);
+    }
+
+    public @Nullable ModListing getCachedMod(String repo){
+        if(modList == null) return null;
+        return modList.find(m -> m.repo.equalsIgnoreCase(repo));
     }
 
     public void getModList(Cons<Seq<ModListing>> listener){
@@ -247,9 +251,9 @@ public class ModBrowserDialog extends BaseDialog{
                                 textureCache.put(repo, last = Core.atlas.find("nomap"));
 
                                 if(mod.hasIcon){
-                                    Fi cacheFolder = Vars.mobile ? Core.files.cache("modIconCache"): dataDirectory.child("modIconCache");
+                                    Fi cacheFolder = mobile ? Core.files.cache("modIconCache"): dataDirectory.child("modIconCache");
                                     cacheFolder.mkdirs();
-                                    Fi cacheFile = cacheFolder.child(Strings.sanitizeFilename(mod.repo + mod.lastUpdated) + ".png");
+                                    Fi cacheFile = cacheFolder.child(Strings.sanitizeFilename(mod.repo + "_" + mod.iconHash) + ".png");
 
                                     if(!cacheFile.exists()){ //fetch from Github
                                         ConsT<HttpResponse, Exception> fetch = res -> {
@@ -337,7 +341,7 @@ public class ModBrowserDialog extends BaseDialog{
                     var found = mods.list().find(l -> mod.repo != null && mod.repo.equals(l.getRepo()));
                     sel.buttons.button(found == null ? "@mods.browser.add" : "@mods.browser.reinstall", Icon.download, () -> {
                         sel.hide();
-                        ui.mods.githubImportMod(mod.repo, mod.hasJava, null, true);
+                        ui.mods.githubImportMod(mod);
                     });
 
                     if(Core.graphics.isPortrait()){

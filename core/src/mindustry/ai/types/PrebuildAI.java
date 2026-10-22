@@ -68,7 +68,7 @@ public class PrebuildAI extends AIController{
 
         //TODO: this search is really slow
         var min = tmpCopy.min(plan ->
-        (canBuild(core, plan.block) || !Structs.contains(plan.block.requirements, it -> !indexer.hasOre(it.item))) &&
+        (canBuild(core, plan.block) || !Structs.contains(plan.block.requirements, it -> !state.indexer.hasOre(it.item))) &&
         (plan.block.category == Category.production || data.buildingTree.any(plan.x * tilesize + plan.block.offset - (plan.block.size * tilesize + 1f)/2f, plan.y * tilesize + plan.block.offset- (plan.block.size * tilesize + 1f)/2f, plan.block.size * tilesize + 1f, plan.block.size * tilesize + 1f)),
         plan -> unit.dst(plan.x * tilesize, plan.y * tilesize) - priorities[plan.block.category.ordinal()] * 200f);
 
@@ -141,7 +141,7 @@ public class PrebuildAI extends AIController{
                 BlockPlan plan = findNextPlan();
 
                 //check if it's already been placed
-                //if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block() == block.block){
+                //if(state.world.tile(block.x, block.y) != null && state.world.tile(block.x, block.y).block() == block.block){
                 //    blocks.removeFirst();
                 //}else
                 if(plan != null && Build.validPlace(plan.block, unit.team(), plan.x, plan.y, plan.rotation)){ //it's valid
@@ -207,8 +207,8 @@ public class PrebuildAI extends AIController{
             }else{
                 if(timer.get(timerTarget3, 60) && targetItem != null){
                     ore = null;
-                    if(unit.type.mineFloor) ore = indexer.findClosestOre(unit, targetItem);
-                    if(ore == null && unit.type.mineWalls) ore = indexer.findClosestWallOre(unit, targetItem);
+                    if(unit.type.mineFloor) ore = state.indexer.findClosestOre(unit, targetItem);
+                    if(ore == null && unit.type.mineWalls) ore = state.indexer.findClosestWallOre(unit, targetItem);
                 }
 
                 if(ore != null){

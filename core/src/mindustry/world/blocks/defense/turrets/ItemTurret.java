@@ -4,14 +4,13 @@ import arc.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.io.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.bullet.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
@@ -46,12 +45,10 @@ public class ItemTurret extends Turret{
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
 
-        stats.remove(Stat.itemCapacity);
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, name));
-        stats.add(Stat.ammoCapacity, maxAmmo / Math.max(ammoPerShot, 1), StatUnit.shots);
     }
 
     @Override
@@ -62,7 +59,7 @@ public class ItemTurret extends Turret{
             new Bar(
                 "stat.ammo",
                 Pal.ammo,
-                () -> (float)entity.totalAmmo / maxAmmo
+                () -> entity.totalAmmo / itemCapacity
             )
         );
     }
@@ -83,7 +80,7 @@ public class ItemTurret extends Turret{
             @Override
             public float efficiency(Building build){
                 //valid when it can shoot
-                return build instanceof ItemTurretBuild it && it.ammo.size > 0 && (it.ammo.peek().amount >= ammoPerShot || it.cheating()) ? 1f : 0f;
+                return build instanceof ItemTurretBuild it && it.ammo.size > 0 && (it.ammo.peek().canShoot() || it.cheating()) ? 1f : 0f;
             }
 
             @Override
@@ -112,11 +109,17 @@ public class ItemTurret extends Turret{
         }
 
         @Override
-        public Object senseObject(LAccess sensor){
+        public Object senseObject(LogicProp sensor){
             return switch(sensor){
                 case currentAmmoType -> ammo.size > 0 ? ((ItemEntry)ammo.peek()).item : null;
                 default -> super.senseObject(sensor);
             };
+        }
+
+        @Override
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.ammoCapacity) return itemCapacity;
+            return super.sense(sensor);
         }
 
         @Override
@@ -126,16 +129,14 @@ public class ItemTurret extends Turret{
 
         @Override
         public float getAmmoFraction(){
-            return (float)totalAmmo / maxAmmo;
+            return totalAmmo / itemCapacity;
         }
 
         @Override
         public int acceptStack(Item item, int amount, Teamc source){
-            BulletType type = ammoTypes.get(item);
+            if(!ammoTypes.containsKey(item)) return 0;
 
-            if(type == null) return 0;
-
-            return Math.min((int)((maxAmmo - totalAmmo) / ammoTypes.get(item).ammoMultiplier), amount);
+            return Math.max(Math.min((int)(itemCapacity - totalAmmo + ammoEpsilon), amount), 0);
         }
 
         @Override
@@ -163,9 +164,8 @@ public class ItemTurret extends Turret{
                 Events.fire(Trigger.resupplyTurret);
             }
 
-            BulletType type = ammoTypes.get(item);
-            if(type == null) return;
-            totalAmmo += type.ammoMultiplier;
+            if(!ammoTypes.containsKey(item)) return;
+            totalAmmo += 1f;
 
             //find ammo entry by type
             for(int i = 0; i < ammo.size; i++){
@@ -173,24 +173,24 @@ public class ItemTurret extends Turret{
 
                 //if found, put it to the right
                 if(entry.item == item){
-                    entry.amount += type.ammoMultiplier;
+                    entry.amount += 1f;
                     ammo.swap(i, ammo.size - 1);
                     return;
                 }
             }
 
             //must not be found
-            ammo.add(new ItemEntry(item, (int)type.ammoMultiplier));
+            ammo.add(new ItemEntry(item, 1f));
         }
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            return ammoTypes.get(item) != null && totalAmmo + ammoTypes.get(item).ammoMultiplier <= maxAmmo;
+            return ammoTypes.containsKey(item) && totalAmmo + 1f <= itemCapacity + ammoEpsilon;
         }
 
         @Override
         public byte version(){
-            return 2;
+            return 3;
         }
 
         @Override
@@ -200,7 +200,7 @@ public class ItemTurret extends Turret{
             for(AmmoEntry entry : ammo){
                 ItemEntry i = (ItemEntry)entry;
                 write.s(i.item.id);
-                write.s(i.amount);
+                write.f(i.amount);
             }
         }
 
@@ -211,11 +211,12 @@ public class ItemTurret extends Turret{
             totalAmmo = 0;
             int amount = read.ub();
             for(int i = 0; i < amount; i++){
-                Item item = Vars.content.item(revision < 2 ? read.ub() : read.s());
-                int itemAmount = Math.min(read.s(), maxAmmo);
+                Item item = read.content(ContentType.item, revision < 2 ? read.ub() : read.s());
+                //older revisions stored ammo units, which are now read as items and capped
+                float itemAmount = Math.min(revision < 3 ? read.s() : read.f(), itemCapacity - totalAmmo);
 
                 //only add ammo if this is a valid ammo type
-                if(item != null && ammoTypes.containsKey(item)){
+                if(item != null && ammoTypes.containsKey(item) && itemAmount > 0f){
                     totalAmmo += itemAmount;
                     ammo.add(new ItemEntry(item, itemAmount));
                 }
@@ -226,7 +227,7 @@ public class ItemTurret extends Turret{
     public class ItemEntry extends AmmoEntry{
         public Item item;
 
-        ItemEntry(Item item, int amount){
+        ItemEntry(Item item, float amount){
             this.item = item;
             this.amount = amount;
         }

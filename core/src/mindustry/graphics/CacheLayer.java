@@ -1,7 +1,6 @@
 package mindustry.graphics;
 
 import arc.graphics.*;
-import arc.graphics.gl.*;
 import arc.math.*;
 import arc.util.*;
 
@@ -96,7 +95,7 @@ public class CacheLayer{
 
         @Override
         public void begin(){
-            if(!renderer.animateWater) return;
+            if(!renderer.animateSurfaces) return;
 
             renderer.effectBuffer.begin(Color.clear);
             renderer.blocks.floor.beginDraw();
@@ -104,7 +103,7 @@ public class CacheLayer{
 
         @Override
         public void end(){
-            if(!renderer.animateWater) return;
+            if(!renderer.animateSurfaces) return;
 
             renderer.effectBuffer.end();
             renderer.effectBuffer.blit(shader);

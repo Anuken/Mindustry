@@ -19,7 +19,6 @@ public class Bullets{
             width = 7f;
             height = 9f;
             lifetime = 60f;
-            ammoMultiplier = 2;
         }};
 
         //lightning bullets need to be initialized first.

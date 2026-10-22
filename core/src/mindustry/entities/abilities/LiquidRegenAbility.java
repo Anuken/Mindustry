@@ -39,7 +39,7 @@ public class LiquidRegenAbility extends Ability{
                 for(int y = -rad; y <= rad; y++){
                     if(x*x + y*y <= rad*rad){
 
-                        Tile tile = world.tile(tx + x, ty + y);
+                        Tile tile = state.world.tile(tx + x, ty + y);
                         if(tile != null){
                             Puddle puddle = Puddles.get(tile);
                             if(puddle != null && puddle.liquid == liquid){

@@ -4,9 +4,8 @@ import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
-import mindustry.graphics.MultiPacker;
+import mindustry.graphics.*;
 import mindustry.mod.data.*;
 import mindustry.net.*;
 import mindustry.net.Packets.*;
@@ -88,10 +87,10 @@ public class EventType{
     public static class ContentInitEvent{}
     /** Called *after* all content has been added to the atlas, but before its pixmaps are disposed. */
     public static class AtlasPackEvent{
-        public final MultiPacker multiPacker;
+        public final PackContext packContext;
 
-        public AtlasPackEvent(MultiPacker multiPacker){
-          this.multiPacker = multiPacker;
+        public AtlasPackEvent(PackContext packContext){
+          this.packContext = packContext;
         }
     }
     /** Called *after* all mod content has been loaded, but before it has been initialized. */
@@ -769,28 +768,28 @@ public class EventType{
     }
 
     /** Called after connecting; when a player receives world data and is ready to play. Fired only once, after initial connection. */
-    public static class PlayerJoin{
+    public static class PlayerJoinEvent{
         public final Player player;
 
-        public PlayerJoin(Player player){
+        public PlayerJoinEvent(Player player){
             this.player = player;
         }
     }
 
     /** Called when a player connects, but has not joined the game yet.*/
-    public static class PlayerConnect{
+    public static class PlayerConnectEvent{
         public final Player player;
 
-        public PlayerConnect(Player player){
+        public PlayerConnectEvent(Player player){
             this.player = player;
         }
     }
 
     /** Called before a player leaves the game. */
-    public static class PlayerLeave{
+    public static class PlayerLeaveEvent{
         public final Player player;
 
-        public PlayerLeave(Player player){
+        public PlayerLeaveEvent(Player player){
             this.player = player;
         }
     }

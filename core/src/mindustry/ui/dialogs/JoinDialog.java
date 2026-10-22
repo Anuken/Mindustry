@@ -1,8 +1,8 @@
 package mindustry.ui.dialogs;
 
 import arc.*;
-import arc.freetype.FreeTypeFontGenerator.*;
 import arc.graphics.*;
+import arc.graphics.font.FreeTypeFontGenerator.*;
 import arc.input.*;
 import arc.math.*;
 import arc.scene.*;
@@ -10,8 +10,8 @@ import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.Timer;
 import arc.util.*;
+import arc.util.Timer;
 import arc.util.Timer.*;
 import arc.util.serialization.*;
 import mindustry.*;
@@ -245,7 +245,7 @@ public class JoinDialog extends BaseDialog{
 
         server.content.background(Tex.whitePane).setColor(Pal.gray);
 
-        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Time.time, 4, 11, ".")).grow().center().labelAlign(Align.center).padBottom(4);
+        server.content.label(() -> Core.bundle.get("server.refreshing") + Strings.animated(Vars.state.time, 4, 11, ".")).grow().center().labelAlign(Align.center).padBottom(4);
 
         net.pingHost(server.ip, server.port, host -> setupServer(server, host), e -> {
             server.content.clear();
@@ -387,6 +387,15 @@ public class JoinDialog extends BaseDialog{
         hosts.row();
         hosts.image().growX().pad(5).padLeft(10).padRight(10).height(3).color(Pal.accent);
         hosts.row();
+        if(eye){
+            hosts.table(t -> {
+                t.add("@search").padRight(10);
+                t.field(serverSearch, text ->
+                serverSearch = text.trim().replaceAll(" +", " ").toLowerCase()
+                ).grow().pad(8).get().keyDown(KeyCode.enter, this::refreshCommunity);
+                t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
+            }).width((targetWidth() + 5f) * columns()).height(70f).pad(4).row();
+        }
         hosts.add(coll).width((targetWidth() + 5f) * columns());
         hosts.row();
     }
@@ -396,7 +405,7 @@ public class JoinDialog extends BaseDialog{
 
         local.clear();
         local.background(null);
-        local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Time.time, 4, 10f, ".")).pad(10f)).growX();
+        local.table(Tex.button, t -> t.label(() -> "[accent]" + Core.bundle.get("hosts.discovering.any") + Strings.animated(Vars.state.time, 4, 10f, ".")).pad(10f)).growX();
         net.discoverServers(this::addLocalHost, this::finishLocalHosts);
     }
 
@@ -409,14 +418,6 @@ public class JoinDialog extends BaseDialog{
         if(!fetchedServers){
             fetchServers();
         }
-
-        global.table(t -> {
-            t.add("@search").padRight(10);
-            t.field(serverSearch, text ->
-                serverSearch = text.trim().replaceAll(" +", " ").toLowerCase()
-            ).grow().pad(8).get().keyDown(KeyCode.enter, this::refreshCommunity);
-            t.button(Icon.zoom, Styles.emptyi, this::refreshCommunity).size(54f);
-        }).width((targetWidth() + 5f) * columns()).height(70f).pad(4).row();
 
         //if the servers have been fetched, use the fetched list
         //otherwise use the cached list + the extra servers that may have been included by mods
@@ -786,7 +787,7 @@ public class JoinDialog extends BaseDialog{
             //not important
             return "";
         }else{
-            return Core.bundle.format("server.version", host.version, host.versionType);
+            return Core.bundle.format("server.version", host.version, "official".equals(host.versionType) ? "" : host.versionType);
         }
     }
 

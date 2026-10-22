@@ -1,5 +1,6 @@
+import arc.graphics.*;
 import mindustry.logic.*;
-import mindustry.logic.LExecutor.*;
+import mindustry.logic.instructions.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
@@ -16,16 +17,16 @@ public class LogicTests{
     }
 
     /** Assembles and loads a small mlog program, mirroring the LogicBlock usage pattern. */
-    static LExecutor load(String code){
-        LExecutor exec = new LExecutor();
+    static LogicExecutor load(String code){
+        LogicExecutor exec = new LogicExecutor();
         exec.privileged = true;
-        exec.load(LAssembler.assemble(code, true));
+        exec.load(LogicAssembler.assemble(code, true));
         return exec;
     }
 
     /** Runs a single `set result <value>` line and returns the decoded value assigned to `from`. */
     static Object setFromValue(String code){
-        LExecutor exec = load(code);
+        LogicExecutor exec = load(code);
         assertTrue(exec.instructions.length > 0, "expected at least one instruction to be parsed from: " + code);
         assertTrue(exec.instructions[0] instanceof SetI, "expected a set instruction from: " + code);
         return ((SetI)exec.instructions[0]).from.objval;
@@ -104,7 +105,7 @@ public class LogicTests{
 
     @Test
     void plainNumberIsNotTreatedAsAString(){
-        LExecutor exec = load("set result 5");
+        LogicExecutor exec = load("set result 5");
         SetI set = (SetI)exec.instructions[0];
         assertFalse(set.from.isobj, "a bare number should not be stored as an object value");
         assertEquals(5.0, set.from.numval);
@@ -113,7 +114,7 @@ public class LogicTests{
     @ParameterizedTest(name = "{0}")
     @MethodSource("sanitizeCases")
     void sanitizesInput(String name, String input, String expected){
-        assertEquals(expected, LStatement.sanitize(input));
+        assertEquals(expected, LogicStatement.sanitize(input));
     }
 
     static Stream<Arguments> sanitizeCases(){
@@ -122,7 +123,7 @@ public class LogicTests{
         Arguments.of("a bare single semicolon is invalid", ";", "invalid"),
         Arguments.of("a bare single space is invalid", " ", "invalid"),
         Arguments.of("a single ordinary character passes through unchanged", "a", "a"),
-        Arguments.of("empty input stays empty", "", ""),
+        Arguments.of("empty input gets converted to null", "", "null"),
         Arguments.of("a plain already-quoted value is untouched", "\"hello\"", "\"hello\""),
         Arguments.of("a unescaped quote at the end gets doubled", "\"hello\\\"", "\"hello\\\\\""),
         Arguments.of(
@@ -187,7 +188,7 @@ public class LogicTests{
     @ParameterizedTest(name = "{0}")
     @MethodSource("sanitizeRoundTripCases")
     void sanitizedQuotedValuesRoundTripThroughTheParser(String name, String userInput, String expectedDecoded){
-        String sanitized = LStatement.sanitize(userInput);
+        String sanitized = LogicStatement.sanitize(userInput);
         //sanity check: sanitize should have kept this as a quoted string value
         assertTrue(sanitized.length() >= 2 && sanitized.charAt(0) == '"' && sanitized.charAt(sanitized.length() - 1) == '"', "expected a quoted value, got: " + sanitized);
 
@@ -195,8 +196,8 @@ public class LogicTests{
         assertEquals(expectedDecoded, decoded);
 
         //make sure read/write roundtrips it
-        var statements = LAssembler.read("set result " + sanitized + "\n", true);
-        assertEquals("set result " + sanitized + "\n", LAssembler.write(statements));
+        var statements = LogicAssembler.read("set result " + sanitized + "\n", true);
+        assertEquals("set result " + sanitized + "\n", LogicAssembler.write(statements));
     }
 
     static Stream<Arguments> sanitizeRoundTripCases(){
@@ -241,6 +242,123 @@ public class LogicTests{
         "end\\"
         )
         );
+    }
+
+    /** Values that must resolve to a numeric constant (isobj == false) or an object constant. */
+    static Stream<Arguments> parseValCases(){
+        return Stream.of(
+        // name, symbol, expected (Double => numeric, anything else => object)
+        Arguments.of("parse null", "null", null),
+
+        //decimal
+        Arguments.of("decimal: zero", "0", 0.0),
+        Arguments.of("decimal: positive integer", "42", 42.0),
+        Arguments.of("decimal: negative integer", "-42", -42.0),
+        Arguments.of("decimal: explicit plus sign", "+42", 42.0),
+        Arguments.of("decimal: fraction", "3.14", 3.14),
+        Arguments.of("decimal: negative fraction", "-3.14", -3.14),
+        Arguments.of("decimal: leading dot", ".5", 0.5),
+        Arguments.of("decimal: large integer", "123456789012", 123456789012.0),
+        Arguments.of("decimal: scientific", "1e3", 1000.0),
+        Arguments.of("decimal: scientific negative exponent", "1.5e-2", 0.015),
+
+        //hex
+        Arguments.of("hex: zero", "0x0", 0.0),
+        Arguments.of("hex: uppercase digits", "0xFF", 255.0),
+        Arguments.of("hex: lowercase digits", "0xff", 255.0),
+        Arguments.of("hex: mixed case", "0xDeadBeef", 3735928559.0),
+        Arguments.of("hex: explicit plus", "+0xFF", 255.0),
+        Arguments.of("hex: negative", "-0xFF", -255.0),
+        Arguments.of("hex: many leading zeros aren't overflow", "0x0000000000000000000000FF", 255.0),
+        Arguments.of("hex: only zeros", "0x" + "0".repeat(100), 0.0),
+        Arguments.of("hex: Long.MAX_VALUE", "0x7FFFFFFFFFFFFFFF", (double)Long.MAX_VALUE),
+        Arguments.of("hex: Long.MIN_VALUE (0x8000...)", "0x8000000000000000", (double)Long.MIN_VALUE),
+        Arguments.of("hex: unsigned long max wraps to -1", "0xFFFFFFFFFFFFFFFF", -1.0),
+        Arguments.of("hex: unsigned long max - 1 wraps to -2", "0xFFFFFFFFFFFFFFFE", -2.0),
+        Arguments.of("hex: negated -1 wrap gives 1", "-0xFFFFFFFFFFFFFFFF", 1.0),
+        Arguments.of("hex: negative Long.MAX_VALUE", "-0x7FFFFFFFFFFFFFFF", -(double)Long.MAX_VALUE),
+
+        //binary
+        Arguments.of("bin: zero", "0b0", 0.0),
+        Arguments.of("bin: one", "0b1", 1.0),
+        Arguments.of("bin: ten", "0b1010", 10.0),
+        Arguments.of("bin: explicit plus", "+0b1010", 10.0),
+        Arguments.of("bin: negative", "-0b1010", -10.0),
+        Arguments.of("bin: many leading zeros aren't overflow", "0b" + "0".repeat(70) + "1", 1.0),
+        Arguments.of("bin: 63 ones is Long.MAX_VALUE", "0b0" + "1".repeat(63), (double)Long.MAX_VALUE),
+        Arguments.of("bin: 1 followed by 63 zeros is Long.MIN_VALUE", "0b1" + "0".repeat(63), (double)Long.MIN_VALUE),
+        Arguments.of("bin: 64 ones wraps to -1", "0b" + "1".repeat(64), -1.0)
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("parseValCases")
+    void parseVarValues(String name, String symbol, Object expected){
+        LogicAssembler asm = new LogicAssembler();
+        LogicVar v = asm.var(symbol);
+        if(expected instanceof Double d){
+            assertFalse(v.isobj, "should be numeric: " + symbol);
+            assertEquals(d, v.numval, 0.00001f);
+        }else{
+            assertTrue(v.isobj);
+            assertEquals(expected, v.objval);
+        }
+    }
+
+    /** Colors are packed into the bits of a (tiny, denormal) double, so they need an exact comparison. */
+    static Stream<Arguments> parseColorCases(){
+        return Stream.of(
+        Arguments.of("color: rgb white", "%ffffff", Color.toDoubleBits(255, 255, 255, 255)),
+        Arguments.of("color: rgba", "%ff000080", Color.toDoubleBits(255, 0, 0, 128)),
+        Arguments.of("color: named", "%[red]", Colors.get("red").toDoubleBits())
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("parseColorCases")
+    void parseColorValues(String name, String symbol, double expected){
+        LogicAssembler asm = new LogicAssembler();
+        LogicVar v = asm.var(symbol);
+        assertFalse(v.isobj);
+        assertEquals(expected, v.numval, 0.0);
+    }
+
+    /** Anything here must NOT be parsed as a number (i.e. it becomes a plain variable name). */
+    static Stream<String> invalidNumberCases(){
+        return Stream.of(
+        //fail-fast: first char can't start a number
+        "",
+        "abc",
+        "e10",
+        "NaN",
+        "Infinity",
+
+        //prefix with no digits
+        "0x", "0b", "+0x", "-0b",
+
+        //invalid digits
+        "0xG", "0x12G4", "0b2", "0b102", "0x-1", "0x1.5",
+
+        //overflow: more than 64 significant bits
+        "0x1" + "0".repeat(16),        //17 hex digits
+        "-0x1" + "0".repeat(16),
+        "0x" + "F".repeat(17),
+        "0b1" + "0".repeat(64),        //65 binary digits
+        "0b" + "1".repeat(65),
+
+        //malformed colors
+        "%fff",
+        "%[nosuchcolor]"
+        );
+    }
+
+    @ParameterizedTest(name = "invalid: [{0}]")
+    @MethodSource("invalidNumberCases")
+    void parseInvalidNumbers(String symbol){
+        LogicAssembler asm = new LogicAssembler();
+        LogicVar v = asm.var(symbol);
+        assertTrue(v.isobj, "should not parse as a number: " + symbol);
+        assertNull(v.objval);
     }
 
     //unterminated / malformed string literals: these must fail loudly, never silently misparse
@@ -294,8 +412,8 @@ public class LogicTests{
 
     @Test
     void varWithProperlyQuotedEmptyString(){
-        LAssembler asm = new LAssembler();
-        LVar v = asm.var("\"\"");
+        LogicAssembler asm = new LogicAssembler();
+        LogicVar v = asm.var("\"\"");
         assertTrue(v.isobj);
         assertEquals("", v.objval);
     }
@@ -314,7 +432,7 @@ public class LogicTests{
 
     @Test
     void crlfAfterUnquotedTokenDoesNotCorruptTheToken(){
-        LExecutor exec = load("set a bar\r\nset b bar\n");
+        LogicExecutor exec = load("set a bar\r\nset b bar\n");
         SetI first = (SetI)exec.instructions[0];
         SetI second = (SetI)exec.instructions[1];
         assertSame(first.from, second.from, "a CRLF-terminated reference to 'bar' must resolve to the same variable as an LF-terminated one");
@@ -328,7 +446,7 @@ public class LogicTests{
     @Test
     void loneCarriageReturnActsAsALineEnding(){
         //old-style Mac ('\r'-only) line endings are normalized the same way as CRLF.
-        LExecutor exec = load("set result 1\rset result2 2\r");
+        LogicExecutor exec = load("set result 1\rset result2 2\r");
         assertEquals(2, exec.instructions.length, "expected two separate statements, split on the lone '\\r'");
     }
 

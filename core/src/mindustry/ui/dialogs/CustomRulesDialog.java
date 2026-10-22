@@ -12,7 +12,6 @@ import arc.util.serialization.*;
 import mindustry.*;
 import mindustry.audio.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.editor.*;
 import mindustry.game.*;
 import mindustry.game.Rules.*;
@@ -41,7 +40,7 @@ public class CustomRulesDialog extends BaseDialog{
     public Seq<String> categoryNames;
     public String currentName = "";
     public String ruleSearch = "";
-    public Seq<Runnable> additionalSetup; // for modding to easily add new rules
+    public static Seq<Runnable> additionalSetup = new Seq<>(); // for modding to easily add new rules
 
     public CustomRulesDialog(){
         this(false);
@@ -58,7 +57,6 @@ public class CustomRulesDialog extends BaseDialog{
         shown(this::setup);
         addCloseButton();
 
-        additionalSetup = new Seq<>();
         categories = new Seq<>();
         categoryNames = new Seq<>();
 
@@ -127,7 +125,7 @@ public class CustomRulesDialog extends BaseDialog{
                 ruleSearch = text.trim().replaceAll(" +", " ").toLowerCase();
                 setupMain();
             }).growX().pad(8).get();
-            field.setMessageText("@player.search");
+            field.setMessageText("@players.search");
             field.setCursorPosition(ruleSearch.length());
             Core.scene.setKeyboardFocus(field);
         }).fillX().row();
@@ -140,6 +138,7 @@ public class CustomRulesDialog extends BaseDialog{
 
     void setupMain(){
         categories.clear();
+        categoryNames.clear();
         main.clear();
         main.left().defaults().fillX().left();
         main.row();
@@ -177,7 +176,7 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.blockdamagemultiplier", f -> rules.blockDamageMultiplier = f, () -> rules.blockDamageMultiplier);
 
         if(Core.bundle.get("configure").toLowerCase().contains(ruleSearch)){
-            current.button("@configure",
+            current.button("@configure", Icon.boxSmall,
                 () -> loadoutDialog.show(999999, rules.loadout,
                     i -> true,
                     () -> rules.loadout.clear().add(new ItemStack(Items.copper, 100)),
@@ -186,7 +185,7 @@ public class CustomRulesDialog extends BaseDialog{
         }
 
         if(Core.bundle.get("bannedblocks").toLowerCase().contains(ruleSearch)){
-            current.button("@bannedblocks", () -> bannedBlocks.show(rules.bannedBlocks)).left().width(300f).row();
+            current.button("@bannedblocks", Icon.cancelSmall, () -> bannedBlocks.show(rules.bannedBlocks)).left().width(300f).row();
         }
         check("@rules.hidebannedblocks", b -> rules.hideBannedBlocks = b, () -> rules.hideBannedBlocks);
         check("@bannedblocks.whitelist", b -> rules.blockWhitelist = b, () -> rules.blockWhitelist);
@@ -207,7 +206,7 @@ public class CustomRulesDialog extends BaseDialog{
         check("@rules.logicunitdeconstruct", b -> rules.logicUnitDeconstruct = b, () -> rules.logicUnitDeconstruct, () -> rules.logicUnitControl);
 
         if(Core.bundle.get("bannedunits").toLowerCase().contains(ruleSearch)){
-            current.button("@bannedunits", () -> bannedUnits.show(rules.bannedUnits)).left().width(300f).row();
+            current.button("@bannedunits", Icon.unitsSmall, () -> bannedUnits.show(rules.bannedUnits)).left().width(300f).row();
         }
         check("@bannedunits.whitelist", b -> rules.unitWhitelist = b, () -> rules.unitWhitelist);
 
@@ -234,7 +233,7 @@ public class CustomRulesDialog extends BaseDialog{
         number("@rules.solarmultiplier", f -> rules.solarMultiplier = f, () -> rules.solarMultiplier);
 
         if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
-            current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
+            current.button("@rules.weather", Icon.rainSmall, this::weatherDialog).width(250f).left().row();
         }
 
         category("light");
@@ -251,16 +250,12 @@ public class CustomRulesDialog extends BaseDialog{
         }
         check("@rules.lighting.unitlight", b -> rules.unitLight = b, () -> rules.unitLight);
 
-        if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
-            current.button("@rules.weather", this::weatherDialog).width(250f).left().row();
-        }
-
         category("music");
 
         Boolp allowMusic = () -> !rules.disableMusic;
         Func<String, Seq<MusicContainer>> parser = str -> {
             try{
-                return Seq.map(new JsonReader().parse("[" + str + "]").asStringArray(), MusicContainer::new);
+                return Jval.read("[" + str + "]").asArray().map( j -> new MusicContainer(j.asString()));
             }catch(Throwable e){
                 return null;
             }
@@ -342,8 +337,8 @@ public class CustomRulesDialog extends BaseDialog{
                 number("@rules.rtsminattackweight", f -> teams.rtsMinWeight = f, () -> teams.rtsMinWeight, () -> teams.rtsAi);
 
                 //disallow on Erekir (this is broken for mods I'm sure, but whatever)
-                check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && rules.env != Planets.erekir.defaultEnv && !rules.pvp);
-                number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && rules.env != Planets.erekir.defaultEnv && !rules.pvp, 0, 1);
+                check("@rules.buildai", b -> teams.buildAi = b, () -> teams.buildAi, () -> team != rules.defaultTeam && !rules.env.equals(Planets.erekir.defaultEnv) && !rules.pvp);
+                number("@rules.buildaitier", false, f -> teams.buildAiTier = f, () -> teams.buildAiTier, () -> teams.buildAi && !rules.env.equals(Planets.erekir.defaultEnv) && !rules.pvp, 0, 1);
 
                 check("@rules.protectcores", b -> teams.protectCores = b, () -> teams.protectCores);
                 number("@rules.extracorebuildradius", f -> teams.extraCoreBuildRadius = f * tilesize, () -> Math.min(teams.extraCoreBuildRadius / tilesize, 200), () -> !rules.polygonCoreProtection && teams.protectCores);

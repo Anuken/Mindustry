@@ -84,6 +84,7 @@ public class MapPatchesView implements AssetView{
             list.button(Icon.trash, Styles.graySquarei, iconMed, () -> {
                 ui.showConfirm("@patch.delete.confirm",  () -> {
                     patches.remove(patch);
+                    state.data.reloadPatches(patches);
                     diag.rebuild();
                 });
             }).size(h);
@@ -147,11 +148,17 @@ public class MapPatchesView implements AssetView{
         }
     }
 
-    int countFields(JsonValue value){
+    int countFields(Jval value){
         if(value.isObject() || value.isArray()){
             int sum = 0;
-            for(var child : value){
-                sum += countFields(child);
+            if(value.isObject()){
+                for(var child : value.asObject()){
+                    sum += countFields(child.value);
+                }
+            }else{
+                for(var child : value.asArray()){
+                    sum += countFields(child);
+                }
             }
             return Math.max(sum, 1);
         }else{

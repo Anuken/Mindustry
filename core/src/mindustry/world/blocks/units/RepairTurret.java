@@ -7,13 +7,14 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.entities.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
@@ -25,9 +26,6 @@ import static mindustry.Vars.*;
 public class RepairTurret extends Block{
     static final Rect rect = new Rect();
     static final Rand rand = new Rand();
-
-    public int timerTarget = timers++;
-    public int timerEffect = timers++;
 
     public float repairRadius = 50f;
     public float repairSpeed = 0.3f;
@@ -62,14 +60,14 @@ public class RepairTurret extends Block{
         //yeah, this isn't the same thing, but it's close enough
         group = BlockGroup.projectors;
 
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         ambientSound = Sounds.beamHeal;
         ambientSoundVolume = 1f;
     }
 
     @Override
-    public void setStats(){
-        super.setStats();
+    public void setStats(Stats stats){
+        super.setStats(stats);
         stats.add(Stat.range, repairRadius / tilesize, StatUnit.blocks);
         stats.add(Stat.repairSpeed, repairSpeed * 60f, StatUnit.perSecond);
 
@@ -119,8 +117,8 @@ public class RepairTurret extends Block{
             lastEnd.setLength(Math.max(2f, lastEnd.len()));
 
             lastEnd.add(offset.trns(
-            rand.random(360f) + Time.time/2f,
-            Mathf.sin(Time.time + rand.random(200f), 55f, rand.random(target.hitSize() * 0.2f, target.hitSize() * 0.45f))
+            rand.random(360f) + Vars.state.time/2f,
+            Mathf.sin(Vars.state.time + rand.random(200f), 55f, rand.random(target.hitSize() * 0.2f, target.hitSize() * 0.45f))
             ).rotate(target instanceof Rotc rot ? rot.rotation() : 0f));
 
             lastEnd.add(originX, originY);
@@ -135,7 +133,7 @@ public class RepairTurret extends Block{
 
             Draw.color(laserColor);
 
-            float f = (Time.time / 85f + rand.random(1f)) % 1f;
+            float f = (Vars.state.time / 85f + rand.random(1f)) % 1f;
 
             Draw.alpha(1f - Interp.pow5In.apply(f));
             Lines.stroke(strength * pulseStroke);
@@ -153,7 +151,7 @@ public class RepairTurret extends Block{
     public class RepairPointBuild extends Building implements Ranged, RotBlock{
         public Unit target;
         public Vec2 offset = new Vec2(), lastEnd = new Vec2();
-        public float strength, rotation = 90;
+        public float strength, rotation = 90, targetTimer;
 
         @Override
         public float buildRotation(){
@@ -211,7 +209,8 @@ public class RepairTurret extends Block{
 
             strength = Mathf.lerpDelta(strength, healed ? 1f : 0f, 0.08f * Time.delta);
 
-            if(timer(timerTarget, 20)){
+            if((targetTimer += Time.delta) >= 20f){
+                targetTimer %= 20f;
                 rect.setSize(repairRadius * 2).setCenter(x, y);
                 target = Units.closest(team, x, y, repairRadius, Unit::damaged);
             }

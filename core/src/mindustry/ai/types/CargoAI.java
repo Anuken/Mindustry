@@ -102,7 +102,7 @@ public class CargoAI extends AIController{
         itemTarget = item;
 
         //autocast for convenience... I know all of these must be cargo unload points anyway
-        targets.selectFrom((Seq<UnitCargoUnloadPointBuild>)(Seq)Vars.indexer.getFlagged(unit.team, BlockFlag.unitCargoUnloadPoint), u -> u.item == item);
+        targets.selectFrom((Seq<UnitCargoUnloadPointBuild>)(Seq)Vars.state.indexer.getFlagged(unit.team, BlockFlag.unitCargoUnloadPoint), u -> u.item == item);
 
         if(targets.isEmpty()) return 0;
 
@@ -129,7 +129,7 @@ public class CargoAI extends AIController{
         itemTarget = null;
 
         //autocast for convenience... I know all of these must be cargo unload points anyway
-        var baseTargets = (Seq<UnitCargoUnloadPointBuild>)(Seq)Vars.indexer.getFlagged(unit.team, BlockFlag.unitCargoUnloadPoint);
+        var baseTargets = (Seq<UnitCargoUnloadPointBuild>)(Seq)Vars.state.indexer.getFlagged(unit.team, BlockFlag.unitCargoUnloadPoint);
 
         if(baseTargets.isEmpty()) return;
 

@@ -12,11 +12,10 @@ import com.github.javaparser.*;
 import com.github.javaparser.ast.body.*;
 import mindustry.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.entities.*;
 import mindustry.entities.units.*;
-import mindustry.game.Objectives.*;
 import mindustry.game.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -51,7 +50,7 @@ public class SchemaGenerator{
             }
         }
         root.put("mappings", mappings);
-        outputDir.child("allContent.json").writeString(root.toString(Jformat.formatted));
+        outputDir.child("allContent.json").writeString(root.toString(Jformat.jsonFormatted));
     }
 
     //called from ScriptMainGenerator
@@ -74,8 +73,8 @@ public class SchemaGenerator{
             val.put("superclass", type.getSuperclass().getCanonicalName());
         }
 
-        if(Objective.class.isAssignableFrom(type)){
-            val.put("superclass", Objective.class.getCanonicalName());
+        if(UnlockCondition.class.isAssignableFrom(type)){
+            val.put("superclass", UnlockCondition.class.getCanonicalName());
         }
 
         if(typeDec.getJavadoc().isPresent()){
@@ -95,7 +94,12 @@ public class SchemaGenerator{
 
             var root = getTypeDecl(field.getDeclaringClass());
             if(root != null) root.getFieldByName(field.getName()).ifPresent(fdec -> {
-                String[] docAndDefault = determineJavadocAndDefault(field, fdec, fdec.getVariables().getFirst().orElseThrow());
+                var variable = fdec.getVariables().stream()
+                .filter(v -> v.getNameAsString().equals(field.getName()))
+                .findFirst().orElse(null);
+                if(variable == null) return;
+
+                String[] docAndDefault = determineJavadocAndDefault(field, fdec, variable);
                 if(docAndDefault[0] != null) inner.put("doc", docAndDefault[0]);
                 if(docAndDefault[1] != null) inner.put("default", docAndDefault[1]);
             });
@@ -108,7 +112,7 @@ public class SchemaGenerator{
             injector.get(val);
         }
 
-        outputDir.child(type.getCanonicalName() + ".json").writeString(val.toString(Jformat.formatted));
+        outputDir.child(type.getCanonicalName() + ".json").writeString(val.toString(Jformat.jsonFormatted));
     }
 
     //writes a schema for an enum type the first time it's encountered as a field value; subsequent calls are no-ops
@@ -129,7 +133,7 @@ public class SchemaGenerator{
         }
         val.put("values", values);
 
-        outputDir.child(enumType.getCanonicalName() + ".json").writeString(val.toString(Jformat.formatted));
+        outputDir.child(enumType.getCanonicalName() + ".json").writeString(val.toString(Jformat.jsonFormatted));
     }
 
     //registers an injector adding/overwriting fields on type's generated schema, for JSON keys with no real backing field
@@ -302,8 +306,14 @@ public class SchemaGenerator{
                 initValue = "[]";
             }
 
-            //field
-            if(initValue.contains(".") && !(baseField.getType().isArray())){
+            //numeric literal: drop the Java-only suffix (f/F/d/D/L), keep the decimal point for JSON
+            boolean numeric = initValue.matches("-?(\\d+\\.?\\d*|\\.\\d+)([eE][-+]?\\d+)?[fFdDlL]?");
+            if(numeric){
+                initValue = initValue.replaceAll("[fFdDlL]$", "");
+            }
+
+            //field reference, e.g. Category.turret -> turret (never applied to numbers)
+            if(!numeric && initValue.contains(".") && !(baseField.getType().isArray())){
                 var split = initValue.split("\\.");
                 initValue = split[split.length - 1];
             }

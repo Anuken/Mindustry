@@ -31,7 +31,7 @@ public class MinimapFragment{
             w = Core.graphics.getWidth(),
             h = Core.graphics.getHeight(),
             ratio = renderer.minimap.getTexture() == null ? 1f : (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width,
-            size = baseSize * zoom * world.width();
+            size = baseSize * zoom * state.world.width;
 
         return Tmp.r1.set(w/2f + panx*zoom - size/2f, h/2f + pany*zoom - size/2f * ratio, size, size * ratio);
     }
@@ -40,7 +40,7 @@ public class MinimapFragment{
         elem = parent.fill((x, y, w, h) -> {
             w = Core.graphics.getWidth();
             h = Core.graphics.getHeight();
-            float size = baseSize * zoom * world.width();
+            float size = baseSize * zoom * state.world.width;
 
             Draw.color(Color.black);
             Fill.crect(0, 0, w, h);
@@ -153,12 +153,12 @@ public class MinimapFragment{
     }
 
     public void panTo(float relativeX, float relativeY){
-        control.input.panCamera(convert(relativeX, relativeY).clamp(-tilesize/2f, -tilesize/2f, world.unitWidth() + tilesize/2f, world.unitHeight() + tilesize/2f));
+        control.input.panCamera(convert(relativeX, relativeY).clamp(-tilesize/2f, -tilesize/2f, state.world.unitWidth + tilesize/2f, state.world.unitHeight + tilesize/2f));
     }
 
     public Vec2 convert(float relativeX, float relativeY){
         Rect r = getRectBounds();
-        return Tmp.v1.set(relativeX, relativeY).sub(r.x - scene.marginLeft, r.y - scene.marginBottom).scl(1f / r.width, 1f / r.height).scl(world.unitWidth(), world.unitHeight()).sub(tilesize/2f, tilesize/2f);
+        return Tmp.v1.set(relativeX, relativeY).sub(r.x - scene.marginLeft, r.y - scene.marginBottom).scl(1f / r.width, 1f / r.height).scl(state.world.unitWidth, state.world.unitHeight).sub(tilesize/2f, tilesize/2f);
     }
 
     public boolean shown(){
@@ -171,11 +171,11 @@ public class MinimapFragment{
 
     public void toggle(){
         if(renderer.minimap.getTexture() != null){
-            float size = baseSize * zoom * world.width();
+            float size = baseSize * zoom * state.world.width;
             float ratio = (float)renderer.minimap.getTexture().height / renderer.minimap.getTexture().width;
             float px = player.dead() ? Core.camera.position.x : player.x, py = player.dead() ? Core.camera.position.y : player.y;
-            panx = (size/2f - px / (world.width() * tilesize) * size) / zoom;
-            pany = (size*ratio/2f - py / (world.height() * tilesize) * size*ratio) / zoom;
+            panx = (size/2f - px / (state.world.width * tilesize) * size) / zoom;
+            pany = (size*ratio/2f - py / (state.world.height * tilesize) * size*ratio) / zoom;
         }
 
         shown = !shown;

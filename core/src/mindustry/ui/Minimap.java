@@ -32,8 +32,8 @@ public class Minimap extends Table{
                         float
                         sx = (cx - x) / width,
                         sy = (cy - y) / height,
-                        scaledX = Mathf.lerp(region.u, region.u2, sx) * world.width() * tilesize,
-                        scaledY = Mathf.lerp(1f - region.v2, 1f - region.v, sy) * world.height() * tilesize;
+                        scaledX = Mathf.lerp(region.u, region.u2, sx) * state.world.width * tilesize,
+                        scaledY = Mathf.lerp(1f - region.v2, 1f - region.v, sy) * state.world.height * tilesize;
 
                         control.input.panCamera(Tmp.v1.set(scaledX, scaledY));
                     }
@@ -98,7 +98,7 @@ public class Minimap extends Table{
                 super.touchDragged(event, x, y, pointer);
 
                 if(mobile){
-                    float max = Math.min(world.width(), world.height()) / 16f / 2f;
+                    float max = Math.min(state.world.width, state.world.height) / 16f / 2f;
                     renderer.minimap.setZoom(1f + y / height * (max - 1f));
                 }
             }

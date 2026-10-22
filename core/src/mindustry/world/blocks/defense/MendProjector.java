@@ -6,11 +6,12 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.world.*;
 import mindustry.world.consumers.*;
@@ -19,7 +20,6 @@ import mindustry.world.meta.*;
 import static mindustry.Vars.*;
 
 public class MendProjector extends Block{
-    public final int timerUse = timers++;
     public Color baseColor = Color.valueOf("84f491");
     public Color phaseColor = baseColor;
     public @Load("@-top") TextureRegion topRegion;
@@ -44,7 +44,7 @@ public class MendProjector extends Block{
         emitLight = true;
         lightRadius = 50f;
         suppressable = true;
-        envEnabled |= Env.space;
+        envEnabled = envEnabled.with(Env.space);
         flags = EnumSet.of(BlockFlag.blockRepair);
         drawCached = true;
     }
@@ -55,9 +55,9 @@ public class MendProjector extends Block{
     }
 
     @Override
-    public void setStats(){
+    public void setStats(Stats stats){
         stats.timePeriod = useTime;
-        super.setStats();
+        super.setStats(stats);
 
         stats.add(Stat.repairTime, (int)(100f / healPercent * reload / 60f), StatUnit.seconds);
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
@@ -78,11 +78,12 @@ public class MendProjector extends Block{
 
         Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
 
-        indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+        state.indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f))));
     }
 
     public class MendBuild extends Building implements Ranged{
         public float heat, charge = Mathf.random(reload), phaseHeat, smoothEfficiency;
+        public float useTimer;
 
         @Override
         public float range(){
@@ -99,8 +100,11 @@ public class MendProjector extends Block{
 
             phaseHeat = Mathf.lerpDelta(phaseHeat, optionalEfficiency, 0.1f);
 
-            if(optionalEfficiency > 0 && timer(timerUse, useTime / timeScale) && canHeal){
-                consume();
+            if(optionalEfficiency > 0 && (useTimer += timeScale * Time.delta) >= useTime){
+                if(canHeal){
+                    consume();
+                }
+                useTimer %= useTime;
             }
 
             if(charge >= reload && canHeal){
@@ -109,7 +113,7 @@ public class MendProjector extends Block{
 
                 any = false;
 
-                indexer.eachBlock(this, realRange, b -> b.damaged() && !b.isHealSuppressed(), other -> {
+                state.indexer.eachBlock(this, realRange, b -> b.damaged() && !b.isHealSuppressed(), other -> {
                     other.heal(other.maxHealth() * (healPercent + phaseHeat * phaseBoost) / 100f * efficiency);
                     other.recentlyHealed();
                     Fx.healBlockFull.at(other.x, other.y, other.block.size, baseColor, other.block);
@@ -123,8 +127,8 @@ public class MendProjector extends Block{
         }
 
         @Override
-        public double sense(LAccess sensor){
-            if(sensor == LAccess.progress) return Mathf.clamp(charge / reload);
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.progress) return Mathf.clamp(charge / reload);
             return super.sense(sensor);
         }
 
@@ -132,7 +136,7 @@ public class MendProjector extends Block{
         public void drawSelect(){
             float realRange = range + phaseHeat * phaseRangeBoost;
 
-            indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(4f, 1f))));
+            state.indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f))));
 
             Drawf.dashCircle(x, y, realRange, baseColor);
         }
@@ -144,12 +148,12 @@ public class MendProjector extends Block{
 
         @Override
         public void draw(){
-            float f = 1f - (Time.time / 100f) % 1f;
+            float f = 1f - (Vars.state.time / 100f) % 1f;
 
             if(!Lod.l2) return;
 
             Draw.color(baseColor, phaseColor, phaseHeat);
-            Draw.alpha(heat * Mathf.absin(Time.time, 50f / Mathf.PI2, 1f) * 0.5f * Lod.alpha2);
+            Draw.alpha(heat * Mathf.absin(Vars.state.time, 50f / Mathf.PI2, 1f) * 0.5f * Lod.alpha2);
             Draw.rect(topRegion, x, y);
             Draw.alpha(Lod.alpha2);
             Lines.stroke((2f * f + 0.2f) * heat);

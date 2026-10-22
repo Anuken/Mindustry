@@ -2,7 +2,7 @@ package mindustry.type.weapons;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.units.*;
 import mindustry.gen.*;
@@ -56,7 +56,7 @@ public class MineWeapon extends Weapon{
                 weaponRotation  = rotation + (rotate ? mount.rotation : 0),
                 wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -mount.recoil),
                 wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -mount.recoil),
-                sY = shootY + Mathf.absin(Time.time, 1.1f, 0.5f),
+                sY = shootY + Mathf.absin(Vars.state.time, 1.1f, 0.5f),
                 px = wx + Angles.trnsx(weaponRotation, shootX, sY),
                 py = wy + Angles.trnsy(weaponRotation, shootX, sY);
 

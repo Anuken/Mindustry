@@ -65,7 +65,7 @@ abstract class CrawlComp implements Posc, Rotc, Hitboxc, Unitc{
                 for(int cy = -radius; cy <= radius; cy++){
                     if(cx*cx + cy*cy <= radius){
                         count ++;
-                        Tile t = Vars.world.tileWorld(x + cx*tilesize, y + cy*tilesize);
+                        Tile t = Vars.state.world.tileWorld(x + cx*tilesize, y + cy*tilesize);
                         if(t != null){
 
                             if(t.solid()){

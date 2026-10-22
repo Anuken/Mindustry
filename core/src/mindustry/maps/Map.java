@@ -63,12 +63,24 @@ public class Map implements Comparable<Map>, Publishable{
         this(Vars.customMapDirectory.child(tags.get("name", "unknown")), 0, 0, tags, true);
     }
 
+    public Map(){
+        this(new StringMap());
+    }
+
+    /**
+     * Runs custom code when this map is loaded. Used for plugins.
+     * @return whether this map ran its own loading logic; false for vanilla map file loading.
+     * */
+    public boolean loadCustom(){
+        return false;
+    }
+
     public int getHighScore(){
         return Core.settings.getInt("hiscore" + file.nameWithoutExtension() + tags.get("steamid", ""), 0);
     }
 
     public Texture safeTexture(){
-        return texture == null ? Core.assets.get("sprites/error.png") : texture;
+        return texture == null ? Core.assets.get("sprites/nomap.png") : texture;
     }
 
     public Fi previewFile(){
@@ -81,6 +93,14 @@ public class Map implements Comparable<Map>, Publishable{
 
     public void setHighScore(int score){
         Core.settings.put("hiscore" + file.nameWithoutExtension() + tags.get("steamid", ""), score);
+    }
+
+    public long getLastPlayed(){
+        return Core.settings.getLong("lastplayed" + file.nameWithoutExtension() + tags.get("steamid", ""), 0);
+    }
+
+    public void setLastPlayed(){
+        Core.settings.put("lastplayed" + file.nameWithoutExtension() + tags.get("steamid", ""), Time.millis());
     }
 
     /** Returns the result of applying this map's rules to the specified gamemode.*/
@@ -107,7 +127,7 @@ public class Map implements Comparable<Map>, Publishable{
                 result.planet = Planets.erekir;
             }
             if(result.planet == null) result.planet = Planets.serpulo;
-            if(result.spawns.isEmpty()) result.spawns = Vars.waves.get();
+            if(result.spawns.isEmpty()) result.spawns = Waves.defaults();
             return result;
         }catch(Throwable e){
             //error reading rules. ignore?

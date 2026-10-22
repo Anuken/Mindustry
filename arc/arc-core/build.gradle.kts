@@ -1,0 +1,202 @@
+import com.badlogic.gdx.jnigen.gradle.JnigenExtension.*
+import java.nio.file.*
+
+plugins{
+    id("com.badlogicgames.jnigen.jnigen-gradle")
+}
+
+val soloudVersion = "2026.10.01"
+
+sourceSets{
+    main{
+        java.setSrcDirs(listOf("src"))
+    }
+    test{
+        java.setSrcDirs(listOf("test"))
+        resources.setSrcDirs(listOf("test/resources"))
+    }
+}
+
+val extraLibs = configurations.create("extraLibs")
+
+dependencies{
+    testImplementation("junit:junit:4.11")
+    testImplementation(project(":natives:natives-desktop"))
+    testImplementation(files("unsafe/unsafe.jar"))
+    //file generated from UnsafeBuffers.java
+    compileOnly(files("unsafe/unsafe.jar"))
+    extraLibs(files("unsafe/unsafe.jar"))
+}
+
+tasks.jar{
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(provider{ extraLibs.map{ if(it.isDirectory) it else zipTree(it) } })
+}
+
+//now, you may ask: why don't I make this a new module? why do I include JARs in the repository? why don't I make this a separate build step?
+//the reason is: I don't want to deal with compiler arguments, --add-opens, or whatever else Java throws at you these days
+//this just works and I don't want to touch it, it's a dependency that has already been compiled and won't explode as much as source compilation might
+//"why are you using unsafe, why aren't you using the new memory access APIs?" because they don't work on Android or iOS
+//and no, I cannot work with buffer put() because of Java's idiotic design making it so that you need to put()/limit()/position() to write memory, breaking multithreading
+//this makes Unsafe the only viable option - any "state independent" methods are Java-16 specific, and iOS/Android don't support those
+
+tasks.register<Exec>("compileBuffersUnsafe"){
+    workingDir = file("unsafe")
+    commandLine("javac --target 8 --source 8 -d . UnsafeBuffers.java".split(" "))
+}
+
+tasks.register<Exec>("compileBuffersSafe"){
+    workingDir = file("unsafe")
+    commandLine("javac --target 16 --source 16 -d . Java16Buffers.java".split(" "))
+}
+
+tasks.register<Exec>("recompileUnsafe"){
+    dependsOn("compileBuffersUnsafe", "compileBuffersSafe")
+    workingDir = file("unsafe")
+    commandLine("jar cvf unsafe.jar arc".split(" "))
+    doLast{
+        delete("unsafe/arc")
+    }
+}
+
+tasks.test{
+    testLogging{
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showStandardStreams = true
+    }
+}
+
+jnigen{
+    sharedLibName = "arc"
+    libsDir = "build/natives"
+    val root = "csrc"
+    val fdir = "$root/freetype"
+
+    all{
+        headerDirs = arrayOf(
+            "$root/soloud/include", "$root/soloud/src/audiosource/wav", root,
+            "$fdir/include", "$fdir/include/freetype", "$fdir/include/freetype/config",
+            "$fdir/include/freetype/internal", "$fdir/include/freetype/internal/services"
+        )
+        cppIncludes = arrayOf("$root/*.cpp", "$root/soloud/src/core/**.cpp", "$root/soloud/src/audiosource/wav/**.cpp", "$root/soloud/src/audiosource/wav/**.c", "$root/soloud/src/filter/**.cpp")
+        cIncludes = arrayOf(
+            "$fdir/src/base/ftsystem.c", "$fdir/src/base/ftinit.c", "$fdir/src/base/ftdebug.c",
+            "$fdir/src/base/ftbase.c", "$fdir/src/base/ftbbox.c", "$fdir/src/base/ftglyph.c",
+            "$fdir/src/base/ftbitmap.c", "$fdir/src/base/ftstroke.c", "$fdir/src/base/ftmm.c",
+            "$fdir/src/truetype/truetype.c", "$fdir/src/sfnt/sfnt.c",
+            "$fdir/src/smooth/smooth.c",
+            "$fdir/src/autofit/autofit.c", "$fdir/src/gzip/ftgzip.c", "$fdir/src/psnames/psnames.c"
+        )
+        cppFlags += "-DSOLOUD_MAX_VOICE_COUNT=100"
+        cFlags += "-DFT2_BUILD_LIBRARY"
+        cppFlags += "-DFT2_BUILD_LIBRARY"
+        cFlags += "-flto"
+        cppFlags += "-flto"
+        linkerFlags += "-flto"
+    }
+    addLinux(x64, x86)
+    addLinux(x64, ARM)
+    each({ it.os == Linux }){
+        headerDirs += "$root/soloud/src/backend/miniaudio/"
+        cppIncludes += "$root/soloud/src/backend/miniaudio/*.cpp"
+        cppFlags += "-DWITH_MINIAUDIO"
+        libraries += "-lpthread -lrt -lm -ldl".split(" ")
+    }
+    addWindows(x64, x86){
+        headerDirs += "$root/soloud/src/backend/miniaudio/"
+        cppIncludes += "$root/soloud/src/backend/miniaudio/*.cpp"
+        cppFlags += arrayOf("-msse", "-DWITH_MINIAUDIO")
+    }
+    addAndroid{
+        linkerFlags += "-llog -lOpenSLES".split(" ")
+        cppIncludes += "$root/soloud/src/backend/opensles/*.cpp"
+        cppFlags += "-DWITH_OPENSLES"
+        androidApplicationMk += "APP_STL := c++_static"
+    }
+    addMac(x64, ARM)
+    each({ it.os == MacOsX }){
+        cppIncludes += "$root/soloud/src/backend/coreaudio/*.mm"
+        cppFlags += arrayOf("-std=c++11", "-DWITH_COREAUDIO")
+        libraries += "-Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox".split(" ")
+    }
+    addIOS{
+        headerDirs += "$root/iosgl"
+        cppIncludes += arrayOf("$root/soloud/src/backend/coreaudio/*.mm", "$root/iosgl/**.cpp")
+        cppFlags += arrayOf("-stdlib=libc++", "-std=c++11", "-DWITH_COREAUDIO")
+        libraries += "-Wl,-framework,CoreAudio -Wl,-framework,AudioToolbox -Wl,-framework,AVFoundation -Wl,-framework,Foundation".split(" ")
+        linkerFlags += arrayOf("-undefined", "dynamic_lookup")
+    }
+}
+
+tasks.register("copyUnsafeStuff"){
+    doLast{
+        copy{
+            from(zipTree("unsafe/unsafe.jar"))
+            into("build/classes/java/main")
+            include("**/*.class")
+        }
+    }
+}
+
+tasks.register("cleanNatives"){
+    doLast{
+        delete("$rootDir/arc-core/csrc/soloud")
+        delete("$rootDir/arc-core/csrc/stb_image.h")
+    }
+}
+
+fun runQuietly(vararg command: String, workingDir: File? = null){
+    providers.exec{
+        commandLine(*command)
+        if(workingDir != null) this.workingDir = workingDir
+        isIgnoreExitValue = true
+    }.result.get()
+}
+
+tasks.register("preJni"){
+    doFirst{
+        if(!file("csrc/stb_image.h").exists()){
+            println("Fetching stb_image source...")
+            //currently locked to a specific commit
+            runQuietly("curl", "-o", "$rootDir/arc-core/csrc/stb_image.h", "https://raw.githubusercontent.com/nothings/stb/013ac3beddff3dbffafd5177e7972067cd2b5083/stb_image.h")
+        }
+
+        if(!file("csrc/soloud").exists()){
+            println("Fetching soloud source...")
+            runQuietly("git", "clone", "--depth", "1", "--branch", soloudVersion, "https://github.com/Anuken/soloud.git", "$rootDir/arc-core/csrc/soloud")
+        }
+
+        val freetypeRoot = file("csrc")
+        val freetypeDir = file("csrc/freetype")
+        if(!freetypeDir.exists()){
+            val extractedFreetypeDir = file("csrc/freetype-2.14.3")
+            if(!extractedFreetypeDir.exists()){
+                println("Fetching freetype source...")
+                freetypeRoot.mkdirs()
+                providers.exec{
+                    workingDir = freetypeRoot
+                    commandLine("wget", "-c", "https://sourceforge.net/projects/freetype/files/freetype2/2.14.3/freetype-2.14.3.tar.gz/download", "-O", "freetype.tar.gz")
+                }.result.get()
+                providers.exec{
+                    workingDir = freetypeRoot
+                    commandLine("tar", "-xf", "freetype.tar.gz")
+                }.result.get()
+            }
+            Files.move(extractedFreetypeDir.toPath(), freetypeDir.toPath())
+        }
+
+        file("csrc/freetype/include/freetype/config/ftmodule.h").writeText(
+            """
+            FT_USE_MODULE( FT_Module_Class, autofit_module_class )
+            FT_USE_MODULE( FT_Driver_ClassRec, tt_driver_class )
+            FT_USE_MODULE( FT_Module_Class, psnames_module_class )
+            FT_USE_MODULE( FT_Module_Class, sfnt_module_class )
+            FT_USE_MODULE( FT_Renderer_Class, ft_smooth_renderer_class )
+            """.trimIndent() + "\n"
+        )
+    }
+}
+
+getTasksByName("jnigen", true).forEach{
+    it.dependsOn("copyUnsafeStuff", "preJni")
+}

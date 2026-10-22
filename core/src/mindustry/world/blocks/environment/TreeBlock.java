@@ -2,7 +2,7 @@ package mindustry.world.blocks.environment;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.graphics.*;
 import mindustry.world.*;
@@ -23,7 +23,7 @@ public class TreeBlock extends Block{
 
         float
         x = tile.worldx(), y = tile.worldy(),
-        rot = Mathf.randomSeed(tile.pos(), 0, 4) * 90 + Mathf.sin(Time.time + x, 50f, 0.5f) + Mathf.sin(Time.time - y, 65f, 0.9f) + Mathf.sin(Time.time + y - x, 85f, 0.9f),
+        rot = Mathf.randomSeed(tile.pos(), 0, 4) * 90 + Mathf.sin(Vars.state.time + x, 50f, 0.5f) + Mathf.sin(Vars.state.time - y, 65f, 0.9f) + Mathf.sin(Vars.state.time + y - x, 85f, 0.9f),
         w = region.width * region.scl(), h = region.height * region.scl(),
         scl = 30f, mag = 0.2f;
 
@@ -35,11 +35,11 @@ public class TreeBlock extends Block{
         }
 
         TextureRegion reg = variants == 0 ? region : variantRegions[Mathf.randomSeed(tile.pos(), 0, Math.max(0, variantRegions.length - 1))];
-        
+
         Draw.z(Layer.power + 1);
         Draw.rectv(reg, x, y, w, h, rot, vec -> vec.add(
-        Mathf.sin(vec.y*3 + Time.time, scl, mag) + Mathf.sin(vec.x*3 - Time.time, 70, 0.8f),
-        Mathf.cos(vec.x*3 + Time.time + 8, scl + 6f, mag * 1.1f) + Mathf.sin(vec.y*3 - Time.time, 50, 0.2f)
+        Mathf.sin(vec.y*3 + Vars.state.time, scl, mag) + Mathf.sin(vec.x*3 - Vars.state.time, 70, 0.8f),
+        Mathf.cos(vec.x*3 + Vars.state.time + 8, scl + 6f, mag * 1.1f) + Mathf.sin(vec.y*3 - Vars.state.time, 50, 0.2f)
         ));
     }
 

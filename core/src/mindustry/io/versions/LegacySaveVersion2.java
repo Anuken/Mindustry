@@ -14,11 +14,11 @@ public class LegacySaveVersion2 extends LegacyRegionSaveVersion{
     }
 
     @Override
-    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveReadState state) throws IOException{
+    public void readWorldEntities(DataInput stream, Prov[] mapping, SaveLoadContext state) throws IOException{
 
         int amount = stream.readInt();
         for(int j = 0; j < amount; j++){
-            readLegacyShortChunk(stream, (in, len) -> {
+            readLegacyShortChunk(stream, state.reads, (in, len) -> {
                 int typeid = in.ub();
                 if(mapping[typeid] == null){
                     in.skip(len - 1);

@@ -3,7 +3,8 @@ package mindustry.world.modules;
 import arc.math.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.util.io.*;
+import mindustry.game.*;
+import mindustry.io.*;
 import mindustry.type.*;
 
 import java.util.*;
@@ -24,7 +25,7 @@ public class ItemModule extends BlockModule{
     private static float[] cacheSums;
     private static float[] displayFlow;
     private static final Bits cacheBits = new Bits();
-    private static final Interval flowTimer = new Interval(2);
+    private static final Interval flowTimer = new mindustry.game.Interval(2);
 
     protected int[] items = new int[content.items().size];
     protected int total;
@@ -47,8 +48,10 @@ public class ItemModule extends BlockModule{
     public void updateFlow(){
         //update the flow at N fps at most
         if(flowTimer.get(1, flowPollInterval)){
+            int len = content.items().size;
+            if(items.length != len) items = Arrays.copyOf(items, len);
 
-            if(flow == null){
+            if(flow == null || flow.length != len || cacheSums == null || cacheFlow == null){
                 if(cacheFlow == null || cacheFlow.length != items.length){
                     cacheFlow = new WindowedMean[items.length];
                     for(int i = 0; i < items.length; i++){
@@ -95,7 +98,7 @@ public class ItemModule extends BlockModule{
 
     /** @return a specific item's flow rate in items/s; any value < 0 means not ready.*/
     public float getFlowRate(Item item){
-        return flow == null ? -1f : displayFlow[item.id] * 60;
+        return flow == null ? -1f : displayFlow != null ? displayFlow[item.id] * 60 : -1f;
     }
 
     public boolean hasFlowItem(Item item){
@@ -290,6 +293,10 @@ public class ItemModule extends BlockModule{
 
     public void checkArrayCapacity(int size){
         if(items.length != size) items = Arrays.copyOf(items, size);
+        cacheFlow = null;
+        cacheSums = null;
+        displayFlow = null;
+        flow = null;
     }
 
     @Override
@@ -319,7 +326,7 @@ public class ItemModule extends BlockModule{
         for(int j = 0; j < count; j++){
             int itemid = legacy ? read.ub() : read.s();
             int itemamount = read.i();
-            Item item = content.item(itemid);
+            Item item = read.content(ContentType.item, itemid);
             if(item != null){
                 items[item.id] = itemamount;
                 total += itemamount;
