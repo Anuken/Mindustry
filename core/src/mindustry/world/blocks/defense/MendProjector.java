@@ -76,9 +76,16 @@ public class MendProjector extends Block{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
 
-        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, range, baseColor);
-
+        drawRange(x * tilesize + offset, y * tilesize + offset, range);
         state.indexer.eachBlock(player.team(), x * tilesize + offset, y * tilesize + offset, range, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f))));
+    }
+
+    public void drawRange(float x, float y, float thisRange){
+        if(!Mathf.equal(thisRange, range + phaseRangeBoost, 1f)){
+            Drawf.dashCircle(x, y, range + phaseRangeBoost, 1f, 5,
+            findConsumer(c -> c instanceof ConsumeItems) instanceof ConsumeItems cons ? cons.items[0].item.color : Items.phaseFabric.color);
+        }
+        Drawf.dashCircle(x, y, thisRange, baseColor);
     }
 
     public class MendBuild extends Building implements Ranged{
@@ -137,8 +144,7 @@ public class MendProjector extends Block{
             float realRange = range + phaseHeat * phaseRangeBoost;
 
             state.indexer.eachBlock(this, realRange, other -> true, other -> Drawf.selected(other, Tmp.c1.set(baseColor).a(Mathf.absin(Vars.state.time, 4f, 1f))));
-
-            Drawf.dashCircle(x, y, realRange, baseColor);
+            drawRange(x, y, realRange);
         }
 
         @Override

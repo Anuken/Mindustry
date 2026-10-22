@@ -398,10 +398,14 @@ public class Drawf{
     }
 
     public static void dashCircle(float x, float y, float rad, Color color){
+        dashCircle(x, y, rad, 0.6f, 2, color);
+    }
+
+    public static void dashCircle(float x, float y, float rad, float scaleFactor, int hideSides, Color color){
         Lines.stroke(3f, Pal.gray);
-        Lines.dashCircle(x, y, rad);
+        Lines.dashCircle(x, y, rad, scaleFactor, hideSides);
         Lines.stroke(1f, color);
-        Lines.dashCircle(x, y, rad);
+        Lines.dashCircle(x, y, rad, scaleFactor, hideSides);
         Draw.reset();
     }
 
