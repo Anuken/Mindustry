@@ -38,7 +38,11 @@ public class LiquidTurret extends Turret{
     @Override
     public void setStats(Stats stats){
         super.setStats(stats);
-        ammoTypes.each((l, b) -> b.statLiquidConsumed = shotsPerSecond() / 60f);
+        //mirror displayed stats onto each bullet
+        ammoTypes.each((l, b) -> {
+            int uses = consumeAmmoOnce ? 1 : (b.shootPattern != null ? b.shootPattern : shoot).shots;
+            b.statLiquidConsumed = uses * b.reloadMultiplier / (reload + (!reloadWhileCharging ? shoot.firstShotDelay : 0f));
+        });
 
         stats.add(Stat.ammo, StatValues.ammo(ammoTypes, this));
     }
@@ -124,7 +128,7 @@ public class LiquidTurret extends Turret{
         public BulletType useAmmo(){
             if(cheating()) return ammoTypes.get(liquids.current());
             BulletType type = ammoTypes.get(liquids.current());
-            liquids.remove(liquids.current(), 1f / type.ammoMultiplier);
+            liquids.remove(liquids.current(), type.ammoUsed);
             return type;
         }
 
@@ -135,7 +139,7 @@ public class LiquidTurret extends Turret{
 
         @Override
         public boolean hasAmmo(){
-            return ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= 1f / ammoTypes.get(liquids.current()).ammoMultiplier;
+            return ammoTypes.get(liquids.current()) != null && liquids.currentAmount() >= ammoTypes.get(liquids.current()).ammoUsed;
         }
 
         @Override
@@ -147,7 +151,7 @@ public class LiquidTurret extends Turret{
         public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null &&
                 (liquids.current() == liquid ||
-                ((!ammoTypes.containsKey(liquids.current()) || liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f)));
+                ((!ammoTypes.containsKey(liquids.current()) || liquids.get(liquids.current()) <= ammoTypes.get(liquids.current()).ammoUsed + 0.001f)));
         }
     }
 }

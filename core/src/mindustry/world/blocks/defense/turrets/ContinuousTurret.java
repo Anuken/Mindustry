@@ -22,7 +22,6 @@ public class ContinuousTurret extends Turret{
 
         coolantMultiplier = 1f;
         envEnabled = envEnabled.with(Env.space);
-        displayAmmoMultiplier = false;
     }
 
     @Override

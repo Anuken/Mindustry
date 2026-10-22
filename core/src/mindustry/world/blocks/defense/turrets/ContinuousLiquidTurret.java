@@ -46,7 +46,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
             {
                 multiplier = b -> {
                     var ammo = ammoTypes.get(b.liquids.current());
-                    return ammo == null ? 1f : 1f / ammo.ammoMultiplier;
+                    return ammo == null ? 1f : ammo.ammoUsed;
                 };
             }
 
@@ -140,7 +140,7 @@ public class ContinuousLiquidTurret extends ContinuousTurret{
         public boolean acceptLiquid(Building source, Liquid liquid){
             return ammoTypes.get(liquid) != null &&
                 (liquids.current() == liquid ||
-                ((!ammoTypes.containsKey(liquids.current()) || liquids.get(liquids.current()) <= 1f / ammoTypes.get(liquids.current()).ammoMultiplier + 0.001f)));
+                ((!ammoTypes.containsKey(liquids.current()) || liquids.get(liquids.current()) <= ammoTypes.get(liquids.current()).ammoUsed + 0.001f)));
         }
     }
 }

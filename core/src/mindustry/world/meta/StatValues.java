@@ -738,8 +738,13 @@ public class StatValues{
             orderedKeys.sort();
 
             for(T t : orderedKeys){
-                boolean compact = t instanceof UnitType && !showUnit || nested;
-                BulletType type = map.get(t);
+                BulletType ammoType = map.get(t), shown = ammoType;
+
+                //unit-spawning ammo displays the spawned unit's bullet, but keeps the ammo's own usage
+                while(shown.spawnUnit != null && shown.spawnUnit.weapons.size > 0){
+                    shown = shown.spawnUnit.weapons.first().bullet;
+                }
+                BulletType type = shown;
                 int patternShots;
 
                 if(type.shootPattern != null){
@@ -750,10 +755,7 @@ public class StatValues{
                     patternShots = 1;
                 }
 
-                if(type.spawnUnit != null && type.spawnUnit.weapons.size > 0){
-                    ammo(ObjectMap.of(t, type.spawnUnit.weapons.first().bullet), nested, false, blockName, null).display(table);
-                    continue;
-                }
+                boolean compact = t instanceof UnitType && (!showUnit || type != ammoType) || nested;
 
                 table.table(Styles.grayPanel, bt -> {
                     bt.left().top().defaults().padRight(3).left();
@@ -764,11 +766,13 @@ public class StatValues{
 
                             title.add(t.localizedName).padRight(10).left().top();
 
-                            if(type.displayAmmoMultiplier && turret != null){
+                            if(ammoType.displayAmmoUsed && ammoType.statLiquidConsumed > 0f){
+                                title.add("[stat]" + fixValue(ammoType.statLiquidConsumed * ammoType.ammoUsed * 60f) + " [lightgray]" + StatUnit.perSecond.localized());
+                            if(ammoType.displayAmmoUsed && turret != null){
                                 float once = !turret.consumeAmmoOnce ? patternShots : 1f;
 
                                 if(type.statLiquidConsumed > 0f){
-                                    title.add("[stat]" + fixValue(once * type.statLiquidConsumed / type.ammoMultiplier * 60f) +
+                                    title.add("[stat]" + fixValue(once * ammoType.statLiquidConsumed / ammoType.ammoMultiplier * 60f) +
                                         "[lightgray]" + StatUnit.perSecond.localized());
                                 }else{
                                     title.add("[stat]" + fixValue(once * turret.ammoPerShot / type.ammoMultiplier) +
@@ -807,6 +811,10 @@ public class StatValues{
 
                     if(type.splashDamage > 0){
                         sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
+                    }
+
+                    if(t instanceof Item && !compact && ammoType.displayAmmoUsed){
+                        sep(bt, Core.bundle.format("bullet.ammoused", fixValue(ammoType.ammoUsed)));
                     }
 
                     if(!compact && !Mathf.equal(type.reloadMultiplier, 1f)){
