@@ -49,6 +49,14 @@ public class ConsumeLiquids extends Consume{
     }
 
     @Override
+    public boolean consumes(Liquid liquid){
+        for(var stack : liquids){
+            if(stack.liquid == liquid) return true;
+        }
+        return false;
+    }
+
+    @Override
     public float efficiency(Building build){
         float mult = multiplier.get(build);
         float ed = build.edelta() * build.efficiencyScale();

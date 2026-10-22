@@ -34,7 +34,7 @@ public class Drill extends Block{
     public int tier;
     /** Base time to drill one ore, in frames. */
     public float drillTime = 300;
-    /** How many times faster the drill will progress when boosted by liquid. */
+    /** How many times faster the drill will progress when boosted by liquid. Final multiplier will be squared. */
     public float liquidBoostIntensity = 1.6f;
     /** Speed at which the drill speeds up. */
     public float warmupSpeed = 0.015f;
@@ -65,6 +65,7 @@ public class Drill extends Block{
     /** Multipliers of drill speed for each item. Defaults to 1. */
     public ObjectFloatMap<Item> drillMultipliers = new ObjectFloatMap<>();
 
+    public Seq<ConsumeLiquidBase> liquidBoosters = new Seq<>();
     public boolean drawRim = false;
     public boolean drawSpinSprite = true;
     public Color heatColor = Color.valueOf("ff5512");
@@ -89,11 +90,21 @@ public class Drill extends Block{
 
     @Override
     public void init(){
-        super.init();
         if(blockedItems == null && blockedItem != null){
             blockedItems = Seq.with(blockedItem);
         }
         if(drillEffectRnd < 0) drillEffectRnd = size;
+
+        liquidBoosters.clear();
+        for(var cons : consumeBuilder){
+            if(cons instanceof ConsumeLiquidBase liq && cons.booster){
+                //update is disabled as boosters are applied manually
+                cons.update = false;
+                liquidBoosters.add(liq);
+            }
+        }
+
+        super.init();
     }
 
     @Override
@@ -171,6 +182,10 @@ public class Drill extends Block{
         return (drillTime + hardnessDrillMultiplier * item.hardness) / drillMultipliers.get(item, 1f);
     }
 
+    public float liquidSpeedMultiplier(ConsumeLiquidBase cons){
+        return cons.boosterMultiplier >= 0f ? cons.boosterMultiplier : liquidBoostIntensity;
+    }
+
     @Override
     public void setStats(){
         super.setStats();
@@ -180,13 +195,19 @@ public class Drill extends Block{
 
         stats.add(Stat.drillSpeed, 60f / drillTime * size * size, StatUnit.itemsSecond);
 
-        if(liquidBoostIntensity != 1 && findConsumer(f -> f instanceof ConsumeLiquidBase && f.booster) instanceof ConsumeLiquidBase consBase){
+        if(liquidBoosters.size > 0){
             stats.remove(Stat.booster);
-            stats.add(Stat.booster,
-                StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(),
-                consBase.amount,
-                liquidBoostIntensity * liquidBoostIntensity, false, consBase::consumes)
-            );
+
+            if(liquidBoosters.size == 1){
+                var cons = liquidBoosters.first();
+                float speed = liquidSpeedMultiplier(cons);
+
+                if(speed != 1f){
+                    stats.add(Stat.booster, StatValues.speedBoosters("{0}" + StatUnit.timesSpeed.localized(), cons.amount, speed * speed, false, cons::consumes));
+                }
+            }else{
+                stats.add(Stat.booster, StatValues.liquidBoosters(StatUnit.timesSpeed.localized(), liquidBoosters, cons -> Mathf.pow(liquidSpeedMultiplier(cons), 2f)));
+            }
         }
     }
 
@@ -298,7 +319,7 @@ public class Drill extends Block{
             float delay = getDrillTime(dominantItem);
 
             if(items.total() < itemCapacity && dominantItems > 0 && efficiency > 0){
-                float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
+                float speed = liquidBoost() * efficiency;
 
                 lastDrillSpeed = (speed * dominantItems * warmup) / delay;
                 warmup = Mathf.approachDelta(warmup, speed, warmupSpeed);
@@ -322,6 +343,27 @@ public class Drill extends Block{
 
                 if(wasVisible && Mathf.chanceDelta(drillEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
             }
+        }
+
+        public float liquidBoost(){
+            float result = 1f;
+            ConsumeLiquidBase best = null;
+
+            for(var cons : liquidBoosters){
+                Liquid liquid = cons instanceof ConsumeLiquid cl ? cl.liquid : cons instanceof ConsumeLiquidFilter filter ? filter.getConsumed(this) : null;
+                if(liquid == null) continue;
+
+                float boost = Mathf.lerp(1f, liquidSpeedMultiplier(cons), cons.efficiency(this));
+                if(boost > result){
+                    result = boost;
+                    best = cons;
+                }
+            }
+
+            if(best != null){
+                best.update(this);
+            }
+            return result;
         }
 
         @Override
