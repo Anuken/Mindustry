@@ -352,13 +352,20 @@ public class Lines{
     }
 
     public static void dashCircle(float x, float y, float radius){
-        float scaleFactor = 0.6f;
-        int sides = 10 + (int)(radius * scaleFactor);
-        if(sides % 2 == 1) sides++;
+        dashCircle(x, y, radius, 0.6f, 2);
+    }
+
+    /**
+     * @param scaleFactor a multiplier on the number of sides (lines)
+     * @param hideSides the number of sides (lines) skipped
+     */
+    public static void dashCircle(float x, float y, float radius, float scaleFactor, int hideSides){
+        if(hideSides <= 0) return;
+        int sides = ((10 + (int)(radius * scaleFactor) + hideSides - 1) / hideSides) * hideSides;
 
         vector.set(0, 0);
 
-        for(int i = 0; i < sides; i += 2){
+        for(int i = 0; i < sides; i += hideSides){
             vector.set(radius, 0).rotate(360f / sides * i + 90);
             float x1 = vector.x;
             float y1 = vector.y;
