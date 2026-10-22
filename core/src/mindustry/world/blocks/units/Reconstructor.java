@@ -80,10 +80,10 @@ public class Reconstructor extends UnitBlock{
                 Core.bundle.format("bar.unitcap",
                     Fonts.getUnicodeStr(e.unit().name),
                     e.team.data().countType(e.unit()),
-                    e.unit() == null || e.unit().useUnitCap ? Units.getStringCap(e.team) : "∞"
+                    e.unit() == null || e.unit().useUnitCap ? Units.getStringCap(e.team, e.unit()) : "∞"
                 ),
             () -> Pal.power,
-            () -> e.unit() == null ? 0f : (e.unit().useUnitCap ? (float)e.team.data().countType(e.unit()) / Units.getCap(e.team) : 1f)
+            () -> e.unit() == null ? 0f : (e.unit().useUnitCap ? (float)e.team.data().countType(e.unit()) / Mathf.ceil(Units.getCap(e.team) * e.unit().unitCapMultiplier) : 1f)
         ));
     }
 
@@ -222,7 +222,7 @@ public class Reconstructor extends UnitBlock{
 
             table.background(Styles.black6);
 
-            var list = unit == null ? Vars.content.unitCommands().copy() : unit().commands;
+            var list = unit == null ? Vars.content.unitCommands().copy() : unit.commands;
             for(var item : list){
                 ImageButton button = table.button(item.getIcon(), Styles.clearNoneTogglei, 44f, () -> {
                     configure(item);
@@ -386,6 +386,7 @@ public class Reconstructor extends UnitBlock{
             if(payload == null) return null;
 
             UnitType t = upgrade(payload.unit.type);
+            if(t == null && downgrade(payload.unit.type) != null) t = payload.unit.type;
             return t != null && (t.unlockedNowHost() || team.isAI()) ? t : null;
         }
 
@@ -399,8 +400,13 @@ public class Reconstructor extends UnitBlock{
         }
 
         public UnitType upgrade(UnitType type){
-            UnitType[] r =  upgrades.find(u -> u[0] == type);
+            UnitType[] r = upgrades.find(u -> u[0] == type);
             return r == null ? null : r[1];
+        }
+
+        public UnitType downgrade(UnitType type){
+            UnitType[] r = upgrades.find(u -> u[1] == type);
+            return r == null ? null : r[0];
         }
 
         @Override
