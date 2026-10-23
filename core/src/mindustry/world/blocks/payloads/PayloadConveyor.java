@@ -24,6 +24,8 @@ public class PayloadConveyor extends Block{
     public Interp interp = Interp.pow5;
     public float payloadLimit = 3f;
     public boolean pushUnits = true;
+    /** Whether the conveyor needs to be aligned to output. */
+    public boolean checkAlignment = false;
 
     public PayloadConveyor(String name){
         super(name);
@@ -113,7 +115,8 @@ public class PayloadConveyor extends Block{
                     (rotation % 2 == 0 ? //check orientation
                     Math.abs(accept.y - y) <= (accept.block.size * tilesize - size * tilesize)/2f : //check Y alignment
                     Math.abs(accept.x - x) <= (accept.block.size * tilesize - size * tilesize)/2f   //check X alignment
-                )))){
+                )) || (!checkAlignment && !(accept.block instanceof PayloadConveyor))
+            )){
                 next = accept;
             }else{
                 next = null;
