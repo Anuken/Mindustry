@@ -34,6 +34,7 @@ import mindustry.net.Administration.*;
 import mindustry.net.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.ui.dialogs.*;
 import mindustry.ui.fragments.*;
 import mindustry.world.*;
 import mindustry.world.blocks.ConstructBlock.*;
@@ -63,6 +64,7 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
     final static Rect r1 = new Rect(), r2 = new Rect();
     final static Seq<Unit> tmpUnits = new Seq<>(false);
     final static Seq<Building> tmpBuildings = new Seq<>(false);
+    final static Seq<Vec2> anchors = new Seq<>();
     final static KeyBind[] controlGroupBindings = {
     Binding.blockSelect01,
     Binding.blockSelect02,
@@ -1086,6 +1088,29 @@ public abstract class InputHandler implements InputProcessor, GestureListener{
 
     public void buildUI(Group group){
 
+    }
+
+    public static float unitAnchorOpacity(Unit unit){
+        int range = settings.getInt("hideunits.range", 15);
+        if(range <= 0 || !state.isGame() || unit == player.unit() || !HideUnitsFilterDialog.affects(unit.type)) return 1f;
+
+        anchors.clear();
+        int mode = settings.getInt("hideunits.mode", 0);
+        if(mode == 0 || mode == 3){
+            Unit p = player.unit();
+            if(p != null && !p.dead && p.isAdded()) anchors.add(Tmp.v1.set(p.x, p.y));
+        }
+
+        if(mode == 1 || mode == 3) anchors.add(Tmp.v1.set(input.mouseWorld()));
+        if(mode == 2 || mode == 3) anchors.add(Tmp.v1.set(camera.position));
+        if(anchors.isEmpty()) return 1f;
+
+        for(Vec2 anchor : anchors){
+            if(unit.within(anchor.x, anchor.y, range * tilesize)){
+                return settings.getInt("hideunits.opacity", 0) / 100f;
+            }
+        }
+        return 1f;
     }
 
     public void updateState(){

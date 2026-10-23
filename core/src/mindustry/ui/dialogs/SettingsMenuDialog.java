@@ -22,6 +22,8 @@ import mindustry.gen.*;
 import mindustry.input.*;
 import mindustry.type.*;
 import mindustry.ui.*;
+import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable.*;
+import mindustry.world.meta.*;
 
 import java.io.*;
 import java.util.*;
@@ -547,6 +549,17 @@ public class SettingsMenuDialog extends BaseDialog{
         graphics.checkPref("showweather", true);
         graphics.checkPref("animatedwater", true);
         graphics.checkPref("hidedisplays", false);
+
+        graphics.sliderPref("hideunits.range", 0, 0, 100, 1, i -> i > 0 ? i + " " + StatUnit.blocks.localized() : bundle.get("disabled"));
+        graphics.sliderPref("hideunits.opacity", 0, 0, 100, 5, i -> i + "%");
+        graphics.sliderPref("hideunits.mode", 0, 0, 3, 1, i -> bundle.get("setting.hideunits.mode." + i));
+        graphics.pref(new Setting("hideunits.filter"){
+            @Override
+            public void add(SettingsTable table){
+                addDesc(table.button(title, new HideUnitsFilterDialog()::show).margin(14).width(240f).pad(6).left().get());
+                table.row();
+            }
+        });
 
         if(OS.isMac){
             graphics.checkPref("macnotch", false);
