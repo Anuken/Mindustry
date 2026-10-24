@@ -7,6 +7,7 @@ import mindustry.entities.bullet.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.io.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.blocks.payloads.*;
@@ -20,12 +21,14 @@ import static mindustry.Vars.*;
 public class PayloadAmmoTurret extends Turret{
     public ObjectMap<UnlockableContent, BulletType> ammoTypes = new ObjectMap<>();
 
+    /** Maximum payloads stored. */
+    public int maxAmmo = 3;
+
     protected UnlockableContent[] ammoKeys;
 
     public PayloadAmmoTurret(String name){
         super(name);
 
-        maxAmmo = 3;
         acceptsPayload = true;
     }
 
@@ -157,7 +160,13 @@ public class PayloadAmmoTurret extends Turret{
 
         @Override
         public float getAmmoFraction(){
-            return (float)totalAmmo / maxAmmo;
+            return totalAmmo / maxAmmo;
+        }
+
+        @Override
+        public double sense(LogicProp sensor){
+            if(sensor == LogicProp.ammoCapacity) return maxAmmo;
+            return super.sense(sensor);
         }
 
         @Override
@@ -170,7 +179,7 @@ public class PayloadAmmoTurret extends Turret{
         public void displayBars(Table bars){
             super.displayBars(bars);
 
-            bars.add(new Bar("stat.ammo", Pal.ammo, () -> (float)totalAmmo / maxAmmo)).growX();
+            bars.add(new Bar("stat.ammo", Pal.ammo, () -> totalAmmo / maxAmmo)).growX();
             bars.row();
         }
 

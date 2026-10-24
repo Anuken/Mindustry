@@ -94,8 +94,8 @@ public class BulletType extends Content implements Cloneable{
     public float hitSoundVolume = 1;
     /** Extra inaccuracy when firing. */
     public float inaccuracy = 0f;
-    /** How many bullets get created per ammo item/liquid. */
-    public float ammoMultiplier = 2f;
+    /** Items or liquid units used per shot in turrets. */
+    public float ammoUsed = 1f;
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
@@ -375,9 +375,9 @@ public class BulletType extends Content implements Cloneable{
     /** Liquid that puddles created are made of. */
     public Liquid puddleLiquid = Liquids.water;
 
-    /** Whether to display the ammo multiplayer for this bullet type in its stats. */
-    public boolean displayAmmoMultiplier = true;
-    /** If >0, this is displayed divided by the ammo multiplier. */
+    /** Whether to display the ammo used per shot for this bullet type in its stats. */
+    public boolean displayAmmoUsed = true;
+    /** Liquid ammo uses per tick, set by liquid turrets for stats. If >0, this is displayed multiplied by ammoUsed, as liquid/second. */
     public float statLiquidConsumed;
 
     /** Radius of light emitted by this bullet; <0 to use defaults. */

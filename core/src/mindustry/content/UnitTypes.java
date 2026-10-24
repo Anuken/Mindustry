@@ -133,7 +133,6 @@ public class UnitTypes{
                 recoil = 1f;
                 ejectEffect = Fx.none;
                 bullet = new BulletType(4.2f, 37f*2f){{
-                    ammoMultiplier = 3f;
                     hitSize = 7f;
                     lifetime = 13f;
                     pierce = true;
@@ -898,7 +897,6 @@ public class UnitTypes{
                     lifetime = 70f;
                     width = height = 19f;
                     collidesTiles = true;
-                    ammoMultiplier = 4f;
                     splashDamageRadius = 70f;
                     splashDamage = 65f;
                     backColor = Pal.sapBulletBack;
@@ -999,7 +997,6 @@ public class UnitTypes{
                     lifetime = 80f;
                     width = height = 25f;
                     collidesTiles = collides = true;
-                    ammoMultiplier = 4f;
                     splashDamageRadius = 80f;
                     splashDamage = 75f;
                     backColor = Pal.sapBulletBack;
@@ -1086,7 +1083,6 @@ public class UnitTypes{
                     lifetime = 32f;
                     shootEffect = Fx.shootSmall;
                     smokeEffect = Fx.shootSmallSmoke;
-                    ammoMultiplier = 2;
                 }};
             }});
         }};
@@ -1210,7 +1206,6 @@ public class UnitTypes{
                 drag = -0.01f;
                 splashDamageRadius = 20f;
                 splashDamage = 37f;
-                ammoMultiplier = 4f;
                 lifetime = 50f;
                 hitEffect = Fx.blastExplosion;
                 despawnEffect = Fx.blastExplosion;
@@ -1281,7 +1276,6 @@ public class UnitTypes{
 
             BulletType fragBullet = new FlakBulletType(4f, 15){{
                 shootEffect = Fx.shootBig;
-                ammoMultiplier = 4f;
                 splashDamage = 65f;
                 splashDamageRadius = 25f;
                 collidesGround = true;
@@ -1607,7 +1601,6 @@ public class UnitTypes{
                     width = 7f;
                     height = 9f;
                     lifetime = 60f;
-                    ammoMultiplier = 2;
                 }};
             }});
 
@@ -1673,7 +1666,6 @@ public class UnitTypes{
                 shootSound = Sounds.shootDuo;
                 bullet = new FlakBulletType(4.2f, 3){{
                     lifetime = 52.5f;
-                    ammoMultiplier = 4f;
                     shootEffect = Fx.shootSmall;
                     width = 6f;
                     height = 8f;
@@ -2107,7 +2099,6 @@ public class UnitTypes{
                 bullet = new BulletType(3.4f, 23f){{
                     healPercent = 1.5f;
                     collidesTeam = true;
-                    ammoMultiplier = 3f;
                     hitSize = 7f;
                     lifetime = 18f;
                     pierce = true;
@@ -3350,7 +3341,6 @@ public class UnitTypes{
                         Drawf.light(e.x, e.y, 23f, e.color, e.fout() * 0.7f);
                     }));
                     smokeEffect = Fx.shootSmokeSquare;
-                    ammoMultiplier = 2;
                 }};
             }});
 
@@ -4036,7 +4026,6 @@ public class UnitTypes{
                     intervalBullet = new LightningBulletType(){{
                         damage = 16;
                         collidesAir = false;
-                        ammoMultiplier = 1f;
                         lightningColor = Pal.sapBullet;
                         lightningLength = 3;
                         lightningLengthRand = 6;

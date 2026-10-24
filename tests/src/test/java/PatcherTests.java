@@ -530,7 +530,7 @@ public class PatcherTests{
           titanium: "-"
           surge-alloy: {
             type: LaserBulletType
-            ammoMultiplier: 1
+            ammoUsed: 1
             reloadMultiplier: 0.5
             damage: 100
             colors: ["000000", "ff0000", "ffffff"]

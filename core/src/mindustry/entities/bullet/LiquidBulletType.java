@@ -30,7 +30,7 @@ public class LiquidBulletType extends BulletType{
             lightOpacity = liquid.lightColor.a;
         }
 
-        ammoMultiplier = 1f;
+        ammoUsed = 1f;
         lifetime = 34f;
         statusDuration = 60f * 2f;
         despawnEffect = Fx.none;
@@ -39,7 +39,6 @@ public class LiquidBulletType extends BulletType{
         shootEffect = Fx.none;
         drag = 0.001f;
         knockback = 0.55f;
-        displayAmmoMultiplier = false;
     }
 
     public LiquidBulletType(){
