@@ -954,9 +954,13 @@ public class StatValues{
 
     /** Adds a note under a value */
     public static Cell<?> note(Table table, String text){
+        return note(table, text, Pal.stat);
+    }
+
+    public static Cell<?> note(Table table, String text, Color color){
         table.row();
         return table.table(t -> {
-            if(!headless) t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(Pal.stat).scaling(Scaling.fit).padRight(6).padLeft(12);
+            if(!headless) t.image(Icon.arrowNoteSmall.getRegion()).size(15).color(color).scaling(Scaling.fit).padRight(6).padLeft(12);
             t.add(text);
         });
     }

@@ -59,8 +59,6 @@ public class RepairBeamWeapon extends Weapon{
     }
 
     public RepairBeamWeapon(){
-        targetUnits = unitRepairSpeed != 0f || unitRepairPercent != 0f;
-        targetBlocks = blockRepairSpeed != 0f || blockRepairPercent != 0f;
     }
 
     {
@@ -82,22 +80,36 @@ public class RepairBeamWeapon extends Weapon{
 
         if(targetUnits) w.add("[lightgray]" + Stat.unitRepairSpeed.localized() + formatStats(unitRepairSpeed, unitRepairPercent)).row();
         if(targetBlocks) w.add("[lightgray]" + Stat.blockRepairSpeed.localized() + formatStats(blockRepairSpeed, blockRepairPercent)).row();
-        if(unitRecentDmgMult > 0 || blockRecentDmgMult > 0) w.add("[lightgray]" + Stat.recentDamageMultiplier.localized() + ": [white]" + Strings.joinEntries(
-            () -> unitRecentDmgMult > 0, () -> blockRecentDmgMult > 0, formatRecent(unitRecentDmgMult, unitRecentDmgTime), formatRecent(blockRecentDmgMult, blockRecentDmgTime))).row();
+        if(unitRecentDmgMult > 0 || blockRecentDmgMult > 0){
+            w.add("[lightgray]" + Stat.recentDamageMultiplier.localized() + ": [white]").padTop(6);
+            if(unitRecentDmgMult > 0) StatValues.note(w, formatRecent(unitRecentDmgMult, unitRecentDmgTime, "content.unit"), Color.lightGray);
+            if(blockRecentDmgMult > 0) StatValues.note(w, formatRecent(blockRecentDmgMult, blockRecentDmgTime, "content.block"), Color.lightGray);
+        }
     }
 
     public String formatStats(float base, float percent){
         return ": " + (mirror ? "2x " : "") + "[white]" + Strings.joinEntries(() -> base != 0, () -> percent != 0,
-        Strings.autoFixed(base * 60, 0) + StatUnit.perSecond.localized(), Core.bundle.format("ability.stat.unitrepairpercentspeed", Strings.autoFixed(percent, 2)));
+        () -> Strings.autoFixed(60 * (mirror ? base * 2 : base), 0) + StatUnit.perSecond.localized(),
+        () -> Core.bundle.format("ability.stat.unitrepairpercentspeed", Strings.format("[white]@", Strings.autoFixed(60f *  (mirror ? percent * 2 : percent), 2))), "[lightgray] + []");
     }
 
-    public String formatRecent(float mult, float time){
-        return Strings.signedMultStat(mult) + "x [lightgray]" + Core.bundle.format(scaleRecentDmg ? "bar.durationafterhitfaded" : "bar.durationafterhit", time / 60f);
+    public String formatRecent(float mult, float time, String stat){
+        return "[white]" + Core.bundle.get(stat) + ": " + Strings.signedMultStat(mult) + "% [lightgray]" +
+        Core.bundle.format(scaleRecentDmg ? "bar.durationafterhitfaded" : "bar.durationafterhit", time / 60f);
     }
 
     @Override
     public float dps(){
         return 0f;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        bullet.healPercent = blockRepairPercent;
+        targetUnits = unitRepairSpeed != 0f || unitRepairPercent != 0f;
+        targetBlocks = blockRepairSpeed != 0f || blockRepairPercent != 0f;
     }
 
     @Override
@@ -134,11 +146,11 @@ public class RepairBeamWeapon extends Weapon{
     }
 
     public boolean isDamaged(Unit u){
-        return u.damaged() || unitRepairSpeed < 0f || unitRepairPercent < 0f;
+        return u.damaged() || (unitRepairSpeed < 0f && unitRepairPercent < 0f);
     }
 
     public boolean isDamaged(Building b){
-        return b.damaged() || blockRepairSpeed < 0f || blockRepairPercent < 0f;
+        return b.damaged() || (blockRepairSpeed < 0f && blockRepairPercent < 0f);
     }
 
     public float healValue(Unit u, float value, float result){
@@ -211,26 +223,28 @@ public class RepairBeamWeapon extends Weapon{
         heal.strength = Mathf.lerpDelta(heal.strength, Mathf.num(autoTarget ? mount.target != null : canShoot), 0.2f);
 
         if(canShoot && mount.target instanceof Healthc u){
-            float base = 0f, mult = 1f, recentMult = 1f, percent = 0f, rotation = 0f;
+            float mult = 1f, recentMult = 1f, recentTime = 1f, base = 0f, percent = 0f, rotation = 0f;
             Object effectData = null;
 
             if(u instanceof Building d){
                 effectData = d.block;
                 base = healValue(unit, blockRepairSpeed, base);
                 percent = healValue(unit, blockRepairPercent, percent);
-                if(blockRecentDmgMult > 0f && d.wasRecentlyDamaged(blockRecentDmgTime)) recentMult = blockRecentDmgMult;
+                recentTime = unitRecentDmgTime;
 
+                if(blockRecentDmgMult > 0f && d.wasRecentlyDamaged(blockRecentDmgTime)) recentMult = blockRecentDmgMult;
             }
             if(u instanceof Unit d){
                 effectData = d.type;
                 base = healValue(unit, unitRepairSpeed, base);
                 percent = healValue(unit, unitRepairPercent, percent);
+                recentTime = unitRecentDmgTime;
 
                 if(unitRecentDmgMult > 0f && d.wasRecentlyDamaged(unitRecentDmgTime)) recentMult = unitRecentDmgMult;
                 rotation = d.rotation - 90f;
             }
             if(scaleRecentDmg){
-                mult = Mathf.approachDelta(recentMult, 1f, Mathf.clamp((Vars.state.time - u.lastDamageTime()) / recentMult));
+                mult = Mathf.approachDelta(recentMult, 1f, Mathf.clamp((Vars.state.time - u.lastDamageTime()) / recentTime));
             }
 
             //create heal effect periodically
@@ -260,12 +274,6 @@ public class RepairBeamWeapon extends Weapon{
             laser, laserEnd, laserTop, laserTopEnd);
             Draw.z(z);
         }
-    }
-
-    @Override
-    public void init(){
-        super.init();
-        bullet.healPercent = blockRepairPercent;
     }
 
     public static class HealBeamMount extends WeaponMount{

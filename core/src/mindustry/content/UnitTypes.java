@@ -4441,11 +4441,12 @@ public class UnitTypes{
                 shootY = 0f;
                 beamWidth = 0.7f;
 
-                unitRepairSpeed = 0f;
+                unitRepairSpeed = 1.5f;
                 blockRepairSpeed = 3.1f;
                 blockRepairPercent = 0.06f;
                 unitRecentDmgMult = blockRecentDmgMult = 0.1f;
-                unitRecentDmgTime = 60f * 10f;
+                unitRecentDmgTime = 60f * 20f;
+                blockRecentDmgTime = 60f * 10f;
 
                 aimDst = 0f;
                 shootCone = 15f;
@@ -4477,7 +4478,7 @@ public class UnitTypes{
             flying = true;
             mineSpeed = 8f;
             mineTier = 3;
-            buildSpeed = 1.4f;
+            buildSpeed = 1.55f;
             drag = 0.08f;
             speed = 7f;
             rotateSpeed = 8f;
@@ -4514,9 +4515,10 @@ public class UnitTypes{
                 mirror = false;
 
                 blockRepairSpeed = unitRepairSpeed = 4.65f;
-                blockRepairPercent = 0.06f;
+                blockRepairPercent = 0.0675f;
                 unitRecentDmgMult = blockRecentDmgMult = 0.1f;
-                unitRecentDmgTime = 60f * 10f;
+                unitRecentDmgTime = 60f * 20f;
+                blockRecentDmgTime = 60f * 10f;
 
                 autoTarget = false;
                 controllable = true;
@@ -4556,7 +4558,7 @@ public class UnitTypes{
             flying = true;
             mineSpeed = 9f;
             mineTier = 3;
-            buildSpeed = 1.5f;
+            buildSpeed = 1.8f;
             drag = 0.08f;
             speed = 7.5f;
             rotateSpeed = 8f;
@@ -4594,10 +4596,11 @@ public class UnitTypes{
                 shootCone = 40f;
                 mirror = true;
 
-                blockRepairSpeed = unitRepairSpeed = 6.2f / 2f;
-                blockRepairPercent = 0.06f / 2f;
+                blockRepairSpeed = unitRepairSpeed = -6;//6.2f / 2f;
+                blockRepairPercent = 0.075f / 2f;
                 unitRecentDmgMult = blockRecentDmgMult = 0.1f;
-                unitRecentDmgTime = 60f * 10f;
+                unitRecentDmgTime = 60f * 20f;
+                blockRecentDmgTime = 60f * 10f;
 
                 autoTarget = false;
                 controllable = true;
