@@ -3046,6 +3046,7 @@ public class UnitTypes{
                     moveY = -15f / 4f;
                     x = 32 / 4f;
                     y = -34 / 4f;
+                    layerOffset = -0.015f;
                 }},
                 new RegionPart("-sinks-heat"){{
                     blending = Blending.additive;
@@ -3058,6 +3059,7 @@ public class UnitTypes{
                     moveY = -15f / 4f;
                     x = 32 / 4f;
                     y = -34 / 4f;
+                    layerOffset = -0.015f;
                 }}
                 );
 
@@ -3071,7 +3073,7 @@ public class UnitTypes{
                         under = true;
                         moveRot = -40f * fi;
                         moveX = 3f;
-                        layerOffset = -0.002f;
+                        layerOffset = -0.02f;
 
                         x = 11 / 4f;
                     }});
@@ -3695,7 +3697,7 @@ public class UnitTypes{
                     int fi = i;
                     parts.add(new RegionPart("-blade"){{
                         under = true;
-                        layerOffset = -0.001f;
+                        layerOffset = -0.02f;
                         heatColor = Pal.techBlue;
                         heatProgress = PartProgress.heat.add(0.2f).min(PartProgress.warmup);
                         progress = PartProgress.warmup.blend(PartProgress.reload, 0.1f);
