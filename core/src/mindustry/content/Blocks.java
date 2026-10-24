@@ -3715,7 +3715,6 @@ public class Blocks{
                 damage = 12;
                 lightningLength = 25;
                 collidesAir = false;
-                ammoMultiplier = 1f;
                 ammoUsed = 1f;
 
                 //for visual stats only.
