@@ -127,8 +127,9 @@ public class Conduit extends LiquidBlock implements Autotiler{
         return cont.get(Geometry.d4(req.rotation)) &&
             cont.get(Geometry.d4(req.rotation - 2)) &&
             req.tile() != null &&
+            (req.tile().block() instanceof LiquidJunction ||
             req.tile().block() instanceof Conduit &&
-            Mathf.mod(req.build().rotation - req.rotation, 2) == 1 ? junctionReplacement : this;
+            Mathf.mod(req.build().rotation - req.rotation, 2) == 1) ? junctionReplacement : this;
     }
 
     @Override
@@ -140,10 +141,12 @@ public class Conduit extends LiquidBlock implements Autotiler{
     public void handlePlacementLine(Seq<BuildPlan> plans){
         if(bridgeReplacement == null) return;
 
+        Boolf<Block> avoid = b -> b instanceof Conduit || b instanceof LiquidJunction;
+
         if(rotBridgeReplacement instanceof DirectionBridge duct){
-            Placement.calculateBridges(plans, duct, true, b -> b instanceof Conduit);
+            Placement.calculateBridges(plans, duct, true, avoid);
         }else{
-            Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement, true, b -> b instanceof Conduit);
+            Placement.calculateBridges(plans, (ItemBridge)bridgeReplacement, true, avoid);
         }
     }
 
