@@ -69,7 +69,7 @@ public class RepairTurret extends Block{
     public void setStats(Stats stats){
         super.setStats(stats);
         stats.add(Stat.range, repairRadius / tilesize, StatUnit.blocks);
-        stats.add(Stat.repairSpeed, repairSpeed * 60f, StatUnit.perSecond);
+        stats.add(Stat.unitRepairSpeed, repairSpeed * 60f, StatUnit.perSecond);
 
         if(acceptCoolant){
             stats.remove(Stat.booster);

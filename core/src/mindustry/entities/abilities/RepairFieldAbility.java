@@ -11,8 +11,6 @@ import mindustry.entities.*;
 import mindustry.gen.*;
 import mindustry.world.meta.*;
 
-import java.util.*;
-
 import static mindustry.Vars.*;
 
 public class RepairFieldAbility extends Ability{
@@ -63,25 +61,22 @@ public class RepairFieldAbility extends Ability{
     @Override
     public void addStats(Table t){
         super.addStats(t);
-        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
-        t.row();
-        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
-        t.row();
+
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2))).row();
+        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2))).row();
+
         if(amount > 0){
-            t.add(Core.bundle.format("bullet.healamount", Strings.autoFixed(amount, 2)) + "[lightgray] ~ []" + abilityStat("repairspeed", Strings.autoFixed(amount * 60f / reload, 2)));
-            t.row();
+            t.add(abilityStat("unitrepair", Strings.autoFixed(amount, 2)) + "[white] ~ []" + abilityStat("unitrepairspeed", Strings.autoFixed(amount * 60f / reload, 2))).row();
         }
         if(healPercent > 0f){
-            t.row();
-            t.add(Core.bundle.format("bullet.healpercent", Strings.autoFixed(healPercent, 2)) + "[lightgray] ~ []" + abilityStat("repairspeed", Strings.autoFixed(healPercent * 60f / reload, 2) + "%"));
+            t.add(abilityStat("unitrepairpercent", Strings.autoFixed(healPercent, 2)) + "[white] ~ []" +
+                abilityStat("unitrepairpercentspeed", Strings.autoFixed(healPercent * 60f / reload, 2))).row();
         }
         if(sameTypeHealMult != 1f){
-            t.row();
-            t.add(abilityStat("sametypehealmultiplier", StatValues.multStat(sameTypeHealMult, false)));
+            t.add(abilityStat("sametypehealmultiplier", Strings.signedMultStat(sameTypeHealMult))).row();
         }
         if(maxTargets > 0){
-            t.row();
-            t.add(abilityStat("maxtargets", maxTargets));
+            t.add(abilityStat("maxtargets", maxTargets)).row();
         }
     }
 

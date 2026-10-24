@@ -26,7 +26,6 @@ public class LastStandAbility extends Ability{
     public float exponent = 2f;
     protected float warmup;
 
-    public TextureRegion shineRegion;
     public String shineSuffix = "-shine";
     public boolean drawShine = true;
     public float shineSpeed = 1f;
@@ -75,7 +74,7 @@ public class LastStandAbility extends Ability{
 
         for(StatEntry s : stats){
             if(s.value > 0f && s.value != 1f){
-                String text = StatValues.multStat(s.value, false) + "%";
+                String text = (s.value > 1f ? "[stat]" : "[negstat]") + Strings.autoFixed(s.value * 100f, 0) + "%";
                 if(s.effectValue != 1f && statusEffect != StatusEffects.none){
                     text += (s.effectValue > 1f ? "[stat] + " : "[negstat] ") + Strings.autoFixed((s.effectValue - 1f) * 100f, 2);
                 }
@@ -93,7 +92,6 @@ public class LastStandAbility extends Ability{
     @Override
     public void init(UnitType type){
         maxHealth = type.health;
-        shineRegion = Core.atlas.find(type.name + shineSuffix, type.region);
     }
 
     @Override
@@ -126,12 +124,12 @@ public class LastStandAbility extends Ability{
 
     @Override
     public void draw(Unit unit){
-        if(drawShine && shineRegion.found() && warmup > 0.001f){
+        if(drawShine && warmup > 0.001f){
             if(shineLayer > 0) Draw.z(shineLayer);
             Draw.color(color, warmup);
             Draw.blend(Blending.additive);
             Draw.alpha(Mathf.absin(Vars.state.time, 2f / (warmup * shineSpeed), warmup / 2f + 0.5f));
-            Draw.rect(shineRegion, unit.x, unit.y, unit.rotation - 90f);
+            Draw.rect(Core.atlas.find(unit.type.name + shineSuffix), unit.x, unit.y, unit.rotation - 90f);
             Draw.reset();
             Draw.blend();
         }

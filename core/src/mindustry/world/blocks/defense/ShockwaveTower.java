@@ -69,9 +69,10 @@ public class ShockwaveTower extends Block{
         super.setStats(stats);
 
         stats.add(Stat.damage, t -> {
-            t.add("[stat]" + Strings.autoFixed(bulletDamage, 2) +
-            (unitDamageMultiplier > 0f ? "[lightgray] ~ [stat]" + Strings.autoFixed(bulletDamage * unitDamageMultiplier, 2) + "[white] " + Core.bundle.get("bar.appliedmissiles") : "") +
-            (falloffCount > 0 ? "[lightgray] ~ [white]" + Core.bundle.format("bar.falloffprojectile", Strings.format("[negstat]@+[lightgray]", falloffCount)) : ""));
+            String text = "[stat]" + Strings.autoFixed(bulletDamage, 2);
+            t.add(Strings.joinEntries(() -> true, () -> falloffCount > 0, unitDamageMultiplier > 0f ?
+            text + "[lightgray] ~ [stat]" + Strings.autoFixed(bulletDamage * unitDamageMultiplier, 2) + "[white] " + Core.bundle.get("bar.appliedmissiles") : text,
+            "[white]" + Core.bundle.format("bar.falloffprojectile", Strings.format("[negstat]@+[lightgray]", falloffCount))));
         });
         stats.add(Stat.range, range / tilesize, StatUnit.blocks);
         stats.add(Stat.reload, 60f / reload, StatUnit.perSecond);

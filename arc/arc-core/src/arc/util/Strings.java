@@ -1,7 +1,9 @@
 package arc.util;
 
+import arc.func.*;
 import arc.graphics.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 
 import java.io.*;
@@ -352,6 +354,42 @@ public class Strings{
         }
         builder.setLength(builder.length() - separator.length());
         return builder.toString();
+    }
+
+    public static String joinEntries(Boolp cond1, Boolp cond2, String text1, String text2){
+        return joinEntries(cond1, cond2, () -> text1, () -> text2);
+    }
+
+    public static String joinEntries(Boolp cond1, Boolp cond2, Prov<String> text1, Prov<String> text2){
+        return joinEntries(cond1, cond2, text1, text2, "[white]  ~  []");
+    }
+
+    /** Joins 2 conditions and their entries into one. */
+    public static String joinEntries(Boolp cond1, Boolp cond2, Prov<String> text1, Prov<String> text2, String joint){
+        boolean apply1 = cond1.get(), apply2 = cond2.get();
+        if(!apply1 && !apply2) return null;
+
+        return apply1 && apply2 ? text1.get() + joint + text2.get() : apply1 ? text1.get() : text2.get();
+    }
+
+    /** Formats a value with a color. <br> E.g. {@code +2} or {@code -2} */
+    public static String ammoStat(float val){
+        return ammoStat(val, true);
+    }
+
+    /** Formats a value with a color. <br> E.g. {@code +2} (signed) or {@code 2} or {@code -2} */
+    public static String ammoStat(float val, boolean signed){
+        return (val > 0 ? "[stat]" + (signed ? "+" : "") : "[negstat]") + Strings.autoFixed(val, 1);
+    }
+
+    /** Formats a decimal multiplier with a color. <br> E.g. {@code 1.25} or {@code 0.75} */
+    public static String multStat(float val){
+        return (val >= 1 ? "[stat]" : "[negstat]") + Strings.autoFixed(val, 2);
+    }
+
+    /** Formats a signed percentage multiplier. <br> E.g. {@code 1.25} -> {@code +25} or {@code 0.75} -> {@code -25}. */
+    public static String signedMultStat(float val){
+        return ammoStat(val * 100 - 100, true);
     }
 
     /** Returns the levenshtein distance between two strings. */

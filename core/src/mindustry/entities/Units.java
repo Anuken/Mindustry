@@ -8,6 +8,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
+import mindustry.core.*;
 import mindustry.game.*;
 import mindustry.game.Teams.*;
 import mindustry.gen.*;

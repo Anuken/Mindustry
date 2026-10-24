@@ -385,12 +385,14 @@ public class Blocks{
             itemDrop = Items.sand;
             playerUnmineable = true;
             attributes.set(Attribute.oil, 0.7f);
+            showOn(() -> Planets.serpulo);
         }};
 
         darksand = new Floor("darksand"){{
             itemDrop = Items.sand;
             playerUnmineable = true;
             attributes.set(Attribute.oil, 1.5f);
+            showOn(() -> Planets.serpulo);
         }};
 
         dirt = new Floor("dirt");
@@ -4466,6 +4468,38 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 buildingDamageMultiplier = 0.3f;
             }},
+            Items.silicon, new BasicBulletType(9f, 45){{
+                width = 10f;
+                hitSize = 7f;
+                height = 22f;
+                shootEffect = sfe;
+                smokeEffect = Fx.shootBigSmoke;
+                ammoMultiplier = 1;
+                pierceCap = 2;
+                pierce = true;
+                pierceBuilding = true;
+                hitColor = backColor = trailColor = Pal.siliconAmmoBack;
+                frontColor = Pal.siliconAmmoFront;
+
+                homingPower = 0.5f;
+                homingArcAngle = 90f;
+                homingArcRadius = 5*8f;
+                homingTiles = false;
+                rangeChange = 7*8f;
+                rotateSpeedMultiplier = 3f;
+                extraRangeMargin = 4f*8f;
+                shootPattern = new ShootPattern(){{
+                    shots = 2;
+                    shotDelay = 4f;
+                }};
+
+                trailWidth = 2.1f;
+                trailLength = 10;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+                airDamageMultiplier = 1.2f;
+                reloadMultiplier = 1.2f;
+                buildingDamageMultiplier = 0.3f;
+            }},
             Items.tungsten, new BasicBulletType(8f, 95){{
                 width = 13f;
                 height = 22f;
@@ -4473,12 +4507,11 @@ public class Blocks{
                 shootEffect = sfe;
                 smokeEffect = Fx.shootBigSmoke;
                 ammoMultiplier = 2;
-                reloadMultiplier = 1f;
                 pierceCap = 4;
                 pierce = true;
                 pierceBuilding = true;
-                maxRicochetAngle = 20f;
-                ricochetSpeed = 2f;
+                maxRicochetAngle = 30f;
+                ricochetSpeed = 2.5f;
                 hitColor = backColor = trailColor = Pal.tungstenShot;
                 frontColor = Color.white;
                 trailWidth = 2.2f;
@@ -4486,6 +4519,12 @@ public class Blocks{
                 hitEffect = despawnEffect = Fx.hitBulletColor;
                 rangeChange = 40f;
                 buildingDamageMultiplier = 0.3f;
+
+                reloadMultiplier = 40f / (40f * 3);
+                shootPattern = new ShootPattern(){{
+                    shots = 3;
+                    shotDelay = 12f;
+                }};
             }},
             Items.carbide, new BasicBulletType(12f, 325f/0.75f){{
                 width = 15f;
@@ -4538,6 +4577,7 @@ public class Blocks{
             shootSound = Sounds.shootBreach;
 
             targetUnderBlocks = false;
+            consumeAmmoOnce = true;
             shake = 1f;
             ammoPerShot = 2;
             drawer = new DrawTurret("reinforced-");
@@ -6566,7 +6606,7 @@ public class Blocks{
         }};
 
         mechFabricator = new UnitFactory("mech-fabricator"){{
-            requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250, Items.tungsten, 10));
+            requirements(Category.units, with(Items.silicon, 200, Items.beryllium, 250, Items.graphite, 300, Items.tungsten, 10));
             size = 3;
             configurable = false;
             plans.add(new UnitPlan(UnitTypes.merui, 60f * 40f, with(Items.beryllium, 50, Items.silicon, 70)));
@@ -6577,7 +6617,7 @@ public class Blocks{
         }};
 
         tankRefabricator = new Reconstructor("tank-refabricator"){{
-            requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 80, Items.silicon, 100));
+            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 120, Items.silicon, 150));
             regionSuffix = "-dark";
 
             size = 3;
@@ -6614,7 +6654,7 @@ public class Blocks{
         }};
 
         mechRefabricator = new Reconstructor("mech-refabricator"){{
-            requirements(Category.units, with(Items.beryllium, 250, Items.tungsten, 175, Items.silicon, 150));
+            requirements(Category.units, with(Items.beryllium, 200, Items.tungsten, 175, Items.graphite, 50, Items.silicon, 150));
             regionSuffix = "-dark";
 
             size = 3;

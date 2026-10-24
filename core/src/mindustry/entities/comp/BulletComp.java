@@ -55,6 +55,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     transient int frags;
 
     transient Posc stickyTarget;
+    transient Teamc homingTarget;
     transient float stickyX, stickyY, stickyRotation, stickyRotationOffset;
 
     @Override

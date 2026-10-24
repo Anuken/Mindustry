@@ -37,6 +37,7 @@ import mindustry.world.meta.*;
 
 import static arc.graphics.g2d.Draw.*;
 import static mindustry.Vars.*;
+import static mindustry.Vars.getPlanet;
 
 public class UnitType extends UnlockableContent implements LogicSenseable{
     public static final float shadowTX = -12, shadowTY = -13;
@@ -387,6 +388,8 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     public boolean mineWalls = false, mineFloor = true;
     /** if true, harder materials will take longer to mine */
     public boolean mineHardnessScaling = true;
+    /** Whether to only display drillable stat entries for the active planet. */
+    public boolean showPlanetDrillable = false;
     /** continuous sound emitted when mining. */
     public Sound mineSound = Sounds.loopMineBeam;
     /** volume of mining sound. */
@@ -853,6 +856,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
             stats.addPercent(Stat.mineSpeed, mineSpeed);
             stats.add(Stat.mineTier, StatValues.drillables(mineSpeed, 1f, 1, null, b ->
                 b.itemDrop != null &&
+                (!showPlanetDrillable || (!b.shownPlanets.isEmpty() && b.isOnPlanet(getPlanet()))) &&
                 (b instanceof Floor f && (((f.wallOre && mineWalls) || (!f.wallOre && mineFloor))) ||
                 (!(b instanceof Floor) && mineWalls)) &&
                 b.itemDrop.hardness <= mineTier && (!b.playerUnmineable || Core.settings.getBool("doubletapmine"))));

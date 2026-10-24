@@ -98,8 +98,12 @@ public class BulletType extends Content implements Cloneable{
     public float ammoMultiplier = 2f;
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
+    /** Multiplier on turret rotation speed when this bullet is used. */
+    public float rotateSpeedMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
     public float buildingDamageMultiplier = 1f;
+    /** Multiplier of how much base damage is done to air units. */
+    public float airDamageMultiplier = 1f;
     /** Multiplier of how much base damage is done to force shields. */
     public float shieldDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
@@ -322,6 +326,13 @@ public class BulletType extends Content implements Cloneable{
     public float homingRange = 50f;
     /** Use a negative value to disable homing delay. */
     public float homingDelay = -1f;
+    public boolean homingTiles = true, homingAir = true, homingGround = true;
+    /** Whether homing position is predictive. */
+    public boolean homingPredict = false;
+    /** Radius of the arc trajectory this bullet will follow upon finding a new target. */
+    public float homingArcRadius = -1f;
+    /** Angle of the arc trajectory this bullet will follow upon finding a new target. */
+    public float homingArcAngle = 180f;
     /** Speed at which bullet rotates to follow cursor. <= 0 to disable. */
     public float followAimSpeed = 0f;
 
@@ -331,7 +342,7 @@ public class BulletType extends Content implements Cloneable{
     public float ricochetSpeed = 1f;
     /** Multiplier on bullet lifetime upon ricocheting. Does not stack. */
     public float ricochetLife = 1.15f;
-    /** Range for checking ricochet targets. Accounts for remaining bullet range by default. */
+    /** Range for checking targets to ricochet onto. Accounts for remaining bullet range by default. */
     public float ricochetRange = -1f;
     /** Whether the ricochet predicts unit movement. */
     public boolean predictRicochet = true;
@@ -408,8 +419,8 @@ public class BulletType extends Content implements Cloneable{
     public BulletType copy(){
         try{
             BulletType copy = (BulletType)clone();
-            copy.id = (short)Vars.content.getBy(getContentType()).size;
-            Vars.content.handleContent(copy);
+            copy.id = (short)content.getBy(getContentType()).size;
+            content.handleContent(copy);
             return copy;
         }catch(Exception e){
             throw new RuntimeException("death to checked exceptions", e);
@@ -565,7 +576,9 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public float damageMultiplier(Bullet b){
-        if(b.owner instanceof Unit u) return u.damageMultiplier() * state.rules.unitDamage(b.team);
+        if(b.owner instanceof Unit u){
+            return u.damageMultiplier() * state.rules.unitDamage(b.team) * (u.isFlying() ? airDamageMultiplier : 1f);
+        }
         if(b.owner instanceof Building) return state.rules.blockDamage(b.team);
 
         return 1f;
@@ -587,7 +600,7 @@ public class BulletType extends Content implements Cloneable{
 
         if(createFrags && fragOnHit){
             if(delayFrags && fragBullet != null && fragBullet.delayFrags){
-                Vars.state.post(() -> createFrags(b, x, y));
+                state.post(() -> createFrags(b, x, y));
             }else{
                 createFrags(b, x, y);
             }
@@ -770,23 +783,29 @@ public class BulletType extends Content implements Cloneable{
             float realAimY = b.aimY < 0 ? b.y : b.aimY;
 
             Teamc target;
+            boolean checkAir = collidesAir && homingAir, checkGround = collidesGround && homingGround, checkTiles = homingTiles && checkGround;
 
             //home in on what the unit is aiming at
-            if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
-                target = b.aimTile.build;
+            Building aimBuild = b.aimTile != null ? b.aimTile.build : null;
+            if(checkTiles && aimBuild != null && aimBuild.team != b.team && !b.hasCollided(aimBuild.id)){
+                target = aimBuild;
             }else if(heals()){
                 //home in on allies if possible
                 target = Units.closestTarget(null, realAimX, realAimY, homingRange, b.team,
-                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
-                    t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id));
+                    e -> e.checkTarget(checkAir, checkGround) && e.team != b.team && !b.hasCollided(e.id),
+                    t -> checkTiles && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id));
             }else{
                 target = Units.closestTarget(b.team, realAimX, realAimY, homingRange,
-                    e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
-                    t -> t != null && collidesGround && !b.hasCollided(t.id));
+                    e -> e != null && e.checkTarget(checkAir, checkGround) && !b.hasCollided(e.id),
+                    t -> t != null && checkTiles && !b.hasCollided(t.id));
             }
 
             if(target != null){
-                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
+                if(homingArcRadius > 0f){
+                    updateHomingArc(b, target);
+                }else{
+                    b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(homingPredict ? Predict.intercept(b, target, speed) : target), homingPower * Time.delta * 50f));
+                }
             }
         }
 
@@ -797,24 +816,23 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void updateRicochet(Bullet b){
-        float angle = b.rotation();
-        Teamc target = Units.closestTarget(b.team, b.x, b.y, ricochetRange > 0f ? ricochetRange : (1f - (b.time / b.lifetime)) * range + 8f,
-            e -> !b.hasCollided(e.id()) && Angles.within(angle, Angles.angle(b.x, b.y, e.x, e.y), maxRicochetAngle),
-            t -> !b.hasCollided(t.id) && Angles.within(angle, Angles.angle(b.x, b.y, t.x, t.y), maxRicochetAngle));
+        Teamc target = Units.closestTarget(b.team, b.x, b.y, ricochetRange > 0f ? ricochetRange : (1f - (b.time / b.lifetime)) * range + 16f,
+            e -> !b.hasCollided(e.id()) && Angles.within(b.rotation(), Angles.angle(b.x, b.y, e.x, e.y), maxRicochetAngle),
+            t -> !b.hasCollided(t.id) && Angles.within(b.rotation(), Angles.angle(b.x, b.y, t.x, t.y), maxRicochetAngle));
 
         if(target != null){
-        float tx = target.x(), ty = target.y();
+            float tx = target.x(), ty = target.y();
 
-            if(predictRicochet && speed >= 0.01f && target instanceof Hitboxc h){
-                Vec2 predict = Predict.intercept(b, target, h.deltaX(), h.deltaY(), speed);
-                if(Angles.within(angle, Angles.angle(b.x, b.y, predict.x, predict.y), maxRicochetAngle)){
+            if(predictRicochet && speed >= 0.01f){
+                Vec2 predict = Predict.intercept(b, target, 0, 0, false, speed * ricochetSpeed);
+                if(Angles.within(b.rotation(), Angles.angle(b.x, b.y, predict.x, predict.y), maxRicochetAngle)){
                     tx = predict.x;
                     ty = predict.y;
                 }
             }
 
-        float newAngle = Angles.angle(b.x, b.y, tx, ty);
-            if(!Angles.near(newAngle, angle, ricochetAngleDiff)) ricochetEffect.at(b.x, b.y, b.rotation(), hitColor);
+            float newAngle = Angles.angle(b.x, b.y, tx, ty);
+            if(!Angles.near(newAngle, b.rotation(), ricochetAngleDiff)) ricochetEffect.at(b.x, b.y, b.rotation(), hitColor);
             b.rotation(newAngle);
             b.vel.setAngle(newAngle);
 
@@ -824,6 +842,75 @@ public class BulletType extends Content implements Cloneable{
                 float newLen = b.vel.len();
                 if(newLen > 0f) b.lifetime = b.time + (b.lifetime - b.time) * ricochetLife * Math.min(1f, len / newLen);
             }
+        }
+    }
+
+    protected void updateHomingArc(Bullet b, Teamc target){
+        Vec2 predicted = Predict.intercept(b, target, speed);
+        float aimX = predicted.x, aimY = predicted.y; //predicted is a shared vector
+
+        HomingArc arc = b.mover instanceof HomingArc a ? a : null;
+
+        //the arc owns the heading while it lasts, only keep the exit aim fresh
+        if(arc != null && arc.remaining > 0f){
+            arc.aimX = aimX;
+            arc.aimY = aimY;
+            return;
+        }
+
+        //straight flight, both before and after the arc
+        b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(aimX, aimY), homingPower * Time.delta * 50f));
+
+        //every new target gets its own arc
+        if((arc == null || arc.target != target) && b.dst(aimX, aimY) <= homingArcRadius * (1f - Mathf.cosDeg(homingArcAngle))){
+            int side = (b.id() & 1) == 0 ? 1 : -1; //consecutive bullets curl in opposite directions
+            float step = b.vel.len() * Time.delta / homingArcRadius * Mathf.radDeg;
+
+            //turn perpendicular to the target; the half step keeps the segmented path centered on the circle
+            b.vel.setAngle(b.angleTo(aimX, aimY) - side * 90f + side * step / 2f);
+            b.mover = new HomingArc(arc != null ? arc.previous : b.mover, target, homingArcRadius, homingArcAngle, side, aimX, aimY);
+        }
+    }
+
+    /**
+     * Per-bullet state of a homing arc. It is the bullet's mover while the arc lasts and stays attached afterwards to remember
+     * which target it arced for, so BulletComp needs no arc fields. A mover the bullet already had is kept and runs
+     * whenever the arc is not in control.
+     */
+    protected static class HomingArc implements Mover{
+        final @Nullable Mover previous;
+        final Teamc target;
+        final float radius;
+        final int side;
+        /** Degrees of arc left to sweep. */
+        float remaining;
+        /** Latest predicted intercept position, the bullet flies at it once the arc ends. */
+        float aimX, aimY;
+
+        HomingArc(@Nullable Mover previous, Teamc target, float radius, float angle, int side, float aimX, float aimY){
+            this.previous = previous;
+            this.target = target;
+            this.radius = radius;
+            this.remaining = angle;
+            this.side = side;
+            this.aimX = aimX;
+            this.aimY = aimY;
+        }
+
+        @Override
+        public void move(Bullet b){
+            if(remaining <= 0f){
+                if(previous != null) previous.move(b);
+                return;
+            }
+
+            //rotate by the angle the bullet travels this tick, which keeps it on the circle
+            float step = Math.min(b.vel.len() * Time.delta / radius * Mathf.radDeg, remaining);
+            b.vel.rotate(side * step);
+            remaining -= step;
+
+            //arc finished: straight line at the target
+            if(remaining <= 0f) b.vel.setAngle(b.angleTo(aimX, aimY));
         }
     }
 
@@ -875,7 +962,7 @@ public class BulletType extends Content implements Cloneable{
                 b.trail = new Trail(trailLength);
             }
             b.trail.length = trailLength;
-            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(Vars.state.time, trailSinScl, trailSinMag) : 0f)));
+            b.trail.update(b.x, b.y, trailInterp.apply(b.fin()) * (1f + (trailSinMag > 0 ? Mathf.absin(state.time, trailSinScl, trailSinMag) : 0f)));
         }
     }
 
@@ -885,6 +972,8 @@ public class BulletType extends Content implements Cloneable{
             pierce = true;
             //pierceBuilding is not enabled by default, because a bullet may want to *not* pierce buildings
         }
+
+        if(homingArcRadius > 0f) homingPredict = true;
 
         if(setDefaults){
             if(lightning > 0){

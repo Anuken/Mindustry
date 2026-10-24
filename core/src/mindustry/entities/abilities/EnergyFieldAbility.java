@@ -44,7 +44,7 @@ public class EnergyFieldAbility extends Ability{
     protected float timer, curStroke;
     protected boolean anyNearby = false;
 
-    EnergyFieldAbility(){}
+    public EnergyFieldAbility(){}
 
     public EnergyFieldAbility(float damage, float reload, float range){
         this.damage = damage;
@@ -59,24 +59,20 @@ public class EnergyFieldAbility extends Ability{
         }else{
             t.add(Core.bundle.get(getBundle() + ".description")).wrap().width(descriptionWidth);
         }
-        t.row();
 
-        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2)));
-        t.row();
-        t.add(abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)));
-        t.row();
-        t.add(abilityStat("maxtargets", maxTargets));
-        t.row();
-        t.add(Core.bundle.format("bullet.damage", damage));
+        t.add(Strings.joinEntries(() -> damage > 0, () -> reload > 0, Core.bundle.format("bullet.damage", damage), abilityStat("firingrate", Strings.autoFixed(60f / reload, 2)))).row();
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2))).row();
+
+        if(maxTargets > 0){
+            t.add(abilityStat("maxtargets", maxTargets)).row();
+        }
         if(status != StatusEffects.none){
-            t.row();
-            t.add((status.hasEmoji() ? status.emoji() : "") + "[stat]" + status.localizedName).with(l -> StatValues.withTooltip(l, status));
+            t.add((status.hasEmoji() ? status.emoji() : "") + "[stat]" + status.localizedName).with(l -> StatValues.withTooltip(l, status)).row();
         }
         if(displayHeal){
-            t.row();
-            t.add(Core.bundle.format("bullet.healpercent", Strings.autoFixed(healPercent, 2)));
-            t.row();
-            t.add(abilityStat("sametypehealmultiplier", StatValues.multStat(sameTypeHealMult, false)));
+            t.add(abilityStat("unitrepairpercent", Strings.autoFixed(healPercent, 2)) + "[white] ~ []" +
+                abilityStat("unitrepairpercentspeed", Strings.autoFixed(healPercent * 60f / reload, 2))).row();
+            t.add(abilityStat("sametypehealmultiplier", Strings.signedMultStat(sameTypeHealMult))).row();
         }
     }
 

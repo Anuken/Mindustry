@@ -634,7 +634,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected void turnToTarget(float targetRot){
-            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * potentialEfficiency);
+            rotation = Angles.moveToward(rotation, targetRot, rotateSpeed * delta() * potentialEfficiency * (hasAmmo() ? peekAmmo().rotateSpeedMultiplier : 1f));
         }
 
         public boolean shouldTurn(){

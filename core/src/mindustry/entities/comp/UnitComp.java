@@ -635,6 +635,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         if(health < maxHealth && amount > 0){
             wasHealed = true;
         }
+        recentlyHealed();
     }
 
     public void updateDrowning(){

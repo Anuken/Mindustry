@@ -577,7 +577,7 @@ public class UnitTypes{
                 y = -30f / 4f;
                 shootY = 6f;
                 beamWidth = 0.8f;
-                repairSpeed = 1.4f;
+                unitRepairSpeed = 1.4f;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
@@ -1984,7 +1984,7 @@ public class UnitTypes{
                 shootY = 6f;
                 beamWidth = 0.8f;
                 mirror = false;
-                repairSpeed = 0.75f;
+                unitRepairSpeed = 0.75f;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
@@ -2177,7 +2177,7 @@ public class UnitTypes{
                 y = -10f;
                 shootY = 6f;
                 beamWidth = 0.8f;
-                repairSpeed = 0.7f;
+                unitRepairSpeed = 0.7f;
 
                 bullet = new BulletType(){{
                     maxRange = 130f;
@@ -4404,7 +4404,7 @@ public class UnitTypes{
             targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;
-            mineFloor = false;
+            showPlanetDrillable = true;
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 6f;
@@ -4440,14 +4440,16 @@ public class UnitTypes{
                 rotate = false;
                 shootY = 0f;
                 beamWidth = 0.7f;
-                repairSpeed = 3.1f;
-                fractionRepairSpeed = 0.06f;
+
+                unitRepairSpeed = 0f;
+                blockRepairSpeed = 3.1f;
+                blockRepairPercent = 0.06f;
+                unitRecentDmgMult = blockRecentDmgMult = 0.1f;
+                unitRecentDmgTime = 60f * 10f;
+
                 aimDst = 0f;
                 shootCone = 15f;
                 mirror = false;
-
-                targetUnits = false;
-                targetBuildings = true;
                 autoTarget = false;
                 controllable = true;
                 laserColor = Pal.accent;
@@ -4470,7 +4472,7 @@ public class UnitTypes{
             lowAltitude = false;
             faceTarget = true;
             mineWalls = true;
-            mineFloor = false;
+            showPlanetDrillable = true;
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 8f;
@@ -4511,11 +4513,11 @@ public class UnitTypes{
                 shootCone = 15f;
                 mirror = false;
 
-                repairSpeed = 3.3f;
-                fractionRepairSpeed = 0.06f;
+                blockRepairSpeed = unitRepairSpeed = 4.65f;
+                blockRepairPercent = 0.06f;
+                unitRecentDmgMult = blockRecentDmgMult = 0.1f;
+                unitRecentDmgTime = 60f * 10f;
 
-                targetUnits = false;
-                targetBuildings = true;
                 autoTarget = false;
                 controllable = true;
                 laserColor = Pal.accent;
@@ -4549,7 +4551,7 @@ public class UnitTypes{
             targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;
-            mineFloor = false;
+            showPlanetDrillable = true;
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 9f;
@@ -4592,11 +4594,11 @@ public class UnitTypes{
                 shootCone = 40f;
                 mirror = true;
 
-                repairSpeed = 3.6f / 2f;
-                fractionRepairSpeed = 0.03f;
+                blockRepairSpeed = unitRepairSpeed = 6.2f / 2f;
+                blockRepairPercent = 0.06f / 2f;
+                unitRecentDmgMult = blockRecentDmgMult = 0.1f;
+                unitRecentDmgTime = 60f * 10f;
 
-                targetUnits = false;
-                targetBuildings = true;
                 autoTarget = false;
                 controllable = true;
                 laserColor = Pal.accent;

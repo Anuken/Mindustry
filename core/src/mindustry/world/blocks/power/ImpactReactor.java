@@ -66,10 +66,12 @@ public class ImpactReactor extends PowerGenerator{
             float t90 = statWarmup(0.1f), t99 = statWarmup(0.01f);
             float equal = statWarmup(1f - Mathf.pow(consPower.usage / powerProduction, 1f / 5f));
 
-            stats.add(Stat.warmupTime, t -> t.add(
-                Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized() +
-                (consPower != null ? " ~ " + Strings.autoFixed(equal, 2) + " " + StatUnit.seconds.localized() + " " + StatUnit.powerEquilibrium.localized() : "")
-            ).tooltip(Core.bundle.format("bar.lerpwarmuptime", Strings.autoFixed(t90, 2), Strings.autoFixed(t99, 2))));
+            stats.add(Stat.warmupTime, t -> {
+                t.add(Strings.joinEntries(() -> true, () -> consPower != null,
+                Strings.autoFixed(max, 2) + " " + StatUnit.seconds.localized(),
+                Strings.autoFixed(equal, 2) + " " + StatUnit.seconds.localized() + " " + StatUnit.powerEquilibrium.localized()))
+                .tooltip(Core.bundle.format("bar.lerpwarmuptime", Strings.autoFixed(t90, 2), Strings.autoFixed(t99, 2)));
+            });
         }
     }
 
