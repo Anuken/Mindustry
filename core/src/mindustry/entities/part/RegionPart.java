@@ -38,7 +38,7 @@ public class RegionPart extends DrawPart{
     /** Progress function for heat alpha. */
     public PartProgress heatProgress = PartProgress.heat;
     public Blending blending = Blending.normal;
-    public float layer = -1, layerOffset = 0f, heatLayerOffset = 1f, turretHeatLayer = Layer.turretHeat;
+    public float layer = -1, layerOffset = 0f, heatLayerOffset = 0.002f, turretHeatLayer = Layer.turretHeat;
     public float outlineLayerOffset = -0.001f;
     //note that origin DOES NOT AFFECT child parts
     public float x, y, xScl = 1f, yScl = 1f, rotation, originX, originY;
