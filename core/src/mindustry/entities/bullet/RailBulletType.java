@@ -71,14 +71,9 @@ public class RailBulletType extends BulletType{
         }
 
         boolean any = b.collided.size > 0;
-        float lnx = b.x + nor.x * resultLen, lny = b.y + nor.y * resultLen;
-
-        if(fragBullet != null){
-            createFrags(b, lnx, lny);
-        }
 
         if(!any && endEffect != Fx.none){
-            endEffect.at(lnx, lny, b.rotation(), hitColor);
+            endEffect.at(b.x + nor.x * resultLen, b.y + nor.y * resultLen, b.rotation(), hitColor);
         }
 
         if(lineEffect != Fx.none){
