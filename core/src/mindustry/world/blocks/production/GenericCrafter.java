@@ -170,7 +170,7 @@ public class GenericCrafter extends Block{
             ));
         }else if(attribute != null && displayEfficiency && boostScale > 0f){
             addBar("efficiency", (GenericCrafterBuild entity) -> new Bar(
-                () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyMultiplier() * 100)),
+                () -> Core.bundle.format("bar.efficiency", Mathf.round(entity.efficiencyMultiplier() * 100)),
                 () -> Pal.lightOrange,
                 entity::efficiencyMultiplier
             ));
@@ -178,7 +178,7 @@ public class GenericCrafter extends Block{
 
         if(attribute != null && displayScaledOutput && outputScale > 0f){
             addBar("yield", (GenericCrafterBuild entity) -> new Bar(
-                () -> Core.bundle.format("bar.yield", (int)(entity.outputMultiplier() * 100)),
+                () -> Core.bundle.format("bar.yield", Mathf.round(entity.outputMultiplier() * 100)),
                 () -> Pal.lightOrange,
                 entity::outputMultiplier
             ));
