@@ -132,7 +132,7 @@ public class GenericCrafter extends Block{
         Core.bundle.format("bar.efficiency", Math.round(Math.max(base + Math.min(maxBoost, boostScale * sum), 0f) * 100f))
         : "") +
         (displayScaledOutput && outputScale > 0f ?
-        "\n" + Core.bundle.format("bar.yield", (int)((1f + Math.min(maxBoost, outputScale * sum)) * 100f))
+        "\n" + Core.bundle.format("bar.yield", Math.round((1f + Math.min(maxBoost, outputScale * sum)) * 100f))
         : ""), x, y, valid);
     }
 
