@@ -74,28 +74,28 @@ public class BurstDrill extends Drill{
 
         @Override
         public void updateTile(){
-            if(dominantItem == null){
+            if(drillingItem == null){
                 return;
             }
 
             if(invertTime > 0f) invertTime -= delta() / invertedTime;
 
             if(timer(timerDump, dumpTime / timeScale)){
-                dump(items.has(dominantItem) ? dominantItem : null);
+                dump(items.has(drillingItem) ? drillingItem : null);
             }
 
-            float drillTime = getDrillTime(dominantItem);
+            float drillTime = getDrillTime(drillingItem);
 
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (drillTime - 20f), 0.1f);
 
-            if(items.total() <= itemCapacity - dominantItems && dominantItems > 0 && efficiency > 0){
+            if(items.total() <= itemCapacity - drillingItemCount && drillingItemCount > 0 && efficiency > 0){
                 warmup = Mathf.approachDelta(warmup, progress / drillTime, 0.01f);
 
                 float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
 
                 timeDrilled += speedCurve.apply(progress / drillTime) * speed;
 
-                lastDrillSpeed = 1f / drillTime * speed * dominantItems;
+                lastDrillSpeed = 1f / drillTime * speed * drillingItemCount;
                 progress += delta() * speed;
             }else{
                 warmup = Mathf.approachDelta(warmup, 0f, 0.01f);
@@ -103,9 +103,9 @@ public class BurstDrill extends Drill{
                 return;
             }
 
-            if(dominantItems > 0 && progress >= drillTime && items.total() < itemCapacity){
-                for(int i = 0; i < dominantItems; i++){
-                    offload(dominantItem);
+            if(drillingItemCount > 0 && progress >= drillTime && items.total() < itemCapacity){
+                for(int i = 0; i < drillingItemCount; i++){
+                    offload(drillingItem);
                 }
 
                 invertTime = 1f;
@@ -114,7 +114,7 @@ public class BurstDrill extends Drill{
                 if(wasVisible){
                     Effect.shake(shake, shake, this);
                     drillSound.at(x, y, 1f + Mathf.range(drillSoundPitchRand), drillSoundVolume);
-                    drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
+                    drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), drillingItem.color);
                 }
             }
         }
@@ -126,7 +126,7 @@ public class BurstDrill extends Drill{
 
         @Override
         public boolean shouldConsume(){
-            return items.total() <= itemCapacity - dominantItems && enabled;
+            return items.total() <= itemCapacity - drillingItemCount && enabled;
         }
 
         @Override
@@ -141,8 +141,8 @@ public class BurstDrill extends Drill{
                 Draw.color();
             }
 
-            if(dominantItem != null && drawMineItem){
-                Draw.color(dominantItem.color);
+            if(drillingItem != null && drawMineItem){
+                Draw.color(drillingItem.color);
                 Draw.rect(itemRegion, x, y);
                 Draw.color();
             }

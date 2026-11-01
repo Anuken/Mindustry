@@ -1,9 +1,12 @@
 package mindustry.world.blocks.production;
 
 import arc.*;
+import arc.Graphics.Cursor;
+import arc.Graphics.Cursor.SystemCursor;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
+import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
@@ -21,14 +24,16 @@ import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.consumers.*;
 import mindustry.world.meta.*;
+import mindustry.world.blocks.*;
 
 import static mindustry.Vars.*;
 
 public class Drill extends Block{
     public float hardnessDrillMultiplier = 50f;
 
-    protected final ObjectIntMap<Item> oreCount = new ObjectIntMap<>();
-    protected final Seq<Item> itemArray = new Seq<>();
+    protected final Seq<Item> returnItemArray = new Seq<>();
+
+    protected final Seq<Item> tmpDrops = new Seq<>();
 
     /** Maximum tier of blocks this drill can mine. */
     public int tier;
@@ -44,8 +49,8 @@ public class Drill extends Block{
     public @Nullable Seq<Item> blockedItems;
 
     //return variables for countOre
-    protected @Nullable Item returnItem;
-    protected int returnCount;
+    protected final ObjectIntMap<Item> returnOreCounts = new ObjectIntMap<>();
+    protected @Nullable Item recommendedReturnItem;
 
     /** Whether to draw the item this drill is mining. */
     public boolean drawMineItem = true;
@@ -85,6 +90,12 @@ public class Drill extends Block{
         //drills work in space I guess
         envEnabled |= Env.space;
         flags = EnumSet.of(BlockFlag.drill);
+
+        clearOnDoubleTap = true;
+        configurable = true;
+
+        config(Item.class, (DrillBuild tile, Item item) -> tile.setDrillingItem(item));
+        configClear((DrillBuild tile) -> tile.setDrillingItem(tile.recommendedItem));
     }
 
     @Override
@@ -103,9 +114,9 @@ public class Drill extends Block{
         if(tile == null) return;
 
         countOre(tile);
-        if(returnItem == null || !drawMineItem) return;
+        if(recommendedReturnItem == null || !drawMineItem) return;
 
-        Draw.tint(returnItem.color);
+        Draw.tint(recommendedReturnItem.color);
         Draw.rect(itemRegion, plan.drawx(), plan.drawy());
         Draw.color();
     }
@@ -121,6 +132,14 @@ public class Drill extends Block{
     public Item getDrop(Tile tile){
         return tile.drop();
     }
+
+    public void getDrops(Tile tile, Seq<Item> out){
+        Item primary = getDrop(tile);
+        if(primary != null) out.add(primary);
+        Item floor = tile.floor().itemDrop;
+        if(floor != null && floor != primary) out.add(floor);
+    }
+
 
     @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
@@ -145,16 +164,17 @@ public class Drill extends Block{
 
         countOre(tile);
 
-        if(returnItem != null){
-            float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / getDrillTime(returnItem) * returnCount, 2), x, y, valid);
+        if (recommendedReturnItem != null){
+            //TODO show all drillable ores here instead of only the recommended one?
+            float width = drawPlaceText(Core.bundle.formatFloat("bar.drillspeed", 60f / getDrillTime(recommendedReturnItem) * returnOreCounts.get(recommendedReturnItem), 2), x, y, valid);
             float dx = x * tilesize + offset - width/2f - 4f, dy = y * tilesize + offset + size * tilesize / 2f + 5, s = iconSmall / 4f;
             Draw.mixcol(Color.darkGray, 1f);
-            Draw.rect(returnItem.fullIcon, dx, dy - 1, s, s);
+            Draw.rect(recommendedReturnItem.fullIcon, dx, dy - 1, s, s);
             Draw.reset();
-            Draw.rect(returnItem.fullIcon, dx, dy, s, s);
+            Draw.rect(recommendedReturnItem.fullIcon, dx, dy, s, s);
 
             if(drawMineItem){
-                Draw.color(returnItem.color);
+                Draw.color(recommendedReturnItem.color);
                 Draw.rect(itemRegion, tile.worldx() + offset, tile.worldy() + offset);
                 Draw.color();
             }
@@ -196,42 +216,57 @@ public class Drill extends Block{
     }
 
     protected void countOre(Tile tile){
-        returnItem = null;
-        returnCount = 0;
+        recommendedReturnItem = null;
 
-        oreCount.clear();
-        itemArray.clear();
+        returnOreCounts.clear();
+        returnItemArray.clear();
 
-        for(Tile other : tile.getLinkedTilesAs(this, tempTiles)){
-            if(canMine(other)){
-                oreCount.increment(getDrop(other), 0, 1);
+        for (Tile other : tile.getLinkedTilesAs(this, tempTiles)) {
+            if (canMine(other)) {
+                tmpDrops.clear();
+                getDrops(other, tmpDrops);
+                for (Item item : tmpDrops) {
+                    if (canMine(item))
+                        returnOreCounts.increment(item, 0, 1);
+                }
             }
         }
 
-        for(Item item : oreCount.keys()){
-            itemArray.add(item);
+        for(Item item : returnOreCounts.keys()){
+            returnItemArray.add(item);
         }
 
-        itemArray.sort((item1, item2) -> {
+        returnItemArray.sort((item1, item2) -> {
             int type = Boolean.compare(!item1.lowPriority, !item2.lowPriority);
             if(type != 0) return type;
-            int amounts = Integer.compare(oreCount.get(item1, 0), oreCount.get(item2, 0));
+            int amounts = Integer.compare(returnOreCounts.get(item1, 0), returnOreCounts.get(item2, 0));
             if(amounts != 0) return amounts;
             return Integer.compare(item1.id, item2.id);
         });
 
-        if(itemArray.size == 0){
+        if(returnItemArray.size == 0){
             return;
         }
 
-        returnItem = itemArray.peek();
-        returnCount = oreCount.get(itemArray.peek(), 0);
+        recommendedReturnItem = returnItemArray.peek();
     }
 
     public boolean canMine(Tile tile){
-        if(tile == null || tile.block().isStatic()) return false;
-        Item drops = tile.drop();
-        return drops != null && drops.hardness <= tier && (blockedItems == null || !blockedItems.contains(drops));
+        tmpDrops.clear();
+        getDrops(tile, tmpDrops);
+        boolean canMineAny = false;
+        for (Item drop : tmpDrops) {
+            if (canMine(drop)) {
+                canMineAny = true;
+            }
+        }
+        if (!canMineAny) return false;
+        if (tile == null || tile.block().isStatic()) return false;
+        return true;
+    }
+    
+    public boolean canMine(Item item){
+        return item != null && item.hardness <= tier && (blockedItems == null || !blockedItems.contains(item));
     }
 
     public class DrillBuild extends Building{
@@ -240,12 +275,15 @@ public class Drill extends Block{
         public float timeDrilled;
         public float lastDrillSpeed;
 
-        public int dominantItems;
-        public Item dominantItem;
+        public Item drillingItem;
+        public int drillingItemCount;
+        public Item recommendedItem;
+        public final ObjectIntMap<Item> drillableOreCounts = new ObjectIntMap<>();
+        public Seq<Item> drillableOres;
 
         @Override
         public boolean shouldConsume(){
-            return items.total() < itemCapacity && enabled && dominantItem != null;
+            return items.total() < itemCapacity && enabled && drillingItem != null;
         }
 
         @Override
@@ -260,49 +298,101 @@ public class Drill extends Block{
 
         @Override
         public void drawSelect(){
-            drawItemSelection(dominantItem);
+            super.drawSelect();
+            drawItemSelection(drillingItem);
+        }
+
+        @Override
+        public void buildConfiguration(Table table) {
+            ItemSelection.buildTable(Drill.this, table, drillableOres, () -> drillingItem, this::configure,
+                    selectionRows, selectionColumns);
+        }
+        
+        @Override
+        public Item config(){
+            return drillingItem;
+        }
+        
+        @Override
+        public boolean shouldShowConfigure(Player player){
+            return drillableOres != null && drillableOres.size > 1;
+        }
+
+        @Override
+        public Cursor getCursor(){
+            //the default shows a hand cursor whenever block.configurable is true
+            return shouldShowConfigure(player) ? super.getCursor() : SystemCursor.arrow;
         }
 
         @Override
         public void pickedUp(){
-            dominantItem = null;
+            // keep drillingItem in case we drop it back on the ground
+            recommendedItem = null;
+            drillingItemCount = 0;
+            drillableOreCounts.clear();
+            drillableOres.clear();
+        }
+        
+        public void updateOre(){
+            countOre(tile);
+            drillableOreCounts.clear();
+            drillableOreCounts.putAll(returnOreCounts);
+            drillableOres = returnItemArray.copy().reverse();
+            recommendedItem = recommendedReturnItem;
+
+            if(drillingItem == null || !returnOreCounts.containsKey(drillingItem)){
+                setDrillingItem(recommendedItem);
+            } else {
+                refreshItemCount();
+            }
+        }
+
+        private void refreshItemCount(){
+            drillingItemCount = drillableOreCounts.get(drillingItem);
         }
 
         @Override
         public void onProximityUpdate(){
             super.onProximityUpdate();
-
-            countOre(tile);
-            dominantItem = returnItem;
-            dominantItems = returnCount;
+            updateOre();
         }
-
+        
+        public void setDrillingItem(@Nullable Item newItem){
+            if(newItem == null){
+                drillingItem = null;
+                drillingItemCount = 0;
+            }else if (drillableOreCounts.containsKey(newItem)){
+                drillingItem = newItem;
+                refreshItemCount();
+            }
+        }
+        
         @Override
         public Object senseObject(LAccess sensor){
-            if(sensor == LAccess.firstItem) return dominantItem;
+            if(sensor == LAccess.firstItem) return drillingItem;
             return super.senseObject(sensor);
         }
 
         @Override
         public void updateTile(){
             if(timer(timerDump, dumpTime / timeScale)){
-                dump(dominantItem != null && items.has(dominantItem) ? dominantItem : null);
+                dump(drillingItem != null && items.has(drillingItem) ? drillingItem : null);
             }
 
-            if(dominantItem == null){
+            if(drillingItem == null){
                 return;
             }
 
             timeDrilled += warmup * delta();
 
-            float delay = getDrillTime(dominantItem);
+            float delay = getDrillTime(drillingItem);
 
-            if(items.total() < itemCapacity && dominantItems > 0 && efficiency > 0){
+            if(items.total() < itemCapacity && drillingItemCount > 0 && efficiency > 0){
                 float speed = Mathf.lerp(1f, liquidBoostIntensity, optionalEfficiency) * efficiency;
 
-                lastDrillSpeed = (speed * dominantItems * warmup) / delay;
+                lastDrillSpeed = (speed * drillingItemCount * warmup) / delay;
                 warmup = Mathf.approachDelta(warmup, speed, warmupSpeed);
-                progress += delta() * dominantItems * speed * warmup;
+                progress += delta() * drillingItemCount * speed * warmup;
 
                 if(Mathf.chanceDelta(updateEffectChance * warmup))
                     updateEffect.at(x + Mathf.range(size * 2f), y + Mathf.range(size * 2f));
@@ -312,26 +402,26 @@ public class Drill extends Block{
                 return;
             }
 
-            if(dominantItems > 0 && progress >= delay && items.total() < itemCapacity){
+            if(drillingItemCount > 0 && progress >= delay && items.total() < itemCapacity){
                 int amount = (int)(progress / delay);
                 for(int i = 0; i < amount; i++){
-                    offload(dominantItem);
+                    offload(drillingItem);
                 }
 
                 progress %= delay;
 
-                if(wasVisible && Mathf.chanceDelta(drillEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), dominantItem.color);
+                if(wasVisible && Mathf.chanceDelta(drillEffectChance * warmup)) drillEffect.at(x + Mathf.range(drillEffectRnd), y + Mathf.range(drillEffectRnd), drillingItem.color);
             }
         }
 
         @Override
         public float progress(){
-            return dominantItem == null ? 0f : Mathf.clamp(progress / getDrillTime(dominantItem));
+            return drillingItem == null ? 0f : Mathf.clamp(progress / getDrillTime(drillingItem));
         }
 
         @Override
         public double sense(LAccess sensor){
-            if(sensor == LAccess.progress && dominantItem != null) return progress;
+            if(sensor == LAccess.progress && drillingItem != null) return progress;
             return super.sense(sensor);
         }
 
@@ -369,8 +459,8 @@ public class Drill extends Block{
 
             Draw.rect(topRegion, x, y);
 
-            if(dominantItem != null && drawMineItem){
-                Draw.color(dominantItem.color);
+            if(drillingItem != null && drawMineItem){
+                Draw.color(drillingItem.color);
                 Draw.rect(itemRegion, x, y);
                 Draw.color();
             }
@@ -378,7 +468,7 @@ public class Drill extends Block{
 
         @Override
         public byte version(){
-            return 1;
+            return 2;
         }
 
         @Override
@@ -386,16 +476,23 @@ public class Drill extends Block{
             super.write(write);
             write.f(progress);
             write.f(warmup);
+            write.s(drillingItem == null ? -1 : drillingItem.id);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            if(revision >= 1){
+            if (revision >= 1) {
                 progress = read.f();
                 warmup = read.f();
             }
+            
+            // if it's below revision 2 drillingItem will be null then set to recommended ore by onProximityUpdate
+            if (revision >= 2) {
+                drillingItem = content.item(read.s());
+                updateOre();
+            }
         }
     }
-
 }
+
