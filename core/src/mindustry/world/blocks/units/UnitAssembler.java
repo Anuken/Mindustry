@@ -139,7 +139,7 @@ public class UnitAssembler extends PayloadBlock{
                 e.unit().useUnitCap ? Units.getStringCap(e.team, e.unit()) : "∞"
             ),
             () -> Pal.power,
-            () -> e.unit().useUnitCap ? ((float)e.team.data().countType(e.unit()) / Mathf.ceil(Units.getCap(e.team) * e.unit().unitCapMultiplier)) : 1f
+            () -> e.unit().useUnitCap ? ((float)e.team.data().countType(e.unit()) / Units.getCap(e.team, e.unit().unitCapMultiplier)) : 1f
         ));
     }
 

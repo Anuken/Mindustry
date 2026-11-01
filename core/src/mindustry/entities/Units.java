@@ -118,16 +118,20 @@ public class Units{
     }
 
     public static int getCap(Team team){
+        return getCap(team, 1f);
+    }
+
+    public static int getCap(Team team, float mult){
         //wave team has no cap
         if((team == state.rules.waveTeam && !state.rules.pvp) || (state.isCampaign() && team == state.rules.waveTeam) || state.rules.disableUnitCap || team.ignoreUnitCap){
             return Integer.MAX_VALUE;
         }
-        return Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap);
+        return Mathf.ceil(Math.max(0, state.rules.unitCapVariable ? state.rules.unitCap + team.data().unitCap : state.rules.unitCap) * mult);
     }
 
     /** @return unit cap as a string, substituting the infinity symbol instead of MAX_VALUE */
     public static String getStringCap(Team team, UnitType type){
-        int cap =  Mathf.ceil(getCap(team) * type.unitCapMultiplier);
+        int cap = getCap(team, type.unitCapMultiplier);
         return cap >= Integer.MAX_VALUE - 1 ? "∞" : cap + "";
     }
 
