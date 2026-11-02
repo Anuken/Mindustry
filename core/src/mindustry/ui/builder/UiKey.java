@@ -13,7 +13,7 @@ public enum UiKey{
     grow, growX, growY, fill, fillX, fillY, expand, expandX, expandY,
     width, height, size, minWidth, maxWidth, minHeight, maxHeight,
     pad, padTop, padLeft, padBottom, padRight,
-    align, labelAlign, colspan, uniform, uniformX, uniformY;
+    align, labelAlign, colspan, uniform, uniformX, uniformY, tooltip;
 
     public static final UiKey[] all = values();
 }
