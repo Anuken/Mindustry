@@ -199,23 +199,23 @@ public class SpaceCameraDialog extends BaseDialog{
         t.check("@spacecamera.clouds", camera.clouds(selected), v -> camera.clouds(selected, v)).left().padTop(4f).row();
 
         if(camera.attached){
-            addSlider(t, "@spacecamera.lon", camera.lon * Mathf.radDeg, 0f, 360f, 1f, v -> camera.lon = v * Mathf.degRad);
-            addSlider(t, "@spacecamera.lat", camera.lat * Mathf.radDeg, -80f, 80f, 1f, v -> camera.lat = v * Mathf.degRad);
-            addSlider(t, "@spacecamera.zoom", camera.zoom, 0.4f, 4f, 0.05f, v -> camera.zoom = v);
+            addSlider(t, "@spacecamera.lon", () -> camera.lon * Mathf.radDeg, 0f, 360f, 1f, v -> camera.lon = v * Mathf.degRad);
+            addSlider(t, "@spacecamera.lat", () -> camera.lat * Mathf.radDeg, -80f, 80f, 1f, v -> camera.lat = v * Mathf.degRad);
+            addSlider(t, "@spacecamera.zoom", () -> camera.zoom, 0.4f, 4f, 0.05f, v -> camera.zoom = Math.max(v, 0.01f));
         }else{
-            addSlider(t, "@spacecamera.x", camera.position.x, -100f, 100f, 0.5f, v -> camera.position.x = v);
-            addSlider(t, "@spacecamera.y", camera.position.y, -100f, 100f, 0.5f, v -> camera.position.y = v);
-            addSlider(t, "@spacecamera.z", camera.position.z, -100f, 100f, 0.5f, v -> camera.position.z = v);
-            addSlider(t, "@spacecamera.yaw", camera.yaw * Mathf.radDeg, 0f, 360f, 1f, v -> camera.yaw = v * Mathf.degRad);
-            addSlider(t, "@spacecamera.pitch", camera.pitch * Mathf.radDeg, -85f, 85f, 1f, v -> camera.pitch = v * Mathf.degRad);
+            addSlider(t, "@spacecamera.x", () -> camera.position.x, -100f, 100f, 0.5f, v -> camera.position.x = v);
+            addSlider(t, "@spacecamera.y", () -> camera.position.y, -100f, 100f, 0.5f, v -> camera.position.y = v);
+            addSlider(t, "@spacecamera.z", () -> camera.position.z, -100f, 100f, 0.5f, v -> camera.position.z = v);
+            addSlider(t, "@spacecamera.yaw", () -> camera.yaw * Mathf.radDeg, 0f, 360f, 1f, v -> camera.yaw = v * Mathf.degRad);
+            addSlider(t, "@spacecamera.pitch", () -> camera.pitch * Mathf.radDeg, -85f, 85f, 1f, v -> camera.pitch = v * Mathf.degRad);
         }
 
         t.image().color(Pal.accent).height(2f).growX().pad(6f, 0f, 6f, 0f).row();
         t.add("@spacecamera.movement").color(Pal.accent).left().row();
 
-        addSlider(t, "@spacecamera.orbitSpeed", camera.orbitSpeed(selected), -30f, 30f, 0.1f, v -> camera.orbitSpeed(selected, v));
-        addSlider(t, "@spacecamera.rotationSpeed", camera.rotationSpeed(selected), -30f, 30f, 0.1f, v -> camera.rotationSpeed(selected, v));
-        addSlider(t, "@spacecamera.cloudSpeed", camera.cloudSpeed(selected), -4f, 4f, 0.1f, v -> camera.cloudSpeed(selected, v));
+        addSlider(t, "@spacecamera.orbitSpeed", () -> camera.orbitSpeed(selected), -30f, 30f, 0.1f, v -> camera.orbitSpeed(selected, v));
+        addSlider(t, "@spacecamera.rotationSpeed", () -> camera.rotationSpeed(selected), -30f, 30f, 0.1f, v -> camera.rotationSpeed(selected, v));
+        addSlider(t, "@spacecamera.cloudSpeed", () -> camera.cloudSpeed(selected), -4f, 4f, 0.1f, v -> camera.cloudSpeed(selected, v));
 
         t.check("@spacecamera.updateingame", camera.updateInGame, v -> camera.updateInGame = v).left().padTop(4f).row();
 
@@ -223,63 +223,64 @@ public class SpaceCameraDialog extends BaseDialog{
         t.add("@spacecamera.bodyvalues").color(Pal.accent).left().row();
 
         if(selected.parent != null){
-            addLiveSlider(t, "@spacecamera.orbitAngle", () -> camera.orbitAngle(selected), 0f, 360f, 1f,
+            addSlider(t, "@spacecamera.orbitAngle", () -> camera.orbitAngle(selected), 0f, 360f, 1f,
                 v -> camera.orbitAngles.put(selected.name, v));
         }
-        addLiveSlider(t, "@spacecamera.rotationAngle", () -> camera.rotationAngle(selected), 0f, 360f, 1f,
+        addSlider(t, "@spacecamera.rotationAngle", () -> camera.rotationAngle(selected), 0f, 360f, 1f,
             v -> camera.rotationAngles.put(selected.name, v));
 
         t.add("@spacecamera.hint").style(Styles.outlineLabel).wrap().width(300f).padTop(8f).row();
     }
 
-    private void addSlider(Table table, String text, float value, float min, float max, float step, Floatc changed){
+    private void addSlider(Table table, String text, Floatp value, float min, float max, float step, Floatc changed){
         table.table(row -> {
             row.left();
-            row.add(text).left().width(120f);
+            row.add(text).left().width(112f);
 
             Slider slider = new Slider(min, max, step, false);
-            slider.setValue(Mathf.clamp(value, min, max));
+            float initial = value.get();
+            slider.setValue(Mathf.clamp(initial, min, max));
 
-            Label label = new Label("", Styles.outlineLabel);
+            TextField field = new TextField("", Styles.defaultField);
+            field.setProgrammaticChangeEvents(false);
+            field.setFilter((f, c) -> Character.isDigit(c) || c == '-' || c == '.' || c == '+');
+            field.setValidator(s -> s.isEmpty() || s.equals("-") || s.equals(".") || s.equals("-.") || validNumber(s));
+            field.setText(Strings.autoFixed(initial, 2));
+            field.changed(() -> {
+                String s = field.getText();
+                if(validNumber(s)){
+                    float v = Float.parseFloat(s);
+                    changed.get(v);
+                    slider.setValue(Mathf.clamp(v, min, max), false);
+                }
+            });
+
             slider.changed(() -> {
                 float v = slider.getValue();
                 changed.get(v);
-                label.setText(Strings.autoFixed(v, 1));
+                if(!field.hasKeyboard()) field.setText(Strings.autoFixed(v, 2));
             });
-            label.setText(Strings.autoFixed(slider.getValue(), 1));
 
-            row.add(slider).width(130f).padLeft(4f);
-            row.add(label).width(44f).right();
-        }).left().row();
-    }
-
-    private void addLiveSlider(Table table, String text, Floatp value, float min, float max, float step, Floatc changed){
-        table.table(row -> {
-            row.left();
-            row.add(text).left().width(120f);
-
-            Slider slider = new Slider(min, max, step, false);
-            slider.setValue(Mathf.clamp(value.get(), min, max));
-
-            Label label = new Label("", Styles.outlineLabel);
-            slider.changed(() -> {
-                float v = slider.getValue();
-                changed.get(v);
-                label.setText(Strings.autoFixed(v, 1));
-            });
-            label.setText(Strings.autoFixed(slider.getValue(), 1));
-
-            row.add(slider).width(130f).padLeft(4f);
-            row.add(label).width(44f).right();
+            row.add(slider).width(92f).padLeft(4f);
+            row.add(field).width(86f).height(36f).padLeft(4f).right();
 
             liveUpdaters.add(() -> {
-                if(!slider.isDragging()){
-                    float v = Mathf.clamp(value.get(), min, max);
-                    slider.setValue(v, false);
-                    label.setText(Strings.autoFixed(v, 1));
+                if(!field.hasKeyboard()){
+                    float v = value.get();
+                    slider.setValue(Mathf.clamp(v, min, max), false);
+                    String string = Strings.autoFixed(v, 2);
+                    if(!field.getText().equals(string)) field.setText(string);
                 }
             });
         }).left().row();
+    }
+
+    private static boolean validNumber(String text){
+        try{
+            return Float.isFinite(Float.parseFloat(text));
+        }catch(NumberFormatException e){
+            return false;
+        }
     }
 
     private void scrollCamera(float amountY){
