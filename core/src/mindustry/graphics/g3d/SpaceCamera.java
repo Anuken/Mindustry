@@ -78,7 +78,9 @@ public class SpaceCamera{
 
         for(Planet other : content.planets()){
             if(other.solarSystem == body.solarSystem){
-                if(other.parent != null) orbitAngles.put(other.name, other.getOrbitAngle());
+                if(other.parent != null){
+                    orbitAngles.put(other.name, other.getOrbitAngle());
+                }
                 rotationAngles.put(other.name, other.getRotation());
                 cloudTimes.put(other.name, Time.globalTime);
             }
@@ -89,9 +91,15 @@ public class SpaceCamera{
     public void fillAngles(Planet body){
         for(Planet other : content.planets()){
             if(other.solarSystem == body.solarSystem){
-                if(other.parent != null && !orbitAngles.containsKey(other.name)) orbitAngles.put(other.name, other.getOrbitAngle());
-                if(!rotationAngles.containsKey(other.name)) rotationAngles.put(other.name, other.getRotation());
-                if(!cloudTimes.containsKey(other.name)) cloudTimes.put(other.name, Time.globalTime);
+                if(other.parent != null && !orbitAngles.containsKey(other.name)){
+                    orbitAngles.put(other.name, other.getOrbitAngle());
+                }
+                if(!rotationAngles.containsKey(other.name)){
+                    rotationAngles.put(other.name, other.getRotation());
+                }
+                if(!cloudTimes.containsKey(other.name)){
+                    cloudTimes.put(other.name, Time.globalTime);
+                }
             }
         }
     }

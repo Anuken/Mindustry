@@ -521,11 +521,12 @@ public class Renderer implements ApplicationListener{
                 backgroundBuffer.begin(Color.clear);
 
                 PlanetParams params;
-                if (hasSpaceCamera) {
-                    assert space != null;
+                if(space != null){
                     params = space.params();
-                } else {
+                }else if(state.rules.planetBackground != null){
                     params = state.rules.planetBackground;
+                }else{
+                    return;
                 }
 
                 //override some values

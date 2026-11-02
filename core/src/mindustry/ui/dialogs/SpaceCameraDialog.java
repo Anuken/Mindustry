@@ -181,7 +181,9 @@ public class SpaceCameraDialog extends BaseDialog{
                 setup();
             }).width(145f).height(40f).pad(2f).checked(b -> selected == planet);
 
-            if(++i % 2 == 0) bodies.row();
+            if(++i % 2 == 0){
+                bodies.row();
+            }
         }
 
         t.add(new ScrollPane(bodies, Styles.smallPane)).width(300f).height(126f).row();
@@ -258,7 +260,9 @@ public class SpaceCameraDialog extends BaseDialog{
             slider.changed(() -> {
                 float v = slider.getValue();
                 changed.get(v);
-                if(!field.hasKeyboard()) field.setText(Strings.autoFixed(v, 2));
+                if(!field.hasKeyboard()){
+                    field.setText(Strings.autoFixed(v, 2));
+                }
             });
 
             row.add(slider).width(92f).padLeft(4f);
@@ -269,7 +273,9 @@ public class SpaceCameraDialog extends BaseDialog{
                     float v = value.get();
                     slider.setValue(Mathf.clamp(v, min, max), false);
                     String string = Strings.autoFixed(v, 2);
-                    if(!field.getText().equals(string)) field.setText(string);
+                    if(!field.getText().equals(string)){
+                        field.setText(string);
+                    }
                 }
             });
         }).left().row();

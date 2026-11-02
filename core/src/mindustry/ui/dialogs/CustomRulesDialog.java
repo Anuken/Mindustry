@@ -239,7 +239,9 @@ public class CustomRulesDialog extends BaseDialog{
 
         if(Core.bundle.get("rules.spacecamera").toLowerCase().contains(ruleSearch)){
             current.button("@rules.spacecamera", Icon.planet, () -> {
-                if(spaceCameraDialog == null) spaceCameraDialog = new SpaceCameraDialog();
+                if(spaceCameraDialog == null){
+                    spaceCameraDialog = new SpaceCameraDialog();
+                }
                 spaceCameraDialog.show(rules);
             }).width(250f).left().row();
         }
