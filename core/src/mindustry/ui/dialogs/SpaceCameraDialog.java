@@ -283,7 +283,8 @@ public class SpaceCameraDialog extends BaseDialog{
 
     private static boolean validNumber(String text){
         try{
-            return Float.isFinite(Float.parseFloat(text));
+            float value = Float.parseFloat(text);
+            return !Float.isNaN(value) && !Float.isInfinite(value);
         }catch(NumberFormatException e){
             return false;
         }
