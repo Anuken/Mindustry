@@ -30,6 +30,10 @@ public class SpaceCameraDialog extends BaseDialog{
     private Planet selected;
     private PlanetParams params;
     private final Seq<Runnable> liveUpdaters = new Seq<>();
+    private float panelWidth;
+    private boolean forcedLandscape;
+    private int pointer1 = -1, pointer2 = -1;
+    private float p1x, p1y, p2x, p2y, lastPinch;
     private float lastX, lastY;
 
     public SpaceCameraDialog(){
@@ -37,8 +41,26 @@ public class SpaceCameraDialog extends BaseDialog{
         setFillParent(true);
         margin(0f);
         shouldPause = true;
-        shown(this::setup);
+        shown(() -> {
+            if(!Core.settings.getBool("landscape") && !ui.editor.isShown()){
+                platform.beginForceLandscape();
+                forcedLandscape = true;
+            }
+            setup();
+        });
+        hidden(() -> {
+            if(forcedLandscape){
+                platform.endForceLandscape();
+                forcedLandscape = false;
+            }
+            resetPointers();
+        });
         addCloseListener();
+        onResize(() -> {
+            if(!(Core.scene.getKeyboardFocus() instanceof TextField)){
+                setup();
+            }
+        });
 
         addListener(new InputListener(){
             @Override
@@ -73,7 +95,16 @@ public class SpaceCameraDialog extends BaseDialog{
     private void setup(){
         clearChildren();
         liveUpdaters.clear();
+        resetPointers();
         margin(0f);
+
+        float rootWidth = Core.scene.root.getWidth();
+        float rootHeight = Core.scene.root.getHeight();
+        float screenWidth = (rootWidth > 1f ? rootWidth : Core.graphics.getWidth()) / Scl.scl(1f);
+        float screenHeight = (rootHeight > 1f ? rootHeight : Core.graphics.getHeight()) / Scl.scl(1f);
+        boolean mobile = Core.app.isMobile();
+        float barHeight = mobile ? 58f : 60f;
+        panelWidth = mobile ? Mathf.clamp(screenWidth * 0.25f, 250f, 330f) : Mathf.clamp(screenWidth * 0.3f, 320f, 420f);
 
         selected = camera.planet();
         camera.planet = selected.name;
@@ -88,13 +119,44 @@ public class SpaceCameraDialog extends BaseDialog{
                 addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, KeyCode button){
-                        lastX = x;
-                        lastY = y;
+                        if(pointer1 == -1){
+                            pointer1 = pointer;
+                            p1x = lastX = x;
+                            p1y = lastY = y;
+                        }else if(pointer2 == -1){
+                            pointer2 = pointer;
+                            p2x = x;
+                            p2y = y;
+                            lastPinch = Mathf.dst(p1x, p1y, p2x, p2y);
+                        }
                         return true;
                     }
 
                     @Override
                     public void touchDragged(InputEvent event, float x, float y, int pointer){
+                        if(pointer == pointer1){
+                            p1x = x;
+                            p1y = y;
+                        }else if(pointer == pointer2){
+                            p2x = x;
+                            p2y = y;
+                        }else{
+                            return;
+                        }
+                        if(pointer2 != -1){
+                            float dist = Mathf.dst(p1x, p1y, p2x, p2y);
+                            pinchCamera(dist - lastPinch);
+                            lastPinch = dist;
+                            return;
+                        }
+
+                        //no look drag while another finger is down elsewhere on screen
+                        if(Core.input.getTouches() > 1){
+                            lastX = x;
+                            lastY = y;
+                            return;
+                        }
+
                         float dx = x - lastX, dy = y - lastY;
                         lastX = x;
                         lastY = y;
@@ -109,6 +171,23 @@ public class SpaceCameraDialog extends BaseDialog{
                         }
                     }
 
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
+                        if(pointer == pointer1){
+                            pointer1 = pointer2;
+                            p1x = p2x;
+                            p1y = p2y;
+                            pointer2 = -1;
+                        }else if(pointer == pointer2){
+                            pointer2 = -1;
+                        }
+                        lastPinch = 0f;
+
+                        if(pointer1 != -1){
+                            lastX = p1x;
+                            lastY = p1y;
+                        }
+                    }
                 });
             }
 
@@ -140,32 +219,45 @@ public class SpaceCameraDialog extends BaseDialog{
         };
 
         Table panel = new Table();
-        panel.table(Tex.pane, this::buildPanel).width(330f).top().left();
+        panel.table(Tex.pane, this::buildPanel).width(panelWidth).top().left();
+
+        float maxHeight = Math.max(220f, screenHeight - barHeight - 28f);
+        float buttonWidth = Mathf.clamp((screenWidth - 40f) / 4f - 8f, mobile ? 80f : 90f, mobile ? 145f : 175f);
+        float buttonHeight = mobile ? 46f : 50f;
 
         Table overlay = new Table();
         overlay.touchable = Touchable.childrenOnly;
-        overlay.left();
+        if(Core.app.isMobile()){
+            overlay.top().left();
+        }else{
+            overlay.left();
+        }
         overlay.add(new ScrollPane(panel, Styles.smallPane))
-            .width(350f)
-            .maxHeight(Math.max(220f, Core.graphics.getHeight() / Scl.scl(1f) - 140f))
+            .width(panelWidth + 20f)
+            .maxHeight(maxHeight)
             .pad(12f).left();
 
         Table bottom = new Table();
         bottom.touchable = Touchable.childrenOnly;
         bottom.bottom();
-        bottom.button("@spacecamera.frame", Icon.map, this::frameSystem).size(180f, 50f).pad(4f);
+        bottom.button("@spacecamera.frame", Icon.map, this::frameSystem).size(buttonWidth, buttonHeight).pad(4f);
         bottom.button("@spacecamera.reset", Icon.refresh, () -> {
             camera.captureAngles(selected);
             setup();
-        }).size(170f, 50f).pad(4f);
-        bottom.button("@spacecamera.save", Icon.ok, this::save).size(150f, 50f).pad(4f);
-        bottom.button("@back", Icon.left, this::hide).size(150f, 50f).pad(4f);
+        }).size(buttonWidth, buttonHeight).pad(4f);
+        bottom.button("@spacecamera.save", Icon.ok, this::save).size(buttonWidth, buttonHeight).pad(4f);
+        bottom.button("@back", Icon.left, this::hide).size(buttonWidth, buttonHeight).pad(4f);
 
         stack(view, overlay, bottom).grow();
     }
 
     private void buildPanel(Table t){
-        t.margin(8f);
+        boolean mobile = Core.app.isMobile();
+        float inner = Math.max(200f, panelWidth - 30f);
+        float bodyHeight = mobile ? 34f : 40f;
+        float listHeight = mobile ? 106f : 126f;
+
+        t.margin(mobile ? 6f : 8f);
         t.left().top();
         t.add("@spacecamera.body").color(Pal.accent).left().row();
 
@@ -179,14 +271,14 @@ public class SpaceCameraDialog extends BaseDialog{
                 camera.planet = planet.name;
                 camera.fillAngles(planet);
                 setup();
-            }).width(145f).height(40f).pad(2f).checked(b -> selected == planet);
+            }).width((inner - 8f) / 2f).height(bodyHeight).pad(2f).checked(b -> selected == planet);
 
             if(++i % 2 == 0){
                 bodies.row();
             }
         }
 
-        t.add(new ScrollPane(bodies, Styles.smallPane)).width(300f).height(126f).row();
+        t.add(new ScrollPane(bodies, Styles.smallPane)).width(inner).height(listHeight).row();
         t.image().color(Pal.accent).height(2f).growX().pad(6f, 0f, 6f, 0f).row();
 
         t.button(camera.attached ? "@spacecamera.orbit" : "@spacecamera.free", Icon.planet, Styles.flatt, () -> {
@@ -196,7 +288,7 @@ public class SpaceCameraDialog extends BaseDialog{
                 camera.attached = true;
             }
             setup();
-        }).width(300f).row();
+        }).width(inner).height(mobile ? 42f : 50f).row();
 
         t.check("@spacecamera.clouds", camera.clouds(selected), v -> camera.clouds(selected, v)).left().padTop(4f).row();
 
@@ -231,16 +323,16 @@ public class SpaceCameraDialog extends BaseDialog{
         addSlider(t, "@spacecamera.rotationAngle", () -> camera.rotationAngle(selected), 0f, 360f, 1f,
             v -> camera.rotationAngles.put(selected.name, v));
 
-        t.add("@spacecamera.hint").style(Styles.outlineLabel).wrap().width(300f).padTop(8f).row();
+        t.add(Core.app.isMobile() ? "@spacecamera.hint.mobile" : "@spacecamera.hint").style(Styles.outlineLabel).wrap().width(inner).padTop(8f).row();
     }
 
     private void addSlider(Table table, String text, Floatp value, float min, float max, float step, Floatc changed){
         table.table(row -> {
             row.left();
-            row.add(text).left().width(112f);
 
             Slider slider = new Slider(min, max, step, false);
             float initial = value.get();
+            float[] lastValue = {initial};
             slider.setValue(Mathf.clamp(initial, min, max));
 
             TextField field = new TextField("", Styles.defaultField);
@@ -260,21 +352,37 @@ public class SpaceCameraDialog extends BaseDialog{
             slider.changed(() -> {
                 float v = slider.getValue();
                 changed.get(v);
+                lastValue[0] = v;
                 if(!field.hasKeyboard()){
                     field.setText(Strings.autoFixed(v, 2));
                 }
             });
 
-            row.add(slider).width(92f).padLeft(4f);
-            row.add(field).width(86f).height(36f).padLeft(4f).right();
+            boolean stacked = Core.app.isMobile() || panelWidth < 360f;
+            float lineHeight = Core.app.isMobile() ? 32f : 36f;
+            if(stacked){
+                row.add(text).left().growX().row();
+
+                Table line = new Table();
+                line.add(slider).growX().minWidth(0f).height(lineHeight);
+                line.add(field).width(86f).height(lineHeight).padLeft(4f).right();
+                row.add(line).growX().row();
+            }else{
+                float inner = Math.max(200f, panelWidth - 30f);
+                float sliderWidth = Mathf.clamp(inner - 112f - 86f - 8f, 60f, 160f);
+
+                row.add(text).left().width(112f);
+                row.add(slider).width(sliderWidth).padLeft(4f);
+                row.add(field).width(86f).height(lineHeight).padLeft(4f).right();
+            }
 
             liveUpdaters.add(() -> {
                 if(!field.hasKeyboard()){
                     float v = value.get();
-                    slider.setValue(Mathf.clamp(v, min, max), false);
-                    String string = Strings.autoFixed(v, 2);
-                    if(!field.getText().equals(string)){
-                        field.setText(string);
+                    if(Math.abs(v - lastValue[0]) > 0.005f){
+                        lastValue[0] = v;
+                        slider.setValue(Mathf.clamp(v, min, max), false);
+                        field.setText(Strings.autoFixed(v, 2));
                     }
                 }
             });
@@ -288,6 +396,24 @@ public class SpaceCameraDialog extends BaseDialog{
         }catch(NumberFormatException e){
             return false;
         }
+    }
+
+    private void pinchCamera(float amount){
+        if(camera.attached){
+            camera.zoom = Mathf.clamp(camera.zoom - amount * 0.008f, 0.4f, 4f);
+        }else{
+            float cp = Mathf.cos(camera.pitch);
+            float move = amount * 0.01f;
+            camera.position.add(
+                cp * Mathf.cos(camera.yaw) * move,
+                Mathf.sin(camera.pitch) * move,
+                cp * Mathf.sin(camera.yaw) * move
+            );
+        }
+    }
+
+    private void resetPointers(){
+        pointer1 = pointer2 = -1;
     }
 
     private void scrollCamera(float amountY){
@@ -383,8 +509,10 @@ public class SpaceCameraDialog extends BaseDialog{
         Planet root = selected.solarSystem;
         for(Planet planet : content.planets()){
             if(planet.solarSystem == root){
-                planet.orbitAngleOverride = camera.orbitAngles.get(planet.name);
-                planet.rotationAngleOverride = camera.rotationAngles.get(planet.name);
+                planet.hasOrbitOverride = camera.orbitAngles.containsKey(planet.name);
+                planet.orbitOverride = camera.orbitAngles.get(planet.name, 0f);
+                planet.hasRotationOverride = camera.rotationAngles.containsKey(planet.name);
+                planet.rotationOverride = camera.rotationAngles.get(planet.name, 0f);
             }
         }
         universe.updateGlobal();
@@ -394,8 +522,8 @@ public class SpaceCameraDialog extends BaseDialog{
         Planet root = selected.solarSystem;
         for(Planet planet : content.planets()){
             if(planet.solarSystem == root){
-                planet.orbitAngleOverride = null;
-                planet.rotationAngleOverride = null;
+                planet.hasOrbitOverride = false;
+                planet.hasRotationOverride = false;
             }
         }
         universe.updateGlobal();

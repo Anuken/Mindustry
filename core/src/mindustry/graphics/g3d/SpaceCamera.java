@@ -18,24 +18,25 @@ public class SpaceCamera{
     /** If true, the map background keeps advancing this camera after it is saved. */
     public boolean updateInGame = false;
     /** Per-planet cloud visibility. Missing entries are visible. */
-    public ObjectMap<String, Boolean> cloudVisibility = new ObjectMap<>();
+    public ObjectSet<String> hiddenClouds = new ObjectSet<>();
     /** Per-planet orbit/rotation speeds in degrees per second. Missing entries are 0. */
-    public ObjectMap<String, Float> orbitSpeeds = new ObjectMap<>();
-    public ObjectMap<String, Float> rotationSpeeds = new ObjectMap<>();
+    public ObjectFloatMap<String> orbitSpeeds = new ObjectFloatMap<>();
+    public ObjectFloatMap<String> rotationSpeeds = new ObjectFloatMap<>();
     /** Per-planet cloud rotation multipliers and accumulated clocks. Missing speeds default to 1. */
-    public ObjectMap<String, Float> cloudSpeeds = new ObjectMap<>();
-    public ObjectMap<String, Float> cloudTimes = new ObjectMap<>();
+    public ObjectFloatMap<String> cloudSpeeds = new ObjectFloatMap<>();
+    public ObjectFloatMap<String> cloudTimes = new ObjectFloatMap<>();
     /** Free-camera position, in scene units. */
     public Vec3 position = new Vec3(0f, 0f, 8f);
     /** Free-camera yaw/pitch, in radians. */
     public float yaw, pitch;
     /** Attached-camera orbit angles and zoom. */
     public float lon = 0.55f, lat = 0.28f, zoom = 1f;
+    private transient PlanetParams cachedParams;
 
     /** Saved orbit angles by planet name, in degrees. */
-    public ObjectMap<String, Float> orbitAngles = new ObjectMap<>();
+    public ObjectFloatMap<String> orbitAngles = new ObjectFloatMap<>();
     /** Saved rotation angles by planet name, in degrees. */
-    public ObjectMap<String, Float> rotationAngles = new ObjectMap<>();
+    public ObjectFloatMap<String> rotationAngles = new ObjectFloatMap<>();
 
     public @Nullable Planet planet(){
         Planet found = planet == null ? null : content.planet(planet);
@@ -65,9 +66,11 @@ public class SpaceCamera{
     }
 
     public PlanetParams params(){
-        PlanetParams params = new PlanetParams();
-        apply(params);
-        return params;
+        if(cachedParams == null){
+            cachedParams = new PlanetParams();
+        }
+        apply(cachedParams);
+        return cachedParams;
     }
 
     /** Snapshots the current orbit/rotation of every body in the selected solar system. */
@@ -105,27 +108,28 @@ public class SpaceCamera{
     }
 
     public float orbitAngle(Planet body){
-        Float value = orbitAngles.get(body.name);
-        if(value != null) return value;
+        if(orbitAngles.containsKey(body.name)) return orbitAngles.get(body.name, 0f);
         return body.parent == null ? 0f : body.getOrbitAngle();
     }
 
     public float rotationAngle(Planet body){
-        Float value = rotationAngles.get(body.name);
-        return value == null ? body.getRotation() : value;
+        return rotationAngles.get(body.name, body.getRotation());
     }
 
     public boolean clouds(Planet body){
-        Boolean value = cloudVisibility.get(body.name);
-        return value == null || value;
+        return !hiddenClouds.contains(body.name);
     }
 
     public void clouds(Planet body, boolean value){
-        cloudVisibility.put(body.name, value);
+        if(value){
+            hiddenClouds.remove(body.name);
+        }else{
+            hiddenClouds.add(body.name);
+        }
     }
 
     public float orbitSpeed(Planet body){
-        return get(orbitSpeeds, body.name, 0f);
+        return orbitSpeeds.get(body.name, 0f);
     }
 
     public void orbitSpeed(Planet body, float value){
@@ -133,7 +137,7 @@ public class SpaceCamera{
     }
 
     public float rotationSpeed(Planet body){
-        return get(rotationSpeeds, body.name, 0f);
+        return rotationSpeeds.get(body.name, 0f);
     }
 
     public void rotationSpeed(Planet body, float value){
@@ -141,7 +145,7 @@ public class SpaceCamera{
     }
 
     public float cloudSpeed(Planet body){
-        return get(cloudSpeeds, body.name, 1f);
+        return cloudSpeeds.get(body.name, 1f);
     }
 
     public void cloudSpeed(Planet body, float value){
@@ -149,7 +153,7 @@ public class SpaceCamera{
     }
 
     public float cloudTime(Planet body){
-        return get(cloudTimes, body.name, 0f);
+        return cloudTimes.get(body.name, 0f);
     }
 
     public boolean hasMovement(){
@@ -182,11 +186,6 @@ public class SpaceCamera{
 
             cloudTimes.put(other.name, cloudTime(other) + delta * 60f * cloudSpeed(other));
         }
-    }
-
-    private static float get(ObjectMap<String, Float> map, String key, float def){
-        Float value = map.get(key);
-        return value == null ? def : value;
     }
 
     private static float normalize(float angle){

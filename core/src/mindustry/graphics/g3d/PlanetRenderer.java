@@ -329,8 +329,10 @@ public class PlanetRenderer implements Disposable{
         Planet root = params.planet.solarSystem;
         for(Planet planet : Vars.content.planets()){
             if(planet.solarSystem == root){
-                planet.orbitAngleOverride = camera.orbitAngles.get(planet.name);
-                planet.rotationAngleOverride = camera.rotationAngles.get(planet.name);
+                planet.hasOrbitOverride = camera.orbitAngles.containsKey(planet.name);
+                planet.orbitOverride = camera.orbitAngles.get(planet.name, 0f);
+                planet.hasRotationOverride = camera.rotationAngles.containsKey(planet.name);
+                planet.rotationOverride = camera.rotationAngles.get(planet.name, 0f);
             }
         }
 
@@ -345,8 +347,8 @@ public class PlanetRenderer implements Disposable{
         Planet root = params.planet.solarSystem;
         for(Planet planet : Vars.content.planets()){
             if(planet.solarSystem == root){
-                planet.orbitAngleOverride = null;
-                planet.rotationAngleOverride = null;
+                planet.hasOrbitOverride = false;
+                planet.hasRotationOverride = false;
             }
         }
 
