@@ -377,6 +377,11 @@ public class Planet extends UnlockableContent{
         }
 
         float angle = getOrbitAngle();
+        if(orbitAngleOverride != null){
+            double radians = angle * Mathf.degRad;
+            return in.add((float)Math.cos(radians) * orbitRadius, 0, (float)Math.sin(radians) * orbitRadius);
+        }
+
         return in.add(Angles.trnsx(angle, orbitRadius), 0, Angles.trnsy(angle, orbitRadius));
     }
 

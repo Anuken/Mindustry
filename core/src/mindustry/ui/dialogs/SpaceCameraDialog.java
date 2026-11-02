@@ -9,6 +9,7 @@ import arc.scene.*;
 import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.game.*;
@@ -28,6 +29,7 @@ public class SpaceCameraDialog extends BaseDialog{
     private Rules rules;
     private Planet selected;
     private PlanetParams params;
+    private final Seq<Runnable> liveUpdaters = new Seq<>();
     private float lastX, lastY;
 
     public SpaceCameraDialog(){
@@ -70,6 +72,7 @@ public class SpaceCameraDialog extends BaseDialog{
 
     private void setup(){
         clearChildren();
+        liveUpdaters.clear();
         margin(0f);
 
         selected = camera.planet();
@@ -115,6 +118,13 @@ public class SpaceCameraDialog extends BaseDialog{
                 //makes scroll not be taken by the panel when dialog is open so when mouse off
                 if(scene != null && scene.getDialog() == SpaceCameraDialog.this && (scene.getHoverElement() == null || !scene.getHoverElement().isDescendantOf(e -> e instanceof ScrollPane))){
                     scene.setScrollFocus(SpaceCameraDialog.this);
+                }
+
+                //preview always advances; saved maps only advance when updateInGame is enabled
+                camera.update(Math.min(delta, 0.05f));
+
+                for(Runnable updater : liveUpdaters){
+                    updater.run();
                 }
 
                 updateInput(delta);
@@ -201,13 +211,22 @@ public class SpaceCameraDialog extends BaseDialog{
         }
 
         t.image().color(Pal.accent).height(2f).growX().pad(6f, 0f, 6f, 0f).row();
+        t.add("@spacecamera.movement").color(Pal.accent).left().row();
+
+        addSlider(t, "@spacecamera.orbitSpeed", camera.orbitSpeed, -30f, 30f, 0.1f, v -> camera.orbitSpeed = v);
+        addSlider(t, "@spacecamera.rotationSpeed", camera.rotationSpeed, -30f, 30f, 0.1f, v -> camera.rotationSpeed = v);
+        addSlider(t, "@spacecamera.cloudSpeed", camera.cloudSpeed, -4f, 4f, 0.1f, v -> camera.cloudSpeed = v);
+
+        t.check("@spacecamera.updateingame", camera.updateInGame, v -> camera.updateInGame = v).left().padTop(4f).row();
+
+        t.image().color(Pal.accent).height(2f).growX().pad(6f, 0f, 6f, 0f).row();
         t.add("@spacecamera.bodyvalues").color(Pal.accent).left().row();
 
         if(selected.parent != null){
-            addSlider(t, "@spacecamera.orbitAngle", camera.orbitAngle(selected), 0f, 360f, 1f,
+            addLiveSlider(t, "@spacecamera.orbitAngle", () -> camera.orbitAngle(selected), 0f, 360f, 1f,
                 v -> camera.orbitAngles.put(selected.name, v));
         }
-        addSlider(t, "@spacecamera.rotationAngle", camera.rotationAngle(selected), 0f, 360f, 1f,
+        addLiveSlider(t, "@spacecamera.rotationAngle", () -> camera.rotationAngle(selected), 0f, 360f, 1f,
             v -> camera.rotationAngles.put(selected.name, v));
 
         t.add("@spacecamera.hint").style(Styles.outlineLabel).wrap().width(300f).padTop(8f).row();
@@ -231,6 +250,35 @@ public class SpaceCameraDialog extends BaseDialog{
 
             row.add(slider).width(130f).padLeft(4f);
             row.add(label).width(44f).right();
+        }).left().row();
+    }
+
+    private void addLiveSlider(Table table, String text, Floatp value, float min, float max, float step, Floatc changed){
+        table.table(row -> {
+            row.left();
+            row.add(text).left().width(120f);
+
+            Slider slider = new Slider(min, max, step, false);
+            slider.setValue(Mathf.clamp(value.get(), min, max));
+
+            Label label = new Label("", Styles.outlineLabel);
+            slider.changed(() -> {
+                float v = slider.getValue();
+                changed.get(v);
+                label.setText(Strings.autoFixed(v, 1));
+            });
+            label.setText(Strings.autoFixed(slider.getValue(), 1));
+
+            row.add(slider).width(130f).padLeft(4f);
+            row.add(label).width(44f).right();
+
+            liveUpdaters.add(() -> {
+                if(!slider.isDragging()){
+                    float v = Mathf.clamp(value.get(), min, max);
+                    slider.setValue(v, false);
+                    label.setText(Strings.autoFixed(v, 1));
+                }
+            });
         }).left().row();
     }
 

@@ -17,6 +17,14 @@ public class SpaceCamera{
     public boolean attached = true;
     /** Whether planet clouds are rendered in this scene. */
     public boolean clouds = true;
+    /** Orbit/rotation speeds in degrees per second. 0 freezes the body. */
+    public float orbitSpeed = 0f, rotationSpeed = 0f;
+    /** Cloud rotation multiplier. 1 is the planet's normal cloud speed. */
+    public float cloudSpeed = 1f;
+    /** Accumulated cloud rotation clock, in the same units as {@code Time.globalTime}. */
+    public float cloudTime;
+    /** If true, the map background keeps advancing this camera after it is saved. */
+    public boolean updateInGame = false;
     /** Free-camera position, in scene units. */
     public Vec3 position = new Vec3(0f, 0f, 8f);
     /** Free-camera yaw/pitch, in radians. */
@@ -66,6 +74,7 @@ public class SpaceCamera{
     public void captureAngles(Planet body){
         orbitAngles.clear();
         rotationAngles.clear();
+        cloudTime = Time.globalTime;
 
         for(Planet other : content.planets()){
             if(other.solarSystem == body.solarSystem){
@@ -94,5 +103,34 @@ public class SpaceCamera{
     public float rotationAngle(Planet body){
         Float value = rotationAngles.get(body.name);
         return value == null ? body.getRotation() : value;
+    }
+
+    public boolean hasMovement(){
+        return orbitSpeed != 0f || rotationSpeed != 0f || (clouds && cloudSpeed != 0f);
+    }
+
+    /** Advances the saved orbit/rotation angles by delta seconds. */
+    public void update(float delta){
+        if(delta <= 0f) return;
+
+        cloudTime += delta * 60f * cloudSpeed;
+
+        Planet body = planet();
+        for(Planet other : content.planets()){
+            if(other.solarSystem != body.solarSystem) continue;
+
+            if(other.parent != null && orbitSpeed != 0f){
+                orbitAngles.put(other.name, normalize(orbitAngle(other) + orbitSpeed * delta));
+            }
+
+            if(rotationSpeed != 0f){
+                rotationAngles.put(other.name, normalize(rotationAngle(other) + rotationSpeed * delta));
+            }
+        }
+    }
+
+    private static float normalize(float angle){
+        angle %= 360f;
+        return angle < 0f ? angle + 360f : angle;
     }
 }

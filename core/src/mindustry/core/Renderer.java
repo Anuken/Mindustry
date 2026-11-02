@@ -509,10 +509,24 @@ public class Renderer implements ApplicationListener{
                 backgroundBuffer = new FrameBuffer(size, size);
             }
 
-            if(resized || backgroundBuffer.resize(size, size)){
+            var space = state.rules.spaceCamera;
+            boolean animateSpace = space != null && space.updateInGame && space.hasMovement();
+            float spaceDelta = animateSpace ? Math.min(Core.graphics.getDeltaTime(), 0.05f) : 0f;
+
+            if(animateSpace){
+                space.update(spaceDelta);
+            }
+
+            if(resized || backgroundBuffer.resize(size, size) || animateSpace){
                 backgroundBuffer.begin(Color.clear);
 
-                var params = hasSpaceCamera ? state.rules.spaceCamera.params() : state.rules.planetBackground;
+                PlanetParams params;
+                if (hasSpaceCamera) {
+                    assert space != null;
+                    params = space.params();
+                } else {
+                    params = state.rules.planetBackground;
+                }
 
                 //override some values
                 params.viewW = size;
