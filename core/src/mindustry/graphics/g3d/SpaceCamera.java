@@ -15,16 +15,16 @@ public class SpaceCamera{
     public @Nullable String planet;
     /** If true, the camera orbits {@link #planet}; otherwise it uses the free position and angles. */
     public boolean attached = true;
-    /** Whether planet clouds are rendered in this scene. */
-    public boolean clouds = true;
-    /** Orbit/rotation speeds in degrees per second. 0 freezes the body. */
-    public float orbitSpeed = 0f, rotationSpeed = 0f;
-    /** Cloud rotation multiplier. 1 is the planet's normal cloud speed. */
-    public float cloudSpeed = 1f;
-    /** Accumulated cloud rotation clock, in the same units as {@code Time.globalTime}. */
-    public float cloudTime;
     /** If true, the map background keeps advancing this camera after it is saved. */
     public boolean updateInGame = false;
+    /** Per-planet cloud visibility. Missing entries are visible. */
+    public ObjectMap<String, Boolean> cloudVisibility = new ObjectMap<>();
+    /** Per-planet orbit/rotation speeds in degrees per second. Missing entries are 0. */
+    public ObjectMap<String, Float> orbitSpeeds = new ObjectMap<>();
+    public ObjectMap<String, Float> rotationSpeeds = new ObjectMap<>();
+    /** Per-planet cloud rotation multipliers and accumulated clocks. Missing speeds default to 1. */
+    public ObjectMap<String, Float> cloudSpeeds = new ObjectMap<>();
+    public ObjectMap<String, Float> cloudTimes = new ObjectMap<>();
     /** Free-camera position, in scene units. */
     public Vec3 position = new Vec3(0f, 0f, 8f);
     /** Free-camera yaw/pitch, in radians. */
@@ -74,12 +74,13 @@ public class SpaceCamera{
     public void captureAngles(Planet body){
         orbitAngles.clear();
         rotationAngles.clear();
-        cloudTime = Time.globalTime;
+        cloudTimes.clear();
 
         for(Planet other : content.planets()){
             if(other.solarSystem == body.solarSystem){
                 if(other.parent != null) orbitAngles.put(other.name, other.getOrbitAngle());
                 rotationAngles.put(other.name, other.getRotation());
+                cloudTimes.put(other.name, Time.globalTime);
             }
         }
     }
@@ -90,6 +91,7 @@ public class SpaceCamera{
             if(other.solarSystem == body.solarSystem){
                 if(other.parent != null && !orbitAngles.containsKey(other.name)) orbitAngles.put(other.name, other.getOrbitAngle());
                 if(!rotationAngles.containsKey(other.name)) rotationAngles.put(other.name, other.getRotation());
+                if(!cloudTimes.containsKey(other.name)) cloudTimes.put(other.name, Time.globalTime);
             }
         }
     }
@@ -105,28 +107,78 @@ public class SpaceCamera{
         return value == null ? body.getRotation() : value;
     }
 
+    public boolean clouds(Planet body){
+        Boolean value = cloudVisibility.get(body.name);
+        return value == null || value;
+    }
+
+    public void clouds(Planet body, boolean value){
+        cloudVisibility.put(body.name, value);
+    }
+
+    public float orbitSpeed(Planet body){
+        return get(orbitSpeeds, body.name, 0f);
+    }
+
+    public void orbitSpeed(Planet body, float value){
+        orbitSpeeds.put(body.name, value);
+    }
+
+    public float rotationSpeed(Planet body){
+        return get(rotationSpeeds, body.name, 0f);
+    }
+
+    public void rotationSpeed(Planet body, float value){
+        rotationSpeeds.put(body.name, value);
+    }
+
+    public float cloudSpeed(Planet body){
+        return get(cloudSpeeds, body.name, 1f);
+    }
+
+    public void cloudSpeed(Planet body, float value){
+        cloudSpeeds.put(body.name, value);
+    }
+
+    public float cloudTime(Planet body){
+        return get(cloudTimes, body.name, 0f);
+    }
+
     public boolean hasMovement(){
-        return orbitSpeed != 0f || rotationSpeed != 0f || (clouds && cloudSpeed != 0f);
+        Planet body = planet();
+        for(Planet other : content.planets()){
+            if(other.solarSystem != body.solarSystem) continue;
+            if(orbitSpeed(other) != 0f || rotationSpeed(other) != 0f) return true;
+            if(other.cloudMesh != null && clouds(other) && cloudSpeed(other) != 0f) return true;
+        }
+        return false;
     }
 
     /** Advances the saved orbit/rotation angles by delta seconds. */
     public void update(float delta){
         if(delta <= 0f) return;
 
-        cloudTime += delta * 60f * cloudSpeed;
-
         Planet body = planet();
         for(Planet other : content.planets()){
             if(other.solarSystem != body.solarSystem) continue;
 
-            if(other.parent != null && orbitSpeed != 0f){
-                orbitAngles.put(other.name, normalize(orbitAngle(other) + orbitSpeed * delta));
+            float orbit = orbitSpeed(other);
+            if(other.parent != null && orbit != 0f){
+                orbitAngles.put(other.name, normalize(orbitAngle(other) + orbit * delta));
             }
 
-            if(rotationSpeed != 0f){
-                rotationAngles.put(other.name, normalize(rotationAngle(other) + rotationSpeed * delta));
+            float rotation = rotationSpeed(other);
+            if(rotation != 0f){
+                rotationAngles.put(other.name, normalize(rotationAngle(other) + rotation * delta));
             }
+
+            cloudTimes.put(other.name, cloudTime(other) + delta * 60f * cloudSpeed(other));
         }
+    }
+
+    private static float get(ObjectMap<String, Float> map, String key, float def){
+        Float value = map.get(key);
+        return value == null ? def : value;
     }
 
     private static float normalize(float angle){

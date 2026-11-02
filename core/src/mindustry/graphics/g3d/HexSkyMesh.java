@@ -46,7 +46,7 @@ public class HexSkyMesh extends PlanetMesh{
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
         if(params.spaceCamera != null){
             //spaceCamera cloud switch
-            if(!params.spaceCamera.clouds) return;
+            if(!params.spaceCamera.clouds(planet)) return;
         }else if(params.planet == planet && Mathf.zero(1f - params.uiAlpha, 0.01f)){
             //don't waste performance rendering 0-alpha clouds
             return;
@@ -74,6 +74,6 @@ public class HexSkyMesh extends PlanetMesh{
     }
 
     private float cloudRotation(PlanetParams params){
-        return params.spaceCamera == null ? relRot() : params.spaceCamera.cloudTime * speed / 40f;
+        return params.spaceCamera == null ? relRot() : params.spaceCamera.cloudTime(planet) * speed / 40f;
     }
 }

@@ -196,7 +196,7 @@ public class SpaceCameraDialog extends BaseDialog{
             setup();
         }).width(300f).row();
 
-        t.check("@spacecamera.clouds", camera.clouds, v -> camera.clouds = v).left().padTop(4f).row();
+        t.check("@spacecamera.clouds", camera.clouds(selected), v -> camera.clouds(selected, v)).left().padTop(4f).row();
 
         if(camera.attached){
             addSlider(t, "@spacecamera.lon", camera.lon * Mathf.radDeg, 0f, 360f, 1f, v -> camera.lon = v * Mathf.degRad);
@@ -213,9 +213,9 @@ public class SpaceCameraDialog extends BaseDialog{
         t.image().color(Pal.accent).height(2f).growX().pad(6f, 0f, 6f, 0f).row();
         t.add("@spacecamera.movement").color(Pal.accent).left().row();
 
-        addSlider(t, "@spacecamera.orbitSpeed", camera.orbitSpeed, -30f, 30f, 0.1f, v -> camera.orbitSpeed = v);
-        addSlider(t, "@spacecamera.rotationSpeed", camera.rotationSpeed, -30f, 30f, 0.1f, v -> camera.rotationSpeed = v);
-        addSlider(t, "@spacecamera.cloudSpeed", camera.cloudSpeed, -4f, 4f, 0.1f, v -> camera.cloudSpeed = v);
+        addSlider(t, "@spacecamera.orbitSpeed", camera.orbitSpeed(selected), -30f, 30f, 0.1f, v -> camera.orbitSpeed(selected, v));
+        addSlider(t, "@spacecamera.rotationSpeed", camera.rotationSpeed(selected), -30f, 30f, 0.1f, v -> camera.rotationSpeed(selected, v));
+        addSlider(t, "@spacecamera.cloudSpeed", camera.cloudSpeed(selected), -4f, 4f, 0.1f, v -> camera.cloudSpeed(selected, v));
 
         t.check("@spacecamera.updateingame", camera.updateInGame, v -> camera.updateInGame = v).left().padTop(4f).row();
 
