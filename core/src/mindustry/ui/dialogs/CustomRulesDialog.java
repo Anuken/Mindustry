@@ -32,6 +32,7 @@ public class CustomRulesDialog extends BaseDialog{
     private Table main;
     private Prov<Rules> resetter;
     private LoadoutDialog loadoutDialog;
+    private SpaceCameraDialog spaceCameraDialog;
     private BannedContentDialog<Block> bannedBlocks = new BannedContentDialog<>("@bannedblocks", ContentType.block, Block::canBeBuilt);
     private BannedContentDialog<UnitType> bannedUnits = new BannedContentDialog<>("@bannedunits", ContentType.unit, u -> !u.isHidden());
     public boolean showRuleEditRule;
@@ -234,6 +235,27 @@ public class CustomRulesDialog extends BaseDialog{
 
         if(Core.bundle.get("rules.weather").toLowerCase().contains(ruleSearch)){
             current.button("@rules.weather", Icon.rainSmall, this::weatherDialog).width(250f).left().row();
+        }
+
+        if(Core.bundle.get("rules.spacecamera").toLowerCase().contains(ruleSearch)){
+            current.button("@rules.spacecamera", Icon.planet, () -> {
+                if(spaceCameraDialog == null) spaceCameraDialog = new SpaceCameraDialog();
+                spaceCameraDialog.show(rules);
+            }).width(250f).left().row();
+        }
+
+        if(Core.bundle.get("rules.spacecamera.reset").toLowerCase().contains(ruleSearch)){
+            current.button("@rules.spacecamera.reset", Icon.refresh, () -> {
+                rules.spaceCamera = null;
+                rules.planetBackground = null;
+
+                if(renderer.backgroundBuffer != null){
+                    renderer.backgroundBuffer.dispose();
+                    renderer.backgroundBuffer = null;
+                }
+
+                ui.showInfoFade("@spacecamera.resetdone");
+            }).width(250f).left().row();
         }
 
         category("light");

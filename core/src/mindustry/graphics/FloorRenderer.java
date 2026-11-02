@@ -212,6 +212,10 @@ public class FloorRenderer{
             return;
         }
 
+        if(layer == CacheLayer.space && state.rules.spaceCamera != null){
+            return;
+        }
+
         Camera camera = Core.camera;
 
         int

@@ -44,6 +44,8 @@ public class Planet extends UnlockableContent{
     public @Nullable Mesh gridMesh;
     /** Position in global coordinates. Will be 0,0,0 until the Universe updates it. */
     public Vec3 position = new Vec3();
+    /** Temporary orbit/rotation overrides used while rendering a saved space camera. */
+    public transient @Nullable Float orbitAngleOverride, rotationAngleOverride;
     /** Grid used for the sectors on the planet. Null if this planet can't be landed on. */
     public @Nullable PlanetGrid grid;
     /** Generator that will make the planet. Can be null for planets that don't need to be landed on. */
@@ -351,11 +353,13 @@ public class Planet extends UnlockableContent{
 
     /** Calculates orbital rotation based on universe time.*/
     public float getOrbitAngle(){
+        if(orbitAngleOverride != null) return orbitAngleOverride;
         return (orbitOffset + universe.secondsf() / (orbitTime / 360f)) % 360f;
     }
 
     /** Calculates rotation on own axis based on universe time.*/
     public float getRotation(){
+        if(rotationAngleOverride != null) return rotationAngleOverride;
         //tidally locked planets always face toward parents
         if(tidalLock){
             return -getOrbitAngle() + 90;

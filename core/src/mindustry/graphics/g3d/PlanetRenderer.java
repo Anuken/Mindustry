@@ -56,6 +56,15 @@ public class PlanetRenderer implements Disposable{
 
     /** Render the entire planet scene to the screen. */
     public void render(PlanetParams params){
+        try{
+            applyCamera(params);
+            renderInternal(params);
+        }finally{
+            clearCamera(params);
+        }
+    }
+
+    private void renderInternal(PlanetParams params){
         boolean aa = Vars.renderer.smaa.enabled() && !params.disableAA;
         if(aa) Vars.renderer.smaa.begin();
         Draw.flush();
@@ -75,15 +84,28 @@ public class PlanetRenderer implements Disposable{
         cam.up.set(Vec3.Y);
 
         cam.resize(w, h);
-        params.camPos.setLength((params.planet.radius + params.planet.camRadius) * camLength + (params.zoom-1f) * (params.planet.radius + params.planet.camRadius) * 2);
 
-        if(params.otherCamPos != null){
-            cam.position.set(params.otherCamPos).lerp(params.planet.position, params.otherCamAlpha).add(params.camPos);
+        if(params.freeCamera){
+            float pitchCos = Mathf.cos(params.freeCamPitch);
+            cam.position.set(params.freeCamPos);
+            cam.direction.set(pitchCos * Mathf.cos(params.freeCamYaw), Mathf.sin(params.freeCamPitch), pitchCos * Mathf.sin(params.freeCamYaw)).nor();
+            cam.normalizeUp();
+            cam.near = 0.1f;
+            cam.far = 500f;
         }else{
-            cam.position.set(params.planet.position).add(params.camPos);
+            cam.near = 1f;
+            cam.far = 150f;
+            params.camPos.setLength((params.planet.radius + params.planet.camRadius) * camLength + (params.zoom-1f) * (params.planet.radius + params.planet.camRadius) * 2);
+
+            if(params.otherCamPos != null){
+                cam.position.set(params.otherCamPos).lerp(params.planet.position, params.otherCamAlpha).add(params.camPos);
+            }else{
+                cam.position.set(params.planet.position).add(params.camPos);
+            }
+
+            cam.lookAt(params.planet.position);
         }
 
-        cam.lookAt(params.planet.position);
         cam.update();
         //write back once it changes.
         params.camUp.set(cam.up);
@@ -297,6 +319,39 @@ public class PlanetRenderer implements Disposable{
             sector.tile.v.scl(1f / arad);
             next.v.scl(1f / arad);
             curr.v.scl(1f / arad);
+        }
+    }
+
+    private void applyCamera(PlanetParams params){
+        SpaceCamera camera = params.spaceCamera;
+        if(camera == null || params.planet == null) return;
+
+        Planet root = params.planet.solarSystem;
+        for(Planet planet : Vars.content.planets()){
+            if(planet.solarSystem == root){
+                planet.orbitAngleOverride = camera.orbitAngles.get(planet.name);
+                planet.rotationAngleOverride = camera.rotationAngles.get(planet.name);
+            }
+        }
+
+        if(Vars.universe != null){
+            Vars.universe.updateGlobal();
+        }
+    }
+
+    private void clearCamera(PlanetParams params){
+        if(params.spaceCamera == null || params.planet == null) return;
+
+        Planet root = params.planet.solarSystem;
+        for(Planet planet : Vars.content.planets()){
+            if(planet.solarSystem == root){
+                planet.orbitAngleOverride = null;
+                planet.rotationAngleOverride = null;
+            }
+        }
+
+        if(Vars.universe != null){
+            Vars.universe.updateGlobal();
         }
     }
 
