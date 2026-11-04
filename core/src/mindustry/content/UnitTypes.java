@@ -576,7 +576,7 @@ public class UnitTypes{
                 y = -30f / 4f;
                 shootY = 6f;
                 beamWidth = 0.8f;
-                repairSpeed = 1.4f;
+                unitRepairSpeed = 1.4f;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
@@ -1976,7 +1976,7 @@ public class UnitTypes{
                 shootY = 6f;
                 beamWidth = 0.8f;
                 mirror = false;
-                repairSpeed = 0.75f;
+                unitRepairSpeed = 0.75f;
 
                 bullet = new BulletType(){{
                     maxRange = 120f;
@@ -2168,7 +2168,7 @@ public class UnitTypes{
                 y = -10f;
                 shootY = 6f;
                 beamWidth = 0.8f;
-                repairSpeed = 0.7f;
+                unitRepairSpeed = 0.7f;
 
                 bullet = new BulletType(){{
                     maxRange = 130f;
@@ -2691,6 +2691,7 @@ public class UnitTypes{
                 shootY = 4.5f;
                 recoil = 1f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 2.2f;
                 mirror = false;
                 x = 0f;
@@ -2738,6 +2739,7 @@ public class UnitTypes{
                 shootY = 10f;
                 recoil = 1f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1.4f;
                 mirror = false;
                 shootCone = 2f;
@@ -2751,6 +2753,7 @@ public class UnitTypes{
                 bullet = new RailBulletType(){{
                     length = 160f;
                     damage = 48f;
+                    shieldDamageMultiplier = 2;
                     hitColor = Color.valueOf("feb380");
                     hitEffect = endEffect = Fx.hitBulletColor;
                     pierceDamageFactor = 0.8f;
@@ -2820,6 +2823,7 @@ public class UnitTypes{
                 shootY = 16f;
                 recoil = 3f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1.625f;
                 mirror = false;
                 shootCone = 2f;
@@ -2880,6 +2884,7 @@ public class UnitTypes{
             armor = 20f;
             itemCapacity = 0;
             crushDamage = 13f / 5f;
+            rotateSpeed = 1.2f;
             floorMultiplier = 0.5f;
             drownTimeMultiplier = 1.25f;
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
@@ -2889,14 +2894,22 @@ public class UnitTypes{
             tankMoveVolume *= 1.25f;
             tankMoveSound = Sounds.tankMoveHeavy;
 
+            abilities.add(new LastStandAbility(){{
+                speedMultiplier = 1.5f;
+                rotateSpeedMultiplier = 2.5f;
+                exponent = 1.5f;
+                minHealth = 0.3f;
+            }});
+
             weapons.add(new Weapon("vanquish-weapon"){{
                 shootSound = Sounds.shootTank;
-                layerOffset = 0.0001f;
+                layerOffset = 0.01f;
                 reload = 80f;
                 shootY = 71f / 4f;
                 shake = 5f;
                 recoil = 4f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 1f;
                 mirror = false;
                 x = 0f;
@@ -2904,12 +2917,14 @@ public class UnitTypes{
                 shadow = 28f;
                 heatColor = Color.valueOf("f9350f");
                 cooldownTime = 80f;
+                minSwitchRange = 0f;
+                maxSwitchRange = 90f;
 
                 bullet = new BasicBulletType(8f, 150f){{
                     sprite = "missile-large";
                     width = 9.5f;
                     height = 18f;
-                    lifetime = 16f;
+                    lifetime = 90f / 8f;
                     hitSize = 6f;
                     shootEffect = Fx.shootTitan;
                     smokeEffect = Fx.shootSmokeTitan;
@@ -2924,7 +2939,6 @@ public class UnitTypes{
                     hitEffect = despawnEffect = Fx.blastExplosion;
                     splashDamageRadius = 20f;
                     splashDamage = 50f;
-                    maxRange = 190f;
 
                     fragOnHit = false;
                     pierceFragCap = 1;
@@ -2951,6 +2965,110 @@ public class UnitTypes{
                 }};
             }});
 
+            weaponSets.add(Seq.with(new Weapon("vanquish-rail-weapon"){{
+                shootSound = Sounds.shootTank;
+                layerOffset = 0.0001f;
+                reload = 180f;
+                shake = 5f;
+                recoil = 4f;
+                rotate = true;
+                rotateSpeed = 1f;
+                shootCone = 0f;
+                mirror = false;
+                x = y = 0f;
+                shadow = 28f;
+                heatColor = Color.valueOf("f9350f");
+                cooldownTime = 160f;
+                minSwitchRange = 90f;
+                maxSwitchRange = 400f;
+
+                bullet = new RailBulletType(){{
+                    length = 400f;
+                    damage = 90f;
+                    splashDamageRadius = 32f;
+                    splashDamage = 30f;
+                    lifetime = 18f;
+                    hitSize = 6f;
+                    pierceCap = 1;
+                    pierce = false;
+                    pierceBuilding = true;
+                    setDefaults = false;
+                    hitColor = Color.valueOf("feb380");
+                    pointEffectSpace = 1f;
+                    knockback = -20f;
+
+                    pointEffect = new ParticleEffect(){{
+                        colorTo = colorFrom = Color.valueOf("feb380");
+                        line = cap = true;
+                        particles = 1;
+                        cone = length = 0f;
+                        baseLength = 2f;
+                        lifetime = Mathf.random(25f, 50f);
+                        strokeFrom = Mathf.random(2f, 6f);
+                        strokeTo = 0f;
+                        lenFrom = lenTo = 4f;
+                    }};
+
+                    shootEffect = Fx.shootTitan;
+                    smokeEffect = new ParticleEffect(){{
+                        colorTo = colorFrom = Color.valueOf("fea480");
+                        particles = Mathf.random(4, 10);
+                        length = Mathf.random(30f, 50f);
+                        lifetime = 35f;
+                        lenFrom = Mathf.random(7f, 14f);
+                        lenTo = strokeTo = 0f;
+                        strokeFrom = 2f;
+                        cone = 10f;
+                        line = true;
+                        interp = Interp.pow2Out;
+                        sizeInterp = Interp.pow2In;
+                    }};
+
+                    hitEffect = endEffect = new ParticleEffect(){{
+                        colorTo = Color.valueOf("feb380");
+                        particles = 8;
+                        length = 60f;
+                        lifetime = 30f;
+                        lenFrom = 10f;
+                        lenTo = strokeTo = 0f;
+                        strokeFrom = 2f;
+                        cone = 40f;
+                        line = true;
+                        interp = Interp.pow2Out;
+                        sizeInterp = Interp.pow2In;
+                    }};
+
+                    fragRandomSpread = 0f;
+                    fragSpread = 10f;
+                    fragBullets = 5;
+                    fragVelocityMin = 1f;
+                    despawnSound = Sounds.explosionDull;
+
+                    fragBullet = new BasicBulletType(8f, 35f){{
+                        sprite = "missile-large";
+                        pierce = true;
+                        pierceBuilding = true;
+                        splashDamageRadius = 20f;
+                        splashDamage = 15f;
+                        pierceCap = 2;
+                        width = 8f;
+                        height = 12f;
+                        lifetime = 10f;
+                        hitSize = 4f;
+                        hitColor = backColor = trailColor = Color.valueOf("feb380");
+                        frontColor = Color.white;
+                        trailWidth = 2.8f;
+                        trailLength = 6;
+                        hitEffect = despawnEffect = Fx.blastExplosion;
+                    }};
+                }};
+
+                parts.add(new RegionPart("-extend"){{
+                    progress = PartProgress.warmup;
+                    moveY = 8f;
+                }});
+            }}));
+
             int i = 0;
             for(float f : new float[]{34f / 4f, -36f / 4f}){
                 int fi = i ++;
@@ -2961,6 +3079,7 @@ public class UnitTypes{
                     shootY = 5.5f;
                     recoil = 2f;
                     rotate = true;
+                    rotateSpeedMoveAdd = true;
                     rotateSpeed = 2f;
                     shootSound = Sounds.shootStell;
 
@@ -3010,6 +3129,7 @@ public class UnitTypes{
                 shake = 5f;
                 recoil = 5f;
                 rotate = true;
+                rotateSpeedMoveAdd = true;
                 rotateSpeed = 0.6f;
                 mirror = false;
                 x = 0f;
@@ -3173,7 +3293,7 @@ public class UnitTypes{
             drag = 0.11f;
             hitSize = 9f;
             rotateSpeed = 3f;
-            health = 680;
+            health = 690;
             armor = 4f;
             legStraightness = 0.3f;
             stepShake = 0f;
@@ -3230,8 +3350,9 @@ public class UnitTypes{
                     knockback = 0.8f;
                     lifetime = 46f;
                     width = height = 9f;
-                    splashDamageRadius = 19f;
+                    splashDamageRadius = 23f;
                     splashDamage = 30f;
+                    scaledSplashDamage = true;
 
                     trailLength = 27;
                     trailWidth = 2.5f;
@@ -3370,7 +3491,6 @@ public class UnitTypes{
             rotateSpeed = 3f;
             health = 2700;
             armor = 7f;
-            fogRadius = 40f;
             stepShake = 0f;
 
             stepSound = Sounds.walkerStepSmall;
@@ -3525,7 +3645,7 @@ public class UnitTypes{
             drag = 0.1f;
             speed = 0.6f;
             hitSize = 30f;
-            health = 6500;
+            health = 6000;
             armor = 5f;
 
             lockLegBase = true;
@@ -3551,6 +3671,8 @@ public class UnitTypes{
                 width = 8f;
                 whenShooting = false;
                 chanceDeflect = 1f;
+                reflectMissileTime = 0f;
+                missileUnitMultiplier = 0.8f;
             }});
 
             rotateSpeed = 2.1f;
@@ -3709,7 +3831,7 @@ public class UnitTypes{
                     }});
                 }
 
-                bullet = new ArtilleryBulletType(5.5f, 260){{
+                bullet = new ArtilleryBulletType(5.5f, 500){{
                     collidesTiles = collides = true;
                     lifetime = 60f;
                     shootEffect = Fx.shootBigColor;
@@ -3745,7 +3867,7 @@ public class UnitTypes{
                         sparkStroke = 3f;
                     }};
 
-                    splashDamage = 120f;
+                    splashDamage = 300f;
                     splashDamageRadius = 36f;
 
                     fragBullets = 15;
@@ -3883,7 +4005,6 @@ public class UnitTypes{
             armor = 3f;
             hitSize = 12f;
             engineSize = 0;
-            fogRadius = 25;
             itemCapacity = 0;
 
             setEnginesMirror(
@@ -3948,7 +4069,6 @@ public class UnitTypes{
             hitSize = 25f;
             engineSize = 4.3f;
             engineOffset = 54f / 4f;
-            fogRadius = 25;
             itemCapacity = 0;
             lowAltitude = true;
 
@@ -4378,7 +4498,7 @@ public class UnitTypes{
             targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;
-            mineFloor = false;
+            showPlanetDrillable = true;
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 6f;
@@ -4414,14 +4534,17 @@ public class UnitTypes{
                 rotate = false;
                 shootY = 0f;
                 beamWidth = 0.7f;
-                repairSpeed = 3.1f;
-                fractionRepairSpeed = 0.06f;
+
+                unitRepairSpeed = 1.5f;
+                blockRepairSpeed = 3.1f;
+                blockRepairPercent = 0.06f;
+                unitRecentDmgMult = blockRecentDmgMult = 0.1f;
+                unitRecentDmgTime = 60f * 20f;
+                blockRecentDmgTime = 60f * 10f;
+
                 aimDst = 0f;
                 shootCone = 15f;
                 mirror = false;
-
-                targetUnits = false;
-                targetBuildings = true;
                 autoTarget = false;
                 controllable = true;
                 laserColor = Pal.accent;
@@ -4444,12 +4567,12 @@ public class UnitTypes{
             lowAltitude = false;
             faceTarget = true;
             mineWalls = true;
-            mineFloor = false;
+            showPlanetDrillable = true;
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 8f;
             mineTier = 3;
-            buildSpeed = 1.4f;
+            buildSpeed = 1.55f;
             drag = 0.08f;
             speed = 7f;
             rotateSpeed = 8f;
@@ -4485,11 +4608,12 @@ public class UnitTypes{
                 shootCone = 15f;
                 mirror = false;
 
-                repairSpeed = 3.3f;
-                fractionRepairSpeed = 0.06f;
+                blockRepairSpeed = unitRepairSpeed = 4.65f;
+                blockRepairPercent = 0.0675f;
+                unitRecentDmgMult = blockRecentDmgMult = 0.1f;
+                unitRecentDmgTime = 60f * 20f;
+                blockRecentDmgTime = 60f * 10f;
 
-                targetUnits = false;
-                targetBuildings = true;
                 autoTarget = false;
                 controllable = true;
                 laserColor = Pal.accent;
@@ -4523,12 +4647,12 @@ public class UnitTypes{
             targetPriority = -2;
             lowAltitude = false;
             mineWalls = true;
-            mineFloor = false;
+            showPlanetDrillable = true;
             mineHardnessScaling = false;
             flying = true;
             mineSpeed = 9f;
             mineTier = 3;
-            buildSpeed = 1.5f;
+            buildSpeed = 1.8f;
             drag = 0.08f;
             speed = 7.5f;
             rotateSpeed = 8f;
@@ -4566,11 +4690,12 @@ public class UnitTypes{
                 shootCone = 40f;
                 mirror = true;
 
-                repairSpeed = 3.6f / 2f;
-                fractionRepairSpeed = 0.03f;
+                blockRepairSpeed = unitRepairSpeed = 6.2f / 2f;
+                blockRepairPercent = 0.075f / 2f;
+                unitRecentDmgMult = blockRecentDmgMult = 0.1f;
+                unitRecentDmgTime = 60f * 20f;
+                blockRecentDmgTime = 60f * 10f;
 
-                targetUnits = false;
-                targetBuildings = true;
                 autoTarget = false;
                 controllable = true;
                 laserColor = Pal.accent;
@@ -4604,6 +4729,7 @@ public class UnitTypes{
             playerControllable = false;
             envDisabled = Environments.none;
             payloadCapacity = 0f;
+            unitCapMultiplier = 1.5f;
 
             lowAltitude = false;
             flying = true;

@@ -56,6 +56,10 @@ public class Predict{
         return intercept(src, dst, 0, 0, v);
     }
 
+    public static Vec2 intercept(Position src, Position dst, boolean useSrcVelocity, float v){
+        return intercept(src, dst, 0, 0, false, v);
+    }
+
     public static Vec2 intercept(Position src, Position dst, BulletType bullet){
         return intercept(src, dst, 0f, 0f, bullet.keepVelocity, bullet.speed);
     }

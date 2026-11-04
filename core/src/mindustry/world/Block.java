@@ -1377,6 +1377,12 @@ public class Block extends UnlockableContent implements LogicSenseable{
                     }
                 }
             }
+        }else if(itemDrop != null && shownPlanets.isEmpty()){ //account for ores
+            for(Planet planet : content.planets()){
+                if(planet.isLandable() && itemDrop.isOnPlanet(planet)){
+                    shownPlanets.add(planet);
+                }
+            }
         }
 
         if(databaseTag == null || databaseTag.isEmpty()){

@@ -55,6 +55,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     transient int frags;
 
     transient Posc stickyTarget;
+    transient Posc arcTarget;
+    transient float arcRemaining, arcRad;
     transient float stickyX, stickyY, stickyRotation, stickyRotationOffset;
 
     @Override
@@ -138,6 +140,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
                 remove();
             }else{
                 collided.add(other.id());
+                arcTarget = null;
             }
 
             type.hitEntity(self(), other, other instanceof Healthc h ? h.health() : 0f);
@@ -152,6 +155,27 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
         stickyTarget = other;
         stickyRotationOffset = rotation;
         stickyRotation = (other instanceof Rotc rot ? rot.rotation() : 0f);
+    }
+
+    public Teamc homingTarget(float homingRange){
+        float realAimX = aimX < 0 ? x : aimX;
+        float realAimY = aimY < 0 ? y : aimY;
+        boolean checkAir = type.collidesAir && type.homingAir, checkGround = type.collidesGround && type.homingGround, checkTiles = type.homingTiles && checkGround;
+
+        //home in on what the unit is aiming at
+        Building aimBuild = aimTile != null ? aimTile.build : null;
+        if(checkTiles && aimBuild != null && aimBuild.team != team && !hasCollided(aimBuild.id)){
+            return aimBuild;
+        }else if(type.heals()){
+            //home in on allies if possible
+            return Units.closestTarget(null, realAimX, realAimY, homingRange, team,
+            e -> e.checkTarget(checkAir, checkGround) && e.team != team && !hasCollided(e.id),
+            t -> checkTiles && (t.team != team || t.damaged()) && !hasCollided(t.id));
+        }else{
+            return Units.closestTarget(team, realAimX, realAimY, homingRange,
+            e -> e != null && e.checkTarget(checkAir, checkGround) && !hasCollided(e.id),
+            t -> t != null && checkTiles && !hasCollided(t.id));
+        }
     }
 
     @Override

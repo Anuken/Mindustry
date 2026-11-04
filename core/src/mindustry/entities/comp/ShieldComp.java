@@ -11,7 +11,7 @@ import mindustry.type.*;
 
 @Component
 abstract class ShieldComp implements Healthc, Posc{
-    @Import float health, hitTime, x, y, healthMultiplier, armorOverride;
+    @Import float health, hitTime, x, y, healthMultiplier, armorOverride, armorMultiplier, lastDamageTime;
     @Import boolean dead;
     @Import Team team;
     @Import UnitType type;
@@ -27,7 +27,7 @@ abstract class ShieldComp implements Healthc, Posc{
     @Override
     public void damage(float amount){
         //apply armor and scaling effects
-        rawDamage(Damage.applyArmor(amount, armorOverride >= 0f ? armorOverride : armor) / healthMultiplier / Vars.state.rules.unitHealth(team));
+        rawDamage(applyArmor(amount));
     }
 
     @Replace
@@ -47,15 +47,23 @@ abstract class ShieldComp implements Healthc, Posc{
     public void damageArmorMult(float amount, float armorMult, boolean withEffect){
         float pre = hitTime;
 
-        rawDamage(Damage.applyArmor(amount, armorOverride >= 0f ? armorOverride * armorMult : armor * armorMult) / healthMultiplier / Vars.state.rules.unitHealth(team));
-
+        rawDamage(applyArmor(amount, armorMult));
         if(!withEffect){
             hitTime = pre;
         }
     }
 
+    protected float applyArmor(float amount){
+        return applyArmor(amount, 1f);
+    }
+
+    protected float applyArmor(float amount, float armorMult){
+        return Damage.applyArmor(amount, (armorOverride >= 0f ? armorOverride : armor) * armorMultiplier * armorMult) / healthMultiplier / Vars.state.rules.unitHealth(team);
+    }
+
     protected void rawDamage(float amount){
         boolean hadShields = shield > 0.0001f;
+        lastDamageTime = Vars.state.time;
 
         if(Float.isNaN(health)) health = 0f;
 

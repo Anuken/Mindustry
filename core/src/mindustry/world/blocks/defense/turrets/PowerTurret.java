@@ -16,7 +16,7 @@ public class PowerTurret extends Turret{
     @Override
     public void setStats(Stats stats){
         super.setStats(stats);
-        stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType)));
+        stats.add(Stat.ammo, StatValues.ammo(ObjectMap.of(this, shootType), this));
     }
 
     public void limitRange(float margin){

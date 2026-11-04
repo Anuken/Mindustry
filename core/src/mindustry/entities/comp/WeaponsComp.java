@@ -1,5 +1,6 @@
 package mindustry.entities.comp;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.annotations.Annotations.*;
@@ -76,6 +77,17 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
         aimY = y;
     }
 
+    public void switchWeaponSet(int index){
+        if(type.weaponSets.size == 0 || index < 0 || index >= type.weaponSets.size) return;
+
+        for(WeaponMount mount : mounts){
+            if(mount.weaponSet == index) continue;
+            mount.targetWeaponSet = index;
+            mount.switching = true;
+            mount.switchProgress = 0f;
+        }
+    }
+
     boolean canShoot(){
         return !disarmed;
     }
@@ -97,7 +109,32 @@ abstract class WeaponsComp implements Teamc, Posc, Rotc, Velc, Statusc{
     /** Update shooting and rotation for this unit. */
     @Override
     public void update(){
+        //allow weapon sets to switch automatically
+        if(type.weaponSets.size > 0 && mounts.length > 0){
+            Teamc target = mounts[0].target;
+            if(target != null){
+                float dst = dst(target);
+                for(int s = 0; s < type.weaponSets.size; s++){
+                    var set = type.weaponSets.get(s);
+                    if(set.size > 0){
+                        var w = set.first();
+                        if((w.minSwitchRange < 0 || dst >= w.minSwitchRange) && (w.maxSwitchRange < 0 || dst <= w.maxSwitchRange) && mounts[0].weaponSet != s && !mounts[0].switching){
+                            switchWeaponSet(s);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         for(WeaponMount mount : mounts){
+            if(mount.switching){
+                mount.switchProgress = Mathf.approachDelta(mount.switchProgress, 1f, 0.05f);
+                if(mount.switchProgress >= 1f){
+                    mount.switching = false;
+                    mount.weaponSet = mount.targetWeaponSet;
+                }
+            }
             mount.weapon.update(self(), mount);
         }
     }

@@ -567,4 +567,9 @@ public class Vars implements Loadable{
             app.post(Fonts::loadExtraFonts);
         }
     }
+
+    /** @return the currently viewed planet in the planet dialog, active planet, or null. */
+    public static Planet getPlanet(){
+        return ui != null && ui.planet.isShown() ? ui.planet.state.planet : state.isGame() ? state.getPlanet() : null;
+    }
 }

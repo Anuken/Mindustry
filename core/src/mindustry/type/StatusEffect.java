@@ -22,10 +22,14 @@ public class StatusEffect extends UnlockableContent{
     public float speedMultiplier = 1f;
     /** Unit reload multiplier. */
     public float reloadMultiplier = 1f;
+    /** Unit and weapon rotate speed multiplier. */
+    public float rotateSpeedMultiplier = 1f;
     /** Unit build speed multiplier. */
     public float buildSpeedMultiplier = 1f;
     /** Unit drag multiplier. */
     public float dragMultiplier = 1f;
+    /** Unit armor multiplier. */
+    public float armorMultiplier = 1f;
     /** Damage dealt upon transition to an affinity. */
     public float transitionDamage = 0f;
     /** Unit weapon(s) disabled. */
@@ -118,6 +122,8 @@ public class StatusEffect extends UnlockableContent{
         if(speedMultiplier != 1) stats.addMultModifier(Stat.speedMultiplier, speedMultiplier);
         if(reloadMultiplier != 1) stats.addMultModifier(Stat.reloadMultiplier, reloadMultiplier);
         if(buildSpeedMultiplier != 1) stats.addMultModifier(Stat.buildSpeedMultiplier, buildSpeedMultiplier);
+        if(rotateSpeedMultiplier != 1) stats.addMultModifier(Stat.rotateSpeedMultiplier, rotateSpeedMultiplier);
+        if(armorMultiplier != 1) stats.addMultModifier(Stat.armorMultiplier, armorMultiplier);
         if(damage > 0) stats.add(Stat.damage, damage * 60f, StatUnit.perSecond);
         if(damage < 0) stats.add(Stat.healing, -damage * 60f, StatUnit.perSecond);
 

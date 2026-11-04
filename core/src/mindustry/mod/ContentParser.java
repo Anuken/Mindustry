@@ -1085,6 +1085,8 @@ public class ContentParser{
             case "mod" -> base.mod(data.getFloat("amount"));
             case "loop" -> base.loop(data.getFloat("time"));
             case "curve" -> data.has("interp") ? base.curve(parser.readValue(Interp.class, data.get("interp"))) : base.curve(data.getFloat("offset"), data.getFloat("duration"));
+            case "pow" -> base.pow(data.getFloat("exponent"));
+            case "pulse" -> base.pulse(data.getFloat("frequency"), data.getFloat("amplitude"), data.getFloat("offset", 0f));
             default -> throw new RuntimeException("Unknown operation '" + op + "', check PartProgress class for a list of methods.");
         };
     }

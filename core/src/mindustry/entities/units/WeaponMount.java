@@ -52,6 +52,14 @@ public class WeaponMount{
     public @Nullable Teamc target;
     /** retarget counter */
     public float retarget = 0f;
+    /** current active weapon index for switchable weapons */
+    public int weaponSet = 0;
+    /** weapon switching transition progress */
+    public float switchProgress = 0f;
+    /** target weapon index when switching */
+    public int targetWeaponSet = 0;
+    /** whether it is currently switching weapon sets */
+    public boolean switching = false;
 
     public WeaponMount(Weapon weapon){
         this.weapon = weapon;

@@ -76,7 +76,7 @@ public class BulletType extends Content implements Cloneable{
     public Effect despawnEffect = Fx.hitBulletSmall;
     /** Effect created when shooting. */
     public Effect shootEffect = Fx.shootSmall;
-    /** Pattern used to shoot this bullet. If null, uses turret's default pattern. */
+    /** Pattern used to shoot this bullet. If null, uses the turret's default pattern. */
     public @Nullable ShootPattern shootPattern = null;
     /** Effect created when charging starts; only usable in single-shot weapons with a firstShotDelay / shotDelay. */
     public Effect chargeEffect = Fx.none;
@@ -98,8 +98,12 @@ public class BulletType extends Content implements Cloneable{
     public float ammoUsed = 1f;
     /** Multiplied by turret reload speed to get final shoot speed. */
     public float reloadMultiplier = 1f;
+    /** Multiplier on turret rotation speed when this bullet is used. */
+    public float rotateSpeedMultiplier = 1f;
     /** Multiplier of how much base damage is done to tiles. */
     public float buildingDamageMultiplier = 1f;
+    /** Multiplier of how much base damage is done to air units. */
+    public float airDamageMultiplier = 1f;
     /** Multiplier of how much base damage is done to force shields. */
     public float shieldDamageMultiplier = 1f;
     /** Recoil from shooter entities. */
@@ -120,8 +124,8 @@ public class BulletType extends Content implements Cloneable{
     public StatusEffect status = StatusEffects.none;
     /** Intensity of applied status effect in terms of duration. */
     public float statusDuration = 60 * 8f;
-    /** Turret only. Function for choosing which unit to target. Overrides turret sorting */
-    public Sortf unitSort = UnitSorts.closest;
+    /** Turret only. Function for choosing which unit to target. Overrides turret sorting. If null, uses the turret's default sorting */
+    public @Nullable Sortf unitSort = null;
     /** Chance for this bullet to apply a status effect */
     public float statusChance = 1f;
     /** Turret only. If false, blocks will not be targeted. */
@@ -322,8 +326,31 @@ public class BulletType extends Content implements Cloneable{
     public float homingRange = 50f;
     /** Use a negative value to disable homing delay. */
     public float homingDelay = -1f;
+    public boolean homingTiles = true, homingAir = true, homingGround = true;
+    /** Radius of the arc trajectory this bullet will follow upon finding a new target. */
+    public float homingArcRadius = -1f;
+    /** Angle of the arc trajectory this bullet will follow upon finding a new target. */
+    public float homingArcAngleMin = 180f, homingArcAngleMax = 180f;
+    /** Multiplier on lifetime added when homing in an arc. */
+    public float homingArcLife = 1f;
+    /** Whether homing position is predictive. */
+    public boolean homingPredict = false;
     /** Speed at which bullet rotates to follow cursor. <= 0 to disable. */
     public float followAimSpeed = 0f;
+
+    /** Maximum half angle at which this bullet will retarget (change angle) towards its next target. Only effective if pierce = true. */
+    public float maxRicochetAngle = -1f;
+    /** Multiplier on bullet speed upon ricocheting. Affects lifetime proportionally. Does not stack. */
+    public float ricochetSpeed = 1f;
+    /** Multiplier on bullet lifetime upon ricocheting. Does not stack. */
+    public float ricochetLife = 1.15f;
+    /** Range for checking targets to ricochet onto. Accounts for remaining bullet range by default. */
+    public float ricochetRange = -1f;
+    /** Whether the ricochet predicts unit movement. */
+    public boolean predictRicochet = true;
+    /** Minimum angle difference for ricochetEffect to show up. */
+    public float ricochetAngleDiff = 5f;
+    public @Nullable Effect ricochetEffect = Fx.ricochetSpark;
 
     /** Range of healing block suppression effect. */
     public float suppressionRange = -1f;
@@ -446,6 +473,11 @@ public class BulletType extends Content implements Cloneable{
         return Math.max(Mathf.zero(drag) ? speed * lifetime : speed * (1f - Mathf.pow(1f - drag, lifetime)) / drag, maxRange);
     }
 
+    /** @return visual {@link #hitSize} */
+    public float clipSize(){
+        return this instanceof BasicBulletType b ? Math.max(hitSize, Math.min(b.width, b.height) - 1) : hitSize;
+    }
+
     /** @return continuous damage in damage/sec, or -1 if not continuous. */
     public float continuousDamage(){
         return -1f;
@@ -482,6 +514,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         handlePierce(b, initialHealth, x, y);
+        if(maxRicochetAngle > 0f) updateRicochet(b);
     }
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
@@ -530,6 +563,7 @@ public class BulletType extends Content implements Cloneable{
         }
 
         handlePierce(b, health, entity.x(), entity.y());
+        if(maxRicochetAngle > 0f) updateRicochet(b);
     }
 
     public void handlePierce(Bullet b, float initialHealth, float x, float y){
@@ -544,7 +578,9 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public float damageMultiplier(Bullet b){
-        if(b.owner instanceof Unit u) return u.damageMultiplier() * state.rules.unitDamage(b.team);
+        if(b.owner instanceof Unit u){
+            return u.damageMultiplier() * state.rules.unitDamage(b.team) * (u.isFlying() ? airDamageMultiplier : 1f);
+        }
         if(b.owner instanceof Building) return state.rules.blockDamage(b.team);
 
         return 1f;
@@ -729,6 +765,7 @@ public class BulletType extends Content implements Cloneable{
     public void update(Bullet b){
         updateTrail(b);
         updateHoming(b);
+        updateFollowAim(b);
         updateWeaving(b);
         updateTrailEffects(b);
         updateBulletInterval(b);
@@ -744,34 +781,90 @@ public class BulletType extends Content implements Cloneable{
     }
 
     public void updateHoming(Bullet b){
-        if(homingPower > 0.0001f && b.time >= homingDelay){
-            float realAimX = b.aimX < 0 ? b.x : b.aimX;
-            float realAimY = b.aimY < 0 ? b.y : b.aimY;
+        if(b.time < homingDelay) return;
 
-            Teamc target;
-
-            //home in on what the unit is aiming at
-            if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
-                target = b.aimTile.build;
-            }else if(heals()){
-                //home in on allies if possible
-                target = Units.closestTarget(null, realAimX, realAimY, homingRange, b.team,
-                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
-                    t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id));
-            }else{
-                target = Units.closestTarget(b.team, realAimX, realAimY, homingRange,
-                    e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
-                    t -> t != null && collidesGround && !b.hasCollided(t.id));
+        float hPower = homingPower * Time.delta * 50f;
+        if(homingArcRadius > 0){
+            if(b.arcTarget == null){
+                b.arcRemaining = b.arcRad = 0;
+                b.arcTarget = b.homingTarget(homingArcRadius * 2f + b.vel.len());
             }
+            if(b.arcTarget != null){
+                //prediction fails when a target is right next to the bullet
+                Vec2 predict = Predict.intercept(b, b.arcTarget, b.dst(b.arcTarget) > homingArcRadius + 8f, b.vel.len());
+                b.aimX = predict.x;
+                b.aimY = predict.y;
 
+                int side = Mathf.signs[b.id & 1];
+                float arcAngle = Mathf.randomSeed(b.id, homingArcAngleMin, homingArcAngleMax);
+
+                //start arching
+                if(b.arcRemaining == 0 && b.within(predict.x, predict.y, homingArcRadius * (arcAngle > 180f ? 1f : 1f - Mathf.cosDeg(arcAngle)))){
+                    float targetDst = b.dst(predict.x, predict.y);
+                    b.arcRemaining = arcAngle;
+                    b.arcRad = Mathf.clamp(homingArcRadius, 0.001f, targetDst - 8f); //cap distance when up close
+
+                    //extend lifetime
+                    if(b.vel.len() > 0.001f) b.lifetime += homingArcLife * Math.max(0f, b.arcRad * arcAngle * Mathf.degRad - targetDst) / b.vel.len();
+                    b.vel.setAngle(b.angleTo(predict.x, predict.y) - side * 90f + side * b.vel.len() * Time.delta / b.arcRad * Mathf.radDeg / 2f);
+                }
+
+                if(b.arcRemaining > 0){
+                    float step = Math.min(b.vel.len() * Time.delta / b.arcRad * Mathf.radDeg, b.arcRemaining);
+                    b.vel.rotate(side * step);
+
+                    if((b.arcRemaining -= step) <= 0f){ //instant rotation
+                        b.arcRemaining = -1f;
+                        float angle = Angles.angle(b.x, b.y, predict.x, predict.y);
+                        b.rotation(angle);
+                        b.vel.setAngle(angle);
+                    }
+                }else{
+                    b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(homingPredict ? predict : b.arcTarget), hPower));
+                }
+            }
+        }else if(homingPower > 0.0001f){
+            Teamc target = b.homingTarget(homingRange);
             if(target != null){
-                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), homingPower * Time.delta * 50f));
+                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(homingPredict ? Predict.intercept(b, target, speed) : target), hPower));
             }
         }
+    }
 
+    public void updateFollowAim(Bullet b){
         if(followAimSpeed > 0f && b.shooter instanceof Unit u){
             float angle = b.angleTo(u.aimX, u.aimY);
             b.vel.setAngle(Angles.moveToward(b.vel.angle(), angle, followAimSpeed * Time.delta));
+        }
+    }
+
+    public void updateRicochet(Bullet b){
+        Teamc target = Units.closestTarget(b.team, b.x, b.y, ricochetRange > 0f ? ricochetRange : (1f - (b.time / b.lifetime)) * range + 16f,
+            e -> !b.hasCollided(e.id()) && Angles.within(b.rotation(), Angles.angle(b.x, b.y, e.x, e.y), maxRicochetAngle),
+            t -> !b.hasCollided(t.id) && Angles.within(b.rotation(), Angles.angle(b.x, b.y, t.x, t.y), maxRicochetAngle));
+
+        if(target != null){
+            float tx = target.x(), ty = target.y();
+
+            if(predictRicochet && speed >= 0.01f){
+                Vec2 predict = Predict.intercept(b, target, false, speed * ricochetSpeed);
+                if(Angles.within(b.rotation(), Angles.angle(b.x, b.y, predict.x, predict.y), maxRicochetAngle)){
+                    tx = predict.x;
+                    ty = predict.y;
+                }
+            }
+
+            float newAngle = Angles.angle(b.x, b.y, tx, ty);
+            if(!Angles.near(newAngle, b.rotation(), ricochetAngleDiff)) ricochetEffect.at(b.x, b.y, b.rotation(), hitColor);
+            b.rotation(newAngle);
+            b.vel.setAngle(newAngle);
+
+            if(b.collided.size == 1){
+                float len = b.vel.len();
+                b.vel.scl(ricochetSpeed);
+                float newLen = b.vel.len();
+                if(newLen > 0f) b.lifetime = b.time + (b.lifetime - b.time) * ricochetLife * Math.min(1f, len / newLen);
+            }
         }
     }
 

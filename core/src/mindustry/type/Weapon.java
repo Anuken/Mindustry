@@ -67,10 +67,14 @@ public class Weapon implements Cloneable{
     public boolean predictTarget = true;
     /** if true, this weapon is used for attack range calculations */
     public boolean useAttackRange = true;
+    /** Target distance required for this weapon set to be active. */
+    public float minSwitchRange = -1f, maxSwitchRange = -1f;
     /** ticks to wait in-between targets */
     public float targetInterval = 40f, targetSwitchInterval = 70f;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
     public float rotateSpeed = 20f;
+    /** whether to add additional rotation speed to this weapon while its unit is rotating */
+    public boolean rotateSpeedMoveAdd = false;
     /** weapon reload in frames */
     public float reload = 1;
     /** inaccuracy of degrees of each shot */
@@ -236,7 +240,7 @@ public class Weapon implements Cloneable{
         }
 
         if(parts.size > 0){
-            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, wx, wy, weaponRotation + 90);
+            DrawPart.params.set(mount.warmup, mount.reload / reload, mount.smoothReload, mount.heat, mount.recoil, mount.charge, wx, wy, weaponRotation + 90).setUnit(unit);
             DrawPart.params.sideMultiplier = flipSprite ? -1 : 1;
 
             for(int i = 0; i < parts.size; i++){
@@ -358,10 +362,13 @@ public class Weapon implements Cloneable{
             axisY = unit.y + Angles.trnsy(unit.rotation - 90,  x, y);
 
             mount.targetRotation = Angles.angle(axisX, axisY, mount.aimX, mount.aimY) - unit.rotation;
-            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, rotateSpeed * Time.delta);
+
+            mount.rotation = Angles.moveToward(mount.rotation, mount.targetRotation, unit.rotateSpeedMultiplier * Time.delta * (rotateSpeed +
+            (rotateSpeedMoveAdd && unit.lastRotation >= 0 && !Mathf.equal(unit.lastRotation, unit.rotation, 0.01f) ? Angles.angleDist(unit.rotation, unit.lastRotation) / 60f : 0f)));
+
             if(rotationLimit < 360){
                 float dst = Angles.angleDist(mount.rotation, baseRotation);
-                if(dst > rotationLimit/2f){
+                if(dst > rotationLimit / 2f){
                     mount.rotation = Angles.moveToward(mount.rotation, baseRotation, dst - rotationLimit/2f);
                 }
             }

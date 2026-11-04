@@ -166,6 +166,7 @@ public class RegionPart extends DrawPart{
                 childParam.set(params.warmup, params.reload, params.smoothReload, params.heat, params.recoil, params.charge, params.x + Tmp.v1.x, params.y + Tmp.v1.y, mr * sign + params.rotation);
                 childParam.sideMultiplier = params.sideMultiplier;
                 childParam.life = params.life;
+                childParam.unit = params.unit;
                 childParam.sideOverride = i;
                 for(var child : children){
                     child.draw(childParam);

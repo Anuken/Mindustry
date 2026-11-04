@@ -3,7 +3,9 @@ package mindustry.entities.part;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.*;
+import arc.util.*;
 import mindustry.*;
+import mindustry.gen.*;
 
 public abstract class DrawPart{
     public static final PartParams params = new PartParams();
@@ -27,6 +29,8 @@ public abstract class DrawPart{
         public float warmup, reload, smoothReload, heat, recoil, life, charge;
         public float x, y, rotation;
         public int sideOverride = -1, sideMultiplier = 1;
+        /** The unit this part is currently being drawn for. Null for everything else. */
+        public @Nullable Unit unit;
 
         public PartParams set(float warmup, float reload, float smoothReload, float heat, float recoil, float charge, float x, float y, float rotation){
             this.warmup = warmup;
@@ -41,6 +45,13 @@ public abstract class DrawPart{
             this.sideOverride = -1;
             this.life = 0f;
             this.sideMultiplier = 1;
+            this.unit = null;
+            return this;
+        }
+
+        public PartParams setUnit(@Nullable Unit unit){
+            this.unit = unit;
+            this.life = unit instanceof Scaled scaled ? scaled.fin() : 0f;
             return this;
         }
 
@@ -86,6 +97,12 @@ public abstract class DrawPart{
         heat = p -> p.heat,
         /** Lifetime fraction, 0 to 1. Only for missiles. */
         life = p -> p.life,
+        /** Unit health fraction, 0 to 1. */
+        health = p -> p.unit == null || p.unit.maxHealth <= 0f ? 0f : p.unit.health / p.unit.maxHealth,
+        /** Fraction of health the unit is missing, 0 to 1. */
+        damage = p -> p.unit == null || p.unit.maxHealth <= 0f ? 0f : 1f - p.unit.health / p.unit.maxHealth,
+        /** Unit speed. */
+        speed = p -> p.unit == null ? 0f : p.unit.vel().len(),
         /** Current unscaled value of Vars.state.time. */
         time = p -> Vars.state.time;
 
@@ -186,6 +203,14 @@ public abstract class DrawPart{
         default PartProgress curve(Interp interp){
             return CompatFix.curve(this, interp);
         }
+
+        default PartProgress pow(float exponent){
+            return CompatFix.pow(this, exponent);
+        }
+
+        default PartProgress pulse(float frequency, float amplitude, float offset){
+            return CompatFix.pulse(this, frequency, amplitude, offset);
+        }
     }
 
     public interface PartFunc{
@@ -266,6 +291,13 @@ public abstract class DrawPart{
             return p -> self.get(p) + Mathf.absin(Vars.state.time, scl, mag);
         }
 
+        static PartProgress pulse(PartProgress self, float frequency, float amplitude, float offset){
+            return p -> {
+                float value = self.get(p);
+                return value <= 0.001f ? 0f : Mathf.absin(Vars.state.time, frequency / value, value * amplitude + offset);
+            };
+        }
+
         static PartProgress mod(PartProgress self, float amount){
             return p -> Mathf.mod(self.get(p), amount);
         }
@@ -280,6 +312,10 @@ public abstract class DrawPart{
 
         static PartProgress curve(PartProgress self, Interp interp){
             return p -> interp.apply(self.get(p));
+        }
+
+        static PartProgress pow(PartProgress self, float exponent){
+            return p -> Mathf.pow(self.get(p), exponent);
         }
     }
 }
