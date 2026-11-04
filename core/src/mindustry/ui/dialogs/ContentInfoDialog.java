@@ -7,7 +7,9 @@ import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.content.TechTree.*;
 import mindustry.core.*;
+import mindustry.game.conditions.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.input.*;
@@ -99,6 +101,40 @@ public class ContentInfoDialog extends BaseDialog{
             }
         }
 
+        TechNode node = content.techNode;
+        if(node != null){
+            SectorPreset found = node.content instanceof SectorPreset preset ? preset : node.objectives
+                .map(cond -> cond instanceof SectorComplete c ? c.preset : cond instanceof OnSector s ? s.preset : null)
+                .find(p -> p != null);
+            if(found == null){
+                TechNode curr = node.parent;
+                while(curr != null){
+                    if(curr.content instanceof SectorPreset preset){
+                        found = preset;
+                        break;
+                    }
+                    curr = curr.parent;
+                }
+            }
+            SectorPreset sector = found;
+            boolean sectorEntry = sector != null && sector != content, nodeEntry = node.parent != null && node.parent.content != content;
+
+            if(sectorEntry || nodeEntry){
+                table.left().add("@techtree").color(Pal.accent).fillX().padTop(10).row();
+                table.table(tech -> {
+                    tech.left();
+                    if(sectorEntry){
+                        techEntry(tech, "techtree.sector", sector);
+                        tech.row();
+                    }
+                    if(nodeEntry){
+                        techEntry(tech, "techtree.previous", node.parent.content);
+                    }
+                }).fillX().padLeft(10);
+                table.row();
+            }
+        }
+
         if(content.details != null){
             table.add("[gray]" + (content.unlocked() || !content.hideDetails ? UI.formatIcons(content.details) : Iconc.lock + " " + Core.bundle.get("unlock.incampaign"))).pad(6).padTop(20).width(400f).wrap().fillX();
             table.row();
@@ -134,4 +170,12 @@ public class ContentInfoDialog extends BaseDialog{
         }
     }
 
+    private void techEntry(Table table, String label, UnlockableContent content){
+        table.table(t -> {
+            t.left();
+            t.add("[lightgray]" + Core.bundle.get(label) + ":").padRight(4f);
+            t.image(content.uiIcon).size(iconMed).scaling(Scaling.fit).padRight(4f).with(i -> StatValues.withTooltip(i, content, true));
+            t.add("[white]" + content.localizedName).left().padRight(12f);
+        }).left().padLeft(10f);
+    }
 }
