@@ -78,6 +78,13 @@ public abstract class Batch implements Disposable{
     public void dispose(){
     }
 
+    protected int mark(){
+        return 0;
+    }
+
+    protected void fade(int mark, float alpha){
+    }
+
     public boolean hasPending(){
         return idx > 0;
     }

@@ -26,6 +26,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.input.*;
 import mindustry.logic.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -1689,6 +1690,10 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         float scl = xscl;
         if(unit.inFogTo(Vars.player.team())) return;
 
+        float drawAlpha = InputHandler.unitAnchorOpacity(unit);
+        if(drawAlpha <= 0.001f) return;
+
+        int mark = Draw.mark();
         boolean isPayload = !unit.isAdded();
 
         if(buildSpeed > 0f && !isPayload){
@@ -1806,6 +1811,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         }
 
         Draw.reset();
+        Draw.fade(mark, drawAlpha);
     }
 
     //...where do I put this

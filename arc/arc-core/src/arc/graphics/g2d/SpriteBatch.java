@@ -145,6 +145,22 @@ public class SpriteBatch extends Batch{
     }
 
     @Override
+    protected int mark(){
+        return requestVertOffset;
+    }
+
+    @Override
+    protected void fade(int mark, float alpha){
+        if(!sort || flushing || alpha >= 1f) return;
+
+        for(int i = mark + 5; i < requestVertOffset; i += vertexSize){ //5 for color/alpha offset
+            int abgr = Color.floatToIntColor(requestVerts[i]);
+            int a = (int)((abgr >>> 24) * Mathf.clamp(alpha));
+            requestVerts[i] = Color.intToFloatColor((abgr & 0x00ffffff) | (a << 24));
+        }
+    }
+
+    @Override
     protected void setSort(boolean sort){
         if(this.sort != sort){
             flush();

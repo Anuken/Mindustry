@@ -67,6 +67,16 @@ public class Draw{
         Core.batch = prev;
     }
 
+    /** Marks the current position in the sorted draw buffer. */
+    public static int mark(){
+        return batch.mark();
+    }
+
+    /** Multiplies the opacity of everything since {@link #mark}. */
+    public static void fade(int mark, float alpha){
+        batch.fade(mark, alpha);
+    }
+
     public static void stencil(Runnable stencil, Runnable contents){
         beginStencil();
 
@@ -240,8 +250,7 @@ public class Draw{
     }
 
     public static void color(float r, float g, float b){
-        Core.batch.setPackedColor(Color.toFloatBits(r, g, b, 1f));
-    }
+        Core.batch.setPackedColor(Color.toFloatBits(r, g, b, 1f));    }
 
     public static void color(float r, float g, float b, float a){
         Core.batch.setPackedColor(Color.toFloatBits(r, g, b, Mathf.clamp(a)));
