@@ -94,7 +94,7 @@ public class RegenProjector extends Block{
         super.setStats(stats);
 
         stats.add(Stat.repairTime, (int)(1f / (healPercent / 100f) / 60f), StatUnit.seconds);
-        stats.add(Stat.range, range, StatUnit.blocks);
+        stats.add(Stat.range, Strings.autoFixed(range / 2f, 1), StatUnit.blocks);
 
         if(findConsumer(c -> c instanceof ConsumeItems) instanceof ConsumeItems cons){
             stats.remove(Stat.booster);
