@@ -507,6 +507,12 @@ public class LCanvas extends Table{
             add(t).pad(4).padTop(2).left().grow();
 
             marginBottom(7);
+
+            //wrap tables guess their height before knowing their width, which makes new statements render oversized for a frame; lay the content out at its final width up front
+            if(st.useWrapping()){
+                t.setSize(Scl.scl(targetWidth - 8f), 0f);
+                t.validate();
+            }
         }
 
         public void updateAddress(int index){
