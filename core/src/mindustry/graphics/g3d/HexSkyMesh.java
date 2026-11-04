@@ -44,22 +44,36 @@ public class HexSkyMesh extends PlanetMesh{
 
     @Override
     public void render(PlanetParams params, Mat3D projection, Mat3D transform){
-        //don't waste performance rendering 0-alpha clouds
-        if(params.planet == planet && Mathf.zero(1f - params.uiAlpha, 0.01f)) return;
+        if(params.spaceCamera != null){
+            //spaceCamera cloud switch
+            if(!params.spaceCamera.clouds(planet)) return;
+        }else if(params.planet == planet && Mathf.zero(1f - params.uiAlpha, 0.01f)){
+            //don't waste performance rendering 0-alpha clouds
+            return;
+        }
 
-        preRender(params);
+        float rotation = cloudRotation(params);
+        preRender(params, rotation);
         shader.bind();
         shader.setUniformMatrix4("u_proj", projection.val);
-        shader.setUniformMatrix4("u_trans", mat.setToTranslation(planet.position).rotate(Vec3.Y, planet.getRotation() + relRot()).val);
+        shader.setUniformMatrix4("u_trans", mat.setToTranslation(planet.position).rotate(Vec3.Y, planet.getRotation() + rotation).val);
         shader.apply();
         mesh.render(shader, Gl.triangles);
     }
 
     @Override
     public void preRender(PlanetParams params){
+        preRender(params, relRot());
+    }
+
+    private void preRender(PlanetParams params, float rotation){
         Shaders.clouds.planet = planet;
-        Shaders.clouds.lightDir.set(planet.solarSystem.position).sub(planet.position).rotate(Vec3.Y, planet.getRotation() + relRot()).nor();
+        Shaders.clouds.lightDir.set(planet.solarSystem.position).sub(planet.position).rotate(Vec3.Y, planet.getRotation() + rotation).nor();
         Shaders.clouds.ambientColor.set(planet.solarSystem.lightColor);
-        Shaders.clouds.alpha = params.planet == planet ? 1f - params.uiAlpha : 1f;
+        Shaders.clouds.alpha = params.spaceCamera != null ? 1f : (params.planet == planet ? 1f - params.uiAlpha : 1f);
+    }
+
+    private float cloudRotation(PlanetParams params){
+        return params.spaceCamera == null ? relRot() : params.spaceCamera.cloudTime(planet) * speed / 40f;
     }
 }

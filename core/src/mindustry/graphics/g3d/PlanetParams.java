@@ -23,6 +23,14 @@ public class PlanetParams{
 
     /** Zoom relative to planet. */
     public float zoom = 1f;
+    /** If true, the camera uses freeCamPos/freeCamYaw/freeCamPitch instead of orbiting the planet. */
+    public boolean freeCamera = false;
+    /** Free-camera position, in scene units. */
+    public Vec3 freeCamPos = new Vec3(0f, 0f, 4f);
+    /** Free-camera yaw/pitch, in radians. */
+    public float freeCamYaw, freeCamPitch;
+    /** Optional saved camera, used for per-planet orbit/rotation overrides. */
+    public @Nullable transient SpaceCamera spaceCamera;
     /** Alpha of orbit rings and other UI elements. */
     public float uiAlpha = 1f;
     /** If false, orbit and sector grid are not drawn. */
