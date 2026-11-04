@@ -652,6 +652,7 @@ public class UnitTypes{
                     sideAngle = 15f;
                     sideWidth = 0f;
                     sideLength = 0f;
+                    lengthOffset = -65f;
                     colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                 }};
             }});
