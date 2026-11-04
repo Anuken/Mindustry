@@ -22,6 +22,7 @@ import mindustry.net.*;
 import mindustry.net.Packets.*;
 import mindustry.type.*;
 import mindustry.world.*;
+import mindustry.world.blocks.defense.AutoDoor.*;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.storage.*;
 import org.junit.jupiter.api.*;
@@ -998,5 +999,59 @@ public class ApplicationTests{
 
         tile.build.handleStack(item, 1, unit);
         assertEquals(capacity, tile.build.items.get(item));
+    }
+
+    @Test
+    void autoDoorDoesNotCloseOnEnemy(){
+        world.loadMap(testMap);
+        state.set(State.playing);
+        state.rules.limitMapArea = false;
+        //other tests can leave the time saturated, which would stop door timers from ever firing
+        Time.setInternalTime(0d);
+        Time.delta = 1f;
+
+        //find an open area so units aren't pushed around by static walls
+        Tile tile = null;
+        for(int x = 6; x < world.width() - 6 && tile == null; x++){
+            for(int y = 6; y < world.height() - 6 && tile == null; y++){
+                boolean open = true;
+                for(int dx = -5; dx <= 5 && open; dx++){
+                    for(int dy = -5; dy <= 5 && open; dy++){
+                        Tile other = world.tile(x + dx, y + dy);
+                        open = other != null && !other.solid() && !other.floor().isLiquid && !other.floor().isDeep();
+                    }
+                }
+                if(open) tile = world.tile(x, y);
+            }
+        }
+        assertNotNull(tile, "No open area found on the test map.");
+        tile.setBlock(Blocks.blastDoor, Team.sharded, 0);
+        AutoDoorBuild door = (AutoDoorBuild)tile.build;
+
+        Unit ally = UnitTypes.dagger.spawn(Team.sharded, door.x - 12f, door.y);
+        Unit enemy = UnitTypes.dagger.spawn(Team.crux, door.x, door.y);
+
+        stepAutoDoor(door, 30);
+        assertTrue(door.open, "Door must open when a ground unit of its team is nearby.");
+
+        ally.remove();
+        stepAutoDoor(door, 30);
+        assertTrue(door.open, "Door must stay open while an enemy is inside it.");
+        assertFalse(enemy.dead(), "Enemy inside the door must not be killed by it closing.");
+
+        enemy.set(door.x + 40f, door.y);
+        stepAutoDoor(door, 30);
+        assertFalse(door.open, "Door must close once nothing is inside it.");
+    }
+
+    void stepAutoDoor(AutoDoorBuild door, int ticks){
+        for(int i = 0; i < ticks; i++){
+            Time.update();
+            Groups.unit.updatePhysics();
+            state.teams.updateTeamStats();
+            door.update();
+        }
+        //units die here if they are inside a solid tile
+        Groups.unit.update();
     }
 }
