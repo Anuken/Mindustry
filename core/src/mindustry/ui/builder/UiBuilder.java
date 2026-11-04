@@ -44,6 +44,7 @@ public class UiBuilder{
 
         public T id(String id){ return prop(UiKey.id, id); }
         public T condition(String cond){ return prop(UiKey.condition, cond); }
+        public T tooltip(String text){ return prop(UiKey.tooltip, text); }
         public T grow(){ return prop(UiKey.grow, true); }
         public T growX(){ return prop(UiKey.growX, true); }
         public T growY(){ return prop(UiKey.growY, true); }

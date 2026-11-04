@@ -15,6 +15,7 @@ import arc.scene.ui.ScrollPane.*;
 import arc.scene.ui.Slider.*;
 import arc.scene.ui.TextButton.*;
 import arc.scene.ui.TextField.*;
+import arc.scene.ui.Tooltip.*;
 import arc.scene.ui.layout.*;
 import arc.scene.utils.*;
 import arc.struct.*;
@@ -76,7 +77,7 @@ public class UiTreeBuilder{
 
     /** Constructs the element for one node, adds it to the parent table, and returns its cell. */
     private static Element addNode(UiKey type, NodeBuilder<?> node, BuildContext ctx){
-        return switch(type){
+        Element result = switch(type){
             case table -> {
                 String bg = node.str(UiKey.background);
                 Table t = node.bool(UiKey.wrap) ? new WrapTable() : new Table();
@@ -222,6 +223,12 @@ public class UiTreeBuilder{
             }
             default -> null;
         };
+        String text = node.str(UiKey.tooltip);
+        if(result != null && text != null){
+            result.touchable = Touchable.enabled;
+            result.addListener(Tooltips.getInstance().create(text, true));
+        }
+        return result;
     }
 
     /** Looks up a style by the node's "style" value (if set) and applies it via the given setter; no-op if absent/unknown. */
