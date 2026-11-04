@@ -111,7 +111,7 @@ public class ModsDialog extends BaseDialog{
                     modToListing.put(mod, entry);
                     var release = entry.getMatchingRelease();
                     //Only compare to the release that fits the current version the client is using, if one exists; don't look for updates that don't match the version
-                    if(Strings.checkNewerSemver(entry.version, release == null ? mod.meta.version : release.version)){
+                    if(Strings.checkNewerSemver(release == null ? entry.version : release.version, mod.meta.version)){
                         withUpdates.add(mod);
                     }
                 }
