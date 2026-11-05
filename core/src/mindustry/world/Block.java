@@ -159,6 +159,8 @@ public class Block extends UnlockableContent implements LogicSenseable{
     public boolean requiresWater = false;
     /** whether this block can be placed on any liquids, anywhere */
     public boolean placeableLiquid = false;
+    /** whether this block can be placed on ground (non-liquid floors) */
+    public boolean placeableGround = true;
     /** whether this block can be placed directly by the player via PlacementFragment */
     public boolean placeablePlayer = true;
     /** whether this floor can be placed on. */

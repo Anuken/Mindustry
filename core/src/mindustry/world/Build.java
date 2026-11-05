@@ -253,6 +253,7 @@ public class Build{
                 check == null || //nothing there
                 (type.size == 2 && state.world.getDarkness(wx, wy) >= 3) ||
                 (state.rules.staticFog && state.rules.fog && !state.fog.isDiscovered(team, wx, wy)) ||
+                (!check.floor().isLiquid && !type.placeableGround) || //not placeable on ground
                 (check.floor().isDeep() && !type.floating && !type.requiresWater && !type.placeableLiquid) || //deep water
                 (!state.rules.derelictRepair && check.team() == Team.derelict && check.build != null) ||
                 (type == check.block() && check.build != null && rotation == check.build.rotation && type.rotate && !((type == check.block && team != Team.derelict && check.team() == Team.derelict))) || //same block, same rotation
