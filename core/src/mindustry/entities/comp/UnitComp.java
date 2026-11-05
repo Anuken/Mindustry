@@ -532,7 +532,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     }
 
     public int cap(){
-        return Units.getCap(team);
+        return Units.getCap(team, type.unitCapMultiplier);
     }
 
     public void setType(UnitType type){

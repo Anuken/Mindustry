@@ -110,6 +110,8 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
     researchCostMultiplier = 50,
     /** multiplier for knockback this unit receives */
     knockbackMultiplier = 1f,
+    /** multiplier for this unit's unit cap */
+    unitCapMultiplier = 1f,
 
     /** for ground units, the layer upon which this unit is drawn */
     groundLayer = Layer.groundUnit,
@@ -870,6 +872,10 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
         if(immunities.size > 0){
             stats.add(Stat.immunities, StatValues.statusEffects(immunities.toSeq().sort()));
+        }
+
+        if(unitCapMultiplier != 1){
+            stats.add(Stat.unitCapMultiplier, Strings.autoFixed(unitCapMultiplier, 4) + "x");
         }
     }
 
