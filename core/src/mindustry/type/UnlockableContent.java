@@ -143,6 +143,7 @@ public abstract class UnlockableContent extends MappableContent{
     public Stats computeStats(){
         var stats = new Stats();
         setStats(stats);
+        Events.fire(new ContentStatsEvent(this, stats));
         return stats;
     }
 

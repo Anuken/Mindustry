@@ -14,6 +14,7 @@ import mindustry.ui.builder.*;
 import mindustry.world.*;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.storage.CoreBlock.*;
+import mindustry.world.meta.*;
 
 public class EventType{
 
@@ -83,6 +84,19 @@ public class EventType{
     public static class LineConfirmEvent{}
     /** Called when the player opens info for a specific block.*/
     public static class BlockInfoEvent{}
+    /**
+     * Called after a content's stats have been computed for display, but before they are shown.
+     * Use this to add custom stats to any content type without overriding {@code setStats()}.
+     */
+    public static class ContentStatsEvent{
+        public final UnlockableContent content;
+        public final Stats stats;
+
+        public ContentStatsEvent(UnlockableContent content, Stats stats){
+            this.content = content;
+            this.stats = stats;
+        }
+    }
     /** Called *after* all content has been initialized. */
     public static class ContentInitEvent{}
     /** Called *after* all content has been added to the atlas, but before its pixmaps are disposed. */
