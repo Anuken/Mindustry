@@ -113,6 +113,7 @@ public class DesktopLauncher extends ClientLauncher{
                                     });
                                 });
                             }
+                            case "noVsync" -> vSyncEnabled = false;
                         }
                     }
                 }
