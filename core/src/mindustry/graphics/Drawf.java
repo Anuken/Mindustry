@@ -613,4 +613,24 @@ public class Drawf{
         Draw.rect(region, x, y, r - 90f);
         Draw.alpha(a);
     }
+
+    /** Draws text according to buildings */
+    public static void planEfficiency(Block t, short tileX, short tileY, Color color, String text){
+        if(renderer.pixelator.enabled()) return;
+
+        Font font = Fonts.outline;
+        boolean ints = font.usesIntegerPositions();
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(1f / 4f / 1.5f / Scl.scl(1f));
+
+        font.setColor(color);
+        float drawX = (tileX - t.size / 2f) * tilesize + t.offset + t.size;
+        float drawY = (tileY - t.size / 2f) * tilesize + t.offset + t.size + font.getData().capHeight;
+        font.draw(text, drawX, drawY, Align.left);
+
+        font.setUseIntegerPositions(ints);
+        font.setColor(Color.white);
+        font.getData().setScale(1f);
+        Draw.reset();
+    }
 }
