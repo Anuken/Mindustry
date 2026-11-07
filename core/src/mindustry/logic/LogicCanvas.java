@@ -19,6 +19,8 @@ import mindustry.graphics.*;
 import mindustry.logic.statements.*;
 import mindustry.ui.*;
 
+import static mindustry.Vars.*;
+
 public class LogicCanvas extends Table{
     private static final Seq<JumpCurve> tmpOccupiers1 = new Seq<>();
     private static final Seq<JumpCurve> tmpOccupiers2 = new Seq<>();
@@ -441,11 +443,23 @@ public class LogicCanvas extends Table{
                 addressLabel = t.add(index + "").style(Styles.outlineLabel).color(color).padRight(8).get();
 
                 //taken from foo's client
-                t.button(Icon.add, Styles.logici, () -> Vars.ui.logic.showAddDialog(index + 1))
+                t.button(Icon.add, Styles.logici, () -> ui.logic.showAddDialog(index + 1))
                 .disabled(b -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions).size(24f).padRight(6);
+                tooltip(t.getCells().peek(), "logic.addhere");
 
                 t.button(Icon.copy, Styles.logici, () -> {
                 }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions).get().tapped(this::copy);
+
+                //taken from foo's client (again)
+                t.button(Icon.paste, Styles.logici, () -> {
+                }).size(24f).padRight(6).disabled(i -> canvas.statements.getChildren().size >= LogicExecutor.maxInstructions).get().tapped(() -> {
+                    try{
+                        this.paste(LogicAssembler.read(Core.app.getClipboardText().replace("\r\n", "\n"), privileged));
+                    }catch(Throwable e){
+                        ui.showException(e);
+                    }
+                });
+                tooltip(t.getCells().peek(), "logic.pastehere");
 
                 t.button(Icon.cancel, Styles.logici, () -> {
                     remove();
@@ -533,6 +547,23 @@ public class LogicCanvas extends Table{
                 copy.setupUI();
                 statements.updateJumpHeights = true;
             }
+        }
+
+        public void paste(Seq<LogicStatement> states){
+            var idx = statements.getChildren().indexOf(this) + 1;
+            var maxAdd = LogicExecutor.maxInstructions - statements.getChildren().size;
+            Seq<LogicStatement> pasted = states.copy();
+            if(pasted.size > maxAdd) ui.announce(Core.bundle.format("logic.pastelimit", maxAdd, pasted.size), 5);
+            pasted.truncate(maxAdd);
+            pasted.reverse();
+
+            for(var state : pasted){
+                if(state instanceof JumpStatement jump && jump.destIndex != -1) jump.destIndex += idx;
+                addAt(idx, state);
+            }
+            for(var state : pasted) state.setupUI();
+            statements.layout();
+            statements.setJumpHeights();
         }
 
         @Override
