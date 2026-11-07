@@ -9,6 +9,7 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.content.*;
 import mindustry.content.TechTree.*;
@@ -82,6 +83,9 @@ public abstract class UnlockableContent extends MappableContent{
     /** Unlock state. Loaded from settings. Do not modify outside the constructor. */
     @NoPatch
     protected boolean unlocked;
+    /** Pending planets to be resolved in init() for {@link #shownPlanets}. */
+    @NoPatch
+    protected Seq<Prov<Planet>> pendingPlanets = new Seq<>();
 
     public UnlockableContent(String name){
         super(name);
@@ -91,6 +95,19 @@ public abstract class UnlockableContent extends MappableContent{
         this.details = Core.bundle.getOrNull(getContentType() + "." + this.name + ".details");
         this.credit = Core.bundle.getOrNull(getContentType() + "." + this.name + ".credit");
         this.unlocked = Core.settings != null && Core.settings.getBool(this.name + "-unlocked", false);
+    }
+
+    @Override
+    public void init(){
+        super.init();
+
+        for(var p : pendingPlanets){
+            Planet planet = p.get();
+            if(planet != null){
+                shownPlanets.add(planet);
+            }
+        }
+        pendingPlanets.clear();
     }
 
     @Override
@@ -106,12 +123,12 @@ public abstract class UnlockableContent extends MappableContent{
     @Override
     public void loadIcon(){
         fullIcon =
-            Core.atlas.find(fullOverride == null ? "" : fullOverride,
-            Core.atlas.find(getContentType().name() + "-" + name + "-full",
-            Core.atlas.find(name + "-full",
-            Core.atlas.find(name,
-            Core.atlas.find(getContentType().name() + "-" + name,
-            Core.atlas.find(name + "1"))))));
+        Core.atlas.find(fullOverride == null ? "" : fullOverride,
+        Core.atlas.find(getContentType().name() + "-" + name + "-full",
+        Core.atlas.find(name + "-full",
+        Core.atlas.find(name,
+        Core.atlas.find(getContentType().name() + "-" + name,
+        Core.atlas.find(name + "1"))))));
 
         uiIcon = Core.atlas.find(getContentType().name() + "-" + name + "-ui", fullIcon);
     }
@@ -127,6 +144,11 @@ public abstract class UnlockableContent extends MappableContent{
 
     public boolean isOnPlanet(@Nullable Planet planet){
         return planet == null || planet == Planets.sun || shownPlanets.isEmpty() || shownPlanets.contains(planet);
+    }
+
+    @SafeVarargs
+    public final void showOn(Prov<Planet>... planets){
+        for(var planet : planets) pendingPlanets.add(planet);
     }
 
     public int getLogicId(){
@@ -276,8 +298,8 @@ public abstract class UnlockableContent extends MappableContent{
     /** @return in multiplayer, whether this is unlocked for the host player, otherwise, whether it is unlocked for the local player (same as unlocked()) */
     public boolean unlockedHost(){
         return net != null && net.client() ?
-            alwaysUnlocked || state.rules.researched.contains(this) :
-            unlocked || alwaysUnlocked;
+        alwaysUnlocked || state.rules.researched.contains(this) :
+        unlocked || alwaysUnlocked;
     }
 
     /** @return whether this content is unlocked, or the player is in a custom (non-campaign) game. */
@@ -287,8 +309,8 @@ public abstract class UnlockableContent extends MappableContent{
 
     public boolean unlocked(){
         return net != null && net.client() ?
-            alwaysUnlocked || unlocked || state.rules.researched.contains(this) :
-            unlocked || alwaysUnlocked;
+        alwaysUnlocked || unlocked || state.rules.researched.contains(this) :
+        unlocked || alwaysUnlocked;
     }
 
     /** Locks this content again. */
