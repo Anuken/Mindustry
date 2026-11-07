@@ -192,7 +192,7 @@ public class Placement{
         calculateBridges(plans, bridge, false, t -> false);
     }
 
-    private static void calculateBridges(Seq<BuildPlan> plans, BridgePlacer bridge, boolean hasJunction, Boolf<Block> avoid){
+    private static void calculateBridges(Seq<BuildPlan> plans, BridgePlacer bridge, BridgePlacer phaseBridge, boolean hasJunction, Boolf<Block> avoid){
         //common checks
         if(isSidePlace(plans) || plans.size == 0) return;
 
@@ -200,11 +200,16 @@ public class Placement{
         if(!(plans.first().x == plans.peek().x || plans.first().y == plans.peek().y) || !bridge.unlockedNow()){
             return;
         }
+        //check for pbridge + unlocked state
+        if(phaseBridge != null && phaseBridge.unlockedNow()) {
+            if(smartCalculateBridges(plans, bridge, false, hasJunction, avoid)) return;
+            if(smartCalculateBridges(plans, phaseBridge, false,hasJunction, avoid)) return;
+        }
 
-        smartCalculateBridges(plans, bridge, hasJunction, avoid);
+        smartCalculateBridges(plans, bridge, true, hasJunction, avoid);
     }
 
-    private static void smartCalculateBridges(Seq<BuildPlan> plans, BridgePlacer bridge, boolean hasJunction, Boolf<Block> avoid){
+    private static boolean smartCalculateBridges(Seq<BuildPlan> plans, BridgePlacer bridge, boolean forceMake, boolean hasJunction, Boolf<Block> avoid){
         Boolf<BuildPlan> placeable = plan ->
         (plan.placeable(player.team()) || (plan.tile() != null && plan.tile().block() == plan.block)) &&  //don't count the same block as inaccessible
         !(plan != plans.first() && plan.build() != null && plan.build().rotation != plan.rotation && avoid.get(plan.tile().block()));
@@ -225,6 +230,7 @@ public class Placement{
         Arrays.fill(parent, 0, 2 * N, -1);
         dp[0] = 0;
         dp[N] = bridgeCost;
+        boolean finished = true;
 
         for(int i = 1; i < N; i++){
             var cur = plans.get(i);
@@ -280,8 +286,10 @@ public class Placement{
                 // Unable to connect, restart a new segment
                 dp[i] = 0;
                 dp[N + i] = bridgeCost;
+                finished = false;
             }
         }
+            if(!finished && !forceMake) return false;
 
         // Backtrack to assign bridges
         int bridgeMode = 0;
@@ -306,14 +314,19 @@ public class Placement{
 
         result.reverse();
         plans.set(result);
+        return true;
     }
 
     public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, boolean hasJunction, Boolf<Block> avoid){
-        calculateBridges(plans, new ItemBridgePlacer(bridge), hasJunction, avoid);
+        calculateBridges(plans, new ItemBridgePlacer(bridge), null, hasJunction, avoid);
     }
 
     public static void calculateBridges(Seq<BuildPlan> plans, DirectionBridge bridge, boolean hasJunction, Boolf<Block> avoid){
-        calculateBridges(plans, new DirectionBridgePlacer(bridge), hasJunction, avoid);
+        calculateBridges(plans, new DirectionBridgePlacer(bridge), null, hasJunction, avoid);
+    }
+    // Turns into phaseBridge if bridge cant finish it
+    public static void calculateBridges(Seq<BuildPlan> plans, ItemBridge bridge, ItemBridge phaseBridge, boolean hasJunction, Boolf<Block> avoid){
+        calculateBridges(plans, new ItemBridgePlacer(bridge), new ItemBridgePlacer(phaseBridge), hasJunction, avoid);
     }
 
     private static float tileHeuristic(Tile tile, Tile other){
