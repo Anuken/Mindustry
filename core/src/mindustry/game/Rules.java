@@ -246,6 +246,8 @@ public class Rules{
     public float backgroundOffsetX = 0.1f, backgroundOffsetY = 0.1f;
     /** Parameters for planet rendered in the background. Cannot be changed once a map is loaded. */
     public @Nullable PlanetParams planetBackground;
+    /** Saved orbit/free camera for the 3D space background. Overrides planetBackground when present. */
+    public @Nullable SpaceCamera spaceCamera;
     /** Rules from this planet are applied. If it's {@code sun}, mixed tech is enabled. */
     public Planet planet = Planets.serpulo;
     /** If the `data` instruction is allowed for world processors */

@@ -457,8 +457,10 @@ public class Renderer implements ApplicationListener{
     }
 
     protected void drawBackground(){
+        boolean hasSpaceCamera = state.rules.spaceCamera != null;
+
         //draw background only if there is no planet background with a skybox
-        if(state.rules.backgroundTexture != null && (state.rules.planetBackground == null || !state.rules.planetBackground.drawSkybox)){
+        if(state.rules.backgroundTexture != null && !hasSpaceCamera && (state.rules.planetBackground == null || !state.rules.planetBackground.drawSkybox)){
             if(!assets.isLoaded(state.rules.backgroundTexture, Texture.class)){
                 var file = assets.getFileHandleResolver().resolve(state.rules.backgroundTexture);
 
@@ -498,7 +500,7 @@ public class Renderer implements ApplicationListener{
             Draw.rect(Tmp.tr1, camera.position.x, camera.position.y, camera.width, camera.height);
         }
 
-        if(state.rules.planetBackground != null){
+        if(hasSpaceCamera || state.rules.planetBackground != null){
             int size = Math.max(graphics.getWidth(), graphics.getHeight());
 
             boolean resized = false;
@@ -507,10 +509,25 @@ public class Renderer implements ApplicationListener{
                 backgroundBuffer = new FrameBuffer(size, size);
             }
 
-            if(resized || backgroundBuffer.resize(size, size)){
+            var space = state.rules.spaceCamera;
+            boolean animateSpace = space != null && space.updateInGame && space.hasMovement();
+            float spaceDelta = animateSpace ? Math.min(Core.graphics.getDeltaTime(), 0.05f) : 0f;
+
+            if(animateSpace){
+                space.update(spaceDelta);
+            }
+
+            if(resized || backgroundBuffer.resize(size, size) || animateSpace){
                 backgroundBuffer.begin(Color.clear);
 
-                var params = state.rules.planetBackground;
+                PlanetParams params;
+                if(space != null){
+                    params = space.params();
+                }else if(state.rules.planetBackground != null){
+                    params = state.rules.planetBackground;
+                }else{
+                    return;
+                }
 
                 //override some values
                 params.viewW = size;
