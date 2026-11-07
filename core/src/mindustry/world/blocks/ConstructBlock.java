@@ -168,7 +168,7 @@ public class ConstructBlock extends Block{
         /** Buildings that previously occupied this location. */
         public @Nullable Seq<Building> prevBuild;
 
-        public float progress = 0;
+        public float progress = 0, lastProgress = 0;
         public float buildCost;
         public @Nullable Object lastConfig;
         public @Nullable Unit lastBuilder;
@@ -304,9 +304,11 @@ public class ConstructBlock extends Block{
             maxProgress = core == null || team.rules().infiniteResources ? maxProgress : checkRequired(core.items, maxProgress, true);
 
             progress = Mathf.clamp(progress + maxProgress);
+            scaleHealth(progress);
 
             if(progress >= 1f || state.rules.infiniteResources){
                 boolean canFinish = !current.isOverPlacementLimit(team);
+                scaleHealth(1f);
 
                 //look at leftover resources to consume, get them from the core if necessary, delay building if not
                 if(!infinite){
@@ -378,6 +380,7 @@ public class ConstructBlock extends Block{
             }
 
             progress = Mathf.clamp(progress - amount);
+            scaleHealth(progress);
 
             if(progress <= current.deconstructThreshold || state.rules.infiniteResources){
                 //add any leftover items that weren't obtained due to rounding errors
@@ -441,12 +444,20 @@ public class ConstructBlock extends Block{
             return progress;
         }
 
+        public void scaleHealth(float progress){
+            float maxHealth = this.maxHealth = current.constructHealth();
+
+            this.health = Mathf.clamp(this.health + (progress - lastProgress) * maxHealth, 0f, maxHealth);
+            lastProgress = progress;
+        }
+
         public void setConstruct(Block previous, Block block){
             if(block == null) return;
 
             this.constructColor = 0f;
             this.wasConstructing = true;
             this.current = block;
+            this.maxHealth = block.constructHealth();
             this.previous = previous;
             this.buildCost = block.buildTime * state.rules.buildCostMultiplier;
             this.itemsLeft = new int[block.requirements.length];
@@ -468,6 +479,7 @@ public class ConstructBlock extends Block{
             this.previous = previous;
             this.progress = 1f;
             this.current = previous;
+            this.maxHealth = previous.constructHealth();
             this.buildCost = previous.buildTime * state.rules.buildCostMultiplier;
             this.itemsLeft = new int[previous.requirements.length];
             this.accumulator = new float[previous.requirements.length];
