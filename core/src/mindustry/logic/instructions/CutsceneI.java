@@ -31,12 +31,17 @@ public class CutsceneI implements LogicInstruction{
                 control.input.logicCutscene = true;
                 control.input.logicCamPan.set(World.unconv(p1.numf()), World.unconv(p2.numf()));
                 control.input.logicCamSpeed = p3.numf();
+                control.input.logicCutsceneInteract = p4.bool();
             }
             case zoom -> {
                 control.input.logicCutscene = true;
                 control.input.logicCutsceneZoom = Mathf.clamp(p1.numf());
+                control.input.logicCutsceneInteract = p2.bool();
             }
-            case stop -> control.input.logicCutscene = false;
+            case stop -> {
+                control.input.logicCutscene = false;
+                control.input.logicCutsceneInteract = false;
+            }
             case shake -> renderer.shake(p1.numf(), p2.numf() * 60);
             case getHud -> p1.setbool(!control.input.logicHideHud);
             case setHud -> control.input.logicHideHud = !p1.bool();
