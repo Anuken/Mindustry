@@ -256,15 +256,19 @@ public class ErekirTechTree{
 
                     node(tungstenWall, () -> {
                         node(tungstenWallLarge, () -> {
-                            node(blastDoor, () -> {
+                            node(blastDoorSmall, () -> {
+                                node(blastDoor, () -> {
 
+                                });
                             });
                         });
 
                         node(reinforcedSurgeWall, () -> {
                             node(reinforcedSurgeWallLarge, () -> {
-                                node(shieldedWall, () -> {
+                                node(shieldedWallSmall, () -> {
+                                    node(shieldedWall, () -> {
 
+                                    });
                                 });
                             });
                         });
