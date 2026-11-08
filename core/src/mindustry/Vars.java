@@ -105,6 +105,10 @@ public class Vars implements Loadable{
     public static final float mineTransferRange = 220f;
     /** maximum number of preview plans for remote players */
     public static final int maxPlayerPreviewPlans = 1000;
+    /** highest selectable FPS limit; values above it disable the cap entirely */
+    public static final int maxFpsCap = 1000;
+    /** FPS limit used by default; high-refresh setups should not be throttled */
+    public static final int defaultFpsCap = maxFpsCap;
     /** max chat message length */
     public static final int maxTextLength = 150;
     /** max length of ping marker text */

@@ -213,13 +213,18 @@ public abstract class ClientLauncher extends ApplicationCore implements Platform
         }
     }
 
+    /** Whether the fpscap setting should throttle the main loop; values above the max cap mean 'unlimited'. */
+    public static boolean fpsCapped(int targetfps){
+        return targetfps > 0 && targetfps <= maxFpsCap;
+    }
+
     @Override
     public void update(){
         PerfCounter.update.begin();
 
-        int targetfps = ios ? 0 : Core.settings.getInt("fpscap", 120);
+        int targetfps = ios ? 0 : Core.settings.getInt("fpscap", defaultFpsCap);
         boolean changed = lastTargetFps != targetfps && lastTargetFps != -1;
-        boolean limitFps = targetfps > 0 && targetfps <= 240;
+        boolean limitFps = fpsCapped(targetfps);
 
         lastTargetFps = targetfps;
 

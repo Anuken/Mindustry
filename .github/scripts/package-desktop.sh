@@ -14,6 +14,8 @@ fi
 
 build_version="${BUILD_VERSION:-custom}"
 commit="${GITHUB_SHA:-$(git rev-parse HEAD)}"
+subject="$(git log -1 --format=%s "$commit" 2>/dev/null || true)"
+subject="${subject//\[release\]/}"
 bundle="${BUNDLE_JRE:-true}"
 repo="${GITHUB_REPOSITORY:-egefefefefef/Mindustry}"
 
@@ -171,6 +173,8 @@ cat > "$out/release-notes.md" <<TXT
 ## Mindustry 8 — desktop builds for Windows and Linux
 
 Built from [\`$commit\`](https://github.com/$repo/commit/$commit), in-game build string \`$build_version\`.
+Latest change: $subject
+
 These are builds of this fork, **not** official Anuken/Mindustry releases.
 
 | Asset | Contents |

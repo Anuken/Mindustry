@@ -95,6 +95,7 @@ jobs:
         for asset in "${assets[@]}"; do test -s "$asset"; done
         if gh release view "$TAG" >/dev/null 2>&1; then
           echo "Updating existing release $TAG"
+          gh release edit "$TAG" --notes-file build/release-notes.md
           gh release upload "$TAG" "${assets[@]}" --clobber
         else
           echo "Creating release $TAG at $GITHUB_SHA"
