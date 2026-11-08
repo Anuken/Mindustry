@@ -1,0 +1,118 @@
+name: Desktop Releases (Windows / Linux)
+
+# Builds the cross-platform desktop JAR with JDK 17, then packages two
+# ready-to-run ZIPs (Windows x64 / Linux x64) and publishes a GitHub Release.
+# Manual trigger from the Actions tab; a push whose message contains [release]
+# also triggers it, so this works on branches other than the default one.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. v8-arena-1'
+        required: true
+        default: 'v8-arena-1'
+      build:
+        description: 'In-game build version string'
+        required: true
+        default: 'arena-1'
+      bundle_jre:
+        description: 'Bundle a Java 17 runtime into each ZIP'
+        type: boolean
+        required: false
+        default: true
+      publish:
+        description: 'Create or update the GitHub Release'
+        type: boolean
+        required: false
+        default: true
+  push:
+    branches:
+      - 'arena/3268cd66-mindustry'
+
+permissions:
+  contents: write
+
+env:
+  TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || 'v8-arena-1' }}
+  BUILD_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.build || 'arena-1' }}
+  BUNDLE_JRE: ${{ github.event_name != 'workflow_dispatch' || inputs.bundle_jre }}
+  PUBLISH: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    - name: Fetch pinned Arc
+      run: |
+        set -euo pipefail
+        hash="$(sed -n 's/^archash=//p' gradle.properties | tr -d '\r')"
+        echo "Arc pin: $hash"
+        mkdir -p ../Arc
+        cd ../Arc
+        git init -q
+        git remote add origin https://github.com/Anuken/Arc.git
+        if ! git fetch -q --depth 1 origin "$hash"; then
+          echo "Pinned Arc commit is not fetchable, falling back to master."
+          git fetch -q --depth 1 origin master
+        fi
+        git checkout -q FETCH_HEAD
+        git rev-parse --short HEAD
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v6
+
+    - name: Build desktop JAR
+      run: |
+        ./gradlew desktop:dist --stacktrace -Pbuildversion="$BUILD_VERSION" -PshowCommitHash
+        test -s desktop/build/libs/Mindustry.jar
+        ls -lh desktop/build/libs/Mindustry.jar
+
+    - name: Package Windows and Linux builds
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: bash .github/scripts/package-desktop.sh
+
+    - name: Publish GitHub Release
+      if: env.PUBLISH == 'true'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        set -euo pipefail
+        assets=(build/Mindustry-Windows-x64.zip build/Mindustry-Linux-x64.zip build/Mindustry.jar build/SHA256SUMS.txt)
+        for asset in "${assets[@]}"; do test -s "$asset"; done
+        if gh release view "$TAG" >/dev/null 2>&1; then
+          echo "Updating existing release $TAG"
+          gh release upload "$TAG" "${assets[@]}" --clobber
+        else
+          echo "Creating release $TAG at $GITHUB_SHA"
+          gh release create "$TAG" "${assets[@]}" \
+            --target "$GITHUB_SHA" \
+            --title "Mindustry 8 — Windows & Linux ($TAG)" \
+            --notes-file build/release-notes.md
+        fi
+        gh release view "$TAG" --json url,tagName,assets --jq '{url, tagName, assets: [.assets[].name]}'
+
+    - name: Upload build artifacts
+      if: always()
+      continue-on-error: true
+      uses: actions/upload-artifact@v7
+      with:
+        name: mindustry-desktop-builds
+        path: |
+          build/Mindustry-Windows-x64.zip
+          build/Mindustry-Linux-x64.zip
+          build/SHA256SUMS.txt
+        if-no-files-found: warn
