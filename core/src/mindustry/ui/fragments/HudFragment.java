@@ -575,6 +575,54 @@ public class HudFragment{
             }).top().left();
         });
 
+        //developer green FPS counter, placed in a selectable corner
+        parent.fill(t -> {
+            t.name = "greenfps";
+            t.touchable = Touchable.disabled;
+            t.visible(() -> Core.settings.getBool("greenfps") && shown());
+
+            int[] lastCorner = {-1};
+            boolean[] lastMinimap = {false};
+            Runnable layout = () -> {
+                int corner = Core.settings.getInt("greenfpscorner", GreenFps.defaultCorner);
+                boolean minimap = Core.settings.getBool("minimap");
+                if(lastCorner[0] == corner && lastMinimap[0] == minimap) return;
+                lastCorner[0] = corner;
+                lastMinimap[0] = minimap;
+
+                int align = GreenFps.cornerAlign(corner);
+                float scale = Scl.scl(1f);
+                float insetTop = Core.scene.marginTop / scale;
+                float insetBottom = Core.scene.marginBottom / scale;
+                float insetLeft = Core.scene.marginLeft / scale;
+                float insetRight = Core.scene.marginRight / scale;
+
+                t.align(align);
+                t.margin(8f + insetTop, 8f + insetLeft, 8f + insetBottom, 8f + insetRight);
+
+                //keep clear of the minimap, chat field, build menu and the top-left HUD stack
+                if(Align.isTop(align) && Align.isRight(align) && minimap){
+                    t.marginRight(160f + insetRight);
+                }
+                if(Align.isBottom(align)){
+                    t.marginBottom((mobile ? 110f : 40f) + insetBottom);
+                }
+                if(align == Align.topLeft){
+                    t.marginTop(190f + insetTop);
+                }
+                t.invalidateHierarchy();
+            };
+            layout.run();
+            t.update(layout);
+
+            IntFormat greenFps = new IntFormat("fps");
+            t.table(Styles.black6, box -> {
+                box.margin(6f);
+                box.label(() -> greenFps.get(Core.graphics.getFramesPerSecond()))
+                    .style(Styles.outlineLabel).color(Color.green).name("greenfps-value");
+            });
+        });
+
         //core info
         parent.fill(t -> {
             t.top();

@@ -570,6 +570,9 @@ public class SettingsMenuDialog extends BaseDialog{
         });
         dev.checkPref("drawhitboxes", false);
         dev.checkPref("showperformance", false);
+        dev.checkPref("greenfps", false);
+        dev.sliderPref("greenfpscorner", GreenFps.defaultCorner, 0, 3, 1,
+            s -> Core.bundle.get("setting.greenfpscorner." + s, "Corner " + s));
 
         if(!ios){
             dev.checkPref("modcrashdisable", true);
