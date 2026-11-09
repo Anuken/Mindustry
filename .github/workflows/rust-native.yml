@@ -40,7 +40,8 @@ jobs:
         cargo clippy --manifest-path rust/mindustry-native/Cargo.toml --all-targets > /tmp/clippy.log 2>&1
         code=$?
         if [ "$code" -ne 0 ]; then
-          tail -40 /tmp/clippy.log | while IFS= read -r line; do echo "::error::$line"; done
+          msg=$(tail -30 /tmp/clippy.log | awk '{printf "%s%s", (NR==1 ? "" : "%0A"), $0}')
+          echo "::error::$msg"
         fi
         cat /tmp/clippy.log
         exit "$code"
@@ -51,7 +52,8 @@ jobs:
         cargo test --manifest-path rust/mindustry-native/Cargo.toml > /tmp/test.log 2>&1
         code=$?
         if [ "$code" -ne 0 ]; then
-          tail -40 /tmp/test.log | while IFS= read -r line; do echo "::error::$line"; done
+          msg=$(tail -30 /tmp/test.log | awk '{printf "%s%s", (NR==1 ? "" : "%0A"), $0}')
+          echo "::error::$msg"
         fi
         cat /tmp/test.log
         exit "$code"
