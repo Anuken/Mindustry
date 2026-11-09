@@ -1,0 +1,18 @@
+[package]
+name = "mindustry-native"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Rust flow-field pathfinder exposed to Mindustry over JNI"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+jni = "0.21"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

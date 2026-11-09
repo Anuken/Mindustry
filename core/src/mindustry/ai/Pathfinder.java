@@ -359,6 +359,7 @@ public class Pathfinder implements Runnable{
             Flowfield field = fieldTypes.get(fieldType).get();
             field.team = team;
             field.cost = costTypes.get(costType);
+            field.costType = costType;
             field.targets.clear();
             field.getPositions(field.targets);
 
@@ -437,6 +438,29 @@ public class Pathfinder implements Runnable{
         return current;
     }
 
+    /** Recomputes the whole field in Rust on the pathfinding thread. Returns false to use the Java implementation. */
+    private boolean rebuildNative(Flowfield path){
+        if(!RustPathfinder.available()) return false;
+
+        try{
+            int[] targets;
+            synchronized(path.targets){
+                targets = new int[path.targets.size];
+                System.arraycopy(path.targets.items, 0, targets, 0, targets.length);
+            }
+
+            if(targets.length == 0 || !RustPathfinder.build(tiles, path.weights, path.searches, targets, path.team.id, path.costType, path.search, path.width, path.height)) return false;
+
+            System.arraycopy(path.weights, 0, path.completeWeights, 0, path.weights.length);
+            path.hasComplete = true;
+            path.frontier.clear();
+            return true;
+        }catch(Throwable t){
+            Log.err("Rust pathfinder failed, falling back to Java", t);
+            return false;
+        }
+    }
+
     /** Increments the search and sets up flow sources. Does not change the frontier. */
     private void updateTargets(Flowfield path){
 
@@ -448,6 +472,9 @@ public class Pathfinder implements Runnable{
             Arrays.fill(path.searches, (short)0);
             path.search = 1;
         }
+
+        //Rust computes the complete field in one pass; no incremental frontier is needed
+        if(rebuildNative(path)) return;
 
         synchronized(path.targets){
             //add targets
@@ -485,6 +512,9 @@ public class Pathfinder implements Runnable{
 
         //fill with impassables by default
         Arrays.fill(path.weights, impassable);
+
+        //let Rust do the initial full build when the native library is present
+        if(rebuildNative(path)) return;
 
         //add targets
         for(int i = 0; i < path.targets.size; i++){
@@ -614,6 +644,8 @@ public class Pathfinder implements Runnable{
         protected Team team = Team.derelict;
         /** Function for calculating path cost. Set before using. */
         protected PathCost cost = costTypes.get(costGround);
+        /** Index of this field's cost function in costTypes, used by the Rust implementation. */
+        int costType = costGround;
         /** Whether there are valid weights in the complete array. */
         protected volatile boolean hasComplete;
         /** If true, this flow field needs updating. This flag is only set to false once the flow field finishes and the weights are copied over. */

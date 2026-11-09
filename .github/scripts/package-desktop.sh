@@ -190,6 +190,10 @@ Linux: unpack and run \`./mindustry.sh\`.
 The game JAR itself is platform-independent; the platform ZIPs differ only by the launcher
 script and the bundled runtime. Requires OpenGL 2+/3+ capable drivers and the native
 libraries included in the JAR. If the bundled runtime is absent, install JDK/JRE 17.
+
+Flow-field pathfinding is implemented in Rust and bundled as JNI natives for Windows and
+Linux (\`libmindustry_native64.so\` / \`mindustry_native64.dll\`). If a native library cannot be
+loaded, the game transparently falls back to the original Java pathfinder.
 TXT
 
 echo "Packaged:"

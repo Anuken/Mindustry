@@ -1,0 +1,81 @@
+name: Rust Native
+
+# Builds/tests the Rust flow-field crate and verifies JNI parity against the Java reference.
+on:
+  push:
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust-native.yml'
+      - 'core/src/mindustry/ai/RustPathfinder.java'
+      - 'core/src/mindustry/ai/Pathfinder.java'
+      - 'tests/src/test/java/RustPathfinderTests.java'
+  pull_request:
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust-native.yml'
+      - 'core/src/mindustry/ai/RustPathfinder.java'
+      - 'core/src/mindustry/ai/Pathfinder.java'
+      - 'tests/src/test/java/RustPathfinderTests.java'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  crate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+
+    - name: Format check (advisory)
+      continue-on-error: true
+      run: cargo fmt --manifest-path rust/mindustry-native/Cargo.toml -- --check
+
+    - name: Clippy
+      run: cargo clippy --manifest-path rust/mindustry-native/Cargo.toml --all-targets
+
+    - name: Unit tests
+      run: cargo test --manifest-path rust/mindustry-native/Cargo.toml
+
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
+
+    - uses: dtolnay/rust-toolchain@stable
+    - uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    - name: Build native library
+      run: |
+        cargo build --release --manifest-path rust/mindustry-native/Cargo.toml
+        mkdir -p build/natives
+        cp rust/mindustry-native/target/release/libmindustry_native.so build/natives/libmindustry_native64.so
+        nm -D build/natives/libmindustry_native64.so | grep Java_mindustry_ai_RustPathfinder_build
+
+    - name: Fetch pinned Arc
+      run: |
+        set -euo pipefail
+        hash="$(sed -n 's/^archash=//p' gradle.properties | tr -d '\r')"
+        mkdir -p ../Arc
+        cd ../Arc
+        git init -q
+        git remote add origin https://github.com/Anuken/Arc.git
+        if ! git fetch -q --depth 1 origin "$hash"; then
+          git fetch -q --depth 1 origin master
+        fi
+        git checkout -q FETCH_HEAD
+
+    - uses: gradle/actions/setup-gradle@v6
+
+    - name: Run JNI parity tests
+      env:
+        MINDUSTRY_NATIVE_LIB: ${{ github.workspace }}/build/natives/libmindustry_native64.so
+      run: ./gradlew tests:test --tests '*RustPathfinderTests*' --stacktrace

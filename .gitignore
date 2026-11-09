@@ -169,5 +169,11 @@ android/libs/
 # ignored due to frequent branch conflicts.
 core/assets/logicids.dat
 
+## Rust native library (built in CI, bundled into the desktop JAR)
+/rust/mindustry-native/target/
+/core/assets/libmindustry_native64.so
+/core/assets/mindustry_native64.dll
+/core/assets/libmindustry_native64.dylib
+
 # project files for the sectors
 core/assets-raw/sprites/ui/sectors/*.json
