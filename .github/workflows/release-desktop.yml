@@ -1,7 +1,7 @@
-name: Desktop Releases (Windows / Linux)
+name: Desktop & Mobile Releases (Windows / Linux / macOS / Android)
 
-# Builds the cross-platform desktop JAR with JDK 17, then packages two
-# ready-to-run ZIPs (Windows x64 / Linux x64) and publishes a GitHub Release.
+# Builds the desktop JAR with JDK 17, Rust JNI natives for Windows/Linux/macOS and a
+# debug Android APK, then packages ready-to-run ZIPs and publishes a GitHub Release.
 # Manual trigger from the Actions tab; a push whose message contains [release]
 # also triggers it, so this works on branches other than the default one.
 on:
@@ -16,7 +16,7 @@ on:
         required: true
         default: 'arena-1'
       bundle_jre:
-        description: 'Bundle a Java 17 runtime into each ZIP'
+        description: 'Bundle a Java 17 runtime into the desktop ZIPs'
         type: boolean
         required: false
         default: true
@@ -39,7 +39,42 @@ env:
   PUBLISH: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
 
 jobs:
+  macos-native:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-apple-darwin, aarch64-apple-darwin
+
+    - name: Build universal macOS dylib
+      run: |
+        set -euo pipefail
+        cargo build --release --target x86_64-apple-darwin --manifest-path rust/mindustry-native/Cargo.toml
+        cargo build --release --target aarch64-apple-darwin --manifest-path rust/mindustry-native/Cargo.toml
+        mkdir -p macos-assets
+        lipo -create \
+          rust/mindustry-native/target/x86_64-apple-darwin/release/libmindustry_native.dylib \
+          rust/mindustry-native/target/aarch64-apple-darwin/release/libmindustry_native.dylib \
+          -output macos-assets/libmindustry_native64.dylib
+        lipo -info macos-assets/libmindustry_native64.dylib
+        nm -gU macos-assets/libmindustry_native64.dylib | grep -q _Java_mindustry_ai_RustPathfinder_build
+        nm -gU macos-assets/libmindustry_native64.dylib | grep -q _Java_mindustry_async_RustAvoidance_build
+        tar -czf macos-assets.tar.gz -C macos-assets .
+
+    - name: Upload macOS native
+      uses: actions/upload-artifact@v7
+      with:
+        name: macos-native
+        path: macos-assets.tar.gz
+        if-no-files-found: error
+
   build:
+    needs: macos-native
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[release]')
     runs-on: ubuntu-latest
 
@@ -79,6 +114,19 @@ jobs:
       with:
         targets: x86_64-pc-windows-gnu
 
+    - name: Download macOS native
+      uses: actions/download-artifact@v7
+      with:
+        name: macos-native
+        path: build/macos
+
+    - name: Install macOS native into assets
+      run: |
+        set -euo pipefail
+        tar -xzf build/macos/macos-assets.tar.gz -C build/macos
+        cp build/macos/libmindustry_native64.dylib core/assets/libmindustry_native64.dylib
+        cp build/macos/libmindustry_native64.dylib core/assets/libmindustry_nativearm64.dylib
+
     - name: Build Rust pathfinder (Linux)
       run: |
         cargo build --release --manifest-path rust/mindustry-native/Cargo.toml
@@ -94,9 +142,14 @@ jobs:
 
     - name: Verify bundled natives
       run: |
-        ls -lh core/assets/libmindustry_native64.so core/assets/mindustry_native64.dll
+        set -euo pipefail
+        ls -lh core/assets/libmindustry_native64.so core/assets/mindustry_native64.dll \
+          core/assets/libmindustry_native64.dylib core/assets/libmindustry_nativearm64.dylib
         nm -D core/assets/libmindustry_native64.so | grep -q Java_mindustry_ai_RustPathfinder_build
         nm -D core/assets/libmindustry_native64.so | grep -q Java_mindustry_async_RustAvoidance_build
+        file core/assets/mindustry_native64.dll | grep -q PE32
+        file core/assets/libmindustry_native64.dylib | grep -q Mach-O
+        file core/assets/libmindustry_nativearm64.dylib | grep -q Mach-O
 
     - name: Build desktop JAR
       run: |
@@ -104,7 +157,31 @@ jobs:
         test -s desktop/build/libs/Mindustry.jar
         ls -lh desktop/build/libs/Mindustry.jar
 
-    - name: Package Windows and Linux builds
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+
+    - name: Build Android APK
+      env:
+        # GitHub Actions sets CI=true, which makes android/build.gradle expect a private
+        # upstream release keystore. Debug builds do not need it.
+        CI: 'false'
+      run: |
+        set -euo pipefail
+        # The desktop JAR is already built; keep desktop-only JNI natives out of the APK's
+        # merged assets. A fresh Gradle process also picks up ANDROID_HOME/CI from this step.
+        rm -f core/assets/libmindustry_native64.so core/assets/mindustry_native64.dll \
+          core/assets/libmindustry_native64.dylib core/assets/libmindustry_nativearm64.dylib
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
+        ./gradlew --stop || true
+        ./gradlew --no-daemon android:assembleDebug --stacktrace -Pbuildversion="$BUILD_VERSION" -PshowCommitHash
+        apk="$(find android/build/outputs/apk/debug -name '*.apk' -print -quit)"
+        test -n "$apk"
+        cp "$apk" build/Mindustry-Android.apk
+        ls -lh build/Mindustry-Android.apk
+
+    - name: Package Windows, Linux, macOS and Android builds
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: bash .github/scripts/package-desktop.sh
@@ -115,17 +192,28 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -euo pipefail
-        assets=(build/Mindustry-Windows-x64.zip build/Mindustry-Linux-x64.zip build/Mindustry.jar build/SHA256SUMS.txt)
+        assets=(
+          build/Mindustry-Windows-x64.zip
+          build/Mindustry-Linux-x64.zip
+          build/Mindustry-macOS-x64.zip
+          build/Mindustry-macOS-arm64.zip
+          build/Mindustry-Android.apk
+          build/Mindustry.jar
+          build/SHA256SUMS.txt
+        )
         for asset in "${assets[@]}"; do test -s "$asset"; done
         if gh release view "$TAG" >/dev/null 2>&1; then
           echo "Updating existing release $TAG"
-          gh release edit "$TAG" --notes-file build/release-notes.md --target "$GITHUB_SHA"
+          gh release edit "$TAG" \
+            --title "Mindustry 8 — Windows / Linux / macOS / Android ($TAG)" \
+            --notes-file build/release-notes.md \
+            --target "$GITHUB_SHA"
           gh release upload "$TAG" "${assets[@]}" --clobber
         else
           echo "Creating release $TAG at $GITHUB_SHA"
           gh release create "$TAG" "${assets[@]}" \
             --target "$GITHUB_SHA" \
-            --title "Mindustry 8 — Windows & Linux ($TAG)" \
+            --title "Mindustry 8 — Windows / Linux / macOS / Android ($TAG)" \
             --notes-file build/release-notes.md
         fi
         gh release view "$TAG" --json url,tagName,assets --jq '{url, tagName, assets: [.assets[].name]}'
@@ -135,9 +223,14 @@ jobs:
       continue-on-error: true
       uses: actions/upload-artifact@v7
       with:
-        name: mindustry-desktop-builds
+        name: mindustry-release-builds
         path: |
           build/Mindustry-Windows-x64.zip
           build/Mindustry-Linux-x64.zip
+          build/Mindustry-macOS-x64.zip
+          build/Mindustry-macOS-arm64.zip
+          build/Mindustry-Android.apk
+          build/Mindustry.jar
           build/SHA256SUMS.txt
+          build/release-notes.md
         if-no-files-found: warn

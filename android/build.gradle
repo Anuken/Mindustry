@@ -52,6 +52,12 @@ android{
 
     packagingOptions{
         exclude 'META-INF/robovm/ios/robovm.xml'
+        //Desktop JNI natives are built into core/assets for the desktop JAR; they must not
+        //be packaged into the Android APK, which uses Arc's own Android natives.
+        exclude 'libmindustry_native64.so'
+        exclude 'mindustry_native64.dll'
+        exclude 'libmindustry_native64.dylib'
+        exclude 'libmindustry_nativearm64.dylib'
     }
 
     defaultConfig{

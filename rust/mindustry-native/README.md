@@ -47,10 +47,14 @@ Arc's `SharedLibraryLoader.load("mindustry_native")` looks for these classpath r
 | --- | --- |
 | Linux x64 | `libmindustry_native64.so` |
 | Windows x64 | `mindustry_native64.dll` |
+| macOS Intel | `libmindustry_native64.dylib` |
+| macOS Apple Silicon | `libmindustry_nativearm64.dylib` |
 
-The release workflow builds both and copies them to `core/assets/`, which `desktop:dist`
-puts at the root of `Mindustry.jar`. Android, iOS and macOS have no bundled library and
-transparently use the Java implementations.
+The release workflow builds the Linux/Windows natives on Ubuntu and a universal
+(`x86_64 + arm64`) dylib on a macOS runner, copies it to `core/assets/` under both macOS
+names (Arc's `SharedLibraryLoader` appends `arm` on Apple Silicon), and `desktop:dist`
+puts all of them at the root of `Mindustry.jar`. Android and iOS have no bundled library
+and transparently use the Java implementations.
 
 ## Build & test
 
@@ -60,6 +64,14 @@ cargo build --release --manifest-path rust/mindustry-native/Cargo.toml
 # Windows cross-build (needs mingw-w64):
 CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER=x86_64-w64-mingw32-gcc \
   cargo build --release --target x86_64-pc-windows-gnu --manifest-path rust/mindustry-native/Cargo.toml
+# macOS universal dylib (needs Xcode command line tools):
+rustup target add x86_64-apple-darwin aarch64-apple-darwin
+cargo build --release --target x86_64-apple-darwin --manifest-path rust/mindustry-native/Cargo.toml
+cargo build --release --target aarch64-apple-darwin --manifest-path rust/mindustry-native/Cargo.toml
+lipo -create \
+  rust/mindustry-native/target/x86_64-apple-darwin/release/libmindustry_native.dylib \
+  rust/mindustry-native/target/aarch64-apple-darwin/release/libmindustry_native.dylib \
+  -output libmindustry_native64.dylib
 ```
 
 `cargo test` checks the packed-tile accessors, cost-function vectors against the Java
