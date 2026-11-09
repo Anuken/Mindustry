@@ -34,16 +34,18 @@ The JAR is platform-independent; the ZIPs differ only by the launcher script and
 bundled runtime. The workflow needs `contents: write` for publishing. These are builds of
 this fork, not official `Anuken/Mindustry` releases.
 
-## Rust pathfinder
+## Rust hot paths
 
-`rust/mindustry-native/` contains a Rust port of the flow-field pathfinding hot path, loaded
-over JNI. The workflow builds `libmindustry_native64.so` and `mindustry_native64.dll` and
-copies them into `core/assets/` before `desktop:dist`, so both end up at the root of
-`Mindustry.jar`. `mindustry.ai.RustPathfinder` loads the library via Arc's
-`SharedLibraryLoader`; when it is missing or a native call fails, `Pathfinder` uses the
-original incremental Java implementation. Android, iOS and macOS therefore need no changes.
+`rust/mindustry-native/` contains Rust ports of two CPU hot paths, both loaded over JNI
+from the same library: flow-field pathfinding (`mindustry.ai.Pathfinder`) and the async
+unit-avoidance mask (`mindustry.async.AvoidanceProcess`). The workflow builds
+`libmindustry_native64.so` and `mindustry_native64.dll` and copies them into `core/assets/`
+before `desktop:dist`, so both end up at the root of `Mindustry.jar`. The wrappers
+`mindustry.ai.RustPathfinder` and `mindustry.async.RustAvoidance` load the library via Arc's
+`SharedLibraryLoader`; when it is missing or a native call fails, the game uses the original
+Java implementations. Android, iOS and macOS therefore need no changes.
 
-`rust-native.yml` runs `cargo test` plus Java-side JNI parity tests; see
-`rust/mindustry-native/README.md` for the JNI contract and cross-build commands.
+`rust-native.yml` runs `cargo test` plus Java-side JNI parity tests for both ports; see
+`rust/mindustry-native/README.md` for the JNI contracts and cross-build commands.
 
 Для запуска: на Windows — `Mindustry.bat`, на Linux — `./mindustry.sh`.

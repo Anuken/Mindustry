@@ -93,7 +93,10 @@ jobs:
         cp rust/mindustry-native/target/x86_64-pc-windows-gnu/release/mindustry_native.dll core/assets/mindustry_native64.dll
 
     - name: Verify bundled natives
-      run: ls -lh core/assets/libmindustry_native64.so core/assets/mindustry_native64.dll
+      run: |
+        ls -lh core/assets/libmindustry_native64.so core/assets/mindustry_native64.dll
+        nm -D core/assets/libmindustry_native64.so | grep -q Java_mindustry_ai_RustPathfinder_build
+        nm -D core/assets/libmindustry_native64.so | grep -q Java_mindustry_async_RustAvoidance_build
 
     - name: Build desktop JAR
       run: |

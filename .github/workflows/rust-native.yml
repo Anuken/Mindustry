@@ -1,6 +1,6 @@
 name: Rust Native
 
-# Builds/tests the Rust flow-field crate and verifies JNI parity against the Java reference.
+# Builds/tests the Rust hot-path crate and verifies JNI parity against the Java reference.
 on:
   push:
     paths:
@@ -8,14 +8,20 @@ on:
       - '.github/workflows/rust-native.yml'
       - 'core/src/mindustry/ai/RustPathfinder.java'
       - 'core/src/mindustry/ai/Pathfinder.java'
+      - 'core/src/mindustry/async/RustAvoidance.java'
+      - 'core/src/mindustry/async/AvoidanceProcess.java'
       - 'tests/src/test/java/RustPathfinderTests.java'
+      - 'tests/src/test/java/RustAvoidanceTests.java'
   pull_request:
     paths:
       - 'rust/**'
       - '.github/workflows/rust-native.yml'
       - 'core/src/mindustry/ai/RustPathfinder.java'
       - 'core/src/mindustry/ai/Pathfinder.java'
+      - 'core/src/mindustry/async/RustAvoidance.java'
+      - 'core/src/mindustry/async/AvoidanceProcess.java'
       - 'tests/src/test/java/RustPathfinderTests.java'
+      - 'tests/src/test/java/RustAvoidanceTests.java'
   workflow_dispatch:
 
 permissions:
@@ -85,6 +91,7 @@ jobs:
         mkdir -p build/natives
         cp rust/mindustry-native/target/release/libmindustry_native.so build/natives/libmindustry_native64.so
         nm -D build/natives/libmindustry_native64.so | grep Java_mindustry_ai_RustPathfinder_build
+        nm -D build/natives/libmindustry_native64.so | grep Java_mindustry_async_RustAvoidance_build
 
     - name: Fetch pinned Arc
       run: |
@@ -104,4 +111,4 @@ jobs:
     - name: Run JNI parity tests
       env:
         MINDUSTRY_NATIVE_LIB: ${{ github.workspace }}/build/natives/libmindustry_native64.so
-      run: ./gradlew tests:test --tests '*RustPathfinderTests*' --stacktrace
+      run: ./gradlew tests:test --tests '*RustPathfinderTests*' --tests '*RustAvoidanceTests*' --stacktrace

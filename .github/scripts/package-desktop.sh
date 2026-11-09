@@ -191,9 +191,10 @@ The game JAR itself is platform-independent; the platform ZIPs differ only by th
 script and the bundled runtime. Requires OpenGL 2+/3+ capable drivers and the native
 libraries included in the JAR. If the bundled runtime is absent, install JDK/JRE 17.
 
-Flow-field pathfinding is implemented in Rust and bundled as JNI natives for Windows and
-Linux (\`libmindustry_native64.so\` / \`mindustry_native64.dll\`). If a native library cannot be
-loaded, the game transparently falls back to the original Java pathfinder.
+Flow-field pathfinding and the AI unit-avoidance mask are implemented in Rust and bundled
+as JNI natives for Windows and Linux (\`libmindustry_native64.so\` / \`mindustry_native64.dll\`).
+If a native library cannot be loaded, the game transparently falls back to the original
+Java implementations of both hot paths.
 TXT
 
 echo "Packaged:"

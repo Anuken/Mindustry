@@ -1,6 +1,8 @@
-//! Flow-field pathfinding core, ported from `mindustry.ai.Pathfinder`.
+//! Rust ports of two Mindustry CPU hot paths, exposed to Java over JNI:
+//! - `mindustry.ai.Pathfinder` flow-field computation (this module);
+//! - `mindustry.async.AvoidanceProcess` unit avoidance mask (`avoidance`).
 //!
-//! The Java implementation updates the frontier incrementally with an 8ms budget on a
+//! The Java pathfinder updates the frontier incrementally with an 8ms budget on a
 //! dedicated thread. This port computes the *whole* field in one pass, so a single JNI
 //! call amortizes the boundary crossing over hundreds of thousands of tiles.
 //!
@@ -9,6 +11,7 @@
 //! fields consume 8 bits, booleans consume one bit each, in declaration order.
 
 mod jni;
+pub mod avoidance;
 
 use std::collections::VecDeque;
 

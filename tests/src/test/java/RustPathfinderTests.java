@@ -15,8 +15,10 @@ public class RustPathfinderTests{
     static void loadNative(){
         String path = System.getenv("MINDUSTRY_NATIVE_LIB");
         if(path != null){
-            System.load(new File(path).getAbsolutePath());
-            SharedLibraryLoader.setLoaded("mindustry_native");
+            if(!SharedLibraryLoader.isLoaded("mindustry_native")){
+                System.load(new File(path).getAbsolutePath());
+                SharedLibraryLoader.setLoaded("mindustry_native");
+            }
             RustPathfinder.tryLoad();
         }
     }

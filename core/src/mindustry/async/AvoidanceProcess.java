@@ -77,15 +77,28 @@ public class AvoidanceProcess implements AsyncProcess{
         swap = !swap;
 
         if(buffer == null) return;
-        //technically, this is wrong, and will lead to flickering avoidance when all units are gone, but this doesn't matter because it's not being queried either way
-        if(modified){
-            Arrays.fill(buffer, 0);
-        }
-
-        modified = requests.size > 0;
 
         int total = requests.size;
         int[] items = requests.items;
+        boolean hadModified = modified;
+
+        //Rust fills the whole avoidance mask in one JNI call; the original loop stays as fallback.
+        try{
+            if(RustAvoidance.available() && RustAvoidance.build(items, total, buffer, wwidth, wheight, hadModified)){
+                modified = total > 0;
+                return;
+            }
+        }catch(Throwable t){
+            Log.err("Rust avoidance failed, falling back to Java", t);
+        }
+
+        //technically, this is wrong, and will lead to flickering avoidance when all units are gone, but this doesn't matter because it's not being queried either way
+        if(hadModified){
+            Arrays.fill(buffer, 0);
+        }
+
+        modified = total > 0;
+
         for(int i = 0; i < total; i += 3){
             int point = items[i], id = items[i + 2];
             int rx = Point2.x(point), ry = Point2.y(point);
