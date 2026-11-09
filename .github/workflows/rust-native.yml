@@ -31,8 +31,16 @@ jobs:
         components: rustfmt, clippy
 
     - name: Format check (advisory)
-      continue-on-error: true
-      run: cargo fmt --manifest-path rust/mindustry-native/Cargo.toml -- --check
+      run: |
+        set +e
+        cargo fmt --manifest-path rust/mindustry-native/Cargo.toml -- --check > /tmp/fmt.log 2>&1
+        code=$?
+        if [ "$code" -ne 0 ]; then
+          msg=$(tail -30 /tmp/fmt.log | awk '{printf "%s%s", (NR==1 ? "" : "%0A"), $0}')
+          echo "::warning::$msg"
+        fi
+        cat /tmp/fmt.log
+        exit 0
 
     - name: Clippy
       run: |

@@ -342,7 +342,7 @@ mod tests {
     fn flat_grid_is_manhattan_distance() {
         let (w, h) = (9, 9);
         let tiles = vec![tile(0, 1, &[]); w * h];
-        let weights = run(&tiles, w, h, &[4 + 4 * w], 4, 1, 1);
+        let weights = run(&tiles, w, h, &[(4 + 4 * w) as i32], 4, 1, 1);
         for y in 0..h {
             for x in 0..w {
                 let expected = (x as i32 - 4).abs() + (y as i32 - 4).abs();
@@ -380,13 +380,8 @@ mod tests {
         for cost_type in [0, 1, 2, 3, 4, 5] {
             for _ in 0..12 {
                 let (w, h) = (11usize, 9usize);
-                let tiles: Vec<i32> = (0..w * h)
-                    .map(|_| {
-                        let bits = next() & 0x0fff_ffff;
-                        // keep health/team small so costs stay realistic
-                        ((bits & 0xffff) | ((next() % 4) << 8)) as i32
-                    })
-                    .collect();
+                // fully random packed tiles exercise every cost bit
+                let tiles: Vec<i32> = (0..w * h).map(|_| next() as i32).collect();
                 let targets = [(next() % (w * h) as u32) as i32];
                 let expected = reference(&tiles, w, h, &targets, cost_type, 2);
                 let actual = run(&tiles, w, h, &targets, cost_type, 2, 1);
