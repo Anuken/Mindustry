@@ -60,12 +60,7 @@ pub fn build(p: AvoidanceParams<'_>) -> bool {
                 let dist2 = dx.wrapping_mul(dx).wrapping_add(dy.wrapping_mul(dy));
                 let x = dx.wrapping_add(rx);
                 let y = dy.wrapping_add(ry);
-                if x >= 0
-                    && y >= 0
-                    && x < p.width
-                    && y < p.height
-                    && (dist2 as f32) <= rad2
-                {
+                if x >= 0 && y >= 0 && x < p.width && y < p.height && (dist2 as f32) <= rad2 {
                     let idx = x.wrapping_add(y.wrapping_mul(p.width));
                     if idx < 0 || idx as usize >= p.buffer.len() {
                         return false;
@@ -145,8 +140,7 @@ mod tests {
     #[test]
     fn radius_is_not_capped_at_twenty() {
         let req = request(50, 50, 25.0, 1);
-        let buffer =
-            run(&req, 100, 100, false, &[0i32; 10_000]).expect("build should succeed");
+        let buffer = run(&req, 100, 100, false, &[0i32; 10_000]).expect("build should succeed");
         // dx = 21 is inside rad2 = 625, but would be missed if r were capped at 20.
         assert_eq!(buffer[71 + 50 * 100], i32::MAX - 1);
     }

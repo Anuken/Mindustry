@@ -10,8 +10,8 @@
 //! `PathTileStruct`: field offsets start at the least significant bit, `@StructField(8)`
 //! fields consume 8 bits, booleans consume one bit each, in declaration order.
 
-mod jni;
 pub mod avoidance;
+mod jni;
 
 use std::collections::VecDeque;
 
