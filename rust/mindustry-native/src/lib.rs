@@ -331,7 +331,10 @@ mod tests {
         assert_eq!(tile_cost(2, enemy, 0), IMPASSABLE);
         let own = tile(0, 1, &[BIT_SOLID]);
         assert_eq!(tile_cost(1, own, 0), IMPASSABLE);
-        assert_eq!(tile_cost(1, tile(0, 1, &[BIT_SOLID, BIT_TEAM_PASSABLE]), 0), 1);
+        assert_eq!(
+            tile_cost(1, tile(0, 1, &[BIT_SOLID, BIT_TEAM_PASSABLE]), 0),
+            1
+        );
 
         // legs: legSolid blocks, solid adds 5
         assert_eq!(tile_cost(1, tile(0, 1, &[BIT_LEG_SOLID]), 1), IMPASSABLE);
@@ -366,7 +369,7 @@ mod tests {
         }
         // the right side is reachable only around the top gap: 3 + 1 + 6 steps
         assert_eq!(weights[4 + 6 * w], 10);
-        assert_eq!(weights[1 + 0 * w], 1);
+        assert_eq!(weights[1], 1);
     }
 
     #[test]
@@ -385,7 +388,10 @@ mod tests {
                 let targets = [(next() % (w * h) as u32) as i32];
                 let expected = reference(&tiles, w, h, &targets, cost_type, 2);
                 let actual = run(&tiles, w, h, &targets, cost_type, 2, 1);
-                assert_eq!(actual, expected, "cost_type={cost_type}, target={targets:?}");
+                assert_eq!(
+                    actual, expected,
+                    "cost_type={cost_type}, target={targets:?}"
+                );
             }
         }
     }
