@@ -35,10 +35,26 @@ jobs:
       run: cargo fmt --manifest-path rust/mindustry-native/Cargo.toml -- --check
 
     - name: Clippy
-      run: cargo clippy --manifest-path rust/mindustry-native/Cargo.toml --all-targets
+      run: |
+        set +e
+        cargo clippy --manifest-path rust/mindustry-native/Cargo.toml --all-targets > /tmp/clippy.log 2>&1
+        code=$?
+        if [ "$code" -ne 0 ]; then
+          tail -40 /tmp/clippy.log | while IFS= read -r line; do echo "::error::$line"; done
+        fi
+        cat /tmp/clippy.log
+        exit "$code"
 
     - name: Unit tests
-      run: cargo test --manifest-path rust/mindustry-native/Cargo.toml
+      run: |
+        set +e
+        cargo test --manifest-path rust/mindustry-native/Cargo.toml > /tmp/test.log 2>&1
+        code=$?
+        if [ "$code" -ne 0 ]; then
+          tail -40 /tmp/test.log | while IFS= read -r line; do echo "::error::$line"; done
+        fi
+        cat /tmp/test.log
+        exit "$code"
 
   parity:
     runs-on: ubuntu-latest
