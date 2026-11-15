@@ -6,6 +6,8 @@ import mindustry.*;
 import mindustry.gen.*;
 import mindustry.logic.LStatements.*;
 
+import java.util.*;
+
 public class LParser{
     private static final String[] tokens = new String[16];
     private static final int maxJumps = 500;
@@ -201,7 +203,7 @@ public class LParser{
                 }else{
                     //attempt parsing using custom parser if a match is found; this is for mods
                     if(LAssembler.customParsers.containsKey(tokens[0])){
-                        var parsed = LAssembler.customParsers.get(tokens[0]).get(tokens);
+                        var parsed = LAssembler.customParsers.get(tokens[0]).get(Arrays.copyOf(tokens, tok));
 
                         if(!privileged && parsed != null && parsed.privileged()){
                             statements.add(new InvalidStatement());
