@@ -109,6 +109,12 @@ public class Menus{
         if(table == null && element instanceof ScrollPane pane && pane.getChildren().size > 0 && pane.getChildren().first() instanceof Table t) table = t;
         if(table == null) return;
 
+        //tables stay attached when their contents are replaced
+        for(var listener : table.getListeners()){
+            if(listener instanceof Tooltip tooltip){
+                tooltip.hide();
+            }
+        }
         table.clear();
         var result = UiTreeBuilder.build(table, builder, res -> {
             //forward results to original listener
