@@ -227,13 +227,18 @@ public enum EditorTool{
                             t.setOverlay(editor.drawBlock.asFloor());
                         }
                     };
-                    
-                    fill(x, y, false, tester, setter);
+
+                    //overlays can be rejected by the tile, leaving it unchanged
+                    fill(x, y, false, true, tester, setter);
                 }
             }
         }
 
         void fill(int x, int y, boolean replace, Boolf<Tile> tester, Cons<Tile> filler){
+            fill(x, y, replace, false, tester, filler);
+        }
+
+        void fill(int x, int y, boolean replace, boolean trackVisited, Boolf<Tile> tester, Cons<Tile> filler){
             int width = editor.width(), height = editor.height();
 
             if(replace){
@@ -250,6 +255,18 @@ public enum EditorTool{
             }else{
                 //perform flood fill
                 int x1;
+
+                //track visited tiles when the filler may leave a tile unchanged
+                if(trackVisited){
+                    Bits visited = new Bits(width * height);
+                    Boolf<Tile> baseTester = tester;
+                    Cons<Tile> baseFiller = filler;
+                    tester = t -> !visited.get(t.array()) && baseTester.get(t);
+                    filler = t -> {
+                        visited.set(t.array());
+                        baseFiller.get(t);
+                    };
+                }
 
                 stack.clear();
                 stack.add(Point2.pack(x, y));
