@@ -1,5 +1,6 @@
 package mindustry.entities.bullet;
 
+import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import mindustry.content.*;
@@ -35,6 +36,11 @@ public class RailBulletType extends BulletType{
     @Override
     public void handlePierce(Bullet b, float initialHealth, float x, float y){
         float sub = Math.max(initialHealth * pierceDamageFactor, 0);
+
+        //units pass their center as the hit position; project it onto the rail line so effects/stop distance line up with the beam
+        float dist = Math.max(Angles.trnsx(-b.rotation(), x - b.x, y - b.y), 0f);
+        x = b.x + Angles.trnsx(b.rotation(), dist);
+        y = b.y + Angles.trnsy(b.rotation(), dist);
 
         if(b.damage <= 0){
             b.fdata = Math.min(b.fdata, b.dst(x, y));
