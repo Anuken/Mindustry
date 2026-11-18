@@ -371,6 +371,8 @@ public class SettingsMenuDialog extends BaseDialog{
         sound.sliderPref("ambientvol", 100, 0, 100, 1, i -> i + "%");
 
         game.sliderPref("saveinterval", 60, 10, 5 * 120, 10, i -> Core.bundle.format("setting.seconds", i));
+        if (!mobile)
+        game.sliderPref("blockselectinterval", 400, 100, 1000, 20, i -> Core.bundle.format("setting.milliseconds", i));
 
         if(mobile){
             game.checkPref("autotarget", true);

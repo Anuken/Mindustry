@@ -2071,6 +2071,7 @@ public class UnitTypes{
 
             buildSpeed = 2f;
             rotateToBuilding = false;
+            targetAir = false;
 
             weapons.add(new Weapon("plasma-mount-weapon"){{
 
