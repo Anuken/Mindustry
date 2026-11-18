@@ -47,6 +47,11 @@ public class Menus{
     //use the MenuBuilder version instead of invoking this with Call
     @Remote(variants = Variant.both)
     public static void menuBuilder(int id, long token, @Nullable String title, boolean hideOnClick, boolean hidePrevious, boolean fillScreen, NodeBuilder<?> builder){
+        menuBuilder(id, token, title, hideOnClick, hidePrevious, fillScreen, true, builder);
+    }
+
+    @Remote(variants = Variant.both)
+    public static void menuBuilder(int id, long token, @Nullable String title, boolean hideOnClick, boolean hidePrevious, boolean fillScreen, boolean closeButton, NodeBuilder<?> builder){
         MenuDialog dialog = new MenuDialog();
         dialog.setFillParent(fillScreen);
         if(title != null){
@@ -55,7 +60,12 @@ public class Menus{
             dialog.titleTable.remove();
         }
 
-        dialog.addCloseButton();
+        if(closeButton){
+            dialog.addCloseButton();
+        }else{
+            dialog.addCloseListener();
+            dialog.getCell(dialog.buttons).pad(0).clearElement();
+        }
 
         dialog.update(() -> {
             if(!net.active()){

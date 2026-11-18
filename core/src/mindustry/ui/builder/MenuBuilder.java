@@ -14,6 +14,8 @@ public class MenuBuilder{
     public boolean hideExisting = true;
     /** If true (default), the dialog fills the screen. If you're showing something small, make it false. For large complex menus, this has to be true in order to work properly. */
     public boolean fillScreen = true;
+    /** If false, hide the default Back button. Escape and Back still close the dialog. */
+    public boolean closeButton = true;
     /** Unique value that is passed to the result after menu is closed. */
     public long token;
     /** ID for menu callback; you can reuse this as long as you have unique keys for button results. */
@@ -37,12 +39,12 @@ public class MenuBuilder{
 
     /** Submits this menu to the relevant player. */
     public void show(Player player){
-        Call.menuBuilder(player.con, id, token, title, hideOnClick, hideExisting, fillScreen, ui);
+        Call.menuBuilder(player.con, id, token, title, hideOnClick, hideExisting, fillScreen, closeButton, ui);
     }
 
     /** Submits this menu to all players. */
     public void showAll(){
-        Call.menuBuilder(id, token, title, hideOnClick, hideExisting, fillScreen, ui);
+        Call.menuBuilder(id, token, title, hideOnClick, hideExisting, fillScreen, closeButton, ui);
     }
 
     /** Rebuilds a specific Table with the specified elementId. This can be used for updating dialog content based on user interaction.*/
@@ -72,6 +74,11 @@ public class MenuBuilder{
 
     public MenuBuilder fillScreen(boolean fillScreen){
         this.fillScreen = fillScreen;
+        return this;
+    }
+
+    public MenuBuilder closeButton(boolean closeButton){
+        this.closeButton = closeButton;
         return this;
     }
 
