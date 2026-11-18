@@ -19,7 +19,10 @@ public class ConsumePayloadDynamic extends Consume{
     @Override
     public float efficiency(Building build){
         float mult = multiplier.get(build);
-        for(PayloadStack stack : payloads.get(build)){
+        //prevent multithreading crash due to shared iterators
+        var pay = payloads.get(build);
+        for(int i = 0; i < pay.size; i++){
+            var stack = pay.get(i);
             if(!build.getPayloads().contains(stack.item, Math.round(stack.amount * mult))){
                 return 0f;
             }
@@ -30,7 +33,9 @@ public class ConsumePayloadDynamic extends Consume{
     @Override
     public void trigger(Building build){
         float mult = multiplier.get(build);
-        for(PayloadStack stack : payloads.get(build)){
+        var pay = payloads.get(build);
+        for(int i = 0; i < pay.size; i++){
+            var stack = pay.get(i);
             build.getPayloads().remove(stack.item, Math.round(stack.amount * mult));
         }
     }
@@ -62,11 +67,11 @@ public class ConsumePayloadDynamic extends Consume{
 
         table.clear();
         table.table(c -> {
-            int i = 0;
-            for(var stack : pay){
+            for(int i = 0; i < pay.size; i++){
+                var stack = pay.get(i);
                 c.add(new ReqImage(StatValues.stack(stack.item, Math.round(stack.amount * multiplier.get(build))),
                 () -> inv.contains(stack.item, Math.round(stack.amount * multiplier.get(build))))).padRight(8);
-                if(++i % 4 == 0) c.row();
+                if((i + 1) % 4 == 0) c.row();
             }
         }).left();
     }
