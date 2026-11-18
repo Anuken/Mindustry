@@ -18,6 +18,7 @@ import mindustry.core.*;
 import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
+import mindustry.ui.*;
 
 import java.util.*;
 
@@ -197,7 +198,7 @@ public class BlockInventoryFragment{
                         lastItem = null;
                     }
                 });
-                table.add(image);
+                table.add(image).tooltip(t -> t.background(Styles.black6).margin(4f).add(item.localizedName).style(Styles.outlineLabel));;
 
                 if(row++ % cols == cols - 1) table.row();
             }
