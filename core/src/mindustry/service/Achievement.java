@@ -136,6 +136,7 @@ public enum Achievement{
 
             service.completeAchievement(name());
             service.storeStats();
+            completed = true;
         }
     }
 
@@ -150,6 +151,10 @@ public enum Achievement{
         if(!isAchieved() && stat != null && stat.get() >= statGoal){
             complete();
         }
+    }
+
+    public @Nullable SStat stat(){
+        return stat;
     }
 
     public boolean isAchieved(){

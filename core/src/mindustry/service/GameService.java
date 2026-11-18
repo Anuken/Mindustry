@@ -553,6 +553,9 @@ public class GameService{
     }
 
     private void checkUpdate(){
+        //stat increments are batched, since they can happen many times per frame (e.g. building/destroying blocks)
+        SStat.flushAll();
+
         if(campaign()){
             SStat.maxUnitActive.max(Groups.unit.count(t -> t.team == player.team()));
 
