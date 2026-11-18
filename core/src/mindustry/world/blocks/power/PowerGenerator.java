@@ -15,6 +15,7 @@ import mindustry.entities.units.*;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
+import mindustry.logic.*;
 import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
@@ -228,6 +229,14 @@ public class PowerGenerator extends PowerDistributor{
             if(revision >= 1){
                 generateTime = read.f();
             }
+        }
+
+        @Override
+        public double sense(LAccess sensor){
+            if(sensor == LAccess.powerOutput){
+                return getPowerProduction() * 60.0 * timeScale();
+            }
+            return super.sense(sensor);
         }
     }
 }

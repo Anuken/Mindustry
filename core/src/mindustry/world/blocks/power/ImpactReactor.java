@@ -127,6 +127,9 @@ public class ImpactReactor extends PowerGenerator{
         @Override
         public double sense(LAccess sensor){
             if(sensor == LAccess.heat) return warmup;
+            if(sensor == LAccess.powerOutput){
+                return Math.max(getPowerProduction() - consPower.usage, 0) * 60.0 * timeScale();
+            }
             return super.sense(sensor);
         }
 
