@@ -594,12 +594,34 @@ public class CoreBlock extends StorageBlock{
         }
 
         @Override
-        public void changeTeam(Team next){
+        public void changeTeam(Team next, boolean updatePower){
             if(this.team == next) return;
 
-            onRemoved();
+            ItemModule network = items, snapshot = items.copy();
+            int totalCapacity = storageCapacity;
 
-            super.changeTeam(next);
+            //the old team keeps the linked storage, each with its share of the items
+            detachStorage(snapshot, totalCapacity, true);
+
+            //if other cores remain, the network stays with them and this core only takes its own share
+            if(sharesItems()){
+                items = new ItemModule();
+                for(Item item : content.items()){
+                    int amount = Math.min(itemCapacity, (int)(snapshot.get(item) * (float)itemCapacity / totalCapacity));
+                    items.set(item, amount);
+                    network.remove(item, amount);
+                }
+            }
+
+            unregister();
+
+            //merge into the new team's network, if it has one; capacity is clamped once this core joins it in onProximityUpdate
+            CoreBuild existing = state.teams.cores(next).find(c -> c != this);
+            if(existing != null && existing.items != items){
+                existing.items.add(items);
+            }
+
+            super.changeTeam(next, updatePower);
 
             onProximityUpdate();
 
@@ -766,6 +788,10 @@ public class CoreBlock extends StorageBlock{
 
             storageCapacity = itemCapacity + proximity.sum(e -> owns(e) ? e.block.itemCapacity : 0);
             proximity.each(this::owns, t -> {
+                //storage joining the network brings its items with it; when loading, its saved items are a copy of the network
+                if(t.items != items && t.items != null && !world.isGenerating()){
+                    items.add(t.items);
+                }
                 t.items = items;
                 ((StorageBuild)t).linkedCore = this;
             });
@@ -853,17 +879,42 @@ public class CoreBlock extends StorageBlock{
 
         @Override
         public void onRemoved(){
-            int totalCapacity = proximity.sum(e -> e.items != null && e.items == items ? e.block.itemCapacity : 0);
+            //with other cores remaining, the network outlives this core, so detached storage takes its items out of it.
+            //otherwise, the items would be lost along with the core, so they are split among the storage
+            boolean shared = sharesItems();
+            detachStorage(items.copy(), shared ? storageCapacity : proximity.sum(e -> owns(e) && e.items == items ? e.block.itemCapacity : 0), shared);
+            unregister();
+        }
 
-            proximity.each(e -> owns(e) && e.items == items && owns(e), t -> {
+        /** @return whether another core of this team uses the same item module. */
+        public boolean sharesItems(){
+            return team.cores().contains(c -> c != this && c.items == items);
+        }
+
+        /**
+         * Unlinks all storage linked to this core. Each one gets its share of the snapshot, proportional to its capacity.
+         * @param subtract whether to remove each share from the network, so items are not duplicated.
+         * */
+        protected void detachStorage(ItemModule snapshot, int totalCapacity, boolean subtract){
+            if(totalCapacity <= 0) return;
+            ItemModule network = items;
+
+            proximity.each(e -> owns(e) && e.items == network, t -> {
                 StorageBuild ent = (StorageBuild)t;
                 ent.linkedCore = null;
                 ent.items = new ItemModule();
                 for(Item item : content.items()){
-                    ent.items.set(item, (int)Math.min(ent.block.itemCapacity, items.get(item) * (float)ent.block.itemCapacity / totalCapacity));
+                    int amount = (int)Math.min(ent.block.itemCapacity, snapshot.get(item) * (float)ent.block.itemCapacity / totalCapacity);
+                    ent.items.set(item, amount);
+                    if(subtract){
+                        network.remove(item, amount);
+                    }
                 }
             });
+        }
 
+        /** Removes this core from its team's network and updates the remaining cores. */
+        protected void unregister(){
             state.teams.unregisterCore(this);
 
             for(CoreBuild other : state.teams.cores(team)){
