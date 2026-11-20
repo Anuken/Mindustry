@@ -785,7 +785,7 @@ public class SchematicsDialog extends BaseDialog{
 
             Table inner = new Table();
 
-            inner.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size)).color(Color.lightGray).row();
+            inner.add(Core.bundle.format("schematic.info", schem.width, schem.height, schem.tiles.size, schem.width * schem.height)).color(Color.lightGray).row();
             inner.table(tags -> buildTags(schem, tags)).fillX().pad(6).row();
             inner.add(new SchematicImage(schem)).maxSize(800f).row();
 
