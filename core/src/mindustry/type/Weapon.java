@@ -189,6 +189,12 @@ public class Weapon implements Cloneable{
         }
 
         StatValues.ammo(ObjectMap.of(u, bullet)).display(t);
+        if(!bullet.collidesAir || !bullet.collidesGround){
+            t.table(b -> {
+                if(!bullet.collidesAir) b.row().add("[lightgray]" + Core.bundle.format("weapon.unablehitair"));
+                if(!bullet.collidesGround) b.row().add("[lightgray]" + Core.bundle.format("weapon.unablehitground"));
+            }).padTop(12);
+        }
     }
 
     public float dps(){
