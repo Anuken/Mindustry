@@ -67,6 +67,8 @@ public class Weapon implements Cloneable{
     public boolean predictTarget = true;
     /** if true, this weapon is used for attack range calculations */
     public boolean useAttackRange = true;
+    /** Displayed range in the database. <0 to disable. */
+    public float displayedRange = -1f;
     /** ticks to wait in-between targets */
     public float targetInterval = 40f, targetSwitchInterval = 70f;
     /** rotation speed of weapon when rotation is enabled, in degrees/t*/
@@ -183,12 +185,17 @@ public class Weapon implements Cloneable{
             t.row();
             t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
         }
+        if(displayedRange > 0){
+            t.row();
+            t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(displayedRange / tilesize, 1) + " " + StatUnit.blocks.localized());
+        }
         if(!alwaysContinuous && reload > 0 && !bullet.killShooter){
             t.row();
             t.add("[lightgray]" + Stat.reload.localized() + ": " + (mirror ? "2x " : "") + "[white]" + Strings.autoFixed(60f / reload * shoot.shots, 2) + " " + StatUnit.perSecond.localized());
         }
 
         StatValues.ammo(ObjectMap.of(u, bullet)).display(t);
+
         if(!bullet.collidesAir || !bullet.collidesGround){
             t.table(b -> {
                 if(!bullet.collidesAir) b.row().add("[lightgray]" + Core.bundle.format("weapon.unablehitair"));
