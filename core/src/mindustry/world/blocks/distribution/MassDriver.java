@@ -31,6 +31,7 @@ public class MassDriver extends Block{
     public int minDistribute = 10;
     public float knockback = 4f;
     public float reload = 100f;
+    public float dumpRate = 1f;
     public MassDriverBolt bullet = new MassDriverBolt();
     public float bulletSpeed = 5.5f;
     public float bulletLifetime = 200f;
@@ -72,10 +73,10 @@ public class MassDriver extends Block{
 
         stats.add(Stat.shootRange, range / tilesize, StatUnit.blocks);
         stats.add(Stat.reload, table -> {
-            table.add((String)(Strings.autoFixed(60f / reload, 2) + StatUnit.perSecond.localized() + " ~ " +
-                Strings.autoFixed(itemCapacity * (60f / reload), 2) + " " + StatUnit.itemsSecond.localized()));
+            table.add(Strings.autoFixed(60f / reload, 2) + StatUnit.perSecond.localized() + " ~ " +
+                Strings.autoFixed(itemCapacity * (60f / reload), 2) + " " + StatUnit.itemsSecond.localized());
         });
-        stats.add(Stat.receiveRate, 60f, StatUnit.itemsSecond);
+        stats.add(Stat.receiveRate, Strings.autoFixed(60f / dumpRate, 2) + " " + StatUnit.itemsSecond.localized());
     }
 
     @Override
@@ -184,7 +185,7 @@ public class MassDriver extends Block{
 
             //dump when idle or accepting
             if(state == DriverState.idle || state == DriverState.accepting){
-                dumpAccumulate();
+                dumpAccumulate(dumpRate);
             }
 
             //skip when there's no power
