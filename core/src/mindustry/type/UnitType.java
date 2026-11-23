@@ -1090,7 +1090,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         if(weapons.size > 1){
             float first = weapons.first().range();
             for(Weapon weapon : weapons){
-                if(weapon.range() != first){
+                if(!Mathf.equal(weapon.range(), first, 1f)){
                     weapons.each(w -> w.displayedRange = w.range() - margin);
                     return;
                 }
