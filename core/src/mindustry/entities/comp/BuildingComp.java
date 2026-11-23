@@ -1056,13 +1056,23 @@ abstract class BuildingComp implements Posc, Teamc, Healthc, Buildingc, QuadTree
         return dumpAccumulate(null);
     }
 
+    /** Dumps any item with an accumulator at a set rate. May dump multiple times per frame. Use with care. */
+    public boolean dumpAccumulate(float rate){
+        return dumpAccumulate(null, rate);
+    }
+
     /** Dumps any item with an accumulator. May dump multiple times per frame. Use with care. */
     public boolean dumpAccumulate(Item item){
+        return dumpAccumulate(item, 1f);
+    }
+
+    /** Dumps any item with an accumulator. May dump multiple times per frame. Use with care. */
+    public boolean dumpAccumulate(Item item, float rate){
         boolean res = false;
         dumpAccum += delta();
-        while(dumpAccum >= 1f){
+        while(dumpAccum >= rate){
             res |= dump(item);
-            dumpAccum -=1f;
+            dumpAccum -= rate;
         }
         return res;
     }
