@@ -81,6 +81,7 @@ public class Stat implements Comparable<Stat>{
     repairTime = new Stat("repairTime", StatCat.function),
     repairSpeed = new Stat("repairSpeed", StatCat.function),
     range = new Stat("range", StatCat.function),
+    maxRange = new Stat("maxRange", StatCat.function),
     shootRange = new Stat("shootRange", StatCat.function),
     inaccuracy = new Stat("inaccuracy", StatCat.function),
     shots = new Stat("shots", StatCat.function),

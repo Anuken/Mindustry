@@ -814,7 +814,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
         stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocks));
         stats.add(Stat.itemCapacity, itemCapacity);
-        stats.add(Stat.range, Strings.autoFixed(maxRange / tilesize, 1), StatUnit.blocks);
+        stats.add(Stat.maxRange, Strings.autoFixed(maxRange / tilesize, 1), StatUnit.blocks);
 
         if(crushDamage > 0){
             stats.add(Stat.crushDamage, crushDamage * 60f * 5f, StatUnit.perSecond);
