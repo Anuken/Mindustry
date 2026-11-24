@@ -167,3 +167,5 @@ core/assets/logicids.dat
 
 # project files for the sectors
 core/assets-raw/sprites/ui/sectors/*.json
+
+arc

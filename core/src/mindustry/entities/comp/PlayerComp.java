@@ -227,10 +227,7 @@ abstract class PlayerComp implements UnitController, Entityc, Syncc, Timerc, Dra
             deathTimer = 0;
 
             //update some basic state to sync things
-            if(unit.type.canBoost){
-                boolean shouldBoost = unit.onSolid() || boosting || (unit.isFlying() && !unit.canLand());
-                unit.elevation = Mathf.approachDelta(unit.elevation, shouldBoost ? 1f : 0f, shouldBoost ? unit.type.riseSpeed : unit.type.descentSpeed);
-            }
+            unit.updateBoosting(boosting);
         }else if((core = bestCore()) != null){
             //have a small delay before death to prevent the camera from jumping around too quickly
             //(this is not for balance, it just looks better this way)

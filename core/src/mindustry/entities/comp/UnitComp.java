@@ -115,10 +115,17 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         updateBoosting(boost, false);
     }
 
+    public boolean shouldBoost(boolean tryingToBoost) {
+        if (onSolid()) return true; //immediatley boost if a block is spawned under us or if we are pushed very forcefully into a wall
+        if (isFlying() && !canLand()) return true; //don't land if there are obstacles on the ground
+        if (isGrounded() && !canLift()) return false; //don't lift if there are obstacles in the air
+        return tryingToBoost;
+    }
+
     public void updateBoosting(boolean boost, boolean event){
         if(!type.canBoost || dead) return;
 
-        boolean shouldBoost = boost || onSolid() || (isFlying() && !canLand());
+        boolean shouldBoost = shouldBoost(boost);
         elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(shouldBoost) : 0f, shouldBoost ? type.riseSpeed : type.descentSpeed);
         if(event){
             Events.fire(Trigger.unitCommandBoost);
@@ -169,10 +176,23 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         return hitSize * 0.7f;
     }
 
-    /** @return whether there is solid, un-occupied ground under this unit. */
-    public boolean canLand(){
+    /** @return whether there is solid, un-occupied space under or above this unit. */
+    public boolean canElevate(boolean isAir){
         float psize = physicSize();
-        return !onSolid() && !Units.any(x - psize/2f, y - psize/2f, psize, psize, f -> f != self() && f.isGrounded());
+        return !onSolid() && !Units.any(x - psize/2f, y - psize/2f, psize, psize, f -> {
+            if (f == self()) { return false; };
+            if (isAir) { return f.isGrounded(); } else { return f.isFlying(); }
+        });
+    }
+
+    /** @return whether we can elevate to ground */
+    public boolean canLand(){
+        return canElevate(true);
+    }
+
+    /** @return whether we can elevate to air */
+    public boolean canLift(){
+        return canElevate(false);
     }
 
     public boolean inRange(Position other){

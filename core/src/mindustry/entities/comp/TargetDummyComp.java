@@ -26,8 +26,8 @@ abstract class TargetDummyComp implements Unitc, Healthc{
 
     @Override
     @Replace
-    public boolean canLand(){
-        //dummies should always respect the boost config even when the landing area is obstructed (usually by other dummies)
+    public boolean canElevate(boolean isAir){
+        //dummies should always respect the boost config even when the landing/lifting area is obstructed (usually by other dummies)
         return true;
     }
 }
