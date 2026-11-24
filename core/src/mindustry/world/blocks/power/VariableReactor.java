@@ -58,7 +58,7 @@ public class VariableReactor extends PowerGenerator{
 
         addBar("heat", (VariableReactorBuild entity) ->
             new Bar(() ->
-            Core.bundle.format("bar.heatpercent", arc.util.Strings.autoFixed(entity.heat, 1), (int)(Mathf.clamp(entity.heat / maxHeat) * 100)),
+            Core.bundle.format("bar.heatpercent", arc.util.Strings.autoFixed(entity.heat, 2), (int)(Mathf.clamp(entity.heat / maxHeat) * 100)),
             () -> Pal.lightOrange,
             () -> entity.heat / maxHeat));
     }
