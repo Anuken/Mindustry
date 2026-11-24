@@ -183,7 +183,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public boolean canElevate(boolean isAir){
         float psize = physicSize();
         return !onSolid() && !Units.any(x - psize/2f, y - psize/2f, psize, psize, f -> {
-            if (f == self()) return false;
+            if (f == self()) { return false; };
             if (isAir) { return f.isGrounded(); } else { return f.isFlying(); }
         });
     }
