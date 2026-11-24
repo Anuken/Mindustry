@@ -10,7 +10,6 @@ import arc.math.geom.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
-import mindustry.*;
 import mindustry.ai.types.*;
 import mindustry.annotations.Annotations.*;
 import mindustry.audio.*;
@@ -182,12 +181,10 @@ public class Weapon implements Cloneable{
 
     public void addStats(UnitType u, Table t){
         if(inaccuracy > 0){
-            t.row();
-            t.add("[lightgray]" + Stat.inaccuracy.localized() + ": [white]" + (int)inaccuracy + " " + StatUnit.degrees.localized());
+            addWeaponStat(t, Stat.inaccuracy, Strings.autoFixed(inaccuracy, 0), StatUnit.degrees);
         }
         if(displayedRange > 0){
-            t.row();
-            t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(displayedRange / tilesize, 1) + " " + StatUnit.blocks.localized());
+            addWeaponStat(t, Stat.shootRange, Strings.autoFixed(displayedRange / tilesize, 1), StatUnit.blocks);
         }
         if(!alwaysContinuous && reload > 0 && !bullet.killShooter){
             t.row();
@@ -198,10 +195,17 @@ public class Weapon implements Cloneable{
 
         if(!bullet.collidesAir || !bullet.collidesGround){
             t.table(b -> {
-                if(!bullet.collidesAir) b.row().add("[lightgray]" + Core.bundle.format("weapon.unablehitair"));
-                if(!bullet.collidesGround) b.row().add("[lightgray]" + Core.bundle.format("weapon.unablehitground"));
+                if(!bullet.collidesAir) addWeaponStat(b, Stat.targetsAir, Core.bundle.get("no"));
+                if(!bullet.collidesGround) addWeaponStat(b, Stat.targetsGround, Core.bundle.get("no"));
             }).padTop(12);
         }
+    }
+
+    public void addWeaponStat(Table t, Stat stat, String value){
+        addWeaponStat(t, stat, value, null);
+    }
+    public void addWeaponStat(Table t, Stat stat, String value, StatUnit unit){
+        t.row().add("[lightgray]" + stat.localized() + ": [white]" + value + " " + (unit != null ? unit.localized() : ""));
     }
 
     public float dps(){
@@ -442,7 +446,7 @@ public class Weapon implements Cloneable{
         }
 
         if(!headless && activeSound != Sounds.none && mount.shoot && can && mount.warmup >= minWarmup){
-            Vars.control.sound.loop(activeSound, unit, activeSoundVolume);
+            control.sound.loop(activeSound, unit, activeSoundVolume);
         }
 
         float velLen = unit.isRemote() ? unit.vel.len() : unit.deltaLen() / Time.delta;
@@ -490,7 +494,7 @@ public class Weapon implements Cloneable{
             int barrel = mount.barrelCounter;
 
             if(delay > 0f){
-                Vars.state.run(delay, () -> {
+                state.run(delay, () -> {
                     //hack: make sure the barrel is the same as what it was when the bullet was queued to fire
                     int prev = mount.barrelCounter;
                     mount.barrelCounter = barrel;
