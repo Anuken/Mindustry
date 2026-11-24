@@ -1163,15 +1163,14 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
                 dpsEstimate /= 15f;
             }
         }
-        if(damageEstimate < 0){
-            damageEstimate = weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f);
-        }
 
         return dpsEstimate;
     }
 
-    public float estimateDamage(){
-        return damageEstimate < 0 ? weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f) : damageEstimate;
+    public void estimateDamage(){
+        if(damageEstimate < 0){
+            damageEstimate = weapons.sumf(w -> w.bullet != null ? w.bullet.estimateDPS() : 0f);
+        }
     }
 
     @CallSuper
