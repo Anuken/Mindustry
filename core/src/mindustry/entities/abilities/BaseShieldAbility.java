@@ -159,7 +159,7 @@ public abstract class BaseShieldAbility extends Ability implements UnitShieldPro
                     b.owner = paramUnit;
                     b.team = paramUnit.team;
                     b.time = b.lifetime * (1 - reflectBulletTime);
-                    if(reflectBuildingDamage > 0f) b.buildingDamageMultiplier = reflectBuildingDamage;
+                    if(reflectBuildingDamage > 0f) b.buildingDamageMultiplier = Math.max(b.buildingDamageMultiplier, reflectBuildingDamage);
                 });
             }else{
                 b.absorb();
