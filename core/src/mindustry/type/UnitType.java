@@ -814,7 +814,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         stats.add(Stat.speed, speed * 60f / tilesize, StatUnit.tilesSecond);
         stats.add(Stat.size, StatValues.squared(hitSize / tilesize, StatUnit.blocks));
         stats.add(Stat.itemCapacity, itemCapacity);
-        stats.add(Stat.range, Strings.autoFixed(maxRange / tilesize, 1), StatUnit.blocks);
+        stats.add(Stat.maxRange, Strings.autoFixed(maxRange / tilesize, 1), StatUnit.blocks);
 
         if(crushDamage > 0){
             stats.add(Stat.crushDamage, crushDamage * 60f * 5f, StatUnit.perSecond);
@@ -1086,6 +1086,16 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
         canHeal = weapons.contains(w -> w.bullet.heals());
 
         canAttack = weapons.contains(w -> !w.noAttack);
+
+        if(weapons.size > 1){
+            float first = weapons.first().range();
+            for(Weapon weapon : weapons){
+                if(!Mathf.equal(weapon.range(), first, 1f)){
+                    weapons.each(w -> w.displayedRange = w.range() - margin);
+                    return;
+                }
+            }
+        }
 
         //assign default commands.
         if(commands.size == 0){
