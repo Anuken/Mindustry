@@ -25,7 +25,6 @@ import mindustry.graphics.*;
 import mindustry.io.*;
 import mindustry.logic.*;
 import mindustry.type.*;
-import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.*;
 import mindustry.world.draw.*;
@@ -103,6 +102,8 @@ public class Turret extends ReloadTurret{
     public Sortf unitSort = UnitSorts.closest;
     /** Filter for types of units to attack. */
     public Boolf<Unit> unitFilter = u -> true;
+    /** Filter for types of allied units to attack. Null to disable. */
+    public @Nullable Boolf<Unit> allyFilter;
     /** Filter for types of buildings to attack. */
     public Boolf<Building> buildingFilter = b -> targetUnderBlocks || !b.block.underBullets;
 
@@ -601,23 +602,40 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean validateTarget(){
-            return !Units.invalidateTarget(target, canHeal() ? Team.derelict : team, x, y) || controlled() || logicControlled();
+            return !Units.invalidateTarget(target, canHeal() || canTargetAlly() ? Team.derelict : team, x, y) || controlled() || logicControlled();
         }
 
         protected boolean canHeal(){
             return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().heals();
         }
 
+        protected boolean canTargetAlly(){
+            return allyFilter != null && hasAmmo() && peekAmmo().collidesAlly;
+        }
+
         protected Posc findEnemy(float range){
             var ammo = peekAmmo();
-            Sortf sort = ammo.unitSort != UnitSorts.closest ? ammo.unitSort : unitSort;
+            Sortf sort = ammo != null && ammo.unitSort != UnitSorts.closest ? ammo.unitSort : unitSort;
             if(targetAir && !targetGround){
                 return Units.bestEnemy(team, x, y, range, e -> !e.dead() && !e.isGrounded() && unitFilter.get(e), sort);
             }else{
-                boolean buildings = targetGround && targetBlocks && (ammo == null || ammo.targetBlocks), missiles = ammo == null || ammo.targetMissiles;
+                boolean buildings = targetGround && targetBlocks && (ammo == null || ammo.targetBlocks);
                 return Units.bestTarget(team, x, y, range,
-                    e -> !e.dead() && unitFilter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && (missiles || !(e instanceof TimedKillc)),
+                    e -> unitPredicate(e, unitFilter),
                     b -> buildings && buildingFilter.get(b), sort);
+            }
+        }
+
+        protected Posc findAlly(float range){
+            if(allyFilter == null) return null;
+
+            var ammo = peekAmmo();
+            Sortf sort = ammo != null && ammo.unitSort != UnitSorts.closest ? ammo.unitSort : unitSort;
+
+            if(targetAir && !targetGround){
+                return Units.closest(team, x, y, range, e -> !e.dead() && !e.isGrounded() && allyFilter.get(e), sort);
+            }else{
+                return Units.closest(team, x, y, range, e -> unitPredicate(e, allyFilter), sort);
             }
         }
 
@@ -633,6 +651,17 @@ public class Turret extends ReloadTurret{
             if(target == null && canHeal()){
                 target = Units.findAllyTile(team, x, y, range, b -> b.damaged() && b != this);
             }
+
+            if(canTargetAlly()){
+                target = findAlly(range);
+                if(!Mathf.equal(trackRange, range) && target == null){
+                    target = findAlly(trackRange);
+                }
+            }
+        }
+
+        protected boolean unitPredicate(Unit e, Boolf<Unit> filter){
+            return !e.dead() && filter != null && filter.get(e) && (e.isGrounded() || targetAir) && (!e.isGrounded() || targetGround) && (peekAmmo() == null || peekAmmo().targetMissiles || !(e instanceof TimedKillc));
         }
 
         protected void turnToTarget(float targetRot){

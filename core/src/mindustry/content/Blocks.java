@@ -3643,6 +3643,7 @@ public class Blocks{
                     knockback = 0.7f;
                     drag = 0.01f;
                     layer = Layer.bullet - 2f;
+                    collidesAlly = true;
                 }},
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     damage = 4;
@@ -3650,6 +3651,7 @@ public class Blocks{
                 }},
                 Liquids.cryofluid, new LiquidBulletType(Liquids.cryofluid){{
                     drag = 0.01f;
+                    collidesAlly = true;
                 }},
                 Liquids.oil, new LiquidBulletType(Liquids.oil){{
                     drag = 0.01f;
@@ -3977,6 +3979,7 @@ public class Blocks{
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
                     layer = Layer.bullet - 2f;
+                    collidesAlly = true;
                 }},
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
                     lifetime = 49f;
@@ -3999,6 +4002,7 @@ public class Blocks{
                     ammoUsed = 2.5f;
                     statusDuration = 60f * 4f;
                     damage = 0.2f;
+                    collidesAlly = true;
                 }},
                 Liquids.oil, new LiquidBulletType(Liquids.oil){{
                     lifetime = 49f;

@@ -132,6 +132,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
     public boolean collidesTeam = false;
+    /** Whether this bullet type collides with units that are of the same team. Allied units will not receive damage, but are still affected by status effects and knockback. */
+    public boolean collidesAlly = false;
     /** Whether this bullet type collides with air/ground units. */
     public boolean collidesAir = true, collidesGround = true;
     /** Whether this bullet types collides with anything at all. */
@@ -486,6 +488,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         boolean wasDead = entity instanceof Unit u && u.dead;
+        boolean ally = b.type.collidesAlly && entity instanceof Unit u && u.team == b.team;
 
         if(entity instanceof Healthc h){
             float damage = b.damage;
@@ -498,16 +501,19 @@ public class BulletType extends Content implements Cloneable{
             }else{
                 health += shield;
             }
-            if(lifesteal > 0f && b.owner instanceof Healthc o){
-                float result = Math.max(Math.min(h.health(), damage), 0);
-                o.heal(result * lifesteal);
-            }
-            if(pierceArmor){
-                h.damagePierce(damage);
-            }else if(armorMultiplier != 1){
-                h.damageArmorMult(damage, armorMultiplier);
-            }else{
-                h.damage(damage);
+
+            if(!ally){
+                if(lifesteal > 0f && b.owner instanceof Healthc o){
+                    float result = Math.max(Math.min(h.health(), damage), 0);
+                    o.heal(result * lifesteal);
+                }
+                if(pierceArmor){
+                    h.damagePierce(damage);
+                }else if(armorMultiplier != 1){
+                    h.damageArmorMult(damage, armorMultiplier);
+                }else{
+                    h.damage(damage);
+                }
             }
         }
 
@@ -522,7 +528,7 @@ public class BulletType extends Content implements Cloneable{
                 unit.apply(status, statusDuration);
             }
 
-            Events.fire(bulletDamageEvent.set(unit, b));
+            if(!ally) Events.fire(bulletDamageEvent.set(unit, b));
         }
 
         if(!wasDead && entity instanceof Unit unit && unit.dead){
