@@ -175,6 +175,10 @@ public class BulletType extends Content implements Cloneable{
     public float healPercent = 0f;
     /** flat amount of block health healed */
     public float healAmount = 0f;
+    /** % of unit health healed **/
+    public float unitHealPercent = 0f;
+    /** flat amount of unit health healed */
+    public float unitHealAmount = 0f;
     /** sound played when a block is healed */
     public Sound healSound = Sounds.blockHeal;
     /** volume of heal sound */
@@ -454,12 +458,23 @@ public class BulletType extends Content implements Cloneable{
         return -1f;
     }
 
-    public boolean heals(){
+    public boolean healsBlocks(){
         return healPercent > 0 || healAmount > 0;
+    }
+    public boolean healsUnits(){
+        return unitHealPercent > 0 || unitHealAmount > 0;
+    }
+
+    public boolean collidesAllies(){
+        return collideAllyFilter != null || healsUnits();
+    }
+
+    public boolean filterAllies(Bullet b, Unit u){
+        return u != b.shooter && u != b.owner && u.team == b.team && ((collideAllyFilter != null && collideAllyFilter.get(u)) || (healsUnits() && u.damaged()));
     }
 
     public boolean testCollision(Bullet bullet, Building tile){
-        return !heals() || tile.team != bullet.team || tile.healthf() < 1f;
+        return !healsBlocks() || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
     /** If direct is false, this is an indirect hit and the tile was already damaged.
@@ -469,7 +484,7 @@ public class BulletType extends Content implements Cloneable{
             Fires.create(build.tile);
         }
 
-        if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
+        if(healsBlocks() && build.team == b.team && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
             healSound.at(build, 1f + Mathf.range(0.1f), healSoundVolume);
@@ -489,7 +504,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         boolean wasDead = entity instanceof Unit u && u.dead;
-        boolean ally = b.type.collideAllyFilter != null && entity instanceof Unit u && u.team == b.team && b.type.collideAllyFilter.get(u);
+        boolean ally = entity instanceof Unit u && filterAllies(b, u);
 
         if(entity instanceof Healthc h){
             float damage = b.damage;
@@ -527,6 +542,8 @@ public class BulletType extends Content implements Cloneable{
 
                     Events.fire(bulletDamageEvent.set(unit, b));
                 }
+            }else{
+                if(healsUnits()) unit.heal(unitHealPercent / 100f * unit.maxHealth() + unitHealAmount);
             }
             if(Mathf.chance(statusChance)){
                 unit.apply(status, statusDuration);
@@ -618,7 +635,7 @@ public class BulletType extends Content implements Cloneable{
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround, statusChance);
             }
 
-            if(heals()){
+            if(healsBlocks()){
                 state.indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
                     healEffect.at(other.x, other.y, 0f, healColor, other.block);
                     other.heal(healPercent / 100f * other.maxHealth() + healAmount);
@@ -761,10 +778,10 @@ public class BulletType extends Content implements Cloneable{
             //home in on what the unit is aiming at
             if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
                 target = b.aimTile.build;
-            }else if(heals()){
+            }else if(healsBlocks() || collidesAllies()){
                 //home in on allies if possible
                 target = Units.closestTarget(null, realAimX, realAimY, homingRange, b.team,
-                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
+                    e -> e.checkTarget(collidesAir, collidesGround) && (e.team != b.team || filterAllies(b, e)) && !b.hasCollided(e.id),
                     t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id));
             }else{
                 target = Units.closestTarget(b.team, realAimX, realAimY, homingRange,

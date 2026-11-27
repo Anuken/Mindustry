@@ -386,6 +386,7 @@ public class UnitTypes{
                 bullet = new LaserBoltBulletType(5.2f, 13){{
                     lifetime = 30f;
                     healPercent = 5f;
+                    unitHealPercent = 0.05f;
                     pierce = true;
                     pierceBuilding = true;
                     pierceCap = 2;

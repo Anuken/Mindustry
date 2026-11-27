@@ -606,7 +606,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean canHeal(){
-            return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().heals();
+            return targetHealing && hasAmmo() && peekAmmo().collidesTeam && peekAmmo().healsBlocks();
         }
 
         protected boolean canTargetAlly(){

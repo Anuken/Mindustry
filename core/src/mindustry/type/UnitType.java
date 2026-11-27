@@ -1083,7 +1083,7 @@ public class UnitType extends UnlockableContent implements LogicSenseable{
 
         weapons.each(Weapon::init);
 
-        canHeal = weapons.contains(w -> w.bullet.heals());
+        canHeal = weapons.contains(w -> w.bullet.healsBlocks());
 
         canAttack = weapons.contains(w -> !w.noAttack);
 
