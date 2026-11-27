@@ -19,6 +19,7 @@ import mindustry.type.*;
 import mindustry.ui.*;
 import mindustry.world.*;
 import mindustry.world.blocks.liquid.Conduit.*;
+import mindustry.world.consumers.*;
 import mindustry.world.draw.*;
 import mindustry.world.meta.*;
 
@@ -76,6 +77,9 @@ public class GenericCrafter extends Block{
     /** If false, progress and warmup are not saved. Keeps the old save format for blocks that were not crafters before. */
     public boolean saveProgress = true;
 
+    /** Used for crafters that realistically have increased yield (higher output, same consumption) but do not use {@link #outputScale} */
+    private boolean shouldShowYield;
+
     public DrawBlock drawer = new DrawDefault();
 
     public GenericCrafter(String name){
@@ -127,13 +131,15 @@ public class GenericCrafter extends Block{
         float sum = sumAttribute(attribute, x, y);
         float base = baseEfficiency * (solidFloorOnly ? percentSolid(x, y) : 1f);
 
+        //scaled liquid crafters consume the same amount/s. Yield: produces more, consumes the same. Speed: produces more, consumes more
+        float efficiencyMultiplier = Math.max(base + Math.min(maxBoost, boostScale * sum), 0f);
         drawPlaceText(
-        (displayEfficiency && boostScale > 0f ?
-        Core.bundle.format("bar.efficiency", Math.round(Math.max(base + Math.min(maxBoost, boostScale * sum), 0f) * 100f))
-        : "") +
-        (displayScaledOutput && outputScale > 0f ?
-        "\n" + Core.bundle.format("bar.yield", (int)((1f + Math.min(maxBoost, outputScale * sum)) * 100f))
-        : ""), x, y, valid);
+        (displayEfficiency && boostScale > 0f && !shouldShowYield ?
+            Core.bundle.format("bar.speed", Math.round(efficiencyMultiplier * 100f))
+            : "") +
+        (displayScaledOutput && (outputScale > 0f || shouldShowYield) ?
+            "\n" + Core.bundle.format("bar.yield", Math.round((outputScale > 0f ? 1f + Math.min(maxBoost, outputScale * sum) : efficiencyMultiplier) * 100f))
+            : ""), x, y, valid);
     }
 
     @Override
@@ -168,20 +174,24 @@ public class GenericCrafter extends Block{
                 () -> Pal.ammo,
                 () -> entity.warmup * entity.efficiency
             ));
-        }else if(attribute != null && displayEfficiency && boostScale > 0f){
-            addBar("efficiency", (GenericCrafterBuild entity) -> new Bar(
-                () -> Core.bundle.format("bar.efficiency", (int)(entity.efficiencyMultiplier() * 100)),
-                () -> Pal.lightOrange,
-                entity::efficiencyMultiplier
-            ));
-        }
-
-        if(attribute != null && displayScaledOutput && outputScale > 0f){
-            addBar("yield", (GenericCrafterBuild entity) -> new Bar(
-                () -> Core.bundle.format("bar.yield", (int)(entity.outputMultiplier() * 100)),
-                () -> Pal.lightOrange,
-                entity::outputMultiplier
-            ));
+        }else if(attribute != null){
+            if(displayEfficiency && boostScale > 0f && !shouldShowYield){
+                addBar("efficiency", (GenericCrafterBuild entity) -> new Bar(
+                    () -> Core.bundle.format("bar.speed", Math.round((entity.efficiencyMultiplier() * 100))),
+                    () -> Pal.lightOrange,
+                    entity::efficiencyMultiplier
+                ));
+            }
+            if(displayScaledOutput && (outputScale > 0f || shouldShowYield)){
+                addBar("yield", (GenericCrafterBuild entity) -> {
+                    float attributeMultiplier = outputScale > 0f ? entity.outputMultiplier() : entity.efficiencyMultiplier();
+                    return new Bar(
+                    () -> Core.bundle.format("bar.yield", Math.round((attributeMultiplier * 100))),
+                    () -> Pal.lightOrange,
+                    () -> attributeMultiplier
+                    );
+                });
+            }
         }
     }
 
@@ -223,6 +233,8 @@ public class GenericCrafter extends Block{
 
         if(outputItems != null) hasItems = true;
         if(outputLiquids != null) hasLiquids = true;
+
+        shouldShowYield = boostScale > 0f && (!attributeScalesProgress || (!scaleLiquidConsumption && findConsumer(f -> f instanceof ConsumeLiquidBase) != null));
 
         super.init();
     }
