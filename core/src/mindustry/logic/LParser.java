@@ -23,6 +23,7 @@ public class LParser{
     char[] chars;
     int pos, line, tok;
     boolean privileged;
+    StringBuilder legacySb;
 
     LParser(String text, boolean privileged){
         this.privileged = privileged;
@@ -72,12 +73,41 @@ public class LParser{
                 continue;
             }
 
-            if(c == '\n'){
-                error("Missing closing quote \" before end of line.");
-            }else if(c == '"'){
-                break;
-            }
+            if(c == '\n') return legacyString(from);
+            if(c == '"') break;
+            utflen += utf16size(c);
+        }
 
+        if(pos >= chars.length || chars[pos] != '"') return legacyString(from);
+        if(utflen > 65535) error("String value too long.");
+
+        pos ++; //move past the closing quote
+        return new String(chars, from, pos - from);
+    }
+
+    // Legacy string parsing invoked when regular parsing fails on an unclosed quote:
+    // the only supported escape is `\n`, all other backslashes are escaped
+    String legacyString(int from){
+        if(legacySb == null) legacySb = new StringBuilder();
+        int utflen = 0;
+        boolean wasBackslash = false;
+
+        legacySb.setLength(0);
+        legacySb.append('"');
+        pos = from;
+        while(++pos < chars.length){
+            char c = chars[pos];
+
+            // Escape all backslashes except \n
+            if(wasBackslash && c != 'n'){
+                utflen++;
+                legacySb.append('\\');
+            }
+            legacySb.append(c);
+            wasBackslash = c == '\\';
+
+            if(c == '\n') error("Missing closing quote \" before end of line.");
+            if(c == '"') break;
             utflen += utf16size(c);
         }
 
@@ -85,8 +115,7 @@ public class LParser{
         if(utflen > 65535) error("String value too long.");
 
         pos ++; //move past the closing quote
-
-        return new String(chars, from, pos - from);
+        return legacySb.toString();
     }
 
     static int utf16size(int c){

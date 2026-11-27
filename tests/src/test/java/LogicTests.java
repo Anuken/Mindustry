@@ -99,6 +99,11 @@ public class LogicTests{
         "\\u escapes combined with other escapes in one string",
         "set result \"\\u0041\\n\\u0042\\\\end\"",
         "A\nB\\end"
+        ),
+        Arguments.of(
+        "legacy string: escape right before the closing quote",
+        "set result \"as\\ndf\\\"",
+        "as\ndf\\"
         )
         );
     }
@@ -372,16 +377,8 @@ public class LogicTests{
     static Stream<Arguments> unterminatedStringCases(){
         return Stream.of(
         Arguments.of(
-        "a trailing escaped quote is content, not a terminator, so the string is left unterminated",
-        "set result \"asd\\\""
-        ),
-        Arguments.of(
         "a dangling backslash at the absolute end of input has nothing to escape",
         "set result \"asd\\"
-        ),
-        Arguments.of(
-        "an escaped-quote-then-semicolon does not let the semicolon act as a statement separator inside the string",
-        "set result \"asd\\\"; set bar 5"
         ),
         Arguments.of(
         "a string missing its closing quote entirely",
@@ -441,6 +438,12 @@ public class LogicTests{
     @Test
     void crlfAfterQuotedStringParsesCleanly(){
         assertEquals("bar", setFromValue("set result \"bar\"\r\n"));
+    }
+
+    @Test
+    void legacyStringSeparatedBySemicolonParsesCleanly(){
+        LExecutor exec = load("set result \"asd\\\"; set bar 5");
+        assertEquals(2, exec.instructions.length, "expected two separate statements, split on the semicolon");
     }
 
     @Test
