@@ -129,7 +129,7 @@ public class GenericCrafter extends Block{
 
         drawPlaceText(
         (displayEfficiency && boostScale > 0f ?
-        Core.bundle.format("bar.efficiency", Math.round(Math.max(base + Math.min(maxBoost, boostScale * sum), 0f) * 100f))
+        Core.bundle.format(attributeScalesProgress ? "bar.efficiency" : "bar.yield", Math.round(Math.max(base + Math.min(maxBoost, boostScale * sum), 0f) * 100f))
         : "") +
         (displayScaledOutput && outputScale > 0f ?
         "\n" + Core.bundle.format("bar.yield", (int)((1f + Math.min(maxBoost, outputScale * sum)) * 100f))
@@ -175,7 +175,6 @@ public class GenericCrafter extends Block{
                 entity::efficiencyMultiplier
             ));
         }
-
         if(attribute != null && displayScaledOutput && outputScale > 0f){
             addBar("yield", (GenericCrafterBuild entity) -> new Bar(
                 () -> Core.bundle.format("bar.yield", (int)(entity.outputMultiplier() * 100)),
