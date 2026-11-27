@@ -26,7 +26,7 @@ public class LiquidTurret extends Turret{
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
-        allyFilter = u -> extinguishStatusEffects.contains(u::hasEffect);
+        allyFilter = u -> u.getStatuses().contains(status -> status.effect.extinguishable);
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */

@@ -72,6 +72,8 @@ public class StatusEffect extends UnlockableContent{
     public Color outlineColor = Pal.gray;
     /** True to tint the sprite by the color. Always applied in vanilla. */
     public boolean applyTint = false;
+    /** Whether this effect can be extinguished by the appropriate liquids */
+    public boolean extinguishable = false;
     /** Transition handler map. */
     protected ObjectMap<StatusEffect, TransitionHandler> transitions = new ObjectMap<>();
     /** Called on init. */

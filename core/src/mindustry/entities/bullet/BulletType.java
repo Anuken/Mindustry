@@ -2,6 +2,7 @@ package mindustry.entities.bullet;
 
 import arc.*;
 import arc.audio.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -132,8 +133,6 @@ public class BulletType extends Content implements Cloneable{
     public boolean collidesTiles = true;
     /** Whether this bullet type collides with tiles that are of the same team. */
     public boolean collidesTeam = false;
-    /** Whether this bullet type collides with units that are of the same team. Allied units will not receive damage, but are still affected by status effects and knockback. */
-    public boolean collidesAlly = false;
     /** Whether this bullet type collides with air/ground units. */
     public boolean collidesAir = true, collidesGround = true;
     /** Whether this bullet types collides with anything at all. */
@@ -142,6 +141,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean collideFloor = false;
     /** If true, this projectile collides with static walls */
     public boolean collideTerrain = false;
+    /** Filter on the types of allied (same team) units to collide onto. If non-null, allied units will not receive damage. */
+    public @Nullable Boolf<Unit> collideAllyFilter;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
     /** If keepVelocity = true, whether to reduce lifetime proportionally to the added speed, making range consistent. */
@@ -488,7 +489,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         boolean wasDead = entity instanceof Unit u && u.dead;
-        boolean ally = b.type.collidesAlly && entity instanceof Unit u && u.team == b.team;
+        boolean ally = b.type.collideAllyFilter != null && entity instanceof Unit u && u.team == b.team && b.type.collideAllyFilter.get(u);
 
         if(entity instanceof Healthc h){
             float damage = b.damage;
@@ -518,17 +519,18 @@ public class BulletType extends Content implements Cloneable{
         }
 
         if(entity instanceof Unit unit){
-            if(unit.type.knockbackMultiplier > 0f){
-                Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f * unit.type.knockbackMultiplier);
-                if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
-                unit.impulse(Tmp.v3);
-            }
+            if(!ally){
+                if(unit.type.knockbackMultiplier > 0f){
+                    Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f * unit.type.knockbackMultiplier);
+                    if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
+                    unit.impulse(Tmp.v3);
 
+                    Events.fire(bulletDamageEvent.set(unit, b));
+                }
+            }
             if(Mathf.chance(statusChance)){
                 unit.apply(status, statusDuration);
             }
-
-            if(!ally) Events.fire(bulletDamageEvent.set(unit, b));
         }
 
         if(!wasDead && entity instanceof Unit unit && unit.dead){

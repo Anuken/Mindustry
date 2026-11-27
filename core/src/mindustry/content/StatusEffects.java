@@ -22,6 +22,7 @@ public class StatusEffects{
             damage = 0.167f;
             effect = Fx.burning;
             transitionDamage = 8f;
+            extinguishable = true;
 
             init(() -> {
                 opposite(wet, freezing);
@@ -105,6 +106,7 @@ public class StatusEffects{
             healthMultiplier = 0.8f;
             damage = 0.3f;
             effect = Fx.melting;
+            extinguishable = true;
 
             init(() -> {
                 opposite(wet, freezing);

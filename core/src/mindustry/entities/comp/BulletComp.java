@@ -61,7 +61,7 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     public void getCollisions(Cons<QuadTree> consumer){
         Seq<TeamData> data = state.teams.present;
         for(int i = 0; i < data.size; i++){
-            if(data.items[i].team != team || type.collidesAlly){
+            if(data.items[i].team != team || type.collideAllyFilter != null){
                 consumer.get(data.items[i].tree());
             }
         }
@@ -115,7 +115,8 @@ abstract class BulletComp implements Timedc, Damagec, Hitboxc, Teamc, Posc, Draw
     @Override
     public boolean collides(Hitboxc other){
         return type.collides
-            && other instanceof Teamc t && (t.team() != team || (type.collidesAlly && other instanceof Unit u && u != shooter && u != owner))
+            && other instanceof Teamc t && (t.team() != team
+            || (other instanceof Unit u && type.collideAllyFilter != null && type.collideAllyFilter.get(u) && u != shooter && u != owner))
             && !(other instanceof Unit f && !f.checkTarget(type.collidesAir, type.collidesGround))
             && !(type.pierce && hasCollided(other.id())) && stickyTarget == null; //prevent multiple collisions
     }

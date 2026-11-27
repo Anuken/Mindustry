@@ -610,7 +610,7 @@ public class Turret extends ReloadTurret{
         }
 
         protected boolean canTargetAlly(){
-            return allyFilter != null && hasAmmo() && peekAmmo().collidesAlly;
+            return allyFilter != null && hasAmmo() && peekAmmo().collideAllyFilter != null;
         }
 
         protected Posc findEnemy(float range){

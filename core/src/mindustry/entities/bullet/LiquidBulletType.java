@@ -4,6 +4,7 @@ import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
+import arc.struct.*;
 import arc.util.*;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -28,6 +29,7 @@ public class LiquidBulletType extends BulletType{
             hitColor = liquid.color;
             lightColor = liquid.lightColor;
             lightOpacity = liquid.lightColor.a;
+            collideAllyFilter = u -> liquid.canExtinguish() && u.getStatuses().contains(status -> status.effect.extinguishable);
         }
 
         ammoUsed = 1f;
