@@ -129,11 +129,12 @@ public class GenericCrafter extends Block{
 
         drawPlaceText(
         (displayEfficiency && boostScale > 0f ?
-        Core.bundle.format(attributeScalesProgress ? "bar.efficiency" : "bar.yield", Math.round(Math.max(base + Math.min(maxBoost, boostScale * sum), 0f) * 100f))
-        : "") +
+            //scaled liquid crafters consume the same amount/s. Yield: produces more, consumes the same. Efficiency: produces more, consumes more
+            Core.bundle.format(attributeScalesProgress ? "bar.efficiency" : "bar.yield", Math.round(Math.max(base + Math.min(maxBoost, boostScale * sum), 0f) * 100f))
+            : "") +
         (displayScaledOutput && outputScale > 0f ?
-        "\n" + Core.bundle.format("bar.yield", (int)((1f + Math.min(maxBoost, outputScale * sum)) * 100f))
-        : ""), x, y, valid);
+            "\n" + Core.bundle.format("bar.yield", (int)((1f + Math.min(maxBoost, outputScale * sum)) * 100f))
+            : ""), x, y, valid);
     }
 
     @Override
