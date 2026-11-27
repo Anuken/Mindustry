@@ -61,7 +61,7 @@ public class GenericCrafter extends Block{
     /** Minimum efficiency required to place this block. */
     public float minEfficiency = -1f;
     /** Whether to show this bar in the UI. */
-    public boolean displayEfficiency = true, displaySpeed = true, displayScaledOutput = true;
+    public boolean displayEfficiency = true, displayScaledOutput = true;
     /** Whether liquid consumption scales with efficiency. */
     public boolean scaleLiquidConsumption = false;
     /** Scaled output (yield) multiplier, scales with attribute. <=0 to disable. */
