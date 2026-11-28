@@ -17,6 +17,7 @@ import static mindustry.Vars.*;
 public class LiquidTurret extends Turret{
     public ObjectMap<Liquid, BulletType> ammoTypes = new ObjectMap<>();
     public boolean extinguish = true;
+    public Seq<StatusEffect> extinguishStatusEffects = Seq.with(StatusEffects.burning, StatusEffects.melting);
 
     public LiquidTurret(String name){
         super(name);
@@ -25,6 +26,7 @@ public class LiquidTurret extends Turret{
         shootSound = Sounds.none;
         smokeEffect = Fx.none;
         shootEffect = Fx.none;
+        allyFilter = u -> u.getStatuses().contains(status -> status.effect.extinguishable);
     }
 
     /** Initializes accepted ammo map. Format: [liquid1, bullet1, liquid2, bullet2...] */
@@ -89,6 +91,11 @@ public class LiquidTurret extends Turret{
                 case currentAmmoType -> liquids.current();
                 default -> super.senseObject(sensor);
             };
+        }
+
+        @Override
+        protected boolean canTargetAlly(){
+            return extinguish && super.canTargetAlly() && liquids.current().canExtinguish();
         }
 
         @Override

@@ -2,6 +2,7 @@ package mindustry.entities.bullet;
 
 import arc.*;
 import arc.audio.*;
+import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
@@ -140,6 +141,8 @@ public class BulletType extends Content implements Cloneable{
     public boolean collideFloor = false;
     /** If true, this projectile collides with static walls */
     public boolean collideTerrain = false;
+    /** Filter on the types of allied (same team) units to collide onto. If non-null, allied units will not receive damage. */
+    public @Nullable Boolf<Unit> collideAllyFilter;
     /** Whether velocity is inherited from the shooter. */
     public boolean keepVelocity = true;
     /** If keepVelocity = true, whether to reduce lifetime proportionally to the added speed, making range consistent. */
@@ -172,6 +175,10 @@ public class BulletType extends Content implements Cloneable{
     public float healPercent = 0f;
     /** flat amount of block health healed */
     public float healAmount = 0f;
+    /** % of unit health healed **/
+    public float unitHealPercent = 0f;
+    /** flat amount of unit health healed */
+    public float unitHealAmount = 0f;
     /** sound played when a block is healed */
     public Sound healSound = Sounds.blockHeal;
     /** volume of heal sound */
@@ -451,12 +458,23 @@ public class BulletType extends Content implements Cloneable{
         return -1f;
     }
 
-    public boolean heals(){
+    public boolean healsBlocks(){
         return healPercent > 0 || healAmount > 0;
+    }
+    public boolean healsUnits(){
+        return unitHealPercent > 0 || unitHealAmount > 0;
+    }
+
+    public boolean collidesAllies(){
+        return collideAllyFilter != null || healsUnits();
+    }
+
+    public boolean filterAllies(Bullet b, Unit u){
+        return u != b.shooter && u != b.owner && u.team == b.team && ((collideAllyFilter != null && collideAllyFilter.get(u)) || (healsUnits() && u.damaged()));
     }
 
     public boolean testCollision(Bullet bullet, Building tile){
-        return !heals() || tile.team != bullet.team || tile.healthf() < 1f;
+        return !healsBlocks() || tile.team != bullet.team || tile.healthf() < 1f;
     }
 
     /** If direct is false, this is an indirect hit and the tile was already damaged.
@@ -466,7 +484,7 @@ public class BulletType extends Content implements Cloneable{
             Fires.create(build.tile);
         }
 
-        if(heals() && build.team == b.team && !(build.block instanceof ConstructBlock)){
+        if(healsBlocks() && build.team == b.team && !(build.block instanceof ConstructBlock)){
             healEffect.at(build.x, build.y, 0f, healColor, build.block);
             build.heal(healPercent / 100f * build.maxHealth + healAmount);
             healSound.at(build, 1f + Mathf.range(0.1f), healSoundVolume);
@@ -486,6 +504,7 @@ public class BulletType extends Content implements Cloneable{
 
     public void hitEntity(Bullet b, Hitboxc entity, float health){
         boolean wasDead = entity instanceof Unit u && u.dead;
+        boolean ally = entity instanceof Unit u && filterAllies(b, u);
 
         if(entity instanceof Healthc h){
             float damage = b.damage;
@@ -498,31 +517,37 @@ public class BulletType extends Content implements Cloneable{
             }else{
                 health += shield;
             }
-            if(lifesteal > 0f && b.owner instanceof Healthc o){
-                float result = Math.max(Math.min(h.health(), damage), 0);
-                o.heal(result * lifesteal);
-            }
-            if(pierceArmor){
-                h.damagePierce(damage);
-            }else if(armorMultiplier != 1){
-                h.damageArmorMult(damage, armorMultiplier);
-            }else{
-                h.damage(damage);
+
+            if(!ally){
+                if(lifesteal > 0f && b.owner instanceof Healthc o){
+                    float result = Math.max(Math.min(h.health(), damage), 0);
+                    o.heal(result * lifesteal);
+                }
+                if(pierceArmor){
+                    h.damagePierce(damage);
+                }else if(armorMultiplier != 1){
+                    h.damageArmorMult(damage, armorMultiplier);
+                }else{
+                    h.damage(damage);
+                }
             }
         }
 
         if(entity instanceof Unit unit){
-            if(unit.type.knockbackMultiplier > 0f){
-                Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f * unit.type.knockbackMultiplier);
-                if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
-                unit.impulse(Tmp.v3);
-            }
+            if(!ally){
+                if(unit.type.knockbackMultiplier > 0f){
+                    Tmp.v3.set(unit).sub(b).nor().scl(knockback * 80f * unit.type.knockbackMultiplier);
+                    if(impact) Tmp.v3.setAngle(b.rotation() + (knockback < 0 ? 180f : 0f));
+                    unit.impulse(Tmp.v3);
 
+                    Events.fire(bulletDamageEvent.set(unit, b));
+                }
+            }else{
+                if(healsUnits()) unit.heal(unitHealPercent / 100f * unit.maxHealth() + unitHealAmount);
+            }
             if(Mathf.chance(statusChance)){
                 unit.apply(status, statusDuration);
             }
-
-            Events.fire(bulletDamageEvent.set(unit, b));
         }
 
         if(!wasDead && entity instanceof Unit unit && unit.dead){
@@ -610,7 +635,7 @@ public class BulletType extends Content implements Cloneable{
                 Damage.status(b.team, x, y, splashDamageRadius, status, statusDuration, collidesAir, collidesGround, statusChance);
             }
 
-            if(heals()){
+            if(healsBlocks()){
                 state.indexer.eachBlock(b.team, x, y, splashDamageRadius, Building::damaged, other -> {
                     healEffect.at(other.x, other.y, 0f, healColor, other.block);
                     other.heal(healPercent / 100f * other.maxHealth() + healAmount);
@@ -753,10 +778,10 @@ public class BulletType extends Content implements Cloneable{
             //home in on what the unit is aiming at
             if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
                 target = b.aimTile.build;
-            }else if(heals()){
+            }else if(healsBlocks() || collidesAllies()){
                 //home in on allies if possible
                 target = Units.closestTarget(null, realAimX, realAimY, homingRange, b.team,
-                    e -> e.checkTarget(collidesAir, collidesGround) && e.team != b.team && !b.hasCollided(e.id),
+                    e -> e.checkTarget(collidesAir, collidesGround) && (e.team != b.team || filterAllies(b, e)) && !b.hasCollided(e.id),
                     t -> collidesGround && (t.team != b.team || t.damaged()) && !b.hasCollided(t.id));
             }else{
                 target = Units.closestTarget(b.team, realAimX, realAimY, homingRange,
