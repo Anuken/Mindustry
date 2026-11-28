@@ -192,6 +192,8 @@ public class LogicCanvas extends Table{
                 pane.setScrollY(pane.getScrollY() + sign * Scl.scl(15f) * Time.delta);
             }
         }
+
+        if(statements != null) statements.refreshVisibility();
     }
 
     public class DragLayout extends WidgetGroup{
@@ -215,10 +217,26 @@ public class LogicCanvas extends Table{
             float cy = 0;
             seq.clear();
 
+            float targetW = Scl.scl(targetWidth);
+            if(!Mathf.equal(width, targetW, 1f)){
+                width = prefWidth = targetW;
+                invalidateHierarchy();
+            }
+
+            for(int i = 0; i < getChildren().size; i++){ //resolve heights
+                Element e = getChildren().get(i);
+
+                if(dragging == e) continue;
+
+                e.setSize(width, e.getPrefHeight());
+                if(e.needsLayout()){
+                    e.validate();
+                }
+            }
+
             float totalHeight = getChildren().sumf(e -> e.getPrefHeight() + space);
-            if(!Mathf.equal(height, totalHeight, 1f) || !Mathf.equal(width, Scl.scl(targetWidth), 1f)){
+            if(!Mathf.equal(height, totalHeight, 1f)){
                 height = prefHeight = totalHeight;
-                width = prefWidth = Scl.scl(targetWidth);
                 invalidateHierarchy();
             }
 
@@ -268,6 +286,33 @@ public class LogicCanvas extends Table{
 
             if(parent != null && parent instanceof Table){
                 setCullingArea(parent.getCullingArea());
+            }
+
+            refreshVisibility();
+        }
+
+        /** Hides elements outside the visible area. Jump curves are not affected. */
+        public void refreshVisibility(){
+            if(pane == null || height <= 0f || pane.getScrollHeight() <= 0f){
+                SnapshotSeq<Element> children = getChildren();
+                for(int i = 0; i < children.size; i++){
+                    children.get(i).visible = true;
+                }
+                return;
+            }
+
+            float margin = Math.max(Scl.scl(200f), pane.getScrollHeight() * 0.5f);
+
+            //never hide the element being edited or dragged
+            Element focus = getScene() == null ? null : getScene().getKeyboardFocus();
+            while(focus != null && !(focus instanceof StatementElem)){
+                focus = focus.parent;
+            }
+
+            SnapshotSeq<Element> children = getChildren();
+            for(int i = 0; i < children.size; i++){
+                Element e = children.get(i);
+                e.visible = e == dragging || e == focus || (e.y + e.getHeight() >= height - pane.getVisualScrollY() - pane.getScrollHeight() - margin && e.y <= height - pane.getVisualScrollY() + margin);
             }
         }
 
@@ -551,6 +596,7 @@ public class LogicCanvas extends Table{
     public static class JumpButton extends ImageButton{
         Color hoverColor = Pal.place;
         Prov<StatementElem> to;
+        Cons<StatementElem> setter;
         boolean selecting;
         float mx, my;
         ClickListener listener;
@@ -564,6 +610,7 @@ public class LogicCanvas extends Table{
             }});
 
             this.elem = elem;
+            this.setter = setter;
             to = getter;
             addListener(listener = new ClickListener());
 
@@ -600,15 +647,19 @@ public class LogicCanvas extends Table{
             });
 
             update(() -> {
-                if(to.get() != null && to.get().parent == null){
-                    setter.get(null);
-                }
+                validateTarget();
 
                 setColor(listener.isOver() ? hoverColor : Color.white);
                 getStyle().imageUpColor = this.color;
             });
 
             curve = new JumpCurve(this);
+        }
+
+        public void validateTarget(){
+            if(to.get() != null && to.get().parent == null){
+                setter.get(null);
+            }
         }
 
         @Override
@@ -652,6 +703,8 @@ public class LogicCanvas extends Table{
         @Override
         public void act(float delta){
             super.act(delta);
+
+            button.validateTarget(); //just in case
 
             //MDTX(WayZer, 2024/8/6) Support Cull
             invertedHeight = false;
